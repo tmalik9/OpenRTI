@@ -178,7 +178,8 @@ HLAfixedArray::encode(VariableLengthData& inData) const
   std::vector<Octet> buffer;
   buffer.reserve(getEncodedLength());
   encodeInto(buffer);
-  inData.setData(&buffer.front(), buffer.size());
+  if (!buffer.empty())
+    inData.setData(&buffer.front(), buffer.size());
 }
 
 void
@@ -192,7 +193,8 @@ void HLAfixedArray::decode(VariableLengthData const & inData)
   throw (EncoderException)
 {
   std::vector<Octet> buffer(inData.size());
-  std::memcpy(&buffer.front(), inData.data(), inData.size());
+  if (!buffer.empty())
+    std::memcpy(&buffer.front(), inData.data(), inData.size());
   decodeFrom(buffer, 0);
 }
 
@@ -219,6 +221,8 @@ HLAfixedArray::getOctetBoundary() const
 bool
 HLAfixedArray::isSameTypeAs(DataElement const& inData ) const
 {
+  if (!DataElement::isSameTypeAs(inData))
+    return false;
   const HLAfixedArray* fixedArray = dynamic_cast<const HLAfixedArray*>(&inData);
   if (!fixedArray)
     return false;

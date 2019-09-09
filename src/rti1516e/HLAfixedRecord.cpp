@@ -214,7 +214,8 @@ HLAfixedRecord::encode(VariableLengthData& inData) const
   std::vector<Octet> buffer;
   buffer.reserve(getEncodedLength());
   encodeInto(buffer);
-  inData.setData(&buffer.front(), buffer.size());
+  if (!buffer.empty())
+    inData.setData(&buffer.front(), buffer.size());
 }
 
 void
@@ -229,7 +230,8 @@ HLAfixedRecord::decode(VariableLengthData const& inData)
   throw (EncoderException)
 {
   std::vector<Octet> buffer(inData.size());
-  std::memcpy(&buffer.front(), inData.data(), inData.size());
+  if (!buffer.empty())
+    std::memcpy(&buffer.front(), inData.data(), inData.size());
   decodeFrom(buffer, 0);
 }
 
@@ -256,6 +258,8 @@ HLAfixedRecord::getOctetBoundary() const
 bool
 HLAfixedRecord::isSameTypeAs(DataElement const& inData ) const
 {
+  if (!DataElement::isSameTypeAs(inData))
+    return false;
   const HLAfixedRecord* fixedRecord = dynamic_cast<const HLAfixedRecord*>(&inData);
   if (!fixedRecord)
     return false;

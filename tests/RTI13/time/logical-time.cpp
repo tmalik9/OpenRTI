@@ -22,9 +22,7 @@
 #include <memory>
 #include <string>
 
-#include <RTI/LogicalTime.h>
-#include <RTI/LogicalTimeFactory.h>
-#include <RTI/LogicalTimeInterval.h>
+#include <RTI.hh>
 
 #include <Options.h>
 #include <StringUtils.h>
@@ -51,6 +49,15 @@
 //
 // T > T' then T' < T              (7)
 
+
+static std::string
+toString(RTI::FedTime& fedTime)
+{
+  char buffer[1024]; // Yuck!!!
+  fedTime.getPrintableString(buffer);
+  return std::string(buffer);
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -65,25 +72,22 @@ main(int argc, char* argv[])
     }
   }
 
-  std::auto_ptr<rti1516::LogicalTimeFactory> factory;
-  factory = rti1516::LogicalTimeFactoryFactory::makeLogicalTimeFactory(OpenRTI::localeToUcs(implementationName));
+  std::auto_ptr<RTI::FedTimeFactory> factory(new RTI::FedTimeFactory);
   if (!factory.get()) {
     std::cerr << "Can not create logical time factory: \"" << implementationName << "\"!" << std::endl;
     return EXIT_FAILURE;
   }
 
-  std::auto_ptr<rti1516::LogicalTimeInterval> logicalTimeInterval = factory->makeLogicalTimeInterval();
+  std::auto_ptr<RTI::FedTime> logicalTimeInterval(factory->makeZero());
   if (!logicalTimeInterval.get()) {
     std::cerr << "Can not create logical time interval: \"" << implementationName << "\"!" << std::endl;
     return EXIT_FAILURE;
   }
-
-  logicalTimeInterval->setZero();
   if (!logicalTimeInterval->isZero()) {
     std::cerr << "Logical time interval is not zero after setting it to zero!" << std::endl;
     return EXIT_FAILURE;
   }
-  if (logicalTimeInterval->isEpsilon()) {
+  if (logicalTimeInterval->isPositiveInfinity()) {
     std::cerr << "Logical time interval is epsilon after setting it to zero!" << std::endl;
     return EXIT_FAILURE;
   }
@@ -93,53 +97,50 @@ main(int argc, char* argv[])
     std::cerr << "Logical time interval is zero after setting it to epsilon!" << std::endl;
     return EXIT_FAILURE;
   }
-  if (!logicalTimeInterval->isEpsilon()) {
+  if (logicalTimeInterval->isPositiveInfinity()) {
     std::cerr << "Logical time interval is not epsilon after setting it to epsilon!" << std::endl;
     return EXIT_FAILURE;
   }
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime = factory->makeLogicalTime();
+  std::auto_ptr<RTI::FedTime> logicalTime(factory->makeZero());
   if (!logicalTime.get()) {
     std::cerr << "Can not create logical time: \"" << implementationName << "\"" << std::endl;
     return EXIT_FAILURE;
   }
-
-  logicalTime->setInitial();
-  if (!logicalTime->isInitial()) {
+  if (!logicalTime->isZero()) {
     std::cerr << "Logical time is not initial after setting it to initial!" << std::endl;
     return EXIT_FAILURE;
   }
-  if (logicalTime->isFinal()) {
+  if (logicalTime->isPositiveInfinity()) {
     std::cerr << "Logical time is final after setting it to initial!" << std::endl;
     return EXIT_FAILURE;
   }
 
-  logicalTime->setFinal();
-  if (logicalTime->isInitial()) {
+  logicalTime->setPositiveInfinity();
+  if (logicalTime->isZero()) {
     std::cerr << "Logical time is initial after setting it to final!" << std::endl;
     return EXIT_FAILURE;
   }
-  if (!logicalTime->isFinal()) {
+  if (!logicalTime->isPositiveInfinity()) {
     std::cerr << "Logical time is not final after setting it to final!" << std::endl;
     return EXIT_FAILURE;
   }
 
-  std::auto_ptr<rti1516::LogicalTime> initialTime = factory->makeLogicalTime();
+  std::auto_ptr<RTI::FedTime> initialTime(factory->makeZero());
   if (!initialTime.get()) {
     std::cerr << "Can not create logical time: \"" << implementationName << "\"!" << std::endl;
     return EXIT_FAILURE;
   }
-  initialTime->setInitial();
 
-  std::auto_ptr<rti1516::LogicalTime> finalTime = factory->makeLogicalTime();
+  std::auto_ptr<RTI::FedTime> finalTime(factory->makeZero());
+  finalTime->setPositiveInfinity();
   if (!finalTime.get()) {
     std::cerr << "Can not create logical time: \"" << implementationName << "\"!" << std::endl;
     return EXIT_FAILURE;
   }
-  finalTime->setFinal();
 
 
-  logicalTime->setInitial();
+  logicalTime->setZero();
   if (!(*initialTime == *logicalTime)) {
     std::cerr << "Initial times are not equal!" << std::endl;
     return EXIT_FAILURE;
@@ -149,7 +150,7 @@ main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  logicalTime->setFinal();
+  logicalTime->setPositiveInfinity();
   if (*initialTime == *logicalTime) {
     std::cerr << "Final time and initial time are equal!" << std::endl;
     return EXIT_FAILURE;
@@ -159,12 +160,12 @@ main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime2 = factory->makeLogicalTime();
+  std::auto_ptr<RTI::FedTime> logicalTime2(factory->makeZero());
   if (!logicalTime2.get()) {
     std::cerr << "Can not create logical time: \"" << implementationName << "\"!" << std::endl;
     return EXIT_FAILURE;
   }
-  std::auto_ptr<rti1516::LogicalTimeInterval> logicalTimeInterval2 = factory->makeLogicalTimeInterval();
+  std::auto_ptr<RTI::FedTime> logicalTimeInterval2(factory->makeZero());
   if (!logicalTimeInterval2.get()) {
     std::cerr << "Can not create logical time interval: \"" << implementationName << "\"!" << std::endl;
     return EXIT_FAILURE;
@@ -173,7 +174,7 @@ main(int argc, char* argv[])
   // For any order of magnitude in start time ...
   logicalTimeInterval->setEpsilon();
   for (;;) {
-    logicalTime->setInitial();
+    logicalTime->setZero();
     *logicalTime += *logicalTimeInterval;
     *logicalTimeInterval += *logicalTimeInterval;
     if (*finalTime <= *logicalTime)
@@ -188,26 +189,26 @@ main(int argc, char* argv[])
       if (*finalTime <= *logicalTime)
         break;
       if (*logicalTime2 == *logicalTime) {
-        std::cerr << "Previous time " << OpenRTI::ucsToLocale(logicalTime2->toString())
-                  << " and initial time plus epsilon " << OpenRTI::ucsToLocale(logicalTime->toString())
+        std::cerr << "Previous time " << toString(*logicalTime2)
+                  << " and initial time plus epsilon " << toString(*logicalTime)
                   << " are equal!" << std::endl;
         return EXIT_FAILURE;
       }
       if (!(*logicalTime2 < *logicalTime)) {
-        std::cerr << "Initial time plus epsilon " << OpenRTI::ucsToLocale(logicalTime->toString())
-                  << " is not greater than previous time " << OpenRTI::ucsToLocale(logicalTime2->toString())
+        std::cerr << "Initial time plus epsilon " << toString(*logicalTime)
+                  << " is not greater than previous time " << toString(*logicalTime2)
                   << "!" << std::endl;
         return EXIT_FAILURE;
       }
       if (*initialTime == *logicalTime) {
-        std::cerr << "Initial time " << OpenRTI::ucsToLocale(initialTime->toString())
-                  << " and initial time plus epsilon " << OpenRTI::ucsToLocale(logicalTime->toString())
+        std::cerr << "Initial time " << toString(*initialTime)
+                  << " and initial time plus epsilon " << toString(*logicalTime)
                   << " are equal!" << std::endl;
         return EXIT_FAILURE;
       }
       if (!(*initialTime < *logicalTime)) {
-        std::cerr << "Initial time plus epsilon " << OpenRTI::ucsToLocale(logicalTime->toString())
-                  << " is not greater than initial time " << OpenRTI::ucsToLocale(initialTime->toString())
+        std::cerr << "Initial time plus epsilon " << toString(*logicalTime)
+                  << " is not greater than initial time " << toString(*initialTime)
                   << "!" << std::endl;
         return EXIT_FAILURE;
       }

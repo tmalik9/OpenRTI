@@ -36,11 +36,11 @@ namespace rti1516e
 class OPENRTI_LOCAL HLAvariableArrayImplementation {
 public:
   HLAvariableArrayImplementation(const DataElement& protoType) :
-    _protoType(protoType.clone())
+    _protoType(protoType.clone().release())
   {
   }
   HLAvariableArrayImplementation(const HLAvariableArrayImplementation& rhs) :
-    _protoType(rhs._protoType->clone())
+    _protoType(rhs._protoType->clone().release())
   {
     _dataElementVector.resize(rhs._dataElementVector.size(), 0);
     for (size_t i = 0; i < rhs._dataElementVector.size(); ++i) {
@@ -55,6 +55,8 @@ public:
       delete *i;
       *i = 0;
     }
+    delete _protoType;
+    _protoType = 0;
   }
 
   void encodeInto(std::vector<Octet>& buffer) const
@@ -81,6 +83,8 @@ public:
   {
     unsigned int octetBoundary = getOctetBoundary();
     index = align(index, octetBoundary);
+    if (buffer.size() < index + 4)
+      throw EncoderException(L"Insufficient buffer size for decoding!");
     size_t length = size_t(buffer[index]) << 24;
     length |= size_t(buffer[index + 1]) << 16;
     length |= size_t(buffer[index + 2]) << 8;
@@ -173,7 +177,7 @@ public:
     return _protoType->isSameTypeAs(*rhs._protoType);
   }
 
-  std::auto_ptr<DataElement> _protoType;
+  DataElement* _protoType;
 
   typedef std::vector<DataElement*> DataElementVector;
   DataElementVector _dataElementVector;
@@ -217,7 +221,8 @@ HLAvariableArray::encode(VariableLengthData& inData) const
   std::vector<Octet> buffer;
   buffer.reserve(getEncodedLength());
   encodeInto(buffer);
-  inData.setData(&buffer.front(), buffer.size());
+  if (!buffer.empty())
+    inData.setData(&buffer.front(), buffer.size());
 }
 
 void
@@ -231,7 +236,8 @@ void HLAvariableArray::decode(VariableLengthData const & inData)
   throw (EncoderException)
 {
   std::vector<Octet> buffer(inData.size());
-  std::memcpy(&buffer.front(), inData.data(), inData.size());
+  if (!buffer.empty())
+    std::memcpy(&buffer.front(), inData.data(), inData.size());
   decodeFrom(buffer, 0);
 }
 
@@ -264,6 +270,8 @@ HLAvariableArray::size() const
 bool
 HLAvariableArray::isSameTypeAs(DataElement const& inData ) const
 {
+  if (!DataElement::isSameTypeAs(inData))
+    return false;
   const HLAvariableArray* variableArray = dynamic_cast<const HLAvariableArray*>(&inData);
   if (!variableArray)
     return false;

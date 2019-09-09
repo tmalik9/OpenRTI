@@ -42,10 +42,10 @@ static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, std::istream
 {
   try {
     stream >> std::skipws;
-    if (stream.peek() == '(')
-      fomModuleList.push_back(OpenRTI::FEDFileReader::read(stream));
-    else
+    if (stream.peek() == '<')
       fomModuleList.push_back(OpenRTI::FDD1516FileReader::read(stream, std::string()));
+    else
+      fomModuleList.push_back(OpenRTI::FEDFileReader::read(stream));
   } catch (const OpenRTI::Exception& e) {
     throw RTI::ErrorReadingFED(e.what());
   } catch (...) {
@@ -1866,6 +1866,8 @@ RTI::RTIambassador::registerObjectInstance(RTI::ObjectClassHandle objectClassHan
     throw RTI::ObjectClassNotDefined(OpenRTI::utf8ToLocale(e.what()).c_str());
   } catch (const OpenRTI::ObjectClassNotPublished& e) {
     throw RTI::ObjectClassNotPublished(OpenRTI::utf8ToLocale(e.what()).c_str());
+  } catch (const OpenRTI::ObjectInstanceNameNotReserved& e) {
+    throw RTI::ObjectAlreadyRegistered(OpenRTI::utf8ToLocale(e.what()).c_str());
   } catch (const OpenRTI::ObjectInstanceNameInUse& e) {
     throw RTI::ObjectAlreadyRegistered(OpenRTI::utf8ToLocale(e.what()).c_str());
   } catch (const OpenRTI::FederateNotExecutionMember& e) {
