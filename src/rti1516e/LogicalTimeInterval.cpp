@@ -26,7 +26,6 @@ namespace rti1516e
 {
 
 LogicalTimeInterval::~LogicalTimeInterval()
-  throw ()
 {
 }
 

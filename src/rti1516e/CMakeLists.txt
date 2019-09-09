@@ -64,12 +64,6 @@ set(LIB_RTI1516E_SOURCES
         HLAopaqueData.cpp
         HLAvariableArray.cpp
         HLAvariantRecord.cpp
-        HLAfloat64Interval.cpp
-        HLAfloat64Time.cpp
-        HLAfloat64TimeFactory.cpp
-        HLAinteger64Interval.cpp
-        HLAinteger64Time.cpp
-        HLAinteger64TimeFactory.cpp
         HLAlogicalTimeFactoryFactory.cpp
         LogicalTime.cpp
         LogicalTimeFactory.cpp
@@ -86,6 +80,12 @@ set(LIB_RTI1516E_SOURCES
 )
 
 set(LIB_FEDTIME1516E_SOURCES
+        HLAfloat64Interval.cpp
+        HLAfloat64Time.cpp
+        HLAfloat64TimeFactory.cpp
+        HLAinteger64Interval.cpp
+        HLAinteger64Time.cpp
+        HLAinteger64TimeFactory.cpp
         LogicalTimeFactoryFactory.cpp
 )
 

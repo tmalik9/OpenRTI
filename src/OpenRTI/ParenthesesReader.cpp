@@ -129,14 +129,14 @@ ParenthesesReader::parse(std::istream& stream, ContentHandler& contentHandler, E
         // Then skip the rest of the line
         while ((c = stream.get()) != -1) {
           if (c == '\n' || c == '\r') {
-            stream.putback(c);
+            stream.putback((char)c);
             break;
           }
         }
         break;
       } else {
         // undo the second character get
-        stream.putback(c);
+        stream.putback((char)c);
         // and restore the first character in c
         c = ';';
         // fallthrough, treat the ';' as the beginning of a token.
@@ -152,7 +152,7 @@ ParenthesesReader::parse(std::istream& stream, ContentHandler& contentHandler, E
         tokenList.push_back(std::string());
         newToken = false;
       }
-      tokenList.back().push_back(c);
+      tokenList.back().push_back((char)c);
       break;
     }
   }

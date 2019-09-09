@@ -105,7 +105,6 @@ namespace rti1516
                                                                         \
   unsigned long                                                         \
   HandleKind::encode(void* buffer, unsigned long bufferSize) const      \
-    throw (CouldNotEncode)                                              \
   {                                                                     \
     OpenRTI::HandleKind handle;                                         \
     handle = HandleKind##Implementation::getHandle(_impl);              \

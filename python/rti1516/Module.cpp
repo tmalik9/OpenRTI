@@ -28,11 +28,15 @@
 #include "RTI/HLAinteger64Time.h"
 #include "RTI/HLAinteger64Interval.h"
 
+#ifndef PYMODULENAME
+#define PYMODULENAME "pyrti1516"
+#endif
+
 class PySharedPtr {
 public:
   PySharedPtr(void) : _ptr(0)
   {}
-  PySharedPtr(const PySharedPtr& p) : _ptr(0)
+  PySharedPtr(const PySharedPtr& /*p*/) : _ptr(0)
   { assign(_ptr); }
   ~PySharedPtr(void)
   { put(); }
@@ -146,13 +150,13 @@ static bool
 PyObject_GetVariableLengthData(rti1516::VariableLengthData& variableLengthData, PyObject* o)
 {
   if (PyByteArray_Check(o)) {
-    variableLengthData.setData(PyByteArray_AsString(o), PyByteArray_Size(o));
+    variableLengthData.setData(PyByteArray_AsString(o), (unsigned long)PyByteArray_Size(o));
     return true;
   } else {
     PyObject *bytearray = PyByteArray_FromObject(o);
     if (!bytearray)
       return false;
-    variableLengthData.setData(PyByteArray_AsString(bytearray), PyByteArray_Size(bytearray));
+    variableLengthData.setData(PyByteArray_AsString(bytearray), (unsigned long)PyByteArray_Size(bytearray));
     Py_DecRef(bytearray);
     return true;
   }
@@ -315,7 +319,7 @@ PyObject_NewLogicalTime(const rti1516::LogicalTime& logicalTime)
 }
 
 static bool
-PyObject_GetLogicalTime(std::auto_ptr<rti1516::LogicalTime>& logicalTime, const std::wstring& implementationName)
+PyObject_GetLogicalTime(std::unique_ptr<rti1516::LogicalTime>& logicalTime, const std::wstring& implementationName)
 {
   if (implementationName == L"HLAfloat64Time") {
     logicalTime.reset(new HLAfloat64Time(0));
@@ -330,7 +334,7 @@ PyObject_GetLogicalTime(std::auto_ptr<rti1516::LogicalTime>& logicalTime, const 
 }
 
 static bool
-PyObject_GetLogicalTime(std::auto_ptr<rti1516::LogicalTime>& logicalTime, PyObject* o, const std::wstring& implementationName)
+PyObject_GetLogicalTime(std::unique_ptr<rti1516::LogicalTime>& logicalTime, PyObject* o, const std::wstring& implementationName)
 {
   if (implementationName == L"HLAfloat64Time") {
     double value;
@@ -364,7 +368,7 @@ PyObject_NewLogicalTimeInterval(const rti1516::LogicalTimeInterval& logicalTimeI
 }
 
 static bool
-PyObject_GetLogicalTimeInterval(std::auto_ptr<rti1516::LogicalTimeInterval>& logicalTimeInterval, PyObject* o, const std::wstring& implementationName)
+PyObject_GetLogicalTimeInterval(std::unique_ptr<rti1516::LogicalTimeInterval>& logicalTimeInterval, PyObject* o, const std::wstring& implementationName)
 {
   if (implementationName == L"HLAfloat64Time") {
     double value;
@@ -385,7 +389,7 @@ PyObject_GetLogicalTimeInterval(std::auto_ptr<rti1516::LogicalTimeInterval>& log
 }
 
 static bool
-PyObject_GetLogicalTimeInterval(std::auto_ptr<rti1516::LogicalTimeInterval>& logicalTimeInterval, const std::wstring& implementationName)
+PyObject_GetLogicalTimeInterval(std::unique_ptr<rti1516::LogicalTimeInterval>& logicalTimeInterval, const std::wstring& implementationName)
 {
   if (implementationName == L"HLAfloat64Time") {
     logicalTimeInterval.reset(new HLAfloat64Interval(0));
@@ -443,16 +447,16 @@ PyObject_GetRangeBounds(rti1516::RangeBounds& rangeBounds, PyObject* o)
     return false;
 
   PyObject* first = PySequence_GetItem(o, 0);
-  PY_LONG_LONG value;
-  if (!PyObject_GetLong(value, first)) {
+  long value;
+  if (!PyObject_GetInt(value, first)) {
     Py_DecRef(first);
     return false;
   }
   Py_DecRef(first);
-  rangeBounds.setLowerBound(value);
+  rangeBounds.setLowerBound((unsigned long)value);
 
   first = PySequence_GetItem(o, 1);
-  if (!PyObject_GetLong(value, first)) {
+  if (!PyObject_GetInt(value, first)) {
     Py_DecRef(first);
     return false;
   }
@@ -602,7 +606,7 @@ PyObject_GetRangeBounds(rti1516::RangeBounds& rangeBounds, PyObject* o)
   };                                                                    \
                                                                         \
   static PyObject*                                                      \
-  HandleKind ## _new(PyTypeObject *type, PyObject *args, PyObject *)    \
+  HandleKind ## _new(PyTypeObject */*type*/, PyObject */*args*/, PyObject *)    \
   {                                                                     \
     Py ## HandleKind *self;                                             \
     self = PyObject_New(Py ## HandleKind, &Py ## HandleKind ## Type);   \
@@ -633,6 +637,10 @@ PyObject_GetRangeBounds(rti1516::RangeBounds& rangeBounds, PyObject* o)
     handle = ((Py ## HandleKind*)o)->ob_value;                          \
     return true;                                                        \
   }                                                                     \
+
+
+#define IMPLEMENT_HANDLE_CLASS_WITH_SET(HandleKind)                     \
+ IMPLEMENT_HANDLE_CLASS(HandleKind)                                     \
                                                                         \
   static PyObject*                                                      \
   PyObject_New ## HandleKind ## Set(const std::set<rti1516::HandleKind>& handleSet) \
@@ -674,14 +682,37 @@ PyObject_GetRangeBounds(rti1516::RangeBounds& rangeBounds, PyObject* o)
     return true;                                                        \
   }
 
-IMPLEMENT_HANDLE_CLASS(FederateHandle)
+#define IMPLEMENT_HANDLE_CLASS_WITH_SET_NO_CONSTRUCT(HandleKind)        \
+ IMPLEMENT_HANDLE_CLASS(HandleKind)                                     \
+                                                                        \
+  static bool                                                           \
+  PyObject_Get ## HandleKind ## Set(std::set<rti1516::HandleKind>& handleSet, PyObject* o) \
+  {                                                                     \
+    PyObject* iterator = PyObject_GetIter(o);                           \
+    if (!iterator)                                                      \
+      return false;                                                     \
+    while (PyObject* item = PyIter_Next(iterator)) {                    \
+      rti1516:: HandleKind handle;                                      \
+      if (!PyObject_Get ## HandleKind(handle, item)) {                  \
+        Py_DecRef(item);                                                \
+        Py_DecRef(iterator);                                            \
+        return false;                                                   \
+      }                                                                 \
+      handleSet.insert(handle);                                         \
+      Py_DecRef(item);                                                  \
+    }                                                                   \
+    Py_DecRef(iterator);                                                \
+    return true;                                                        \
+  }
+
+IMPLEMENT_HANDLE_CLASS_WITH_SET_NO_CONSTRUCT(FederateHandle)
 IMPLEMENT_HANDLE_CLASS(ObjectClassHandle)
 IMPLEMENT_HANDLE_CLASS(InteractionClassHandle)
 IMPLEMENT_HANDLE_CLASS(ObjectInstanceHandle)
-IMPLEMENT_HANDLE_CLASS(AttributeHandle)
+IMPLEMENT_HANDLE_CLASS_WITH_SET(AttributeHandle)
 IMPLEMENT_HANDLE_CLASS(ParameterHandle)
-IMPLEMENT_HANDLE_CLASS(DimensionHandle)
-IMPLEMENT_HANDLE_CLASS(RegionHandle)
+IMPLEMENT_HANDLE_CLASS_WITH_SET(DimensionHandle)
+IMPLEMENT_HANDLE_CLASS_WITH_SET(RegionHandle)
 IMPLEMENT_HANDLE_CLASS(MessageRetractionHandle)
 
 #undef IMPLEMENT_HANDLE_CLASS
@@ -1111,8 +1142,7 @@ static std::wstring PyErr_GetExceptionString()
 ///////////////////////////////////////////////////////////////////////////////
 
 struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
-  PyRTI1516FederateAmbassador(PyObject* federateAmbassador = 0)
-    throw (rti1516::FederateInternalError) :
+  PyRTI1516FederateAmbassador(PyObject* federateAmbassador = 0) :
     ob_federateAmbassador(federateAmbassador)
   {
     if (ob_federateAmbassador)
@@ -1120,7 +1150,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual ~PyRTI1516FederateAmbassador()
-    throw ()
   {
     if (ob_federateAmbassador)
       Py_DecRef(ob_federateAmbassador);
@@ -1147,7 +1176,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   };
 
   virtual void synchronizationPointRegistrationSucceeded(std::wstring const & label)
-      throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1168,7 +1196,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
   virtual void synchronizationPointRegistrationFailed(std::wstring const & label,
                                                       rti1516::SynchronizationFailureReason reason)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1190,7 +1217,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
   virtual void announceSynchronizationPoint(std::wstring const & label,
                                             rti1516::VariableLengthData const & theUserSuppliedTag)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1211,7 +1237,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void federationSynchronized(std::wstring const & label)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1231,8 +1256,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void initiateFederateSave(std::wstring const & label)
-    throw (rti1516::UnableToPerformSave,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1253,9 +1276,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void initiateFederateSave(std::wstring const & label, rti1516::LogicalTime const & theTime)
-    throw (rti1516::UnableToPerformSave,
-           rti1516::InvalidLogicalTime,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1278,7 +1298,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void federationSaved()
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1297,7 +1316,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void federationNotSaved(rti1516::SaveFailureReason theSaveFailureReason)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1317,7 +1335,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void federationSaveStatusResponse(rti1516::FederateHandleSaveStatusPairVector const & theFederateStatusVector)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1337,7 +1354,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void requestFederationRestoreSucceeded(std::wstring const & label)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1357,7 +1373,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void requestFederationRestoreFailed(std::wstring const & label)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1377,7 +1392,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void federationRestoreBegun()
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1396,9 +1410,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void initiateFederateRestore(std::wstring const & label, rti1516::FederateHandle handle)
-    throw (rti1516::SpecifiedSaveLabelDoesNotExist,
-           rti1516::CouldNotInitiateRestore,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1421,7 +1432,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void federationRestored()
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1440,7 +1450,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void federationNotRestored(rti1516::RestoreFailureReason theRestoreFailureReason)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1460,7 +1469,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void federationRestoreStatusResponse(rti1516::FederateHandleRestoreStatusPairVector const & theFederateStatusVector)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1480,8 +1488,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void startRegistrationForObjectClass(rti1516::ObjectClassHandle theClass)
-      throw (rti1516::ObjectClassNotPublished,
-             rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1502,8 +1508,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void stopRegistrationForObjectClass(rti1516::ObjectClassHandle theClass)
-    throw (rti1516::ObjectClassNotPublished,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1524,8 +1528,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void turnInteractionsOn(rti1516::InteractionClassHandle theHandle)
-    throw (rti1516::InteractionClassNotPublished,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1546,8 +1548,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void turnInteractionsOff(rti1516::InteractionClassHandle theHandle)
-    throw (rti1516::InteractionClassNotPublished,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1568,8 +1568,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void objectInstanceNameReservationSucceeded(std::wstring const & theObjectInstanceName)
-    throw (rti1516::UnknownName,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1590,8 +1588,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void objectInstanceNameReservationFailed(std::wstring const & theObjectInstanceName)
-    throw (rti1516::UnknownName,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1613,9 +1609,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
   virtual void discoverObjectInstance(rti1516::ObjectInstanceHandle theObject, rti1516::ObjectClassHandle theObjectClass,
                                       std::wstring const & theObjectInstanceName)
-    throw (rti1516::CouldNotDiscover,
-           rti1516::ObjectClassNotKnown,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1641,10 +1634,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   virtual void reflectAttributeValues(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleValueMap const & theAttributeValues,
                                       rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                                       rti1516::TransportationType theType)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1682,10 +1671,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   virtual void reflectAttributeValues(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleValueMap const & theAttributeValues,
                                       rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                                       rti1516::TransportationType theType, rti1516::RegionHandleSet const & theSentRegionHandleSet)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1722,10 +1707,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   virtual void reflectAttributeValues(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleValueMap const & theAttributeValues,
                                       rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                                       rti1516::TransportationType theType, rti1516::LogicalTime const & theTime, rti1516::OrderType receivedOrder)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1763,10 +1744,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
                                       rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                                       rti1516::TransportationType theType, rti1516::LogicalTime const & theTime,
                                       rti1516::OrderType receivedOrder, rti1516::RegionHandleSet const & theSentRegionHandleSet)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1803,11 +1780,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
                                       rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                                       rti1516::TransportationType theType, rti1516::LogicalTime const & theTime,
                                       rti1516::OrderType receivedOrder, rti1516::MessageRetractionHandle theHandle)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::InvalidLogicalTime,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1845,11 +1817,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
                                       rti1516::TransportationType theType, rti1516::LogicalTime const & theTime,
                                       rti1516::OrderType receivedOrder, rti1516::MessageRetractionHandle theHandle,
                                       rti1516::RegionHandleSet const & theSentRegionHandleSet)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::InvalidLogicalTime,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1884,10 +1851,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   virtual void receiveInteraction(rti1516::InteractionClassHandle theInteraction, rti1516::ParameterHandleValueMap const & theParameterValues,
                                   rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                                   rti1516::TransportationType theType)
-    throw (rti1516::InteractionClassNotRecognized,
-           rti1516::InteractionParameterNotRecognized,
-           rti1516::InteractionClassNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1921,10 +1884,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   virtual void receiveInteraction(rti1516::InteractionClassHandle theInteraction, rti1516::ParameterHandleValueMap const & theParameterValues,
                                   rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                                   rti1516::TransportationType theType, rti1516::RegionHandleSet const & theSentRegionHandleSet)
-    throw (rti1516::InteractionClassNotRecognized,
-           rti1516::InteractionParameterNotRecognized,
-           rti1516::InteractionClassNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1958,10 +1917,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   virtual void receiveInteraction(rti1516::InteractionClassHandle theInteraction, rti1516::ParameterHandleValueMap const & theParameterValues,
                                   rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                                   rti1516::TransportationType theType, rti1516::LogicalTime const & theTime, rti1516::OrderType receivedOrder)
-    throw (rti1516::InteractionClassNotRecognized,
-           rti1516::InteractionParameterNotRecognized,
-           rti1516::InteractionClassNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -1996,10 +1951,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
                                   rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                                   rti1516::TransportationType theType, rti1516::LogicalTime const & theTime,
                                   rti1516::OrderType receivedOrder, rti1516::RegionHandleSet const & theSentRegionHandleSet)
-    throw (rti1516::InteractionClassNotRecognized,
-           rti1516::InteractionParameterNotRecognized,
-           rti1516::InteractionClassNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2036,11 +1987,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
                      rti1516::VariableLengthData const & theUserSuppliedTag, rti1516::OrderType sentOrder,
                      rti1516::TransportationType theType, rti1516::LogicalTime const & theTime,
                      rti1516::OrderType receivedOrder, rti1516::MessageRetractionHandle theHandle)
-    throw (rti1516::InteractionClassNotRecognized,
-           rti1516::InteractionParameterNotRecognized,
-           rti1516::InteractionClassNotSubscribed,
-           rti1516::InvalidLogicalTime,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2079,11 +2025,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
                      rti1516::TransportationType theType, rti1516::LogicalTime const & theTime,
                      rti1516::OrderType receivedOrder, rti1516::MessageRetractionHandle theHandle,
                      rti1516::RegionHandleSet const & theSentRegionHandleSet)
-    throw (rti1516::InteractionClassNotRecognized,
-           rti1516::InteractionParameterNotRecognized,
-           rti1516::InteractionClassNotSubscribed,
-           rti1516::InvalidLogicalTime,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2121,8 +2062,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   removeObjectInstance(rti1516::ObjectInstanceHandle theObject,
                        rti1516::VariableLengthData const & theUserSuppliedTag,
                        rti1516::OrderType sentOrder)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2155,8 +2094,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
                        rti1516::OrderType sentOrder,
                        rti1516::LogicalTime const & theTime,
                        rti1516::OrderType receivedOrder)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2190,9 +2127,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
                        rti1516::LogicalTime const & theTime,
                        rti1516::OrderType receivedOrder,
                        rti1516::MessageRetractionHandle theHandle)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::InvalidLogicalTime,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2223,10 +2157,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   virtual
   void
   attributesInScope(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & theAttributes)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2253,10 +2183,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   virtual
   void
   attributesOutOfScope(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & theAttributes)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2282,10 +2208,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   // 6.18
   virtual void provideAttributeValueUpdate(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & theAttributes,
                                            rti1516::VariableLengthData const & theUserSuppliedTag)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotOwned,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2310,10 +2232,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void turnUpdatesOnForObjectInstance(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & theAttributes)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotOwned,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2337,10 +2255,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void turnUpdatesOffForObjectInstance(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & theAttributes)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotOwned,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2365,11 +2279,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
   virtual void requestAttributeOwnershipAssumption(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & offeredAttributes,
                                                    rti1516::VariableLengthData const & theUserSuppliedTag)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeAlreadyOwned,
-           rti1516::AttributeNotPublished,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2395,11 +2304,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void requestDivestitureConfirmation(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & releasedAttributes)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotOwned,
-           rti1516::AttributeDivestitureWasNotRequested,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2425,12 +2329,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
   virtual void attributeOwnershipAcquisitionNotification(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & securedAttributes,
                                                          rti1516::VariableLengthData const & theUserSuppliedTag)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeAcquisitionWasNotRequested,
-           rti1516::AttributeAlreadyOwned,
-           rti1516::AttributeNotPublished,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2457,11 +2355,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void attributeOwnershipUnavailable(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & theAttributes)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeAlreadyOwned,
-           rti1516::AttributeAcquisitionWasNotRequested,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2487,10 +2380,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
   virtual void requestAttributeOwnershipRelease(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandleSet const & candidateAttributes,
                                                 rti1516::VariableLengthData const & theUserSuppliedTag)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotOwned,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2516,11 +2405,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
   virtual void confirmAttributeOwnershipAcquisitionCancellation(rti1516::ObjectInstanceHandle theObject,
                                                                 rti1516::AttributeHandleSet const & theAttributes)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeAlreadyOwned,
-           rti1516::AttributeAcquisitionWasNotCanceled,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2546,9 +2430,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
   virtual void informAttributeOwnership(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandle theAttribute,
                                         rti1516::FederateHandle theOwner)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2572,9 +2453,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void attributeIsNotOwned(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandle theAttribute)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2597,9 +2475,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void attributeIsOwnedByRTI(rti1516::ObjectInstanceHandle theObject, rti1516::AttributeHandle theAttribute)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2622,9 +2497,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void timeRegulationEnabled(rti1516::LogicalTime const & theFederateTime)
-    throw (rti1516::InvalidLogicalTime,
-           rti1516::NoRequestToEnableTimeRegulationWasPending,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2647,9 +2519,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
   // 8.6
   virtual void timeConstrainedEnabled(rti1516::LogicalTime const & theFederateTime)
-    throw (rti1516::InvalidLogicalTime,
-           rti1516::NoRequestToEnableTimeConstrainedWasPending,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2671,9 +2540,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void timeAdvanceGrant(rti1516::LogicalTime const & theTime)
-    throw (rti1516::InvalidLogicalTime,
-           rti1516::JoinedFederateIsNotInTimeAdvancingState,
-           rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2695,7 +2561,6 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
   }
 
   virtual void requestRetraction(rti1516::MessageRetractionHandle theHandle)
-    throw (rti1516::FederateInternalError)
   {
     if (!ob_federateAmbassador)
       return;
@@ -2719,7 +2584,7 @@ struct PyRTI1516FederateAmbassador : public rti1516::FederateAmbassador {
 
 struct PyRTIambassadorObject {
   PyObject_HEAD
-  std::auto_ptr<rti1516::RTIambassador> ob_value;
+  std::unique_ptr<rti1516::RTIambassador> ob_value;
   PyRTI1516FederateAmbassador _federateAmbassador;
   std::wstring _logicaltimeFactoryName;
 };
@@ -2727,11 +2592,11 @@ struct PyRTIambassadorObject {
 static std::wstring
 validateLogicalTimeFactory(const std::wstring& implementationName)
 {
-  std::auto_ptr<rti1516::LogicalTimeFactory> logicalTimeFactory(rti1516::LogicalTimeFactoryFactory::makeLogicalTimeFactory(implementationName));
+  std::unique_ptr<rti1516::LogicalTimeFactory> logicalTimeFactory(rti1516::LogicalTimeFactoryFactory::makeLogicalTimeFactory(implementationName));
   if (!logicalTimeFactory.get())
     return std::wstring();
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime(logicalTimeFactory->makeLogicalTime());
+  std::unique_ptr<rti1516::LogicalTime> logicalTime(logicalTimeFactory->makeLogicalTime());
   if (!logicalTime.get())
     return std::wstring();
 
@@ -3018,7 +2883,7 @@ PyRTIambassador_requestFederationSave(PyRTIambassadorObject *self, PyObject *arg
     return 0;
   }
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (arg2 && !PyObject_GetLogicalTime(logicalTime, arg2, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Second argument needs to be a LogicalTime!");
     return 0;
@@ -3612,7 +3477,7 @@ PyRTIambassador_updateAttributeValues(PyRTIambassadorObject *self, PyObject *arg
     return 0;
   }
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (arg4 && !PyObject_GetLogicalTime(logicalTime, arg4, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Fourth argument needs to be a LogicalTime!");
     return 0;
@@ -3667,7 +3532,7 @@ PyRTIambassador_sendInteraction(PyRTIambassadorObject *self, PyObject *args)
     return 0;
   }
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (arg4 && !PyObject_GetLogicalTime(logicalTime, arg4, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Fourth argument needs to be a LogicalTime!");
     return 0;
@@ -3716,7 +3581,7 @@ PyRTIambassador_deleteObjectInstance(PyRTIambassadorObject *self, PyObject *args
     return 0;
   }
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (arg3 && !PyObject_GetLogicalTime(logicalTime, arg3, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Third argument needs to be a LogicalTime!");
     return 0;
@@ -4284,7 +4149,7 @@ PyRTIambassador_enableTimeRegulation(PyRTIambassadorObject *self, PyObject *args
   if (!PyArg_UnpackTuple(args, "enableTimeRegulation", 1, 1, &arg1))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTimeInterval> logicalTimeInterval;
+  std::unique_ptr<rti1516::LogicalTimeInterval> logicalTimeInterval;
   if (!PyObject_GetLogicalTimeInterval(logicalTimeInterval, arg1, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Argument needs to be a LogicalTimeInterval!");
     return 0;
@@ -4376,7 +4241,7 @@ PyRTIambassador_timeAdvanceRequest(PyRTIambassadorObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "timeAdvanceRequest", 1, 1, &arg1))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (!PyObject_GetLogicalTime(logicalTime, arg1, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Argument needs to be a LogicalTime!");
     return 0;
@@ -4407,7 +4272,7 @@ PyRTIambassador_timeAdvanceRequestAvailable(PyRTIambassadorObject *self, PyObjec
   if (!PyArg_UnpackTuple(args, "timeAdvanceRequestAvailable", 1, 1, &arg1))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (!PyObject_GetLogicalTime(logicalTime, arg1, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Argument needs to be a LogicalTime!");
     return 0;
@@ -4438,7 +4303,7 @@ PyRTIambassador_nextMessageRequest(PyRTIambassadorObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "nextMessageRequest", 1, 1, &arg1))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (!PyObject_GetLogicalTime(logicalTime, arg1, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Argument needs to be a LogicalTime!");
     return 0;
@@ -4469,7 +4334,7 @@ PyRTIambassador_nextMessageRequestAvailable(PyRTIambassadorObject *self, PyObjec
   if (!PyArg_UnpackTuple(args, "nextMessageRequestAvailable", 1, 1, &arg1))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (!PyObject_GetLogicalTime(logicalTime, arg1, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Argument needs to be a LogicalTime!");
     return 0;
@@ -4500,7 +4365,7 @@ PyRTIambassador_flushQueueRequest(PyRTIambassadorObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "flushQueueRequest", 1, 1, &arg1))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (!PyObject_GetLogicalTime(logicalTime, arg1, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Argument needs to be a LogicalTime!");
     return 0;
@@ -4570,7 +4435,7 @@ PyRTIambassador_queryGALT(PyRTIambassadorObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "queryGALT", 0, 0))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (!PyObject_GetLogicalTime(logicalTime, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Cannot get LogicalTime for given factory!");
     return 0;
@@ -4596,7 +4461,7 @@ PyRTIambassador_queryLogicalTime(PyRTIambassadorObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "queryLogicalTime", 0, 0))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (!PyObject_GetLogicalTime(logicalTime, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Cannot get LogicalTime for given factory!");
     return 0;
@@ -4620,7 +4485,7 @@ PyRTIambassador_queryLITS(PyRTIambassadorObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "queryLITS", 0, 0))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (!PyObject_GetLogicalTime(logicalTime, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Cannot get LogicalTime for given factory!");
     return 0;
@@ -4647,7 +4512,7 @@ PyRTIambassador_modifyLookahead(PyRTIambassadorObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "modifyLookahead", 1, 1, &arg1))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTimeInterval> logicalTimeInterval;
+  std::unique_ptr<rti1516::LogicalTimeInterval> logicalTimeInterval;
   if (!PyObject_GetLogicalTimeInterval(logicalTimeInterval, arg1, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Argument needs to be a LogicalTimeInterval!");
     return 0;
@@ -4675,7 +4540,7 @@ PyRTIambassador_queryLookahead(PyRTIambassadorObject *self, PyObject *args)
   if (!PyArg_UnpackTuple(args, "queryLookahead", 0, 0))
     return 0;
 
-  std::auto_ptr<rti1516::LogicalTimeInterval> logicalTimeInterval;
+  std::unique_ptr<rti1516::LogicalTimeInterval> logicalTimeInterval;
   if (!PyObject_GetLogicalTimeInterval(logicalTimeInterval, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Cannot get LogicalTimeInterval for given factory!");
     return 0;
@@ -5202,7 +5067,7 @@ PyRTIambassador_sendInteractionWithRegions(PyRTIambassadorObject *self, PyObject
     return 0;
   }
 
-  std::auto_ptr<rti1516::LogicalTime> logicalTime;
+  std::unique_ptr<rti1516::LogicalTime> logicalTime;
   if (arg5 && !PyObject_GetLogicalTime(logicalTime, arg5, self->_logicaltimeFactoryName)) {
     PyErr_SetString(PyExc_TypeError, "Fifth argument needs to be a LogicalTime!");
     return 0;
@@ -6477,7 +6342,7 @@ static PyMethodDef PyRTIambassador_methods[] =
 };
 
 static PyObject*
-PyObject_NewRTIambassador(PyTypeObject *type, PyObject *args, PyObject *kwds)
+PyObject_NewRTIambassador(PyTypeObject *type, PyObject *args, PyObject * /*kwds*/)
 {
   std::vector<std::wstring> stringArgs;
 
@@ -6494,7 +6359,7 @@ PyObject_NewRTIambassador(PyTypeObject *type, PyObject *args, PyObject *kwds)
     stringArgs.push_back(string);
   }
 
-  std::auto_ptr<rti1516::RTIambassador> ambassador;
+  std::unique_ptr<rti1516::RTIambassador> ambassador;
   ambassador = rti1516::RTIambassadorFactory().createRTIambassador(stringArgs);
   if (!ambassador.get()) {
     PyErr_SetObject(PyRTI1516RTIinternalError.get(), PyUnicode_FromString("Cannot create RTIambassador!"));
@@ -6505,7 +6370,7 @@ PyObject_NewRTIambassador(PyTypeObject *type, PyObject *args, PyObject *kwds)
   if (!self)
     return 0;
   new (self) PyRTIambassadorObject;
-  self->ob_value = ambassador;
+  self->ob_value = std::move(ambassador);
   return (PyObject*)self;
 }
 
@@ -6567,7 +6432,7 @@ static PyMethodDef rti1516_methods[] = {
 
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
-        "rti1516",
+        PYMODULENAME,
         NULL,
         -1,
         rti1516_methods,

@@ -46,6 +46,18 @@ enum PropagationType {
   PropagateSend,
   PropagateNone
 };
+
+inline std::string to_string(PropagationType value)
+{
+  switch (value)
+  {
+  case PropagateBroadcast : return "PropagateBroadcast";
+  case PropagateSend : return "PropagateSend";
+  case PropagateNone : return "PropagateNone";
+  default : return "<Invalid PropagationType>";
+  }
+}
+
 typedef std::pair<PropagationType, ConnectHandle> PropagationTypeConnectHandlePair;
 
 class OPENRTI_LOCAL BroadcastConnectHandleSet {
@@ -413,12 +425,7 @@ public:
     _ownerConnectHandle = connectHandle;
   }
 
-  void removeConnect(const ConnectHandle& connectHandle)
-  {
-    _receivingConnects.erase(connectHandle);
-    if (_ownerConnectHandle == connectHandle)
-      _ownerConnectHandle = ConnectHandle();
-  }
+  void removeConnect(const ConnectHandle& connectHandle);
 
   // Because of attribute ownership, it is clear for an object attribute where the update
   // stems from, so just have a set of connect handles that want to receive the updates
@@ -476,7 +483,8 @@ private:
 class Federation;
 class ObjectClass;
 
-class OPENRTI_LOCAL ObjectInstance : public HandleStringEntity<ObjectInstance, ObjectInstanceHandle>, public IntrusiveList<ObjectInstance, 0>::Hook {
+class OPENRTI_LOCAL ObjectInstance : public HandleStringEntity<ObjectInstance, ObjectInstanceHandle>, public IntrusiveList<ObjectInstance, 0>::Hook,
+                                     public PublishSubscribe {
 public:
   typedef HandleStringEntity<ObjectInstance, ObjectInstanceHandle>::HandleMap HandleMap;
   typedef HandleStringEntity<ObjectInstance, ObjectInstanceHandle>::StringMap NameMap;
@@ -484,6 +492,9 @@ public:
 
   ObjectInstance(Federation& federation);
   ~ObjectInstance();
+  std::string getEntityName() const {
+    return std::string("<ObjectInstance ") + getName() + std::string(">");
+  }
 
   const ObjectInstanceHandle& getObjectInstanceHandle() const
   { return HandleStringEntity<ObjectInstance, ObjectInstanceHandle>::_getHandle(); }
@@ -498,7 +509,7 @@ public:
   Federation& getFederation()
   { return _federation; }
 
-  void insert(InstanceAttribute& instanceAttribute);
+  //void insert(InstanceAttribute& instanceAttribute);
   InstanceAttribute* getInstanceAttribute(const AttributeHandle& attributeHandle);
   InstanceAttribute* getPrivilegeToDeleteInstanceAttribute();
   InstanceAttribute::HandleMap& getAttributeHandleInstanceAttributeMap()
@@ -1039,6 +1050,13 @@ private:
 
 ////////////////////////////////////////////////////////////
 
+// a set of unique values
+typedef std::set<VariableLengthData> VariableLengthDataSet;
+// associates parameter handles with filter value list
+typedef std::map<ParameterHandle, VariableLengthDataSet> ParameterFilterMap;
+// associates federates with parameter filter maps
+typedef std::map<ConnectHandle, ParameterFilterMap> ParameterFilterMapByConnect;
+
 class OPENRTI_LOCAL InteractionClass : public ModuleClassEntity<InteractionClass, InteractionClassHandle>, public PublishSubscribe /*FIXME*/ {
 public:
   typedef ModuleClassEntity<InteractionClass, InteractionClassHandle>::HandleMap HandleMap;
@@ -1054,6 +1072,8 @@ public:
 
   const StringVector& getName() const
   { return ModuleClassEntity<InteractionClass, InteractionClassHandle>::_getString(); }
+  std::string getFQName() const;
+
   void setName(const StringVector& name);
 
   const InteractionClassHandle& getInteractionClassHandle() const
@@ -1125,9 +1145,18 @@ public:
     }
   }
 
+  // returns true if the filter changes for given connect
+  bool updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues);
+  bool hasFilterSubscriptions() const;
+  bool isFiltered(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues) const;
+  ParameterValueVector getParameterFilters(const ConnectHandle& connectHandle);
 private:
-  InteractionClass(const InteractionClass&);
-  InteractionClass& operator=(const InteractionClass&);
+  InteractionClass(const InteractionClass&) = delete;
+  InteractionClass& operator=(const InteractionClass&) = delete;
+
+  void Dump(const char* prefix, const VariableLengthDataSet& filterValues) const;
+  void Dump(const char* prefix, const ParameterFilterMapByConnect& filtersByFederate) const;
+  bool AddParameterFilterValues(ParameterFilterMap& filterMap, const ParameterValueVector& parameterFilters);
 
   Federation& _federation;
 
@@ -1144,6 +1173,7 @@ private:
   ParameterDefinition::NameMap _parameterNameParameterMap;
 
   ClassParameter::HandleMap _parameterHandleClassParameterMap;
+  ParameterFilterMapByConnect _parameterFiltersByConnect;
 };
 
 ////////////////////////////////////////////////////////////
@@ -1308,6 +1338,7 @@ public:
   const StringVector& getName() const
   { return ModuleClassEntity<ObjectClass, ObjectClassHandle>::_getString(); }
   void setName(const StringVector& name);
+  std::string getFQName() const;
 
   const ObjectClassHandle& getObjectClassHandle() const
   { return ModuleClassEntity<ObjectClass, ObjectClassHandle>::_getHandle(); }
@@ -1356,62 +1387,14 @@ public:
   typedef std::list<ObjectInstance*> ObjectInstanceList;
 
   /// since we might end in different depths for different attributes, this is done per attribute
-  void updateCumulativeSubscription(const ConnectHandle& connectHandle, const AttributeHandle& attributeHandle,
-                                    ObjectInstanceList& objectInstanceList)
-  {
-    bool parentSubscribed = false;
-    if (_parentObjectClass) {
-      ClassAttribute* classAttribute = _parentObjectClass->getClassAttribute(attributeHandle);
-      if (classAttribute)
-        if (0 != classAttribute->_cumulativeSubscribedConnectHandleSet.count(connectHandle))
-          parentSubscribed = true;
-    }
+  void updateCumulativeSubscription(const ConnectHandle& connectHandle,
+                                    const AttributeHandle& attributeHandle,
+                                    ObjectInstanceList& objectInstanceList);
 
-    _updateCumulativeSubscription(connectHandle, attributeHandle, parentSubscribed, objectInstanceList);
-  }
-  void _updateCumulativeSubscription(const ConnectHandle& connectHandle, const AttributeHandle& attributeHandle,
-                                     bool subscribe /*Replace with regionset or something*/, ObjectInstanceList& objectInstanceList)
-  {
-    ClassAttribute* classAttribute = getClassAttribute(attributeHandle);
-    subscribe |= (Unsubscribed != classAttribute->getSubscriptionType(connectHandle));
-    if (!classAttribute->updateCumulativeSubscribedConnectHandleSet(connectHandle, subscribe))
-      return;
-    // Update the receiving connect handle set
-    for (ChildList::iterator i = _childObjectClassList.begin(); i != _childObjectClassList.end(); ++i) {
-      i->_updateCumulativeSubscription(connectHandle, attributeHandle, subscribe, objectInstanceList);
-    }
-    /// FIXME: need to walk the objects and see how the routing for the object changes
-    /// FIXME: store the object instances that are yet unknown to a connect and store these to propagate them into the connect
-    /// Hmm, here is the first good use case for a visitor
-    for (ObjectInstance::FirstList::iterator i = _objectInstanceList.begin(); i != _objectInstanceList.end(); ++i) {
-      InstanceAttribute* instanceAttribute = i->getInstanceAttribute(attributeHandle);
-      if (!instanceAttribute)
-        continue;
-
-      // Don't add the owner to the list of connect handles that receive this attribute
-      if (instanceAttribute->getOwnerConnectHandle() == connectHandle)
-        continue;
-
-      if (subscribe) {
-        // Insert the connect handle into the receiving connects
-        if (!instanceAttribute->_receivingConnects.insert(connectHandle).second)
-          continue;
-
-        // Note that we need to insert this object instance into this connect
-        if (attributeHandle == AttributeHandle(0))
-          objectInstanceList.push_back(i.get());
-
-      } else {
-        // Never remove a attribute 0 subsciption as pushing the instance information may race
-        if (attributeHandle == AttributeHandle(0))
-          continue;
-
-        // Erase the connect handle from the receiving connects
-        if (instanceAttribute->_receivingConnects.erase(connectHandle) == 0)
-          continue;
-      }
-    }
-  }
+  void _updateCumulativeSubscription(const ConnectHandle& connectHandle,
+                                     const AttributeHandle& attributeHandle,
+                                     bool subscribe /*Replace with regionset or something*/,
+                                     ObjectInstanceList& objectInstanceList);
 
   void accumulateAllPublications(ConnectHandleSet& connectHandleSet)
   {
@@ -1471,6 +1454,10 @@ private:
 
 ////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////
+// a Module is the root of a processed FOM file.
+// Source is a 
+////////////////////////////////////////////////////////////
 class OPENRTI_LOCAL Module : public HandleEntity<Module, ModuleHandle> {
 public:
   typedef HandleEntity<Module, ModuleHandle>::HandleMap HandleMap;
@@ -1940,7 +1927,7 @@ public:
   { return _parentConnectHandle; }
 
   NodeConnect* getNodeConnect(const ConnectHandle& connectHandle);
-  NodeConnect* insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options);
+  NodeConnect* insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName);
   NodeConnect* insertParentNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options);
   void insert(NodeConnect& nodeConnect);
   void erase(const ConnectHandle& connectHandle);
@@ -1957,9 +1944,13 @@ public:
   { return _federationHandleFederationMap; }
 
   void send(const ConnectHandle& connectHandle, const SharedPtr<const AbstractMessage>& message);
+  // send message to the parent node
   void sendToParent(const SharedPtr<const AbstractMessage>& message);
+  // send message to all connected nodes
   void broadcast(const SharedPtr<const AbstractMessage>& message);
+  // send message to all connected nodes *except* the given connectHandle
   void broadcast(const ConnectHandle& connectHandle, const SharedPtr<const AbstractMessage>& message);
+  // send message to all connected nodes *except* the parent connect
   void broadcastToChildren(const SharedPtr<const AbstractMessage>& message);
 
   ServerOptions& getServerOptions()

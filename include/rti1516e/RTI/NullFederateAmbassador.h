@@ -25,122 +25,83 @@ namespace rti1516e
    class RTI_EXPORT NullFederateAmbassador : public FederateAmbassador
    {
    public:
-      NullFederateAmbassador ()
-         throw (
-            FederateInternalError) {}
+      NullFederateAmbassador () {}
 
-      virtual ~NullFederateAmbassador ()
-         throw () {}
+      virtual ~NullFederateAmbassador () {}
 
       // 4.4
       virtual void connectionLost (
-         std::wstring const & faultDescription)
-         throw (
-            FederateInternalError) {}
+         std::wstring const & faultDescription);
 
       // 4.8
       virtual void reportFederationExecutions (
          FederationExecutionInformationVector const &
-         theFederationExecutionInformationList)
-         throw (
-            FederateInternalError) {}
+         theFederationExecutionInformationList);
 
       // 4.12
       virtual void synchronizationPointRegistrationSucceeded (
-         std::wstring const & label)
-         throw (
-            FederateInternalError) {}
+         std::wstring const & label);
 
       virtual void synchronizationPointRegistrationFailed (
          std::wstring const & label,
-         SynchronizationPointFailureReason reason)
-         throw (
-            FederateInternalError) {}
+         SynchronizationPointFailureReason reason);
 
       // 4.13
       virtual void announceSynchronizationPoint (
          std::wstring  const & label,
-         VariableLengthData const & theUserSuppliedTag)
-         throw (
-            FederateInternalError) {}
+         VariableLengthData const & theUserSuppliedTag);
 
       // 4.15
       virtual void federationSynchronized (
          std::wstring const & label,
-         FederateHandleSet const& failedToSyncSet)
-         throw (
-            FederateInternalError) {}
+         FederateHandleSet const& failedToSyncSet);
 
       // 4.17
       virtual void initiateFederateSave (
-         std::wstring const & label)
-         throw (
-            FederateInternalError) {}
+         std::wstring const & label) {}
 
       virtual void initiateFederateSave (
          std::wstring const & label,
-         LogicalTime const & theTime)
-         throw (
-            FederateInternalError) {}
+         LogicalTime const & theTime) {}
 
       // 4.20
-      virtual void federationSaved ()
-         throw (
-            FederateInternalError) {}
+      virtual void federationSaved () {}
 
       virtual void federationNotSaved (
-         SaveFailureReason theSaveFailureReason)
-         throw (
-            FederateInternalError) {}
+         SaveFailureReason theSaveFailureReason) {}
 
 
       // 4.23
       virtual void federationSaveStatusResponse (
          FederateHandleSaveStatusPairVector const &
-         theFederateStatusVector)
-         throw (
-            FederateInternalError) {}
+         theFederateStatusVector) {}
 
       // 4.25
       virtual void requestFederationRestoreSucceeded (
-         std::wstring const & label)
-         throw (
-            FederateInternalError) {}
+         std::wstring const & label) {}
 
       virtual void requestFederationRestoreFailed (
-         std::wstring const & label)
-         throw (
-            FederateInternalError) {}
+         std::wstring const & label) {}
 
       // 4.26
-      virtual void federationRestoreBegun ()
-         throw (
-            FederateInternalError) {}
+      virtual void federationRestoreBegun () {}
 
       // 4.27
       virtual void initiateFederateRestore (
          std::wstring const & label,
          std::wstring const & federateName,
-         FederateHandle handle)
-         throw (
-            FederateInternalError) {}
+         FederateHandle handle) {}
 
       // 4.29
-      virtual void federationRestored ()
-         throw (
-            FederateInternalError) {}
+      virtual void federationRestored () {}
 
       virtual void federationNotRestored (
-         RestoreFailureReason theRestoreFailureReason)
-         throw (
-            FederateInternalError) {}
+         RestoreFailureReason theRestoreFailureReason) {}
 
       // 4.32
       virtual void federationRestoreStatusResponse (
          FederateRestoreStatusVector const &
-         theFederateRestoreStatusVector)
-         throw (
-            FederateInternalError) {}
+         theFederateRestoreStatusVector) {}
 
       /////////////////////////////////////
       // Declaration Management Services //
@@ -148,27 +109,19 @@ namespace rti1516e
 
       // 5.10
       virtual void startRegistrationForObjectClass (
-         ObjectClassHandle theClass)
-         throw (
-            FederateInternalError) {}
+         ObjectClassHandle theClass);
 
       // 5.11
       virtual void stopRegistrationForObjectClass (
-         ObjectClassHandle theClass)
-         throw (
-            FederateInternalError) {}
+         ObjectClassHandle theClass);
 
       // 5.12
       virtual void turnInteractionsOn (
-         InteractionClassHandle theHandle)
-         throw (
-            FederateInternalError) {}
+         InteractionClassHandle theHandle);
 
       // 5.13
       virtual void turnInteractionsOff (
-         InteractionClassHandle theHandle)
-         throw (
-            FederateInternalError) {}
+         InteractionClassHandle theHandle);
 
       ////////////////////////////////
       // Object Management Services //
@@ -176,41 +129,29 @@ namespace rti1516e
 
       // 6.3
       virtual void objectInstanceNameReservationSucceeded (
-         std::wstring const & theObjectInstanceName)
-         throw (
-            FederateInternalError) {}
+         std::wstring const & theObjectInstanceName);
 
       virtual void objectInstanceNameReservationFailed (
-         std::wstring const & theObjectInstanceName)
-         throw (
-            FederateInternalError) {}
+         std::wstring const & theObjectInstanceName);
 
       // 6.6
       virtual void multipleObjectInstanceNameReservationSucceeded (
-         std::set<std::wstring> const & theObjectInstanceNames)
-         throw (
-            FederateInternalError) {}
+         std::set<std::wstring> const & theObjectInstanceNames);
 
       virtual void multipleObjectInstanceNameReservationFailed (
-         std::set<std::wstring> const & theObjectInstanceNames)
-         throw (
-            FederateInternalError) {}
+         std::set<std::wstring> const & theObjectInstanceNames);
 
       // 6.9
       virtual void discoverObjectInstance (
          ObjectInstanceHandle theObject,
          ObjectClassHandle theObjectClass,
-         std::wstring const & theObjectInstanceName)
-         throw (
-            FederateInternalError) {}
+         std::wstring const & theObjectInstanceName);
 
       virtual void discoverObjectInstance (
          ObjectInstanceHandle theObject,
          ObjectClassHandle theObjectClass,
          std::wstring const & theObjectInstanceName,
-         FederateHandle producingFederate)
-         throw (
-            FederateInternalError) {}
+         FederateHandle producingFederate);
 
       // 6.11
       virtual void reflectAttributeValues (
@@ -219,9 +160,7 @@ namespace rti1516e
          VariableLengthData const & theUserSuppliedTag,
          OrderType sentOrder,
          TransportationType theType,
-         SupplementalReflectInfo theReflectInfo)
-         throw (
-            FederateInternalError) {}
+         SupplementalReflectInfo theReflectInfo);
 
       virtual void reflectAttributeValues (
          ObjectInstanceHandle theObject,
@@ -231,9 +170,7 @@ namespace rti1516e
          TransportationType theType,
          LogicalTime const & theTime,
          OrderType receivedOrder,
-         SupplementalReflectInfo theReflectInfo)
-         throw (
-            FederateInternalError) {}
+         SupplementalReflectInfo theReflectInfo);
 
       virtual void reflectAttributeValues (
          ObjectInstanceHandle theObject,
@@ -244,9 +181,7 @@ namespace rti1516e
          LogicalTime const & theTime,
          OrderType receivedOrder,
          MessageRetractionHandle theHandle,
-         SupplementalReflectInfo theReflectInfo)
-         throw (
-            FederateInternalError) {}
+         SupplementalReflectInfo theReflectInfo);
 
       // 6.13
       virtual void receiveInteraction (
@@ -255,9 +190,7 @@ namespace rti1516e
          VariableLengthData const & theUserSuppliedTag,
          OrderType sentOrder,
          TransportationType theType,
-         SupplementalReceiveInfo theReceiveInfo)
-         throw (
-            FederateInternalError) {}
+         SupplementalReceiveInfo theReceiveInfo);
 
       virtual void receiveInteraction (
          InteractionClassHandle theInteraction,
@@ -267,9 +200,7 @@ namespace rti1516e
          TransportationType theType,
          LogicalTime const & theTime,
          OrderType receivedOrder,
-         SupplementalReceiveInfo theReceiveInfo)
-         throw (
-            FederateInternalError) {}
+         SupplementalReceiveInfo theReceiveInfo);
 
       virtual void receiveInteraction (
          InteractionClassHandle theInteraction,
@@ -280,18 +211,14 @@ namespace rti1516e
          LogicalTime const & theTime,
          OrderType receivedOrder,
          MessageRetractionHandle theHandle,
-         SupplementalReceiveInfo theReceiveInfo)
-         throw (
-            FederateInternalError) {}
+         SupplementalReceiveInfo theReceiveInfo) {}
 
       // 6.15
       virtual void removeObjectInstance (
          ObjectInstanceHandle theObject,
          VariableLengthData const & theUserSuppliedTag,
          OrderType sentOrder,
-         SupplementalRemoveInfo theRemoveInfo)
-         throw (
-            FederateInternalError) {}
+         SupplementalRemoveInfo theRemoveInfo);
 
       virtual void removeObjectInstance (
          ObjectInstanceHandle theObject,
@@ -299,9 +226,7 @@ namespace rti1516e
          OrderType sentOrder,
          LogicalTime const & theTime,
          OrderType receivedOrder,
-         SupplementalRemoveInfo theRemoveInfo)
-         throw (
-            FederateInternalError) {}
+         SupplementalRemoveInfo theRemoveInfo);
 
       virtual void removeObjectInstance (
          ObjectInstanceHandle theObject,
@@ -310,83 +235,61 @@ namespace rti1516e
          LogicalTime const & theTime,
          OrderType receivedOrder,
          MessageRetractionHandle theHandle,
-         SupplementalRemoveInfo theRemoveInfo)
-         throw (
-            FederateInternalError) {}
+         SupplementalRemoveInfo theRemoveInfo) {}
 
       // 6.17
       virtual void attributesInScope (
          ObjectInstanceHandle theObject,
-         AttributeHandleSet const & theAttributes)
-         throw (
-            FederateInternalError) {}
+         AttributeHandleSet const & theAttributes);
 
       // 6.18
       virtual void attributesOutOfScope (
          ObjectInstanceHandle theObject,
-         AttributeHandleSet const & theAttributes)
-         throw (
-            FederateInternalError) {}
+         AttributeHandleSet const & theAttributes);
 
       // 6.20
       virtual void provideAttributeValueUpdate (
          ObjectInstanceHandle theObject,
          AttributeHandleSet const & theAttributes,
-         VariableLengthData const & theUserSuppliedTag)
-         throw (
-            FederateInternalError) {}
+         VariableLengthData const & theUserSuppliedTag);
 
       // 6.21
       virtual void turnUpdatesOnForObjectInstance (
          ObjectInstanceHandle theObject,
-         AttributeHandleSet const & theAttributes)
-         throw (
-            FederateInternalError) {}
+         AttributeHandleSet const & theAttributes);
 
       virtual void turnUpdatesOnForObjectInstance (
          ObjectInstanceHandle theObject,
          AttributeHandleSet const & theAttributes,
-         std::wstring const & updateRateDesignator)
-         throw (
-            FederateInternalError) {}
+         std::wstring const & updateRateDesignator);
 
       // 6.22
       virtual void turnUpdatesOffForObjectInstance (
          ObjectInstanceHandle theObject,
-         AttributeHandleSet const & theAttributes)
-         throw (
-            FederateInternalError) {}
+         AttributeHandleSet const & theAttributes);
 
       // 6.24
       virtual void confirmAttributeTransportationTypeChange (
          ObjectInstanceHandle theObject,
          AttributeHandleSet theAttributes,
-         TransportationType theTransportation)
-         throw (
-            FederateInternalError) {}
+         TransportationType theTransportation);
 
       // 6.26
       virtual void reportAttributeTransportationType (
          ObjectInstanceHandle theObject,
          AttributeHandle theAttribute,
-         TransportationType theTransportation)
-         throw (
-            FederateInternalError) {}
+         TransportationType theTransportation);
 
       // 6.28
       virtual void confirmInteractionTransportationTypeChange (
          InteractionClassHandle theInteraction,
-         TransportationType theTransportation)
-         throw (
-            FederateInternalError) {}
+         TransportationType theTransportation) {}
 
       // 6.30
       virtual void reportInteractionTransportationType (
          FederateHandle federateHandle,
          InteractionClassHandle theInteraction,
-         TransportationType  theTransportation)
-         throw (
-            FederateInternalError) {}
+         TransportationType  theTransportation);
 
 
       ///////////////////////////////////
@@ -397,66 +300,48 @@ namespace rti1516e
       virtual void requestAttributeOwnershipAssumption (
          ObjectInstanceHandle theObject,
          AttributeHandleSet const & offeredAttributes,
-         VariableLengthData const & theUserSuppliedTag)
-         throw (
-            FederateInternalError) {}
+         VariableLengthData const & theUserSuppliedTag) {}
 
       // 7.5
       virtual void requestDivestitureConfirmation (
          ObjectInstanceHandle theObject,
-         AttributeHandleSet const & releasedAttributes)
-         throw (
-            FederateInternalError) {}
+         AttributeHandleSet const & releasedAttributes) {}
 
       // 7.7
       virtual void attributeOwnershipAcquisitionNotification (
          ObjectInstanceHandle theObject,
          AttributeHandleSet const & securedAttributes,
-         VariableLengthData const & theUserSuppliedTag)
-         throw (
-            FederateInternalError) {}
+         VariableLengthData const & theUserSuppliedTag) {}
 
       // 7.10
       virtual void attributeOwnershipUnavailable (
          ObjectInstanceHandle theObject,
-         AttributeHandleSet const & theAttributes)
-         throw (
-            FederateInternalError) {}
+         AttributeHandleSet const & theAttributes) {}
 
       // 7.11
       virtual void requestAttributeOwnershipRelease (
          ObjectInstanceHandle theObject,
          AttributeHandleSet const & candidateAttributes,
-         VariableLengthData const & theUserSuppliedTag)
-         throw (
-            FederateInternalError) {}
+         VariableLengthData const & theUserSuppliedTag) {}
 
       // 7.16
       virtual void confirmAttributeOwnershipAcquisitionCancellation (
          ObjectInstanceHandle theObject,
-         AttributeHandleSet const & theAttributes)
-         throw (
-            FederateInternalError) {}
+         AttributeHandleSet const & theAttributes) {}
 
       // 7.18
       virtual void informAttributeOwnership (
          ObjectInstanceHandle theObject,
          AttributeHandle theAttribute,
-         FederateHandle theOwner)
-         throw (
-            FederateInternalError) {}
+         FederateHandle theOwner) {}
 
       virtual void attributeIsNotOwned (
          ObjectInstanceHandle theObject,
-         AttributeHandle theAttribute)
-         throw (
-            FederateInternalError) {}
+         AttributeHandle theAttribute);
 
       virtual void attributeIsOwnedByRTI (
          ObjectInstanceHandle theObject,
-         AttributeHandle theAttribute)
-         throw (
-            FederateInternalError) {}
+         AttributeHandle theAttribute);
 
       //////////////////////////////
       // Time Management Services //
@@ -464,27 +349,19 @@ namespace rti1516e
 
       // 8.3
       virtual void timeRegulationEnabled (
-         LogicalTime const & theFederateTime)
-         throw (
-            FederateInternalError) {}
+         LogicalTime const & theFederateTime);
 
       // 8.6
       virtual void timeConstrainedEnabled (
-         LogicalTime const & theFederateTime)
-         throw (
-            FederateInternalError) {}
+         LogicalTime const & theFederateTime);
 
       // 8.13
       virtual void timeAdvanceGrant (
-         LogicalTime const & theTime)
-         throw (
-            FederateInternalError) {}
+         LogicalTime const & theTime);
 
       // 8.22
       virtual void requestRetraction (
-         MessageRetractionHandle theHandle)
-         throw (
-            FederateInternalError) {}
+         MessageRetractionHandle theHandle);
    };
 }
 

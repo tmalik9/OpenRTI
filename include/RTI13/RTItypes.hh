@@ -3,7 +3,7 @@
 #ifndef RTITYPES_HH_INCLUDED
 #define RTITYPES_HH_INCLUDED
 
-#define MAX_FEDERATION                "macro variable is deprecated" 
+#define MAX_FEDERATION                "macro variable is deprecated"
 #define MAX_FEDERATE                  "macro variable is deprecated"
 #define MAX_NAME_LENGTH               "macro variable is deprecated"
 #define MAX_SPACES                    "macro variable is deprecated"
@@ -110,7 +110,8 @@ RTI_EXCEPT(UnableToPerformSave)
 RTI_EXCEPT(ValueCountExceeded)
 RTI_EXCEPT(ValueLengthExceeded)
 
-enum ResignAction {
+enum ResignAction
+{
   RELEASE_ATTRIBUTES = 1,
   DELETE_OBJECTS,
   DELETE_OBJECTS_AND_RELEASE_ATTRIBUTES,
@@ -142,245 +143,234 @@ typedef ULong RegionToken;
 
 class RTI_EXPORT AttributeHandleValuePairSet
 {
- public:
-  virtual ~AttributeHandleValuePairSet() {}
+  public:
+    virtual ~AttributeHandleValuePairSet() {}
 
-  virtual ULong size() const = 0;
+    virtual ULong size() const = 0;
 
-  virtual Handle getHandle(ULong) const
-    throw (ArrayIndexOutOfBounds) = 0 ;
+    virtual Handle getHandle(ULong) const = 0;
 
-  virtual ULong getValueLength(ULong) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual ULong getValueLength(ULong) const = 0
+    ;
 
-  virtual void getValue(ULong, char*, ULong&) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual void getValue(ULong, char*, ULong&) const = 0
+    ;
 
-  virtual char* getValuePointer(ULong, ULong&) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual char* getValuePointer(ULong, ULong&) const = 0
+    ;
 
-  virtual TransportType getTransportType(ULong) const
-    throw (InvalidHandleValuePairSetContext) = 0;
+    virtual TransportType getTransportType(ULong) const = 0
+    ;
 
-  virtual OrderType getOrderType(ULong) const
-    throw (ArrayIndexOutOfBounds, InvalidHandleValuePairSetContext) = 0;
+    virtual OrderType getOrderType(ULong) const = 0
+    ;
 
-  virtual Region* getRegion(ULong) const
-    throw (ArrayIndexOutOfBounds, InvalidHandleValuePairSetContext) = 0;
+    virtual Region* getRegion(ULong) const = 0
+    ;
 
-  virtual void add(Handle, const char*, ULong)
-    throw (ValueLengthExceeded, ValueCountExceeded) = 0;
+    virtual void add(Handle, const char*, ULong) = 0
+    ;
 
-  virtual void remove(Handle h)
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual void remove(Handle h) = 0
+    ;
 
-  virtual void moveFrom(const AttributeHandleValuePairSet &, ULong &)
-    throw (ValueCountExceeded, ArrayIndexOutOfBounds) = 0;
+    virtual void moveFrom(const AttributeHandleValuePairSet&, ULong&) = 0
+    ;
 
-  virtual void empty() = 0;
+    virtual void empty() = 0;
 
-  virtual ULong start() const = 0;
-  virtual ULong valid(ULong i) const = 0;
-  virtual ULong next(ULong i) const = 0;
+    virtual ULong start() const = 0;
+    virtual ULong valid(ULong i) const = 0;
+    virtual ULong next(ULong i) const = 0;
 };
 
 class RTI_EXPORT AttributeSetFactory
 {
- public:
-  static AttributeHandleValuePairSet* create(ULong)
-    throw (MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded);
+  public:
+    static AttributeHandleValuePairSet* create(ULong)
+    ;
 };
 
 class RTI_EXPORT AttributeHandleSet
 {
- public:
-  virtual ~AttributeHandleSet() { }
+  public:
+    virtual ~AttributeHandleSet() { }
 
-  virtual ULong size() const = 0;
+    virtual ULong size() const = 0;
 
-  virtual AttributeHandle getHandle(ULong) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual AttributeHandle getHandle(ULong) const = 0
+    ;
 
-  virtual void add(AttributeHandle)
-    throw (ArrayIndexOutOfBounds, AttributeNotDefined) = 0;
+    virtual void add(AttributeHandle) = 0
+    ;
 
-  virtual void remove(AttributeHandle)
-    throw (AttributeNotDefined) = 0;
+    virtual void remove(AttributeHandle) = 0
+    ;
 
-  virtual void empty() = 0;
+    virtual void empty() = 0;
 
-  virtual Boolean isEmpty() const = 0;
-  virtual Boolean isMember(AttributeHandle h) const = 0;
+    virtual Boolean isEmpty() const = 0;
+    virtual Boolean isMember(AttributeHandle h) const = 0;
 };
 
 class RTI_EXPORT AttributeHandleSetFactory
 {
- public:
-  static AttributeHandleSet* create(ULong)
-    throw(MemoryExhausted, ValueCountExceeded);
+  public:
+    static AttributeHandleSet* create(ULong);
 };
 
 class RTI_EXPORT FederateHandleSet
 {
- public:
-  virtual ~FederateHandleSet() { }
+  public:
+    virtual ~FederateHandleSet() { }
 
-  virtual ULong size() const = 0;
+    virtual ULong size() const = 0;
 
-  virtual FederateHandle getHandle(ULong) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual FederateHandle getHandle(ULong) const = 0
+    ;
 
-  virtual void add(FederateHandle)
-    throw (ValueCountExceeded) = 0;
+    virtual void add(FederateHandle) = 0
+    ;
 
-  virtual void remove(FederateHandle)
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual void remove(FederateHandle) = 0
+    ;
 
-  virtual void empty() = 0;
+    virtual void empty() = 0;
 
-  virtual Boolean isMember(FederateHandle) const = 0;
+    virtual Boolean isMember(FederateHandle) const = 0;
 };
 
 class RTI_EXPORT FederateHandleSetFactory
 {
- public:
-  static FederateHandleSet* create(ULong)
-    throw (MemoryExhausted, ValueCountExceeded);
+  public:
+    static FederateHandleSet* create(ULong)
+    ;
 };
 
 class RTI_EXPORT ParameterHandleValuePairSet
 {
- public:
-  virtual ~ParameterHandleValuePairSet() { }
+  public:
+    virtual ~ParameterHandleValuePairSet() { }
 
-  virtual ULong size() const = 0;
+    virtual ULong size() const = 0;
 
-  virtual Handle getHandle(ULong) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual Handle getHandle(ULong) const = 0
+    ;
 
-  virtual ULong getValueLength(ULong) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual ULong getValueLength(ULong) const = 0
+    ;
 
-  virtual void getValue(ULong, char* , ULong &) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual void getValue(ULong, char*, ULong&) const = 0
+    ;
 
-  virtual char* getValuePointer(ULong, ULong &) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual char* getValuePointer(ULong, ULong&) const = 0
+    ;
 
-  virtual TransportType getTransportType() const
-    throw (InvalidHandleValuePairSetContext) = 0;
+    virtual TransportType getTransportType() const = 0
+    ;
 
-  virtual OrderType getOrderType() const
-    throw (InvalidHandleValuePairSetContext) = 0;
+    virtual OrderType getOrderType() const = 0
+    ;
 
-  virtual Region* getRegion() const
-    throw (InvalidHandleValuePairSetContext) = 0;
+    virtual Region* getRegion() const = 0
+    ;
 
-  virtual void add(Handle, const char* , ULong)
-    throw (ValueLengthExceeded, ValueCountExceeded) = 0;
+    virtual void add(Handle, const char*, ULong) = 0
+    ;
 
-  virtual void remove(Handle)
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual void remove(Handle) = 0
+    ;
 
-  virtual void moveFrom(const ParameterHandleValuePairSet &, ULong &)
-    throw (ValueCountExceeded, ArrayIndexOutOfBounds) = 0;
+    virtual void moveFrom(const ParameterHandleValuePairSet&, ULong&) = 0
+    ;
 
-  virtual void empty() = 0;
+    virtual void empty() = 0;
 
-  virtual ULong start() const = 0;
-  virtual ULong valid(ULong i) const = 0;
-  virtual ULong next(ULong i) const = 0;
+    virtual ULong start() const = 0;
+    virtual ULong valid(ULong i) const = 0;
+    virtual ULong next(ULong i) const = 0;
 };
 
 class RTI_EXPORT ParameterSetFactory
 {
- public:
-  static ParameterHandleValuePairSet* create(ULong)
-    throw (MemoryExhausted, ValueCountExceeded, HandleValuePairMaximumExceeded);
+  public:
+    static ParameterHandleValuePairSet* create(ULong)
+    ;
 };
 
 class RTI_EXPORT Region
 {
- public:
-  virtual ~Region() { }
+  public:
+    virtual ~Region() { }
 
-  virtual ULong getRangeLowerBound(ExtentIndex, DimensionHandle) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual ULong getRangeLowerBound(ExtentIndex, DimensionHandle) const = 0
+    ;
 
-  virtual ULong getRangeUpperBound(ExtentIndex, DimensionHandle) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual ULong getRangeUpperBound(ExtentIndex, DimensionHandle) const = 0
+    ;
 
-  virtual void setRangeLowerBound(ExtentIndex, DimensionHandle, ULong)
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual void setRangeLowerBound(ExtentIndex, DimensionHandle, ULong) = 0
+    ;
 
-  virtual void setRangeUpperBound(ExtentIndex, DimensionHandle, ULong)
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual void setRangeUpperBound(ExtentIndex, DimensionHandle, ULong) = 0
+    ;
 
-  virtual SpaceHandle getSpaceHandle() const
-    throw () = 0;
+    virtual SpaceHandle getSpaceHandle() const = 0
+    ;
 
-  virtual ULong getNumberOfExtents() const
-    throw () = 0;
+    virtual ULong getNumberOfExtents() const = 0
+    ;
 
-  virtual ULong getRangeLowerBoundNotificationLimit(ExtentIndex, DimensionHandle) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual ULong getRangeLowerBoundNotificationLimit(ExtentIndex, DimensionHandle) const = 0
+    ;
 
-  virtual ULong getRangeUpperBoundNotificationLimit(ExtentIndex, DimensionHandle) const
-    throw (ArrayIndexOutOfBounds) = 0;
+    virtual ULong getRangeUpperBoundNotificationLimit(ExtentIndex, DimensionHandle) const = 0
+    ;
 };
 
 class FEDTIME_EXPORT FedTime
 {
- public:
-  virtual ~FedTime(){}
+  public:
+    virtual ~FedTime() {}
 
-  virtual void setZero() = 0;
-  virtual Boolean isZero() = 0;
-  virtual void setEpsilon() = 0;
-  virtual void setPositiveInfinity() = 0;
-  virtual Boolean isPositiveInfinity() = 0;
+    virtual void setZero() = 0;
+    virtual Boolean isZero() = 0;
+    virtual void setEpsilon() = 0;
+    virtual void setPositiveInfinity() = 0;
+    virtual Boolean isPositiveInfinity() = 0;
 
-  virtual FedTime &operator+=(const FedTime &)
-    throw (InvalidFederationTime) = 0;
+    virtual FedTime& operator+=(const FedTime&) = 0;
 
-  virtual FedTime &operator-=(const FedTime &)
-    throw (InvalidFederationTime) = 0;
+    virtual FedTime& operator-=(const FedTime&) = 0;
 
-  virtual Boolean operator<=(const FedTime &) const
-    throw (InvalidFederationTime) = 0;
+    virtual Boolean operator<=(const FedTime&) const = 0;
 
-  virtual Boolean operator<(const FedTime &) const
-    throw (InvalidFederationTime) = 0;
+    virtual Boolean operator<(const FedTime&) const = 0;
 
-  virtual Boolean operator>=(const FedTime &) const
-    throw (InvalidFederationTime) = 0;
+    virtual Boolean operator>=(const FedTime&) const = 0;
 
-  virtual Boolean operator>(const FedTime &) const
-    throw (InvalidFederationTime) = 0;
+    virtual Boolean operator>(const FedTime&) const = 0;
 
-  virtual Boolean operator==(const FedTime &) const
-    throw (InvalidFederationTime) = 0;
+    virtual Boolean operator==(const FedTime&) const = 0;
 
-  virtual FedTime &operator=(const FedTime &)
-    throw (InvalidFederationTime) = 0;
+    virtual FedTime& operator=(const FedTime&) = 0;
 
-  virtual int encodedLength() const = 0;
-  virtual void encode(char* ) const = 0;
-  virtual int getPrintableLength() const = 0;
-  virtual void getPrintableString(char* ) = 0;
+    virtual int encodedLength() const = 0;
+    virtual void encode(char*) const = 0;
+    virtual int getPrintableLength() const = 0;
+    virtual void getPrintableString(char*) = 0;
 };
 
 class FEDTIME_EXPORT FedTimeFactory
 {
- public:
-  static RTI::FedTime* makeZero()
-    throw (RTI::MemoryExhausted);
+  public:
+    static RTI::FedTime* makeZero();
 
-  static RTI::FedTime* decode(const char* buf)
-    throw (RTI::MemoryExhausted);
+    static RTI::FedTime* decode(const char* buf);
 };
 
-struct EventRetractionHandle_s {
+struct EventRetractionHandle_s
+{
   UniqueID theSerialNumber;
   FederateHandle sendingFederate;
 };

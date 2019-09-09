@@ -88,6 +88,8 @@ Federate::PublishSubscribe::setTransportationType(TransportationType transportat
 bool
 Federate::PublishSubscribe::setSubscriptionType(SubscriptionType subscriptionType)
 {
+  Log(ServerFederate, Info) << __FUNCTION__ << ": " << _name << ":" << subscriptionType << std::endl;
+
   std::swap(_subscriptionType, subscriptionType);
   return _subscriptionType != subscriptionType;
 }
@@ -119,7 +121,8 @@ Federate::Parameter::setName(const std::string& name)
   _name = name;
 }
 
-Federate::InteractionClass::InteractionClass()
+Federate::InteractionClass::InteractionClass() 
+  : _deliverToSelf(false)
 {
 }
 
@@ -200,7 +203,8 @@ Federate::InteractionClass::insertChildInteractionClass(InteractionClass& intera
 
 Federate::ObjectClass::ObjectClass() :
   _subscriptionType(Unsubscribed),
-  _publicationType(Unpublished)
+  _publicationType(Unpublished),
+  _deliverToSelf(false)
 {
 }
 
@@ -250,6 +254,18 @@ Federate::ObjectClass::getAttributeHandle(const std::string& name) const
   if (i == _nameAttributeHandleMap.end())
     return AttributeHandle();
   return i->second;
+}
+
+
+AttributeHandleVector Federate::ObjectClass::getAttributeHandles() const
+{
+  AttributeHandleVector result;
+  result.reserve(_attributeVector.size());
+  for (auto entry : _nameAttributeHandleMap)
+  {
+    result.push_back(entry.second);
+  }
+  return result;
 }
 
 void
@@ -426,8 +442,10 @@ Federate::InstanceAttribute::setUpdateRate(double updateRate)
 
 Federate::ObjectInstance::ObjectInstance(NameObjectInstanceHandleMap::iterator nameObjectInstanceHandleMapIterator,
                                          const ObjectClass& objectClass, bool owned) :
-  _nameObjectInstanceHandleMapIterator(nameObjectInstanceHandleMapIterator)
+  _nameObjectInstanceHandleMapIterator(nameObjectInstanceHandleMapIterator),
+  _subscriptionType(Unsubscribed)
 {
+  _objectClass = &objectClass;
   size_t numAttributes = objectClass.getNumAttributes();
   _instanceAttributeVector.reserve(numAttributes);
   for (size_t k = 0; k < numAttributes; ++k) {
@@ -1000,6 +1018,7 @@ Federate::insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const 
   i = _nameObjectInstanceHandleMap.insert(NameObjectInstanceHandleMap::value_type(name, objectInstanceHandle)).first;
   SharedPtr<ObjectInstance> objectInstance = new ObjectInstance(i, *objectClass, owned);
   objectInstance->setObjectClassHandle(objectClassHandle);
+  objectInstance->setSubscriptionType(SubscribedActive);
   _objectInstanceHandleMap.insert(ObjectInstanceHandleMap::value_type(objectInstanceHandle, objectInstance));
 }
 

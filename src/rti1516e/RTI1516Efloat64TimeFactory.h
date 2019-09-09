@@ -30,6 +30,10 @@
 #include <cmath>
 #include <limits>
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 namespace OpenRTI {
 
 // Interface to build up an optimized OpenRTI::Federate for the builtin
@@ -56,7 +60,7 @@ public:
 
   static LogicalTime nextAfter(const LogicalTime& logicalTime)
   {
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
     return std::nextafter(logicalTime, std::numeric_limits<double>::infinity());
 #elif defined _WIN32
     return _nextafter(logicalTime, std::numeric_limits<double>::infinity());

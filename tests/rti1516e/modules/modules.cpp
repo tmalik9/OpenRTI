@@ -32,6 +32,8 @@
 #include <TestLib.h>
 #include <RTI1516ETestLib.h>
 
+#pragma warning(disable: 4456)
+
 namespace OpenRTI {
 
 struct OPENRTI_LOCAL InteractionClass {

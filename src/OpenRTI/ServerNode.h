@@ -56,8 +56,8 @@ public:
   virtual void _dispatchMessage(const AbstractMessage* message, const ConnectHandle& connectHandle);
 
 private:
-  ServerNode(const ServerNode&);
-  ServerNode& operator=(const ServerNode&);
+  ServerNode(const ServerNode&) = delete;
+  ServerNode& operator=(const ServerNode&) = delete;
 
   ServerMessageDispatcher* _serverMessageDispatcher;
 };

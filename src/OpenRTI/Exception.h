@@ -22,12 +22,13 @@
 
 #include <exception>
 #include <string>
-
+#include <cassert>
 #include "Export.h"
+#include "dprintf.h"
 
 namespace OpenRTI {
 
-class OPENRTI_API Exception : public std::exception {
+class OPENRTI_API Exception /*: public std::exception*/ {
 public:
   virtual ~Exception() throw();
 
@@ -48,13 +49,18 @@ public:
   RTIinternalError(const std::string& reason);
   virtual ~RTIinternalError() throw();
 
+private:
   static void assertMessage(const char* file, unsigned line, const char* reason = 0);
 };
 
 #if defined(NDEBUG) || defined(_NDEBUG)
 #define OpenRTIAssert(expr) do { } while(0)
 #else
-#define OpenRTIAssert(expr) do { if (!(expr)) OpenRTI::RTIinternalError::assertMessage(__FILE__, __LINE__, #expr); } while(0)
+//#define OpenRTIAssert(expr) if (!(expr)) throw OpenRTI::RTIinternalError(__FILE__, __LINE__, #expr)
+#define OpenRTIAssert(expr) if (!(expr)) { \
+ DebugPrintf("%s: %s %d: %s\n", __FUNCTION__, __FILE__, __LINE__, #expr); \
+ abort(); \
+}
 #endif
 
 #define RTI_EXCEPTION(name) \

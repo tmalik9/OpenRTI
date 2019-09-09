@@ -29,6 +29,8 @@
 
 #include "SocketAddressPrivateDataWin32.h"
 
+#pragma comment(lib, "ws2_32.lib")
+
 namespace OpenRTI {
 
 SocketAddress::SocketAddress()
@@ -105,7 +107,7 @@ SocketAddress::getNumericName() const
     if (ret == EAI_AGAIN)
       continue;
     WSACleanup();
-    throw TransportError(localeToUtf8(gai_strerror(ret)));
+    throw TransportError(localeToUtf8(gai_strerrorA(ret)));
   }
   WSACleanup();
 
@@ -156,7 +158,7 @@ SocketAddress::resolve(const std::string& address, const std::string& service, b
     if (ret == EAI_AGAIN)
       continue;
     WSACleanup();
-    throw TransportError(localeToUtf8(gai_strerror(ret)));
+    throw TransportError(localeToUtf8(gai_strerrorA(ret)));
   }
 
   SocketAddressList socketAddressList;

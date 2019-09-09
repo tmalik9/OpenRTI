@@ -45,8 +45,8 @@ protected:
   virtual ~Socket();
 
 private:
-  Socket(const Socket &sock);
-  void operator=(const Socket &sock);
+  Socket(const Socket &sock) = delete;
+  void operator=(const Socket &sock) = delete;
 
   friend class SocketEventDispatcher;
 };

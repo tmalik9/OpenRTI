@@ -36,7 +36,6 @@ AttributeHandleSetCallback::size() const
 
 RTI::AttributeHandle
 AttributeHandleSetCallback::getHandle(RTI::ULong index) const
-  throw (RTI::ArrayIndexOutOfBounds)
 {
   if (_attributeHandleVector.size() <= index)
     throw RTI::ArrayIndexOutOfBounds("Array Index out of bounds in getHandle()");
@@ -45,14 +44,12 @@ AttributeHandleSetCallback::getHandle(RTI::ULong index) const
 
 void
 AttributeHandleSetCallback::add(RTI::AttributeHandle handle)
-  throw (RTI::ArrayIndexOutOfBounds, RTI::AttributeNotDefined)
 {
   throw RTI::RTIinternalError("Unimplemented function: This class is only intendet for constant use.");
 }
 
 void
 AttributeHandleSetCallback::remove(RTI::AttributeHandle handle)
-  throw (RTI::AttributeNotDefined)
 {
   throw RTI::RTIinternalError("Unimplemented function: This class is only intendet for constant use.");
 }

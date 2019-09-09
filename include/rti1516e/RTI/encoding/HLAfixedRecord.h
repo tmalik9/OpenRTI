@@ -39,36 +39,30 @@ namespace rti1516e
       virtual ~HLAfixedRecord ();
 
       // Return a new copy of the DataElement
-      virtual std::auto_ptr<DataElement> clone () const;
+      virtual std::unique_ptr<DataElement> clone () const;
 
       // Encode this element into a new VariableLengthData
-      virtual VariableLengthData encode () const
-         throw (EncoderException);
+      virtual VariableLengthData encode () const;
 
       // Encode this element into an existing VariableLengthData
       virtual void encode (
-         VariableLengthData& inData) const
-         throw (EncoderException);
+         VariableLengthData& inData) const;
 
       // Encode this element and append it to a buffer
       virtual void encodeInto (
-         std::vector<Octet>& buffer) const
-         throw (EncoderException);
+         std::vector<Octet>& buffer) const;
 
       // Decode this element from the RTI's VariableLengthData.
       virtual void decode (
-         VariableLengthData const & inData)
-         throw (EncoderException);
+         VariableLengthData const & inData);
 
       // Decode this element starting at the index in the provided buffer
       virtual size_t decodeFrom (
          std::vector<Octet> const & buffer,
-         size_t index)
-         throw (EncoderException);
+         size_t index);
 
       // Return the size in bytes of this record's encoding.
-      virtual size_t getEncodedLength () const
-         throw (EncoderException);
+      virtual size_t getEncodedLength () const;
 
       // Return the octet boundary of this element.
       virtual unsigned int getOctetBoundary () const;
@@ -95,25 +89,21 @@ namespace rti1516e
       // Sets the element at the given index to a copy of the given element instance
       // Element must match prototype of existing element at this index.
       virtual void set (size_t index,
-         const DataElement& dataElement)
-         throw (EncoderException);
+         const DataElement& dataElement);
 
       // Sets the element at the given index to the given element instance
       // Element must match prototype of existing element at this index.
       // Null pointer results in an exception.
-      virtual void setElementPointer (size_t index, DataElement* dataElement)
-         throw (EncoderException);
+      virtual void setElementPointer (size_t index, DataElement* dataElement);
 
       // Return a const reference to the element at the specified index.
       // Must use set to change element.
       virtual const DataElement& get (
-         size_t index) const
-         throw (EncoderException);
+         size_t index) const;
 
       // Return a const reference to the element instance at the specified index.
       // Must use set to change element.
-      DataElement const& operator [](size_t index) const
-         throw (EncoderException);
+      DataElement const& operator [](size_t index) const;
 
    private:
 

@@ -8,6 +8,7 @@ set(CPACK_PACKAGE_VERSION_MINOR 9)
 set(CPACK_PACKAGE_VERSION_PATCH 0)
 
 # Options
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Not fully supported for all operating systems, but currently
 # the only way to make the circular link reference work on android.
@@ -32,7 +33,7 @@ enable_language(C)
 
 # Starting with cmake 3.1 we can easily change the
 # c++ standard version using
-# set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Some whole project sensible defines
 if(UNIX)

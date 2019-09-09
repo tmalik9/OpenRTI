@@ -184,6 +184,7 @@ set(OpenRTI_SOURCES
   URL.cpp
   WeakReferenced.cpp
   XMLReader.cpp
+  dprintf.cpp
   ${OpenRTI_OS_SOURCES}
   ${OpenRTI_EXPAT_SOURCES}
   ${OpenRTI_ZLIB_SOURCES}

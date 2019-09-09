@@ -25,6 +25,8 @@
 
 #include <sstream>
 
+#pragma warning(disable: 4100)
+
 namespace rti1516e
 {
 
@@ -53,15 +55,15 @@ operator<<(std::wostream& stream, Exception const& e)
 }
 
 #define IMPLEMENT_RTI_EXCEPTION(A)             \
-  A::A(std::wstring const & message) throw() : \
+  A::A(std::wstring const & message) :         \
     _msg(message)                              \
   {                                            \
   }                                            \
   std::wstring                                 \
-  A::what() const throw()                      \
+  A::what() const                              \
   {                                            \
     std::wstringstream stream;                 \
-    stream << "rti1516e::" #A ": " << _msg;     \
+    stream << "rti1516e::" #A ": " << _msg;    \
     return stream.str();                       \
   }
 

@@ -199,15 +199,14 @@ HLAvariableArray::~HLAvariableArray()
   _impl = 0;
 }
 
-std::auto_ptr<DataElement>
+std::unique_ptr<DataElement>
 HLAvariableArray::clone () const
 {
-  return std::auto_ptr<rti1516e::DataElement>(new HLAvariableArray(*this));
+  return std::unique_ptr<rti1516e::DataElement>(new HLAvariableArray(*this));
 }
 
 VariableLengthData
 HLAvariableArray::encode () const
-  throw (EncoderException)
 {
   VariableLengthData variableLengthData;
   encode(variableLengthData);
@@ -216,7 +215,6 @@ HLAvariableArray::encode () const
 
 void
 HLAvariableArray::encode(VariableLengthData& inData) const
-  throw (EncoderException)
 {
   std::vector<Octet> buffer;
   buffer.reserve(getEncodedLength());
@@ -227,13 +225,11 @@ HLAvariableArray::encode(VariableLengthData& inData) const
 
 void
 HLAvariableArray::encodeInto(std::vector<Octet>& buffer) const
-  throw (EncoderException)
 {
   _impl->encodeInto(buffer);
 }
 
 void HLAvariableArray::decode(VariableLengthData const & inData)
-  throw (EncoderException)
 {
   std::vector<Octet> buffer(inData.size());
   if (!buffer.empty())
@@ -243,14 +239,12 @@ void HLAvariableArray::decode(VariableLengthData const & inData)
 
 size_t
 HLAvariableArray::decodeFrom(std::vector<Octet> const & buffer, size_t index)
-  throw (EncoderException)
 {
   return _impl->decodeFrom(buffer, index);
 }
 
 size_t
 HLAvariableArray::getEncodedLength() const
-  throw (EncoderException)
 {
   return _impl->getEncodedLength();
 }
@@ -289,42 +283,36 @@ HLAvariableArray::hasPrototypeSameTypeAs(DataElement const& dataElement) const
 
 void
 HLAvariableArray::addElement(const DataElement& dataElement)
-  throw (EncoderException)
 {
   _impl->addElement(dataElement);
 }
 
 void
 HLAvariableArray::addElementPointer(DataElement* dataElement)
-  throw (EncoderException)
 {
   _impl->addElementPointer(dataElement);
 }
 
 void
 HLAvariableArray::set(size_t index, const DataElement& dataElement)
-  throw (EncoderException)
 {
   _impl->set(index, dataElement);
 }
 
 void
 HLAvariableArray::setElementPointer(size_t index, DataElement* dataElement)
-  throw (EncoderException)
 {
   _impl->setElementPointer(index, dataElement);
 }
 
 const DataElement&
 HLAvariableArray::get(size_t index) const
-  throw (EncoderException)
 {
   return _impl->get(index);
 }
 
 DataElement const&
 HLAvariableArray::operator [](size_t index) const
-  throw (EncoderException)
 {
   return _impl->get(index);
 }

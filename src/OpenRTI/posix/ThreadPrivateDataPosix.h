@@ -23,6 +23,7 @@
 #include <pthread.h>
 #include <signal.h>
 
+#include "OpenRTIConfig.h"
 #include "Export.h"
 #include "SharedPtr.h"
 #include "Thread.h"

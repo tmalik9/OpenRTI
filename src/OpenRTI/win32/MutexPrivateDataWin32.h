@@ -25,10 +25,15 @@
 # define NOMINMAX
 #endif
 #include <windows.h>
+#include "OpenRTIConfig.h"
+
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
 
 namespace OpenRTI {
 
-#if __cplusplus < 201103L
+#if __CPlusPlusStd < 201103L
 struct Mutex::PrivateData {
   PrivateData()
   {

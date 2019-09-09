@@ -17,6 +17,7 @@
  *
  */
 
+#include "OpenRTIConfig.h"
 #include "Atomic.h"
 
 #if defined(OpenRTI_ATOMIC_USE_SUN)

@@ -67,6 +67,7 @@ class ChangeInteractionClassPublicationMessage;
 class ChangeObjectClassPublicationMessage;
 class ChangeInteractionClassSubscriptionMessage;
 class ChangeObjectClassSubscriptionMessage;
+class ChangeObjectInstanceSubscriptionMessage;
 class RegistrationForObjectClassMessage;
 class AttributesInScopeMessage;
 class TurnUpdatesOnForInstanceMessage;
@@ -132,6 +133,7 @@ public:
   virtual void accept(const ChangeObjectClassPublicationMessage&) const = 0;
   virtual void accept(const ChangeInteractionClassSubscriptionMessage&) const = 0;
   virtual void accept(const ChangeObjectClassSubscriptionMessage&) const = 0;
+  virtual void accept(const ChangeObjectInstanceSubscriptionMessage&) const = 0;
   virtual void accept(const RegistrationForObjectClassMessage&) const = 0;
   virtual void accept(const AttributesInScopeMessage&) const = 0;
   virtual void accept(const TurnUpdatesOnForInstanceMessage&) const = 0;
@@ -200,6 +202,7 @@ public:
   virtual void accept(const ChangeObjectClassPublicationMessage& message) const { _t(message); }
   virtual void accept(const ChangeInteractionClassSubscriptionMessage& message) const { _t(message); }
   virtual void accept(const ChangeObjectClassSubscriptionMessage& message) const { _t(message); }
+  virtual void accept(const ChangeObjectInstanceSubscriptionMessage& message) const { _t(message); }
   virtual void accept(const RegistrationForObjectClassMessage& message) const { _t(message); }
   virtual void accept(const AttributesInScopeMessage& message) const { _t(message); }
   virtual void accept(const TurnUpdatesOnForInstanceMessage& message) const { _t(message); }
@@ -270,6 +273,7 @@ public:
   virtual void accept(const ChangeObjectClassPublicationMessage& message) const { _t(message); }
   virtual void accept(const ChangeInteractionClassSubscriptionMessage& message) const { _t(message); }
   virtual void accept(const ChangeObjectClassSubscriptionMessage& message) const { _t(message); }
+  virtual void accept(const ChangeObjectInstanceSubscriptionMessage& message) const { _t(message); }
   virtual void accept(const RegistrationForObjectClassMessage& message) const { _t(message); }
   virtual void accept(const AttributesInScopeMessage& message) const { _t(message); }
   virtual void accept(const TurnUpdatesOnForInstanceMessage& message) const { _t(message); }

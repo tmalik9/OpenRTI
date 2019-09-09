@@ -30,6 +30,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
+#include "AbstractNetworkStatistics.h"
 
 static void usage(const char* argv0)
 {
@@ -42,7 +43,13 @@ public:
   virtual ~SignalNetworkServer();
 
   static void setDoneStatic();
-
+  virtual int exec() override {
+    //OpenRTI::GetNetworkStatistics().Start();
+    int result = OpenRTI::NetworkServer::exec();
+    //OpenRTI::GetNetworkStatistics().Stop();
+    std::cout << "exit" << std::endl;
+    return result;
+  }
 private:
   static SignalNetworkServer* _networkServer;
 };
@@ -62,7 +69,8 @@ SignalNetworkServer::setDoneStatic()
 {
   if (!_networkServer)
     return;
-  _networkServer->setDone(true);
+  std::cout << "stopping ..." << std::endl;
+  _networkServer->postDone();
 }
 
 SignalNetworkServer* SignalNetworkServer::_networkServer = NULL;

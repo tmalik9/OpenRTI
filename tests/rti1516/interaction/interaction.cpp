@@ -45,7 +45,6 @@ public:
     _fail(false)
   { }
   virtual ~TestResponderAmbassador()
-    throw ()
   { }
 
   virtual bool execJoined(rti1516::RTIambassador& ambassador)
@@ -271,10 +270,6 @@ public:
                           const rti1516::VariableLengthData& tag,
                           rti1516::OrderType sentOrder,
                           rti1516::TransportationType theType)
-      throw (rti1516::InteractionClassNotRecognized,
-             rti1516::InteractionParameterNotRecognized,
-             rti1516::InteractionClassNotSubscribed,
-             rti1516::FederateInternalError)
   {
     if (interactionClassHandle != _requestInteractionClassHandle) {
       std::wcout << L"Received interaction class that was not subscribed!" << std::endl;
@@ -313,7 +308,6 @@ public:
     _fail(false)
   { }
   virtual ~TestRequestorAmbassador()
-    throw ()
   {
     std::wcout << L"Average roundtrip time: " << _time / double(_interactionCount) << L"s." << std::endl;
   }
@@ -520,10 +514,6 @@ public:
                           const rti1516::VariableLengthData& tag,
                           rti1516::OrderType sentOrder,
                           rti1516::TransportationType theType)
-      throw (rti1516::InteractionClassNotRecognized,
-             rti1516::InteractionParameterNotRecognized,
-             rti1516::InteractionClassNotSubscribed,
-             rti1516::FederateInternalError)
   {
     for (unsigned i = 0; i < 4; ++i) {
       if (interactionClassHandle == _interactionClassHandles[i] && !(_subscriptionMask & (1u << i))) {

@@ -30,7 +30,6 @@ namespace rti1516
 {
 
 LogicalTime::~LogicalTime()
-  throw ()
 {
 }
 

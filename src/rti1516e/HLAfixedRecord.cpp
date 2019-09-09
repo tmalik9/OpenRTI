@@ -192,15 +192,14 @@ HLAfixedRecord::~HLAfixedRecord()
   _impl = 0;
 }
 
-std::auto_ptr<DataElement>
+std::unique_ptr<DataElement>
 HLAfixedRecord::clone() const
 {
-  return std::auto_ptr<DataElement>(new HLAfixedRecord(*this));
+  return std::unique_ptr<DataElement>(new HLAfixedRecord(*this));
 }
 
 VariableLengthData
 HLAfixedRecord::encode() const
-  throw (EncoderException)
 {
   VariableLengthData variableLengthData;
   encode(variableLengthData);
@@ -209,7 +208,6 @@ HLAfixedRecord::encode() const
 
 void
 HLAfixedRecord::encode(VariableLengthData& inData) const
-  throw (EncoderException)
 {
   std::vector<Octet> buffer;
   buffer.reserve(getEncodedLength());
@@ -220,14 +218,12 @@ HLAfixedRecord::encode(VariableLengthData& inData) const
 
 void
 HLAfixedRecord::encodeInto(std::vector<Octet>& buffer) const
-  throw (EncoderException)
 {
   _impl->encodeInto(buffer);
 }
 
 void
 HLAfixedRecord::decode(VariableLengthData const& inData)
-  throw (EncoderException)
 {
   std::vector<Octet> buffer(inData.size());
   if (!buffer.empty())
@@ -237,14 +233,12 @@ HLAfixedRecord::decode(VariableLengthData const& inData)
 
 size_t
 HLAfixedRecord::decodeFrom(std::vector<Octet> const& buffer, size_t index)
-  throw (EncoderException)
 {
   return _impl->decodeFrom(buffer, index);
 }
 
 size_t
 HLAfixedRecord::getEncodedLength() const
-  throw (EncoderException)
 {
   return _impl->getEncodedLength();
 }
@@ -292,28 +286,24 @@ HLAfixedRecord::appendElementPointer(DataElement* dataElement)
 
 void
 HLAfixedRecord::set(size_t index, const DataElement& dataElement)
-  throw (EncoderException)
 {
   _impl->set(index, dataElement);
 }
 
 void
 HLAfixedRecord::setElementPointer(size_t index, DataElement* dataElement)
-  throw (EncoderException)
 {
   _impl->setElementPointer(index, dataElement);
 }
 
 const DataElement&
 HLAfixedRecord::get(size_t index) const
-  throw (EncoderException)
 {
   return _impl->get(index);
 }
 
 DataElement const&
 HLAfixedRecord::operator[](size_t index) const
-  throw (EncoderException)
 {
   return _impl->arrayget(index);
 }

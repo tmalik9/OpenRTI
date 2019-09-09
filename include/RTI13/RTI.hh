@@ -9,6 +9,7 @@
 # pragma warning(disable: 4251)
 # pragma warning(disable: 4273)
 # pragma warning(disable: 4996)
+# pragma warning(disable: 5040)
 # if defined(RTI_EXPORTS)
 #  define RTI_EXPORT __declspec(dllexport)
 # else

@@ -22,6 +22,10 @@
 #include "Atomic.h"
 #include "ClockWin32.h"
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 #ifndef NOMINMAX
 # define NOMINMAX
 #endif
@@ -34,7 +38,7 @@
 
 namespace OpenRTI {
 
-#if __cplusplus < 201103L
+#if __CPlusPlusStd < 201103L
 
 #if defined(HAVE_PERFORMANCE_COUNTER)
 

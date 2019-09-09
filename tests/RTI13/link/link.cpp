@@ -25,9 +25,9 @@
 #include <fedtime.hh>
 
 int
-main(int argc, char* argv[])
+main(int /*argc*/, char* /*argv*/[])
 {
-  std::auto_ptr<RTI::RTIambassador> ambassador;
+  std::unique_ptr<RTI::RTIambassador> ambassador;
   ambassador.reset(new RTI::RTIambassador);
   return EXIT_SUCCESS;
 }

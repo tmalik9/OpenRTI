@@ -28,10 +28,13 @@
 
 #include "Clock.h"
 #include "MutexPrivateDataWin32.h"
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
 
 namespace OpenRTI {
 
-#if __cplusplus < 201103L
+#if __CPlusPlusStd < 201103L
 
 // Windows Server 2008/Vista provides native conditions
 #if 0x0600 <= WINVER

@@ -31,12 +31,9 @@ public:
   virtual ~AttributeHandleSetCallback();
 
   virtual RTI::ULong size() const;
-  virtual RTI::AttributeHandle getHandle(RTI::ULong index) const
-    throw (RTI::ArrayIndexOutOfBounds);
-  virtual void add(RTI::AttributeHandle handle)
-    throw (RTI::ArrayIndexOutOfBounds, RTI::AttributeNotDefined);
-  virtual void remove(RTI::AttributeHandle handle)
-    throw (RTI::AttributeNotDefined);
+  virtual RTI::AttributeHandle getHandle(RTI::ULong index) const;
+  virtual void add(RTI::AttributeHandle handle);
+  virtual void remove(RTI::AttributeHandle handle);
   virtual void empty();
   virtual RTI::Boolean isEmpty() const;
   virtual RTI::Boolean isMember(RTI::AttributeHandle handle) const;

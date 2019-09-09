@@ -27,6 +27,7 @@
 #include <cmath>
 #include <limits>
 
+#include "OpenRTIConfig.h"
 #include "Clock.h"
 #include "Export.h"
 #include "Types.h"
@@ -56,7 +57,10 @@ struct OPENRTI_LOCAL ClockPosix {
     return ts;
   }
   static uint64_t toNSec(const struct timespec& ts)
-  { return uint64_t(ts.tv_nsec) + uint64_t(ts.tv_sec) * 1000000000; }
+  { return uint64_t(ts.tv_nsec) + uint64_t(ts.tv_sec)*1000000000u; }
+
+   static uint64_t toNSec(const struct timeval& tv)
+  { return uint64_t(tv.tv_usec)*1000u + uint64_t(tv.tv_sec)*1000000000u; }
 
   static int toIntMSec(const uint64_t& nsec)
   {

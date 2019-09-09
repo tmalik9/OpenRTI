@@ -24,12 +24,12 @@
 namespace rti1516e
 {
 
-EncoderException::EncoderException(std::wstring const& message) throw() :
+EncoderException::EncoderException(std::wstring const& message) :
   _msg(message)
 {
 }
 
-std::wstring EncoderException::what () const throw()
+std::wstring EncoderException::what () const
 {
   return _msg;
 }

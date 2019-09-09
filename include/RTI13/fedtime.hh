@@ -20,29 +20,21 @@ class FEDTIME_EXPORT RTIfedTime : public RTI::FedTime {
   virtual void setPositiveInfinity();
   virtual RTI::Boolean isPositiveInfinity();
 
-  virtual RTI::FedTime& operator+=(const RTI::FedTime&)
-    throw (RTI::InvalidFederationTime);
+  virtual RTI::FedTime& operator+=(const RTI::FedTime&);
 
-  virtual RTI::FedTime& operator-=(const RTI::FedTime&)
-    throw (RTI::InvalidFederationTime);
+  virtual RTI::FedTime& operator-=(const RTI::FedTime&);
 
-  virtual RTI::Boolean operator<=(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  virtual RTI::Boolean operator<=(const RTI::FedTime&) const;
 
-  virtual RTI::Boolean operator<(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  virtual RTI::Boolean operator<(const RTI::FedTime&) const;
 
-  virtual RTI::Boolean operator>=(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  virtual RTI::Boolean operator>=(const RTI::FedTime&) const;
 
-  virtual RTI::Boolean operator>(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  virtual RTI::Boolean operator>(const RTI::FedTime&) const;
 
-  virtual RTI::Boolean operator==(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  virtual RTI::Boolean operator==(const RTI::FedTime&) const;
 
-  virtual RTI::FedTime& operator=(const RTI::FedTime&)
-    throw (RTI::InvalidFederationTime);
+  virtual RTI::FedTime& operator=(const RTI::FedTime&);
 
   virtual int encodedLength() const;
   virtual void encode(char *) const;
@@ -52,74 +44,51 @@ class FEDTIME_EXPORT RTIfedTime : public RTI::FedTime {
   bool isEpsilon() const;
   double getTime() const;
 
-  RTI::Boolean operator==(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTI::Boolean operator==(const double&) const;
 
-  RTI::Boolean operator!=(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  RTI::Boolean operator!=(const RTI::FedTime&) const;
 
-  RTI::Boolean operator!=(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTI::Boolean operator!=(const double&) const;
 
-  RTI::Boolean operator<=(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTI::Boolean operator<=(const double&) const;
 
-  RTI::Boolean operator<(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTI::Boolean operator<(const double&) const;
 
-  RTI::Boolean operator>=(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTI::Boolean operator>=(const double&) const;
 
-  RTI::Boolean operator>(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTI::Boolean operator>(const double&) const;
 
-  RTI::FedTime& operator=(const RTIfedTime&)
-    throw (RTI::InvalidFederationTime);
+  RTI::FedTime& operator=(const RTIfedTime&);
 
-  RTI::FedTime& operator=(const double&)
-    throw (RTI::InvalidFederationTime);
+  RTI::FedTime& operator=(const double&);
 
-  RTI::FedTime& operator*=(const RTI::FedTime&)
-    throw (RTI::InvalidFederationTime);
+  RTI::FedTime& operator*=(const RTI::FedTime&);
 
-  RTI::FedTime& operator/=(const RTI::FedTime&)
-    throw (RTI::InvalidFederationTime);
+  RTI::FedTime& operator/=(const RTI::FedTime&);
 
-  RTI::FedTime& operator+=(const double&)
-    throw (RTI::InvalidFederationTime);
+  RTI::FedTime& operator+=(const double&);
 
-  RTI::FedTime& operator-=(const double&)
-    throw (RTI::InvalidFederationTime);
+  RTI::FedTime& operator-=(const double&);
 
-  RTI::FedTime& operator*=(const double&)
-    throw (RTI::InvalidFederationTime);
+  RTI::FedTime& operator*=(const double&);
 
-  RTI::FedTime& operator/=(const double&)
-    throw (RTI::InvalidFederationTime);
+  RTI::FedTime& operator/=(const double&);
 
-  RTIfedTime operator+(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  RTIfedTime operator+(const RTI::FedTime&) const;
 
-  RTIfedTime operator+(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTIfedTime operator+(const double&) const;
 
-  RTIfedTime operator-(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  RTIfedTime operator-(const RTI::FedTime&) const;
 
-  RTIfedTime operator-(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTIfedTime operator-(const double&) const;
 
-  RTIfedTime operator*(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  RTIfedTime operator*(const RTI::FedTime&) const;
 
-  RTIfedTime operator*(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTIfedTime operator*(const double&) const;
 
-  RTIfedTime operator/(const RTI::FedTime&) const
-    throw (RTI::InvalidFederationTime);
+  RTIfedTime operator/(const RTI::FedTime&) const;
 
-  RTIfedTime operator/(const double&) const
-    throw (RTI::InvalidFederationTime);
+  RTIfedTime operator/(const double&) const;
 
 private:
   double _fedTime;

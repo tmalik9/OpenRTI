@@ -24,10 +24,16 @@
 #include <limits>
 #include <ostream>
 #include <sstream>
+#include "OpenRTIConfig.h"
 #include "Export.h"
 #include "Types.h"
 
-#if 201103L <= __cplusplus
+
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
+#if 201103L <= __CPlusPlusStd
 # include <chrono>
 # include <thread>
 #endif
@@ -42,7 +48,7 @@ public:
     _nsec(0)
   { }
 
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   static Clock now()
   {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
@@ -52,7 +58,7 @@ public:
   static Clock now();
 #endif
 
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   static void sleep_for(const Clock& reltime)
   {
     std::this_thread::sleep_for(std::chrono::nanoseconds(reltime.getNSec()));

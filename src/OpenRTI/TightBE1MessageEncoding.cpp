@@ -27,6 +27,11 @@
 #include "EncodeDataStream.h"
 #include "Export.h"
 #include "Message.h"
+#include "AbstractNetworkStatistics.h"
+
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
 
 namespace OpenRTI {
 
@@ -1366,6 +1371,7 @@ public:
     writeFederationHandle(value.getFederationHandle());
     writeSubscriptionType(value.getSubscriptionType());
     writeInteractionClassHandle(value.getInteractionClassHandle());
+    writeParameterValueVector(value.getParameterFilterValues());
   }
 
   void writeChangeObjectClassSubscriptionMessage(const ChangeObjectClassSubscriptionMessage& value)
@@ -1374,6 +1380,14 @@ public:
     writeSubscriptionType(value.getSubscriptionType());
     writeObjectClassHandle(value.getObjectClassHandle());
     writeAttributeHandleVector(value.getAttributeHandles());
+  }
+
+  void writeChangeObjectInstanceSubscriptionMessage(const ChangeObjectInstanceSubscriptionMessage& value)
+  {
+    writeFederationHandle(value.getFederationHandle());
+    writeSubscriptionType(value.getSubscriptionType());
+    writeObjectClassHandle(value.getObjectClassHandle());
+    writeObjectInstanceHandle(value.getObjectInstanceHandle());
   }
 
   void writeRegistrationForObjectClassMessage(const RegistrationForObjectClassMessage& value)
@@ -1919,6 +1933,16 @@ public:
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
     encodeStream.writeUInt16Compressed(53);
     encodeStream.writeChangeObjectClassSubscriptionMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const ChangeObjectInstanceSubscriptionMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(99);
+    encodeStream.writeChangeObjectInstanceSubscriptionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
@@ -3428,6 +3452,7 @@ public:
     readFederationHandle(value.getFederationHandle());
     readSubscriptionType(value.getSubscriptionType());
     readInteractionClassHandle(value.getInteractionClassHandle());
+    readParameterValueVector(value.getParameterFilterValues());
   }
 
   void readChangeObjectClassSubscriptionMessage(ChangeObjectClassSubscriptionMessage& value)
@@ -3436,6 +3461,14 @@ public:
     readSubscriptionType(value.getSubscriptionType());
     readObjectClassHandle(value.getObjectClassHandle());
     readAttributeHandleVector(value.getAttributeHandles());
+  }
+
+  void readChangeObjectInstanceSubscriptionMessage(ChangeObjectInstanceSubscriptionMessage& value)
+  {
+    readFederationHandle(value.getFederationHandle());
+    readSubscriptionType(value.getSubscriptionType());
+    readObjectClassHandle(value.getObjectClassHandle());
+    readObjectInstanceHandle(value.getObjectInstanceHandle());
   }
 
   void readRegistrationForObjectClassMessage(RegistrationForObjectClassMessage& value)
@@ -3671,6 +3704,11 @@ public:
     readPayloadVariableLengthData(value.getTimeStamp());
   }
 
+  void readPayloadChangeInteractionClassSubscriptionMessage(ChangeInteractionClassSubscriptionMessage& value)
+  {
+    readPayloadParameterValueVector(value.getParameterFilterValues());
+  }
+
   void readPayloadInteractionMessage(InteractionMessage& value)
   {
     readPayloadVariableLengthData(value.getTag());
@@ -3749,7 +3787,12 @@ TightBE1MessageEncoding::readPacket(const Buffer& buffer)
     decodePayload(i);
   }
   if (getInputBufferComplete())
+  {
+#ifdef ENABLE_NETWORKSTATISTICS
+    GetNetworkStatistics().MessageReceived(_message->getTypeName());
+#endif
     getConnect()->send(SharedPtr<AbstractMessage>().swap(_message));
+  }
 }
 
 void
@@ -3902,6 +3945,10 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
     _message = new ChangeObjectClassSubscriptionMessage;
     decodeStream.readChangeObjectClassSubscriptionMessage(static_cast<ChangeObjectClassSubscriptionMessage&>(*_message));
     break;
+  case 99:
+    _message = new ChangeObjectInstanceSubscriptionMessage;
+    decodeStream.readChangeObjectInstanceSubscriptionMessage(static_cast<ChangeObjectInstanceSubscriptionMessage&>(*_message));
+    break;
   case 80:
     _message = new InteractionMessage;
     decodeStream.readInteractionMessage(static_cast<InteractionMessage&>(*_message));
@@ -3994,6 +4041,9 @@ TightBE1MessageEncoding::decodePayload(const Buffer::const_iterator& i)
   case 43:
     payloadDecoder.readPayloadCommitLowerBoundTimeStampMessage(static_cast<CommitLowerBoundTimeStampMessage&>(*_message));
     break;
+  case 52:
+    payloadDecoder.readPayloadChangeInteractionClassSubscriptionMessage(static_cast<ChangeInteractionClassSubscriptionMessage&>(*_message));
+    break;
   case 80:
     payloadDecoder.readPayloadInteractionMessage(static_cast<InteractionMessage&>(*_message));
     break;
@@ -4027,6 +4077,9 @@ void
 TightBE1MessageEncoding::writeMessage(const AbstractMessage& message)
 {
   message.dispatchFunctor(DispatchFunctor(*this));
+#ifdef ENABLE_NETWORKSTATISTICS
+  GetNetworkStatistics().MessageSent(message.getTypeName());
+#endif
 }
 
 } // namespace OpenRTI

@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4CEBC18D-BB3C-378A-A973-5D4F86C6AD20}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)src\RTI13\FedTime.vcxproj">
+      <Project>{24B63959-FD2B-3E7F-BB2F-A91DB01B6814}</Project>
+      <Name>FedTime</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\RTI13\FedTimeStub.vcxproj">
+      <Project>{A937D876-244E-35AB-A0FF-528001B7BD9B}</Project>
+      <Name>FedTimeStub</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\OpenRTI\OpenRTI.vcxproj">
+      <Project>{1A1A66B8-408A-301F-AA77-DFD4708C8C6E}</Project>
+      <Name>OpenRTI</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\RTI13\RTI-NG.vcxproj">
+      <Project>{1AA28F6B-939B-39CF-86C3-D4ABABF878BC}</Project>
+      <Name>RTI-NG</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\create\concurrent-create-1516.vcxproj">
+      <Project>{F1E3F629-10CD-3DAE-9EA8-8FAF8CCE9A17}</Project>
+      <Name>concurrent-create-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\join\concurrent-join-1516.vcxproj">
+      <Project>{809042A9-AF72-398D-B76C-A30499F9827C}</Project>
+      <Name>concurrent-join-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\time\concurrent-time-1516.vcxproj">
+      <Project>{3EBF09B7-0CDB-3117-86E1-7896E47F43D2}</Project>
+      <Name>concurrent-time-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\connect\connect-1516.vcxproj">
+      <Project>{FB32FD1B-572F-3F92-B886-001EC1C2A233}</Project>
+      <Name>connect-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\create\create-1516.vcxproj">
+      <Project>{B26DD7F5-3EF8-3AC1-90C3-DF3291D5A56D}</Project>
+      <Name>create-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\RTI13\fddget\fddget-13.vcxproj">
+      <Project>{7B27D82D-D92F-3FFB-A427-66F816AC8B89}</Project>
+      <Name>fddget-13</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\fddget\fddget-1516.vcxproj">
+      <Project>{453F64AA-5105-3660-8A08-506A6B1DE79F}</Project>
+      <Name>fddget-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516e\fddget\fddget-1516e.vcxproj">
+      <Project>{F3FDDD4B-F52B-3460-97BA-6BCBA24FCDF4}</Project>
+      <Name>fddget-1516e</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\rti1516\fedtime1516.vcxproj">
+      <Project>{8028FCD5-28A5-3B4E-90BA-1652FBC4C573}</Project>
+      <Name>fedtime1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\rti1516\fedtime1516Stub.vcxproj">
+      <Project>{662BEBC6-6AAB-32F8-A196-78C52F1B6B27}</Project>
+      <Name>fedtime1516Stub</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\rti1516e\fedtime1516e.vcxproj">
+      <Project>{AC5B586D-F120-3715-BC9C-FC80DD945C84}</Project>
+      <Name>fedtime1516e</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\rti1516e\fedtime1516eStub.vcxproj">
+      <Project>{F8E7565C-E670-3525-A6A8-27D4E9420652}</Project>
+      <Name>fedtime1516eStub</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\interaction\interaction-1516.vcxproj">
+      <Project>{B213AA86-4E61-3299-BCA9-84F4505E9E9C}</Project>
+      <Name>interaction-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\join\join-1516.vcxproj">
+      <Project>{D62560DC-7897-3AC4-A934-D1F9693DDC7F}</Project>
+      <Name>join-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\RTI13\link\link-13.vcxproj">
+      <Project>{BF525866-997C-3C69-A3DC-1BF23EE9F363}</Project>
+      <Name>link-13</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\link\link-1516.vcxproj">
+      <Project>{2CB5B31A-132D-3439-B034-F9BD4E1938BC}</Project>
+      <Name>link-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516e\link\link-1516e.vcxproj">
+      <Project>{409E5602-A804-3428-A9A8-3AE9E95D04F8}</Project>
+      <Name>link-1516e</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\time\logical-time-1516.vcxproj">
+      <Project>{35529BD0-BB24-3EC1-8673-AF2CD7F515A8}</Project>
+      <Name>logical-time-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516e\modules\modules-1516e.vcxproj">
+      <Project>{3408918C-28A9-3393-8EC7-0BC04E177AD2}</Project>
+      <Name>modules-1516e</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\objectinstance\objectinstance-1516.vcxproj">
+      <Project>{70B0FA1B-C77B-3257-9BEA-586A644DB45E}</Project>
+      <Name>objectinstance-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\objectinstance\objectname-1516.vcxproj">
+      <Project>{DE2FE221-7C9A-33B9-A81B-67F7640DBE31}</Project>
+      <Name>objectname-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\rti1516\rti1516.vcxproj">
+      <Project>{8B44E524-3A8E-32AE-81DD-5115F5A4BAE2}</Project>
+      <Name>rti1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\rti1516e\rti1516e.vcxproj">
+      <Project>{DEE8A809-6531-30D3-9292-E70C38ED75FC}</Project>
+      <Name>rti1516e</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)src\rtinode\rtinode.vcxproj">
+      <Project>{BB51B31F-3D6D-3A84-8883-EC4BF0193C48}</Project>
+      <Name>rtinode</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\OpenRTI\network\socketaddress.vcxproj">
+      <Project>{CB5C64C0-DC18-3DBA-82C4-A545C920800C}</Project>
+      <Name>socketaddress</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\rti1516\sync\sync-1516.vcxproj">
+      <Project>{3888C836-9D5C-3751-9DD7-375147A94A85}</Project>
+      <Name>sync-1516</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\OpenRTI\threads\threads.vcxproj">
+      <Project>{239B98CC-6BB3-3948-A238-DBEFE657FDCB}</Project>
+      <Name>threads</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)tests\OpenRTI\network\url.vcxproj">
+      <Project>{268054D2-69C7-3696-8DD5-2A8BCE54B755}</Project>
+      <Name>url</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

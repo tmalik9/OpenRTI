@@ -26,6 +26,10 @@
 #include "Exception.h"
 #include "IntrusiveList.h"
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 namespace OpenRTI {
 
 template<typename T>
@@ -94,6 +98,9 @@ public:
     void setKey(const Key& key)
     { OpenRTIAssert(!is_linked()); _key = key; }
 
+    Key& getModifiableKey()
+    { return _key; }
+
   private:
     Key _key;
   };
@@ -108,7 +115,7 @@ public:
   { }
   IntrusiveUnorderedMap(const IntrusiveUnorderedMap& intrusiveUnorderedMap)
   { OpenRTIAssert(intrusiveUnorderedMap.empty()); }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   IntrusiveUnorderedMap(IntrusiveUnorderedMap&& intrusiveUnorderedMap)
   { swap(intrusiveUnorderedMap); }
 #endif
@@ -117,7 +124,7 @@ public:
 
   IntrusiveUnorderedMap& operator=(const IntrusiveUnorderedMap& intrusiveUnorderedMap)
   { OpenRTIAssert(empty()); OpenRTIAssert(intrusiveUnorderedMap.empty()); return *this; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   IntrusiveUnorderedMap& operator=(IntrusiveUnorderedMap&& intrusiveUnorderedMap)
   { swap(intrusiveUnorderedMap); return *this; }
 #endif

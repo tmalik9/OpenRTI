@@ -21,8 +21,13 @@
 #define OpenRTI_Mutex_h
 
 #include "Export.h"
+#include "OpenRTIConfig.h"
 
-#if 201103L <= __cplusplus
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
+#if 201103L <= __CPlusPlusStd
 # include <mutex>
 #endif
 
@@ -33,26 +38,26 @@ class ScopeLock;
 
 class OPENRTI_API Mutex {
 public:
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   Mutex(void)
   { }
 #else
   Mutex(void);
 #endif
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   ~Mutex(void)
   { }
 #else
   ~Mutex(void);
 #endif
 
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   void lock(void)
   { _mutex.lock(); }
 #else
   void lock(void);
 #endif
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   void unlock(void)
   { _mutex.unlock(); }
 #else
@@ -63,7 +68,7 @@ private:
   Mutex(const Mutex&);
   Mutex& operator=(const Mutex&);
 
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   std::mutex _mutex;
 #else
   struct PrivateData;

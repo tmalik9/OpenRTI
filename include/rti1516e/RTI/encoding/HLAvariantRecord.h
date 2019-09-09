@@ -41,36 +41,30 @@ namespace rti1516e
       virtual ~HLAvariantRecord ();
 
       // Return a new copy of the DataElement
-      virtual std::auto_ptr<DataElement> clone () const;
+      virtual std::unique_ptr<DataElement> clone () const;
 
       // Encode this element into a new VariableLengthData
-      virtual VariableLengthData encode () const
-         throw (EncoderException);
+      virtual VariableLengthData encode () const;
 
       // Encode this element into an existing VariableLengthData
       virtual void encode (
-         VariableLengthData& inData) const
-         throw (EncoderException);
+         VariableLengthData& inData) const;
 
       // Encode this element and append it to a buffer
       virtual void encodeInto (
-         std::vector<Octet>& buffer) const
-         throw (EncoderException);
+         std::vector<Octet>& buffer) const;
 
       // Decode this element from the RTI's VariableLengthData.
       virtual void decode (
-         VariableLengthData const & inData)
-         throw (EncoderException);
+         VariableLengthData const & inData);
 
       // Decode this element starting at the index in the provided buffer
       virtual size_t decodeFrom (
          std::vector<Octet> const & buffer,
-         size_t index)
-         throw (EncoderException);
+         size_t index);
 
       // Return the size in bytes of this element's encoding.
-      virtual size_t getEncodedLength () const
-         throw (EncoderException);
+      virtual size_t getEncodedLength () const;
 
       // Return the octet boundary of this element.
       virtual unsigned int getOctetBoundary () const;
@@ -81,8 +75,7 @@ namespace rti1516e
 
       // Return true if given element is same type as specified variant; otherwise, false.
       virtual bool isSameTypeAs(DataElement const& discriminant, 
-         DataElement const& inData ) const
-         throw (EncoderException);
+         DataElement const& inData ) const;
 
       // Return true if given element matches prototype of this array.
       virtual bool hasMatchingDiscriminantTypeAs(DataElement const& dataElement ) const;
@@ -97,8 +90,7 @@ namespace rti1516e
       // Discriminants must match prototype
       virtual void addVariant (
          const DataElement& discriminant,
-         const DataElement& valuePrototype)
-         throw (EncoderException);
+         const DataElement& valuePrototype);
 
       // Add a new discriminant/variant pair: adds a mapping between the given
       // unique discriminant and the given value element.
@@ -114,21 +106,18 @@ namespace rti1516e
       // Null pointer results in an exception.
       virtual void addVariantPointer (
          const DataElement& discriminant,
-         DataElement* valuePtr)
-         throw (EncoderException);
+         DataElement* valuePtr);
 
       // Set the current value of the discriminant (specifies the type of the value)
       // Discriminants must match prototype
       virtual void setDiscriminant (
-         const DataElement& discriminant)
-         throw (EncoderException);
+         const DataElement& discriminant);
 
       // Sets the variant with the given discriminant to a copy of the given value
       // Discriminant must match prototype and value must match its variant
       virtual void setVariant (
          const DataElement& discriminant,
-         DataElement const& value)
-         throw (EncoderException);
+         DataElement const& value);
 
       // Sets the variant with the given discriminant to the given value
       // Discriminant must match prototype and value must match its variant
@@ -138,16 +127,14 @@ namespace rti1516e
       // Null pointer results in an exception.
       virtual void setVariantPointer (
          const DataElement& discriminant,
-         DataElement* valuePtr)
-         throw (EncoderException);
+         DataElement* valuePtr);
 
       // Return a reference to the discriminant element
       virtual const DataElement& getDiscriminant () const;
 
       // Return a reference to the variant element.
       // Exception thrown if encoded discriminant is not mapped to a value.
-      virtual const DataElement& getVariant() const
-         throw (EncoderException);
+      virtual const DataElement& getVariant() const;
 
    private:
 

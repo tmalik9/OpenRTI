@@ -37,12 +37,10 @@ namespace rti1516e
 
       virtual
       ~Exception ();
-      // throw();
 
       virtual
       std::wstring
-      what () const
-         throw() = 0;
+      what () const = 0;
    };
 
    // Output operator for Exceptions
@@ -56,12 +54,10 @@ namespace rti1516e
    {                                      \
       public:                             \
       A (                                 \
-         std::wstring const & message)    \
-         throw();                         \
+         std::wstring const & message);   \
                                           \
       std::wstring                        \
-      what () const                       \
-         throw();                         \
+      what () const;                      \
                                           \
       private:                            \
       std::wstring _msg;                  \

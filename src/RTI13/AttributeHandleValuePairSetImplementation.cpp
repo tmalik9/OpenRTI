@@ -36,7 +36,6 @@ AttributeHandleValuePairSetImplementation::size() const
 
 RTI::Handle
 AttributeHandleValuePairSetImplementation::getHandle(RTI::ULong index) const
-  throw (RTI::ArrayIndexOutOfBounds)
 {
   if (_attributeValues.size() <= index)
     throw RTI::ArrayIndexOutOfBounds("Array Index out of bounds in getHandle()");
@@ -45,7 +44,6 @@ AttributeHandleValuePairSetImplementation::getHandle(RTI::ULong index) const
 
 RTI::ULong
 AttributeHandleValuePairSetImplementation::getValueLength(RTI::ULong index) const
-  throw (RTI::ArrayIndexOutOfBounds)
 {
   if (_attributeValues.size() <= index)
     throw RTI::ArrayIndexOutOfBounds("Array Index out of bounds in getHandle()");
@@ -57,7 +55,6 @@ AttributeHandleValuePairSetImplementation::getValueLength(RTI::ULong index) cons
 
 void
 AttributeHandleValuePairSetImplementation::getValue(RTI::ULong index, char* data, RTI::ULong& length) const
-  throw (RTI::ArrayIndexOutOfBounds)
 {
   if (_attributeValues.size() <= index)
     throw RTI::ArrayIndexOutOfBounds("Array Index out of bounds in getHandle()");
@@ -70,7 +67,6 @@ AttributeHandleValuePairSetImplementation::getValue(RTI::ULong index, char* data
 
 char*
 AttributeHandleValuePairSetImplementation::getValuePointer(RTI::ULong index, RTI::ULong& length) const
-  throw (RTI::ArrayIndexOutOfBounds)
 {
   if (_attributeValues.size() <= index)
     throw RTI::ArrayIndexOutOfBounds("Array Index out of bounds in getHandle()");
@@ -84,31 +80,24 @@ AttributeHandleValuePairSetImplementation::getValuePointer(RTI::ULong index, RTI
 
 RTI::TransportType
 AttributeHandleValuePairSetImplementation::getTransportType(RTI::ULong index) const
-  throw (RTI::InvalidHandleValuePairSetContext)
 {
   throw RTI::InvalidHandleValuePairSetContext("Don't ask for the transportation type here!");
 }
 
 RTI::OrderType
 AttributeHandleValuePairSetImplementation::getOrderType(RTI::ULong index) const
-  throw (RTI::ArrayIndexOutOfBounds,
-         RTI::InvalidHandleValuePairSetContext)
 {
   throw RTI::InvalidHandleValuePairSetContext("Don't ask for the order type here!");
 }
 
 RTI::Region*
 AttributeHandleValuePairSetImplementation::getRegion(RTI::ULong index) const
-  throw (RTI::ArrayIndexOutOfBounds,
-         RTI::InvalidHandleValuePairSetContext)
 {
   throw RTI::InvalidHandleValuePairSetContext("Don't ask for the region here!");
 }
 
 void
 AttributeHandleValuePairSetImplementation::add(RTI::Handle handle, const char* data, RTI::ULong length)
-  throw (RTI::ValueLengthExceeded,
-         RTI::ValueCountExceeded)
 {
   OpenRTI::AttributeHandle attributeHandle = handle;
   _attributeValues.push_back(OpenRTI::AttributeValue());
@@ -118,7 +107,6 @@ AttributeHandleValuePairSetImplementation::add(RTI::Handle handle, const char* d
 
 void
 AttributeHandleValuePairSetImplementation::remove(RTI::Handle handle)
-  throw (RTI::ArrayIndexOutOfBounds)
 {
   bool found = false;
   OpenRTI::AttributeHandle attributeHandle = handle;
@@ -136,8 +124,6 @@ AttributeHandleValuePairSetImplementation::remove(RTI::Handle handle)
 
 void
 AttributeHandleValuePairSetImplementation::moveFrom(const RTI::AttributeHandleValuePairSet& attributeHandleValuePairSet, RTI::ULong& index)
-  throw (RTI::ValueCountExceeded,
-         RTI::ArrayIndexOutOfBounds)
 {
   throw RTI::RTIinternalError("Unimplemented function: To be honest I did not find any reference about the desired semantics. Provide me, any I implement ...");
 }
@@ -170,7 +156,6 @@ AttributeHandleValuePairSetImplementation::next(RTI::ULong i) const
 
 RTI::AttributeHandleValuePairSet*
 RTI::AttributeSetFactory::create(ULong size)
-  throw (RTI::MemoryExhausted, RTI::ValueCountExceeded, RTI::HandleValuePairMaximumExceeded)
 {
   return new AttributeHandleValuePairSetImplementation(size);
 }

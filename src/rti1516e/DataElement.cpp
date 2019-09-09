@@ -19,6 +19,8 @@
 
 #include <RTI/encoding/DataElement.h>
 
+#pragma warning(disable: 4100)
+
 #include <typeinfo>
 
 namespace rti1516e
