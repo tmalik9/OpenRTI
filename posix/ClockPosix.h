@@ -45,7 +45,7 @@ struct OPENRTI_LOCAL ClockPosix {
   static struct timespec toTimespec(const uint64_t& nsec)
   {
     struct timespec ts;
-    ts.tv_nsec = nsec % 1000000000;
+    ts.tv_nsec = nsec % uint64_t(1000000000);
     uint64_t sec = nsec/uint64_t(1000000000);
     if (uint64_t(std::numeric_limits<time_t>::max()) < sec) {
       ts.tv_nsec = 999999999;
