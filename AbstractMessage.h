@@ -45,7 +45,7 @@ public:
   virtual const char* getTypeName() const = 0;
   virtual void out(std::ostream& os) const = 0;
   virtual void dispatch(const AbstractMessageDispatcher&) const = 0;
-
+  std::string toString() const;
   // For testing of the transport implementation
   virtual bool operator==(const AbstractMessage&) const = 0;
   bool operator!=(const AbstractMessage& message) const

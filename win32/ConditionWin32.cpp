@@ -24,10 +24,13 @@
 #include "ScopeLock.h"
 #include "MutexPrivateDataWin32.h"
 #include "ConditionPrivateDataWin32.h"
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
 
 namespace OpenRTI {
 
-#if __cplusplus < 201103L
+#if __CPlusPlusStd < 201103L
 
 Condition::Condition(void) :
   _privateData(new PrivateData)

@@ -31,6 +31,8 @@
 #include "LogStream.h"
 #include "SocketPrivateDataWin32.h"
 
+#pragma comment(lib, "ws2_32.lib")
+
 namespace OpenRTI {
 
 static void

@@ -21,7 +21,7 @@
 
 #include <istream>
 #include <cstring>
-#include <expat.h>
+#include "xml/expat.h"
 #include "Exception.h"
 
 #if XML_MAJOR_VERSION < 2

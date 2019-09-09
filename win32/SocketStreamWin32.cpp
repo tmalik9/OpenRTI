@@ -63,19 +63,21 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
     if (sendBufferSize < bytelen)
       break;
   }
-
+#ifndef _WIN32
   if (more)
     cork(true);
-
+#endif
   DWORD flags = 0;
   DWORD numBytesSent = 0;
   int ret = WSASend(_privateData->_socket, buffers, bufferCount, &numBytesSent, flags, NULL, NULL);
   // get the error of the send call before trying setsocketopt
   int errorNumber = WSAGetLastError();
 
+#ifndef _WIN32
   // flush the buffer
   if (!more)
     cork(false);
+#endif
 
   if (ret != SOCKET_ERROR)
     return numBytesSent;

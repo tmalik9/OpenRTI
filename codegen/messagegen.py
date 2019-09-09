@@ -105,6 +105,8 @@ class DataType(object):
     def writeStreamOut(self, sourceStream):
         pass
 
+    def writeToString(self, sourceStream):
+        pass
 
 ###############################################################################
 class CDataType(DataType):
@@ -188,6 +190,7 @@ class EnumDataType(DataType):
         getattr(messageEncoding, 'writeEnum' + component)(self, sourceStream)
 
     def writeStreamOut(self, sourceStream):
+        sourceStream.writeline('// EnumDataType ' + self.getName())
         sourceStream.writeline('template<typename char_type, typename traits_type>')
         sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
         sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
@@ -197,6 +200,15 @@ class EnumDataType(DataType):
             sourceStream.writeline('  case {enum}: os << "{enum}"; break;'.format(enum = enum.getName()))
         sourceStream.writeline('  }')
         sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+        sourceStream.writeline('inline std::string to_string(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  switch (value) {')
+        for enum in self.__enumList:
+            sourceStream.writeline('  case {enum}: return "{enum}";'.format(enum = enum.getName()))
+        sourceStream.writeline('  default: return "<Invalid {name}>";'.format(name = self.getName()))
+        sourceStream.writeline('  }')
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -229,6 +241,7 @@ class VectorDataType(DataType):
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
         sourceStream.writeline('template<typename char_type, typename traits_type>')
         sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
         sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
@@ -275,6 +288,7 @@ class SetDataType(DataType):
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
+        sourceStream.writeline('// ' + str(self))
         sourceStream.writeline('template<typename char_type, typename traits_type>')
         sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
         sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
@@ -338,6 +352,7 @@ class MapDataType(DataType):
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
+        sourceStream.writeline('// ' + str(self))
         sourceStream.writeline('template<typename char_type, typename traits_type>')
         sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
         sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
@@ -400,6 +415,7 @@ class PairDataType(DataType):
         getattr(messageEncoding, 'writePair' + component)(self, sourceStream)
 
     def writeStreamOut(self, sourceStream):
+        sourceStream.writeline('// ' + str(self))
         sourceStream.writeline('template<typename char_type, typename traits_type>')
         sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
         sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
@@ -415,11 +431,12 @@ class PairDataType(DataType):
 
 ###############################################################################
 class StructField(object):
-    def __init__(self, name, typeName):
+    def __init__(self, name, typeName, hideOnPrint=False):
         self.__name = name
         self.__typeName = typeName
         self.__hasSwap = False
         self._hasPayload = None
+        self._hideOnPrint = hideOnPrint
 
     def getName(self):
         return self.__name
@@ -446,13 +463,16 @@ class StructField(object):
     def hasPayload(self):
         return self._hasPayload
 
+    def hideOnPrint(self):
+        return self._hideOnPrint
+
     def writeSetter(self, sourceStream, valuePrefix):
         upperName = self.getUpperName()
         typeName = self.getTypeName()
         memberName = self.getMemberName()
         sourceStream.writeline('void set{upperName}(const {typeName}& value)'.format(upperName = upperName, typeName = typeName))
         sourceStream.writeline('{{ {prefix}{memberName} = value; }}'.format(memberName = memberName, prefix = valuePrefix))
-        sourceStream.writelineNoIndent('#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference')
+        sourceStream.writelineNoIndent('#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference')
         sourceStream.writeline('void set{upperName}({typeName}&& value)'.format(upperName = upperName, typeName = typeName))
         sourceStream.writeline('{{ {prefix}{memberName} = std::move(value); }}'.format(memberName = memberName, prefix = valuePrefix))
         sourceStream.writelineNoIndent('#endif')
@@ -497,8 +517,8 @@ class StructDataType(DataType):
     def getCopyOnWrite(self):
         return self.__cow
 
-    def addField(self, name, typeName):
-        self.__fieldList.append(StructField(name, typeName))
+    def addField(self, name, typeName, hideOnPrint=False):
+        self.__fieldList.append(StructField(name, typeName, hideOnPrint))
 
     def getFieldList(self):
         return self.__fieldList
@@ -650,6 +670,7 @@ class StructDataType(DataType):
         getattr(messageEncoding, 'writeStruct' + component)(self, sourceStream)
 
     def writeStreamOut(self, sourceStream):
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
         sourceStream.writeline('template<typename char_type, typename traits_type>')
         sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
         sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
@@ -660,14 +681,32 @@ class StructDataType(DataType):
             count = count + 1
             lowerName = field.getLowerName()
             upperName = field.getUpperName()
-            sourceStream.writeline('  os << "{lowerName}: " << value.get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
-            if count != len(self.__fieldList):
-                sourceStream.writeline('  os << ", ";')
+            if not field.hideOnPrint():
+                sourceStream.writeline('  os << "{lowerName}: " << value.get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
+                if count != len(self.__fieldList):
+                    sourceStream.writeline('  os << ", ";')
+            else:
+                sourceStream.writeline('  // ' + type(field).__name__ + " " + field.getLowerName() + " (hidden)")
+                sourceStream.writeline('  //os << "{lowerName}: " << value.get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
+                if count != len(self.__fieldList):
+                    sourceStream.writeline('  //os << ", ";')
+            
         sourceStream.writeline('  os << " }";')
         sourceStream.writeline('  return os;')
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writeToString(self, sourceStream):
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
+        sourceStream.writeline('inline std::string to_string(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent();
+        sourceStream.writeline('  std::ostringstream out;')
+        sourceStream.writeline('  out << value;')
+        sourceStream.writeline('  return out.str();')
+        sourceStream.popIndent();
+        sourceStream.writeline('}')
+        sourceStream.writeline()
 
 ###############################################################################
 class MessageDataType(StructDataType):
@@ -897,7 +936,8 @@ class MessageEncoding(object):
             'AttributeUpdateMessage' : 94,
             'TimeStampedAttributeUpdateMessage' : 96,
             'RequestAttributeUpdateMessage' : 97,
-            'RequestClassAttributeUpdateMessage' : 98
+            'RequestClassAttributeUpdateMessage' : 98,
+            'ChangeObjectInstanceSubscriptionMessage' : 99
         }
 
     def getName(self):
@@ -1259,7 +1299,13 @@ class MessageEncoding(object):
         sourceStream.writeline('#include "EncodeDataStream.h"')
         sourceStream.writeline('#include "Export.h"')
         sourceStream.writeline('#include "Message.h"')
+        sourceStream.writeline('#include "AbstractNetworkStatistics.h"')
         sourceStream.writeline()
+        sourceStream.writeline('#ifndef __CPlusPlusStd')
+        sourceStream.writeline('#error "must include "OpenRTIConfig.h!"')
+        sourceStream.writeline('#endif')
+        sourceStream.writeline()
+
         sourceStream.writeline('namespace OpenRTI {')
         sourceStream.writeline()
 
@@ -1394,7 +1440,14 @@ class MessageEncoding(object):
         sourceStream.writeline('  decodePayload(i);')
         sourceStream.writeline('}')
         sourceStream.writeline('if (getInputBufferComplete())')
-        sourceStream.writeline('  getConnect()->send(SharedPtr<AbstractMessage>().swap(_message));')
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writelineNoIndent('#ifdef ENABLE_NETWORKSTATISTICS')
+        sourceStream.writeline('GetNetworkStatistics().MessageReceived(_message->getTypeName());')
+        sourceStream.writelineNoIndent('#endif')
+        sourceStream.writeline('getConnect()->send(SharedPtr<AbstractMessage>().swap(_message));')
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
         sourceStream.popIndent()
         sourceStream.writeline('}')
         sourceStream.writeline()
@@ -1457,7 +1510,12 @@ class MessageEncoding(object):
         sourceStream.writeline('void')
         sourceStream.writeline(encodingName + 'MessageEncoding::writeMessage(const AbstractMessage& message)')
         sourceStream.writeline('{')
-        sourceStream.writeline('  message.dispatchFunctor(DispatchFunctor(*this));')
+        sourceStream.pushIndent()
+        sourceStream.writeline('message.dispatchFunctor(DispatchFunctor(*this));')
+        sourceStream.writelineNoIndent('#ifdef ENABLE_NETWORKSTATISTICS')
+        sourceStream.writeline('GetNetworkStatistics().MessageSent(message->getTypeName());')
+        sourceStream.writelineNoIndent('#endif')
+        sourceStream.popIndent()
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -1482,61 +1540,60 @@ class TightBE1MessageEncoding(MessageEncoding):
 
 ###############################################################################
 class TypeMap(object):
-    def __init__(self, node):
+    def __init__(self, root):
         self.__typeList = []
         self.__typeMap = {}
+        for node in root.getchildren():
+            if node.tag == 'message':
+                message = MessageDataType(node.get('type') + 'Message', 'AbstractMessage')
+                for field in node.getchildren():
+                    if field.tag == 'field':
+                        hide = field.get('hide')
+                        if hide is not None:
+                            if hide.lower() == 'true' or hide == '1': 
+                                hide = True
+                            else:
+                                hide = False
+                        message.addField(field.get('name'), field.get('type'), hide)
+                    elif field.tag == 'reliable':
+                        message.setReliableExpression(field.get('expression'))
+                    elif field.tag == 'objectInstance':
+                        message.setObjectInstanceExpression(field.get('expression'))
+                    #field = field.next
+                self.addType(message)
 
-        while node:
-            if node.type == 'element':
-                if node.name == 'message':
-                    message = MessageDataType(node.prop('type') + 'Message', 'AbstractMessage')
-                    field = node.children
-                    while field:
-                        if field.type == 'element' and field.name == 'field':
-                            message.addField(field.prop('name'), field.prop('type'))
-                        elif field.type == 'element' and field.name == 'reliable':
-                            message.setReliableExpression(field.prop('expression'))
-                        elif field.type == 'element' and field.name == 'objectInstance':
-                            message.setObjectInstanceExpression(field.prop('expression'))
-                        field = field.next
-                    self.addType(message)
+            elif node.tag == 'type':
+                typeName = node.get('type')
+                if typeName == 'enum':
+                    enum = EnumDataType(node.get('name'))
+                    for enumerant in node.getchildren():
+                        if enumerant.tag == 'enumerant':
+                            enum.addEnum(enumerant.get('name'), enumerant.get('value'))
+                    self.addType(enum)
 
-                elif node.name == 'type':
-                    typeName = node.prop('type')
-                    if typeName == 'enum':
-                        enum = EnumDataType(node.prop('name'))
-                        enumerant = node.children
-                        while enumerant:
-                            if enumerant.type == 'element' and enumerant.name == 'enumerant':
-                                enum.addEnum(enumerant.prop('name'), enumerant.prop('value'))
-                            enumerant = enumerant.next
-                        self.addType(enum)
+                elif typeName == 'vector':
+                    self.addType(VectorDataType(node.get('name'), node.get('scalar')))
 
-                    elif typeName == 'vector':
-                        self.addType(VectorDataType(node.prop('name'), node.prop('scalar')))
+                elif typeName == 'set':
+                    self.addType(SetDataType(node.get('name'), node.get('scalar')))
 
-                    elif typeName == 'set':
-                        self.addType(SetDataType(node.prop('name'), node.prop('scalar')))
+                elif typeName == 'map':
+                    self.addType(MapDataType(node.get('name'), node.get('key'), node.get('value')))
 
-                    elif typeName == 'map':
-                        self.addType(MapDataType(node.prop('name'), node.prop('key'), node.prop('value')))
+                elif typeName == 'pair':
+                    self.addType(PairDataType(node.get('name'), node.get('first'), node.get('second')))
 
-                    elif typeName == 'pair':
-                        self.addType(PairDataType(node.prop('name'), node.prop('first'), node.prop('second')))
-
-                    elif typeName == 'struct':
-                        struct = StructDataType(node.prop('name'))
-                        struct.setCopyOnWrite(node.prop('copyOnWrite') == 'true')
-                        field = node.children
-                        while field:
-                            if field.type == 'element' and field.name == 'field':
-                                struct.addField(field.prop('name'), field.prop('type'))
-                            field = field.next
-                        self.addType(struct)
-                    else:
-                        dataType = CDataType(node.prop('name'), node.prop('encoding'), node.prop('ctype'))
-                        self.addType(dataType)
-            node = node.next
+                elif typeName == 'struct':
+                    struct = StructDataType(node.get('name'))
+                    struct.setCopyOnWrite(node.get('copyOnWrite') == 'true')
+                    for field in node.getchildren():
+                        if field.tag == 'field':
+                            struct.addField(field.get('name'), field.get('type'))
+                    self.addType(struct)
+                else:
+                    dataType = CDataType(node.get('name'), node.get('encoding'), node.get('ctype'))
+                    self.addType(dataType)
+            #node = node.next
 
         for t in self.__typeList:
             t.resolveHasPayloadAndHasSwap(self)
@@ -1564,6 +1621,10 @@ class TypeMap(object):
         sourceStream.writeline('#include "Handle.h"')
         sourceStream.writeline('#include "VariableLengthData.h"')
         sourceStream.writeline()
+        sourceStream.writeline('#ifndef __CPlusPlusStd')
+        sourceStream.writeline('#error "must include "OpenRTIConfig.h!"')
+        sourceStream.writeline('#endif')
+        sourceStream.writeline()
         sourceStream.writeline('namespace OpenRTI {')
         sourceStream.writeline()
         for t in self.__typeList:
@@ -1574,6 +1635,9 @@ class TypeMap(object):
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeStreamOut(sourceStream)
+        sourceStream.writeline()
+        for t in self.__typeList:
+            t.writeToString(sourceStream)
         sourceStream.writeline('} // namespace OpenRTI')
         sourceStream.writeline()
         sourceStream.writeline('#endif')
@@ -1683,7 +1747,7 @@ class TypeMap(object):
 
 import sys
 import getopt
-import libxml2
+import xml.etree.ElementTree as etree
 
 messageDefinitionFile = 'codegen/Message.xml'
 outputMode = ''
@@ -1704,10 +1768,10 @@ for (arg, val) in args:
 #    libxml2.XML_PARSE_DTDLOAD +
 #    libxml2.XML_PARSE_DTDVALID +
 #    libxml2.XML_PARSE_NOBLANKS)
-doc = libxml2.readFile(messageDefinitionFile, None, libxml2.XML_PARSE_NOBLANKS)
-rootElement = doc.getRootElement()
-typeMap = TypeMap(rootElement.children)
-doc.freeDoc()
+doc = etree.parse(messageDefinitionFile)
+rootElement = doc.getroot()
+typeMap = TypeMap(rootElement)
+# doc.freeDoc()
 
 # These are the output modes for debugging specific stages
 if outputMode == 'MessageDeclaration':

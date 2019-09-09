@@ -22,6 +22,10 @@
 #include <expat_config.h>
 #endif /* ndef COMPILED_FROM_DSP */
 
+#ifdef _MSC_VER
+#pragma warning(disable : 4100 4127 4244 4456)
+#endif
+
 #include "ascii.h"
 #include "expat.h"
 
@@ -1580,7 +1584,7 @@ XML_Parse(XML_Parser parser, const char *s, int len, int isFinal)
     }
 
     XmlUpdatePosition(encoding, positionPtr, end, &position);
-    nLeftOver = s + len - end;
+    nLeftOver = (int)(s + len - end);
     if (nLeftOver) {
       if (buffer == NULL || nLeftOver > bufferLim - buffer) {
         /* FIXME avoid integer overflow */
@@ -1852,7 +1856,7 @@ XML_Index XMLCALL
 XML_GetCurrentByteIndex(XML_Parser parser)
 {
   if (eventPtr)
-    return parseEndByteIndex - (parseEndPtr - eventPtr);
+    return (XML_Index)(parseEndByteIndex - (parseEndPtr - eventPtr));
   return -1;
 }
 

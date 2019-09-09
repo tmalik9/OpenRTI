@@ -34,4 +34,25 @@ InternalTimeManagement::~InternalTimeManagement()
 {
 }
 
+std::string to_string(InternalTimeManagement::TimeAdvanceMode mode)
+{
+  switch (mode)
+  {
+    case InternalTimeManagement::TimeAdvanceMode::TimeAdvanceGranted:
+      return "TimeAdvanceGranted";
+    case InternalTimeManagement::TimeAdvanceMode::TimeAdvanceRequest:
+      return "TimeAdvanceRequest";
+    case InternalTimeManagement::TimeAdvanceMode::TimeAdvanceRequestAvailable:
+      return "TimeAdvanceRequestAvailable";
+    case InternalTimeManagement::TimeAdvanceMode::NextMessageRequest:
+      return "NextMessageRequest";
+    case InternalTimeManagement::TimeAdvanceMode::NextMessageRequestAvailable:
+      return "NextMessageRequestAvailable";
+    case InternalTimeManagement::TimeAdvanceMode::FlushQueueRequest:
+      return "FlushQueueRequest";
+    default:
+      return "TimeAdvanceMode::Unknown";
+  }
+}
+
 }

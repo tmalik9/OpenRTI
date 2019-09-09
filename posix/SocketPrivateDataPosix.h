@@ -22,6 +22,7 @@
 
 #include "Socket.h"
 
+#include "OpenRTIConfig.h"
 #include "Export.h"
 #include <sys/types.h>
 #include <sys/socket.h>

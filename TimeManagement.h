@@ -21,6 +21,7 @@
 #define OpenRTI_TimeManagement_h
 
 #include "InternalTimeManagement.h"
+#include "AbstractNotificationHandle.h"
 
 namespace OpenRTI {
 
@@ -43,6 +44,7 @@ public:
 
   virtual bool isLogicalTimeInThePast(const NativeLogicalTime& logicalTime) = 0;
   virtual bool logicalTimeAlreadyPassed(const NativeLogicalTime& logicalTime) = 0;
+  virtual bool logicalTimeAlreadyPassed(const NativeLogicalTime& logicalTime, std::string& reason) = 0;
 
   virtual void enableTimeRegulation(InternalAmbassador& ambassador, const NativeLogicalTimeInterval& nativeLookahead) = 0;
   virtual void enableTimeRegulation(InternalAmbassador& ambassador, const NativeLogicalTime& nativeLogicalTime, const NativeLogicalTimeInterval& nativeLookahead) = 0;
@@ -73,6 +75,7 @@ public:
   virtual void eraseMessagesForObjectInstance(Ambassador<T>& ambassador, const ObjectInstanceHandle& objectInstanceHandle) = 0;
   virtual void receiveInteraction(Ambassador<T>& ambassador, const Federate::InteractionClass& interactionClass,
                                   const InteractionClassHandle& interactionClassHandle, const TimeStampedInteractionMessage& message) = 0;
+  virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) = 0;
 };
 
 } // namespace OpenRTI

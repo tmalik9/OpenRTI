@@ -424,8 +424,8 @@
 
   <!-- Tell a child server node about a new federation -->
   <message type="InsertFederationExecution">
-    <field name="FederationHandle" type="FederationHandle"/>
-    <field name="FederationName" type="String"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="FederationName" type="String"  hide="False"/>
     <field name="LogicalTimeFactoryName" type="String"/>
     <!-- Maximum backward compatible string based key value map describing the rti capabilites. -->
     <field name="ConfigurationParameterMap" type="ConfigurationParameterMap"/>
@@ -453,8 +453,8 @@
        Don't need the erase since once inserted they persist
   -->
   <message type="InsertModules">
-    <field name="FederationHandle" type="FederationHandle"/>
-    <field name="FOMModuleList" type="FOMModuleList"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="FOMModuleList" type="FOMModuleList" hide="True"/>
   </message>
 
   <!-- Join federation execution -->
@@ -503,9 +503,9 @@
   <!-- Notify messages for new and vanished Federates -->
   <message type="JoinFederateNotify">
     <!-- The federation handle to identify packets -->
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <!-- The new federates handle -->
-    <field name="FederateHandle" type="FederateHandle"/>
+    <field name="FederateHandle" type="FederateHandle" hide="True"/>
     <!-- The new federates type -->
     <field name="FederateType" type="String"/>
     <!-- The new federates unique name -->
@@ -530,7 +530,7 @@
     -->
   <message type="RegisterFederationSynchronizationPoint">
     <!-- The federation handle to identify packets -->
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <!-- The originating federates handle -->
     <field name="FederateHandle" type="FederateHandle"/>
     <!-- The synchronization label -->
@@ -542,7 +542,7 @@
   </message>
   <message type="RegisterFederationSynchronizationPointResponse">
     <!-- The federation handle to identify packets -->
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <!-- The originating federates handle, do we need to have a more stable routing??? FIXME -->
     <field name="FederateHandle" type="FederateHandle"/>
     <!-- The synchronization label -->
@@ -552,7 +552,7 @@
 
   <message type="AnnounceSynchronizationPoint">
     <!-- The federation handle to identify packets -->
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <!-- The synchronization label -->
     <field name="Label" type="String"/>
     <field name="Tag" type="VariableLengthData"/>
@@ -563,25 +563,25 @@
   </message>
 
   <message type="SynchronizationPointAchieved">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="Label" type="String"/>
     <field name="FederateHandleBoolPairVector" type="FederateHandleBoolPairVector"/>
   </message>
   <message type="FederationSynchronized">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="Label" type="String"/>
     <field name="FederateHandleBoolPairVector" type="FederateHandleBoolPairVector"/>
   </message>
 
   <!-- Time management -->
   <message type="EnableTimeRegulationRequest">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
     <field name="TimeStamp" type="VariableLengthData"/>
     <field name="CommitId" type="Unsigned"/>
   </message>
   <message type="EnableTimeRegulationResponse">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
     <field name="RespondingFederateHandle" type="FederateHandle"/>
     <field name="TimeStampValid" type="Bool"/>
@@ -601,19 +601,19 @@
     <field name="FederationHandle" type="FederationHandle"/>
     <!-- May be a federate handle vector already? For the optimized case where we know the representation
          and handle collecting commits in the server tree? FIXME -->
-    <field name="FederateHandle" type="FederateHandle"/>
+    <field name="FederateHandle" type="FederateHandle" hide="True"/>
     <field name="TimeStamp" type="VariableLengthData"/>
     <field name="CommitType" type="LowerBoundTimeStampCommitType"/>
     <field name="CommitId" type="Unsigned"/>
   </message>
   <message type="CommitLowerBoundTimeStampResponse">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
     <field name="SendingFederateHandle" type="FederateHandle"/>
     <field name="CommitId" type="Unsigned"/>
   </message>
   <message type="LockedByNextMessageRequest">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <!-- <field name="FederateHandle" type="FederateHandle"/> -->
     <field name="SendingFederateHandle" type="FederateHandle"/>
     <field name="LockedByNextMessage" type="Bool"/>
@@ -646,12 +646,12 @@
 
   <!-- Publications are pushed into all federates. -->
   <message type="ChangeInteractionClassPublication">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="PublicationType" type="PublicationType"/>
     <field name="InteractionClassHandle" type="InteractionClassHandle"/>
   </message>
   <message type="ChangeObjectClassPublication">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="PublicationType" type="PublicationType"/>
     <field name="ObjectClassHandle" type="ObjectClassHandle"/>
     <field name="AttributeHandles" type="AttributeHandleVector"/>
@@ -659,16 +659,24 @@
 
   <!-- Subscribtions are pushed into federates that publish the appropriate stuff. -->
   <message type="ChangeInteractionClassSubscription">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="SubscriptionType" type="SubscriptionType"/>
     <field name="InteractionClassHandle" type="InteractionClassHandle"/>
+    <field name="ParameterFilterValues" type="ParameterValueVector"/>
     <!-- <field name="InteractionClassHandleRegionValueListPair" type="InteractionClassHandleRegionValueListPair"/> -->
   </message>
   <message type="ChangeObjectClassSubscription">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="SubscriptionType" type="SubscriptionType"/>
     <field name="ObjectClassHandle" type="ObjectClassHandle"/>
     <field name="AttributeHandles" type="AttributeHandleVector"/>
+  </message>
+
+  <message type="ChangeObjectInstanceSubscription">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="SubscriptionType" type="SubscriptionType"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
   </message>
 
   <!-- Ambassador internal messages. -->

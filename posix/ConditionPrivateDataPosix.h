@@ -23,6 +23,7 @@
 #include <pthread.h>
 #include <cerrno>
 
+#include "OpenRTIConfig.h"
 #include "Clock.h"
 #include "Export.h"
 #include "Mutex.h"

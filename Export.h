@@ -67,6 +67,7 @@
 # pragma warning(disable: 4251)
 // the 'this is used in base ...' warning for WeakReferenced.
 # pragma warning(disable: 4355)
+# pragma warning(disable: 4100)
 #endif
 
 

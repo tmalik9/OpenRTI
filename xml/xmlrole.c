@@ -29,6 +29,9 @@
  content of literals
 
 */
+#ifdef _MSC_VER
+#pragma warning(disable : 4100)
+#endif
 
 static const char KW_ANY[] = {
     ASCII_A, ASCII_N, ASCII_Y, '\0' };

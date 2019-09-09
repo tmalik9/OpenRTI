@@ -20,6 +20,7 @@
 #ifndef MutexPrivateDataPosix_h
 #define MutexPrivateDataPosix_h
 
+#include "OpenRTIConfig.h"
 #include "Mutex.h"
 
 #include "Exception.h"

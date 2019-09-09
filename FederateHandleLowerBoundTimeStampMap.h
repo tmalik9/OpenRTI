@@ -48,6 +48,7 @@ public:
   /// Returns true if this unleaches a new logical time
   bool erase(const FederateHandle& federateHandle)
   {
+    // find the (last) commit done by the given federate
     typename FederateHandleCommitMap::iterator i;
     i = _federateHandleCommitMap.find(federateHandle);
     // OpenRTIAssert(i != _federateHandleCommitMap.end());
@@ -71,32 +72,41 @@ public:
     OpenRTIAssert(!_nextMessageLogicalTimeFederateCountMap.empty());
     OpenRTIAssert(!_federateHandleCommitMap.empty());
 
+    // find the (last) commit done by the given federate
+    // Note each federate has exactly one commit entry.
     typename FederateHandleCommitMap::iterator i;
     i = _federateHandleCommitMap.find(federateHandle);
     OpenRTIAssert(i != _federateHandleCommitMap.end());
+    Commit& commit = i->second;
 
+    // The iterators contained in the commit entry point into the time advance count map, or the next message commit map, or both.
     bool isFirstLogicalTime;
     if (commitType & TimeAdvanceCommit) {
-      std::pair<typename LogicalTimeFederateCountMap::iterator, bool> iteratorPair = _timeAdvanceLogicalTimeFederateCountMap.move(i->second._timeAdvanceCommit, logicalTime);
-      i->second._timeAdvanceCommit = iteratorPair.first;
+      // 'move' this federate's count in the _timeAdvanceLogicalTimeFederateCountMap
+      std::pair<typename LogicalTimeFederateCountMap::iterator, bool> iteratorPair = _timeAdvanceLogicalTimeFederateCountMap.move(commit._timeAdvanceCommit, logicalTime);
+      commit._timeAdvanceCommit = iteratorPair.first;
       isFirstLogicalTime = iteratorPair.second;
     } else {
       isFirstLogicalTime = false;
     }
 
     if (commitType & NextMessageCommit) {
-      i->second._nextMessageCommit = _nextMessageLogicalTimeFederateCountMap.move(i->second._nextMessageCommit, logicalTime).first;
+      commit._nextMessageCommit = _nextMessageLogicalTimeFederateCountMap.move(commit._nextMessageCommit, logicalTime).first;
     }
 
     // Forcefully clear this
-    bool nextMessageMode = i->second.isInNextMessageMode();
+#ifndef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
+    bool nextMessageMode = commit.isInNextMessageMode();
     if (!nextMessageMode)
-      i->second._federateIsLocked = false;
+      commit._federateIsLocked = false;
+#endif
 
     bool commmitIdChangedAndNextMessageMode;
-    if (i->second._commitId != commitId) {
+    if (commit._commitId != commitId) {
+#ifndef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
       OpenRTIAssert(nextMessageMode);
-      i->second._commitId = commitId;
+#endif
+      commit._commitId = commitId;
       commmitIdChangedAndNextMessageMode = true;
     } else {
       commmitIdChangedAndNextMessageMode = false;
@@ -105,7 +115,7 @@ public:
     OpenRTIAssert(!_timeAdvanceLogicalTimeFederateCountMap.empty());
     OpenRTIAssert(!_nextMessageLogicalTimeFederateCountMap.empty());
     OpenRTIAssert(!_federateHandleCommitMap.empty());
-    OpenRTIAssert(i->second._timeAdvanceCommit->first <= i->second._nextMessageCommit->first);
+    OpenRTIAssert(commit._timeAdvanceCommit->first <= commit._nextMessageCommit->first);
     OpenRTIAssert(_timeAdvanceLogicalTimeFederateCountMap.begin()->first <= _nextMessageLogicalTimeFederateCountMap.begin()->first);
 
     return std::pair<bool, bool>(isFirstLogicalTime, commmitIdChangedAndNextMessageMode);
@@ -160,6 +170,7 @@ public:
   }
 
   // O(1)
+  // Is there a TAR pending, with a smaller time than any NMR? Has priority.
   bool getConstrainedByNextMessage() const
   {
     if (empty())
@@ -177,6 +188,7 @@ public:
   }
 
   // O(log(n))
+#ifndef EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
   void setFederateWaitCommitId(const FederateHandle& federateHandle, const Unsigned& commitId)
   {
     typename FederateHandleCommitMap::iterator i = _federateHandleCommitMap.find(federateHandle);
@@ -184,8 +196,10 @@ public:
       return;
     i->second._federateIsWaitingForCommitId = commitId;
   }
+#endif
 
-  // O(log(n))
+// O(log(n))
+#ifndef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
   void setFederateLockedByNextMessage(const FederateHandle& federateHandle, bool locked)
   {
     typename FederateHandleCommitMap::iterator i = _federateHandleCommitMap.find(federateHandle);
@@ -193,8 +207,10 @@ public:
       return;
     i->second._federateIsLocked = locked;
   }
+#endif
 
   // O(n)
+#ifndef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
   bool getLockedByNextMessage(const Unsigned& commitId) const
   {
     if (!getConstrainedByNextMessage())
@@ -211,6 +227,7 @@ public:
     }
     return true;
   }
+#endif
 
   // O(n)
   bool getIsSaveToAdvanceToNextMessage(const Unsigned& commitId) const
@@ -233,6 +250,7 @@ public:
   }
 
   // O(n)
+  // return list of federates (with commits) currently executing NMR
   void getNextMessageFederateHandleList(std::list<std::pair<FederateHandle, Unsigned> >& federateHandleCommitIdList)
   {
     for (typename FederateHandleCommitMap::const_iterator i = _federateHandleCommitMap.begin();
@@ -246,6 +264,11 @@ public:
 private:
   typedef FederateHandle::value_type FederateCountType;
 
+  // Mapping from LogicalTimes to number of federates who committed that logical time.
+  // Entries where the count drops to zero get removed.
+  // The front of this list is the minimum time, which some (but maybe not all federates) committed to.
+  // This central data structure actually implements the conservative approach in simulation time synchronization,
+  // and is used to actually find out whether this federate's time may advance to a certain point.
   class OPENRTI_LOCAL LogicalTimeFederateCountMap {
   public:
     typedef typename std::map<LogicalTime, FederateCountType>::iterator iterator;
@@ -279,28 +302,31 @@ private:
       return i;
     }
 
-    std::pair<iterator, bool> move(iterator i, const LogicalTime& logicalTime)
+    // 'Move' a count pointing to oldEntryIter to another logical time.
+    // The logical time pointed to by oldEntryIter may get removed, if it's count drops to zero.
+    std::pair<iterator, bool> move(iterator oldEntryIter, const LogicalTime& logicalTime)
     {
       // Only inserts if the entry is new
-      iterator j = _countMap.insert(value_type(logicalTime, 0)).first;
+      iterator newEntryIter = _countMap.insert(value_type(logicalTime, 0)).first;
       // If we get back the same iterator, we must have gotten the same entry again
-      if (j == i)
-        return std::pair<iterator, bool>(i, false);
+      if (newEntryIter == oldEntryIter)
+        return std::pair<iterator, bool>(oldEntryIter, false);
 
       // Change the reference count on the new entry
-      ++(j->second);
+      ++(newEntryIter->second);
 
       // And if at the old entry the reference count does drop to zero ...
-      if (0 != --(i->second))
-        return std::pair<iterator, bool>(j, false);
+      if (0 != --(oldEntryIter->second))
+        return std::pair<iterator, bool>(newEntryIter, false); // old entry remains
 
+      // 0 == oldEntryIter->second:
       // ... see if this unleaches a new time ...
-      bool isFirstLogicalTime = (i == _countMap.begin());
+      bool isFirstLogicalTime = (oldEntryIter == _countMap.begin());
 
       // .. and finally erase this entry.
-      _countMap.erase(i);
+      _countMap.erase(oldEntryIter);
 
-      return std::pair<iterator, bool>(j, isFirstLogicalTime);
+      return std::pair<iterator, bool>(newEntryIter, isFirstLogicalTime);
     }
 
     bool erase(iterator i)
@@ -323,15 +349,22 @@ private:
 
   typedef typename LogicalTimeFederateCountMap::iterator LogicalTimeMapIterator;
   struct Commit {
-    Commit(const LogicalTimeMapIterator& timeAdvanceCommit, const LogicalTimeMapIterator& nextMessageCommit, const Unsigned& commitId, const Unsigned& beforeOwnCommitId) :
-      _timeAdvanceCommit(timeAdvanceCommit),
-      _nextMessageCommit(nextMessageCommit),
-      _commitId(commitId),
-      _federateIsWaitingForCommitId(beforeOwnCommitId),
-      _federateIsLocked(false)
+    Commit(const LogicalTimeMapIterator& timeAdvanceCommit, const LogicalTimeMapIterator& nextMessageCommit, const Unsigned& commitId, const Unsigned& beforeOwnCommitId)
+      : _timeAdvanceCommit(timeAdvanceCommit)
+      , _nextMessageCommit(nextMessageCommit)
+      , _commitId(commitId)
+#ifndef EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
+      , _federateIsWaitingForCommitId(beforeOwnCommitId)
+#endif
+#ifndef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
+      , _federateIsLocked(false)
+#endif
     {
       OpenRTIAssert(_timeAdvanceCommit->first <= _nextMessageCommit->first);
     }
+
+    // if there are entries in the nextMessageCommit map with lower times than in the time advance commit map,
+    // s.o. is still processing nextMessage requests.
     bool isInNextMessageMode() const
     {
       OpenRTIAssert(_timeAdvanceCommit->first <= _nextMessageCommit->first);
@@ -344,10 +377,15 @@ private:
     // The commit id of this federate we have seen last.
     Unsigned _commitId;
     // This compares against our own commit id, if they are the same we know that the appropriate federate has received our current commit
+#ifndef EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
     Unsigned _federateIsWaitingForCommitId;
+#endif
     // Tells us if the federate is locked by next message request
+#ifndef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
     bool _federateIsLocked;
+#endif
   };
+  // there's exactly one commit per federate
   typedef std::map<FederateHandle, Commit> FederateHandleCommitMap;
   FederateHandleCommitMap _federateHandleCommitMap;
 };

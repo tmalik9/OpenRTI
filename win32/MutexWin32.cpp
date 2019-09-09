@@ -21,9 +21,14 @@
 
 #include "MutexPrivateDataWin32.h"
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 namespace OpenRTI {
 
-#if __cplusplus < 201103L
+#if __CPlusPlusStd < 201103L
+
 Mutex::Mutex(void) :
   _privateData(new PrivateData)
 {

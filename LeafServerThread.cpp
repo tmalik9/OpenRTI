@@ -199,7 +199,6 @@ LeafServerThread::connect(const URL& url, const StringStringListMap& clientOptio
   SharedPtr<_Registry> registry = _Registry::_instance.get();
   if (!registry.valid())
     return SharedPtr<AbstractConnect>();
-
   return registry->connect(url, clientOptions);
 }
 

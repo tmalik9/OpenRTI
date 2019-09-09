@@ -2215,7 +2215,8 @@ ChangeObjectClassPublicationMessage::operator<(const ChangeObjectClassPublicatio
 ChangeInteractionClassSubscriptionMessage::ChangeInteractionClassSubscriptionMessage() :
   _federationHandle(),
   _subscriptionType(),
-  _interactionClassHandle()
+  _interactionClassHandle(),
+  _parameterFilterValues()
 {
 }
 
@@ -2256,6 +2257,7 @@ ChangeInteractionClassSubscriptionMessage::operator==(const ChangeInteractionCla
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getSubscriptionType() != rhs.getSubscriptionType()) return false;
   if (getInteractionClassHandle() != rhs.getInteractionClassHandle()) return false;
+  if (getParameterFilterValues() != rhs.getParameterFilterValues()) return false;
   return true;
 }
 
@@ -2268,6 +2270,8 @@ ChangeInteractionClassSubscriptionMessage::operator<(const ChangeInteractionClas
   if (rhs.getSubscriptionType() < getSubscriptionType()) return false;
   if (getInteractionClassHandle() < rhs.getInteractionClassHandle()) return true;
   if (rhs.getInteractionClassHandle() < getInteractionClassHandle()) return false;
+  if (getParameterFilterValues() < rhs.getParameterFilterValues()) return true;
+  if (rhs.getParameterFilterValues() < getParameterFilterValues()) return false;
   return false;
 }
 
@@ -2331,6 +2335,69 @@ ChangeObjectClassSubscriptionMessage::operator<(const ChangeObjectClassSubscript
   if (rhs.getObjectClassHandle() < getObjectClassHandle()) return false;
   if (getAttributeHandles() < rhs.getAttributeHandles()) return true;
   if (rhs.getAttributeHandles() < getAttributeHandles()) return false;
+  return false;
+}
+
+ChangeObjectInstanceSubscriptionMessage::ChangeObjectInstanceSubscriptionMessage() :
+  _federationHandle(),
+  _subscriptionType(),
+  _objectClassHandle(),
+  _objectInstanceHandle()
+{
+}
+
+ChangeObjectInstanceSubscriptionMessage::~ChangeObjectInstanceSubscriptionMessage()
+{
+}
+
+const char*
+ChangeObjectInstanceSubscriptionMessage::getTypeName() const
+{
+  return "ChangeObjectInstanceSubscriptionMessage";
+}
+
+void
+ChangeObjectInstanceSubscriptionMessage::out(std::ostream& os) const
+{
+  os << "ChangeObjectInstanceSubscriptionMessage " << *this;
+}
+
+void
+ChangeObjectInstanceSubscriptionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
+{
+  dispatcher.accept(*this);
+}
+
+bool
+ChangeObjectInstanceSubscriptionMessage::operator==(const AbstractMessage& rhs) const
+{
+  const ChangeObjectInstanceSubscriptionMessage* message = dynamic_cast<const ChangeObjectInstanceSubscriptionMessage*>(&rhs);
+  if (!message)
+    return false;
+  return operator==(*message);
+}
+
+bool
+ChangeObjectInstanceSubscriptionMessage::operator==(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+{
+  if (getFederationHandle() != rhs.getFederationHandle()) return false;
+  if (getSubscriptionType() != rhs.getSubscriptionType()) return false;
+  if (getObjectClassHandle() != rhs.getObjectClassHandle()) return false;
+  if (getObjectInstanceHandle() != rhs.getObjectInstanceHandle()) return false;
+  return true;
+}
+
+bool
+ChangeObjectInstanceSubscriptionMessage::operator<(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+{
+  if (getFederationHandle() < rhs.getFederationHandle()) return true;
+  if (rhs.getFederationHandle() < getFederationHandle()) return false;
+  if (getSubscriptionType() < rhs.getSubscriptionType()) return true;
+  if (rhs.getSubscriptionType() < getSubscriptionType()) return false;
+  if (getObjectClassHandle() < rhs.getObjectClassHandle()) return true;
+  if (rhs.getObjectClassHandle() < getObjectClassHandle()) return false;
+  if (getObjectInstanceHandle() < rhs.getObjectInstanceHandle()) return true;
+  if (rhs.getObjectInstanceHandle() < getObjectInstanceHandle()) return false;
   return false;
 }
 

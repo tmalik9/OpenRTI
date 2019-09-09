@@ -25,6 +25,14 @@ AbstractMessage::~AbstractMessage()
 {
 }
 
+
+std::string AbstractMessage::toString() const
+{
+  std::ostringstream s;
+  out(s);
+  return s.str();
+}
+
 bool
 AbstractMessage::getReliable() const
 {

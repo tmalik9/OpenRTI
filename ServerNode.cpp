@@ -233,7 +233,9 @@ public:
   {
     // We can use asserts here since this message is only produced by a federate ambassador which is what we have with us in the same shared library
     OpenRTIAssert(connectHandle.valid());
+#if !defined(NDEBUG)
     ServerModel::FederationConnect* federationConnect = getFederationConnect(connectHandle);
+#endif
     OpenRTIAssert(federationConnect);
 
     FederateHandle federateHandle = message->getFederateHandle();
@@ -758,6 +760,12 @@ public:
     // Change publication type for this connect ...
     ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
     propagationConnectPair = interactionClass->setPublicationType(connectHandle, message->getPublicationType());
+    //DebugPrintf("%s(ChangeInteractionClassPublicationMessage): iclass=%s connectHandle=%s propagation=%s publishers=%s\n", __FUNCTION__, 
+    //            interactionClass->getFQName().c_str(),
+    //            connectHandle.toString().c_str(),
+    //            to_string(propagationConnectPair.first).c_str(),
+    //            to_string(interactionClass->getPublishingConnectHandleSet()).c_str()
+    //            );
     // ... and propagate further if required.
     switch (propagationConnectPair.first) {
     case ServerModel::PropagateBroadcast:
@@ -773,18 +781,47 @@ public:
     // See if and how we should respond to that publication
     SubscriptionType subscriptionType = interactionClass->getSubscriptionTypeToConnect(connectHandle);
     if (subscriptionType != Unsubscribed) {
-      SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
-      subscription = new ChangeInteractionClassSubscriptionMessage;
-      subscription->setFederationHandle(getFederationHandle());
-      subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
       if (message->getPublicationType() == Published) {
-        subscription->setSubscriptionType(subscriptionType);
-      } else {
+        if (interactionClass->hasFilterSubscriptions())
+        {
+          auto& subscribers = interactionClass->getSubscribedConnectHandleSet();
+          for (const ConnectHandle& subscriber : subscribers)
+          {
+            // send one message per subscriber
+            SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
+            subscription = new ChangeInteractionClassSubscriptionMessage;
+            subscription->setFederationHandle(getFederationHandle());
+            subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
+            subscription->setSubscriptionType(subscriptionType);
+            ParameterValueVector parameters = interactionClass->getParameterFilters(subscriber);
+            if (!parameters.empty())
+            {
+              subscription->setParameterFilterValues(parameters);
+            }
+            send(connectHandle, subscription);
+          }
+        }
+        else
+        {
+          // send one message, w/o filters
+          SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
+          subscription = new ChangeInteractionClassSubscriptionMessage;
+          subscription->setFederationHandle(getFederationHandle());
+          subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
+          subscription->setSubscriptionType(subscriptionType);
+          send(connectHandle, subscription);
+        }
+      } else { // != Published
+        SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
+        subscription = new ChangeInteractionClassSubscriptionMessage;
+        subscription->setFederationHandle(getFederationHandle());
+        subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
         subscription->setSubscriptionType(Unsubscribed);
+        send(connectHandle, subscription);
       }
-      send(connectHandle, subscription);
     }
   }
+
   void accept(const ConnectHandle& connectHandle, const ChangeObjectClassPublicationMessage* message)
   {
     ServerModel::ObjectClass* objectClass = ServerModel::Federation::getObjectClass(message->getObjectClassHandle());
@@ -796,19 +833,18 @@ public:
     std::map<ConnectHandle, AttributeHandleVector> sendAttributeHandlesMap;
     AttributeHandleVector passiveSubscribeAttributeHandles;
     AttributeHandleVector activeSubscribeAttributeHandles;
-    for (AttributeHandleVector::const_iterator i = message->getAttributeHandles().begin();
-         i != message->getAttributeHandles().end(); ++i) {
-      ServerModel::ClassAttribute* attribute = objectClass->getClassAttribute(*i);
+    for (const AttributeHandle& attributeHandle : message->getAttributeHandles()) {
+      ServerModel::ClassAttribute* attribute = objectClass->getClassAttribute(attributeHandle);
       if (!attribute)
         continue;
       ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
       propagationConnectPair = attribute->setPublicationType(connectHandle, message->getPublicationType());
       switch (propagationConnectPair.first) {
       case ServerModel::PropagateBroadcast:
-        broadcastAttributeHandles.push_back(*i);
+        broadcastAttributeHandles.push_back(attributeHandle);
         break;
       case ServerModel::PropagateSend:
-        sendAttributeHandlesMap[propagationConnectPair.second].push_back(*i);
+        sendAttributeHandlesMap[propagationConnectPair.second].push_back(attributeHandle);
         break;
       case ServerModel::PropagateNone:
         break;
@@ -820,10 +856,10 @@ public:
       case Unsubscribed:
         break;
       case SubscribedPassive:
-        passiveSubscribeAttributeHandles.push_back(*i);
+        passiveSubscribeAttributeHandles.push_back(attributeHandle);
         break;
       case SubscribedActive:
-        activeSubscribeAttributeHandles.push_back(*i);
+        activeSubscribeAttributeHandles.push_back(attributeHandle);
         break;
       }
     }
@@ -836,15 +872,14 @@ public:
       request->setPublicationType(message->getPublicationType());
       broadcast(connectHandle, request);
     }
-    for (std::map<ConnectHandle, AttributeHandleVector>::iterator i = sendAttributeHandlesMap.begin();
-         i != sendAttributeHandlesMap.end(); ++i) {
+    for (auto& [targetConnectHandle, attributeHandle] : sendAttributeHandlesMap) {
       SharedPtr<ChangeObjectClassPublicationMessage> request;
       request = new ChangeObjectClassPublicationMessage;
       request->setFederationHandle(message->getFederationHandle());
       request->setObjectClassHandle(message->getObjectClassHandle());
-      request->getAttributeHandles().swap(i->second);
+      request->getAttributeHandles().swap(attributeHandle);
       request->setPublicationType(message->getPublicationType());
-      send(i->first, request);
+      send(targetConnectHandle, request);
     }
 
     // Already existing subscriptions need to be sent to the new publishing connect
@@ -910,7 +945,6 @@ public:
     }
   }
 
-
   // (un)subscription messages for interactions
   void accept(const ConnectHandle& connectHandle, const ChangeInteractionClassSubscriptionMessage* message)
   {
@@ -919,7 +953,9 @@ public:
       throw MessageError("ChangeInteractionClassSubscriptionMessage for unknown InteractionClass!");
     // Change publication type for this connect ...
     ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
+    ParameterValueVector parameterFilterValues = message->getParameterFilterValues();
     propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, message->getSubscriptionType());
+    bool filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues);
     // Update the receiving connect handle set
     interactionClass->updateCumulativeSubscription(connectHandle);
     // ... and propagate further if required.
@@ -931,6 +967,18 @@ public:
       send(propagationConnectPair.second, message);
       break;
     case ServerModel::PropagateNone:
+      // MUST still be forwarded when filter has changed => TODO: integrate filter settings into setSubscriptionType
+      if (filterChanged)
+      {
+        //DebugPrintf("%s(ChangeInteractionClassSubscriptionMessage): filter changed: iclass=%s connectHandle=%s #parameterFilterValues=%d filterChanged=%d propagation=%s publishers=%s\n", __FUNCTION__, 
+        //            interactionClass->getFQName().c_str(),
+        //            connectHandle.toString().c_str(),
+        //            parameterFilterValues.size(), filterChanged,
+        //            to_string(propagationConnectPair.first).c_str(),
+        //            to_string(interactionClass->getPublishingConnectHandleSet()).c_str()
+        //            );
+        send(interactionClass->getPublishingConnectHandleSet(), connectHandle, message);
+      }
       break;
     }
   }
@@ -941,15 +989,13 @@ public:
     ServerModel::ObjectClass* objectClass = ServerModel::Federation::getObjectClass(message->getObjectClassHandle());
     if (!objectClass)
       return;
-
     ServerModel::FederationConnect* federationConnect = getFederationConnect(connectHandle);
     OpenRTIAssert(federationConnect);
 
     ServerModel::ObjectClass::ObjectInstanceList objectInstanceList;
     std::map<ConnectHandle, AttributeHandleVector> sendAttributeHandlesMap;
-    for (std::vector<AttributeHandle>::const_iterator i = message->getAttributeHandles().begin();
-         i != message->getAttributeHandles().end(); ++i) {
-      ServerModel::ClassAttribute* attribute = objectClass->getClassAttribute(*i);
+    for (const AttributeHandle& attributeHandle : message->getAttributeHandles()) {
+      ServerModel::ClassAttribute* attribute = objectClass->getClassAttribute(attributeHandle);
       if (!attribute)
         continue;
       ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
@@ -958,85 +1004,128 @@ public:
       case ServerModel::PropagateNone:
         break;
       case ServerModel::PropagateBroadcast:
-        for (ConnectHandleSet::const_iterator j = attribute->getPublishingConnectHandleSet().begin();
-             j != attribute->getPublishingConnectHandleSet().end(); ++j) {
-          if (*j == connectHandle)
+        for (ConnectHandle publisherConnectHandle : attribute->getPublishingConnectHandleSet()) {
+          if (publisherConnectHandle == connectHandle)
             continue;
-          sendAttributeHandlesMap[*j].push_back(*i);
+          sendAttributeHandlesMap[publisherConnectHandle].push_back(attributeHandle);
         }
         break;
       case ServerModel::PropagateSend:
         if (attribute->getPublicationType(propagationConnectPair.second) == Published)
-          sendAttributeHandlesMap[propagationConnectPair.second].push_back(*i);
+          sendAttributeHandlesMap[propagationConnectPair.second].push_back(attributeHandle);
         break;
       }
 
-      objectClass->updateCumulativeSubscription(connectHandle, *i, objectInstanceList);
+      objectClass->updateCumulativeSubscription(connectHandle, attributeHandle, objectInstanceList);
     }
 
     // Now propagate the subscription change further
-    for (std::map<ConnectHandle, AttributeHandleVector>::iterator i = sendAttributeHandlesMap.begin();
-         i != sendAttributeHandlesMap.end(); ++i) {
+    for (auto [connectHandle, attributeHandleVector] : sendAttributeHandlesMap) {
       SharedPtr<ChangeObjectClassSubscriptionMessage> request;
       request = new ChangeObjectClassSubscriptionMessage;
       request->setFederationHandle(message->getFederationHandle());
       request->setObjectClassHandle(message->getObjectClassHandle());
-      request->getAttributeHandles().swap(i->second);
+      request->getAttributeHandles().swap(attributeHandleVector);
       request->setSubscriptionType(message->getSubscriptionType());
-      send(i->first, request);
+      send(connectHandle, request);
     }
 
     // Insert all object instances that are now new to this connect
     if (message->getSubscriptionType() != Unsubscribed) {
-      for (ServerModel::ObjectClass::ObjectInstanceList::iterator j = objectInstanceList.begin(); j != objectInstanceList.end(); ++j) {
+      for (ServerModel::ObjectInstance* objectInstance : objectInstanceList) {
         SharedPtr<InsertObjectInstanceMessage> request = new InsertObjectInstanceMessage;
         request->setFederationHandle(getFederationHandle());
-        request->setObjectInstanceHandle((*j)->getObjectInstanceHandle());
-        request->setObjectClassHandle((*j)->getObjectClass()->getObjectClassHandle());
-        request->setName((*j)->getName());
-        request->getAttributeStateVector().reserve((*j)->getAttributeHandleInstanceAttributeMap().size());
-        for (ServerModel::InstanceAttribute::HandleMap::iterator k = (*j)->getAttributeHandleInstanceAttributeMap().begin();
-             k != (*j)->getAttributeHandleInstanceAttributeMap().end(); ++k) {
+        request->setObjectInstanceHandle(objectInstance->getObjectInstanceHandle());
+        request->setObjectClassHandle(objectInstance->getObjectClass()->getObjectClassHandle());
+        request->setName(objectInstance->getName());
+        request->getAttributeStateVector().reserve(objectInstance->getAttributeHandleInstanceAttributeMap().size());
+        for (ServerModel::InstanceAttribute::HandleMap::iterator k = objectInstance->getAttributeHandleInstanceAttributeMap().begin();
+             k != objectInstance->getAttributeHandleInstanceAttributeMap().end(); ++k) {
           AttributeState attributeState;
           attributeState.setAttributeHandle(k->getAttributeHandle());
           request->getAttributeStateVector().push_back(attributeState);
         }
         if (!isParentConnect(connectHandle)) {
-          (*j)->reference(*federationConnect);
+          objectInstance->reference(*federationConnect);
         }
         federationConnect->send(request);
       }
     }
   }
+
+  void accept(const ConnectHandle& connectHandle, const ChangeObjectInstanceSubscriptionMessage* message)
+  {
+    ServerModel::ObjectClass* objectClass = ServerModel::Federation::getObjectClass(message->getObjectClassHandle());
+    if (!objectClass)
+      return;
+
+    ServerModel::ObjectInstance* objectInstance = ServerModel::Federation::getObjectInstance(message->getObjectInstanceHandle());
+    //ServerModel::FederationConnect* federationConnect = getFederationConnect(connectHandle);
+    //OpenRTIAssert(federationConnect);
+    ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
+
+    // This is the point where an object instance gets unsubscribed!
+    propagationConnectPair = objectInstance->setSubscriptionType(connectHandle, message->getSubscriptionType());
+
+    ConnectHandleSet connects;
+    switch (propagationConnectPair.first) {
+    case ServerModel::PropagateNone:
+      // subscriber list was emptied - no need to propagate anything
+      break;
+    case ServerModel::PropagateBroadcast:
+      // subscriber list has more than one entry - broadcast to remaining subscribers
+      for (ConnectHandle publisherConnectHandle : objectInstance->getPublishingConnectHandleSet()) {
+        if (publisherConnectHandle == connectHandle)
+          continue;
+        connects.insert(publisherConnectHandle);
+      }
+      break;
+    case ServerModel::PropagateSend:
+      // subscriber list has exactly one entry left. send the update to him.
+      if (objectInstance->getPublicationType(propagationConnectPair.second) == Published)
+      {
+        connects.insert(propagationConnectPair.second);
+      }
+      break;
+    }
+
+    for (auto targetConnectHandle : connects) {
+      SharedPtr<ChangeObjectInstanceSubscriptionMessage> request;
+      request = new ChangeObjectInstanceSubscriptionMessage;
+      request->setFederationHandle(message->getFederationHandle());
+      request->setObjectClassHandle(message->getObjectClassHandle());
+      request->setObjectInstanceHandle(message->getObjectInstanceHandle());
+      request->setSubscriptionType(message->getSubscriptionType());
+      send(targetConnectHandle, request);
+    }
+  }
+
   void unsubscribeConnect(const ConnectHandle& connectHandle)
   {
     // Unsubscribe this connect by fake unsubscribe messages?!!
-    for (ServerModel::InteractionClass::HandleMap::iterator j = getInteractionClassHandleInteractionClassMap().begin();
-         j != getInteractionClassHandleInteractionClassMap().end(); ++j) {
-      if (j->getSubscriptionType(connectHandle) == Unsubscribed)
+    for (ServerModel::InteractionClass& interactionClass : getInteractionClassHandleInteractionClassMap()) {
+      if (interactionClass.getSubscriptionType(connectHandle) == Unsubscribed)
         continue;
       SharedPtr<ChangeInteractionClassSubscriptionMessage> message = new ChangeInteractionClassSubscriptionMessage;
       message->setFederationHandle(getFederationHandle());
       message->setSubscriptionType(Unsubscribed);
-      message->setInteractionClassHandle(j->getInteractionClassHandle());
+      message->setInteractionClassHandle(interactionClass.getInteractionClassHandle());
       accept(connectHandle, message.get());
     }
-    for (ServerModel::ObjectClass::HandleMap::iterator j = getObjectClassHandleObjectClassMap().begin();
-         j != getObjectClassHandleObjectClassMap().end(); ++j) {
+    for (ServerModel::ObjectClass& objectClass : getObjectClassHandleObjectClassMap()) {
       AttributeHandleVector attributeHandleVector;
-      for (ServerModel::ClassAttribute::HandleMap::iterator k = j->getAttributeHandleClassAttributeMap().begin();
-           k != j->getAttributeHandleClassAttributeMap().end(); ++k) {
-        if (k->getSubscriptionType(connectHandle) == Unsubscribed)
+      for (ServerModel::ClassAttribute& classAttribute : objectClass.getAttributeHandleClassAttributeMap()) {
+        if (classAttribute.getSubscriptionType(connectHandle) == Unsubscribed)
           continue;
-        attributeHandleVector.reserve(j->getAttributeHandleClassAttributeMap().size());
-        attributeHandleVector.push_back(k->getAttributeHandle());
+        attributeHandleVector.reserve(objectClass.getAttributeHandleClassAttributeMap().size());
+        attributeHandleVector.push_back(classAttribute.getAttributeHandle());
       }
       if (attributeHandleVector.empty())
         continue;
       SharedPtr<ChangeObjectClassSubscriptionMessage> message = new ChangeObjectClassSubscriptionMessage;
       message->setFederationHandle(getFederationHandle());
       message->setSubscriptionType(Unsubscribed);
-      message->setObjectClassHandle(j->getObjectClassHandle());
+      message->setObjectClassHandle(objectClass.getObjectClassHandle());
       message->getAttributeHandles().swap(attributeHandleVector);
       accept(connectHandle, message.get());
     }
@@ -1045,8 +1134,8 @@ public:
   // ObjectInstance handle management,
   // These are maintained at the root server. Clients can request handles from the root server
   // the root server then sends the requested amount of unused object instance handles to the client.
-  // The reponse is sent to the requesting federate and each server node on the way registers a
-  // refrence of the receiving connect handle to this object instance handle.
+  // The response is sent to the requesting federate and each server node on the way registers a
+  // reference of the receiving connect handle to this object instance handle.
   // An ambassador requests a bunch of handles at join time. Then, on object creation,
   // the ambassador has very likely some free handles available. So in effect we even have the
   // object instance registration without any latency. With every new registered object, the
@@ -1226,6 +1315,7 @@ public:
              j != response->getObjectInstanceHandleNamePairVector().end(); ++j) {
           ServerModel::ObjectInstance* objectInstance = insertObjectInstance(ObjectInstanceHandle(), j->second);
           objectInstance->reference(*federationConnect);
+          //objectInstance->setSubscriptionType(connectHandle, SubscribedActive);
           j->first = objectInstance->getObjectInstanceHandle();
         }
       }
@@ -1248,9 +1338,8 @@ public:
       // If so, then release the reservations.
     } else {
       if (message->getSuccess()) {
-        for (ObjectInstanceHandleNamePairVector::const_iterator k = message->getObjectInstanceHandleNamePairVector().begin();
-             k != message->getObjectInstanceHandleNamePairVector().end(); ++k) {
-          ServerModel::ObjectInstance* objectInstance = insertObjectInstance(k->first, k->second);
+        for (auto& [objectInstanceHandle, name] : message->getObjectInstanceHandleNamePairVector()) {
+          ServerModel::ObjectInstance* objectInstance = insertObjectInstance(objectInstanceHandle, name);
           objectInstance->reference(*federateConnect);
         }
       }
@@ -1269,37 +1358,44 @@ public:
     if (!objectClass)
       throw MessageError("InsertObjectInstanceMessage for unknown ObjectClass.");
 
-    // FIXME Improove this with preevaluated sets:
+    // FIXME Improve this with preevaluated sets:
     // std::map<ConnectHandle,ConnectHandleSet> ...
     ServerModel::ObjectInstance* objectInstance = getObjectInstance(objectInstanceHandle);
     ServerModel::ClassAttribute* privilegeToDeleteAttribute = objectClass->getPrivilegeToDeleteClassAttribute();
     if (privilegeToDeleteAttribute) {
-      for (ConnectHandleSet::iterator j = privilegeToDeleteAttribute->_cumulativeSubscribedConnectHandleSet.begin();
-           j != privilegeToDeleteAttribute->_cumulativeSubscribedConnectHandleSet.end(); ++j) {
-        if (isParentConnect(*j))
+      for (const ConnectHandle& subscribedConnect : privilegeToDeleteAttribute->_cumulativeSubscribedConnectHandleSet) {
+        if (isParentConnect(subscribedConnect))
           continue;
-        if (*j == connectHandle)
+        if (subscribedConnect == connectHandle)
           continue;
+        //DebugPrintf("%s(InsertObjectInstanceMessage): subscribedConnect=%s name=%s\n", __FUNCTION__,
+        //            subscribedConnect.toString().c_str(),
+        //            message->getName().c_str());
         if (!objectInstance)
           objectInstance = insertObjectInstance(objectInstanceHandle, message->getName());
-        ServerModel::FederationConnect* federationConnect = getFederationConnect(*j);
+        ServerModel::FederationConnect* federationConnect = getFederationConnect(subscribedConnect);
         if (!federationConnect)
           continue;
         objectInstance->reference(*federationConnect);
       }
     }
-
+    if (objectInstance)
+    {
+      // REQUIRED: must tell this server model that objectInstance actually publishes something,
+      // so this is the actual first-time initialization 
+      objectInstance->setPublicationType(connectHandle, Published);
+    }
     // If still unreferenced, ignore the insert and unref again in the parent
     // this can happen if we subscribed and unsubscribed at the server before we received the insert that is triggered by the subscribe request.
     if (!objectInstance) {
       OpenRTIAssert(isParentConnect(connectHandle));
 
-      SharedPtr<ReleaseMultipleObjectInstanceNameHandlePairsMessage> message;
-      message = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
-      message->setFederationHandle(getFederationHandle());
-      message->getObjectInstanceHandleVector().push_back(objectInstanceHandle);
+      SharedPtr<ReleaseMultipleObjectInstanceNameHandlePairsMessage> propagatedMessage;
+      propagatedMessage = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
+      propagatedMessage->setFederationHandle(getFederationHandle());
+      propagatedMessage->getObjectInstanceHandleVector().push_back(objectInstanceHandle);
 
-      sendToParent(message);
+      sendToParent(propagatedMessage);
 
     } else {
       OpenRTIAssert(!objectInstance->getConnectHandleObjectInstanceConnectMap().empty());
@@ -1348,7 +1444,7 @@ public:
     if (!objectInstance)
       return;
 
-    // FIXME: this can be improoved:
+    // FIXME: this can be improved:
     // An update message always stems from a single federate, which means that we should already be able to
     // have a preprepared list of connect handle sets associated with a maximum attribute handle value for this message.
     // If this list is trivial we do not need to make any copy of the message, just broadcast to this set of connects.
@@ -1356,54 +1452,63 @@ public:
 
     typedef std::map<ConnectHandle, AttributeValueVector> ConnectHandleAttributeValueVectorMap;
     ConnectHandleAttributeValueVectorMap connectHandleAttributeValueVectorMap;
-    for (AttributeValueVector::const_iterator i = message->getAttributeValues().begin();
-         i != message->getAttributeValues().end(); ++i) {
-      ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(i->getAttributeHandle());
+    for (auto& attributeValue : message->getAttributeValues())
+    {
+      ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeValue.getAttributeHandle());
       if (!instanceAttribute)
         continue;
-      for (ConnectHandleSet::const_iterator j = instanceAttribute->_receivingConnects.begin();
-           j != instanceAttribute->_receivingConnects.end(); ++j) {
-        connectHandleAttributeValueVectorMap[*j].reserve(message->getAttributeValues().size());
-        connectHandleAttributeValueVectorMap[*j].push_back(*i);
+      for (ConnectHandle receivingConnect : instanceAttribute->_receivingConnects)
+      {
+        connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
+        connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
+        //DebugPrintf("%s(TimeStampedAttributeUpdateMessage): instance=%s subscription(receivingConnect=%s) = %s, connectHandle=%s\n", __FUNCTION__,
+        //            objectInstance->getName().c_str(), 
+        //            receivingConnect.toString().c_str(),
+        //            to_string(objectInstance->getSubscriptionType(receivingConnect)).c_str(),
+        //            connectHandle.toString().c_str());
       }
     }
 
-    for (ConnectHandleAttributeValueVectorMap::iterator i = connectHandleAttributeValueVectorMap.begin();
-          i != connectHandleAttributeValueVectorMap.end(); ++i) {
+    for (auto& [connectHandle, attributeValueVector] : connectHandleAttributeValueVectorMap) {
       SharedPtr<AttributeUpdateMessage> update = new AttributeUpdateMessage;
       update->setFederationHandle(getFederationHandle());
       update->setFederateHandle(message->getFederateHandle());
       update->setObjectInstanceHandle(message->getObjectInstanceHandle());
       update->setTag(message->getTag());
       update->setTransportationType(message->getTransportationType());
-      update->getAttributeValues().swap(i->second);
-      send(i->first, update);
+      update->getAttributeValues().swap(attributeValueVector);
+      send(connectHandle, update);
     }
   }
+
   void accept(const ConnectHandle& connectHandle, const TimeStampedAttributeUpdateMessage* message)
   {
     ServerModel::ObjectInstance* objectInstance = getObjectInstance(message->getObjectInstanceHandle());
     if (!objectInstance)
       return;
 
-    // See the above improovements for the AttributeUpdateMessage FIXME
+    // See the above improvements for the AttributeUpdateMessage FIXME
 
     typedef std::map<ConnectHandle, AttributeValueVector> ConnectHandleAttributeValueVectorMap;
     ConnectHandleAttributeValueVectorMap connectHandleAttributeValueVectorMap;
-    for (AttributeValueVector::const_iterator i = message->getAttributeValues().begin();
-         i != message->getAttributeValues().end(); ++i) {
-      ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(i->getAttributeHandle());
+    for (auto& attributeValue : message->getAttributeValues())
+    {
+      ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeValue.getAttributeHandle());
       if (!instanceAttribute)
         continue;
-      for (ConnectHandleSet::const_iterator j = instanceAttribute->_receivingConnects.begin();
-           j != instanceAttribute->_receivingConnects.end(); ++j) {
-        connectHandleAttributeValueVectorMap[*j].reserve(message->getAttributeValues().size());
-        connectHandleAttributeValueVectorMap[*j].push_back(*i);
+      for (ConnectHandle receivingConnect : instanceAttribute->_receivingConnects)
+      {
+        connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
+        connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
+        //DebugPrintf("%s(TimeStampedAttributeUpdateMessage): instance=%s subscription(receivingConnect=%s) = %s, connectHandle=%s\n", __FUNCTION__,
+        //            objectInstance->getName().c_str(), 
+        //            receivingConnect.toString().c_str(),
+        //            to_string(objectInstance->getSubscriptionType(receivingConnect)).c_str(),
+        //            connectHandle.toString().c_str());
       }
     }
 
-    for (ConnectHandleAttributeValueVectorMap::iterator i = connectHandleAttributeValueVectorMap.begin();
-          i != connectHandleAttributeValueVectorMap.end(); ++i) {
+    for (auto& [connectHandle, attributeValueVector] : connectHandleAttributeValueVectorMap) {
       SharedPtr<TimeStampedAttributeUpdateMessage> update = new TimeStampedAttributeUpdateMessage;
       update->setFederationHandle(getFederationHandle());
       update->setFederateHandle(message->getFederateHandle());
@@ -1413,8 +1518,8 @@ public:
       update->setMessageRetractionHandle(message->getMessageRetractionHandle());
       update->setOrderType(message->getOrderType());
       update->setTransportationType(message->getTransportationType());
-      update->getAttributeValues().swap(i->second);
-      send(i->first, update);
+      update->getAttributeValues().swap(attributeValueVector);
+      send(connectHandle, update);
     }
   }
 
@@ -1426,15 +1531,15 @@ public:
     if (!interactionClass)
       throw MessageError("Received InteractionMessage for unknown interaction class!");
     // Send to all subscribed connects except the originating one
-    for (ConnectHandleSet::const_iterator i = interactionClass->_cumulativeSubscribedConnectHandleSet.begin();
-         i != interactionClass->_cumulativeSubscribedConnectHandleSet.end(); ++i) {
-      if (*i == connectHandle)
+    for (auto& subscriberConnectHandle : interactionClass->_cumulativeSubscribedConnectHandleSet) {
+      // TODO: plug in self-delivery of interactions here!
+      if (subscriberConnectHandle == connectHandle)
         continue;
       ServerModel::InteractionClass* currentInteractionClass = interactionClass;
       while (currentInteractionClass) {
-        if (currentInteractionClass->getSubscriptionType(*i) != Unsubscribed) {
+        if (currentInteractionClass->getSubscriptionType(subscriberConnectHandle) != Unsubscribed) {
           if (currentInteractionClass == interactionClass) {
-            send(*i, message);
+            send(subscriberConnectHandle, message);
           } else {
             SharedPtr<InteractionMessage> message2 = new InteractionMessage;
             message2->setFederationHandle(message->getFederationHandle());
@@ -1442,14 +1547,13 @@ public:
             message2->setTransportationType(message->getTransportationType());
             message2->setTag(message->getTag());
             message2->getParameterValues().reserve(message->getParameterValues().size());
-            for (ParameterValueVector::const_iterator j = message->getParameterValues().begin();
-                 j != message->getParameterValues().end(); ++j) {
-              if (!currentInteractionClass->getClassParameter(j->getParameterHandle()))
+            for (const ParameterValue& parameterValue : message->getParameterValues()) {
+              if (!currentInteractionClass->getClassParameter(parameterValue.getParameterHandle()))
                 continue;
-              message2->getParameterValues().push_back(*j);
+              message2->getParameterValues().push_back(parameterValue);
             }
             message2->setInteractionClassHandle(currentInteractionClass->getInteractionClassHandle());
-            send(*i, message2);
+            send(subscriberConnectHandle, message2);
           }
           break;
         }
@@ -1463,16 +1567,22 @@ public:
     if (!interactionClass)
       throw MessageError("Received TimeStampedInteractionMessage for unknown interaction class!");
     // Send to all subscribed connects except the originating one
-    for (ConnectHandleSet::const_iterator i = interactionClass->_cumulativeSubscribedConnectHandleSet.begin();
-         i != interactionClass->_cumulativeSubscribedConnectHandleSet.end(); ++i) {
-      if (*i == connectHandle)
+    for (auto& subscriberConnectHandle : interactionClass->_cumulativeSubscribedConnectHandleSet) {
+      if (subscriberConnectHandle == connectHandle)
+        // don't send to self
         continue;
       ServerModel::InteractionClass* currentInteractionClass = interactionClass;
+      // distribute message, one for each parent class in addition to selected interactionClass
       while (currentInteractionClass) {
-        if (currentInteractionClass->getSubscriptionType(*i) != Unsubscribed) {
+        // double-check: Interaction is actually subscribed by subscriberConnectHandle
+        if (currentInteractionClass->getSubscriptionType(subscriberConnectHandle) != Unsubscribed) {
           if (currentInteractionClass == interactionClass) {
-            send(*i, message);
+            // interaction class specified in message
+            if (interactionClass->isFiltered(subscriberConnectHandle, message->getParameterValues())) {
+              send(subscriberConnectHandle, message);
+            }
           } else {
+            // parent interaction class
             SharedPtr<TimeStampedInteractionMessage> message2 = new TimeStampedInteractionMessage;
             message2->setFederationHandle(message->getFederationHandle());
             message2->setFederateHandle(message->getFederateHandle());
@@ -1482,14 +1592,13 @@ public:
             message2->setTimeStamp(message->getTimeStamp());
             message2->setMessageRetractionHandle(message->getMessageRetractionHandle());
             message2->getParameterValues().reserve(message->getParameterValues().size());
-            for (ParameterValueVector::const_iterator j = message->getParameterValues().begin();
-                 j != message->getParameterValues().end(); ++j) {
-              if (!currentInteractionClass->getClassParameter(j->getParameterHandle()))
+            for (const ParameterValue& parameterValue : message->getParameterValues()) {
+              if (!currentInteractionClass->getClassParameter(parameterValue.getParameterHandle()))
                 continue;
-              message2->getParameterValues().push_back(*j);
+              message2->getParameterValues().push_back(parameterValue);
             }
             message2->setInteractionClassHandle(currentInteractionClass->getInteractionClassHandle());
-            send(*i, message2);
+            send(subscriberConnectHandle, message2);
           }
           break;
         }
@@ -1509,27 +1618,27 @@ public:
 
     // Find the server connects that own the attributes and build up a message for those
     ConnectMessageMap connectMessageMap;
-    for (AttributeHandleVector::const_iterator i = message->getAttributeHandles().begin();
-         i != message->getAttributeHandles().end(); ++i) {
-      ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(*i);
+    for (AttributeHandleVector::const_iterator attrHandleIter = message->getAttributeHandles().begin();
+         attrHandleIter != message->getAttributeHandles().end(); ++attrHandleIter) {
+      ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(*attrHandleIter);
       if (!instanceAttribute) // FIXME this is more an error ...
         continue;
       // The connect handle that owns this attribute
-      ConnectHandle connectHandle = instanceAttribute->getOwnerConnectHandle();
-      if (!connectHandle.valid())
+      ConnectHandle ownerConnectHandle = instanceAttribute->getOwnerConnectHandle();
+      if (!ownerConnectHandle.valid())
         continue;
-      ConnectMessageMap::iterator k = connectMessageMap.find(connectHandle);
+      ConnectMessageMap::iterator k = connectMessageMap.find(ownerConnectHandle);
       if (k == connectMessageMap.end()) {
-        k = connectMessageMap.insert(ConnectMessageMap::value_type(connectHandle, new RequestAttributeUpdateMessage)).first;
+        k = connectMessageMap.insert(ConnectMessageMap::value_type(ownerConnectHandle, new RequestAttributeUpdateMessage)).first;
         k->second->setFederationHandle(getFederationHandle());
         k->second->setObjectInstanceHandle(objectInstanceHandle);
         k->second->setTag(message->getTag());
         k->second->getAttributeHandles().reserve(message->getAttributeHandles().size());
       }
-      k->second->getAttributeHandles().push_back(*i);
+      k->second->getAttributeHandles().push_back(*attrHandleIter);
     }
-    for (ConnectMessageMap::iterator i = connectMessageMap.begin(); i != connectMessageMap.end(); ++i) {
-      send(i->first, i->second);
+    for (ConnectMessageMap::iterator attrHandleIter = connectMessageMap.begin(); attrHandleIter != connectMessageMap.end(); ++attrHandleIter) {
+      send(attrHandleIter->first, attrHandleIter->second);
     }
   }
   void accept(const ConnectHandle& connectHandle, const RequestClassAttributeUpdateMessage* message)
@@ -1882,7 +1991,7 @@ public:
     // FIXME is currently O(n*log(n)) can be O(n)
     for (ConnectHandleSet::const_iterator i = connectHandleSet.begin(); i != connectHandleSet.end(); ++i) {
       if (*i == connectHandle)
-	continue;
+        continue;
       send(*i, message);
     }
   }
@@ -2401,6 +2510,8 @@ public:
   { acceptFederationMessage(connectHandle, message); }
   void accept(const ConnectHandle& connectHandle, const ChangeObjectClassSubscriptionMessage* message)
   { acceptFederationMessage(connectHandle, message); }
+  void accept(const ConnectHandle& connectHandle, const ChangeObjectInstanceSubscriptionMessage* message)
+  { acceptFederationMessage(connectHandle, message); }
 
   // ObjectInstance handle management
   void accept(const ConnectHandle& connectHandle, const ObjectInstanceHandlesRequestMessage* message)
@@ -2471,17 +2582,19 @@ public:
     }
   }
 
-  ConnectHandle insertConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
+  ConnectHandle insertConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName)
   {
-    ServerModel::NodeConnect* nodeConnect = Node::insertNodeConnect(messageSender, options);
+    ServerModel::NodeConnect* nodeConnect = Node::insertNodeConnect(messageSender, options, connectName);
     return nodeConnect->getConnectHandle();
   }
-  ConnectHandle insertParentConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
+
+  ConnectHandle insertParentConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName)
   {
     ServerModel::NodeConnect* nodeConnect = Node::insertParentNodeConnect(messageSender, options);
     getServerOptions().setParentOptionMap(options);
     return nodeConnect->getConnectHandle();
   }
+
   void removeConnect(const ConnectHandle& connectHandle)
   {
     bool isParent = isParentConnect(connectHandle);
@@ -2614,13 +2727,14 @@ ServerNode::getServerOptions() const
 ConnectHandle
 ServerNode::_insertConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
 {
-  return _serverMessageDispatcher->insertConnect(messageSender, options);
+  return _serverMessageDispatcher->insertConnect(messageSender, options, getServerName().c_str());
 }
 
 ConnectHandle
 ServerNode::_insertParentConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
 {
-  return _serverMessageDispatcher->insertParentConnect(messageSender, options);
+  std::string connectName = getServerName() + "(Parent)";
+  return _serverMessageDispatcher->insertParentConnect(messageSender, options, connectName.c_str());
 }
 
 void

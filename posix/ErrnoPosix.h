@@ -20,6 +20,7 @@
 #ifndef OpenRTI_ErrnoPosix_h
 #define OpenRTI_ErrnoPosix_h
 
+#include "OpenRTIConfig.h"
 #include <string.h>
 #include <cerrno>
 #include "StringUtils.h"

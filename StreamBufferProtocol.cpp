@@ -20,6 +20,7 @@
 #include "StreamBufferProtocol.h"
 
 #include "LogStream.h"
+#include "AbstractNetworkStatistics.h"
 
 namespace OpenRTI {
 
@@ -53,6 +54,9 @@ StreamBufferProtocol::read(AbstractProtocolSocket& protocolSocket)
       }
       _inputIterator += ret;
       _inputIterator.skip_empty_chunks(_inputBuffer.byte_end());
+#ifdef ENABLE_NETWORKSTATISTICS
+      GetNetworkStatistics().BytesReceived(ret);
+#endif
     }
 
     readPacket(_inputBuffer);
@@ -99,6 +103,9 @@ StreamBufferProtocol::write(AbstractProtocolSocket& protocolSocket)
       }
       _outputIterator += ret;
       _outputIterator.skip_empty_chunks(_outputBuffer.byte_end());
+#ifdef ENABLE_NETWORKSTATISTICS
+      GetNetworkStatistics().BytesSent(ret);
+#endif
     }
 
     // We are ready with this packet, reset state
