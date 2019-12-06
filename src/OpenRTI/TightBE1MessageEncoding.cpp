@@ -4076,7 +4076,18 @@ TightBE1MessageEncoding::decodePayload(const Buffer::const_iterator& i)
 void
 TightBE1MessageEncoding::writeMessage(const AbstractMessage& message)
 {
+  //DebugPrintf("%s(before encode): %d chunks\n", __FUNCTION__, this->getOutputBuffer().size());
   message.dispatchFunctor(DispatchFunctor(*this));
+  /*
+  DebugPrintf("%s(after encode): %d chunks\n", __FUNCTION__, this->getOutputBuffer().size());
+  size_t totalSize=0;
+  for (auto b : this->getOutputBuffer())
+  {
+    totalSize += b.size();
+    DebugPrintf("%s: %d bytes\n", __FUNCTION__, b.size());
+  }
+  DebugPrintf("%s: %d bytes total\n", __FUNCTION__, totalSize);
+  */
 #ifdef ENABLE_NETWORKSTATISTICS
   GetNetworkStatistics().MessageSent(message.getTypeName());
 #endif

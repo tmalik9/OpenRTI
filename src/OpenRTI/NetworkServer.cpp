@@ -337,6 +337,7 @@ NetworkServer::_postMessage(const _MessageConnectHandlePair& messageConnectHandl
 {
   ScopeLock scopeLock(_mutex);
   bool empty = _queue.empty();
+  //DebugPrintf("%s: message=%s\n", __FUNCTION__, messageConnectHandlePair.first->toString().c_str());
   _queue.push_back(messageConnectHandlePair, _pool);
   // If the list already contains some unsent messages,
   // the socket event dispatcher is already informed and will also catch this new message.
