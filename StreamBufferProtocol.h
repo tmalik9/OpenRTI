@@ -51,7 +51,7 @@ public:
   void addScratchReadBuffer(size_t size);
   void addWriteBuffer(const VariableLengthData& value);
   VariableLengthData& addScratchWriteBuffer();
-
+  Buffer& getOutputBuffer() { return _outputBuffer; }
 private:
   // Buffer for the incomming data
   Buffer _inputBuffer;

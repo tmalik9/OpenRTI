@@ -55,7 +55,7 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
 #if defined DEBUG_ASSEMBLY || defined DEBUG2_ASSEMBLY
     break;
 #endif
-
+    //DebugPrintf("%s: more=%d bytelen=%d\n", __FUNCTION__, more, bytelen);
     // Stop processing stuff here if we run out of space in the buffers ...
     if (maxBufferCount <= bufferCount)
       break;

@@ -84,7 +84,7 @@ public:
     if (_messageList.empty())
       return 0;
     SharedPtr<const AbstractMessage> message = _messageList.pop_front();
-    CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
     return message;
   }
   virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout)
@@ -102,7 +102,7 @@ public:
         return 0;
     }
     SharedPtr<const AbstractMessage> message = _messageList.pop_front();
-    CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
     return message;
   }
   virtual bool isOpen() const
