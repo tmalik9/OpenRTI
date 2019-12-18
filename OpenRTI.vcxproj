@@ -207,6 +207,8 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClInclude Include="OpenRTIVersion.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="win32\PerformanceCounterStopWatch.h" />
     <ClInclude Include="xml\xmltok_impl.c">
       <FileType>CppHeader</FileType>
@@ -332,6 +334,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OpenRTI.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
