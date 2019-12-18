@@ -86,24 +86,36 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\include\rti1516e\;$(ProjectDir)..\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BUILDING_RTI;RTI_DISABLE_WARNINGS;OPENRTI_DLL;rti1516e_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SOURCE_DIR);$(ProjectDir);$(ProjectDir)..\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\include\rti1516e\;$(ProjectDir)..\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BUILDING_RTI;RTI_DISABLE_WARNINGS;OPENRTI_DLL;rti1516e_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SOURCE_DIR);$(ProjectDir);$(ProjectDir)..\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\include\rti1516e\;$(ProjectDir)..\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;BUILDING_RTI;RTI_DISABLE_WARNINGS;OPENRTI_DLL;rti1516e_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SOURCE_DIR);$(ProjectDir);$(ProjectDir)..\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\..\include\rti1516e\;$(ProjectDir)..\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;BUILDING_RTI;RTI_DISABLE_WARNINGS;OPENRTI_DLL;rti1516e_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SOURCE_DIR);$(ProjectDir);$(ProjectDir)..\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\OpenRTI\dprintf.cpp" />
@@ -187,6 +199,9 @@
     <ClInclude Include="RTI1516ELogicalTimeFactory.h" />
     <ClInclude Include="RTIambassadorImplementation.h" />
     <ClInclude Include="VariableLengthDataImplementation.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="rti1516e.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

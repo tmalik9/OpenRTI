@@ -13,4 +13,9 @@
   <ItemGroup>
     <Xml Include="rtinode-config.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="rtinode.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
 </Project>

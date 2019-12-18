@@ -20,8 +20,6 @@
 #ifndef OpenRTI_OpenRTIConfig_h
 #define OpenRTI_OpenRTIConfig_h
 
-#define OpenRTI_VERSION_STRING "1.0"
-
 // Defaults for server connects
 #define OpenRTI_DEFAULT_HOST_STRING "localhost"
 // Just a free port from my /etc/services ...

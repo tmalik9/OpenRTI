@@ -231,6 +231,9 @@
     <Filter Include="Source Files\posix">
       <UniqueIdentifier>{d8edc727-abd5-49bc-9d9e-21514928c2d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{2d9d25c5-1ecd-4632-bc83-b0c34eda7d08}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -578,8 +581,17 @@
     <ClInclude Include="win32\PerformanceCounterStopWatch.h">
       <Filter>Source Files\win32</Filter>
     </ClInclude>
+    <ClInclude Include="OpenRTIVersion.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OpenRTI.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
