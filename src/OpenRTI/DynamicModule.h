@@ -34,8 +34,8 @@ public:
   static std::string getFileNameForAddress(const void* address);
 
 private:
-  DynamicModule(const DynamicModule&);
-  DynamicModule& operator=(const DynamicModule&);
+  DynamicModule(const DynamicModule&) = delete;
+  DynamicModule& operator=(const DynamicModule&) = delete;
 
   // struct PrivateData;
   // PrivateData* _privateData;

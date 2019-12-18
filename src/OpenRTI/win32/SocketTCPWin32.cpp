@@ -41,7 +41,7 @@ SocketTCP::connect(const SocketAddress& socketAddress)
     throw TransportError("Trying to connect to an invalid address!");
 
   const struct sockaddr* sockaddr = SocketAddress::PrivateData::sockaddr(socketAddress.constData());
-  SOCKET fd = ::socket(sockaddr->sa_family, SOCK_STREAM, IPPROTO_TCP);
+  SOCKET fd = WSASocket(sockaddr->sa_family, SOCK_STREAM, IPPROTO_TCP, NULL, 0, 0);
   if (fd == INVALID_SOCKET)
     throw TransportError(errnoToUtf8(WSAGetLastError()));
 
@@ -72,7 +72,22 @@ SocketTCP::connect(const SocketAddress& socketAddress)
     }
   }
 
+  HANDLE notificationEvent = WSACreateEvent();
+  if (notificationEvent == WSA_INVALID_EVENT) {
+    int errorNumber = WSAGetLastError();
+    ::closesocket(fd);
+    throw TransportError(errnoToUtf8(errorNumber));
+  }
+  int rc = WSAEventSelect(fd, notificationEvent, FD_READ | FD_WRITE | FD_CLOSE);
+  if (rc==SOCKET_ERROR)
+  {
+    int errorNumber = WSAGetLastError();
+    WSACloseEvent(notificationEvent);
+    closesocket(fd);
+    throw TransportError(errnoToUtf8(errorNumber));
+  }
   _privateData->_socket = fd;
+  _privateData->_notificationEvent = notificationEvent;
 }
 
 void

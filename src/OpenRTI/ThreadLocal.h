@@ -37,8 +37,8 @@ protected:
   void _set(_AbstractData*);
 
 private:
-  AbstractThreadLocal(const AbstractThreadLocal&);
-  AbstractThreadLocal& operator=(const AbstractThreadLocal&);
+  AbstractThreadLocal(const AbstractThreadLocal&) = delete;
+  AbstractThreadLocal& operator=(const AbstractThreadLocal&) = delete;
 
   struct _Provider;
 

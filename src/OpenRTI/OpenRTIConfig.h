@@ -95,4 +95,8 @@
 //#define EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
 #undef EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
 
+#define _QUOTE(x)       # x
+#define QUOTE(x)        _QUOTE(x)
+#define __FILE__LINE__      __FILE__ "(" QUOTE(__LINE__) ") : "
+
 #endif

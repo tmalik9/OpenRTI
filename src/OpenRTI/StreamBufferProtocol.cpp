@@ -37,15 +37,20 @@ StreamBufferProtocol::~StreamBufferProtocol()
 void
 StreamBufferProtocol::read(AbstractProtocolSocket& protocolSocket)
 {
-  while (getEnableRead()) {
-    while (_inputIterator != _inputBuffer.byte_end()) {
+  //DebugPrintf("%s: getEnableRead=%d\n", __FUNCTION__, getEnableRead());
+  while (getEnableRead())
+  {
+    while (_inputIterator != _inputBuffer.byte_end())
+    {
       ssize_t ret = protocolSocket.recv(BufferRange(_inputIterator, _inputBuffer.byte_end()), false);
-      if (ret == -1) {
+      if (ret == -1)
+      {
         // EAGAIN or similar in this socket abstraction.
         // Serious error numbers are delivered as exceptions.
         return;
       }
-      if (ret == 0) {
+      if (ret == 0)
+      {
         // EOF in this socket abstraction.
         // Serious error numbers are delivered as exceptions
         // FIXME close does not help.
@@ -61,10 +66,13 @@ StreamBufferProtocol::read(AbstractProtocolSocket& protocolSocket)
 
     readPacket(_inputBuffer);
     if (_inputIterator != _inputBuffer.byte_end())
+    {
       continue;
+    }
 
     for (std::list<Buffer::iterator>::iterator i = _inputScratchBufferList.begin();
-         i != _inputScratchBufferList.end(); ++i) {
+      i != _inputScratchBufferList.end(); ++i)
+    {
       _scratchPool.splice(_scratchPool.end(), _inputBuffer, *i);
     }
 
@@ -83,24 +91,54 @@ StreamBufferProtocol::getEnableRead() const
 void
 StreamBufferProtocol::write(AbstractProtocolSocket& protocolSocket)
 {
-  while (getEnableWrite()) {
+  while (getEnableWrite())
+  {
+    const ssize_t kMaxBufferSize = protocolSocket.sendBufferSize();
+    auto endOfOutput = _outputBuffer.end();
+    ssize_t bytesSoFar = 0;
     if (_outputBuffer.empty())
+    {
       writePacket();
+      for (auto iter = endOfOutput; iter != _outputBuffer.end(); iter++)
+      {
+        bytesSoFar += iter->size();
+      }
+      endOfOutput = _outputBuffer.end();
+    }
 
-    while (_outputIterator != _outputBuffer.byte_end()) {
+    while (getMoreToSend() && bytesSoFar < kMaxBufferSize)
+    {
+      // Pop message, decode and pass to _outputBuffer
+      writePacket();
+      for (auto iter = endOfOutput; iter != _outputBuffer.end(); iter++)
+      {
+        bytesSoFar += iter->size();
+      }
+      endOfOutput = _outputBuffer.end();
+    }
+
+    //while (getEnableWrite()) {
+    //  if (_outputBuffer.empty())
+    //    writePacket();
+
+    while (_outputIterator != _outputBuffer.byte_end())
+    {
       ssize_t ret = protocolSocket.send(ConstBufferRange(_outputIterator, _outputBuffer.byte_end()), getMoreToSend());
-      if (ret == -1) {
+      if (ret == -1)
+      {
         // Signals a message to big error. Currently unhandled ...
         // Serious error numbers are delivered as exceptions.
         protocolSocket.close();
         Log(MessageCoding, Warning) << "Got an error code from sending to socket!" << std::endl;
         return;
       }
-      if (ret == 0) {
+      if (ret == 0)
+      {
         // EAGAIN or similar in this socket abstraction.
         // Serious error numbers are delivered as exceptions.
         return;
       }
+      //DebugPrintf("%s: _outputBuffer.byte_size=%d sent=%d cycle=%d\n", __FUNCTION__, _outputBuffer.byte_size(), ret, cycle);
       _outputIterator += ret;
       _outputIterator.skip_empty_chunks(_outputBuffer.byte_end());
 #ifdef ENABLE_NETWORKSTATISTICS
@@ -109,8 +147,8 @@ StreamBufferProtocol::write(AbstractProtocolSocket& protocolSocket)
     }
 
     // We are ready with this packet, reset state
-    for (std::list<Buffer::iterator>::iterator i = _outputScratchBufferList.begin();
-         i != _outputScratchBufferList.end(); ++i) {
+    for (std::list<Buffer::iterator>::iterator i = _outputScratchBufferList.begin(); i != _outputScratchBufferList.end(); ++i)
+    {
       _scratchPool.splice(_scratchPool.end(), _outputBuffer, *i);
     }
 
@@ -132,9 +170,13 @@ StreamBufferProtocol::addReadBuffer(size_t size)
 {
   OpenRTIAssert(size);
   if (_inputIterator == _inputBuffer.byte_end())
+  {
     _inputIterator = _inputBuffer.insert(_inputBuffer.end(), VariableLengthData(size));
+  }
   else
+  {
     _inputBuffer.push_back(VariableLengthData(size));
+  }
 }
 
 void
@@ -143,17 +185,26 @@ StreamBufferProtocol::addScratchReadBuffer(size_t size)
   OpenRTIAssert(size);
   VariableLengthDataList scratchElement;
   if (!_scratchPool.empty())
+  {
     scratchElement.splice(scratchElement.end(), _scratchPool, _scratchPool.begin());
+  }
   else
+  {
     scratchElement.push_back(VariableLengthData());
+  }
   _inputBuffer.splice(_inputBuffer.end(), scratchElement, scratchElement.begin());
   VariableLengthDataList::iterator back_iterator = _inputBuffer.end();
   --back_iterator;
   if (_inputIterator.iterator() == _inputBuffer.end())
+  {
     _inputIterator = back_iterator;
+  }
   if (_iteratorPool.empty())
+  {
     _inputScratchBufferList.push_back(back_iterator);
-  else {
+  }
+  else
+  {
     _inputScratchBufferList.splice(_inputScratchBufferList.end(), _iteratorPool, _iteratorPool.begin());
     _inputScratchBufferList.back() = back_iterator;
   }
@@ -164,11 +215,17 @@ void
 StreamBufferProtocol::addWriteBuffer(const VariableLengthData& value)
 {
   if (value.empty())
+  {
     return;
+  }
   if (_outputIterator == _outputBuffer.byte_end())
+  {
     _outputIterator = _outputBuffer.insert(_outputBuffer.end(), value);
+  }
   else
+  {
     _outputBuffer.push_back(value);
+  }
 }
 
 VariableLengthData&
@@ -176,17 +233,26 @@ StreamBufferProtocol::addScratchWriteBuffer()
 {
   VariableLengthDataList scratchElement;
   if (!_scratchPool.empty())
+  {
     scratchElement.splice(scratchElement.end(), _scratchPool, _scratchPool.begin());
+  }
   else
+  {
     scratchElement.push_back(VariableLengthData());
+  }
   _outputBuffer.splice(_outputBuffer.end(), scratchElement, scratchElement.begin());
   VariableLengthDataList::iterator back_iterator = _outputBuffer.end();
   --back_iterator;
   if (_outputIterator.iterator() == _outputBuffer.end())
+  {
     _outputIterator = back_iterator;
+  }
   if (_iteratorPool.empty())
+  {
     _outputScratchBufferList.push_back(back_iterator);
-  else {
+  }
+  else
+  {
     _outputScratchBufferList.splice(_outputScratchBufferList.end(), _iteratorPool, _iteratorPool.begin());
     _outputScratchBufferList.back() = back_iterator;
   }

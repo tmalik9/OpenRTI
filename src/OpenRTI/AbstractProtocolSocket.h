@@ -37,6 +37,7 @@ public:
 
   /// Can be called from the consuming layer to send something into this protocol layer
   virtual ssize_t send(const ConstBufferRange& bufferRange, bool more) = 0;
+  virtual ssize_t sendBufferSize() const = 0;
 
   /// Call when the user wants to close this socket.
   /// Closing a socket means:

@@ -38,8 +38,8 @@ protected:
   virtual void _postOperation(const SharedPtr<_Operation>& operation);
 
 private:
-  ThreadServer(const ThreadServer&);
-  ThreadServer& operator=(const ThreadServer&);
+  ThreadServer(const ThreadServer&) = delete;
+  ThreadServer& operator=(const ThreadServer&) = delete;
 
   mutable Mutex _mutex;
   Condition _condition;

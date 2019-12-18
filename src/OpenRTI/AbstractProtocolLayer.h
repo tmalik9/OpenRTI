@@ -44,8 +44,8 @@ public:
   virtual void error(const Exception& e) = 0;
 
 private:
-  AbstractProtocolLayer(const AbstractProtocolLayer&);
-  AbstractProtocolLayer& operator=(const AbstractProtocolLayer&);
+  AbstractProtocolLayer(const AbstractProtocolLayer&) = delete;
+  AbstractProtocolLayer& operator=(const AbstractProtocolLayer&) = delete;
 };
 
 } // namespace OpenRTI

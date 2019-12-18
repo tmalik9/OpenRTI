@@ -40,11 +40,11 @@ public:
   virtual ~AbstractSocketEvent();
 
   // Is called from the parent protocol layer when there is data to read
-  virtual void read(SocketEventDispatcher& dispatcher);
+  virtual void read(SocketEventDispatcher& dispatcher) = 0;
   virtual bool getEnableRead() const = 0;
 
   // Is called from the parent protocol layer when there is space to write something
-  virtual void write(SocketEventDispatcher& dispatcher);
+  virtual void write(SocketEventDispatcher& dispatcher) = 0;
   virtual bool getEnableWrite() const = 0;
 
   // Is called when the given timeout value expires.

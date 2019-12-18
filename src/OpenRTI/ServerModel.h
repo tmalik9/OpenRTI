@@ -435,8 +435,8 @@ public:
   ConnectHandle _ownerConnectHandle;
 
 private:
-  InstanceAttribute(const InstanceAttribute&);
-  InstanceAttribute& operator=(const InstanceAttribute&);
+  InstanceAttribute(const InstanceAttribute&) = delete;
+  InstanceAttribute& operator=(const InstanceAttribute&) = delete;
 
   ObjectInstance& _objectInstance;
   ClassAttribute& _classAttribute;
@@ -1623,8 +1623,8 @@ public:
   void send(const SharedPtr<const AbstractMessage>& message);
 
 private:
-  FederationConnect(const FederationConnect&);
-  FederationConnect& operator=(const FederationConnect&);
+  FederationConnect(const FederationConnect&) = delete;
+  FederationConnect& operator=(const FederationConnect&) = delete;
 
   // The federation backward reference
   Federation& _federation;
@@ -1792,8 +1792,8 @@ public:
 
 
 private:
-  Federation(const Federation&);
-  Federation& operator=(const Federation&);
+  Federation(const Federation&) = delete;
+  Federation& operator=(const Federation&) = delete;
 
   /// The server node this Federation belongs to
   Node& _serverNode;
@@ -1896,8 +1896,8 @@ public:
   void send(const SharedPtr<const AbstractMessage>& message);
 
 private:
-  NodeConnect(const NodeConnect&);
-  NodeConnect& operator=(const NodeConnect&);
+  NodeConnect(const NodeConnect&) = delete;
+  NodeConnect& operator=(const NodeConnect&) = delete;
 
   bool _isParentConnect;
 
@@ -1978,8 +1978,8 @@ protected:
   SharedPtr<ServerOptions> _serverOptions;
 
 private:
-  Node(const Node&);
-  Node& operator=(const Node&);
+  Node(const Node&) = delete;
+  Node& operator=(const Node&) = delete;
 };
 
 } // namespace ServerModel

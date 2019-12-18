@@ -51,7 +51,7 @@ public:
   bool getDone() const
   { return _done; }
 
-  /// Supposed to be called from a differrent thread
+  /// Supposed to be called from a different thread
   void postDone()
   { _postDone(); }
 
@@ -107,8 +107,8 @@ protected:
   };
 
 private:
-  AbstractServer(const AbstractServer&);
-  AbstractServer& operator=(const AbstractServer&);
+  AbstractServer(const AbstractServer&) = delete;
+  AbstractServer& operator=(const AbstractServer&) = delete;
 
   class _Connect;
   class _ConnectOperation;

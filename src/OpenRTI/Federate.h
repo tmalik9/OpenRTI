@@ -149,8 +149,8 @@ public:
     void setRegion(const Region& region);
 
   private:
-    RegionData(const RegionData&);
-    RegionData& operator=(const RegionData&);
+    RegionData(const RegionData&) = delete;
+    RegionData& operator=(const RegionData&) = delete;
 
     DimensionHandleSet _dimensionHandleSet;
     Region _region;

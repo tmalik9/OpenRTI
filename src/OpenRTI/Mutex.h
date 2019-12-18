@@ -65,8 +65,8 @@ public:
 #endif
 
 private:
-  Mutex(const Mutex&);
-  Mutex& operator=(const Mutex&);
+  Mutex(const Mutex&) = delete;
+  Mutex& operator=(const Mutex&) = delete;
 
 #if 201103L <= __CPlusPlusStd
   std::mutex _mutex;

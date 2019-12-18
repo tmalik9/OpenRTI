@@ -18,8 +18,6 @@
  */
 
 #include "Clock.h"
-
-#include "Atomic.h"
 #include "ClockWin32.h"
 
 #ifndef __CPlusPlusStd

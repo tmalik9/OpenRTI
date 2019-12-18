@@ -5509,10 +5509,10 @@ void RTIambassadorImplementation::setNotificationHandle(rti1516e::RTInotificatio
 }
 
 
-void RTIambassadorImplementation::StartNetworkStatistics()
+void RTIambassadorImplementation::StartNetworkStatistics(bool startTimer)
 {
 #ifdef ENABLE_NETWORKSTATISTICS
-  GetNetworkStatistics().Start();
+  GetNetworkStatistics().Start(startTimer);
 #endif
 }
 

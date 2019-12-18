@@ -694,7 +694,7 @@ public:
   // Vector extensions
   void setNotificationHandle(rti1516e::RTInotificationHandle* h) override;
 
-  void StartNetworkStatistics() override;
+  void StartNetworkStatistics(bool startTimer) override;
   void StopNetworkStatistics() override;
   void ResetNetworkStatistics() override;
 

@@ -78,8 +78,8 @@ struct SocketAddress::PrivateData : public Referenced {
 
 private:
   // We should not need them
-  PrivateData(const PrivateData& privateData);
-  PrivateData& operator=(const PrivateData& privateData);
+  PrivateData(const PrivateData& privateData) = delete;
+  PrivateData& operator=(const PrivateData& privateData) = delete;
 
   socklen_t _addrlen;
   struct sockaddr_storage _sockaddr;

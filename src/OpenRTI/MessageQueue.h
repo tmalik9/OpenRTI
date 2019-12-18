@@ -140,7 +140,7 @@ protected:
       _condition.notify_one();
     }
 #ifdef _MSC_VER
-#pragma message("revisit: notify only once")
+#pragma message(__FILE__LINE__ "revisit: notify only once")
 #endif
     CondDebugPrintf("%s: signal _notificationHandle=%p empty=%d needSignal=%d\n", __FUNCTION__,
                 _notificationHandle.get(), _messageList.empty(), needSignal);

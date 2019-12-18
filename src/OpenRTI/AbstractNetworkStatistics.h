@@ -17,7 +17,7 @@ public:
   virtual void MessageReceived(const char* typeName) = 0;
   virtual void DumpStatistics() = 0;
   virtual void Reset() = 0;
-  virtual void Start() = 0;
+  virtual void Start(bool startTimer) = 0;
   virtual void Stop() = 0;
 #endif
 };

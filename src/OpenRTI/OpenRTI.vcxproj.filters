@@ -217,6 +217,9 @@
     <ClCompile Include="win32\NetworkStatisticsWin32.cpp">
       <Filter>Source Files\win32</Filter>
     </ClCompile>
+    <ClCompile Include="win32\PerformanceCounterStopWatch.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -571,6 +574,9 @@
     </ClInclude>
     <ClInclude Include="xml\xmltok_ns.c">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\PerformanceCounterStopWatch.h">
+      <Filter>Source Files\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

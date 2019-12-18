@@ -737,7 +737,7 @@ namespace rti1516e
       virtual void setInteractionClassDeliverToSelf(InteractionClassHandle interactionClassHandle, bool enable) = 0;
       virtual void setObjectClassDeliverToSelf(ObjectClassHandle objectClassHandle, bool enable) = 0;
 
-      virtual void StartNetworkStatistics() = 0;
+      virtual void StartNetworkStatistics(bool startTimer) = 0;
       virtual void StopNetworkStatistics() = 0;
       virtual void ResetNetworkStatistics() = 0;
 };

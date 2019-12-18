@@ -60,8 +60,8 @@ protected:
   virtual void _postOperation(const SharedPtr<_Operation>& operation);
 
 private:
-  NetworkServer(const NetworkServer&);
-  NetworkServer& operator=(const NetworkServer&);
+  NetworkServer(const NetworkServer&) = delete;
+  NetworkServer& operator=(const NetworkServer&) = delete;
 
   SocketEventDispatcher _dispatcher;
 

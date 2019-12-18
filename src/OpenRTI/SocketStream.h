@@ -45,6 +45,7 @@ class OPENRTI_API SocketStream : public SocketData {
 public:
 
   ssize_t send(const ConstBufferRange& bufferRange, bool more);
+  ssize_t sendBufferSize() const;
   ssize_t recv(const BufferRange& bufferRange, bool peek);
   virtual void cork(bool enable);
   virtual void shutdown();

@@ -12,7 +12,7 @@
 
   <!-- Listen on any network socket on the default port. -->
   <!-- <listen protocol="rti" address="::" service="14321"/> -->
-  <listen url="rti://localhost:14321/"/>
+  <listen url="rti://0.0.0.0:14321/"/>
 
   <!-- Listen on a local unix domain socket. -->
   <!-- <listen url="pipe:///tmp/rtinode-server-socket"/> -->
