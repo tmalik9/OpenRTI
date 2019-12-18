@@ -44,7 +44,7 @@ Socket::close()
 }
 
 Socket::Socket(PrivateData* privateData) :
-  _privateData(privateData)
+  _privateData(privateData), _mIsWritable(false)
 {
 }
 

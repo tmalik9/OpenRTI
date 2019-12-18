@@ -17,8 +17,6 @@
  *
  */
 
-#include "StringUtils.h"
-
 #include <algorithm>
 #include <cstring>
 #include <wctype.h>
@@ -29,6 +27,7 @@
 #include <sstream>
 
 #include "OpenRTIConfig.h"
+#include "StringUtils.h"
 #include "Types.h"
 
 namespace OpenRTI {

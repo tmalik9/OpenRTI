@@ -3,10 +3,11 @@
 #include "NetworkStatistics.h"
 #include "dprintf.h"
 #include <sstream>
+#include <limits.h>
 
 namespace OpenRTI {
 
-NetworkStatistics::NetworkStatistics()
+NetworkStatistics::NetworkStatistics() : _Collecting(false)
 {
 }
 
@@ -33,28 +34,40 @@ void NetworkStatistics::Reset()
 
 void NetworkStatistics::BytesReceived(size_t bytes)
 {
-  _BytesReceived += bytes;
-  _BytesReceivedTotal += bytes;
+  if (_Collecting)
+  {
+    _BytesReceived += bytes;
+    _BytesReceivedTotal += bytes;
+  }
 }
 
 void NetworkStatistics::BytesSent(size_t bytes)
 {
-  _BytesSent += bytes;
-  _BytesSentTotal += bytes;
+  if (_Collecting)
+  {
+    _BytesSent += bytes;
+    _BytesSentTotal += bytes;
+  }
 }
 
 void NetworkStatistics::MessageReceived(const char* typeName)
 {
-  _MessagesReceived++;
-  _MessagesReceivedTotal++;
-  _MessagesReceivedByType[typeName]++;
+  if (_Collecting)
+  {
+    _MessagesReceived++;
+    _MessagesReceivedTotal++;
+    _MessagesReceivedByType[typeName]++;
+  }
 }
 
 void NetworkStatistics::MessageSent(const char* typeName)
 {
-  _MessagesSent++;
-  _MessagesSentTotal++;
-  _MessagesSentByType[typeName]++;
+  if (_Collecting)
+  {
+    _MessagesSent++;
+    _MessagesSentTotal++;
+    _MessagesSentByType[typeName]++;
+  }
 }
 
 void NetworkStatistics::DumpStatistics()

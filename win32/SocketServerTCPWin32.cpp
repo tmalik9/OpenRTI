@@ -65,7 +65,22 @@ SocketServerTCP::bind(const SocketAddress& socketAddress)
     throw TransportError(errnoToUtf8(errorNumber));
   }
 
+  HANDLE notificationEvent = WSACreateEvent();
+  if (notificationEvent == WSA_INVALID_EVENT) {
+    int errorNumber = WSAGetLastError();
+    ::closesocket(fd);
+    throw TransportError(errnoToUtf8(errorNumber));
+  }
+  int rc = WSAEventSelect(fd, notificationEvent, FD_ACCEPT | FD_CLOSE);
+  if (rc==SOCKET_ERROR)
+  {
+    int errorNumber = WSAGetLastError();
+    WSACloseEvent(notificationEvent);
+    closesocket(fd);
+    throw TransportError(errnoToUtf8(errorNumber));
+  }
   _privateData->_socket = fd;
+  _privateData->_notificationEvent = notificationEvent;
 }
 
 void
@@ -102,9 +117,25 @@ SocketServerTCP::accept()
     throw TransportError(errnoToUtf8(errorNumber));
   }
 
+  HANDLE notificationEvent = WSACreateEvent();
+  if (notificationEvent == WSA_INVALID_EVENT) {
+    int errorNumber = WSAGetLastError();
+    ::closesocket(fd);
+    throw TransportError(errnoToUtf8(errorNumber));
+  }
+  int rc = WSAEventSelect(fd, notificationEvent, FD_READ | FD_WRITE | FD_CLOSE);
+  if (rc==SOCKET_ERROR)
+  {
+    int errorNumber = WSAGetLastError();
+    WSACloseEvent(notificationEvent);
+    closesocket(fd);
+    throw TransportError(errnoToUtf8(errorNumber));
+  }
+
   PrivateData* pd = new PrivateData;
   pd->wsaStartup();
   pd->_socket = fd;
+  pd->_notificationEvent = notificationEvent;
   return new SocketTCP(pd);
 }
 

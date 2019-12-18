@@ -166,6 +166,7 @@
     <ClCompile Include="ThreadServer.cpp" />
     <ClCompile Include="URL.cpp" />
     <ClCompile Include="WeakReferenced.cpp" />
+    <ClCompile Include="win32\PerformanceCounterStopWatch.cpp" />
     <ClCompile Include="XMLReader.cpp" />
     <ClCompile Include="win32\AtomicWin32.cpp" />
     <ClCompile Include="win32\ClockWin32.cpp" />
@@ -206,6 +207,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClInclude Include="win32\PerformanceCounterStopWatch.h" />
     <ClInclude Include="xml\xmltok_impl.c">
       <FileType>CppHeader</FileType>
     </ClInclude>

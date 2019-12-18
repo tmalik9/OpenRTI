@@ -39,6 +39,7 @@ struct OPENRTI_LOCAL Socket::PrivateData {
   // we cannot reliably have any socket handle in our hands at that time
   PrivateData(SOCKET socket = SOCKET_ERROR) : _socket(socket), _wsaStartupCalled(false)
   {
+    _notificationEvent = WSA_INVALID_EVENT;
     // Probably too late, but make sure we have a reference as long as we have a socket
     if (_socket != SOCKET_ERROR)
       wsaStartup();
@@ -52,9 +53,15 @@ struct OPENRTI_LOCAL Socket::PrivateData {
 
   void close()
   {
-    if (_socket != INVALID_SOCKET) {
+    if (_socket != INVALID_SOCKET)
+    {
       closesocket(_socket);
       _socket = INVALID_SOCKET;
+    }
+    if (_notificationEvent != WSA_INVALID_EVENT)
+    {
+      CloseHandle(_notificationEvent);
+      _notificationEvent = WSA_INVALID_EVENT;
     }
   }
 
@@ -74,7 +81,7 @@ struct OPENRTI_LOCAL Socket::PrivateData {
   }
 
   SOCKET _socket;
-
+  HANDLE _notificationEvent;
 private:
   bool _wsaStartupCalled;
 };

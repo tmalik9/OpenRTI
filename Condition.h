@@ -97,8 +97,8 @@ public:
 #endif
 
 private:
-  Condition(const Condition&);
-  Condition& operator=(const Condition&);
+  Condition(const Condition&) = delete;
+  Condition& operator=(const Condition&) = delete;
 
 #if 201103L <= __CPlusPlusStd
   std::condition_variable _condition;

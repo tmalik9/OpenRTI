@@ -58,8 +58,8 @@ public:
   virtual void _dispatchMessage(const AbstractMessage* message, const ConnectHandle& connectHandle) = 0;
 
 private:
-  AbstractServerNode(const AbstractServerNode&);
-  AbstractServerNode& operator=(const AbstractServerNode&);
+  AbstractServerNode(const AbstractServerNode&) = delete;
+  AbstractServerNode& operator=(const AbstractServerNode&) = delete;
 };
 
 } // namespace OpenRTI

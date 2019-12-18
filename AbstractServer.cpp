@@ -230,8 +230,8 @@ public:
   _PostingMessageSender(const SharedPtr<AbstractServer>& serverLoop, const ConnectHandle& connectHandle);
   virtual ~_PostingMessageSender();
 
-  virtual void send(const SharedPtr<const AbstractMessage>& message);
-  virtual void close();
+  virtual void send(const SharedPtr<const AbstractMessage>& message) override;
+  virtual void close() override;
 
 private:
   SharedPtr<AbstractServer> _serverLoop;
@@ -254,6 +254,7 @@ AbstractServer::_PostingMessageSender::send(const SharedPtr<const AbstractMessag
 {
   if (!_connectHandle.valid())
     return;
+  //DebugPrintf("%s: message=%s\n", __FUNCTION__, message.valid() ? message->toString().c_str() : "null");
   _serverLoop->_postMessage(_MessageConnectHandlePair(message, _connectHandle));
 }
 

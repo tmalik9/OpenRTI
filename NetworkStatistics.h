@@ -2,6 +2,7 @@
 #pragma once
 #include <mutex>
 #include <map>
+#include <atomic>
 #include "AbstractNetworkStatistics.h"
 
 namespace OpenRTI {
@@ -23,6 +24,7 @@ protected:
 #ifdef ENABLE_NETWORKSTATISTICS
   void DumpTotals();
 
+  std::atomic<bool> _Collecting;
   size_t _BytesReceived;
   size_t _BytesReceivedTotal;
   size_t _BytesSent;
