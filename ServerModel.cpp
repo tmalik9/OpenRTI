@@ -812,7 +812,6 @@ bool InteractionClass::isFiltered(const ConnectHandle& connectHandle, const Para
     {
       //DebugPrintf("%s(name=%s): %s in list\n", __FUNCTION__, getFQName().c_str(), parameterValue.getParameterHandle().toString().c_str());
       const VariableLengthData& parameterData = parameterValue.getValue();
-      std::string dataRepr = make_hex_string(parameterData.charData(), parameterData.charData()+parameterData.size(), true, true);
       // now go through each specified valid filter value for given parameter
       const VariableLengthDataSet& values = parameterFilterIter->second;
       if (values.find(parameterData) == values.end())
