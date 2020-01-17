@@ -91,6 +91,7 @@ else(WIN32)
     posix/ConditionPosix.cpp
     posix/DynamicModulePosix.cpp
     posix/MutexPosix.cpp
+    posix/NetworkStatisticsPosix.cpp
     posix/SocketAddressPosix.cpp
     posix/SocketDataPosix.cpp
     posix/SocketEventDispatcherPosix.cpp
@@ -129,11 +130,29 @@ endif(EXPAT_FOUND)
 
 include(FindZLIB)
 if(ZLIB_FOUND)
-  include_directories(${ZLIB_INCLUDE_DIRS})
-  add_definitions(-DOPENRTI_HAVE_ZLIB)
-  set(OpenRTI_ZLIB_SOURCES
-    ZLibProtocolLayer.cpp
-  )
+# ems: disabled (unused) ZLIB support due to a bug in the implementation:
+# -------------------- 8< --------------------
+# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp: In constructor OpenRTI::ZLibProtocolLayer::ZLibProtocolLayer():
+# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:190:50: error: invalid new-expression of abstract class type OpenRTI::ZLibProtocolLayer::ProtocolSocket
+#    _protocolSocket(new ProtocolSocket(Z_BEST_SPEED))
+#                                                   ^
+# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:27:40: note:   because the following virtual functions are pure within OpenRTI::ZLibProtocolLayer::ProtocolSocket:
+#  class OPENRTI_LOCAL ZLibProtocolLayer::ProtocolSocket : public AbstractProtocolSocket {
+#                                         ^~~~~~~~~~~~~~
+# In file included from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolLayer.h:23:0,
+#                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/NestedProtocolLayer.h:23,
+#                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.h:23,
+#                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:20:
+# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolSocket.h:40:19: note:     virtual OpenRTI::ssize_t OpenRTI::AbstractProtocolSocket::sendBufferSize() const
+#    virtual ssize_t sendBufferSize() const = 0;
+#                    ^~~~~~~~~~~~~~
+# -------------------- >8 --------------------
+  message(WARNING "ZLIB is found but ignored due to a bug in ZLibProtocolLayer implementation. cf. src/OpenRTI/CMakeLists.txt for details.")
+#  include_directories(${ZLIB_INCLUDE_DIRS})
+#  add_definitions(-DOPENRTI_HAVE_ZLIB)
+#  set(OpenRTI_ZLIB_SOURCES
+#    ZLibProtocolLayer.cpp
+#  )
 else()
   set(OpenRTI_ZLIB_SOURCES "")
 endif()
@@ -167,6 +186,7 @@ set(OpenRTI_SOURCES
   MessageEncodingRegistry.cpp
   NestedProtocolLayer.cpp
   NetworkServer.cpp
+  NetworkStatistics.cpp
   Options.cpp
   ParenthesesReader.cpp
   ServerModel.cpp

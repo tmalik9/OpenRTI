@@ -1317,19 +1317,20 @@ public:
   class LogicalTimeMessageListMap : public std::map<LogicalTimePair, _MessageList>
   {
   public:
+    using BaseType = std::map<LogicalTimePair, _MessageList>;
     const LogicalTime& getLeastIncomingTimestamp() const {
-      return begin()->first.first;
+      return BaseType::begin()->first.first;
     }
     const LogicalTimePair& getLeastIncomingTimepair() const {
-      return begin()->first;
+      return BaseType::begin()->first;
     }
     const _MessageList& getOldestMessages() const {
-      return begin()->second;
+      return BaseType::begin()->second;
     }
     bool cleanOldestMessageList()
     {
-      if (begin()->second.empty()) {
-        erase(begin());
+      if (BaseType::begin()->second.empty()) {
+        BaseType::erase(BaseType::begin());
         return true;
       } else {
         return false;
