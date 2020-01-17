@@ -36,7 +36,7 @@ ssize_t
 SocketStream::send(const ConstBufferRange& bufferRange, bool more)
 {
   size_t bytelen = 0;
-  size_t sendBufferSize = 64*1024; /* FIXME Use the real send buffer size instead */
+  size_t sendBufferSize = this->sendBufferSize(); /* FIXME Use the real send buffer size instead */
 #ifdef OpenRTI_HAVE_ALLOCA
 #if defined(__sun)
   size_t numPengingBuffers = 100;
@@ -134,6 +134,11 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
 
   // All other errors are considered serious and need to be handled somewhere where this is caught
   throw TransportError(errnoToUtf8(errorNumber));
+}
+
+ssize_t SocketStream::sendBufferSize() const
+{
+  return 64*1024;
 }
 
 ssize_t

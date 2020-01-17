@@ -17,6 +17,8 @@ class NetworkStatisticsWin32 : public NetworkStatistics
 #ifdef ENABLE_NETWORKSTATISTICS
     void Start(bool startTimer) override;
     void Stop() override;
+    void DumpStatistics() override;
+    void DumpTotals() override;
     static NetworkStatisticsWin32& GetInstance();
 #endif
   private:

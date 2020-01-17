@@ -15,15 +15,12 @@ public:
   void BytesSent(size_t bytes) override;
   void MessageSent(const char* typeName) override;
   void MessageReceived(const char* typeName) override;
-  void DumpStatistics() override;
   void Reset() override;
 #endif
 protected:
   NetworkStatistics();
   ~NetworkStatistics();
 #ifdef ENABLE_NETWORKSTATISTICS
-  void DumpTotals();
-
   std::atomic<bool> _Collecting;
   size_t _BytesReceived;
   size_t _BytesReceivedTotal;
