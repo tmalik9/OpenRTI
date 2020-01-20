@@ -90,8 +90,8 @@ else()
   include(GNUInstallDirsCompat)
 endif()
 
-set(OPENRTI_ENABLE_RTI13 ON CACHE BOOL "Build and install the RTI13 interface.")
-set(OPENRTI_ENABLE_RTI1516 ON CACHE BOOL "Build and install the RTI1516 interface.")
+set(OPENRTI_ENABLE_RTI13 OFF CACHE BOOL "Build and install the RTI13 interface.")
+set(OPENRTI_ENABLE_RTI1516 OFF CACHE BOOL "Build and install the RTI1516 interface.")
 set(OPENRTI_ENABLE_RTI1516E ON CACHE BOOL "Build and install the RTI1516E interface (EXPERIMENTAL).")
 
 set(OPENRTI_ENABLE_PYTHON_BINDINGS ON CACHE BOOL "Build python binding extension modules.")
@@ -199,5 +199,5 @@ endfunction()
 
 add_subdirectory(python)
 add_subdirectory(src)
-add_subdirectory(tests)
+# add_subdirectory(tests)
 
