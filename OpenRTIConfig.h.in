@@ -37,7 +37,13 @@
 #define OpenRTI_DEPRECATED
 #endif
 
-#if 201103L <= __cplusplus
+#ifdef _MSVC_LANG
+#define __CPlusPlusStd _MSVC_LANG
+#else
+#define __CPlusPlusStd __cplusplus
+#endif
+
+#if 201103L <= __CPlusPlusStd
 // In any case this is the best choice as this provides a reliable api for any future
 # define OpenRTI_ATOMIC_USE_STD_ATOMIC
 #else
@@ -79,5 +85,14 @@
 #cmakedefine OpenRTI_HAVE_ALLOCA
 #cmakedefine OpenRTI_HAVE_DLADDR
 #cmakedefine OPENRTI_DATAROOTDIR "@OPENRTI_DATAROOTDIR@"
+
+//#define EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
+#undef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
+//#define EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
+#undef EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
+
+#define _QUOTE(x)       # x
+#define QUOTE(x)        _QUOTE(x)
+#define __FILE__LINE__      __FILE__ "(" QUOTE(__LINE__) ") : "
 
 #endif
