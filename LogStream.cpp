@@ -17,6 +17,11 @@
  *
  */
 
+#if defined(_WIN32)
+#include <windows.h>
+#include <processenv.h>
+#endif
+
 #include "LogStream.h"
 
 #include <cstdlib>
@@ -31,6 +36,11 @@
 #include "StringUtils.h"
 #include "ThreadLocal.h"
 
+#ifdef _MSC_VER
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem;
+#endif
 namespace OpenRTI {
 
 class OPENRTI_LOCAL LogStream::StreamPair {
@@ -196,8 +206,24 @@ LogStream::setPriority(LogStream::Priority priority)
 
 void LogStream::AddLogFile(const std::string& path)
 {
+  std::string expandedPath = path;
+#if defined(_WIN32)
+  DWORD requiredSize = ExpandEnvironmentStringsA(path.c_str(), NULL, 0);
+  char* buffer = new char[requiredSize];
+  DWORD expandedSize = ExpandEnvironmentStringsA(path.c_str(), buffer, requiredSize);
+  if (expandedSize == requiredSize - 1)
+  {
+    expandedPath = buffer;
+  }
+  fs::path directory = fs::path(expandedPath).parent_path();
+  DebugPrintf("AddLogFile(\"%s\"), dir=\"%S\"\n", expandedPath.c_str(), directory.c_str());
+  if (!directory.empty() && !fs::exists(directory))
+  {
+    fs::create_directories(directory);
+  }
+#endif
   LogStream& logger = Instance();
-  logger.mLogFile.open(path);
+  logger.mLogFile.open(expandedPath);
   StreamPair::getStreamPair()->AddOutStream(logger.mLogFile);
 }
 

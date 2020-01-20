@@ -27,8 +27,7 @@
 #include "LeafServerThread.h"
 #include "Message.h"
 
-//#include <windows.h>
-//#include "dprintf.h"
+#include "dprintf.h"
 
 namespace OpenRTI {
 

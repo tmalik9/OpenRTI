@@ -26,7 +26,6 @@
 #include "Mutex.h"
 #include "ScopeLock.h"
 
-//#include <windows.h>
 //#include "dprintf.h"
 
 namespace OpenRTI {
@@ -61,7 +60,7 @@ public:
 protected:
   virtual void append(const SharedPtr<const AbstractMessage>& message)
   {
-    CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+    //CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
     _messageList.push_back(message);
   }
   virtual void close()
@@ -142,8 +141,8 @@ protected:
 #ifdef _MSC_VER
 #pragma message(__FILE__LINE__ "revisit: notify only once")
 #endif
-    CondDebugPrintf("%s: signal _notificationHandle=%p empty=%d needSignal=%d\n", __FUNCTION__,
-                _notificationHandle.get(), _messageList.empty(), needSignal);
+    //CondDebugPrintf("%s: signal _notificationHandle=%p empty=%d needSignal=%d\n", __FUNCTION__,
+    //            _notificationHandle.get(), _messageList.empty(), needSignal);
     if (!_messageList.empty() && _notificationHandle != nullptr)
     {
       _notificationHandle->Signal();
