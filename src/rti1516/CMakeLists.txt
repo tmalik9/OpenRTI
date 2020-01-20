@@ -68,8 +68,9 @@ set(LIB_FEDTIME1516_SOURCES
 if(OPENRTI_BUILD_SHARED)
   add_library(rti1516 SHARED ${LIB_RTI1516_SOURCES})
   set_property(TARGET rti1516 APPEND PROPERTY COMPILE_DEFINITIONS BUILDING_RTI)
-  set_property(TARGET rti1516 PROPERTY VERSION 1.0.0)
-  set_property(TARGET rti1516 PROPERTY SOVERSION 1)
+# ems: disable CMake so library versioning
+#  set_property(TARGET rti1516 PROPERTY VERSION 1.0.0)
+#  set_property(TARGET rti1516 PROPERTY SOVERSION 1)
 
   # rti1516, the circular reference is tricky on win32
   if(MSVC)
@@ -116,8 +117,9 @@ endif()
 if(OPENRTI_BUILD_SHARED)
   add_library(fedtime1516 SHARED ${LIB_FEDTIME1516_SOURCES})
   set_property(TARGET fedtime1516 APPEND PROPERTY COMPILE_DEFINITIONS BUILDING_FEDTIME)
-  set_property(TARGET fedtime1516 PROPERTY VERSION 1.0.0)
-  set_property(TARGET fedtime1516 PROPERTY SOVERSION 1)
+# ems: disable CMake so library versioning
+#  set_property(TARGET fedtime1516 PROPERTY VERSION 1.0.0)
+#  set_property(TARGET fedtime1516 PROPERTY SOVERSION 1)
   if(OPENRTI_INSTALL_WITH_RPATH)
     set_property(TARGET fedtime1516 PROPERTY INSTALL_RPATH "$ORIGIN")
     set_property(TARGET fedtime1516 APPEND PROPERTY LINK_FLAGS "${OPENRTI_RPATH_LINK_FLAGS}")
