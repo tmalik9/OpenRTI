@@ -91,35 +91,34 @@ StreamBufferProtocol::getEnableRead() const
 void
 StreamBufferProtocol::write(AbstractProtocolSocket& protocolSocket)
 {
-  while (getEnableWrite())
+  while (getEnableWrite()) 
   {
     const ssize_t kMaxBufferSize = protocolSocket.sendBufferSize();
-    auto endOfOutput = _outputBuffer.end();
     ssize_t bytesSoFar = 0;
+    size_t numElements = _outputBuffer.size();
+
+    // bkd: Single writePacket() because following getMoreToSend() is false for InitialStreamProtocol
+    //      When is InitialStreamProtocol really relevant?
     if (_outputBuffer.empty())
     {
       writePacket();
-      for (auto iter = endOfOutput; iter != _outputBuffer.end(); iter++)
+      for (auto iter = std::next(_outputBuffer.begin(), numElements); iter != _outputBuffer.end(); iter++)
       {
         bytesSoFar += iter->size();
       }
-      endOfOutput = _outputBuffer.end();
+      numElements = _outputBuffer.size();
     }
 
     while (getMoreToSend() && bytesSoFar < kMaxBufferSize)
     {
       // Pop message, decode and pass to _outputBuffer
       writePacket();
-      for (auto iter = endOfOutput; iter != _outputBuffer.end(); iter++)
+      for (auto iter = std::next(_outputBuffer.begin(), numElements); iter != _outputBuffer.end(); iter++)
       {
         bytesSoFar += iter->size();
       }
-      endOfOutput = _outputBuffer.end();
+      numElements = _outputBuffer.size();
     }
-
-    //while (getEnableWrite()) {
-    //  if (_outputBuffer.empty())
-    //    writePacket();
 
     while (_outputIterator != _outputBuffer.byte_end())
     {
