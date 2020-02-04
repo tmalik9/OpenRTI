@@ -92,6 +92,7 @@ else(WIN32)
     posix/DynamicModulePosix.cpp
     posix/MutexPosix.cpp
     posix/NetworkStatisticsPosix.cpp
+    posix/PerformanceCounterStopWatchPosix.cpp
     posix/SocketAddressPosix.cpp
     posix/SocketDataPosix.cpp
     posix/SocketEventDispatcherPosix.cpp
