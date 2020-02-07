@@ -216,13 +216,13 @@ void LogStream::AddLogFile(const std::string& path)
     expandedPath = buffer;
   }
   fs::path directory = fs::path(expandedPath).parent_path();
-  DebugPrintf("AddLogFile(\"%s\"), dir=\"%S\"\n", expandedPath.c_str(), directory.c_str());
   if (!directory.empty() && !fs::exists(directory))
   {
     fs::create_directories(directory);
   }
 #endif
   LogStream& logger = Instance();
+  std::cout << "Logging to \"" << expandedPath << "\"" << std::endl;
   logger.mLogFile.open(expandedPath);
   StreamPair::getStreamPair()->AddOutStream(logger.mLogFile);
 }
