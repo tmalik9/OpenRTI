@@ -39,37 +39,25 @@ public:
   virtual void setEpsilon();
   virtual bool isEpsilon() const;
 
-  virtual HLAfloat64Interval& operator=(const rti1516::LogicalTimeInterval& logicalTimeInterval)
-    throw (rti1516::InvalidLogicalTimeInterval);
+  virtual HLAfloat64Interval& operator=(const rti1516::LogicalTimeInterval& logicalTimeInterval);
 
-  virtual void setToDifference(const rti1516::LogicalTime& minuend, const rti1516::LogicalTime& subtrahend)
-    throw (rti1516::InvalidLogicalTime);
+  virtual void setToDifference(const rti1516::LogicalTime& minuend, const rti1516::LogicalTime& subtrahend);
 
-  virtual HLAfloat64Interval& operator+=(const rti1516::LogicalTimeInterval& logicalTimeInterval)
-    throw (rti1516::InvalidLogicalTimeInterval);
-  virtual HLAfloat64Interval& operator-=(const rti1516::LogicalTimeInterval& logicalTimeInterval)
-    throw (rti1516::InvalidLogicalTimeInterval);
+  virtual HLAfloat64Interval& operator+=(const rti1516::LogicalTimeInterval& logicalTimeInterval);
+  virtual HLAfloat64Interval& operator-=(const rti1516::LogicalTimeInterval& logicalTimeInterval);
 
-  virtual bool operator>(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-    throw (rti1516::InvalidLogicalTimeInterval);
-  virtual bool operator<(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-    throw (rti1516::InvalidLogicalTimeInterval);
-  virtual bool operator==(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-    throw (rti1516::InvalidLogicalTimeInterval);
-  virtual bool operator>=(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-    throw (rti1516::InvalidLogicalTimeInterval);
-  virtual bool operator<=(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-    throw (rti1516::InvalidLogicalTimeInterval);
+  virtual bool operator>(const rti1516::LogicalTimeInterval& logicalTimeInterval) const;
+  virtual bool operator<(const rti1516::LogicalTimeInterval& logicalTimeInterval) const;
+  virtual bool operator==(const rti1516::LogicalTimeInterval& logicalTimeInterval) const;
+  virtual bool operator>=(const rti1516::LogicalTimeInterval& logicalTimeInterval) const;
+  virtual bool operator<=(const rti1516::LogicalTimeInterval& logicalTimeInterval) const;
 
   virtual rti1516::VariableLengthData encode() const;
   virtual unsigned long encodedLength() const;
-  virtual unsigned long encode(void* buffer, unsigned long bufferSize) const
-    throw (rti1516::CouldNotEncode);
+  virtual unsigned long encode(void* buffer, unsigned long bufferSize) const;
 
-  virtual void decode(const rti1516::VariableLengthData& variableLengthData)
-    throw (rti1516::InternalError, rti1516::CouldNotDecode);
-  virtual void decode(void* buffer, unsigned long bufferSize)
-    throw (rti1516::InternalError, rti1516::CouldNotDecode);
+  virtual void decode(const rti1516::VariableLengthData& variableLengthData);
+  virtual void decode(void* buffer, unsigned long bufferSize);
 
   virtual std::wstring toString() const;
   virtual std::wstring implementationName() const;

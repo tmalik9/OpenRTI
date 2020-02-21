@@ -24,9 +24,9 @@
 #include <RTI/RTIambassador.h>
 
 int
-main(int argc, char* argv[])
+main(int /*argc*/, char* /*argv*/[])
 {
-  std::auto_ptr<rti1516e::RTIambassador> ambassador;
+  std::unique_ptr<rti1516e::RTIambassador> ambassador;
   rti1516e::RTIambassadorFactory factory;
   ambassador = factory.createRTIambassador();
   return EXIT_SUCCESS;

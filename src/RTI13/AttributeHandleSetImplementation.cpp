@@ -36,7 +36,6 @@ AttributeHandleSetImplementation::size() const
 
 RTI::AttributeHandle
 AttributeHandleSetImplementation::getHandle(RTI::ULong index) const
-  throw (RTI::ArrayIndexOutOfBounds)
 {
   if (_attributeHandleVector.size() <= index)
     throw RTI::ArrayIndexOutOfBounds("Array Index out of bounds in getHandle()");
@@ -45,7 +44,6 @@ AttributeHandleSetImplementation::getHandle(RTI::ULong index) const
 
 void
 AttributeHandleSetImplementation::add(RTI::AttributeHandle handle)
-  throw (RTI::ArrayIndexOutOfBounds, RTI::AttributeNotDefined)
 {
   OpenRTI::AttributeHandle attributeHandle = handle;
   _attributeHandleVector.push_back(attributeHandle);
@@ -53,7 +51,6 @@ AttributeHandleSetImplementation::add(RTI::AttributeHandle handle)
 
 void
 AttributeHandleSetImplementation::remove(RTI::AttributeHandle handle)
-  throw (RTI::AttributeNotDefined)
 {
   bool found = false;
   OpenRTI::AttributeHandle attributeHandle = handle;
@@ -97,7 +94,6 @@ AttributeHandleSetImplementation::isMember(RTI::AttributeHandle handle) const
 
 RTI::AttributeHandleSet*
 RTI::AttributeHandleSetFactory::create(ULong size)
-  throw(MemoryExhausted, ValueCountExceeded)
 {
   return new AttributeHandleSetImplementation(size);
 }

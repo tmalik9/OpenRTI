@@ -35,20 +35,17 @@ namespace rti1516
   {
   public:
     virtual
-    ~LogicalTimeFactory()
-      throw () = 0;
+    ~LogicalTimeFactory() = 0;
     
     // Returns a LogicalTime with a value of "initial"
     virtual
-    std::auto_ptr< LogicalTime >
-    makeLogicalTime()
-      throw (InternalError) = 0;
+    std::unique_ptr< LogicalTime >
+    makeLogicalTime() = 0;
     
     // Returns a LogicalTimeInterval with a value of "zero"
     virtual 
-    std::auto_ptr< LogicalTimeInterval >
-    makeLogicalTimeInterval() 
-      throw (InternalError) = 0;
+    std::unique_ptr< LogicalTimeInterval >
+    makeLogicalTimeInterval() = 0;
   };
 }
 
@@ -64,7 +61,7 @@ namespace rti1516
     // If the supplied name is the empty string, a default LogicalTimeFactory is
     // returned.  If the supplied implementation name does not match any name 
     // supported by the library, then a NULL pointer is returned. 
-    static std::auto_ptr< LogicalTimeFactory > 
+    static std::unique_ptr< LogicalTimeFactory > 
        makeLogicalTimeFactory(std::wstring const & implementationName);
   };
 }

@@ -23,12 +23,10 @@ namespace rti1516e
 {
 
 FederateAmbassador::FederateAmbassador()
-  throw (FederateInternalError)
 {
 }
 
 FederateAmbassador::~FederateAmbassador()
-  throw ()
 {
 }
 

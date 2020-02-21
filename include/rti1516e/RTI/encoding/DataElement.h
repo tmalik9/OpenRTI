@@ -33,36 +33,30 @@ namespace rti1516e
       virtual ~DataElement () = 0;
 
       // Return a new copy of the DataElement
-      virtual std::auto_ptr<DataElement> clone () const = 0;
+      virtual std::unique_ptr<DataElement> clone () const = 0;
 
       // Encode this element into a new VariableLengthData
-      virtual VariableLengthData encode () const
-         throw (EncoderException) = 0;
+      virtual VariableLengthData encode () const = 0;
 
       // Encode this element into an existing VariableLengthData
       virtual void encode (
-         VariableLengthData& inData) const
-         throw (EncoderException) = 0;
+         VariableLengthData& inData) const = 0;
 
       // Encode this element and append it to a buffer
       virtual void encodeInto (
-         std::vector<Octet>& buffer) const
-         throw (EncoderException) = 0;
+         std::vector<Octet>& buffer) const = 0;
 
       // Decode this element from the RTI's VariableLengthData.
       virtual void decode (
-         VariableLengthData const & inData)
-         throw (EncoderException) = 0;
+         VariableLengthData const & inData) = 0;
 
       // Decode this element starting at the index in the provided buffer
       virtual size_t decodeFrom (
          std::vector<Octet> const & buffer,
-         size_t index)
-         throw (EncoderException) = 0;
+         size_t index) = 0;
 
       // Return the size in bytes of this element's encoding.
-      virtual size_t getEncodedLength () const
-         throw (EncoderException) = 0;
+      virtual size_t getEncodedLength () const = 0;
 
       // Return the octet boundary of this element.
       virtual unsigned int getOctetBoundary () const = 0;

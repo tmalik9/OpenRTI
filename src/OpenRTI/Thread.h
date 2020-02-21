@@ -41,8 +41,8 @@ protected:
   virtual void run() = 0;
 
 private:
-  Thread(const Thread&);
-  Thread& operator=(const Thread&);
+  Thread(const Thread&) = delete;
+  Thread& operator=(const Thread&) = delete;
 
   struct PrivateData;
   PrivateData* _privateData;

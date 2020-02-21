@@ -23,6 +23,10 @@
 #include "OpenRTIConfig.h"
 #include "Referenced.h"
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 namespace OpenRTI {
 
 template<typename T>
@@ -37,7 +41,7 @@ public:
   { T::getFirst(_ptr); }
   SharedPtr(const SharedPtr& p) : _ptr(p.get())
   { T::get(_ptr); }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   SharedPtr(SharedPtr&& p) : _ptr(0)
   { swap(p); }
 #endif
@@ -49,7 +53,7 @@ public:
 
   SharedPtr& operator=(const SharedPtr& p)
   { assign(p.get()); return *this; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   SharedPtr& operator=(SharedPtr&& p)
   { swap(p); return *this; }
 #endif

@@ -18,12 +18,16 @@
  */
 
 #include "Atomic.h"
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
 
 #if defined OpenRTI_ATOMIC_USE_LIBRARY
 #ifndef NOMINMAX
 # define NOMINMAX
 #endif
 #include <windows.h>
+
 
 namespace OpenRTI {
 

@@ -3,11 +3,12 @@ cmake_minimum_required(VERSION 2.6.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(PACKAGE_NAME "OpenRTI")
-set(CPACK_PACKAGE_VERSION_MAJOR 0)
-set(CPACK_PACKAGE_VERSION_MINOR 9)
+set(CPACK_PACKAGE_VERSION_MAJOR 1)
+set(CPACK_PACKAGE_VERSION_MINOR 0)
 set(CPACK_PACKAGE_VERSION_PATCH 0)
 
 # Options
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Not fully supported for all operating systems, but currently
 # the only way to make the circular link reference work on android.
@@ -32,7 +33,7 @@ enable_language(C)
 
 # Starting with cmake 3.1 we can easily change the
 # c++ standard version using
-# set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 # Some whole project sensible defines
 if(UNIX)
@@ -89,8 +90,8 @@ else()
   include(GNUInstallDirsCompat)
 endif()
 
-set(OPENRTI_ENABLE_RTI13 ON CACHE BOOL "Build and install the RTI13 interface.")
-set(OPENRTI_ENABLE_RTI1516 ON CACHE BOOL "Build and install the RTI1516 interface.")
+set(OPENRTI_ENABLE_RTI13 OFF CACHE BOOL "Build and install the RTI13 interface.")
+set(OPENRTI_ENABLE_RTI1516 OFF CACHE BOOL "Build and install the RTI1516 interface.")
 set(OPENRTI_ENABLE_RTI1516E ON CACHE BOOL "Build and install the RTI1516E interface (EXPERIMENTAL).")
 
 set(OPENRTI_ENABLE_PYTHON_BINDINGS ON CACHE BOOL "Build python binding extension modules.")
@@ -176,7 +177,7 @@ macro(OPENRTI_TARGET_LINK_PRIVATE_LIBRARIES _target)
   endif()
 endmacro()
 
-macro(OPENRTI_TARGET_POSITION_INDEPENDENT _target)
+macro(openrti_target_position_independent _target)
   if(CMAKE_VERSION VERSION_GREATER 2.8.8)
     set_property(TARGET ${_target} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
   else()
@@ -198,5 +199,5 @@ endfunction()
 
 add_subdirectory(python)
 add_subdirectory(src)
-add_subdirectory(tests)
+# add_subdirectory(tests)
 

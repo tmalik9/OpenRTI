@@ -32,6 +32,10 @@ namespace OpenRTI {
 
 class InternalAmbassador;
 
+// This object represents the local federate (the object receiving callbacks from the RTI).
+// It contains the data model built up by reading the FOM.
+// Internally dispatched and externally received messages change the state of the data model.
+// NOTE there is another class named _Federate, which represents the participants of the federation.
 class OPENRTI_API Federate : public Referenced {
 public:
   Federate();
@@ -145,8 +149,8 @@ public:
     void setRegion(const Region& region);
 
   private:
-    RegionData(const RegionData&);
-    RegionData& operator=(const RegionData&);
+    RegionData(const RegionData&) = delete;
+    RegionData& operator=(const RegionData&) = delete;
 
     DimensionHandleSet _dimensionHandleSet;
     Region _region;
@@ -252,7 +256,8 @@ public:
     ParameterHandle getParameterHandle(const std::string& name) const;
     void insertParameter(const FOMParameter& fomParameter);
     void insertChildInteractionClass(InteractionClass& interactionClass);
-
+    void setDeliverToSelf(bool enable) { _deliverToSelf = enable; }
+    bool getDeliverToSelf() const { return _deliverToSelf; }
   private:
     InteractionClass(const InteractionClass&);
     InteractionClass& operator=(const InteractionClass&);
@@ -265,6 +270,7 @@ public:
     NameParameterHandleMap _nameParameterHandleMap;
 
     ChildInteractionClassList _childInteractionClassList;
+    bool _deliverToSelf;
   };
   typedef std::vector<SharedPtr<InteractionClass> > InteractionClassVector;
 
@@ -305,8 +311,10 @@ public:
     const Attribute* getAttribute(const AttributeHandle& attributeHandle) const;
     Attribute* getAttribute(const AttributeHandle& attributeHandle);
     AttributeHandle getAttributeHandle(const std::string& name) const;
-    size_t getNumAttributes() const
-    { return _attributeVector.size(); }
+    size_t getNumAttributes() const { return _attributeVector.size(); }
+    AttributeVector& getAttributes() { return _attributeVector; }
+    const AttributeVector& getAttributes() const { return _attributeVector; }
+    AttributeHandleVector getAttributeHandles() const;
     void insertAttribute(const FOMAttribute& fomAttribute);
     void insertChildObjectClass(ObjectClass& objectClass);
 
@@ -335,6 +343,9 @@ public:
     { return _publicationType; }
     bool setPublicationType(PublicationType publicationType);
 
+    void setDeliverToSelf(bool enable) { _deliverToSelf = enable; }
+    bool getDeliverToSelf() const { return _deliverToSelf; }
+
   private:
     ObjectClass(const ObjectClass&);
     ObjectClass& operator=(const ObjectClass&);
@@ -352,6 +363,7 @@ public:
     PublicationType _publicationType;
 
     ChildObjectClassList _childObjectClassList;
+    bool _deliverToSelf;
   };
   typedef std::vector<SharedPtr<ObjectClass> > ObjectClassVector;
 
@@ -416,17 +428,31 @@ public:
     bool isOwnedByFederate() const;
     bool ownsAnyAttribute() const;
 
+    SubscriptionType getSubscriptionType() const
+    { return _subscriptionType; }
+
+    bool setSubscriptionType(SubscriptionType subscriptionType)
+    { 
+      bool changed = _subscriptionType != subscriptionType;
+      _subscriptionType = subscriptionType;
+      return changed;
+    }
+
   private:
-    ObjectInstance(const ObjectInstance&);
-    ObjectInstance& operator=(const ObjectInstance&);
+    ObjectInstance(const ObjectInstance&) = delete;
+    ObjectInstance& operator=(const ObjectInstance&) = delete;
 
     ObjectClassHandle _objectClassHandle;
+    const ObjectClass* _objectClass;
     NameObjectInstanceHandleMap::iterator _nameObjectInstanceHandleMapIterator;
     InstanceAttributeVector _instanceAttributeVector;
+    SubscriptionType _subscriptionType;
   };
   typedef std::map<ObjectInstanceHandle, SharedPtr<ObjectInstance> > ObjectInstanceHandleMap;
 
   typedef std::map<std::string, FederateHandle> NameFederateHandleMap;
+
+  // this object represents *OTHER* federates participating in the federation.
   struct OPENRTI_API _Federate : public Referenced {
     _Federate(NameFederateHandleMap::iterator nameFederateHandleMapIterator);
     ~_Federate();

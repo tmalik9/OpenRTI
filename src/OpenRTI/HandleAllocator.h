@@ -29,7 +29,7 @@ namespace OpenRTI {
 template<typename H>
 class HandleAllocator {
 public:
-  typedef H Handle;
+  typedef H HandleTypeToAllocate;
 
   HandleAllocator() :
     _handle(0u)
@@ -41,7 +41,7 @@ public:
   /// Especially in presence of exceptions that class is very useful ...
   class Candidate {
   public:
-    Candidate(HandleAllocator& handleAllocator, const Handle& handle = Handle()) :
+    Candidate(HandleAllocator& handleAllocator, const HandleTypeToAllocate& handle = HandleTypeToAllocate()) :
       _handleAllocator(handleAllocator),
       _handle(handle)
     {
@@ -55,22 +55,22 @@ public:
       if (_handle.valid())
         _handleAllocator.put(_handle);
     }
-    const Handle& get() const
+    const HandleTypeToAllocate& get() const
     { return _handle; }
-    Handle take()
+    HandleTypeToAllocate take()
     {
-      Handle handle = _handle;
-      _handle = Handle();
+      HandleTypeToAllocate handle = _handle;
+      _handle = HandleTypeToAllocate();
       return handle;
     }
   private:
     HandleAllocator& _handleAllocator;
-    Handle _handle;
+    HandleTypeToAllocate _handle;
   };
 
   // take the handle out of the allocator. this is used when a slave server tracks
   // the parent servers allocations.
-  void take(const Handle& handle)
+  void take(const HandleTypeToAllocate& handle)
   {
     if (!handle.valid())
       return;
@@ -81,24 +81,24 @@ public:
     }
     OpenRTIAssert(_handle <= handle);
     while (_handle < handle)
-      _handleSet.insert(_handle++);
+      _handleSet.insert(HandleTypeToAllocate(_handle++));
     ++_handle;
   }
 
-  Handle get()
+  HandleTypeToAllocate get()
   {
     if (_handleSet.empty()) {
       if (!_handle.valid())
         throw ResourceError("Running out of handle values");
-      return _handle++;
+      return HandleTypeToAllocate(_handle++);
     }
 
-    Handle handle = *_handleSet.begin();
+    HandleTypeToAllocate handle = *_handleSet.begin();
     _handleSet.erase(_handleSet.begin());
     return handle;
   }
 
-  Handle getOrTake(const Handle& handle)
+  HandleTypeToAllocate getOrTake(const HandleTypeToAllocate& handle)
   {
     if (!handle.valid())
       return get();
@@ -106,7 +106,7 @@ public:
     return handle;
   }
 
-  void put(const Handle& handle)
+  void put(const HandleTypeToAllocate& handle)
   {
     if (!handle.valid())
       return;
@@ -126,9 +126,9 @@ public:
 
 private:
 
-  typedef std::set<Handle> HandleSet;
+  typedef std::set<HandleTypeToAllocate> HandleSet;
   HandleSet _handleSet;
-  Handle _handle;
+  HandleTypeToAllocate _handle;
 };
 
 typedef HandleAllocator<ObjectInstanceHandle> ObjectInstanceHandleAllocator;

@@ -29,7 +29,7 @@ ssize_t
 SocketStream::send(const ConstBufferRange& bufferRange, bool more)
 {
   size_t bytelen = 0;
-  size_t sendBufferSize = 64*1024; /* FIXME Use the real send buffer size instead */
+  size_t sendBufferSize = this->sendBufferSize(); /* FIXME Use the real send buffer size instead */
   // Currently fixed to max of 100
   // For stream sockets it does not matter: If we could not send all in one chunk, the next chunk will send the rest.
   WSABUF buffers[100];
@@ -55,7 +55,6 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
 #if defined DEBUG_ASSEMBLY || defined DEBUG2_ASSEMBLY
     break;
 #endif
-
     // Stop processing stuff here if we run out of space in the buffers ...
     if (maxBufferCount <= bufferCount)
       break;
@@ -63,26 +62,33 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
     if (sendBufferSize < bytelen)
       break;
   }
-
+#ifndef _WIN32
   if (more)
     cork(true);
-
+#endif
   DWORD flags = 0;
   DWORD numBytesSent = 0;
   int ret = WSASend(_privateData->_socket, buffers, bufferCount, &numBytesSent, flags, NULL, NULL);
+  //DebugPrintf("%s: socket=0x%08x bufferCount=%d bytelen=%d numBytesSent=%d ret=%d\n", __FUNCTION__, _privateData->_socket, bufferCount, bytelen, numBytesSent, ret);
   // get the error of the send call before trying setsocketopt
   int errorNumber = WSAGetLastError();
 
+#ifndef _WIN32
   // flush the buffer
   if (!more)
     cork(false);
+#endif
 
   if (ret != SOCKET_ERROR)
+  {
     return numBytesSent;
-
+  }
   // errors that just mean 'please try again' which is mapped to 'return nothing written'
   if (errorNumber == WSAEINTR || errorNumber == WSAEINPROGRESS || errorNumber == WSAENOBUFS || errorNumber == WSAEWOULDBLOCK)
+  {
+    _mIsWritable = false;
     return 0;
+  }
 
   // Hmm, not sure if we should do so - not yet message based sockets in use
   if (errorNumber == WSAEMSGSIZE)
@@ -95,6 +101,12 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
 
   // All other errors are considered serious and need to be handled somewhere where this is caught
   throw TransportError(errnoToUtf8(errorNumber));
+}
+
+
+ssize_t SocketStream::sendBufferSize() const
+{
+  return 64*1024;
 }
 
 ssize_t
@@ -142,6 +154,7 @@ SocketStream::recv(const BufferRange& bufferRange, bool peek)
 
   DWORD numBytesRecvd = 0;
   int ret = WSARecv(_privateData->_socket, buffers, bufferCount, &numBytesRecvd, &flags, NULL, NULL);
+  //DebugPrintf("%s: socket=0x%08x bufferCount=%d bytelen=%d numBytesRecvd=%d ret=%d\n", __FUNCTION__, _privateData->_socket, bufferCount, bytelen, numBytesRecvd, ret);
   if (ret != SOCKET_ERROR)
     return numBytesRecvd;
 

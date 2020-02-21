@@ -22,11 +22,29 @@
 
 #include "Referenced.h"
 #include "SharedPtr.h"
+#include "AbstractNotificationHandle.h"
+#include <memory>
 
 namespace OpenRTI {
 
 class AbstractMessage;
 class Clock;
+
+template<typename T>
+struct NotificationHandleWrapper : public AbstractNotificationHandle
+{
+  NotificationHandleWrapper(T* handle) 
+  {
+    _notificationHandleImpl = handle;
+  }
+  virtual void Signal() {
+    if (_notificationHandleImpl != nullptr)
+    {
+      _notificationHandleImpl->Signal();
+    }
+  }
+  T* _notificationHandleImpl;
+};
 
 class OPENRTI_API AbstractMessageReceiver : public Referenced {
 public:
@@ -35,6 +53,7 @@ public:
   virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout) = 0;
   virtual bool empty() const = 0;
   virtual bool isOpen() const = 0;
+  virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) = 0;
 };
 
 } // namespace OpenRTI

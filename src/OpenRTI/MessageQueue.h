@@ -26,6 +26,8 @@
 #include "Mutex.h"
 #include "ScopeLock.h"
 
+//#include "dprintf.h"
+
 namespace OpenRTI {
 
 // Unlocked queue implementation,
@@ -39,17 +41,28 @@ public:
     _isClosed(false)
   { }
   virtual SharedPtr<const AbstractMessage> receive()
-  { return _messageList.pop_front(); }
+  {
+    return _messageList.pop_front();
+  }
   virtual SharedPtr<const AbstractMessage> receive(const Clock&)
-  { return _messageList.pop_front(); }
+  {
+    return _messageList.pop_front();
+  }
   virtual bool isOpen() const
   { return !_isClosed; }
   virtual bool empty() const
   { return _messageList.empty(); }
+  virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) override
+  {
+    assert(!"not implemented");
+  }
 
 protected:
   virtual void append(const SharedPtr<const AbstractMessage>& message)
-  { _messageList.push_back(message); }
+  {
+    //CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+    _messageList.push_back(message);
+  }
   virtual void close()
   { _isClosed = true; }
 
@@ -69,7 +82,9 @@ public:
     ScopeLock scopeLock(_mutex);
     if (_messageList.empty())
       return 0;
-    return _messageList.pop_front();
+    SharedPtr<const AbstractMessage> message = _messageList.pop_front();
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+    return message;
   }
   virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout)
   {
@@ -85,7 +100,9 @@ public:
       if (!signaledOrSpurious)
         return 0;
     }
-    return _messageList.pop_front();
+    SharedPtr<const AbstractMessage> message = _messageList.pop_front();
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+    return message;
   }
   virtual bool isOpen() const
   {
@@ -99,13 +116,37 @@ public:
   }
 
 protected:
+  virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) override
+  {
+    _notificationHandle = h;
+    if (_notificationHandle != nullptr)
+    {
+      ScopeLock scopeLock(_mutex);
+      if (!_messageList.empty())
+      {
+        //CondDebugPrintf("%s: signal _notificationHandle=%p\n", __FUNCTION__, _notificationHandle.get());
+        _notificationHandle->Signal();
+      }
+    }
+  }
   virtual void append(const SharedPtr<const AbstractMessage>& message)
   {
     ScopeLock scopeLock(_mutex);
     bool needSignal = _messageList.empty();
     _messageList.push_back(message);
     if (needSignal)
+    {
       _condition.notify_one();
+    }
+#ifdef _MSC_VER
+#pragma message(__FILE__LINE__ "revisit: notify only once")
+#endif
+    //CondDebugPrintf("%s: signal _notificationHandle=%p empty=%d needSignal=%d\n", __FUNCTION__,
+    //            _notificationHandle.get(), _messageList.empty(), needSignal);
+    if (!_messageList.empty() && _notificationHandle != nullptr)
+    {
+      _notificationHandle->Signal();
+    }
   }
   virtual void close()
   {
@@ -119,6 +160,7 @@ private:
   Condition _condition;
   PooledMessageList _messageList;
   bool _isClosed;
+  std::shared_ptr<AbstractNotificationHandle> _notificationHandle;
 };
 
 } // namespace OpenRTI

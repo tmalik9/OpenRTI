@@ -20,6 +20,7 @@
 #ifndef OpenRTI_SocketAddressPrivateDataPosix_h
 #define OpenRTI_SocketAddressPrivateDataPosix_h
 
+#include "OpenRTIConfig.h"
 #include "SocketAddress.h"
 
 #include <netdb.h>

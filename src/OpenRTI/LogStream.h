@@ -21,6 +21,7 @@
 #define OpenRTI_LogStream_H
 
 #include <ostream>
+#include <fstream>
 #include "Export.h"
 #include "Referenced.h"
 
@@ -44,7 +45,7 @@ public:
   };
 
   enum Priority {
-    /// Non recoverable error, either due to an implementation problem or
+  /// Non recoverable error, either due to an implementation problem or
     /// due to a user problem probably ignoring previous error return values.
     /// Simulation results may not be valid.
     Error            = 0,
@@ -68,6 +69,9 @@ public:
   static void setCategoryEnable(Category category, bool enable = true);
   static void setCategoryDisable(Category category);
   static void setPriority(Priority priority);
+  static void AddLogFile(const std::string& path);
+  static void EnableLogToConsole(bool enable);
+  static void setCategory(LogStream::Category category);
 
   static std::ostream* getStaticStream(Category category, Priority priority)
   {
@@ -94,9 +98,10 @@ protected:
   }
 
 private:
-  struct StreamPair;
+  class StreamPair;
   unsigned mCategory;
   int mPriority;
+  std::ofstream mLogFile;
 };
 
 #define Log(c, p) \

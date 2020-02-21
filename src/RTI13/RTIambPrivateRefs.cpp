@@ -238,11 +238,9 @@ public:
   }
 
   virtual void reportFederationExecutions(const OpenRTI::FederationExecutionInformationVector& theFederationExecutionInformationList)
-    throw ()
   { }
 
   virtual void synchronizationPointRegistrationResponse(const std::string& label, OpenRTI::RegisterFederationSynchronizationPointResponseType reason)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -263,7 +261,6 @@ public:
   }
 
   virtual void announceSynchronizationPoint(const std::string& label, const OpenRTI::VariableLengthData& tag)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -277,7 +274,6 @@ public:
   }
 
   virtual void federationSynchronized(const std::string& label, const OpenRTI::FederateHandleBoolPairVector&)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -491,7 +487,6 @@ public:
   /////////////////////////////////////
 
   virtual void registrationForObjectClass(OpenRTI::ObjectClassHandle objectClassHandle, bool start)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -508,7 +503,6 @@ public:
   }
 
   virtual void turnInteractionsOn(OpenRTI::InteractionClassHandle interactionClassHandle, bool on)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -529,23 +523,19 @@ public:
   ////////////////////////////////
 
   virtual void objectInstanceNameReservationSucceeded(const std::string& objectInstanceName)
-    throw ()
   {
     Log(FederateAmbassador, Warning) << "Ignoring unexpected name reservation response!" << std::endl;
   }
   virtual void objectInstanceNameReservationFailed(const std::string& objectInstanceName)
-    throw ()
   {
     Log(FederateAmbassador, Warning) << "Ignoring unexpected name reservation response!" << std::endl;
   }
 
   virtual void multipleObjectInstanceNameReservationSucceeded(const std::vector<std::string>&)
-    throw ()
   {
     Log(FederateAmbassador, Warning) << "Ignoring unexpected multiple name reservation response!" << std::endl;
   }
   virtual void multipleObjectInstanceNameReservationFailed(const std::vector<std::string>&)
-    throw ()
   {
     Log(FederateAmbassador, Warning) << "Ignoring unexpected multiple name reservation response!" << std::endl;
   }
@@ -556,7 +546,6 @@ public:
   discoverObjectInstance(OpenRTI::ObjectInstanceHandle objectInstanceHandle,
                          OpenRTI::ObjectClassHandle objectClassHandle,
                          std::string const& name)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -574,7 +563,6 @@ public:
   virtual void reflectAttributeValues(const OpenRTI::Federate::ObjectClass& objectClass, OpenRTI::ObjectInstanceHandle objectInstanceHandle,
                                       const OpenRTI::AttributeValueVector& attributeValueVector, const OpenRTI::VariableLengthData& tag,
                                       OpenRTI::OrderType sentOrder, OpenRTI::TransportationType transportationType, OpenRTI::FederateHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -602,7 +590,6 @@ public:
                                       OpenRTI::OrderType sentOrder, OpenRTI::TransportationType transportationType,
                                       const NativeLogicalTime& logicalTime, OpenRTI::OrderType receivedOrder,
                                       OpenRTI::FederateHandle federateHandle)
-    throw ()
   {
     reflectAttributeValues(objectClass, objectInstanceHandle,attributeValueVector, tag, sentOrder, transportationType,
                            logicalTime, receivedOrder, federateHandle, OpenRTI::MessageRetractionHandle());
@@ -612,7 +599,6 @@ public:
                                       OpenRTI::OrderType sentOrder, OpenRTI::TransportationType transportationType,
                                       const NativeLogicalTime& logicalTime, OpenRTI::OrderType receivedOrder, OpenRTI::FederateHandle,
                                       OpenRTI::MessageRetractionHandle messageRetractionHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -640,7 +626,6 @@ public:
 
   virtual void removeObjectInstance(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::VariableLengthData& tag,
                                     OpenRTI::OrderType, OpenRTI::FederateHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -655,14 +640,12 @@ public:
   virtual void removeObjectInstance(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::VariableLengthData& tag,
                                     OpenRTI::OrderType sentOrder, const NativeLogicalTime& logicalTime,
                                     OpenRTI::OrderType receivedOrder, OpenRTI::FederateHandle federateHandle)
-    throw ()
   {
     removeObjectInstance(objectInstanceHandle, tag, sentOrder, logicalTime, receivedOrder, federateHandle, OpenRTI::MessageRetractionHandle());
   }
   virtual void removeObjectInstance(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::VariableLengthData& tag,
                                     OpenRTI::OrderType sentOrder, const NativeLogicalTime& logicalTime,
                                     OpenRTI::OrderType receivedOrder, OpenRTI::FederateHandle, OpenRTI::MessageRetractionHandle messageRetractionHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -680,7 +663,6 @@ public:
                                   OpenRTI::InteractionClassHandle interactionClassHandle,
                                   const OpenRTI::ParameterValueVector& parameterValueVector, const OpenRTI::VariableLengthData& tag,
                                   OpenRTI::OrderType sentOrder, OpenRTI::TransportationType transportationType, OpenRTI::FederateHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -709,7 +691,6 @@ public:
                                   const OpenRTI::ParameterValueVector& parameterValueVector, const OpenRTI::VariableLengthData& tag,
                                   OpenRTI::OrderType sentOrder, OpenRTI::TransportationType transportationType,
                                   const NativeLogicalTime& logicalTime, OpenRTI::OrderType receivedOrder, OpenRTI::FederateHandle federateHandle)
-    throw ()
   {
     receiveInteraction(interactionClass, interactionClassHandle, parameterValueVector, tag, sentOrder, transportationType,
                        logicalTime, receivedOrder, federateHandle, OpenRTI::MessageRetractionHandle());
@@ -720,7 +701,6 @@ public:
                                   OpenRTI::OrderType sentOrder, OpenRTI::TransportationType transportationType,
                                   const NativeLogicalTime& logicalTime, OpenRTI::OrderType receivedOrder, OpenRTI::FederateHandle,
                                   OpenRTI::MessageRetractionHandle messageRetractionHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -751,7 +731,6 @@ public:
   virtual
   void
   attributesInScope(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::AttributeHandleVector& attributeHandleVector)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -768,7 +747,6 @@ public:
   virtual
   void
   attributesOutOfScope(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::AttributeHandleVector& attributeHandleVector)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -787,7 +765,6 @@ public:
   provideAttributeValueUpdate(OpenRTI::ObjectInstanceHandle objectInstanceHandle,
                               const OpenRTI::AttributeHandleVector& attributeHandleVector,
                               const OpenRTI::VariableLengthData& tag)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -804,7 +781,6 @@ public:
   virtual
   void
   turnUpdatesOnForObjectInstance(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::AttributeHandleVector& attributeHandleVector, const std::string&)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -821,7 +797,6 @@ public:
   virtual
   void
   turnUpdatesOffForObjectInstance(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::AttributeHandleVector& attributeHandleVector)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -843,7 +818,6 @@ public:
   void
   requestAttributeOwnershipAssumption(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::AttributeHandleVector& attributeHandleVector,
                                       const OpenRTI::VariableLengthData& tag)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -861,7 +835,6 @@ public:
   virtual
   void
   requestDivestitureConfirmation(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::AttributeHandleVector& attributeHandleVector)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -879,7 +852,6 @@ public:
   void
   attributeOwnershipAcquisitionNotification(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::AttributeHandleVector& attributeHandleVector,
                                             const OpenRTI::VariableLengthData& tag)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -896,7 +868,6 @@ public:
   virtual
   void
   attributeOwnershipUnavailable(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::AttributeHandleVector& attributeHandleVector)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -914,7 +885,6 @@ public:
   void
   requestAttributeOwnershipRelease(OpenRTI::ObjectInstanceHandle objectInstanceHandle, const OpenRTI::AttributeHandleVector& attributeHandleVector,
                                    const OpenRTI::VariableLengthData& tag)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -933,7 +903,6 @@ public:
   void
   confirmAttributeOwnershipAcquisitionCancellation(OpenRTI::ObjectInstanceHandle objectInstanceHandle,
                                                    const OpenRTI::AttributeHandleVector& attributeHandleVector)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -952,7 +921,6 @@ public:
   informAttributeOwnership(OpenRTI::ObjectInstanceHandle objectInstanceHandle,
                            OpenRTI::AttributeHandle attributeHandle,
                            OpenRTI::FederateHandle federateHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -971,7 +939,6 @@ public:
   void
   attributeIsNotOwned(OpenRTI::ObjectInstanceHandle objectInstanceHandle,
                       OpenRTI::AttributeHandle attributeHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -989,7 +956,6 @@ public:
   void
   attributeIsOwnedByRTI(OpenRTI::ObjectInstanceHandle objectInstanceHandle,
                         OpenRTI::AttributeHandle attributeHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1011,7 +977,6 @@ public:
   virtual
   void
   timeRegulationEnabled(const RTI::FedTime& logicalTime)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1028,7 +993,6 @@ public:
   virtual
   void
   timeConstrainedEnabled(const RTI::FedTime& logicalTime)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1045,7 +1009,6 @@ public:
   virtual
   void
     timeAdvanceGrant(const RTI::FedTime& logicalTime)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1062,7 +1025,6 @@ public:
   virtual
   void
   requestRetraction(OpenRTI::MessageRetractionHandle theHandle)
-    throw ()
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1131,15 +1093,13 @@ public:
   RTI::FederateAmbassador* _federateAmbassador;
 };
 
-RTI::RTIambassador::RTIambassador()
-  throw (MemoryExhausted, RTIinternalError) :
+RTI::RTIambassador::RTIambassador() :
   privateData(0),
   privateRefs(new RTIambPrivateRefs)
 {
 }
 
 RTI::RTIambassador::~RTIambassador()
-  throw (RTI::RTIinternalError)
 {
   delete privateRefs;
   privateRefs = 0;
@@ -1148,11 +1108,6 @@ RTI::RTIambassador::~RTIambassador()
 void
 RTI::RTIambassador::createFederationExecution(const char* federationExecutionName,
                                               const char* fedFile)
-  throw (RTI::FederationExecutionAlreadyExists,
-         RTI::CouldNotOpenFED,
-         RTI::ErrorReadingFED,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
 
@@ -1177,10 +1132,6 @@ RTI::RTIambassador::createFederationExecution(const char* federationExecutionNam
 
 void
 RTI::RTIambassador::destroyFederationExecution(const char* federationExecutionName)
-  throw (RTI::FederatesCurrentlyJoined,
-         RTI::FederationExecutionDoesNotExist,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
 
@@ -1203,14 +1154,6 @@ RTI::FederateHandle
 RTI::RTIambassador::joinFederationExecution(const char* federateType,
                                             const char* federationExecutionName,
                                             RTI::FederateAmbassadorPtr federateAmbassadorPointer)
-  throw (RTI::FederateAlreadyExecutionMember,
-         RTI::FederationExecutionDoesNotExist,
-         RTI::CouldNotOpenFED,
-         RTI::ErrorReadingFED,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!federateAmbassadorPointer)
@@ -1242,11 +1185,6 @@ RTI::RTIambassador::joinFederationExecution(const char* federateType,
 
 void
 RTI::RTIambassador::resignFederationExecution(RTI::ResignAction RTI13resignAction)
-  throw (RTI::FederateOwnsAttributes,
-         RTI::FederateNotExecutionMember,
-         RTI::InvalidResignAction,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   OpenRTI::ResignAction resignAction;
@@ -1278,6 +1216,8 @@ RTI::RTIambassador::resignFederationExecution(RTI::ResignAction RTI13resignActio
     throw RTI::FederateNotExecutionMember(OpenRTI::utf8ToLocale(e.what()).c_str());
   } catch (const OpenRTI::NotConnected& e) {
     throw RTI::FederateNotExecutionMember(OpenRTI::utf8ToLocale(e.what()).c_str());
+  } catch (const OpenRTI::Exception& e) {
+    throw RTI::RTIinternalError(OpenRTI::utf8ToLocale(e.what()).c_str());
   } catch (const std::exception& e) {
     throw RTI::RTIinternalError(OpenRTI::utf8ToLocale(e.what()).c_str());
   } catch (...) {
@@ -1288,11 +1228,6 @@ RTI::RTIambassador::resignFederationExecution(RTI::ResignAction RTI13resignActio
 void
 RTI::RTIambassador::registerFederationSynchronizationPoint(const char* label,
                                                            const char* tag)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1319,11 +1254,6 @@ void
 RTI::RTIambassador::registerFederationSynchronizationPoint(const char* label,
                                                            const char* tag,
                                                            const RTI::FederateHandleSet& syncSet)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1347,12 +1277,6 @@ RTI::RTIambassador::registerFederationSynchronizationPoint(const char* label,
 
 void
 RTI::RTIambassador::synchronizationPointAchieved(const char* label)
-  throw (RTI::SynchronizationPointLabelWasNotAnnounced,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1376,13 +1300,6 @@ RTI::RTIambassador::synchronizationPointAchieved(const char* label)
 
 void
 RTI::RTIambassador::requestFederationSave(const char* label, const RTI::FedTime& fedTime)
-  throw (RTI::FederationTimeAlreadyPassed,
-         RTI::InvalidFederationTime,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1410,11 +1327,6 @@ RTI::RTIambassador::requestFederationSave(const char* label, const RTI::FedTime&
 
 void
 RTI::RTIambassador::requestFederationSave(const char* label)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1436,11 +1348,6 @@ RTI::RTIambassador::requestFederationSave(const char* label)
 
 void
 RTI::RTIambassador::federateSaveBegun()
-  throw (RTI::SaveNotInitiated,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1462,11 +1369,6 @@ RTI::RTIambassador::federateSaveBegun()
 
 void
 RTI::RTIambassador::federateSaveComplete()
-  throw (RTI::SaveNotInitiated,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1488,11 +1390,6 @@ RTI::RTIambassador::federateSaveComplete()
 
 void
 RTI::RTIambassador::federateSaveNotComplete()
-  throw (RTI::SaveNotInitiated,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1514,11 +1411,6 @@ RTI::RTIambassador::federateSaveNotComplete()
 
 void
 RTI::RTIambassador::requestFederationRestore(const char* label)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1540,11 +1432,6 @@ RTI::RTIambassador::requestFederationRestore(const char* label)
 
 void
 RTI::RTIambassador::federateRestoreComplete()
-  throw (RTI::RestoreNotRequested,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1566,11 +1453,6 @@ RTI::RTIambassador::federateRestoreComplete()
 
 void
 RTI::RTIambassador::federateRestoreNotComplete()
-  throw (RTI::RestoreNotRequested,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1593,14 +1475,6 @@ RTI::RTIambassador::federateRestoreNotComplete()
 void
 RTI::RTIambassador::publishObjectClass(RTI::ObjectClassHandle objectClassHandle,
                                        const RTI::AttributeHandleSet& attributeHandleSet)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::AttributeNotDefined,
-         RTI::OwnershipAcquisitionPending,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1627,14 +1501,6 @@ RTI::RTIambassador::publishObjectClass(RTI::ObjectClassHandle objectClassHandle,
 
 void
 RTI::RTIambassador::unpublishObjectClass(RTI::ObjectClassHandle objectClassHandle)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::ObjectClassNotPublished,
-         RTI::OwnershipAcquisitionPending,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1660,12 +1526,6 @@ RTI::RTIambassador::unpublishObjectClass(RTI::ObjectClassHandle objectClassHandl
 
 void
 RTI::RTIambassador::publishInteractionClass(RTI::InteractionClassHandle interactionClassHandle)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1690,13 +1550,6 @@ RTI::RTIambassador::publishInteractionClass(RTI::InteractionClassHandle interact
 
 void
 RTI::RTIambassador::unpublishInteractionClass(RTI::InteractionClassHandle interactionClassHandle)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionClassNotPublished,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1723,13 +1576,6 @@ void
 RTI::RTIambassador::subscribeObjectClassAttributes(RTI::ObjectClassHandle objectClassHandle,
                                                    const RTI::AttributeHandleSet& attributeHandleSet,
                                                    RTI::Boolean active)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::AttributeNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1756,13 +1602,6 @@ RTI::RTIambassador::subscribeObjectClassAttributes(RTI::ObjectClassHandle object
 
 void
 RTI::RTIambassador::unsubscribeObjectClass(RTI::ObjectClassHandle objectClassHandle)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::ObjectClassNotSubscribed,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1787,13 +1626,6 @@ RTI::RTIambassador::unsubscribeObjectClass(RTI::ObjectClassHandle objectClassHan
 void
 RTI::RTIambassador::subscribeInteractionClass(RTI::InteractionClassHandle interactionClassHandle,
                                               RTI::Boolean active)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::FederateLoggingServiceCalls,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1819,13 +1651,6 @@ RTI::RTIambassador::subscribeInteractionClass(RTI::InteractionClassHandle intera
 
 void
 RTI::RTIambassador::unsubscribeInteractionClass(RTI::InteractionClassHandle interactionClassHandle)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionClassNotSubscribed,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1850,14 +1675,6 @@ RTI::RTIambassador::unsubscribeInteractionClass(RTI::InteractionClassHandle inte
 RTI::ObjectHandle
 RTI::RTIambassador::registerObjectInstance(RTI::ObjectClassHandle objectClassHandle,
                                            const char* name)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::ObjectClassNotPublished,
-         RTI::ObjectAlreadyRegistered,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1887,13 +1704,6 @@ RTI::RTIambassador::registerObjectInstance(RTI::ObjectClassHandle objectClassHan
 
 RTI::ObjectHandle
 RTI::RTIambassador::registerObjectInstance(RTI::ObjectClassHandle objectClassHandle)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::ObjectClassNotPublished,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1922,15 +1732,6 @@ RTI::RTIambassador::updateAttributeValues(RTI::ObjectHandle objectHandle,
                                           const RTI::AttributeHandleValuePairSet& attributeHandleArray,
                                           const RTI::FedTime& fedTime,
                                           const char* tag)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotOwned,
-         RTI::InvalidFederationTime,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -1966,14 +1767,6 @@ void
 RTI::RTIambassador::updateAttributeValues(RTI::ObjectHandle objectHandle,
                                           const RTI::AttributeHandleValuePairSet& attributeHandleArray,
                                           const char* tag)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotOwned,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2006,15 +1799,6 @@ RTI::RTIambassador::sendInteraction(RTI::InteractionClassHandle interactionClass
                                     const RTI::ParameterHandleValuePairSet& parameterHandleArray,
                                     const RTI::FedTime& fedTime,
                                     const char* tag)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionClassNotPublished,
-         RTI::InteractionParameterNotDefined,
-         RTI::InvalidFederationTime,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2052,14 +1836,6 @@ void
 RTI::RTIambassador::sendInteraction(RTI::InteractionClassHandle interactionClassHandle,
                                     const RTI::ParameterHandleValuePairSet& parameterHandleArray,
                                     const char* tag)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionClassNotPublished,
-         RTI::InteractionParameterNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2093,14 +1869,6 @@ RTI::EventRetractionHandle
 RTI::RTIambassador::deleteObjectInstance(RTI::ObjectHandle objectHandle,
                                          const RTI::FedTime& fedTime,
                                          const char* tag)
-  throw (RTI::ObjectNotKnown,
-         RTI::DeletePrivilegeNotHeld,
-         RTI::InvalidFederationTime,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2132,13 +1900,6 @@ RTI::RTIambassador::deleteObjectInstance(RTI::ObjectHandle objectHandle,
 void
 RTI::RTIambassador::deleteObjectInstance(RTI::ObjectHandle objectHandle,
                                          const char* tag)
-  throw (RTI::ObjectNotKnown,
-         RTI::DeletePrivilegeNotHeld,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2165,13 +1926,6 @@ RTI::RTIambassador::deleteObjectInstance(RTI::ObjectHandle objectHandle,
 
 void
 RTI::RTIambassador::localDeleteObjectInstance(RTI::ObjectHandle objectHandle)
-  throw (RTI::ObjectNotKnown,
-         RTI::FederateOwnsAttributes,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2201,15 +1955,6 @@ void
 RTI::RTIambassador::changeAttributeTransportationType(RTI::ObjectHandle objectHandle,
                                                       const RTI::AttributeHandleSet& attributeHandleSet,
                                                       RTI::TransportationHandle transportationHandle)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotOwned,
-         RTI::InvalidTransportationHandle,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2240,14 +1985,6 @@ RTI::RTIambassador::changeAttributeTransportationType(RTI::ObjectHandle objectHa
 void
 RTI::RTIambassador::changeInteractionTransportationType(RTI::InteractionClassHandle interactionClassHandle,
                                                         RTI::TransportationHandle transportationHandle)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionClassNotPublished,
-         RTI::InvalidTransportationHandle,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2276,13 +2013,6 @@ RTI::RTIambassador::changeInteractionTransportationType(RTI::InteractionClassHan
 void
 RTI::RTIambassador::requestObjectAttributeValueUpdate(RTI::ObjectHandle objectHandle,
                                                       const RTI::AttributeHandleSet& attributeHandleSet)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2311,13 +2041,6 @@ RTI::RTIambassador::requestObjectAttributeValueUpdate(RTI::ObjectHandle objectHa
 void
 RTI::RTIambassador::requestClassAttributeValueUpdate(RTI::ObjectClassHandle objectClassHandle,
                                                      const RTI::AttributeHandleSet& attributeHandleSet)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::AttributeNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2346,14 +2069,6 @@ RTI::RTIambassador::requestClassAttributeValueUpdate(RTI::ObjectClassHandle obje
 void
 RTI::RTIambassador::unconditionalAttributeOwnershipDivestiture(RTI::ObjectHandle objectHandle,
                                                                const RTI::AttributeHandleSet& attributeHandleSet)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotOwned,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2384,15 +2099,6 @@ void
 RTI::RTIambassador::negotiatedAttributeOwnershipDivestiture(RTI::ObjectHandle objectHandle,
                                                             const RTI::AttributeHandleSet& attributeHandleSet,
                                                             const char* tag)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotOwned,
-         RTI::AttributeAlreadyBeingDivested,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2426,16 +2132,6 @@ void
 RTI::RTIambassador::attributeOwnershipAcquisition(RTI::ObjectHandle objectHandle,
                                                   const RTI::AttributeHandleSet& attributeHandleSet,
                                                   const char* tag)
-  throw (RTI::ObjectNotKnown,
-         RTI::ObjectClassNotPublished,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotPublished,
-         RTI::FederateOwnsAttributes,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2468,17 +2164,6 @@ RTI::RTIambassador::attributeOwnershipAcquisition(RTI::ObjectHandle objectHandle
 void
 RTI::RTIambassador::attributeOwnershipAcquisitionIfAvailable(RTI::ObjectHandle objectHandle,
                                                              const AttributeHandleSet& attributeHandleSet)
-  throw (RTI::ObjectNotKnown,
-         RTI::ObjectClassNotPublished,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotPublished,
-         RTI::FederateOwnsAttributes,
-         RTI::AttributeAlreadyBeingAcquired,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2514,15 +2199,6 @@ RTI::RTIambassador::attributeOwnershipAcquisitionIfAvailable(RTI::ObjectHandle o
 RTI::AttributeHandleSet*
 RTI::RTIambassador::attributeOwnershipReleaseResponse(RTI::ObjectHandle objectHandle,
                                                       const RTI::AttributeHandleSet& attributeHandleSet)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotOwned,
-         RTI::FederateWasNotAskedToReleaseAttribute,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2554,15 +2230,6 @@ RTI::RTIambassador::attributeOwnershipReleaseResponse(RTI::ObjectHandle objectHa
 void
 RTI::RTIambassador::cancelNegotiatedAttributeOwnershipDivestiture(RTI::ObjectHandle objectHandle,
                                                                   const RTI::AttributeHandleSet& attributeHandleSet)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotOwned,
-         RTI::AttributeDivestitureWasNotRequested,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2594,15 +2261,6 @@ RTI::RTIambassador::cancelNegotiatedAttributeOwnershipDivestiture(RTI::ObjectHan
 void
 RTI::RTIambassador::cancelAttributeOwnershipAcquisition(RTI::ObjectHandle objectHandle,
                                                         const RTI::AttributeHandleSet& attributeHandleSet)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::AttributeAlreadyOwned,
-         RTI::AttributeAcquisitionWasNotRequested,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2634,13 +2292,6 @@ RTI::RTIambassador::cancelAttributeOwnershipAcquisition(RTI::ObjectHandle object
 void
 RTI::RTIambassador::queryAttributeOwnership(RTI::ObjectHandle objectHandle,
                                             RTI::AttributeHandle attributeHandle)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2667,13 +2318,6 @@ RTI::RTIambassador::queryAttributeOwnership(RTI::ObjectHandle objectHandle,
 RTI::Boolean
 RTI::RTIambassador::isAttributeOwnedByFederate(RTI::ObjectHandle objectHandle,
                                                RTI::AttributeHandle attributeHandle)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2700,16 +2344,6 @@ RTI::RTIambassador::isAttributeOwnedByFederate(RTI::ObjectHandle objectHandle,
 
 void
 RTI::RTIambassador::enableTimeRegulation(const RTI::FedTime& time, const RTI::FedTime& lookahead)
-  throw (RTI::TimeRegulationAlreadyEnabled,
-         RTI::EnableTimeRegulationPending,
-         RTI::TimeAdvanceAlreadyInProgress,
-         RTI::InvalidFederationTime,
-         RTI::InvalidLookahead,
-         RTI::ConcurrentAccessAttempted,
-         RTI::FederateNotExecutionMember,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2739,12 +2373,6 @@ RTI::RTIambassador::enableTimeRegulation(const RTI::FedTime& time, const RTI::Fe
 
 void
 RTI::RTIambassador::disableTimeRegulation()
-  throw (RTI::TimeRegulationWasNotEnabled,
-         RTI::ConcurrentAccessAttempted,
-         RTI::FederateNotExecutionMember,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2768,14 +2396,6 @@ RTI::RTIambassador::disableTimeRegulation()
 
 void
 RTI::RTIambassador::enableTimeConstrained()
-  throw (RTI::TimeConstrainedAlreadyEnabled,
-         RTI::EnableTimeConstrainedPending,
-         RTI::TimeAdvanceAlreadyInProgress,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2803,12 +2423,6 @@ RTI::RTIambassador::enableTimeConstrained()
 
 void
 RTI::RTIambassador::disableTimeConstrained()
-  throw (RTI::TimeConstrainedWasNotEnabled,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2832,16 +2446,6 @@ RTI::RTIambassador::disableTimeConstrained()
 
 void
 RTI::RTIambassador::timeAdvanceRequest(const RTI::FedTime& fedTime)
-  throw (RTI::InvalidFederationTime,
-         RTI::FederationTimeAlreadyPassed,
-         RTI::TimeAdvanceAlreadyInProgress,
-         RTI::EnableTimeRegulationPending,
-         RTI::EnableTimeConstrainedPending,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2873,16 +2477,6 @@ RTI::RTIambassador::timeAdvanceRequest(const RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::timeAdvanceRequestAvailable(const RTI::FedTime& fedTime)
-  throw (RTI::InvalidFederationTime,
-         RTI::FederationTimeAlreadyPassed,
-         RTI::TimeAdvanceAlreadyInProgress,
-         RTI::EnableTimeRegulationPending,
-         RTI::EnableTimeConstrainedPending,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2914,16 +2508,6 @@ RTI::RTIambassador::timeAdvanceRequestAvailable(const RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::nextEventRequest(const RTI::FedTime& fedTime)
-  throw (RTI::InvalidFederationTime,
-         RTI::FederationTimeAlreadyPassed,
-         RTI::TimeAdvanceAlreadyInProgress,
-         RTI::EnableTimeRegulationPending,
-         RTI::EnableTimeConstrainedPending,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2955,16 +2539,6 @@ RTI::RTIambassador::nextEventRequest(const RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::nextEventRequestAvailable(const RTI::FedTime& fedTime)
-  throw (RTI::InvalidFederationTime,
-         RTI::FederationTimeAlreadyPassed,
-         RTI::TimeAdvanceAlreadyInProgress,
-         RTI::EnableTimeRegulationPending,
-         RTI::EnableTimeConstrainedPending,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -2996,16 +2570,6 @@ RTI::RTIambassador::nextEventRequestAvailable(const RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::flushQueueRequest(const RTI::FedTime& fedTime)
-  throw (RTI::InvalidFederationTime,
-         RTI::FederationTimeAlreadyPassed,
-         RTI::TimeAdvanceAlreadyInProgress,
-         RTI::EnableTimeRegulationPending,
-         RTI::EnableTimeConstrainedPending,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3037,12 +2601,6 @@ RTI::RTIambassador::flushQueueRequest(const RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::enableAsynchronousDelivery()
-  throw (RTI::AsynchronousDeliveryAlreadyEnabled,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3066,12 +2624,6 @@ RTI::RTIambassador::enableAsynchronousDelivery()
 
 void
 RTI::RTIambassador::disableAsynchronousDelivery()
-  throw (RTI::AsynchronousDeliveryAlreadyDisabled,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3095,11 +2647,6 @@ RTI::RTIambassador::disableAsynchronousDelivery()
 
 void
 RTI::RTIambassador::queryLBTS(RTI::FedTime& fedTime)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3123,11 +2670,6 @@ RTI::RTIambassador::queryLBTS(RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::queryFederateTime(RTI::FedTime& fedTime)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3149,11 +2691,6 @@ RTI::RTIambassador::queryFederateTime(RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::queryMinNextEventTime(RTI::FedTime& fedTime)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3177,12 +2714,6 @@ RTI::RTIambassador::queryMinNextEventTime(RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::modifyLookahead(const RTI::FedTime& fedTime)
-  throw (RTI::InvalidLookahead,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3208,11 +2739,6 @@ RTI::RTIambassador::modifyLookahead(const RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::queryLookahead(RTI::FedTime& fedTime)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3234,12 +2760,6 @@ RTI::RTIambassador::queryLookahead(RTI::FedTime& fedTime)
 
 void
 RTI::RTIambassador::retract(RTI::EventRetractionHandle theHandle)
-  throw (RTI::InvalidRetractionHandle,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3268,15 +2788,6 @@ void
 RTI::RTIambassador::changeAttributeOrderType(RTI::ObjectHandle objectHandle,
                                              const RTI::AttributeHandleSet& attributeHandleSet,
                                              RTI::OrderingHandle orderingHandle)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotOwned,
-         RTI::InvalidOrderingHandle,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3307,14 +2818,6 @@ RTI::RTIambassador::changeAttributeOrderType(RTI::ObjectHandle objectHandle,
 void
 RTI::RTIambassador::changeInteractionOrderType(RTI::InteractionClassHandle interactionClassHandle,
                                                RTI::OrderingHandle orderingHandle)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionClassNotPublished,
-         RTI::InvalidOrderingHandle,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3342,13 +2845,6 @@ RTI::RTIambassador::changeInteractionOrderType(RTI::InteractionClassHandle inter
 RTI::Region*
 RTI::RTIambassador::createRegion(RTI::SpaceHandle spaceHandle,
                                  RTI::ULong)
-  throw (RTI::SpaceNotDefined,
-         RTI::InvalidExtents,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3356,13 +2852,6 @@ RTI::RTIambassador::createRegion(RTI::SpaceHandle spaceHandle,
 
 void
 RTI::RTIambassador::notifyAboutRegionModification(RTI::Region& theRegion)
-  throw (RTI::RegionNotKnown,
-         RTI::InvalidExtents,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3370,13 +2859,6 @@ RTI::RTIambassador::notifyAboutRegionModification(RTI::Region& theRegion)
 
 void
 RTI::RTIambassador::deleteRegion(RTI::Region* region)
-  throw (RTI::RegionNotKnown,
-         RTI::RegionInUse,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3388,18 +2870,6 @@ RTI::RTIambassador::registerObjectInstanceWithRegion(RTI::ObjectClassHandle obje
                                                      RTI::AttributeHandle [],
                                                      RTI::Region* theRegions[],
                                                      RTI::ULong)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::ObjectClassNotPublished,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotPublished,
-         RTI::RegionNotKnown,
-         RTI::InvalidRegionContext,
-         RTI::ObjectAlreadyRegistered,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3410,17 +2880,6 @@ RTI::RTIambassador::registerObjectInstanceWithRegion(RTI::ObjectClassHandle obje
                                                      RTI::AttributeHandle [],
                                                      RTI::Region* regions[],
                                                      RTI::ULong)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::ObjectClassNotPublished,
-         RTI::AttributeNotDefined,
-         RTI::AttributeNotPublished,
-         RTI::RegionNotKnown,
-         RTI::InvalidRegionContext,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3430,15 +2889,6 @@ void
 RTI::RTIambassador::associateRegionForUpdates(RTI::Region& ,
                                               RTI::ObjectHandle,
                                               const RTI::AttributeHandleSet& attributeHandleSet)
-  throw (RTI::ObjectNotKnown,
-         RTI::AttributeNotDefined,
-         RTI::InvalidRegionContext,
-         RTI::RegionNotKnown,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3446,14 +2896,6 @@ RTI::RTIambassador::associateRegionForUpdates(RTI::Region& ,
 
 void
 RTI::RTIambassador::unassociateRegionForUpdates(RTI::Region&, RTI::ObjectHandle)
-  throw (RTI::ObjectNotKnown,
-         RTI::InvalidRegionContext,
-         RTI::RegionNotKnown,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3464,15 +2906,6 @@ RTI::RTIambassador::subscribeObjectClassAttributesWithRegion(RTI::ObjectClassHan
                                                              RTI::Region&,
                                                              const RTI::AttributeHandleSet&,
                                                              RTI::Boolean active)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::AttributeNotDefined,
-         RTI::RegionNotKnown,
-         RTI::InvalidRegionContext,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3481,14 +2914,6 @@ RTI::RTIambassador::subscribeObjectClassAttributesWithRegion(RTI::ObjectClassHan
 void
 RTI::RTIambassador::unsubscribeObjectClassWithRegion(RTI::ObjectClassHandle objectClassHandle,
                                                      RTI::Region&)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::RegionNotKnown,
-         RTI::ObjectClassNotSubscribed,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3498,15 +2923,6 @@ void
 RTI::RTIambassador::subscribeInteractionClassWithRegion(RTI::InteractionClassHandle interactionClassHandle,
                                                         RTI::Region&,
                                                         RTI::Boolean active)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::RegionNotKnown,
-         RTI::InvalidRegionContext,
-         RTI::FederateLoggingServiceCalls,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3515,14 +2931,6 @@ RTI::RTIambassador::subscribeInteractionClassWithRegion(RTI::InteractionClassHan
 void
 RTI::RTIambassador::unsubscribeInteractionClassWithRegion(RTI::InteractionClassHandle interactionClassHandle,
                                                           RTI::Region&)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionClassNotSubscribed,
-         RTI::RegionNotKnown,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3534,17 +2942,6 @@ RTI::RTIambassador::sendInteractionWithRegion(RTI::InteractionClassHandle intera
                                               const RTI::FedTime&,
                                               const char* tag,
                                               const RTI::Region&)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionClassNotPublished,
-         RTI::InteractionParameterNotDefined,
-         RTI::InvalidFederationTime,
-         RTI::RegionNotKnown,
-         RTI::InvalidRegionContext,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3555,16 +2952,6 @@ RTI::RTIambassador::sendInteractionWithRegion(RTI::InteractionClassHandle intera
                                               const RTI::ParameterHandleValuePairSet& ,
                                               const char* tag,
                                               const RTI::Region& )
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionClassNotPublished,
-         RTI::InteractionParameterNotDefined,
-         RTI::RegionNotKnown,
-         RTI::InvalidRegionContext,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3574,14 +2961,6 @@ void
 RTI::RTIambassador::requestClassAttributeValueUpdateWithRegion(RTI::ObjectClassHandle objectClassHandle,
                                                                const RTI::AttributeHandleSet&,
                                                                const RTI::Region&)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::AttributeNotDefined,
-         RTI::RegionNotKnown,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw OpenRTI::RTIinternalError("ENOIMP");
@@ -3589,10 +2968,6 @@ RTI::RTIambassador::requestClassAttributeValueUpdateWithRegion(RTI::ObjectClassH
 
 RTI::ObjectClassHandle
 RTI::RTIambassador::getObjectClassHandle(const char* _name)
-  throw (RTI::NameNotFound,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!_name)
@@ -3618,10 +2993,6 @@ RTI::RTIambassador::getObjectClassHandle(const char* _name)
 
 char*
 RTI::RTIambassador::getObjectClassName(RTI::ObjectClassHandle objectClassHandle)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3646,11 +3017,6 @@ RTI::RTIambassador::getObjectClassName(RTI::ObjectClassHandle objectClassHandle)
 RTI::AttributeHandle
 RTI::RTIambassador::getAttributeHandle(const char* _name,
                                        RTI::ObjectClassHandle objectClassHandle)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::NameNotFound,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!_name)
@@ -3681,11 +3047,6 @@ RTI::RTIambassador::getAttributeHandle(const char* _name,
 char*
 RTI::RTIambassador::getAttributeName(RTI::AttributeHandle attributeHandle,
                                      RTI::ObjectClassHandle objectClassHandle)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::AttributeNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3715,10 +3076,6 @@ RTI::RTIambassador::getAttributeName(RTI::AttributeHandle attributeHandle,
 
 RTI::InteractionClassHandle
 RTI::RTIambassador::getInteractionClassHandle(const char* _name)
-  throw (RTI::NameNotFound,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!_name)
@@ -3744,10 +3101,6 @@ RTI::RTIambassador::getInteractionClassHandle(const char* _name)
 
 char*
 RTI::RTIambassador::getInteractionClassName(RTI::InteractionClassHandle interactionClassHandle)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3772,11 +3125,6 @@ RTI::RTIambassador::getInteractionClassName(RTI::InteractionClassHandle interact
 RTI::ParameterHandle
 RTI::RTIambassador::getParameterHandle(const char* _name,
                                        RTI::InteractionClassHandle interactionClassHandle)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::NameNotFound,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!_name)
@@ -3805,11 +3153,6 @@ RTI::RTIambassador::getParameterHandle(const char* _name,
 char*
 RTI::RTIambassador::getParameterName(RTI::ParameterHandle parameterHandle,
                                      RTI::InteractionClassHandle interactionClassHandle)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::InteractionParameterNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3837,10 +3180,6 @@ RTI::RTIambassador::getParameterName(RTI::ParameterHandle parameterHandle,
 
 RTI::ObjectHandle
 RTI::RTIambassador::getObjectInstanceHandle(const char* name)
-  throw (RTI::ObjectNotKnown,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!name)
@@ -3862,10 +3201,6 @@ RTI::RTIambassador::getObjectInstanceHandle(const char* name)
 
 char*
 RTI::RTIambassador::getObjectInstanceName(RTI::ObjectHandle objectHandle)
-  throw (RTI::ObjectNotKnown,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3885,10 +3220,6 @@ RTI::RTIambassador::getObjectInstanceName(RTI::ObjectHandle objectHandle)
 
 RTI::SpaceHandle
 RTI::RTIambassador::getRoutingSpaceHandle(const char* name)
-  throw (RTI::NameNotFound,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!name)
@@ -3898,10 +3229,6 @@ RTI::RTIambassador::getRoutingSpaceHandle(const char* name)
 
 char*
 RTI::RTIambassador::getRoutingSpaceName(RTI::SpaceHandle spaceHandle)
-  throw (RTI::SpaceNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw RTI::RTIinternalError("ENOIMP");
@@ -3910,11 +3237,6 @@ RTI::RTIambassador::getRoutingSpaceName(RTI::SpaceHandle spaceHandle)
 RTI::DimensionHandle
 RTI::RTIambassador::getDimensionHandle(const char* name,
                                        RTI::SpaceHandle spaceHandle)
-  throw (RTI::SpaceNotDefined,
-         RTI::NameNotFound,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!name)
@@ -3925,11 +3247,6 @@ RTI::RTIambassador::getDimensionHandle(const char* name,
 char*
 RTI::RTIambassador::getDimensionName(RTI::DimensionHandle dimensionHandle,
                                      RTI::SpaceHandle spaceHandle)
-  throw (RTI::SpaceNotDefined,
-         RTI::DimensionNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw RTI::RTIinternalError("ENOIMP");
@@ -3938,11 +3255,6 @@ RTI::RTIambassador::getDimensionName(RTI::DimensionHandle dimensionHandle,
 RTI::SpaceHandle
 RTI::RTIambassador::getAttributeRoutingSpaceHandle(RTI::AttributeHandle attributeHandle,
                                                    RTI::ObjectClassHandle objectClassHandle)
-  throw (RTI::ObjectClassNotDefined,
-         RTI::AttributeNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw RTI::RTIinternalError("ENOIMP");
@@ -3950,10 +3262,6 @@ RTI::RTIambassador::getAttributeRoutingSpaceHandle(RTI::AttributeHandle attribut
 
 RTI::ObjectClassHandle
 RTI::RTIambassador::getObjectClass(RTI::ObjectHandle objectHandle)
-  throw (RTI::ObjectNotKnown,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -3973,10 +3281,6 @@ RTI::RTIambassador::getObjectClass(RTI::ObjectHandle objectHandle)
 
 RTI::SpaceHandle
 RTI::RTIambassador::getInteractionRoutingSpaceHandle(InteractionClassHandle interactionClassHandle)
-  throw (RTI::InteractionClassNotDefined,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw RTI::RTIinternalError("ENOIMP");
@@ -3984,10 +3288,6 @@ RTI::RTIambassador::getInteractionRoutingSpaceHandle(InteractionClassHandle inte
 
 RTI::TransportationHandle
 RTI::RTIambassador::getTransportationHandle(const char* name)
-  throw (RTI::NameNotFound,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!name)
@@ -4013,10 +3313,6 @@ RTI::RTIambassador::getTransportationHandle(const char* name)
 
 char*
 RTI::RTIambassador::getTransportationName(RTI::TransportationHandle transportationHandle)
-  throw (RTI::InvalidTransportationHandle,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4042,10 +3338,6 @@ RTI::RTIambassador::getTransportationName(RTI::TransportationHandle transportati
 
 RTI::OrderingHandle
 RTI::RTIambassador::getOrderingHandle(const char* name)
-  throw (RTI::NameNotFound,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   if (!name)
@@ -4071,10 +3363,6 @@ RTI::RTIambassador::getOrderingHandle(const char* name)
 
 char*
 RTI::RTIambassador::getOrderingName(RTI::OrderingHandle orderingHandle)
-  throw (RTI::InvalidOrderingHandle,
-         RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4101,11 +3389,6 @@ RTI::RTIambassador::getOrderingName(RTI::OrderingHandle orderingHandle)
 
 void
 RTI::RTIambassador::enableClassRelevanceAdvisorySwitch()
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4128,11 +3411,6 @@ RTI::RTIambassador::enableClassRelevanceAdvisorySwitch()
 
 void
 RTI::RTIambassador::disableClassRelevanceAdvisorySwitch()
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4155,11 +3433,6 @@ RTI::RTIambassador::disableClassRelevanceAdvisorySwitch()
 
 void
 RTI::RTIambassador::enableAttributeRelevanceAdvisorySwitch()
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4182,11 +3455,6 @@ RTI::RTIambassador::enableAttributeRelevanceAdvisorySwitch()
 
 void
 RTI::RTIambassador::disableAttributeRelevanceAdvisorySwitch()
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4209,11 +3477,6 @@ RTI::RTIambassador::disableAttributeRelevanceAdvisorySwitch()
 
 void
 RTI::RTIambassador::enableAttributeScopeAdvisorySwitch()
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4236,11 +3499,6 @@ RTI::RTIambassador::enableAttributeScopeAdvisorySwitch()
 
 void
 RTI::RTIambassador::disableAttributeScopeAdvisorySwitch()
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4263,11 +3521,6 @@ RTI::RTIambassador::disableAttributeScopeAdvisorySwitch()
 
 void
 RTI::RTIambassador::enableInteractionRelevanceAdvisorySwitch()
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4290,11 +3543,6 @@ RTI::RTIambassador::enableInteractionRelevanceAdvisorySwitch()
 
 void
 RTI::RTIambassador::disableInteractionRelevanceAdvisorySwitch()
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::SaveInProgress,
-         RTI::RestoreInProgress,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4317,9 +3565,6 @@ RTI::RTIambassador::disableInteractionRelevanceAdvisorySwitch()
 
 RTI::Boolean
 RTI::RTIambassador::tick()
-  throw (RTI::SpecifiedSaveLabelDoesNotExist,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4335,9 +3580,6 @@ RTI::RTIambassador::tick()
 RTI::Boolean
 RTI::RTIambassador::tick(RTI::TickTime minTime,
                          RTI::TickTime maxTime)
-  throw (RTI::SpecifiedSaveLabelDoesNotExist,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   try {
@@ -4352,10 +3594,6 @@ RTI::RTIambassador::tick(RTI::TickTime minTime,
 
 RTI::RegionToken
 RTI::RTIambassador::getRegionToken(RTI::Region*)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RegionNotKnown,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw RTI::RTIinternalError("ENOIMP");
@@ -4363,10 +3601,6 @@ RTI::RTIambassador::getRegionToken(RTI::Region*)
 
 RTI::Region*
 RTI::RTIambassador::getRegion(RTI::RegionToken)
-  throw (RTI::FederateNotExecutionMember,
-         RTI::ConcurrentAccessAttempted,
-         RTI::RegionNotKnown,
-         RTI::RTIinternalError)
 {
   RTIambPrivateRefs::ConcurrentAccessGuard concurrentAccessGuard(*privateRefs);
   throw RTI::RTIinternalError("ENOIMP");

@@ -10,11 +10,9 @@
 #define RTI_SpecificConfig_h
 
 #if defined(_WIN32)
-#if defined(_MSC_VER) && defined(RTI_DISABLE_WARNINGS)
+#if defined(_MSC_VER)
 // disable warning about truncating template instantiation symbol names
 #pragma warning(disable: 4786)
-// disable warning about exceptions not being part of a method's signature
-#pragma warning(disable: 4290)
 // disable warnings about a "dllexport" class using a regular class
 #pragma warning(disable: 4251)
 #endif

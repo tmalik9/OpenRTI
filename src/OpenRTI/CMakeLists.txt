@@ -91,6 +91,8 @@ else(WIN32)
     posix/ConditionPosix.cpp
     posix/DynamicModulePosix.cpp
     posix/MutexPosix.cpp
+    posix/NetworkStatisticsPosix.cpp
+    posix/PerformanceCounterStopWatchPosix.cpp
     posix/SocketAddressPosix.cpp
     posix/SocketDataPosix.cpp
     posix/SocketEventDispatcherPosix.cpp
@@ -129,11 +131,12 @@ endif(EXPAT_FOUND)
 
 include(FindZLIB)
 if(ZLIB_FOUND)
-  include_directories(${ZLIB_INCLUDE_DIRS})
-  add_definitions(-DOPENRTI_HAVE_ZLIB)
-  set(OpenRTI_ZLIB_SOURCES
-    ZLibProtocolLayer.cpp
-  )
+  message(WARNING "ZLIB is found but ignored due to a bug in ZLibProtocolLayer implementation. cf. src/OpenRTI/CMakeLists.txt for details.")
+#  include_directories(${ZLIB_INCLUDE_DIRS})
+#  add_definitions(-DOPENRTI_HAVE_ZLIB)
+#  set(OpenRTI_ZLIB_SOURCES
+#    ZLibProtocolLayer.cpp
+#  )
 else()
   set(OpenRTI_ZLIB_SOURCES "")
 endif()
@@ -167,6 +170,7 @@ set(OpenRTI_SOURCES
   MessageEncodingRegistry.cpp
   NestedProtocolLayer.cpp
   NetworkServer.cpp
+  NetworkStatistics.cpp
   Options.cpp
   ParenthesesReader.cpp
   ServerModel.cpp
@@ -184,6 +188,7 @@ set(OpenRTI_SOURCES
   URL.cpp
   WeakReferenced.cpp
   XMLReader.cpp
+  dprintf.cpp
   ${OpenRTI_OS_SOURCES}
   ${OpenRTI_EXPAT_SOURCES}
   ${OpenRTI_ZLIB_SOURCES}
@@ -193,8 +198,9 @@ if(OPENRTI_BUILD_SHARED)
   add_library(OpenRTI SHARED ${OpenRTI_SOURCES})
   set_property(TARGET OpenRTI APPEND PROPERTY COMPILE_DEFINITIONS OPENRTI_DLL)
   set_property(TARGET OpenRTI APPEND PROPERTY COMPILE_DEFINITIONS OPENRTI_DLL_EXPORTS)
-  set_property(TARGET OpenRTI PROPERTY VERSION 1.0.0)
-  set_property(TARGET OpenRTI PROPERTY SOVERSION 1)
+# ems: disable CMake so library versioning
+#  set_property(TARGET OpenRTI PROPERTY VERSION 1.0.0)
+#  set_property(TARGET OpenRTI PROPERTY SOVERSION 1)
 else()
   add_library(OpenRTI STATIC ${OpenRTI_SOURCES})
   openrti_target_position_independent(OpenRTI)

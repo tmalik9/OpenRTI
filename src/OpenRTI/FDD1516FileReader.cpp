@@ -144,8 +144,8 @@ FDD1516ContentHandler::startElement(const char* uri, const char* name,
 
     _fomStringModuleBuilder.addAttribute();
 
-    std::string name = trim(atts->getValue("name"));
-    _fomStringModuleBuilder.getCurrentObjectClassAttribute().setName(name);
+    std::string nameAttr = trim(atts->getValue("name"));
+    _fomStringModuleBuilder.getCurrentObjectClassAttribute().setName(nameAttr);
     std::string order = trim(atts->getValue("order"));
     _fomStringModuleBuilder.getCurrentObjectClassAttribute().setOrderType(order);
     std::string transportation = trim(atts->getValue("transportation"));
@@ -168,8 +168,8 @@ FDD1516ContentHandler::startElement(const char* uri, const char* name,
 
     _fomStringModuleBuilder.pushObjectClass();
 
-    std::string name = classNamePart(trim(atts->getValue("name")));
-    _fomStringModuleBuilder.getCurrentObjectClass().getName().push_back(name);
+    std::string nameAttr = classNamePart(trim(atts->getValue("name")));
+    _fomStringModuleBuilder.getCurrentObjectClass().getName().push_back(nameAttr);
 
   } else if (strcmp(name, "objects") == 0) {
     if (getCurrentMode() != ObjectModelMode)
@@ -183,8 +183,8 @@ FDD1516ContentHandler::startElement(const char* uri, const char* name,
 
     _fomStringModuleBuilder.addParameter();
 
-    std::string name = trim(atts->getValue("name"));
-    _fomStringModuleBuilder.getCurrentInteractionClassParameter().setName(name);
+    std::string nameAttr = trim(atts->getValue("name"));
+    _fomStringModuleBuilder.getCurrentInteractionClassParameter().setName(nameAttr);
 
   } else if (strcmp(name, "interactionClass") == 0) {
     if (getCurrentMode() != InteractionsMode && getCurrentMode() != InteractionClassMode)
@@ -193,8 +193,8 @@ FDD1516ContentHandler::startElement(const char* uri, const char* name,
 
     _fomStringModuleBuilder.pushInteractionClass();
 
-    std::string name = classNamePart(trim(atts->getValue("name")));
-    _fomStringModuleBuilder.getCurrentInteractionClass().getName().push_back(name);
+    std::string nameAttr = classNamePart(trim(atts->getValue("name")));
+    _fomStringModuleBuilder.getCurrentInteractionClass().getName().push_back(nameAttr);
     std::string order = trim(atts->getValue("order"));
     _fomStringModuleBuilder.getCurrentInteractionClass().setOrderType(order);
     std::string transportation = trim(atts->getValue("transportation"));
@@ -227,8 +227,8 @@ FDD1516ContentHandler::startElement(const char* uri, const char* name,
 
     _fomStringModuleBuilder.addDimension();
 
-    std::string name = trim(atts->getValue("name"));
-    _fomStringModuleBuilder.getCurrentDimension().setName(name);
+    std::string nameAttr = trim(atts->getValue("name"));
+    _fomStringModuleBuilder.getCurrentDimension().setName(nameAttr);
 
     std::stringstream ss(atts->getValue("upperBound"));
     Unsigned upperBound = 0;
@@ -242,8 +242,8 @@ FDD1516ContentHandler::startElement(const char* uri, const char* name,
 
     _fomStringModuleBuilder.addTransportationType();
 
-    std::string name = trim(atts->getValue("name"));
-    _fomStringModuleBuilder.getCurrentTransportationType().setName(name);
+    std::string nameAttr = trim(atts->getValue("name"));
+    _fomStringModuleBuilder.getCurrentTransportationType().setName(nameAttr);
 
   } else if (strcmp(name, "transportations") == 0) {
     if (getCurrentMode() != ObjectModelMode)

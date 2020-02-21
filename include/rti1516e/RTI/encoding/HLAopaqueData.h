@@ -51,8 +51,7 @@ namespace rti1516e
       HLAopaqueData (
          Octet** inData,
          size_t bufferSize,
-         size_t dataSize)
-         throw (EncoderException);
+         size_t dataSize);
 
       // Constructor: Copy
       // Uses internal memory
@@ -63,36 +62,30 @@ namespace rti1516e
       virtual ~HLAopaqueData();
 
       // Return a new copy of the DataElement
-      virtual std::auto_ptr<DataElement> clone () const;
+      virtual std::unique_ptr<DataElement> clone () const;
 
       // Return the encoding of this element in a VariableLengthData
-      virtual VariableLengthData encode () const
-         throw (EncoderException);
+      virtual VariableLengthData encode () const;
 
       // Encode this element into an existing VariableLengthData
       virtual void encode (
-         VariableLengthData& inData) const
-         throw (EncoderException);
+         VariableLengthData& inData) const;
 
       // Encode this element and append it to a buffer.
       virtual void encodeInto (
-         std::vector<Octet>& buffer) const
-         throw (EncoderException);
+         std::vector<Octet>& buffer) const;
 
       // Decode this element from the RTI's VariableLengthData.
       virtual void decode (
-         VariableLengthData const & inData)
-         throw (EncoderException);
+         VariableLengthData const & inData);
 
       // Decode this element starting at the index in the provided buffer
       virtual size_t decodeFrom (
          std::vector<Octet> const & buffer,
-         size_t index)
-         throw (EncoderException);
+         size_t index);
 
       // Return the size in bytes of this element's encoding.
-      virtual size_t getEncodedLength () const
-         throw (EncoderException);
+      virtual size_t getEncodedLength () const;
 
       // Return the octet boundary of this element.
       virtual unsigned int getOctetBoundary () const;
@@ -114,8 +107,7 @@ namespace rti1516e
       virtual void setDataPointer (
          Octet** inData,
          size_t bufferSize,
-         size_t dataSize)
-         throw (EncoderException);
+         size_t dataSize);
 
       // Set the data to be encoded.
       virtual void set(

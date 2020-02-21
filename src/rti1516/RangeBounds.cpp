@@ -38,7 +38,6 @@ RangeBounds::RangeBounds(unsigned long lowerBound,
 }
 
 RangeBounds::~RangeBounds()
-  throw ()
 {
 }
 

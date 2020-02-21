@@ -30,6 +30,8 @@
 #include "Export.h"
 #include "Types.h"
 
+#pragma warning(disable: 4456)
+
 namespace rti1516e
 {
 
@@ -109,15 +111,14 @@ EncodableDataType::operator=(EncodableDataType const& rhs)              \
   return *this;                                                         \
 }                                                                       \
                                                                         \
-std::auto_ptr<DataElement>                                              \
+std::unique_ptr<DataElement>                                            \
 EncodableDataType::clone() const                                        \
 {                                                                       \
-  return std::auto_ptr<DataElement>(new EncodableDataType(*this));      \
+  return std::unique_ptr<DataElement>(new EncodableDataType(*this));    \
 }                                                                       \
                                                                         \
 VariableLengthData                                                      \
 EncodableDataType::encode() const                                       \
-  throw (EncoderException)                                              \
 {                                                                       \
   VariableLengthData variableLengthData;                                \
   encode(variableLengthData);                                           \
@@ -126,7 +127,6 @@ EncodableDataType::encode() const                                       \
                                                                         \
 void                                                                    \
 EncodableDataType::encode(VariableLengthData& inData) const             \
-  throw (EncoderException)                                              \
 {                                                                       \
   std::vector<Octet> buffer;                                            \
   buffer.reserve(getEncodedLength());                                   \
@@ -137,14 +137,12 @@ EncodableDataType::encode(VariableLengthData& inData) const             \
                                                                         \
 void                                                                    \
 EncodableDataType::encodeInto(std::vector<Octet>& buffer) const         \
-  throw (EncoderException)                                              \
 {                                                                       \
   return _impl->encodeInto(buffer);                                     \
 }                                                                       \
                                                                         \
 void                                                                    \
 EncodableDataType::decode(VariableLengthData const & inData)            \
-  throw (EncoderException)                                              \
 {                                                                       \
   if (inData.size() != getEncodedLength())                              \
     throw EncoderException(L"Encoded size does not match!");            \
@@ -157,14 +155,12 @@ EncodableDataType::decode(VariableLengthData const & inData)            \
                                                                         \
 size_t                                                                  \
 EncodableDataType::decodeFrom(std::vector<Octet> const & buffer, size_t index) \
-  throw (EncoderException)                                              \
 {                                                                       \
   return _impl->decodeFrom(buffer, index);                              \
 }                                                                       \
                                                                         \
 size_t                                                                  \
 EncodableDataType::getEncodedLength() const                             \
-  throw (EncoderException)                                              \
 {                                                                       \
   return _impl->getEncodedLength();                                     \
 }                                                                       \
@@ -183,7 +179,6 @@ EncodableDataType::hash() const                                         \
                                                                         \
 void                                                                    \
 EncodableDataType::setDataPointer(SimpleDataType* inData)               \
-  throw (EncoderException)                                              \
 {                                                                       \
 }                                                                       \
                                                                         \
@@ -942,6 +937,9 @@ Integer64 hash() const
   return Integer64(u.u);
 }
 )
+
+// signed/unsigned mismatch
+#pragma warning(disable: 4018)
 
 // Array values
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAASCIIstring, std::string,

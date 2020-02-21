@@ -26,6 +26,8 @@
 #include "StringUtils.h"
 #include "LogStream.h"
 
+#pragma warning(disable: 4100)
+
 namespace OpenRTI {
 
 Exception::Exception(const char* type, const char* reason) :

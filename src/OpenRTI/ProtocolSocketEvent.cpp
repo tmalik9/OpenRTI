@@ -33,20 +33,24 @@ struct OPENRTI_LOCAL ProtocolSocketEvent::ProtocolSocket : public AbstractProtoc
   { }
 
   /// Can be called from the consuming layer to receive ready to read data
-  virtual ssize_t recv(const BufferRange& bufferRange, bool peek)
-  { return _socketStream->recv(bufferRange, peek); }
+  virtual ssize_t recv(const BufferRange& bufferRange, bool peek) override {
+    return _socketStream->recv(bufferRange, peek);
+  }
   /// Can be called from the consuming layer to send something into this protocol layer
-  virtual ssize_t send(const ConstBufferRange& bufferRange, bool more)
-  { return _socketStream->send(bufferRange, more); }
-
+  virtual ssize_t send(const ConstBufferRange& bufferRange, bool more) override {
+    return _socketStream->send(bufferRange, more);
+  }
+  virtual ssize_t sendBufferSize() const override {
+    return _socketStream->sendBufferSize();
+  }
   /// Call when the user wants to close this socket.
-  virtual void close()
+  virtual void close() override
   {
     _socketStream->shutdown();
     _closed = true;
   }
 
-  virtual void replaceProtocol(const SharedPtr<AbstractProtocolLayer>& protocolLayer)
+  virtual void replaceProtocol(const SharedPtr<AbstractProtocolLayer>& protocolLayer) override
   { _replacingProtocol = protocolLayer; }
 
   void read()
@@ -114,7 +118,7 @@ ProtocolSocketEvent::getEnableRead() const
 void
 ProtocolSocketEvent::write(SocketEventDispatcher& dispatcher)
 {
-  OpenRTIAssert(!_protocolSocket->_closed);
+  //OpenRTIAssert(!_protocolSocket->_closed);
   _protocolSocket->write();
 }
 

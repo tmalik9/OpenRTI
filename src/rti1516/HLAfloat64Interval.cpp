@@ -30,6 +30,10 @@
 #include "ValueImplementation.h"
 #include "RTI/HLAfloat64Time.h"
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 DECLARE_VALUE_IMPLEMENTATION(HLAfloat64IntervalImpl, double)
 
 static const HLAfloat64Time& toHLAfloat64Time(const rti1516::LogicalTime& logicalTime)
@@ -88,7 +92,7 @@ static inline bool isNaN(const double& fedTime)
 
 static inline double nextAfter(const double& logicalTime, const double& direction)
 {
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   return std::nextafter(logicalTime, direction);
 #elif defined _WIN32
   return _nextafter(logicalTime, direction);
@@ -157,7 +161,6 @@ HLAfloat64Interval::isEpsilon() const
 
 HLAfloat64Interval&
 HLAfloat64Interval::operator=(const rti1516::LogicalTimeInterval& logicalTimeInterval)
-  throw (rti1516::InvalidLogicalTimeInterval)
 {
   HLAfloat64IntervalImpl::assign(_impl, toHLAfloat64Interval(logicalTimeInterval)._impl);
   return *this;
@@ -165,14 +168,12 @@ HLAfloat64Interval::operator=(const rti1516::LogicalTimeInterval& logicalTimeInt
 
 void
 HLAfloat64Interval::setToDifference(const rti1516::LogicalTime& minuend, const rti1516::LogicalTime& subtrahend)
-  throw (rti1516::InvalidLogicalTime)
 {
   HLAfloat64IntervalImpl::setValue(_impl, toHLAfloat64Time(minuend).getTime() - toHLAfloat64Time(subtrahend).getTime());
 }
 
 HLAfloat64Interval&
 HLAfloat64Interval::operator+=(const rti1516::LogicalTimeInterval& logicalTimeInterval)
-  throw (rti1516::InvalidLogicalTimeInterval)
 {
   double interval = HLAfloat64IntervalImpl::getValue(toHLAfloat64Interval(logicalTimeInterval)._impl);
   if (isNaN(interval))
@@ -206,7 +207,6 @@ HLAfloat64Interval::operator+=(const rti1516::LogicalTimeInterval& logicalTimeIn
 
 HLAfloat64Interval&
 HLAfloat64Interval::operator-=(const rti1516::LogicalTimeInterval& logicalTimeInterval)
-  throw (rti1516::InvalidLogicalTimeInterval)
 {
   double interval = HLAfloat64IntervalImpl::getValue(toHLAfloat64Interval(logicalTimeInterval)._impl);
   if (isNaN(interval))
@@ -240,7 +240,6 @@ HLAfloat64Interval::operator-=(const rti1516::LogicalTimeInterval& logicalTimeIn
 
 bool
 HLAfloat64Interval::operator>(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-  throw (rti1516::InvalidLogicalTimeInterval)
 {
   double left = HLAfloat64IntervalImpl::getValue(_impl);
   if (isNaN(left))
@@ -253,7 +252,6 @@ HLAfloat64Interval::operator>(const rti1516::LogicalTimeInterval& logicalTimeInt
 
 bool
 HLAfloat64Interval::operator<(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-  throw (rti1516::InvalidLogicalTimeInterval)
 {
   double left = HLAfloat64IntervalImpl::getValue(_impl);
   if (isNaN(left))
@@ -266,7 +264,6 @@ HLAfloat64Interval::operator<(const rti1516::LogicalTimeInterval& logicalTimeInt
 
 bool
 HLAfloat64Interval::operator==(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-  throw (rti1516::InvalidLogicalTimeInterval)
 {
   double left = HLAfloat64IntervalImpl::getValue(_impl);
   if (isNaN(left))
@@ -279,7 +276,6 @@ HLAfloat64Interval::operator==(const rti1516::LogicalTimeInterval& logicalTimeIn
 
 bool
 HLAfloat64Interval::operator>=(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-  throw (rti1516::InvalidLogicalTimeInterval)
 {
   double left = HLAfloat64IntervalImpl::getValue(_impl);
   if (isNaN(left))
@@ -292,7 +288,6 @@ HLAfloat64Interval::operator>=(const rti1516::LogicalTimeInterval& logicalTimeIn
 
 bool
 HLAfloat64Interval::operator<=(const rti1516::LogicalTimeInterval& logicalTimeInterval) const
-  throw (rti1516::InvalidLogicalTimeInterval)
 {
   double left = HLAfloat64IntervalImpl::getValue(_impl);
   if (isNaN(left))
@@ -319,7 +314,6 @@ HLAfloat64Interval::encodedLength() const
 
 unsigned long
 HLAfloat64Interval::encode(void* buffer, unsigned long bufferSize) const
-  throw (rti1516::CouldNotEncode)
 {
   if (bufferSize < 8)
     throw rti1516::CouldNotEncode(L"Buffer size too short!");
@@ -342,7 +336,6 @@ HLAfloat64Interval::encode(void* buffer, unsigned long bufferSize) const
 
 void
 HLAfloat64Interval::decode(const rti1516::VariableLengthData& variableLengthData)
-  throw (rti1516::InternalError, rti1516::CouldNotDecode)
 {
   OpenRTI::VariableLengthData data = rti1516::VariableLengthDataFriend::readPointer(variableLengthData);
   if (data.size() < 8)
@@ -352,7 +345,6 @@ HLAfloat64Interval::decode(const rti1516::VariableLengthData& variableLengthData
 
 void
 HLAfloat64Interval::decode(void* buffer, unsigned long bufferSize)
-  throw (rti1516::InternalError, rti1516::CouldNotDecode)
 {
   if (bufferSize < 8)
     throw rti1516::CouldNotDecode(L"Buffer size too short!");

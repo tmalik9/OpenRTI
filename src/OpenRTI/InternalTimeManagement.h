@@ -23,7 +23,7 @@
 #include "Export.h"
 #include "Referenced.h"
 #include "Message.h"
-
+#include <string>
 namespace OpenRTI {
 
 class InternalAmbassador;
@@ -117,11 +117,12 @@ public:
   virtual void acceptInternalMessage(InternalAmbassador& ambassador, const CommitLowerBoundTimeStampResponseMessage& message) = 0;
   virtual void acceptInternalMessage(InternalAmbassador& ambassador, const LockedByNextMessageRequestMessage& message) = 0;
 
-  virtual void queueTimeStampedMessage(InternalAmbassador& ambassador, const VariableLengthData& timeStamp, const AbstractMessage& message) = 0;
+  virtual void queueTimeStampedMessage(InternalAmbassador& ambassador, const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback) = 0;
   virtual void queueReceiveOrderMessage(InternalAmbassador& ambassador, const AbstractMessage& message) = 0;
 
   virtual bool dispatchCallback(const AbstractMessageDispatcher& dispatcher) = 0;
   virtual bool callbackMessageAvailable() = 0;
+  virtual std::string logicalTimeToString(const VariableLengthData& nativeLogicalTime) = 0;
 
 protected:
 
@@ -133,6 +134,8 @@ protected:
   // Serial number for message retraction
   uint32_t _messageRetractionSerial;
 };
+
+std::string OPENRTI_API to_string(InternalTimeManagement::TimeAdvanceMode);
 
 } // namespace OpenRTI
 

@@ -42,8 +42,7 @@ namespace rti1516e
          Integer64);
 
       // Destructor
-      virtual ~HLAinteger64Interval()
-         throw ();
+      virtual ~HLAinteger64Interval();
 
       // Basic accessors/mutators
 
@@ -58,45 +57,33 @@ namespace rti1516e
       // Operators
 
       virtual rti1516e::LogicalTimeInterval& operator= (
-         rti1516e::LogicalTimeInterval const & value)
-         throw (rti1516e::InvalidLogicalTimeInterval);
+         rti1516e::LogicalTimeInterval const & value);
 
       virtual rti1516e::LogicalTimeInterval& operator+= (
-         rti1516e::LogicalTimeInterval const & addend)
-         throw (rti1516e::IllegalTimeArithmetic,
-                rti1516e::InvalidLogicalTimeInterval);
+         rti1516e::LogicalTimeInterval const & addend);
 
       virtual rti1516e::LogicalTimeInterval& operator-= (
-         rti1516e::LogicalTimeInterval const & subtrahend)
-         throw (rti1516e::IllegalTimeArithmetic,
-                rti1516e::InvalidLogicalTimeInterval);
+         rti1516e::LogicalTimeInterval const & subtrahend);
 
       virtual bool operator> (
-         rti1516e::LogicalTimeInterval const & value) const
-         throw (rti1516e::InvalidLogicalTimeInterval);
+         rti1516e::LogicalTimeInterval const & value) const;
 
       virtual bool operator< (
-         rti1516e::LogicalTimeInterval const & value) const
-         throw (rti1516e::InvalidLogicalTimeInterval);
+         rti1516e::LogicalTimeInterval const & value) const;
 
       virtual bool operator== (
-         rti1516e::LogicalTimeInterval const & value) const
-         throw (rti1516e::InvalidLogicalTimeInterval);
+         rti1516e::LogicalTimeInterval const & value) const;
 
       virtual bool operator>= (
-         rti1516e::LogicalTimeInterval const & value) const
-         throw (rti1516e::InvalidLogicalTimeInterval);
+         rti1516e::LogicalTimeInterval const & value) const;
 
       virtual bool operator<= (
-         rti1516e::LogicalTimeInterval const & value) const
-         throw (rti1516e::InvalidLogicalTimeInterval);
+         rti1516e::LogicalTimeInterval const & value) const;
 
       // Set self to the difference between two LogicalTimes
       virtual void setToDifference (
          rti1516e::LogicalTime const & minuend,
-         rti1516e::LogicalTime const& subtrahend)
-         throw (rti1516e::IllegalTimeArithmetic,
-                rti1516e::InvalidLogicalTime);
+         rti1516e::LogicalTime const& subtrahend);
 
       // Generates an encoded value that can be used to send
       // LogicalTimeIntervals to other federates in updates or interactions
@@ -106,25 +93,20 @@ namespace rti1516e
       // Return the length of encoded data
       virtual size_t encode (
          void* buffer,
-         size_t bufferSize) const
-         throw (rti1516e::CouldNotEncode);
+         size_t bufferSize) const;
 
       // The length of the encoded data
       virtual size_t encodedLength () const;
 
       // Decode encodedValue into self
       virtual void decode (
-         rti1516e::VariableLengthData const & encodedValue)
-         throw (rti1516e::InternalError,
-                rti1516e::CouldNotDecode);
+         rti1516e::VariableLengthData const & encodedValue);
 
       // Decode encodedValue into self
       // Alternate decode that reads directly from a buffer
       virtual void decode (
          void* buffer,
-         size_t bufferSize)
-         throw (rti1516e::InternalError,
-                rti1516e::CouldNotDecode);
+         size_t bufferSize);
 
       // Diagnostic string representation of time
       virtual std::wstring toString () const;
@@ -148,8 +130,7 @@ namespace rti1516e
       // Implementation operators
       //-----------------------------------------------------------------
       virtual HLAinteger64Interval& operator= (
-         const HLAinteger64Interval& value)
-         throw (rti1516e::InvalidLogicalTimeInterval);
+         const HLAinteger64Interval& value);
 
       operator Integer64 () const;
 

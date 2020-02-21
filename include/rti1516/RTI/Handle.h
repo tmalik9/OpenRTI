@@ -37,8 +37,7 @@ public:                                                         \
    /* Constructs an invalid handle                           */ \
    HandleKind();                                                \
                                                                 \
-   ~HandleKind()                                                \
-      throw();                                                  \
+   ~HandleKind();                                               \
                                                                 \
    HandleKind(HandleKind const & rhs);                          \
                                                                 \
@@ -60,8 +59,7 @@ public:                                                         \
    /* Alternate encode for directly filling a buffer         */ \
    unsigned long encodedLength() const;                         \
    unsigned long encode(                                        \
-      void* buffer, unsigned long bufferSize) const             \
-      throw (CouldNotEncode);                                   \
+      void* buffer, unsigned long bufferSize) const;            \
                                                                 \
    std::wstring toString() const;                               \
                                                                 \

@@ -35,7 +35,7 @@ DynamicModule::getFileNameForAddress(const void* address)
   flags |= GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
   flags |= GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS;
   HMODULE handle;
-  if (!GetModuleHandleEx(flags, (LPCSTR)address, &handle))
+  if (!GetModuleHandleExA(flags, (LPCSTR)address, &handle))
     return std::string();
 
   std::vector<wchar_t> buf(MAX_PATH, 0);
@@ -54,7 +54,7 @@ DynamicModule::getFileNameForAddress(const void* address)
     return ucsToUtf8(std::wstring(&buf.front(), std::wstring::size_type(retval)));
   }
 
-  return std::string();
+  //return std::string();
 #else
   return std::string();
 #endif

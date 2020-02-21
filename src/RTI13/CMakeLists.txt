@@ -37,8 +37,9 @@ set(LIB_FEDTIME_SOURCES RTIfedTime.cpp)
 if(OPENRTI_BUILD_SHARED)
   add_library(RTI-NG SHARED ${LIB_RTI_NG_SOURCES})
   set_property(TARGET RTI-NG APPEND PROPERTY COMPILE_DEFINITIONS RTI_EXPORTS)
-  set_property(TARGET RTI-NG PROPERTY VERSION 1.3.0)
-  set_property(TARGET RTI-NG PROPERTY SOVERSION 1)
+# ems: disable CMake so library versioning
+#  set_property(TARGET RTI-NG PROPERTY VERSION 1.3.0)
+#  set_property(TARGET RTI-NG PROPERTY SOVERSION 1)
 
   # RTI-NG, the circular reference is tricky on win32
   if(MSVC)
@@ -82,8 +83,9 @@ endif()
 if(OPENRTI_BUILD_SHARED)
   add_library(FedTime SHARED ${LIB_FEDTIME_SOURCES})
   set_property(TARGET FedTime APPEND PROPERTY COMPILE_DEFINITIONS FedTime_EXPORTS)
-  set_property(TARGET FedTime PROPERTY VERSION 1.3.0)
-  set_property(TARGET FedTime PROPERTY SOVERSION 1)
+# ems: disable CMake so library versioning
+#  set_property(TARGET FedTime PROPERTY VERSION 1.3.0)
+#  set_property(TARGET FedTime PROPERTY SOVERSION 1)
   if(OPENRTI_INSTALL_WITH_RPATH)
     set_property(TARGET FedTime PROPERTY INSTALL_RPATH "$ORIGIN")
     set_property(TARGET FedTime APPEND PROPERTY LINK_FLAGS "${OPENRTI_RPATH_LINK_FLAGS}")

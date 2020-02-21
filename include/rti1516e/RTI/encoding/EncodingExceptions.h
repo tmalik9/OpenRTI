@@ -23,11 +23,9 @@ namespace rti1516e
    class RTI_EXPORT EncoderException: public Exception
    {
    public:
-      EncoderException (std::wstring const & message)
-         throw();
+      EncoderException (std::wstring const & message);
 
-      std::wstring what () const
-         throw();
+      std::wstring what () const;
 
    private:
       std::wstring _msg;

@@ -38,7 +38,6 @@ public:
     _fail(false)
   { }
   virtual ~TestAmbassador()
-    throw ()
   { }
 
   virtual bool execJoined(rti1516::RTIambassador& ambassador)
@@ -273,9 +272,6 @@ public:
   void discoverObjectInstance(rti1516::ObjectInstanceHandle objectInstanceHandle,
                               rti1516::ObjectClassHandle objectClassHandle,
                               const std::wstring& objectInstanceName)
-      throw (rti1516::CouldNotDiscover,
-             rti1516::ObjectClassNotKnown,
-             rti1516::FederateInternalError)
   {
     // Log(Assert, Error) << "discover "  << objectClassHandle.toString() << " " << objectInstanceHandle.toString() << std::endl;
     if (_expectedObjectClassHandle != objectClassHandle) {
@@ -294,8 +290,6 @@ public:
   void removeObjectInstance(rti1516::ObjectInstanceHandle objectInstanceHandle,
                             const rti1516::VariableLengthData& tag,
                             rti1516::OrderType sentOrder)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::FederateInternalError)
   {
     if (_foreignObjectInstanceHandles.find(objectInstanceHandle) == _foreignObjectInstanceHandles.end()) {
       Log(Assert, Error) << "Spurious removeObjectInstance callback for object instance "
@@ -315,10 +309,6 @@ public:
 
   virtual void reflectAttributeValues(rti1516::ObjectInstanceHandle objectInstanceHandle, const rti1516::AttributeHandleValueMap& attributeValues,
                                       const rti1516::VariableLengthData&, rti1516::OrderType, rti1516::TransportationType)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
   }
@@ -326,10 +316,6 @@ public:
   virtual void reflectAttributeValues(rti1516::ObjectInstanceHandle objectInstanceHandle, const rti1516::AttributeHandleValueMap& attributeValues,
                                       const rti1516::VariableLengthData&, rti1516::OrderType, rti1516::TransportationType,
                                       const rti1516::RegionHandleSet&)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
   }
@@ -337,10 +323,6 @@ public:
   virtual void reflectAttributeValues(rti1516::ObjectInstanceHandle objectInstanceHandle, const rti1516::AttributeHandleValueMap& attributeValues,
                                       const rti1516::VariableLengthData&, rti1516::OrderType, rti1516::TransportationType,
                                       const rti1516::LogicalTime&, rti1516::OrderType)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
   }
@@ -348,10 +330,6 @@ public:
   virtual void reflectAttributeValues(rti1516::ObjectInstanceHandle objectInstanceHandle, const rti1516::AttributeHandleValueMap& attributeValues,
                                       const rti1516::VariableLengthData&, rti1516::OrderType, rti1516::TransportationType,
                                       const rti1516::LogicalTime&, rti1516::OrderType, const rti1516::RegionHandleSet&)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::FederateInternalError)
   {
     _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
   }
@@ -359,11 +337,6 @@ public:
   virtual void reflectAttributeValues(rti1516::ObjectInstanceHandle objectInstanceHandle, const rti1516::AttributeHandleValueMap& attributeValues,
                                       const rti1516::VariableLengthData&, rti1516::OrderType, rti1516::TransportationType,
                                       const rti1516::LogicalTime&, rti1516::OrderType, rti1516::MessageRetractionHandle)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::InvalidLogicalTime,
-           rti1516::FederateInternalError)
   {
     _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
   }
@@ -372,11 +345,6 @@ public:
                                       const rti1516::VariableLengthData&, rti1516::OrderType, rti1516::TransportationType,
                                       const rti1516::LogicalTime&, rti1516::OrderType, rti1516::MessageRetractionHandle,
                                       const rti1516::RegionHandleSet&)
-    throw (rti1516::ObjectInstanceNotKnown,
-           rti1516::AttributeNotRecognized,
-           rti1516::AttributeNotSubscribed,
-           rti1516::InvalidLogicalTime,
-           rti1516::FederateInternalError)
   {
     _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
   }

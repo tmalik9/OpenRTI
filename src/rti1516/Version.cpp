@@ -23,6 +23,7 @@
 
 #include <RTI/RTI1516.h>
 #include "OpenRTIConfig.h"
+#include "OpenRTIVersion.h"
 
 #define PASTE2(a, b) a##b
 #define PASTE(a, b) PASTE2(a, b)
@@ -39,7 +40,7 @@ RTIname()
 std::wstring
 RTIversion()
 {
-  return std::wstring(PASTE(L, OpenRTI_VERSION_STRING));
+  return std::wstring(PASTE(L, OPENRTI_FILE_VERSION_STRING));
 }
 
 }

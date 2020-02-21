@@ -28,6 +28,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include "Export.h"
 #include "VariableLengthData.h"
@@ -111,6 +112,32 @@ split(const char* s, const char* c = ", \t\n")
   return split(std::string(s), c);
 }
 
+template<typename Iter>
+inline std::string join(Iter begin, Iter end, const std::string& sep, bool quote)
+{
+  std::ostringstream to;
+  Iter current = begin;
+  while (current != end)
+  {
+    if (quote) to << "\"";
+    to << *current;
+    if (quote) to << "\"";
+    current++;
+    if (current != end) to << sep;
+  }
+  return to.str();
+}
+
+inline std::string join(const std::vector<std::string>& parts, const std::string& sep, bool quote=true)
+{
+  return join(parts.begin(), parts.end(), sep, quote);
+}
+
+inline std::string join(const std::list<std::string>& parts, const std::string& sep, bool quote=true)
+{
+  return join(parts.begin(), parts.end(), sep, quote);
+}
+
 OPENRTI_API std::string
 trim(std::string s, const char* c = " \t\n");
 
@@ -151,6 +178,25 @@ getBasePart(const std::string& path);
 inline std::ostream&
 operator<<(std::ostream& stream, const std::wstring& s)
 { return stream << ucsToLocale(s); }
+
+inline std::string to_string(const StringList& stringList)
+{
+  std::ostringstream out;
+  out << "{ ";
+  out << join(stringList, ", ");
+  out << " }";
+  return out.str();
+}
+
+inline std::string to_string(const StringStringListMap& stringListMap)
+{
+  StringList resultList;
+  for (auto& [key, values] : stringListMap)
+  {
+    resultList.push_back(key + " : " + to_string(values));
+  }
+  return join(resultList, ", ", false);
+}
 
 } // namespace OpenRTI
 

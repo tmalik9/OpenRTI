@@ -156,15 +156,14 @@ HLAfixedArray::~HLAfixedArray()
   _impl = 0;
 }
 
-std::auto_ptr<DataElement>
+std::unique_ptr<DataElement>
 HLAfixedArray::clone () const
 {
-  return std::auto_ptr<rti1516e::DataElement>(new HLAfixedArray(*this));
+  return std::unique_ptr<rti1516e::DataElement>(new HLAfixedArray(*this));
 }
 
 VariableLengthData
 HLAfixedArray::encode () const
-  throw (EncoderException)
 {
   VariableLengthData variableLengthData;
   encode(variableLengthData);
@@ -173,7 +172,6 @@ HLAfixedArray::encode () const
 
 void
 HLAfixedArray::encode(VariableLengthData& inData) const
-  throw (EncoderException)
 {
   std::vector<Octet> buffer;
   buffer.reserve(getEncodedLength());
@@ -184,13 +182,11 @@ HLAfixedArray::encode(VariableLengthData& inData) const
 
 void
 HLAfixedArray::encodeInto(std::vector<Octet>& buffer) const
-  throw (EncoderException)
 {
   _impl->encodeInto(buffer);
 }
 
 void HLAfixedArray::decode(VariableLengthData const & inData)
-  throw (EncoderException)
 {
   std::vector<Octet> buffer(inData.size());
   if (!buffer.empty())
@@ -200,14 +196,12 @@ void HLAfixedArray::decode(VariableLengthData const & inData)
 
 size_t
 HLAfixedArray::decodeFrom(std::vector<Octet> const & buffer, size_t index)
-  throw (EncoderException)
 {
   return _impl->decodeFrom(buffer, index);
 }
 
 size_t
 HLAfixedArray::getEncodedLength() const
-  throw (EncoderException)
 {
   return _impl->getEncodedLength();
 }
@@ -246,28 +240,24 @@ HLAfixedArray::size () const
 
 void
 HLAfixedArray::set(size_t index, const DataElement& dataElement)
-  throw (EncoderException)
 {
   _impl->set(index, dataElement);
 }
 
 void
 HLAfixedArray::setElementPointer(size_t index, DataElement* dataElement)
-  throw (EncoderException)
 {
   _impl->setElementPointer(index, dataElement);
 }
 
 const DataElement&
 HLAfixedArray::get(size_t index) const
-  throw (EncoderException)
 {
   return _impl->get(index);
 }
 
 DataElement const&
 HLAfixedArray::operator [](size_t index) const
-  throw (EncoderException)
 {
   return _impl->get(index);
 }

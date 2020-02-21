@@ -34,19 +34,22 @@ public:
   bool isOpen() const;
   virtual void close();
 
+  void setWriteable() { _mIsWritable = true; }
+  bool isWritable() const { return _mIsWritable; }
   // Sigh, a strange access problem on aCC and early gcc, just disable that control here
 #if !defined(__hpux) && !(defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 1)))
 protected:
 #endif
   struct PrivateData;
   PrivateData* _privateData;
+  bool _mIsWritable;
 
   Socket(PrivateData* privateData);
   virtual ~Socket();
 
 private:
-  Socket(const Socket &sock);
-  void operator=(const Socket &sock);
+  Socket(const Socket &sock) = delete;
+  void operator=(const Socket &sock) = delete;
 
   friend class SocketEventDispatcher;
 };

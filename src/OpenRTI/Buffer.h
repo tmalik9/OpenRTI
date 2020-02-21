@@ -210,6 +210,17 @@ public:
   { return begin(); }
   const_byte_iterator byte_end() const
   { return end(); }
+
+  // SLOW
+  size_t byte_size() const
+  {
+    size_t result = 0;
+    for (auto iter=begin(); iter != end(); iter++)
+    {
+      result += iter->size();
+    }
+    return result;
+  }
 };
 
 typedef std::pair<Buffer::byte_iterator, Buffer::byte_iterator> BufferRange;

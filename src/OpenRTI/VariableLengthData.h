@@ -31,6 +31,10 @@
 #include <ostream>
 #include <string>
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 namespace OpenRTI {
 
 class VariableLengthData;
@@ -93,7 +97,7 @@ public:
     _size(value._size),
     _offset(value._offset)
   { }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   VariableLengthData(VariableLengthData&& value) :
     _data(std::move(value._data)),
     _size(value._size),
@@ -132,7 +136,7 @@ public:
     _offset = value._offset;
     return *this;
   }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   VariableLengthData&
   operator=(VariableLengthData&& value)
   {

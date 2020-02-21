@@ -27,6 +27,8 @@
 #include "LeafServerThread.h"
 #include "Message.h"
 
+#include "dprintf.h"
+
 namespace OpenRTI {
 
 class OPENRTI_LOCAL InternalAmbassador::_InternalMessageDispatchFunctor {
@@ -47,8 +49,15 @@ InternalAmbassador::InternalAmbassador()
 
 InternalAmbassador::~InternalAmbassador()
 {
-  if (_connect.valid())
-    _connect->close();
+  try
+  {
+    if (_connect.valid())
+      _connect->close();
+  }
+  catch (Exception& e)
+  {
+    CondDebugPrintf("%s: %S\n", e.getReason().c_str());
+  }
   _connect.clear();
 }
 
@@ -307,6 +316,25 @@ InternalAmbassador::acceptInternalMessage(const ChangeInteractionClassSubscripti
 void
 InternalAmbassador::acceptInternalMessage(const ChangeObjectClassSubscriptionMessage& message)
 {
+}
+
+void
+InternalAmbassador::acceptInternalMessage(const ChangeObjectInstanceSubscriptionMessage& message)
+{
+  // probably the wrong place to do this -
+  // maybe this should only get through when there is no subscriber left at all.
+  Federate::ObjectClass* objectClass = getFederate()->getObjectClass(message.getObjectClassHandle());
+  Federate::ObjectInstance* objectInstance = getFederate()->getObjectInstance(message.getObjectInstanceHandle());
+  SubscriptionType subscriptionType = message.getSubscriptionType();
+  if (objectInstance->setSubscriptionType(subscriptionType))
+  {
+    SharedPtr<TurnUpdatesOnForInstanceMessage> updatesMessage = new TurnUpdatesOnForInstanceMessage;
+    updatesMessage->setObjectInstanceHandle(message.getObjectInstanceHandle());
+    updatesMessage->setAttributeHandles(objectClass->getAttributeHandles());
+    updatesMessage->setOn(subscriptionType != Unsubscribed);
+    // message->setUpdateRate(/*FIXME*/);
+    queueCallback(updatesMessage);
+  }
 }
 
 void
@@ -647,15 +675,16 @@ InternalAmbassador::dispatchWaitReserveObjectInstanceName(const Clock& abstime, 
 }
 
 void
-InternalAmbassador::queueTimeStampedMessage(const VariableLengthData& timeStamp, const AbstractMessage& message)
+InternalAmbassador::queueTimeStampedMessage(const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback)
 {
   if (InternalTimeManagement* timeManagement = getTimeManagement())
-    timeManagement->queueTimeStampedMessage(*this, timeStamp, message);
+    timeManagement->queueTimeStampedMessage(*this, timeStamp, message, loopback);
 }
 
 void
 InternalAmbassador::queueReceiveOrderMessage(const AbstractMessage& message)
 {
+  //CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message.toString().c_str());
   if (InternalTimeManagement* timeManagement = getTimeManagement())
     timeManagement->queueReceiveOrderMessage(*this, message);
 }
@@ -667,6 +696,7 @@ InternalAmbassador::_dispatchCallbackMessage(AbstractMessageDispatcher& messageD
     SharedPtr<const AbstractMessage> message;
     message.swap(_callbackMessageList.front());
     _messageListPool.splice(_messageListPool.begin(), _callbackMessageList, _callbackMessageList.begin());
+    CondDebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message->toString().c_str());
     message->dispatch(messageDispatcher);
     return true;
   }
@@ -687,5 +717,21 @@ InternalAmbassador::_callbackMessageAvailable()
     return true;
   return false;
 }
+
+void InternalAmbassador::_setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h)
+{
+  if (_connect.valid() && _connect->getMessageReceiver() != nullptr)
+  {
+    if (_connect->getMessageReceiver() != nullptr)
+    {
+    _connect->getMessageReceiver()->setNotificationHandle(h);
+    }
+  }
+  _notificationHandle = h;
+  if (_notificationHandle != nullptr && !_callbackMessageList.empty())
+  {
+    _notificationHandle->Signal();
+  }
+};
 
 }

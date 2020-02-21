@@ -38,14 +38,20 @@ public:
 
   /// Convenience methods for obvious tasks
   void send(const SharedPtr<const AbstractMessage>& message)
-  { getMessageSender()->send(message); }
+  { 
+    getMessageSender()->send(message);
+  }
 
   /// Returns the next message. Returns 0 if no new message arrives before abstime
   SharedPtr<const AbstractMessage> receive(const Clock& abstime)
-  { return getMessageReceiver()->receive(abstime); }
+  {
+    return getMessageReceiver()->receive(abstime);
+  }
   /// Returns the next message if there is one.
   SharedPtr<const AbstractMessage> receive()
-  { return getMessageReceiver()->receive(); }
+  {
+    return getMessageReceiver()->receive();
+  }
 
   /// Close the message sender
   void close()

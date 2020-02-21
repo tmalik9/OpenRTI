@@ -36,7 +36,6 @@ public:
     RTI1516TestAmbassador(constructorArgs)
   { }
   virtual ~TestAmbassador()
-    throw ()
   { }
 
   virtual bool execJoined(rti1516::RTIambassador& ambassador)
@@ -203,14 +202,12 @@ public:
 
   virtual void
   objectInstanceNameReservationSucceeded(const std::wstring& objectInstanceName)
-    throw (rti1516::UnknownName, rti1516::FederateInternalError)
   {
     _nameReservationMap[objectInstanceName] = true;
   }
 
   virtual void
   objectInstanceNameReservationFailed(const std::wstring& objectInstanceName)
-    throw (rti1516::UnknownName, rti1516::FederateInternalError)
   {
     _nameReservationMap[objectInstanceName] = false;
   }

@@ -20,6 +20,8 @@
 #include "ServerModel.h"
 
 #include "ServerOptions.h"
+#include <sstream>
+#include <iomanip>
 
 namespace OpenRTI {
 namespace ServerModel {
@@ -59,6 +61,14 @@ void
 InstanceAttribute::setAttributeHandle(const AttributeHandle& attributeHandle)
 {
   HandleEntity<InstanceAttribute, AttributeHandle>::_setHandle(attributeHandle);
+}
+
+
+void InstanceAttribute::removeConnect(const ConnectHandle& connectHandle)
+{
+  _receivingConnects.erase(connectHandle);
+  if (_ownerConnectHandle == connectHandle)
+    _ownerConnectHandle = ConnectHandle();
 }
 
 ////////////////////////////////////////////////////////////
@@ -106,11 +116,13 @@ ObjectInstance::setName(const std::string& name)
   HandleStringEntity<ObjectInstance, ObjectInstanceHandle>::_setString(name);
 }
 
+/*
 void
 ObjectInstance::insert(InstanceAttribute& instanceAttribute)
 {
   _attributeHandleInstanceAttributeMap.insert(instanceAttribute);
 }
+*/
 
 InstanceAttribute*
 ObjectInstance::getInstanceAttribute(const AttributeHandle& attributeHandle)
@@ -158,8 +170,7 @@ ObjectInstance::removeConnect(const ConnectHandle& connectHandle)
 {
   // FIXME make that an assert at some time
   // OpenRTIAssert(_connectHandleSet.find(connectHandle) == _connectHandleSet.end());
-  for (InstanceAttribute::HandleMap::iterator i = _attributeHandleInstanceAttributeMap.begin();
-       i != _attributeHandleInstanceAttributeMap.end(); ++i) {
+  for (InstanceAttribute::HandleMap::iterator i = _attributeHandleInstanceAttributeMap.begin(); i != _attributeHandleInstanceAttributeMap.end(); ++i) {
     i->removeConnect(connectHandle);
   }
 }
@@ -174,11 +185,26 @@ ObjectInstance::setObjectClass(ObjectClass* objectClass)
   _objectClass->insert(*this);
 
   ClassAttribute::HandleMap& attributeHandleClassAttributeMap = objectClass->getAttributeHandleClassAttributeMap();
-  for (ClassAttribute::HandleMap::iterator i = attributeHandleClassAttributeMap.begin();
-       i != attributeHandleClassAttributeMap.end(); ++i) {
-    ServerModel::InstanceAttribute* instanceAttribute = new ServerModel::InstanceAttribute(*this, *i);
-    insert(*instanceAttribute);
+  //size_t numSubscribers = getSubscribedConnectHandleSet().size();
+  for (ClassAttribute& classAttribute : attributeHandleClassAttributeMap) {
+    ServerModel::InstanceAttribute* instanceAttribute = new ServerModel::InstanceAttribute(*this, classAttribute);
+    //insert(*instanceAttribute);
+    _attributeHandleInstanceAttributeMap.insert(*instanceAttribute);
+    for (auto subscriber : classAttribute._cumulativeSubscribedConnectHandleSet)
+    {
+      setSubscriptionType(subscriber, SubscribedActive);
+    }
   }
+  /*
+  size_t numSubscribers2 = getSubscribedConnectHandleSet().size();
+  DebugPrintf("%s: name=%s class=%s %d subscribers before, %d now\n", __FUNCTION__,
+              getName().c_str(), objectClass->getFQName().c_str(),
+              numSubscribers, numSubscribers2);
+  for (auto& subscriber : getSubscribedConnectHandleSet())
+  {
+    DebugPrintf("%s: subscriber=%s\n", __FUNCTION__, subscriber.toString().c_str());
+  }
+  */
 }
 
 ////////////////////////////////////////////////////////////
@@ -565,6 +591,21 @@ InteractionClass::~InteractionClass()
   _parentInteractionClass = 0;
 }
 
+std::string InteractionClass::getFQName() const
+{
+  // alternatively, we could go recursively through getParentObjectClass
+  StringVector name = getName();
+  std::string result;
+  StringVector::iterator iter = name.begin();
+  while (iter != name.end())
+  {
+    result += *iter;
+    if (++iter != name.end())
+      result += ".";
+  }
+  return result;
+}
+
 void
 InteractionClass::setName(const StringVector& name)
 {
@@ -646,6 +687,188 @@ InteractionClass::insert(ParameterDefinition& parameterDefinition)
   _parameterHandleParameterMap.insert(parameterDefinition);
   _parameterNameParameterMap.insert(parameterDefinition);
   insertClassParameterFor(parameterDefinition);
+}
+
+bool InteractionClass::AddParameterFilterValues(ParameterFilterMap& filterMap, const ParameterValueVector& parameterFilters)
+{
+  bool result = false;
+  for (auto& parameterFilterValue : parameterFilters) {
+    auto existingValueMapIter = filterMap.find(parameterFilterValue.getParameterHandle());
+    if (existingValueMapIter == filterMap.end()) {
+      // parameter not filtered yet: insert list with one element ...
+      VariableLengthDataSet values;
+      values.insert(parameterFilterValue.getValue());
+      // ... into existing map
+      filterMap.insert(ParameterFilterMap::value_type(parameterFilterValue.getParameterHandle(), values));
+      //DebugPrintf("%s(%s): parameter added\n", __FUNCTION__, getFQName().c_str());
+      result = true;
+    } else {
+      // parameter already has filter: insert value to existing list of values
+      // first scan the value list if value already associated with parameter
+      VariableLengthDataSet& values = existingValueMapIter->second;
+      if (values.find(parameterFilterValue.getValue()) != values.end())
+      {
+        // value already exists - continue with next parameterFilterValue
+        continue;
+      }
+      // new value: add to list
+      existingValueMapIter->second.insert(parameterFilterValue.getValue());
+      //DebugPrintf("%s(%s): value added\n", __FUNCTION__, getFQName().c_str());
+      result = true;
+    }
+  }
+  return result;
+}
+
+bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilters)
+{
+  bool result = false;
+  if (!connectHandle.valid())
+  {
+    // given list is empty and any filter value list exists: request to remove filter
+    //_parameterFiltersByFederate.erase(where);
+    DebugPrintf("%s(%s): invalid connect handle\n", __FUNCTION__, getFQName().c_str());
+    return false;
+  }
+  auto where = _parameterFiltersByConnect.find(connectHandle);
+  if (parameterFilters.empty() /* && where != _parameterFiltersByFederate.end() */)
+  {
+    // given list is empty and any filter value list exists: request to remove filter
+    //_parameterFiltersByFederate.erase(where);
+    //DebugPrintf("%s(%s): empty filter list, connect=%s\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
+    return false;
+  }
+  else if (where == _parameterFiltersByConnect.end())
+  {
+    // connect handle not yet in filter: add
+    ParameterFilterMap newFilterMap;
+    // convert vector <ParameterHandle, Value> to map<ParameterHandle : list of Values>
+    AddParameterFilterValues(newFilterMap, parameterFilters);
+    // now associate connect handle with ParameterFilterMap constructed above
+    _parameterFiltersByConnect.insert(ParameterFilterMapByConnect::value_type(connectHandle, newFilterMap));
+    //DebugPrintf("%s(%s): added connect %s\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
+    result = true;
+  }
+  else
+  {
+    // filter already exists for given connect ...
+    auto& existingFilterValues = where->second;
+    // merge given filters into existing parameter filter map
+    result = AddParameterFilterValues(existingFilterValues, parameterFilters);
+  }
+  //Dump(__FUNCTION__, _parameterFiltersByConnect);
+  return result;
+}
+
+
+bool InteractionClass::hasFilterSubscriptions() const
+{
+  return !_parameterFiltersByConnect.empty();
+}
+
+template<typename TInputIter>
+std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercase = true, bool insert_spaces = false)
+{
+    std::ostringstream ss;
+    ss << std::hex << std::setfill('0');
+    if (use_uppercase)
+        ss << std::uppercase;
+    while (first != last)
+    {
+        ss << std::setw(2) << static_cast<int>(*first++);
+        if (insert_spaces && first != last)
+            ss << " ";
+    }
+    return ss.str();
+}
+
+// In the parameter filter set defined in _parameterFiltersByConnect, test if all parameters from parameterValues match a given value.
+// if no parameter filter is defined for connectHandle, return true (all parameters 'match').
+// If there is no parameter filter specified for any of the parameters in parameterValues, also return true.
+bool InteractionClass::isFiltered(const ConnectHandle& connectHandle, const ParameterValueVector& parameterValues) const
+{
+  auto where = _parameterFiltersByConnect.find(connectHandle);
+  if (where == _parameterFiltersByConnect.end())
+  {
+    //DebugPrintf("%s(name=%s): %s not found in filter list\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
+    return true;
+  }
+  // filter exists for given connect ...
+  const ParameterFilterMap& parameterFilterValues = where->second;
+  // match vector <ParameterHandle, Value> with existing map<ParameterHandle : list of Values>
+  // go through received parameter value vector ...
+  if (parameterFilterValues.empty())
+  {
+    //DebugPrintf("%s(name=%s): connect %s has no filter parameters\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
+    //Dump(__FUNCTION__, _parameterFiltersByConnect);
+    return true;
+  }
+  // go through all parameters specified in interaction ...
+  for (auto& parameterValue : parameterValues)
+  {
+    // ... and match parameter handles against each handle specified by filter subscriptions
+    auto parameterFilterIter = parameterFilterValues.find(parameterValue.getParameterHandle());
+    if (parameterFilterIter != parameterFilterValues.end())
+    {
+      //DebugPrintf("%s(name=%s): %s in list\n", __FUNCTION__, getFQName().c_str(), parameterValue.getParameterHandle().toString().c_str());
+      const VariableLengthData& parameterData = parameterValue.getValue();
+      // now go through each specified valid filter value for given parameter
+      const VariableLengthDataSet& values = parameterFilterIter->second;
+      if (values.find(parameterData) == values.end())
+      {
+        // value not found in set of allowed values for the current filter parameter => mismatch
+        return false;
+      }
+    }
+    // else: there is no filter for specified parameter, skip
+  }
+  // no mismatch found => match
+  return true;
+}
+
+
+ParameterValueVector InteractionClass::getParameterFilters(const ConnectHandle& connectHandle)
+{
+  ParameterValueVector result;
+  auto where = _parameterFiltersByConnect.find(connectHandle);
+  if (where != _parameterFiltersByConnect.end())
+  {
+    // filter exists for given connect ...
+    auto& parameterFilterValues = where->second;
+    for (auto& parameterFilter : parameterFilterValues)
+    {
+      for (auto& value : parameterFilter.second)
+      {
+        ParameterValue parameterValue;
+        parameterValue.setParameterHandle(parameterFilter.first);
+        parameterValue.setValue(value);
+        result.push_back(parameterValue);
+      }
+    }
+  }
+  return result;
+}
+
+void InteractionClass::Dump(const char* prefix, const VariableLengthDataSet& filterValues) const
+{
+  for (auto& parameterData : filterValues)
+  {
+    std::string dataRepr = make_hex_string(parameterData.charData(), parameterData.charData() + parameterData.size(), true, true);
+    DebugPrintf("%s(%s):     %s\n", prefix, getFQName().c_str(), dataRepr.c_str());
+  }
+}
+
+void InteractionClass::Dump(const char* prefix, const ParameterFilterMapByConnect& filterValuesByConnect) const
+{
+  for (auto& [filteredConnectHandle, parameterFilterValues] : filterValuesByConnect)
+  {
+    DebugPrintf("%s(%s): connect %s has %d filter parameters\n", prefix, getFQName().c_str(), filteredConnectHandle.toString().c_str(), parameterFilterValues.size());
+    for (auto& parameterFilter : parameterFilterValues)
+    {
+      DebugPrintf("%s(%s):   %s\n", prefix, getFQName().c_str(), parameterFilter.first.toString().c_str());
+      Dump(prefix, parameterFilter.second);
+    }
+  }
 }
 
 ParameterDefinition*
@@ -798,6 +1021,21 @@ ObjectClass::setName(const StringVector& name)
   ModuleClassEntity<ObjectClass, ObjectClassHandle>::_setString(name);
 }
 
+std::string ObjectClass::getFQName() const
+{
+  // alternatively, we could go recursively through getParentObjectClass
+  StringVector name = getName();
+  std::string result;
+  StringVector::iterator iter = name.begin();
+  while (iter != name.end())
+  {
+    result += *iter;
+    if (++iter != name.end())
+      result += ".";
+  }
+  return result;
+}
+
 void
 ObjectClass::setObjectClassHandle(const ObjectClassHandle& objectClassHandle)
 {
@@ -937,6 +1175,69 @@ ObjectClass::removeConnect(const ConnectHandle& connectHandle)
   for (ClassAttribute::HandleMap::iterator i = _attributeHandleClassAttributeMap.begin();
        i != _attributeHandleClassAttributeMap.end(); ++i)
     i->removeConnect(connectHandle);
+}
+
+// Update internal subscription list. Also considers parent classes.
+// If a particular object instance's attributes have been subscribed for the first time, return this instance
+// in objectInstanceList
+void ObjectClass::updateCumulativeSubscription(const ConnectHandle& connectHandle,
+                                               const AttributeHandle& attributeHandle,
+                                               ObjectInstanceList& objectInstanceList)
+{
+  bool parentSubscribed = false;
+  if (_parentObjectClass) {
+    ClassAttribute* classAttribute = _parentObjectClass->getClassAttribute(attributeHandle);
+    if (classAttribute)
+      if (0 != classAttribute->_cumulativeSubscribedConnectHandleSet.count(connectHandle))
+        parentSubscribed = true;
+  }
+
+  _updateCumulativeSubscription(connectHandle, attributeHandle, parentSubscribed, objectInstanceList);
+}
+
+void ObjectClass::_updateCumulativeSubscription(const ConnectHandle& connectHandle, const AttributeHandle& attributeHandle, bool subscribe /*Replace with regionset or something*/, ObjectInstanceList& objectInstanceList)
+{
+  // PRECOND: we already updated the subscription type in the class attribute
+  ClassAttribute* classAttribute = getClassAttribute(attributeHandle);
+  subscribe |= (Unsubscribed != classAttribute->getSubscriptionType(connectHandle));
+  if (!classAttribute->updateCumulativeSubscribedConnectHandleSet(connectHandle, subscribe))
+    return;
+  // Update the receiving connect handle set
+  for (ObjectClass& childObjectClass : _childObjectClassList) {
+    childObjectClass._updateCumulativeSubscription(connectHandle, attributeHandle, subscribe, objectInstanceList);
+  }
+  /// FIXME: need to walk the objects and see how the routing for the object changes
+  /// FIXME: store the object instances that are yet unknown to a connect and store these to propagate them into the connect
+  /// Hmm, here is the first good use case for a visitor
+  for (ObjectInstance::FirstList::iterator i = _objectInstanceList.begin(); i != _objectInstanceList.end(); ++i) {
+    InstanceAttribute* instanceAttribute = i->getInstanceAttribute(attributeHandle);
+    if (!instanceAttribute)
+      continue;
+
+    // Don't add the owner to the list of connect handles that receive this attribute
+    if (instanceAttribute->getOwnerConnectHandle() == connectHandle)
+      continue;
+
+    if (subscribe) {
+      // Insert the connect handle into the receiving connects
+      if (!instanceAttribute->_receivingConnects.insert(connectHandle).second)
+        continue;
+
+      // Note that we need to insert this object instance into this connect
+      if (attributeHandle == AttributeHandle(0))
+        objectInstanceList.push_back(i.get());
+
+    }
+    else {
+      // Never remove a attribute 0 subsciption as pushing the instance information may race
+      if (attributeHandle == AttributeHandle(0))
+        continue;
+
+      // Erase the connect handle from the receiving connects
+      if (instanceAttribute->_receivingConnects.erase(connectHandle) == 0)
+        continue;
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////
@@ -1630,11 +1931,11 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
 
     interactionClass->setOrderType(resolveOrderType(stringInteractionClass.getOrderType()));
     interactionClass->setTransportationType(resolveTransportationType(stringInteractionClass.getTransportationType()));
-    for (StringSet::const_iterator i = stringInteractionClass.getDimensionSet().begin();
-         i != stringInteractionClass.getDimensionSet().end(); ++i) {
-      Dimension* dimension = resolveDimension(*i);
+    for (StringSet::const_iterator dimSetIter = stringInteractionClass.getDimensionSet().begin();
+         dimSetIter != stringInteractionClass.getDimensionSet().end(); ++dimSetIter) {
+      Dimension* dimension = resolveDimension(*dimSetIter);
       if (!dimension)
-        throw InconsistentFDD("Cannot resolve dimension \"" + *i + "\"!");
+        throw InconsistentFDD("Cannot resolve dimension \"" + *dimSetIter + "\"!");
       /// FIXME avoid using the handle sets ...
       interactionClass->_dimensionHandleSet.insert(dimension->getDimensionHandle());
     }
@@ -1643,18 +1944,18 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
       module.insertParameters(*interactionClass);
 
     ParameterHandle nextParameterHandle = interactionClass->getFirstUnusedParameterHandle();
-    for (FOMStringParameterList::const_iterator i = stringInteractionClass.getParameterList().begin();
-         i != stringInteractionClass.getParameterList().end(); ++i) {
-      if (interactionClass->getParameterDefinition(i->getName())) {
+    for (FOMStringParameterList::const_iterator dimSetIter = stringInteractionClass.getParameterList().begin();
+         dimSetIter != stringInteractionClass.getParameterList().end(); ++dimSetIter) {
+      if (interactionClass->getParameterDefinition(dimSetIter->getName())) {
         std::stringstream ss;
-        ss << "Duplicate parameter name \"" << i->getName() << "\" in InteractionClass \""
+        ss << "Duplicate parameter name \"" << dimSetIter->getName() << "\" in InteractionClass \""
            << interactionClass->getName() << "\"!";
         throw InconsistentFDD(ss.str());
       }
 
       ParameterDefinition* parameterDefinition;
       parameterDefinition = new ParameterDefinition(*interactionClass);
-      parameterDefinition->setName(i->getName());
+      parameterDefinition->setName(dimSetIter->getName());
       parameterDefinition->setParameterHandle(nextParameterHandle);
       interactionClass->insert(*parameterDefinition);
 
@@ -1752,25 +2053,25 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
       module.insertAttributes(*objectClass);
 
     AttributeHandle nextAttributeHandle = objectClass->getFirstUnusedAttributeHandle();
-    for (FOMStringAttributeList::const_iterator i = stringObjectClass.getAttributeList().begin();
-         i != stringObjectClass.getAttributeList().end(); ++i) {
-      if (objectClass->getAttributeDefinition(i->getName())) {
+    for (FOMStringAttributeList::const_iterator attrListIter = stringObjectClass.getAttributeList().begin();
+         attrListIter != stringObjectClass.getAttributeList().end(); ++attrListIter) {
+      if (objectClass->getAttributeDefinition(attrListIter->getName())) {
         std::stringstream ss;
-        ss << "Duplicate attribute name \"" << i->getName() << "\" in ObjectClass \""
+        ss << "Duplicate attribute name \"" << attrListIter->getName() << "\" in ObjectClass \""
            << objectClass->getName() << "\"!";
         throw InconsistentFDD(ss.str());
       }
 
       AttributeDefinition* attributeDefinition;
       attributeDefinition = new AttributeDefinition(*objectClass);
-      attributeDefinition->setName(i->getName());
+      attributeDefinition->setName(attrListIter->getName());
       attributeDefinition->setAttributeHandle(nextAttributeHandle);
       objectClass->insert(*attributeDefinition);
 
-      attributeDefinition->setOrderType(resolveOrderType(i->getOrderType()));
-      attributeDefinition->setTransportationType(resolveTransportationType(i->getTransportationType()));
-      for (StringSet::const_iterator j = i->getDimensionSet().begin();
-           j != i->getDimensionSet().end(); ++j) {
+      attributeDefinition->setOrderType(resolveOrderType(attrListIter->getOrderType()));
+      attributeDefinition->setTransportationType(resolveTransportationType(attrListIter->getTransportationType()));
+      for (StringSet::const_iterator j = attrListIter->getDimensionSet().begin();
+           j != attrListIter->getDimensionSet().end(); ++j) {
         Dimension* dimension = resolveDimension(*j);
         if (!dimension)
           throw InconsistentFDD("Cannot resolve dimension \"" + *j + "\"!");
@@ -1833,7 +2134,7 @@ Federation::insert(const FOMStringModule& stringModule)
     throw;
   }
 
-  return ModuleHandle();
+  //UNREACHABLE: return ModuleHandle();
 }
 
 void
@@ -2460,6 +2761,7 @@ Federation::insertObjectInstance(const ObjectInstanceHandle& objectInstanceHandl
 NodeConnect::NodeConnect() :
   _isParentConnect(false)
 {
+  //DebugPrintf("%s\n", __FUNCTION__);
 }
 
 NodeConnect::~NodeConnect()
@@ -2516,6 +2818,18 @@ NodeConnect::setOptions(const StringStringListMap& options)
     _name = i->second.front();
   else
     _name.clear();
+  i = options.find("isLeaf");
+  if (i != options.end() && !i->second.empty())
+  {
+    if (i->second.front() == "true") 
+    {
+      HandleMap::Hook::getModifiableKey().setLeafConnect(true);
+    }
+  }
+  else
+  {
+    _name.clear();
+  }
 }
 
 void
@@ -2577,10 +2891,13 @@ Node::getNodeConnect(const ConnectHandle& connectHandle)
 }
 
 NodeConnect*
-Node::insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
+Node::insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName)
 {
   NodeConnect* nodeConnect = new NodeConnect;
+  nodeConnect->setName(connectName);
+  // >>> ### THIS ALLOCATES THE CONNECT HANDLE ###
   insert(*nodeConnect);
+  // <<< ### THIS ALLOCATES THE CONNECT HANDLE ###
   nodeConnect->setMessageSender(messageSender);
   nodeConnect->setOptions(options);
   return nodeConnect;
@@ -2590,16 +2907,20 @@ NodeConnect*
 Node::insertParentNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
 {
   OpenRTIAssert(!_parentConnectHandle.valid());
-  NodeConnect* nodeConnect = insertNodeConnect(messageSender, options);
+  NodeConnect* nodeConnect = insertNodeConnect(messageSender, options, "ParentNodeConnect");
   nodeConnect->setIsParentConnect(true);
   _parentConnectHandle = nodeConnect->getConnectHandle();
+  //DebugPrintf("%s: _parentConnectHandle=%s\n", __FUNCTION__, _parentConnectHandle.toString().c_str());
   return nodeConnect;
 }
 
 void
 Node::insert(NodeConnect& nodeConnect)
 {
-  nodeConnect.setConnectHandle(_connectHandleAllocator.getOrTake(nodeConnect.getConnectHandle()));
+  ConnectHandle newConnectHandle = _connectHandleAllocator.getOrTake(nodeConnect.getConnectHandle());
+  newConnectHandle.setName(nodeConnect.getName());
+  //DebugPrintf("%s: newConnectHandle=%s\n", __FUNCTION__, newConnectHandle.toString().c_str());
+  nodeConnect.setConnectHandle(newConnectHandle);
   _connectHandleNodeConnectMap.insert(nodeConnect);
 }
 
@@ -2704,11 +3025,12 @@ Node::broadcast(const SharedPtr<const AbstractMessage>& message)
 void
 Node::broadcast(const ConnectHandle& connectHandle, const SharedPtr<const AbstractMessage>& message)
 {
-  for (NodeConnect::HandleMap::iterator i = _connectHandleNodeConnectMap.begin();
-       i != _connectHandleNodeConnectMap.end(); ++i) {
-    if (i->getConnectHandle() == connectHandle)
+  //for (NodeConnect::HandleMap::iterator i = _connectHandleNodeConnectMap.begin();
+  //     i != _connectHandleNodeConnectMap.end(); ++i) {
+  for (auto& connect : _connectHandleNodeConnectMap) {
+    if (connect.getConnectHandle() == connectHandle)
       continue;
-    i->send(message);
+    connect.send(message);
   }
 }
 

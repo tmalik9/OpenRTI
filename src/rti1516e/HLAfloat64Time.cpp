@@ -26,6 +26,10 @@
 #include "ValueImplementation.h"
 #include "RTI/time/HLAfloat64Interval.h"
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 namespace rti1516e {
 
 DECLARE_VALUE_IMPLEMENTATION(HLAfloat64TimeImpl, double)
@@ -86,7 +90,7 @@ static inline bool isNaN(const double& fedTime)
 
 static inline double nextAfter(const double& logicalTime, const double& direction)
 {
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   return std::nextafter(logicalTime, direction);
 #elif defined _WIN32
   return _nextafter(logicalTime, direction);
@@ -149,7 +153,6 @@ HLAfloat64Time::isFinal() const
 
 LogicalTime&
 HLAfloat64Time::operator=(const LogicalTime& logicalTime)
-  throw (InvalidLogicalTime)
 {
   HLAfloat64TimeImpl::assign(_impl, toHLAfloat64Time(logicalTime)._impl);
   return *this;
@@ -157,7 +160,6 @@ HLAfloat64Time::operator=(const LogicalTime& logicalTime)
 
 LogicalTime&
 HLAfloat64Time::operator+=(const LogicalTimeInterval& logicalTimeInterval)
-  throw (IllegalTimeArithmetic, InvalidLogicalTimeInterval)
 {
   double interval = toHLAfloat64Interval(logicalTimeInterval).getInterval();
   if (isNaN(interval))
@@ -187,7 +189,6 @@ HLAfloat64Time::operator+=(const LogicalTimeInterval& logicalTimeInterval)
 
 LogicalTime&
 HLAfloat64Time::operator-=(const LogicalTimeInterval& logicalTimeInterval)
-  throw (IllegalTimeArithmetic, InvalidLogicalTimeInterval)
 {
   double interval = toHLAfloat64Interval(logicalTimeInterval).getInterval();
   if (isNaN(interval))
@@ -217,7 +218,6 @@ HLAfloat64Time::operator-=(const LogicalTimeInterval& logicalTimeInterval)
 
 bool
 HLAfloat64Time::operator>(const LogicalTime& logicalTime) const
-  throw (InvalidLogicalTime)
 {
   double left = HLAfloat64TimeImpl::getValue(_impl);
   if (isNaN(left))
@@ -230,7 +230,6 @@ HLAfloat64Time::operator>(const LogicalTime& logicalTime) const
 
 bool
 HLAfloat64Time::operator<(const LogicalTime& logicalTime) const
-    throw (InvalidLogicalTime)
 {
   double left = HLAfloat64TimeImpl::getValue(_impl);
   if (isNaN(left))
@@ -243,7 +242,6 @@ HLAfloat64Time::operator<(const LogicalTime& logicalTime) const
 
 bool
 HLAfloat64Time::operator==(const LogicalTime& logicalTime) const
-    throw (InvalidLogicalTime)
 {
   double left = HLAfloat64TimeImpl::getValue(_impl);
   if (isNaN(left))
@@ -256,7 +254,6 @@ HLAfloat64Time::operator==(const LogicalTime& logicalTime) const
 
 bool
 HLAfloat64Time::operator>=(const LogicalTime& logicalTime) const
-    throw (InvalidLogicalTime)
 {
   double left = HLAfloat64TimeImpl::getValue(_impl);
   if (isNaN(left))
@@ -269,7 +266,6 @@ HLAfloat64Time::operator>=(const LogicalTime& logicalTime) const
 
 bool
 HLAfloat64Time::operator<=(const LogicalTime& logicalTime) const
-    throw (InvalidLogicalTime)
 {
   double left = HLAfloat64TimeImpl::getValue(_impl);
   if (isNaN(left))
@@ -296,7 +292,6 @@ HLAfloat64Time::encodedLength() const
 
 size_t
 HLAfloat64Time::encode(void* buffer, size_t bufferSize) const
-    throw (CouldNotEncode)
 {
   if (bufferSize < 8)
     throw CouldNotEncode(L"Buffer size too short!");
@@ -319,7 +314,6 @@ HLAfloat64Time::encode(void* buffer, size_t bufferSize) const
 
 void
 HLAfloat64Time::decode(const VariableLengthData& variableLengthData)
-    throw (InternalError, CouldNotDecode)
 {
   OpenRTI::VariableLengthData data = VariableLengthDataFriend::readPointer(variableLengthData);
   if (data.size() < 8)
@@ -329,7 +323,6 @@ HLAfloat64Time::decode(const VariableLengthData& variableLengthData)
 
 void
 HLAfloat64Time::decode(void* buffer, size_t bufferSize)
-    throw (InternalError, CouldNotDecode)
 {
   if (bufferSize < 8)
     throw CouldNotDecode(L"Buffer size too short!");
@@ -377,7 +370,6 @@ HLAfloat64Time::setTime(double value)
 
 HLAfloat64Time&
 HLAfloat64Time::operator=(const HLAfloat64Time& float64Time)
-  throw (InvalidLogicalTime)
 {
   HLAfloat64TimeImpl::assign(_impl, float64Time._impl);
   return *this;

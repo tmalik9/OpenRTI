@@ -30,251 +30,227 @@
 #include "Exception.h"
 #include "LogStream.h"
 #include "SocketPrivateDataWin32.h"
+#include "AbstractNetworkStatistics.h"
+
+#pragma comment(lib, "ws2_32.lib")
 
 namespace OpenRTI {
 
-static void
-nonblocking_pipe(SOCKET pipeFd[2])
+struct SocketEventDispatcher::PrivateData
 {
-  // Build up an ipv4 socket, and connect immediately.
-  SOCKET listener = socket(AF_INET, SOCK_STREAM, 0);
-  if (listener == INVALID_SOCKET) {
-    int errorNumber = WSAGetLastError();
-    throw TransportError(errnoToUtf8(errorNumber));
-  }
+    PrivateData()
+      : _wakeupEvent(WSA_INVALID_EVENT)
+    {
+      WSADATA wsaData;
+      if (WSAStartup(MAKEWORD(2, 2), &wsaData))
+      {
+        throw TransportError("Could not initialize windows sockets!");
+      }
+      if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
+      {
+        WSACleanup();
+        throw TransportError("Could not initialize windows sockets 2.2!");
+      }
 
-  struct sockaddr_in addr;
-  int addrlen = sizeof(addr);
-  memset(&addr, 0, sizeof(addr));
-  addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = htonl(0x7f000001);
-  addr.sin_port = 0;
+      _wakeupEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+      _wokenUp = false;
+    }
 
-  int ret = bind(listener, (const struct sockaddr*)&addr, sizeof(addr));
-  if (ret == SOCKET_ERROR) {
-    int errorNumber = WSAGetLastError();
-    closesocket(listener);
-    throw TransportError(errnoToUtf8(errorNumber));
-  }
-  ret = getsockname(listener, (struct sockaddr*)&addr, &addrlen);
-  if (ret == SOCKET_ERROR) {
-    int errorNumber = WSAGetLastError();
-    closesocket(listener);
-    throw TransportError(errnoToUtf8(errorNumber));
-  }
-
-  // Note that this 'listen for exactly 1 connect' is the key to prevent a
-  // hijacked socket. It will just fail in this case
-  if (listen(listener, 1) == SOCKET_ERROR) {
-    int errorNumber = WSAGetLastError();
-    closesocket(listener);
-    throw TransportError(errnoToUtf8(errorNumber));
-  }
-  pipeFd[0] = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, 0);
-  if (pipeFd[0] == INVALID_SOCKET) {
-    int errorNumber = WSAGetLastError();
-    closesocket(listener);
-    throw TransportError(errnoToUtf8(errorNumber));
-  }
-  if (::connect(pipeFd[0], (const struct sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
-    int errorNumber = WSAGetLastError();
-    closesocket(pipeFd[0]);
-    closesocket(listener);
-    throw TransportError(errnoToUtf8(errorNumber));
-  }
-  pipeFd[1] = accept(listener, NULL, NULL);
-  if (pipeFd[1] == INVALID_SOCKET) {
-    int errorNumber = WSAGetLastError();
-    closesocket(pipeFd[0]);
-    closesocket(listener);
-    throw TransportError(errnoToUtf8(errorNumber));
-  }
-  closesocket(listener);
-
-  // Switch to nonblocking io
-  u_long mode = 1;
-  ret = ::ioctlsocket(pipeFd[0], FIONBIO, &mode);
-  if (ret == SOCKET_ERROR) {
-    int errorNumber = WSAGetLastError();
-    ::closesocket(pipeFd[0]);
-    ::closesocket(pipeFd[1]);
-    throw TransportError(errnoToUtf8(errorNumber));
-  }
-
-  ret = ::ioctlsocket(pipeFd[1], FIONBIO, &mode);
-  if (ret == SOCKET_ERROR) {
-    int errorNumber = WSAGetLastError();
-    ::closesocket(pipeFd[0]);
-    ::closesocket(pipeFd[1]);
-    throw TransportError(errnoToUtf8(errorNumber));
-  }
-}
-
-struct SocketEventDispatcher::PrivateData {
-  PrivateData() :
-    _wakeupReadSocket(INVALID_SOCKET),
-    _wakeupWriteSocket(INVALID_SOCKET)
-  {
-    WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData))
-      throw TransportError("Could not initialize windows sockets!");
-    if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
+    ~PrivateData()
+    {
+      CloseHandle(_wakeupEvent);
       WSACleanup();
-      throw TransportError("Could not initialize windows sockets 2.2!");
     }
 
-    SOCKET pipeSocket[2] = {INVALID_SOCKET, INVALID_SOCKET};
-    nonblocking_pipe(pipeSocket);
-    _wakeupReadSocket = pipeSocket[0];
-    _wakeupWriteSocket = pipeSocket[1];
-  }
-  ~PrivateData()
-  {
-    if (_wakeupReadSocket != INVALID_SOCKET) {
-      closesocket(_wakeupReadSocket);
-      _wakeupReadSocket = INVALID_SOCKET;
-    }
-    if (_wakeupWriteSocket != INVALID_SOCKET) {
-      closesocket(_wakeupWriteSocket);
-      _wakeupWriteSocket = INVALID_SOCKET;
-    }
-    WSACleanup();
-  }
+    int exec(SocketEventDispatcher& dispatcher, const Clock& absclock)
+    {
+      int retv = 0;
+      //HANDLE unlockedEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+      while (!dispatcher._done)
+      {
+        Clock absTimeout = absclock;
+        bool doWait = true;
+        std::vector<SharedPtr<AbstractSocketEvent>> sockets;
+        sockets.reserve(dispatcher._socketEventList.size());
 
-  int exec(SocketEventDispatcher& dispatcher, const Clock& absclock)
-  {
-    int retv = 0;
+        std::vector<HANDLE> notificationEvents;
+        notificationEvents.reserve(dispatcher._socketEventList.size() + 1);
 
-    while (!dispatcher._done) {
-      fd_set readfds;
-      fd_set writefds;
-      fd_set exceptfds;
-      FD_ZERO(&readfds);
-      FD_ZERO(&writefds);
-      FD_ZERO(&exceptfds);
-
-      Clock timeout = absclock;
-
-      int nfds = -1;
-      for (SocketEventList::const_iterator i = dispatcher._socketEventList.begin(); i != dispatcher._socketEventList.end(); ++i) {
-        AbstractSocketEvent* socketEvent = i->get();
-        if (socketEvent->getTimeout() < timeout)
-          timeout = socketEvent->getTimeout();
-        Socket* abstractSocket = socketEvent->getSocket();
-        if (!abstractSocket)
-           continue;
-        SOCKET socket = abstractSocket->_privateData->_socket;
-        if (socket == INVALID_SOCKET)
-          continue;
-        if (socket == SOCKET_ERROR)
-          continue;
-        if (socketEvent->getEnableRead()) {
-          FD_SET(socket, &readfds);
-          if (nfds < int(socket))
-            nfds = int(socket);
-        }
-        if (socketEvent->getEnableWrite()) {
-          FD_SET(socket, &writefds);
-          // In case of a failed connect we get the exception
-          FD_SET(socket, &exceptfds);
-          if (nfds < int(socket))
-            nfds = int(socket);
-        }
-      }
-
-      FD_SET(_wakeupReadSocket, &readfds);
-      if (nfds < int(_wakeupReadSocket))
-        nfds = int(_wakeupReadSocket);
-
-      int count;
-      if (timeout < Clock::max()) {
-        Clock now = Clock::now();
-        if (timeout < now) {
-          count = 0;
-          FD_ZERO(&readfds);
-          FD_ZERO(&writefds);
-          FD_ZERO(&exceptfds);
-        } else {
-          struct timeval timeval = ClockWin32::toTimeval((timeout - now).getNSec());
-          count = ::select(nfds + 1, &readfds, &writefds, &exceptfds, &timeval);
-        }
-      } else {
-        count = ::select(nfds + 1, &readfds, &writefds, &exceptfds, 0);
-      }
-      if (count == -1) {
-        int errorNumber = WSAGetLastError();
-        if (errorNumber != EINTR && errorNumber != EAGAIN) {
-          retv = -1;
-          break;
-        } else {
-          count = 0;
-          FD_ZERO(&readfds);
-          FD_ZERO(&writefds);
-          FD_ZERO(&exceptfds);
-        }
-      }
-      // Timeout
-      Clock now = Clock::now();
-      if (absclock <= now) {
-        retv = 0;
-        break;
-      }
-
-      for (SocketEventList::const_iterator i = dispatcher._socketEventList.begin(); i != dispatcher._socketEventList.end();) {
-        SharedPtr<AbstractSocketEvent> socketEvent = *i;
-        ++i;
-        Socket* abstractSocket = socketEvent->getSocket();
-        if (abstractSocket) {
+        for (SocketEventList::const_iterator i = dispatcher._socketEventList.begin(); i != dispatcher._socketEventList.end(); ++i)
+        {
+          AbstractSocketEvent* socketEvent = i->get();
+          if (socketEvent->getTimeout() < absTimeout)
+          {
+            absTimeout = socketEvent->getTimeout();
+          }
+          Socket* abstractSocket = socketEvent->getSocket();
+          if (!abstractSocket)
+          {
+            continue;
+          }
           SOCKET socket = abstractSocket->_privateData->_socket;
-          if (socket != INVALID_SOCKET && socket != SOCKET_ERROR) {
-            if (FD_ISSET(socket, &readfds))
-              dispatcher.read(socketEvent);
-            if (FD_ISSET(socket, &writefds) || FD_ISSET(socket, &exceptfds))
+          if (socket == INVALID_SOCKET)
+          {
+            continue;
+          }
+          if (socket == SOCKET_ERROR)
+          {
+            continue;
+          }
+
+          if (socketEvent->getEnableWrite())
+          {
+            if (socketEvent->getSocket()->isWritable())
+            {
+              // The socket has data to write, and hasn't been marked as blocking by a previous call to write -
+              // jump right into write() again and restart the outer loop after having processed all sockets
               dispatcher.write(socketEvent);
+              doWait = false;
+            }
+            else
+            {
+              // The socket has data to write, but either write has not been called before, or the previous
+              // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
+              // to survey 
+              sockets.push_back(*i);
+              notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
+            }
+          }
+          else if (socketEvent->getEnableRead())
+          {
+            sockets.push_back(*i);
+            notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
           }
         }
-        if (socketEvent->getTimeout() <= now)
-          dispatcher.timeout(socketEvent);
+
+        if (!doWait) continue;
+
+        notificationEvents.push_back(_wakeupEvent);
+
+        uint32_t timeoutMs = INFINITE;
+        if (absTimeout < Clock::max())
+        {
+          Clock now = Clock::now();
+          if (absTimeout < now)
+          {
+            retv = 0;
+            break;
+          }
+          else
+          {
+            timeoutMs = static_cast<uint32_t>((absTimeout - now).getNSec() / 1000ULL);
+          }
+        }
+
+        DWORD waitResult = WSAWaitForMultipleEvents(static_cast<DWORD>(notificationEvents.size()), notificationEvents.data(), FALSE, timeoutMs, FALSE);
+        if (waitResult == WAIT_FAILED)
+        {
+          DWORD lastError = GetLastError();
+          LPVOID lpMsgBuf;
+
+          FormatMessageW(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            lastError,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&lpMsgBuf,
+            0, NULL);
+          DebugPrintf("%s: %S\n", __FUNCTION__, lpMsgBuf);
+          LocalFree(lpMsgBuf);
+          DebugPrintf("%s: %d handles:\n", __FUNCTION__, notificationEvents.size());
+          for (size_t i = 0; i < notificationEvents.size(); i++)
+          {
+            DebugPrintf("%s: i: 0x%08x:\n", __FUNCTION__, i, notificationEvents.data()[i]);
+          }
+          retv = -1;
+          break;
+        }
+
+        // Timeout
+        Clock now = Clock::now();
+        if (absclock <= now || waitResult == WAIT_TIMEOUT)
+        {
+          retv = 0;
+          break;
+        }
+
+        if (waitResult >= WAIT_OBJECT_0 && waitResult < WAIT_OBJECT_0 + notificationEvents.size())
+        {
+          for (uint32_t index = waitResult - WAIT_OBJECT_0; index < notificationEvents.size() - 1; index++)
+          {
+            SharedPtr<AbstractSocketEvent> socketEvent = sockets[index];
+            Socket* abstractSocket = socketEvent->getSocket();
+            if (abstractSocket)
+            {
+              SOCKET socketHandle = abstractSocket->_privateData->_socket;
+              HANDLE notificationEvent = abstractSocket->_privateData->_notificationEvent;
+
+              WSANETWORKEVENTS networkEvents;
+              memset(&networkEvents, 0, sizeof(networkEvents));
+              int rc = WSAEnumNetworkEvents(socketHandle, notificationEvent, &networkEvents);
+              if (rc == SOCKET_ERROR)
+              {
+                DebugPrintf("%s: wsaError=%d\n", __FUNCTION__, WSAGetLastError());
+                return 0;
+              }
+              if (networkEvents.lNetworkEvents & FD_READ)
+              {
+                dispatcher.read(socketEvent);
+              }
+              if (networkEvents.lNetworkEvents & FD_WRITE)
+              {
+                socketEvent->getSocket()->setWriteable();
+              }
+              if (socketEvent->getSocket()->isWritable())
+              {
+                dispatcher.write(socketEvent);
+              }
+
+              if (networkEvents.lNetworkEvents & FD_CLOSE)
+              {
+                dispatcher.write(socketEvent);
+              }
+              if (networkEvents.lNetworkEvents & FD_ACCEPT)
+              {
+                dispatcher.read(socketEvent);
+              }
+              if (socketEvent->getTimeout() <= now)
+              {
+                dispatcher.timeout(socketEvent);
+              }
+            }
+          }
+
+          bool expected = true;
+          if (_wokenUp.compare_exchange_weak(expected, false, std::memory_order_acq_rel))
+          {
+            retv = 0;
+            break;
+          }
+        }
       }
-      if (FD_ISSET(_wakeupReadSocket, &readfds)) {
-        char dummy[64];
-        while (0 < ::recv(_wakeupReadSocket, dummy, sizeof(dummy), 0));
-        if (!_wokenUp.compareAndExchange(1, 0, Atomic::MemoryOrderAcqRel))
-          Log(Network, Warning) << "Having something to read from the wakeup pipe, but the flag is not set?" << std::endl;
-        retv = 0;
-        break;
-      }
+
+      //DebugPrintf("<<< %s: retv=%d\n", __FUNCTION__, retv);
+      return retv;
     }
 
-    return retv;
-  }
-
-  void wakeUp()
-  {
-    // Check if we already have a wakeup pending
-    if (!_wokenUp.compareAndExchange(0, 1, Atomic::MemoryOrderAcqRel))
-      return;
-    // No, the first one, write to the pipe
-    char data = 1;
-    for (;;) {
-      ssize_t ret = ::send(_wakeupWriteSocket, &data, sizeof(data), 0);
-      if (ret == 1)
-        break;
-      // We should not get EAGAIN here, since we only write the first time to wake up,
-      // but be paranoid.
-      if (ret == 0)
-        continue;
-      int errorNumber = WSAGetLastError();
-      if (ret == -1 && (errorNumber == EAGAIN || errorNumber == EINTR))
-        continue;
-      throw TransportError(errnoToUtf8(errorNumber));
+    void wakeUp()
+    {
+      // Check if we already have a wakeup pending
+      bool expected = false;
+      if (!_wokenUp.compare_exchange_weak(expected, true, std::memory_order_acq_rel))
+      {
+        return;
+      }
+      // No, the first one, actually wake up the networking thread
+      SetEvent(_wakeupEvent);
     }
-  }
 
-private:
-  Atomic _wokenUp;
-  SOCKET _wakeupReadSocket;
-  SOCKET _wakeupWriteSocket;
+  private:
+    std::atomic_bool _wokenUp;
+    HANDLE _wakeupEvent;
 };
 
 SocketEventDispatcher::SocketEventDispatcher() :

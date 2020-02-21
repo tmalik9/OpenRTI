@@ -18,8 +18,7 @@ namespace rti1516
     RangeBounds(unsigned long lowerBound,
                 unsigned long upperBound);
 
-    ~RangeBounds()
-      throw ();
+    ~RangeBounds();
 
     RangeBounds(RangeBounds const & rhs);
 

@@ -8,3 +8,6 @@ install_manifest.txt
 Testing
 .gdb_history
 *~
+.vs
+Obj32
+Obj64

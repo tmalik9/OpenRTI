@@ -47,8 +47,8 @@ protected:
   virtual void run();
 
 private:
-  LeafServerThread(const LeafServerThread&);
-  LeafServerThread& operator=(const LeafServerThread&);
+  LeafServerThread(const LeafServerThread&) = delete;
+  LeafServerThread& operator=(const LeafServerThread&) = delete;
 
   /// Store the server threads available per url
   typedef std::map<URL, SharedPtr<LeafServerThread> > UrlServerMap;

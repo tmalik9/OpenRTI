@@ -22,7 +22,12 @@
 
 #include "Export.h"
 #include "ScopeLock.h"
-#if 201103L <= __cplusplus
+
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
+#if 201103L <= __CPlusPlusStd
 # include <condition_variable>
 # include "Clock.h"
 # include "Mutex.h"
@@ -35,44 +40,44 @@ class ScopeLock;
 
 class OPENRTI_API Condition {
 public:
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   Condition(void)
   { }
 #else
   Condition(void);
 #endif
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   ~Condition(void)
   { }
 #else
   ~Condition(void);
 #endif
 
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   void notify_one(void)
   { _condition.notify_one(); }
 #else
   void notify_one(void);
 #endif
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   void notify_all(void)
   { _condition.notify_all(); }
 #else
   void notify_all(void);
 #endif
 
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   void wait(ScopeLock& scopeLock)
   { _condition.wait(scopeLock); }
 #else
   void wait(ScopeLock& scopeLock);
 #endif
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   bool wait_until(ScopeLock& scopeLock, const Clock& timeout)
   {
     // Try to prevent overflow
     std::chrono::nanoseconds nsec;
-    if (timeout.getNSec() <= std::chrono::nanoseconds::max().count())
+    if (timeout.getNSec() <= (uint64_t)std::chrono::nanoseconds::max().count())
       nsec = std::chrono::nanoseconds(timeout.getNSec());
     else
       nsec = std::chrono::nanoseconds::max();
@@ -92,10 +97,10 @@ public:
 #endif
 
 private:
-  Condition(const Condition&);
-  Condition& operator=(const Condition&);
+  Condition(const Condition&) = delete;
+  Condition& operator=(const Condition&) = delete;
 
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
   std::condition_variable _condition;
 #else
   struct PrivateData;

@@ -91,6 +91,7 @@ public:
   void acceptInternalMessage(const ChangeObjectClassPublicationMessage& message);
   void acceptInternalMessage(const ChangeInteractionClassSubscriptionMessage& message);
   void acceptInternalMessage(const ChangeObjectClassSubscriptionMessage& message);
+  void acceptInternalMessage(const ChangeObjectInstanceSubscriptionMessage& message);
   void acceptInternalMessage(const RegistrationForObjectClassMessage& message);
   void acceptInternalMessage(const TurnInteractionsOnMessage& message);
   void acceptInternalMessage(const InteractionMessage& message);
@@ -138,6 +139,11 @@ public:
       _callbackMessageList.splice(_callbackMessageList.end(), _messageListPool, _messageListPool.begin());
       _callbackMessageList.back() = message;
     }
+    if (_notificationHandle != nullptr)
+    {
+      //CondDebugPrintf("%s(TID=%d): _notificationHandle=%p\n", __FUNCTION__, GetCurrentThreadId(), _notificationHandle.get());
+      _notificationHandle->Signal();
+    }
   }
   void queueCallback(const AbstractMessage& message)
   {
@@ -147,16 +153,27 @@ public:
       _callbackMessageList.splice(_callbackMessageList.end(), _messageListPool, _messageListPool.begin());
       _callbackMessageList.back() = &message;
     }
+    if (_notificationHandle != nullptr)
+    {
+      //CondDebugPrintf("%s(TID=%d): _notificationHandle=%p\n", __FUNCTION__, GetCurrentThreadId(), _notificationHandle.get());
+      _notificationHandle->Signal();
+    }
   }
-  void queueTimeStampedMessage(const VariableLengthData& timeStamp, const AbstractMessage& message);
+  void queueTimeStampedMessage(const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback=false);
   void queueReceiveOrderMessage(const AbstractMessage& message);
 
   bool _dispatchCallbackMessage(AbstractMessageDispatcher& messageDispatcher);
   bool _callbackMessageAvailable();
 
+protected:
+  void _setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h);
+  std::shared_ptr<AbstractNotificationHandle> _getNotificationHandle()
+  {
+    return _notificationHandle;
+  }
 private:
-  InternalAmbassador(const InternalAmbassador&);
-  InternalAmbassador& operator=(const InternalAmbassador&);
+  InternalAmbassador(const InternalAmbassador&) = delete;
+  InternalAmbassador& operator=(const InternalAmbassador&) = delete;
 
   class _InternalMessageDispatchFunctor;
   class _CreateFederationExecutionFunctor;
@@ -173,6 +190,8 @@ private:
 
   // List elements for reuse
   MessageList _messageListPool;
+
+  std::shared_ptr<AbstractNotificationHandle> _notificationHandle;
 };
 
 } // namespace OpenRTI

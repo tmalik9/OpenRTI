@@ -32,13 +32,10 @@ namespace rti1516e
    public:
       RTIambassadorFactory();
 
-      virtual ~RTIambassadorFactory()
-         throw ();
+      virtual ~RTIambassadorFactory();
 
       // 10.35
-      std::auto_ptr< RTIambassador > createRTIambassador ()
-         throw (
-            RTIinternalError);
+      std::unique_ptr< RTIambassador > createRTIambassador ();
    };
 }
 

@@ -31,6 +31,10 @@
 #include "Handle.h"
 #include "VariableLengthData.h"
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 namespace OpenRTI {
 
 enum CallbackModel {
@@ -338,6 +342,7 @@ class ChangeInteractionClassPublicationMessage;
 class ChangeObjectClassPublicationMessage;
 class ChangeInteractionClassSubscriptionMessage;
 class ChangeObjectClassSubscriptionMessage;
+class ChangeObjectInstanceSubscriptionMessage;
 class RegistrationForObjectClassMessage;
 class AttributesInScopeMessage;
 class TurnUpdatesOnForInstanceMessage;
@@ -399,7 +404,7 @@ public:
   { }
   void setLowerBound(const Unsigned& value)
   { _lowerBound = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLowerBound(Unsigned&& value)
   { _lowerBound = std::move(value); }
 #endif
@@ -410,7 +415,7 @@ public:
 
   void setUpperBound(const Unsigned& value)
   { _upperBound = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setUpperBound(Unsigned&& value)
   { _upperBound = std::move(value); }
 #endif
@@ -481,7 +486,7 @@ public:
   { }
   void setAttributeHandle(const AttributeHandle& value)
   { _attributeHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeHandle(AttributeHandle&& value)
   { _attributeHandle = std::move(value); }
 #endif
@@ -528,7 +533,7 @@ public:
   { }
   void setParameterHandle(const ParameterHandle& value)
   { _parameterHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setParameterHandle(ParameterHandle&& value)
   { _parameterHandle = std::move(value); }
 #endif
@@ -539,7 +544,7 @@ public:
 
   void setValue(const VariableLengthData& value)
   { _value = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setValue(VariableLengthData&& value)
   { _value = std::move(value); }
 #endif
@@ -591,7 +596,7 @@ public:
   { }
   void setAttributeHandle(const AttributeHandle& value)
   { _attributeHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeHandle(AttributeHandle&& value)
   { _attributeHandle = std::move(value); }
 #endif
@@ -602,7 +607,7 @@ public:
 
   void setValue(const VariableLengthData& value)
   { _value = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setValue(VariableLengthData&& value)
   { _value = std::move(value); }
 #endif
@@ -662,7 +667,7 @@ public:
   { }
   void setFederationExecutionName(const String& value)
   { _federationExecutionName = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationExecutionName(String&& value)
   { _federationExecutionName = std::move(value); }
 #endif
@@ -673,7 +678,7 @@ public:
 
   void setLogicalTimeFactoryName(const String& value)
   { _logicalTimeFactoryName = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLogicalTimeFactoryName(String&& value)
   { _logicalTimeFactoryName = std::move(value); }
 #endif
@@ -730,7 +735,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -799,7 +804,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -810,7 +815,7 @@ public:
 
   void setUpperBound(const Unsigned& value)
   { getImpl()._upperBound = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setUpperBound(Unsigned&& value)
   { getImpl()._upperBound = std::move(value); }
 #endif
@@ -884,7 +889,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -895,7 +900,7 @@ public:
 
   void setDimensionSet(const StringSet& value)
   { getImpl()._dimensionSet = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDimensionSet(StringSet&& value)
   { getImpl()._dimensionSet = std::move(value); }
 #endif
@@ -969,7 +974,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -1038,7 +1043,7 @@ public:
   { }
   void setName(const StringVector& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(StringVector&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -1049,7 +1054,7 @@ public:
 
   void setOrderType(const String& value)
   { getImpl()._orderType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setOrderType(String&& value)
   { getImpl()._orderType = std::move(value); }
 #endif
@@ -1060,7 +1065,7 @@ public:
 
   void setTransportationType(const String& value)
   { getImpl()._transportationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationType(String&& value)
   { getImpl()._transportationType = std::move(value); }
 #endif
@@ -1071,7 +1076,7 @@ public:
 
   void setRoutingSpace(const String& value)
   { getImpl()._routingSpace = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRoutingSpace(String&& value)
   { getImpl()._routingSpace = std::move(value); }
 #endif
@@ -1082,7 +1087,7 @@ public:
 
   void setDimensionSet(const StringSet& value)
   { getImpl()._dimensionSet = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDimensionSet(StringSet&& value)
   { getImpl()._dimensionSet = std::move(value); }
 #endif
@@ -1093,7 +1098,7 @@ public:
 
   void setParameterList(const FOMStringParameterList& value)
   { getImpl()._parameterList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setParameterList(FOMStringParameterList&& value)
   { getImpl()._parameterList = std::move(value); }
 #endif
@@ -1187,7 +1192,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -1198,7 +1203,7 @@ public:
 
   void setOrderType(const String& value)
   { getImpl()._orderType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setOrderType(String&& value)
   { getImpl()._orderType = std::move(value); }
 #endif
@@ -1209,7 +1214,7 @@ public:
 
   void setTransportationType(const String& value)
   { getImpl()._transportationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationType(String&& value)
   { getImpl()._transportationType = std::move(value); }
 #endif
@@ -1220,7 +1225,7 @@ public:
 
   void setRoutingSpace(const String& value)
   { getImpl()._routingSpace = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRoutingSpace(String&& value)
   { getImpl()._routingSpace = std::move(value); }
 #endif
@@ -1231,7 +1236,7 @@ public:
 
   void setDimensionSet(const StringSet& value)
   { getImpl()._dimensionSet = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDimensionSet(StringSet&& value)
   { getImpl()._dimensionSet = std::move(value); }
 #endif
@@ -1320,7 +1325,7 @@ public:
   { }
   void setName(const StringVector& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(StringVector&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -1331,7 +1336,7 @@ public:
 
   void setAttributeList(const FOMStringAttributeList& value)
   { getImpl()._attributeList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeList(FOMStringAttributeList&& value)
   { getImpl()._attributeList = std::move(value); }
 #endif
@@ -1405,7 +1410,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -1416,7 +1421,7 @@ public:
 
   void setRate(const Double& value)
   { getImpl()._rate = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRate(Double&& value)
   { getImpl()._rate = std::move(value); }
 #endif
@@ -1490,7 +1495,7 @@ public:
   { }
   void setSwitchesType(const SwitchesType& value)
   { getImpl()._switchesType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSwitchesType(SwitchesType&& value)
   { getImpl()._switchesType = std::move(value); }
 #endif
@@ -1501,7 +1506,7 @@ public:
 
   void setEnabled(const Bool& value)
   { getImpl()._enabled = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setEnabled(Bool&& value)
   { getImpl()._enabled = std::move(value); }
 #endif
@@ -1575,7 +1580,7 @@ public:
   { }
   void setContent(const String& value)
   { getImpl()._content = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setContent(String&& value)
   { getImpl()._content = std::move(value); }
 #endif
@@ -1586,7 +1591,7 @@ public:
 
   void setTransportationTypeList(const FOMStringTransportationTypeList& value)
   { getImpl()._transportationTypeList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationTypeList(FOMStringTransportationTypeList&& value)
   { getImpl()._transportationTypeList = std::move(value); }
 #endif
@@ -1597,7 +1602,7 @@ public:
 
   void setDimensionList(const FOMStringDimensionList& value)
   { getImpl()._dimensionList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDimensionList(FOMStringDimensionList&& value)
   { getImpl()._dimensionList = std::move(value); }
 #endif
@@ -1608,7 +1613,7 @@ public:
 
   void setRoutingSpaceList(const FOMStringRoutingSpaceList& value)
   { getImpl()._routingSpaceList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRoutingSpaceList(FOMStringRoutingSpaceList&& value)
   { getImpl()._routingSpaceList = std::move(value); }
 #endif
@@ -1619,7 +1624,7 @@ public:
 
   void setInteractionClassList(const FOMStringInteractionClassList& value)
   { getImpl()._interactionClassList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setInteractionClassList(FOMStringInteractionClassList&& value)
   { getImpl()._interactionClassList = std::move(value); }
 #endif
@@ -1630,7 +1635,7 @@ public:
 
   void setObjectClassList(const FOMStringObjectClassList& value)
   { getImpl()._objectClassList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectClassList(FOMStringObjectClassList&& value)
   { getImpl()._objectClassList = std::move(value); }
 #endif
@@ -1641,7 +1646,7 @@ public:
 
   void setUpdateRateList(const FOMStringUpdateRateList& value)
   { getImpl()._updateRateList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setUpdateRateList(FOMStringUpdateRateList&& value)
   { getImpl()._updateRateList = std::move(value); }
 #endif
@@ -1652,7 +1657,7 @@ public:
 
   void setSwitchList(const FOMStringSwitchList& value)
   { getImpl()._switchList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSwitchList(FOMStringSwitchList&& value)
   { getImpl()._switchList = std::move(value); }
 #endif
@@ -1663,7 +1668,7 @@ public:
 
   void setArtificialInteractionRoot(const Bool& value)
   { getImpl()._artificialInteractionRoot = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setArtificialInteractionRoot(Bool&& value)
   { getImpl()._artificialInteractionRoot = std::move(value); }
 #endif
@@ -1674,7 +1679,7 @@ public:
 
   void setArtificialObjectRoot(const Bool& value)
   { getImpl()._artificialObjectRoot = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setArtificialObjectRoot(Bool&& value)
   { getImpl()._artificialObjectRoot = std::move(value); }
 #endif
@@ -1788,7 +1793,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -1799,7 +1804,7 @@ public:
 
   void setTransportationType(const TransportationType& value)
   { getImpl()._transportationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationType(TransportationType&& value)
   { getImpl()._transportationType = std::move(value); }
 #endif
@@ -1873,7 +1878,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -1884,7 +1889,7 @@ public:
 
   void setDimensionHandle(const DimensionHandle& value)
   { getImpl()._dimensionHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDimensionHandle(DimensionHandle&& value)
   { getImpl()._dimensionHandle = std::move(value); }
 #endif
@@ -1895,7 +1900,7 @@ public:
 
   void setUpperBound(const Unsigned& value)
   { getImpl()._upperBound = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setUpperBound(Unsigned&& value)
   { getImpl()._upperBound = std::move(value); }
 #endif
@@ -1974,7 +1979,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -1985,7 +1990,7 @@ public:
 
   void setSpaceHandle(const SpaceHandle& value)
   { getImpl()._spaceHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSpaceHandle(SpaceHandle&& value)
   { getImpl()._spaceHandle = std::move(value); }
 #endif
@@ -1996,7 +2001,7 @@ public:
 
   void setDimensionHandleSet(const DimensionHandleSet& value)
   { getImpl()._dimensionHandleSet = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDimensionHandleSet(DimensionHandleSet&& value)
   { getImpl()._dimensionHandleSet = std::move(value); }
 #endif
@@ -2075,7 +2080,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -2086,7 +2091,7 @@ public:
 
   void setParameterHandle(const ParameterHandle& value)
   { getImpl()._parameterHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setParameterHandle(ParameterHandle&& value)
   { getImpl()._parameterHandle = std::move(value); }
 #endif
@@ -2160,7 +2165,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -2171,7 +2176,7 @@ public:
 
   void setInteractionClassHandle(const InteractionClassHandle& value)
   { getImpl()._interactionClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setInteractionClassHandle(InteractionClassHandle&& value)
   { getImpl()._interactionClassHandle = std::move(value); }
 #endif
@@ -2182,7 +2187,7 @@ public:
 
   void setParentInteractionClassHandle(const InteractionClassHandle& value)
   { getImpl()._parentInteractionClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setParentInteractionClassHandle(InteractionClassHandle&& value)
   { getImpl()._parentInteractionClassHandle = std::move(value); }
 #endif
@@ -2193,7 +2198,7 @@ public:
 
   void setOrderType(const OrderType& value)
   { getImpl()._orderType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setOrderType(OrderType&& value)
   { getImpl()._orderType = std::move(value); }
 #endif
@@ -2204,7 +2209,7 @@ public:
 
   void setTransportationType(const TransportationType& value)
   { getImpl()._transportationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationType(TransportationType&& value)
   { getImpl()._transportationType = std::move(value); }
 #endif
@@ -2215,7 +2220,7 @@ public:
 
   void setDimensionHandleSet(const DimensionHandleSet& value)
   { getImpl()._dimensionHandleSet = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDimensionHandleSet(DimensionHandleSet&& value)
   { getImpl()._dimensionHandleSet = std::move(value); }
 #endif
@@ -2226,7 +2231,7 @@ public:
 
   void setParameterList(const FOMParameterList& value)
   { getImpl()._parameterList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setParameterList(FOMParameterList&& value)
   { getImpl()._parameterList = std::move(value); }
 #endif
@@ -2325,7 +2330,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -2336,7 +2341,7 @@ public:
 
   void setAttributeHandle(const AttributeHandle& value)
   { getImpl()._attributeHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeHandle(AttributeHandle&& value)
   { getImpl()._attributeHandle = std::move(value); }
 #endif
@@ -2347,7 +2352,7 @@ public:
 
   void setOrderType(const OrderType& value)
   { getImpl()._orderType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setOrderType(OrderType&& value)
   { getImpl()._orderType = std::move(value); }
 #endif
@@ -2358,7 +2363,7 @@ public:
 
   void setTransportationType(const TransportationType& value)
   { getImpl()._transportationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationType(TransportationType&& value)
   { getImpl()._transportationType = std::move(value); }
 #endif
@@ -2369,7 +2374,7 @@ public:
 
   void setDimensionHandleSet(const DimensionHandleSet& value)
   { getImpl()._dimensionHandleSet = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDimensionHandleSet(DimensionHandleSet&& value)
   { getImpl()._dimensionHandleSet = std::move(value); }
 #endif
@@ -2458,7 +2463,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -2469,7 +2474,7 @@ public:
 
   void setObjectClassHandle(const ObjectClassHandle& value)
   { getImpl()._objectClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectClassHandle(ObjectClassHandle&& value)
   { getImpl()._objectClassHandle = std::move(value); }
 #endif
@@ -2480,7 +2485,7 @@ public:
 
   void setParentObjectClassHandle(const ObjectClassHandle& value)
   { getImpl()._parentObjectClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setParentObjectClassHandle(ObjectClassHandle&& value)
   { getImpl()._parentObjectClassHandle = std::move(value); }
 #endif
@@ -2491,7 +2496,7 @@ public:
 
   void setAttributeList(const FOMAttributeList& value)
   { getImpl()._attributeList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeList(FOMAttributeList&& value)
   { getImpl()._attributeList = std::move(value); }
 #endif
@@ -2575,7 +2580,7 @@ public:
   { }
   void setName(const String& value)
   { getImpl()._name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { getImpl()._name = std::move(value); }
 #endif
@@ -2586,7 +2591,7 @@ public:
 
   void setUpdateRateHandle(const UpdateRateHandle& value)
   { getImpl()._updateRateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setUpdateRateHandle(UpdateRateHandle&& value)
   { getImpl()._updateRateHandle = std::move(value); }
 #endif
@@ -2597,7 +2602,7 @@ public:
 
   void setRate(const Double& value)
   { getImpl()._rate = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRate(Double&& value)
   { getImpl()._rate = std::move(value); }
 #endif
@@ -2676,7 +2681,7 @@ public:
   { }
   void setSwitchesType(const SwitchesType& value)
   { getImpl()._switchesType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSwitchesType(SwitchesType&& value)
   { getImpl()._switchesType = std::move(value); }
 #endif
@@ -2687,7 +2692,7 @@ public:
 
   void setEnabled(const Bool& value)
   { getImpl()._enabled = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setEnabled(Bool&& value)
   { getImpl()._enabled = std::move(value); }
 #endif
@@ -2761,7 +2766,7 @@ public:
   { }
   void setModuleHandle(const ModuleHandle& value)
   { getImpl()._moduleHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setModuleHandle(ModuleHandle&& value)
   { getImpl()._moduleHandle = std::move(value); }
 #endif
@@ -2772,7 +2777,7 @@ public:
 
   void setTransportationTypeList(const FOMTransportationTypeList& value)
   { getImpl()._transportationTypeList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationTypeList(FOMTransportationTypeList&& value)
   { getImpl()._transportationTypeList = std::move(value); }
 #endif
@@ -2783,7 +2788,7 @@ public:
 
   void setDimensionList(const FOMDimensionList& value)
   { getImpl()._dimensionList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDimensionList(FOMDimensionList&& value)
   { getImpl()._dimensionList = std::move(value); }
 #endif
@@ -2794,7 +2799,7 @@ public:
 
   void setRoutingSpaceList(const FOMRoutingSpaceList& value)
   { getImpl()._routingSpaceList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRoutingSpaceList(FOMRoutingSpaceList&& value)
   { getImpl()._routingSpaceList = std::move(value); }
 #endif
@@ -2805,7 +2810,7 @@ public:
 
   void setInteractionClassList(const FOMInteractionClassList& value)
   { getImpl()._interactionClassList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setInteractionClassList(FOMInteractionClassList&& value)
   { getImpl()._interactionClassList = std::move(value); }
 #endif
@@ -2816,7 +2821,7 @@ public:
 
   void setObjectClassList(const FOMObjectClassList& value)
   { getImpl()._objectClassList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectClassList(FOMObjectClassList&& value)
   { getImpl()._objectClassList = std::move(value); }
 #endif
@@ -2827,7 +2832,7 @@ public:
 
   void setUpdateRateList(const FOMUpdateRateList& value)
   { getImpl()._updateRateList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setUpdateRateList(FOMUpdateRateList&& value)
   { getImpl()._updateRateList = std::move(value); }
 #endif
@@ -2838,7 +2843,7 @@ public:
 
   void setSwitchList(const FOMSwitchList& value)
   { getImpl()._switchList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSwitchList(FOMSwitchList&& value)
   { getImpl()._switchList = std::move(value); }
 #endif
@@ -2849,7 +2854,7 @@ public:
 
   void setArtificialInteractionRoot(const Bool& value)
   { getImpl()._artificialInteractionRoot = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setArtificialInteractionRoot(Bool&& value)
   { getImpl()._artificialInteractionRoot = std::move(value); }
 #endif
@@ -2860,7 +2865,7 @@ public:
 
   void setArtificialObjectRoot(const Bool& value)
   { getImpl()._artificialObjectRoot = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setArtificialObjectRoot(Bool&& value)
   { getImpl()._artificialObjectRoot = std::move(value); }
 #endif
@@ -2871,7 +2876,7 @@ public:
 
   void setContent(const String& value)
   { getImpl()._content = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setContent(String&& value)
   { getImpl()._content = std::move(value); }
 #endif
@@ -3006,7 +3011,7 @@ public:
 
   void setFaultDescription(const String& value)
   { _faultDescription = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFaultDescription(String&& value)
   { _faultDescription = std::move(value); }
 #endif
@@ -3042,7 +3047,7 @@ public:
 
   void setFederationExecution(const String& value)
   { _federationExecution = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationExecution(String&& value)
   { _federationExecution = std::move(value); }
 #endif
@@ -3053,7 +3058,7 @@ public:
 
   void setLogicalTimeFactoryName(const String& value)
   { _logicalTimeFactoryName = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLogicalTimeFactoryName(String&& value)
   { _logicalTimeFactoryName = std::move(value); }
 #endif
@@ -3064,7 +3069,7 @@ public:
 
   void setFOMStringModuleList(const FOMStringModuleList& value)
   { _fOMStringModuleList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFOMStringModuleList(FOMStringModuleList&& value)
   { _fOMStringModuleList = std::move(value); }
 #endif
@@ -3102,7 +3107,7 @@ public:
 
   void setCreateFederationExecutionResponseType(const CreateFederationExecutionResponseType& value)
   { _createFederationExecutionResponseType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setCreateFederationExecutionResponseType(CreateFederationExecutionResponseType&& value)
   { _createFederationExecutionResponseType = std::move(value); }
 #endif
@@ -3113,7 +3118,7 @@ public:
 
   void setExceptionString(const String& value)
   { _exceptionString = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setExceptionString(String&& value)
   { _exceptionString = std::move(value); }
 #endif
@@ -3150,7 +3155,7 @@ public:
 
   void setFederationExecution(const String& value)
   { _federationExecution = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationExecution(String&& value)
   { _federationExecution = std::move(value); }
 #endif
@@ -3186,7 +3191,7 @@ public:
 
   void setDestroyFederationExecutionResponseType(const DestroyFederationExecutionResponseType& value)
   { _destroyFederationExecutionResponseType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setDestroyFederationExecutionResponseType(DestroyFederationExecutionResponseType&& value)
   { _destroyFederationExecutionResponseType = std::move(value); }
 #endif
@@ -3246,7 +3251,7 @@ public:
 
   void setFederationExecutionInformationVector(const FederationExecutionInformationVector& value)
   { _federationExecutionInformationVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationExecutionInformationVector(FederationExecutionInformationVector&& value)
   { _federationExecutionInformationVector = std::move(value); }
 #endif
@@ -3282,7 +3287,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3293,7 +3298,7 @@ public:
 
   void setFederationName(const String& value)
   { _federationName = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationName(String&& value)
   { _federationName = std::move(value); }
 #endif
@@ -3304,7 +3309,7 @@ public:
 
   void setLogicalTimeFactoryName(const String& value)
   { _logicalTimeFactoryName = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLogicalTimeFactoryName(String&& value)
   { _logicalTimeFactoryName = std::move(value); }
 #endif
@@ -3315,7 +3320,7 @@ public:
 
   void setConfigurationParameterMap(const ConfigurationParameterMap& value)
   { _configurationParameterMap = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setConfigurationParameterMap(ConfigurationParameterMap&& value)
   { _configurationParameterMap = std::move(value); }
 #endif
@@ -3354,7 +3359,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3390,7 +3395,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3426,7 +3431,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3462,7 +3467,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3473,7 +3478,7 @@ public:
 
   void setFOMModuleList(const FOMModuleList& value)
   { _fOMModuleList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFOMModuleList(FOMModuleList&& value)
   { _fOMModuleList = std::move(value); }
 #endif
@@ -3510,7 +3515,7 @@ public:
 
   void setFederationExecution(const String& value)
   { _federationExecution = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationExecution(String&& value)
   { _federationExecution = std::move(value); }
 #endif
@@ -3521,7 +3526,7 @@ public:
 
   void setFederateType(const String& value)
   { _federateType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateType(String&& value)
   { _federateType = std::move(value); }
 #endif
@@ -3532,7 +3537,7 @@ public:
 
   void setFederateName(const String& value)
   { _federateName = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateName(String&& value)
   { _federateName = std::move(value); }
 #endif
@@ -3543,7 +3548,7 @@ public:
 
   void setFOMStringModuleList(const FOMStringModuleList& value)
   { _fOMStringModuleList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFOMStringModuleList(FOMStringModuleList&& value)
   { _fOMStringModuleList = std::move(value); }
 #endif
@@ -3554,7 +3559,7 @@ public:
 
   void setConfigurationParameterMap(const ConfigurationParameterMap& value)
   { _configurationParameterMap = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setConfigurationParameterMap(ConfigurationParameterMap&& value)
   { _configurationParameterMap = std::move(value); }
 #endif
@@ -3594,7 +3599,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3605,7 +3610,7 @@ public:
 
   void setJoinFederationExecutionResponseType(const JoinFederationExecutionResponseType& value)
   { _joinFederationExecutionResponseType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setJoinFederationExecutionResponseType(JoinFederationExecutionResponseType&& value)
   { _joinFederationExecutionResponseType = std::move(value); }
 #endif
@@ -3616,7 +3621,7 @@ public:
 
   void setExceptionString(const String& value)
   { _exceptionString = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setExceptionString(String&& value)
   { _exceptionString = std::move(value); }
 #endif
@@ -3627,7 +3632,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -3638,7 +3643,7 @@ public:
 
   void setFederateType(const String& value)
   { _federateType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateType(String&& value)
   { _federateType = std::move(value); }
 #endif
@@ -3649,7 +3654,7 @@ public:
 
   void setFederateName(const String& value)
   { _federateName = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateName(String&& value)
   { _federateName = std::move(value); }
 #endif
@@ -3690,7 +3695,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3701,7 +3706,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -3712,7 +3717,7 @@ public:
 
   void setResignAction(const ResignAction& value)
   { _resignAction = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setResignAction(ResignAction&& value)
   { _resignAction = std::move(value); }
 #endif
@@ -3750,7 +3755,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3761,7 +3766,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -3798,7 +3803,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3809,7 +3814,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -3820,7 +3825,7 @@ public:
 
   void setFederateType(const String& value)
   { _federateType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateType(String&& value)
   { _federateType = std::move(value); }
 #endif
@@ -3831,7 +3836,7 @@ public:
 
   void setFederateName(const String& value)
   { _federateName = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateName(String&& value)
   { _federateName = std::move(value); }
 #endif
@@ -3870,7 +3875,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3881,7 +3886,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -3918,7 +3923,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3929,7 +3934,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -3940,7 +3945,7 @@ public:
 
   void setResignAction(const ResignAction& value)
   { _resignAction = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setResignAction(ResignAction&& value)
   { _resignAction = std::move(value); }
 #endif
@@ -3978,7 +3983,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -3989,7 +3994,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -4000,7 +4005,7 @@ public:
 
   void setLabel(const String& value)
   { _label = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLabel(String&& value)
   { _label = std::move(value); }
 #endif
@@ -4011,7 +4016,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -4022,7 +4027,7 @@ public:
 
   void setFederateHandleVector(const FederateHandleVector& value)
   { _federateHandleVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandleVector(FederateHandleVector&& value)
   { _federateHandleVector = std::move(value); }
 #endif
@@ -4062,7 +4067,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4073,7 +4078,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -4084,7 +4089,7 @@ public:
 
   void setLabel(const String& value)
   { _label = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLabel(String&& value)
   { _label = std::move(value); }
 #endif
@@ -4095,7 +4100,7 @@ public:
 
   void setRegisterFederationSynchronizationPointResponseType(const RegisterFederationSynchronizationPointResponseType& value)
   { _registerFederationSynchronizationPointResponseType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRegisterFederationSynchronizationPointResponseType(RegisterFederationSynchronizationPointResponseType&& value)
   { _registerFederationSynchronizationPointResponseType = std::move(value); }
 #endif
@@ -4134,7 +4139,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4145,7 +4150,7 @@ public:
 
   void setLabel(const String& value)
   { _label = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLabel(String&& value)
   { _label = std::move(value); }
 #endif
@@ -4156,7 +4161,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -4167,7 +4172,7 @@ public:
 
   void setAddJoiningFederates(const Bool& value)
   { _addJoiningFederates = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAddJoiningFederates(Bool&& value)
   { _addJoiningFederates = std::move(value); }
 #endif
@@ -4178,7 +4183,7 @@ public:
 
   void setFederateHandleVector(const FederateHandleVector& value)
   { _federateHandleVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandleVector(FederateHandleVector&& value)
   { _federateHandleVector = std::move(value); }
 #endif
@@ -4218,7 +4223,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4229,7 +4234,7 @@ public:
 
   void setLabel(const String& value)
   { _label = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLabel(String&& value)
   { _label = std::move(value); }
 #endif
@@ -4240,7 +4245,7 @@ public:
 
   void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value)
   { _federateHandleBoolPairVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value)
   { _federateHandleBoolPairVector = std::move(value); }
 #endif
@@ -4278,7 +4283,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4289,7 +4294,7 @@ public:
 
   void setLabel(const String& value)
   { _label = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLabel(String&& value)
   { _label = std::move(value); }
 #endif
@@ -4300,7 +4305,7 @@ public:
 
   void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value)
   { _federateHandleBoolPairVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value)
   { _federateHandleBoolPairVector = std::move(value); }
 #endif
@@ -4338,7 +4343,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4349,7 +4354,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -4360,7 +4365,7 @@ public:
 
   void setTimeStamp(const VariableLengthData& value)
   { _timeStamp = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTimeStamp(VariableLengthData&& value)
   { _timeStamp = std::move(value); }
 #endif
@@ -4371,7 +4376,7 @@ public:
 
   void setCommitId(const Unsigned& value)
   { _commitId = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setCommitId(Unsigned&& value)
   { _commitId = std::move(value); }
 #endif
@@ -4410,7 +4415,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4421,7 +4426,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -4432,7 +4437,7 @@ public:
 
   void setRespondingFederateHandle(const FederateHandle& value)
   { _respondingFederateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRespondingFederateHandle(FederateHandle&& value)
   { _respondingFederateHandle = std::move(value); }
 #endif
@@ -4443,7 +4448,7 @@ public:
 
   void setTimeStampValid(const Bool& value)
   { _timeStampValid = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTimeStampValid(Bool&& value)
   { _timeStampValid = std::move(value); }
 #endif
@@ -4454,7 +4459,7 @@ public:
 
   void setTimeStamp(const VariableLengthData& value)
   { _timeStamp = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTimeStamp(VariableLengthData&& value)
   { _timeStamp = std::move(value); }
 #endif
@@ -4494,7 +4499,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4505,7 +4510,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -4542,7 +4547,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4553,7 +4558,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -4564,7 +4569,7 @@ public:
 
   void setTimeStamp(const VariableLengthData& value)
   { _timeStamp = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTimeStamp(VariableLengthData&& value)
   { _timeStamp = std::move(value); }
 #endif
@@ -4575,7 +4580,7 @@ public:
 
   void setCommitType(const LowerBoundTimeStampCommitType& value)
   { _commitType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setCommitType(LowerBoundTimeStampCommitType&& value)
   { _commitType = std::move(value); }
 #endif
@@ -4586,7 +4591,7 @@ public:
 
   void setCommitId(const Unsigned& value)
   { _commitId = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setCommitId(Unsigned&& value)
   { _commitId = std::move(value); }
 #endif
@@ -4626,7 +4631,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4637,7 +4642,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -4648,7 +4653,7 @@ public:
 
   void setSendingFederateHandle(const FederateHandle& value)
   { _sendingFederateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSendingFederateHandle(FederateHandle&& value)
   { _sendingFederateHandle = std::move(value); }
 #endif
@@ -4659,7 +4664,7 @@ public:
 
   void setCommitId(const Unsigned& value)
   { _commitId = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setCommitId(Unsigned&& value)
   { _commitId = std::move(value); }
 #endif
@@ -4698,7 +4703,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4709,7 +4714,7 @@ public:
 
   void setSendingFederateHandle(const FederateHandle& value)
   { _sendingFederateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSendingFederateHandle(FederateHandle&& value)
   { _sendingFederateHandle = std::move(value); }
 #endif
@@ -4720,7 +4725,7 @@ public:
 
   void setLockedByNextMessage(const Bool& value)
   { _lockedByNextMessage = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setLockedByNextMessage(Bool&& value)
   { _lockedByNextMessage = std::move(value); }
 #endif
@@ -4830,7 +4835,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4841,7 +4846,7 @@ public:
 
   void setRegionHandleDimensionHandleSetPairVector(const RegionHandleDimensionHandleSetPairVector& value)
   { _regionHandleDimensionHandleSetPairVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRegionHandleDimensionHandleSetPairVector(RegionHandleDimensionHandleSetPairVector&& value)
   { _regionHandleDimensionHandleSetPairVector = std::move(value); }
 #endif
@@ -4878,7 +4883,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4889,7 +4894,7 @@ public:
 
   void setRegionHandleRegionValuePairVector(const RegionHandleRegionValuePairVector& value)
   { _regionHandleRegionValuePairVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRegionHandleRegionValuePairVector(RegionHandleRegionValuePairVector&& value)
   { _regionHandleRegionValuePairVector = std::move(value); }
 #endif
@@ -4926,7 +4931,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4937,7 +4942,7 @@ public:
 
   void setRegionHandleVector(const RegionHandleVector& value)
   { _regionHandleVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setRegionHandleVector(RegionHandleVector&& value)
   { _regionHandleVector = std::move(value); }
 #endif
@@ -4974,7 +4979,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -4985,7 +4990,7 @@ public:
 
   void setPublicationType(const PublicationType& value)
   { _publicationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setPublicationType(PublicationType&& value)
   { _publicationType = std::move(value); }
 #endif
@@ -4996,7 +5001,7 @@ public:
 
   void setInteractionClassHandle(const InteractionClassHandle& value)
   { _interactionClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setInteractionClassHandle(InteractionClassHandle&& value)
   { _interactionClassHandle = std::move(value); }
 #endif
@@ -5034,7 +5039,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5045,7 +5050,7 @@ public:
 
   void setPublicationType(const PublicationType& value)
   { _publicationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setPublicationType(PublicationType&& value)
   { _publicationType = std::move(value); }
 #endif
@@ -5056,7 +5061,7 @@ public:
 
   void setObjectClassHandle(const ObjectClassHandle& value)
   { _objectClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectClassHandle(ObjectClassHandle&& value)
   { _objectClassHandle = std::move(value); }
 #endif
@@ -5067,7 +5072,7 @@ public:
 
   void setAttributeHandles(const AttributeHandleVector& value)
   { _attributeHandles = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeHandles(AttributeHandleVector&& value)
   { _attributeHandles = std::move(value); }
 #endif
@@ -5106,7 +5111,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5117,7 +5122,7 @@ public:
 
   void setSubscriptionType(const SubscriptionType& value)
   { _subscriptionType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSubscriptionType(SubscriptionType&& value)
   { _subscriptionType = std::move(value); }
 #endif
@@ -5128,7 +5133,7 @@ public:
 
   void setInteractionClassHandle(const InteractionClassHandle& value)
   { _interactionClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setInteractionClassHandle(InteractionClassHandle&& value)
   { _interactionClassHandle = std::move(value); }
 #endif
@@ -5137,10 +5142,22 @@ public:
   const InteractionClassHandle& getInteractionClassHandle() const
   { return _interactionClassHandle; }
 
+  void setParameterFilterValues(const ParameterValueVector& value)
+  { _parameterFilterValues = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setParameterFilterValues(ParameterValueVector&& value)
+  { _parameterFilterValues = std::move(value); }
+#endif
+  ParameterValueVector& getParameterFilterValues()
+  { return _parameterFilterValues; }
+  const ParameterValueVector& getParameterFilterValues() const
+  { return _parameterFilterValues; }
+
 private:
   FederationHandle _federationHandle;
   SubscriptionType _subscriptionType;
   InteractionClassHandle _interactionClassHandle;
+  ParameterValueVector _parameterFilterValues;
 };
 
 class OPENRTI_API ChangeObjectClassSubscriptionMessage : public AbstractMessage {
@@ -5166,7 +5183,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5177,7 +5194,7 @@ public:
 
   void setSubscriptionType(const SubscriptionType& value)
   { _subscriptionType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSubscriptionType(SubscriptionType&& value)
   { _subscriptionType = std::move(value); }
 #endif
@@ -5188,7 +5205,7 @@ public:
 
   void setObjectClassHandle(const ObjectClassHandle& value)
   { _objectClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectClassHandle(ObjectClassHandle&& value)
   { _objectClassHandle = std::move(value); }
 #endif
@@ -5199,7 +5216,7 @@ public:
 
   void setAttributeHandles(const AttributeHandleVector& value)
   { _attributeHandles = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeHandles(AttributeHandleVector&& value)
   { _attributeHandles = std::move(value); }
 #endif
@@ -5213,6 +5230,78 @@ private:
   SubscriptionType _subscriptionType;
   ObjectClassHandle _objectClassHandle;
   AttributeHandleVector _attributeHandles;
+};
+
+class OPENRTI_API ChangeObjectInstanceSubscriptionMessage : public AbstractMessage {
+public:
+  ChangeObjectInstanceSubscriptionMessage();
+  virtual ~ChangeObjectInstanceSubscriptionMessage();
+
+  virtual const char* getTypeName() const;
+  virtual void out(std::ostream& os) const;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+
+  virtual bool operator==(const AbstractMessage& rhs) const;
+  bool operator==(const ChangeObjectInstanceSubscriptionMessage& rhs) const;
+  bool operator<(const ChangeObjectInstanceSubscriptionMessage& rhs) const;
+  bool operator!=(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value)
+  { _federationHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederationHandle(FederationHandle&& value)
+  { _federationHandle = std::move(value); }
+#endif
+  FederationHandle& getFederationHandle()
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const
+  { return _federationHandle; }
+
+  void setSubscriptionType(const SubscriptionType& value)
+  { _subscriptionType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setSubscriptionType(SubscriptionType&& value)
+  { _subscriptionType = std::move(value); }
+#endif
+  SubscriptionType& getSubscriptionType()
+  { return _subscriptionType; }
+  const SubscriptionType& getSubscriptionType() const
+  { return _subscriptionType; }
+
+  void setObjectClassHandle(const ObjectClassHandle& value)
+  { _objectClassHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setObjectClassHandle(ObjectClassHandle&& value)
+  { _objectClassHandle = std::move(value); }
+#endif
+  ObjectClassHandle& getObjectClassHandle()
+  { return _objectClassHandle; }
+  const ObjectClassHandle& getObjectClassHandle() const
+  { return _objectClassHandle; }
+
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  { _objectInstanceHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  { _objectInstanceHandle = std::move(value); }
+#endif
+  ObjectInstanceHandle& getObjectInstanceHandle()
+  { return _objectInstanceHandle; }
+  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  { return _objectInstanceHandle; }
+
+private:
+  FederationHandle _federationHandle;
+  SubscriptionType _subscriptionType;
+  ObjectClassHandle _objectClassHandle;
+  ObjectInstanceHandle _objectInstanceHandle;
 };
 
 class OPENRTI_API RegistrationForObjectClassMessage : public AbstractMessage {
@@ -5238,7 +5327,7 @@ public:
 
   void setObjectClassHandle(const ObjectClassHandle& value)
   { _objectClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectClassHandle(ObjectClassHandle&& value)
   { _objectClassHandle = std::move(value); }
 #endif
@@ -5249,7 +5338,7 @@ public:
 
   void setStart(const Bool& value)
   { _start = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setStart(Bool&& value)
   { _start = std::move(value); }
 #endif
@@ -5288,7 +5377,7 @@ public:
 
   void setObjectInstanceHandle(const ObjectInstanceHandle& value)
   { _objectInstanceHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandle(ObjectInstanceHandle&& value)
   { _objectInstanceHandle = std::move(value); }
 #endif
@@ -5299,7 +5388,7 @@ public:
 
   void setAttributeHandles(const AttributeHandleVector& value)
   { _attributeHandles = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeHandles(AttributeHandleVector&& value)
   { _attributeHandles = std::move(value); }
 #endif
@@ -5310,7 +5399,7 @@ public:
 
   void setInScope(const Bool& value)
   { _inScope = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setInScope(Bool&& value)
   { _inScope = std::move(value); }
 #endif
@@ -5350,7 +5439,7 @@ public:
 
   void setObjectInstanceHandle(const ObjectInstanceHandle& value)
   { _objectInstanceHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandle(ObjectInstanceHandle&& value)
   { _objectInstanceHandle = std::move(value); }
 #endif
@@ -5361,7 +5450,7 @@ public:
 
   void setAttributeHandles(const AttributeHandleVector& value)
   { _attributeHandles = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeHandles(AttributeHandleVector&& value)
   { _attributeHandles = std::move(value); }
 #endif
@@ -5372,7 +5461,7 @@ public:
 
   void setUpdateRate(const String& value)
   { _updateRate = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setUpdateRate(String&& value)
   { _updateRate = std::move(value); }
 #endif
@@ -5383,7 +5472,7 @@ public:
 
   void setOn(const Bool& value)
   { _on = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setOn(Bool&& value)
   { _on = std::move(value); }
 #endif
@@ -5422,7 +5511,7 @@ public:
 
   void setInteractionClassHandle(const InteractionClassHandle& value)
   { _interactionClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setInteractionClassHandle(InteractionClassHandle&& value)
   { _interactionClassHandle = std::move(value); }
 #endif
@@ -5433,7 +5522,7 @@ public:
 
   void setOn(const Bool& value)
   { _on = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setOn(Bool&& value)
   { _on = std::move(value); }
 #endif
@@ -5472,7 +5561,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5483,7 +5572,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -5494,7 +5583,7 @@ public:
 
   void setInteractionClassHandle(const InteractionClassHandle& value)
   { _interactionClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setInteractionClassHandle(InteractionClassHandle&& value)
   { _interactionClassHandle = std::move(value); }
 #endif
@@ -5505,7 +5594,7 @@ public:
 
   void setTransportationType(const TransportationType& value)
   { _transportationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationType(TransportationType&& value)
   { _transportationType = std::move(value); }
 #endif
@@ -5516,7 +5605,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -5527,7 +5616,7 @@ public:
 
   void setParameterValues(const ParameterValueVector& value)
   { _parameterValues = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setParameterValues(ParameterValueVector&& value)
   { _parameterValues = std::move(value); }
 #endif
@@ -5570,7 +5659,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5581,7 +5670,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -5592,7 +5681,7 @@ public:
 
   void setInteractionClassHandle(const InteractionClassHandle& value)
   { _interactionClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setInteractionClassHandle(InteractionClassHandle&& value)
   { _interactionClassHandle = std::move(value); }
 #endif
@@ -5603,7 +5692,7 @@ public:
 
   void setOrderType(const OrderType& value)
   { _orderType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setOrderType(OrderType&& value)
   { _orderType = std::move(value); }
 #endif
@@ -5614,7 +5703,7 @@ public:
 
   void setTransportationType(const TransportationType& value)
   { _transportationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationType(TransportationType&& value)
   { _transportationType = std::move(value); }
 #endif
@@ -5625,7 +5714,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -5636,7 +5725,7 @@ public:
 
   void setTimeStamp(const VariableLengthData& value)
   { _timeStamp = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTimeStamp(VariableLengthData&& value)
   { _timeStamp = std::move(value); }
 #endif
@@ -5647,7 +5736,7 @@ public:
 
   void setMessageRetractionHandle(const MessageRetractionHandle& value)
   { _messageRetractionHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setMessageRetractionHandle(MessageRetractionHandle&& value)
   { _messageRetractionHandle = std::move(value); }
 #endif
@@ -5658,7 +5747,7 @@ public:
 
   void setParameterValues(const ParameterValueVector& value)
   { _parameterValues = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setParameterValues(ParameterValueVector&& value)
   { _parameterValues = std::move(value); }
 #endif
@@ -5702,7 +5791,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5713,7 +5802,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -5724,7 +5813,7 @@ public:
 
   void setCount(const Unsigned& value)
   { _count = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setCount(Unsigned&& value)
   { _count = std::move(value); }
 #endif
@@ -5762,7 +5851,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5773,7 +5862,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -5784,7 +5873,7 @@ public:
 
   void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value)
   { _objectInstanceHandleNamePairVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value)
   { _objectInstanceHandleNamePairVector = std::move(value); }
 #endif
@@ -5822,7 +5911,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5833,7 +5922,7 @@ public:
 
   void setObjectInstanceHandleVector(const ObjectInstanceHandleVector& value)
   { _objectInstanceHandleVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandleVector(ObjectInstanceHandleVector&& value)
   { _objectInstanceHandleVector = std::move(value); }
 #endif
@@ -5870,7 +5959,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5881,7 +5970,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -5892,7 +5981,7 @@ public:
 
   void setName(const String& value)
   { _name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { _name = std::move(value); }
 #endif
@@ -5930,7 +6019,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -5941,7 +6030,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -5952,7 +6041,7 @@ public:
 
   void setObjectInstanceHandleNamePair(const ObjectInstanceHandleNamePair& value)
   { _objectInstanceHandleNamePair = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandleNamePair(ObjectInstanceHandleNamePair&& value)
   { _objectInstanceHandleNamePair = std::move(value); }
 #endif
@@ -5963,7 +6052,7 @@ public:
 
   void setSuccess(const Bool& value)
   { _success = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSuccess(Bool&& value)
   { _success = std::move(value); }
 #endif
@@ -6002,7 +6091,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -6013,7 +6102,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -6024,7 +6113,7 @@ public:
 
   void setNameList(const StringVector& value)
   { _nameList = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setNameList(StringVector&& value)
   { _nameList = std::move(value); }
 #endif
@@ -6062,7 +6151,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -6073,7 +6162,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -6084,7 +6173,7 @@ public:
 
   void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value)
   { _objectInstanceHandleNamePairVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value)
   { _objectInstanceHandleNamePairVector = std::move(value); }
 #endif
@@ -6095,7 +6184,7 @@ public:
 
   void setSuccess(const Bool& value)
   { _success = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setSuccess(Bool&& value)
   { _success = std::move(value); }
 #endif
@@ -6136,7 +6225,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -6147,7 +6236,7 @@ public:
 
   void setObjectClassHandle(const ObjectClassHandle& value)
   { _objectClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectClassHandle(ObjectClassHandle&& value)
   { _objectClassHandle = std::move(value); }
 #endif
@@ -6158,7 +6247,7 @@ public:
 
   void setObjectInstanceHandle(const ObjectInstanceHandle& value)
   { _objectInstanceHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandle(ObjectInstanceHandle&& value)
   { _objectInstanceHandle = std::move(value); }
 #endif
@@ -6169,7 +6258,7 @@ public:
 
   void setName(const String& value)
   { _name = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setName(String&& value)
   { _name = std::move(value); }
 #endif
@@ -6180,7 +6269,7 @@ public:
 
   void setAttributeStateVector(const AttributeStateVector& value)
   { _attributeStateVector = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeStateVector(AttributeStateVector&& value)
   { _attributeStateVector = std::move(value); }
 #endif
@@ -6222,7 +6311,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -6233,7 +6322,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -6244,7 +6333,7 @@ public:
 
   void setObjectInstanceHandle(const ObjectInstanceHandle& value)
   { _objectInstanceHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandle(ObjectInstanceHandle&& value)
   { _objectInstanceHandle = std::move(value); }
 #endif
@@ -6255,7 +6344,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -6296,7 +6385,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -6307,7 +6396,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -6318,7 +6407,7 @@ public:
 
   void setObjectInstanceHandle(const ObjectInstanceHandle& value)
   { _objectInstanceHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandle(ObjectInstanceHandle&& value)
   { _objectInstanceHandle = std::move(value); }
 #endif
@@ -6329,7 +6418,7 @@ public:
 
   void setOrderType(const OrderType& value)
   { _orderType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setOrderType(OrderType&& value)
   { _orderType = std::move(value); }
 #endif
@@ -6340,7 +6429,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -6351,7 +6440,7 @@ public:
 
   void setTimeStamp(const VariableLengthData& value)
   { _timeStamp = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTimeStamp(VariableLengthData&& value)
   { _timeStamp = std::move(value); }
 #endif
@@ -6362,7 +6451,7 @@ public:
 
   void setMessageRetractionHandle(const MessageRetractionHandle& value)
   { _messageRetractionHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setMessageRetractionHandle(MessageRetractionHandle&& value)
   { _messageRetractionHandle = std::move(value); }
 #endif
@@ -6408,7 +6497,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -6419,7 +6508,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -6430,7 +6519,7 @@ public:
 
   void setObjectInstanceHandle(const ObjectInstanceHandle& value)
   { _objectInstanceHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandle(ObjectInstanceHandle&& value)
   { _objectInstanceHandle = std::move(value); }
 #endif
@@ -6441,7 +6530,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -6452,7 +6541,7 @@ public:
 
   void setTransportationType(const TransportationType& value)
   { _transportationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationType(TransportationType&& value)
   { _transportationType = std::move(value); }
 #endif
@@ -6463,7 +6552,7 @@ public:
 
   void setAttributeValues(const AttributeValueVector& value)
   { _attributeValues = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeValues(AttributeValueVector&& value)
   { _attributeValues = std::move(value); }
 #endif
@@ -6508,7 +6597,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -6519,7 +6608,7 @@ public:
 
   void setFederateHandle(const FederateHandle& value)
   { _federateHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederateHandle(FederateHandle&& value)
   { _federateHandle = std::move(value); }
 #endif
@@ -6530,7 +6619,7 @@ public:
 
   void setObjectInstanceHandle(const ObjectInstanceHandle& value)
   { _objectInstanceHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandle(ObjectInstanceHandle&& value)
   { _objectInstanceHandle = std::move(value); }
 #endif
@@ -6541,7 +6630,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -6552,7 +6641,7 @@ public:
 
   void setTimeStamp(const VariableLengthData& value)
   { _timeStamp = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTimeStamp(VariableLengthData&& value)
   { _timeStamp = std::move(value); }
 #endif
@@ -6563,7 +6652,7 @@ public:
 
   void setMessageRetractionHandle(const MessageRetractionHandle& value)
   { _messageRetractionHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setMessageRetractionHandle(MessageRetractionHandle&& value)
   { _messageRetractionHandle = std::move(value); }
 #endif
@@ -6574,7 +6663,7 @@ public:
 
   void setOrderType(const OrderType& value)
   { _orderType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setOrderType(OrderType&& value)
   { _orderType = std::move(value); }
 #endif
@@ -6585,7 +6674,7 @@ public:
 
   void setTransportationType(const TransportationType& value)
   { _transportationType = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTransportationType(TransportationType&& value)
   { _transportationType = std::move(value); }
 #endif
@@ -6596,7 +6685,7 @@ public:
 
   void setAttributeValues(const AttributeValueVector& value)
   { _attributeValues = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeValues(AttributeValueVector&& value)
   { _attributeValues = std::move(value); }
 #endif
@@ -6642,7 +6731,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -6653,7 +6742,7 @@ public:
 
   void setObjectInstanceHandle(const ObjectInstanceHandle& value)
   { _objectInstanceHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectInstanceHandle(ObjectInstanceHandle&& value)
   { _objectInstanceHandle = std::move(value); }
 #endif
@@ -6664,7 +6753,7 @@ public:
 
   void setAttributeHandles(const AttributeHandleVector& value)
   { _attributeHandles = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeHandles(AttributeHandleVector&& value)
   { _attributeHandles = std::move(value); }
 #endif
@@ -6675,7 +6764,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -6714,7 +6803,7 @@ public:
 
   void setFederationHandle(const FederationHandle& value)
   { _federationHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setFederationHandle(FederationHandle&& value)
   { _federationHandle = std::move(value); }
 #endif
@@ -6725,7 +6814,7 @@ public:
 
   void setObjectClassHandle(const ObjectClassHandle& value)
   { _objectClassHandle = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setObjectClassHandle(ObjectClassHandle&& value)
   { _objectClassHandle = std::move(value); }
 #endif
@@ -6736,7 +6825,7 @@ public:
 
   void setAttributeHandles(const AttributeHandleVector& value)
   { _attributeHandles = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setAttributeHandles(AttributeHandleVector&& value)
   { _attributeHandles = std::move(value); }
 #endif
@@ -6747,7 +6836,7 @@ public:
 
   void setTag(const VariableLengthData& value)
   { _tag = value; }
-#if 201103L <= __cplusplus || 200610L <= __cpp_rvalue_reference
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   void setTag(VariableLengthData&& value)
   { _tag = std::move(value); }
 #endif
@@ -6764,6 +6853,7 @@ private:
 };
 
 
+// EnumDataType CallbackModel
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const CallbackModel& value)
@@ -6775,6 +6865,16 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const CallbackModel& 
   return os;
 }
 
+inline std::string to_string(const CallbackModel& value)
+{
+  switch (value) {
+  case HLA_IMMEDIATE: return "HLA_IMMEDIATE";
+  case HLA_EVOKED: return "HLA_EVOKED";
+  default: return "<Invalid CallbackModel>";
+  }
+}
+
+// EnumDataType OrderType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const OrderType& value)
@@ -6786,6 +6886,16 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const OrderType& valu
   return os;
 }
 
+inline std::string to_string(const OrderType& value)
+{
+  switch (value) {
+  case RECEIVE: return "RECEIVE";
+  case TIMESTAMP: return "TIMESTAMP";
+  default: return "<Invalid OrderType>";
+  }
+}
+
+// EnumDataType TransportationType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const TransportationType& value)
@@ -6797,6 +6907,16 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const TransportationT
   return os;
 }
 
+inline std::string to_string(const TransportationType& value)
+{
+  switch (value) {
+  case RELIABLE: return "RELIABLE";
+  case BEST_EFFORT: return "BEST_EFFORT";
+  default: return "<Invalid TransportationType>";
+  }
+}
+
+// EnumDataType SubscriptionType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const SubscriptionType& value)
@@ -6809,6 +6929,17 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const SubscriptionTyp
   return os;
 }
 
+inline std::string to_string(const SubscriptionType& value)
+{
+  switch (value) {
+  case Unsubscribed: return "Unsubscribed";
+  case SubscribedPassive: return "SubscribedPassive";
+  case SubscribedActive: return "SubscribedActive";
+  default: return "<Invalid SubscriptionType>";
+  }
+}
+
+// EnumDataType PublicationType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const PublicationType& value)
@@ -6820,6 +6951,16 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const PublicationType
   return os;
 }
 
+inline std::string to_string(const PublicationType& value)
+{
+  switch (value) {
+  case Unpublished: return "Unpublished";
+  case Published: return "Published";
+  default: return "<Invalid PublicationType>";
+  }
+}
+
+// EnumDataType ResignAction
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignAction& value)
@@ -6835,6 +6976,20 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignAction& v
   return os;
 }
 
+inline std::string to_string(const ResignAction& value)
+{
+  switch (value) {
+  case UNCONDITIONALLY_DIVEST_ATTRIBUTES: return "UNCONDITIONALLY_DIVEST_ATTRIBUTES";
+  case DELETE_OBJECTS: return "DELETE_OBJECTS";
+  case CANCEL_PENDING_OWNERSHIP_ACQUISITIONS: return "CANCEL_PENDING_OWNERSHIP_ACQUISITIONS";
+  case DELETE_OBJECTS_THEN_DIVEST: return "DELETE_OBJECTS_THEN_DIVEST";
+  case CANCEL_THEN_DELETE_THEN_DIVEST: return "CANCEL_THEN_DELETE_THEN_DIVEST";
+  case NO_ACTION: return "NO_ACTION";
+  default: return "<Invalid ResignAction>";
+  }
+}
+
+// EnumDataType RestoreFailureReason
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RestoreFailureReason& value)
@@ -6848,6 +7003,18 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RestoreFailureR
   return os;
 }
 
+inline std::string to_string(const RestoreFailureReason& value)
+{
+  switch (value) {
+  case RTI_UNABLE_TO_RESTORE: return "RTI_UNABLE_TO_RESTORE";
+  case FEDERATE_REPORTED_FAILURE_DURING_RESTORE: return "FEDERATE_REPORTED_FAILURE_DURING_RESTORE";
+  case FEDERATE_RESIGNED_DURING_RESTORE: return "FEDERATE_RESIGNED_DURING_RESTORE";
+  case RTI_DETECTED_FAILURE_DURING_RESTORE: return "RTI_DETECTED_FAILURE_DURING_RESTORE";
+  default: return "<Invalid RestoreFailureReason>";
+  }
+}
+
+// EnumDataType RestoreStatus
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RestoreStatus& value)
@@ -6863,6 +7030,20 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RestoreStatus& 
   return os;
 }
 
+inline std::string to_string(const RestoreStatus& value)
+{
+  switch (value) {
+  case NO_RESTORE_IN_PROGRESS: return "NO_RESTORE_IN_PROGRESS";
+  case FEDERATE_RESTORE_REQUEST_PENDING: return "FEDERATE_RESTORE_REQUEST_PENDING";
+  case FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN: return "FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN";
+  case FEDERATE_PREPARED_TO_RESTORE: return "FEDERATE_PREPARED_TO_RESTORE";
+  case FEDERATE_RESTORING: return "FEDERATE_RESTORING";
+  case FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE";
+  default: return "<Invalid RestoreStatus>";
+  }
+}
+
+// EnumDataType SaveFailureReason
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const SaveFailureReason& value)
@@ -6877,6 +7058,19 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const SaveFailureReas
   return os;
 }
 
+inline std::string to_string(const SaveFailureReason& value)
+{
+  switch (value) {
+  case RTI_UNABLE_TO_SAVE: return "RTI_UNABLE_TO_SAVE";
+  case FEDERATE_REPORTED_FAILURE_DURING_SAVE: return "FEDERATE_REPORTED_FAILURE_DURING_SAVE";
+  case FEDERATE_RESIGNED_DURING_SAVE: return "FEDERATE_RESIGNED_DURING_SAVE";
+  case RTI_DETECTED_FAILURE_DURING_SAVE: return "RTI_DETECTED_FAILURE_DURING_SAVE";
+  case SAVE_TIME_CANNOT_BE_HONORED: return "SAVE_TIME_CANNOT_BE_HONORED";
+  default: return "<Invalid SaveFailureReason>";
+  }
+}
+
+// EnumDataType SaveStatus
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const SaveStatus& value)
@@ -6890,6 +7084,18 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const SaveStatus& val
   return os;
 }
 
+inline std::string to_string(const SaveStatus& value)
+{
+  switch (value) {
+  case NO_SAVE_IN_PROGRESS: return "NO_SAVE_IN_PROGRESS";
+  case FEDERATE_INSTRUCTED_TO_SAVE: return "FEDERATE_INSTRUCTED_TO_SAVE";
+  case FEDERATE_SAVING: return "FEDERATE_SAVING";
+  case FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE";
+  default: return "<Invalid SaveStatus>";
+  }
+}
+
+// EnumDataType ServiceGroupIndicator
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ServiceGroupIndicator& value)
@@ -6906,6 +7112,21 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ServiceGroupInd
   return os;
 }
 
+inline std::string to_string(const ServiceGroupIndicator& value)
+{
+  switch (value) {
+  case FEDERATION_MANAGEMENT: return "FEDERATION_MANAGEMENT";
+  case DECLARATION_MANAGEMENT: return "DECLARATION_MANAGEMENT";
+  case OBJECT_MANAGEMENT: return "OBJECT_MANAGEMENT";
+  case OWNERSHIP_MANAGEMENT: return "OWNERSHIP_MANAGEMENT";
+  case TIME_MANAGEMENT: return "TIME_MANAGEMENT";
+  case DATA_DISTRIBUTION_MANAGEMENT: return "DATA_DISTRIBUTION_MANAGEMENT";
+  case SUPPORT_SERVICES: return "SUPPORT_SERVICES";
+  default: return "<Invalid ServiceGroupIndicator>";
+  }
+}
+
+// EnumDataType LowerBoundTimeStampCommitType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const LowerBoundTimeStampCommitType& value)
@@ -6918,6 +7139,17 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const LowerBoundTimeS
   return os;
 }
 
+inline std::string to_string(const LowerBoundTimeStampCommitType& value)
+{
+  switch (value) {
+  case TimeAdvanceCommit: return "TimeAdvanceCommit";
+  case NextMessageCommit: return "NextMessageCommit";
+  case TimeAdvanceAndNextMessageCommit: return "TimeAdvanceAndNextMessageCommit";
+  default: return "<Invalid LowerBoundTimeStampCommitType>";
+  }
+}
+
+// EnumDataType SwitchesType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const SwitchesType& value)
@@ -6934,6 +7166,21 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const SwitchesType& v
   return os;
 }
 
+inline std::string to_string(const SwitchesType& value)
+{
+  switch (value) {
+  case InteractionRelevanceAdvisorySwitchesType: return "InteractionRelevanceAdvisorySwitchesType";
+  case ObjectClassRelevanceAdvisorySwitchesType: return "ObjectClassRelevanceAdvisorySwitchesType";
+  case AttributeRelevanceAdvisorySwitchesType: return "AttributeRelevanceAdvisorySwitchesType";
+  case AttributeScopeAdvisorySwitchesType: return "AttributeScopeAdvisorySwitchesType";
+  case AutoProvideSwitchesType: return "AutoProvideSwitchesType";
+  case ConveyRegionDesignatorSetsSwitchesType: return "ConveyRegionDesignatorSetsSwitchesType";
+  case ServiceReportingSwitchesType: return "ServiceReportingSwitchesType";
+  default: return "<Invalid SwitchesType>";
+  }
+}
+
+// VectorDataType AttributeHandleVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeHandleVector& value)
@@ -6950,6 +7197,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeHandle
   return os;
 }
 
+// VectorDataType FederateHandleVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleVector& value)
@@ -6966,6 +7214,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleV
   return os;
 }
 
+// VectorDataType ParameterHandleVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterHandleVector& value)
@@ -6982,6 +7231,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterHandle
   return os;
 }
 
+// VectorDataType DimensionHandleVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandleVector& value)
@@ -6998,6 +7248,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandle
   return os;
 }
 
+// <__main__.SetDataType object at 0x0000000002B3C0B8>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandleSet& value)
@@ -7014,6 +7265,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandle
   return os;
 }
 
+// VectorDataType ObjectInstanceHandleVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandleVector& value)
@@ -7030,6 +7282,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceH
   return os;
 }
 
+// VectorDataType RegionHandleVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleVector& value)
@@ -7046,6 +7299,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleVec
   return os;
 }
 
+// VectorDataType ModuleHandleVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ModuleHandleVector& value)
@@ -7062,6 +7316,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ModuleHandleVec
   return os;
 }
 
+// VectorDataType StringVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const StringVector& value)
@@ -7078,6 +7333,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const StringVector& v
   return os;
 }
 
+// <__main__.SetDataType object at 0x0000000002B3C1D0>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const StringSet& value)
@@ -7094,6 +7350,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const StringSet& valu
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C240>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleBoolPair& value)
@@ -7105,6 +7362,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleB
   return os;
 }
 
+// VectorDataType FederateHandleBoolPairVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleBoolPairVector& value)
@@ -7121,6 +7379,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleB
   return os;
 }
 
+// StructDataType RangeBoundsValue
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RangeBoundsValue& value)
@@ -7133,6 +7392,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RangeBoundsValu
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C2E8>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandleRangeBoundsValuePair& value)
@@ -7144,6 +7404,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandle
   return os;
 }
 
+// VectorDataType RegionValue
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionValue& value)
@@ -7160,6 +7421,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionValue& va
   return os;
 }
 
+// VectorDataType RegionValueList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionValueList& value)
@@ -7176,6 +7438,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionValueList
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C400>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleDimensionHandleSetPair& value)
@@ -7187,6 +7450,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleDim
   return os;
 }
 
+// VectorDataType RegionHandleDimensionHandleSetPairVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleDimensionHandleSetPairVector& value)
@@ -7203,6 +7467,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleDim
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C470>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleSpaceHandlePair& value)
@@ -7214,6 +7479,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleSpa
   return os;
 }
 
+// VectorDataType RegionHandleSpaceHandlePairVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleSpaceHandlePairVector& value)
@@ -7230,6 +7496,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleSpa
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C4E0>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleRegionValuePair& value)
@@ -7241,6 +7508,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleReg
   return os;
 }
 
+// VectorDataType RegionHandleRegionValuePairVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleRegionValuePairVector& value)
@@ -7257,6 +7525,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleReg
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C550>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const InteractionClassHandleRegionValueListPair& value)
@@ -7268,6 +7537,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const InteractionClas
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C588>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeHandleRegionValueListPair& value)
@@ -7279,6 +7549,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeHandle
   return os;
 }
 
+// StructDataType AttributeState
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeState& value)
@@ -7289,6 +7560,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeState&
   return os;
 }
 
+// VectorDataType AttributeStateVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeStateVector& value)
@@ -7305,6 +7577,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeStateV
   return os;
 }
 
+// StructDataType ParameterValue
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterValue& value)
@@ -7317,6 +7590,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterValue&
   return os;
 }
 
+// VectorDataType ParameterValueVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterValueVector& value)
@@ -7333,6 +7607,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterValueV
   return os;
 }
 
+// StructDataType AttributeValue
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeValue& value)
@@ -7345,6 +7620,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeValue&
   return os;
 }
 
+// VectorDataType AttributeValueVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeValueVector& value)
@@ -7361,6 +7637,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeValueV
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C828>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleSaveStatusPair& value)
@@ -7372,6 +7649,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleS
   return os;
 }
 
+// VectorDataType FederateHandleSaveStatusPairVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleSaveStatusPairVector& value)
@@ -7388,6 +7666,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleS
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C898>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleRestoreStatusPair& value)
@@ -7399,6 +7678,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleR
   return os;
 }
 
+// VectorDataType FederateHandleRestoreStatusPairVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleRestoreStatusPairVector& value)
@@ -7415,6 +7695,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleR
   return os;
 }
 
+// StructDataType FederationExecutionInformation
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationExecutionInformation& value)
@@ -7427,6 +7708,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationExecu
   return os;
 }
 
+// VectorDataType FederationExecutionInformationVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationExecutionInformationVector& value)
@@ -7443,6 +7725,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationExecu
   return os;
 }
 
+// <__main__.PairDataType object at 0x0000000002B3C9E8>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandleNamePair& value)
@@ -7454,6 +7737,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceH
   return os;
 }
 
+// VectorDataType ObjectInstanceHandleNamePairVector
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandleNamePairVector& value)
@@ -7470,6 +7754,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceH
   return os;
 }
 
+// EnumDataType CreateFederationExecutionResponseType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const CreateFederationExecutionResponseType& value)
@@ -7486,6 +7771,21 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const CreateFederatio
   return os;
 }
 
+inline std::string to_string(const CreateFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case CreateFederationExecutionResponseSuccess: return "CreateFederationExecutionResponseSuccess";
+  case CreateFederationExecutionResponseFederationExecutionAlreadyExists: return "CreateFederationExecutionResponseFederationExecutionAlreadyExists";
+  case CreateFederationExecutionResponseCouldNotOpenFDD: return "CreateFederationExecutionResponseCouldNotOpenFDD";
+  case CreateFederationExecutionResponseErrorReadingFDD: return "CreateFederationExecutionResponseErrorReadingFDD";
+  case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: return "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory";
+  case CreateFederationExecutionResponseInconsistentFDD: return "CreateFederationExecutionResponseInconsistentFDD";
+  case CreateFederationExecutionResponseRTIinternalError: return "CreateFederationExecutionResponseRTIinternalError";
+  default: return "<Invalid CreateFederationExecutionResponseType>";
+  }
+}
+
+// EnumDataType DestroyFederationExecutionResponseType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DestroyFederationExecutionResponseType& value)
@@ -7499,6 +7799,18 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DestroyFederati
   return os;
 }
 
+inline std::string to_string(const DestroyFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case DestroyFederationExecutionResponseSuccess: return "DestroyFederationExecutionResponseSuccess";
+  case DestroyFederationExecutionResponseFederatesCurrentlyJoined: return "DestroyFederationExecutionResponseFederatesCurrentlyJoined";
+  case DestroyFederationExecutionResponseFederationExecutionDoesNotExist: return "DestroyFederationExecutionResponseFederationExecutionDoesNotExist";
+  case DestroyFederationExecutionResponseRTIinternalError: return "DestroyFederationExecutionResponseRTIinternalError";
+  default: return "<Invalid DestroyFederationExecutionResponseType>";
+  }
+}
+
+// EnumDataType JoinFederationExecutionResponseType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationExecutionResponseType& value)
@@ -7514,6 +7826,20 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationE
   return os;
 }
 
+inline std::string to_string(const JoinFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case JoinFederationExecutionResponseSuccess: return "JoinFederationExecutionResponseSuccess";
+  case JoinFederationExecutionResponseFederateNameAlreadyInUse: return "JoinFederationExecutionResponseFederateNameAlreadyInUse";
+  case JoinFederationExecutionResponseFederationExecutionDoesNotExist: return "JoinFederationExecutionResponseFederationExecutionDoesNotExist";
+  case JoinFederationExecutionResponseSaveInProgress: return "JoinFederationExecutionResponseSaveInProgress";
+  case JoinFederationExecutionResponseRestoreInProgress: return "JoinFederationExecutionResponseRestoreInProgress";
+  case JoinFederationExecutionResponseInconsistentFDD: return "JoinFederationExecutionResponseInconsistentFDD";
+  default: return "<Invalid JoinFederationExecutionResponseType>";
+  }
+}
+
+// EnumDataType RegisterFederationSynchronizationPointResponseType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegisterFederationSynchronizationPointResponseType& value)
@@ -7526,6 +7852,17 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegisterFederat
   return os;
 }
 
+inline std::string to_string(const RegisterFederationSynchronizationPointResponseType& value)
+{
+  switch (value) {
+  case RegisterFederationSynchronizationPointResponseSuccess: return "RegisterFederationSynchronizationPointResponseSuccess";
+  case RegisterFederationSynchronizationPointResponseLabelNotUnique: return "RegisterFederationSynchronizationPointResponseLabelNotUnique";
+  case RegisterFederationSynchronizationPointResponseMemberNotJoined: return "RegisterFederationSynchronizationPointResponseMemberNotJoined";
+  default: return "<Invalid RegisterFederationSynchronizationPointResponseType>";
+  }
+}
+
+// <__main__.MapDataType object at 0x0000000002B3CEF0>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ConfigurationParameterMap& value)
@@ -7542,6 +7879,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ConfigurationPa
   return os;
 }
 
+// StructDataType FOMStringTransportationType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringTransportationType& value)
@@ -7552,6 +7890,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringTransp
   return os;
 }
 
+// VectorDataType FOMStringTransportationTypeList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringTransportationTypeList& value)
@@ -7568,6 +7907,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringTransp
   return os;
 }
 
+// StructDataType FOMStringDimension
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringDimension& value)
@@ -7580,6 +7920,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringDimens
   return os;
 }
 
+// VectorDataType FOMStringDimensionList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringDimensionList& value)
@@ -7596,6 +7937,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringDimens
   return os;
 }
 
+// StructDataType FOMStringRoutingSpace
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringRoutingSpace& value)
@@ -7608,6 +7950,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringRoutin
   return os;
 }
 
+// VectorDataType FOMStringRoutingSpaceList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringRoutingSpaceList& value)
@@ -7624,6 +7967,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringRoutin
   return os;
 }
 
+// StructDataType FOMStringParameter
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringParameter& value)
@@ -7634,6 +7978,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringParame
   return os;
 }
 
+// VectorDataType FOMStringParameterList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringParameterList& value)
@@ -7650,6 +7995,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringParame
   return os;
 }
 
+// StructDataType FOMStringInteractionClass
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringInteractionClass& value)
@@ -7670,6 +8016,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringIntera
   return os;
 }
 
+// VectorDataType FOMStringInteractionClassList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringInteractionClassList& value)
@@ -7686,6 +8033,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringIntera
   return os;
 }
 
+// StructDataType FOMStringAttribute
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringAttribute& value)
@@ -7704,6 +8052,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringAttrib
   return os;
 }
 
+// VectorDataType FOMStringAttributeList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringAttributeList& value)
@@ -7720,6 +8069,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringAttrib
   return os;
 }
 
+// StructDataType FOMStringObjectClass
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringObjectClass& value)
@@ -7732,6 +8082,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringObject
   return os;
 }
 
+// VectorDataType FOMStringObjectClassList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringObjectClassList& value)
@@ -7748,6 +8099,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringObject
   return os;
 }
 
+// StructDataType FOMStringUpdateRate
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringUpdateRate& value)
@@ -7760,6 +8112,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringUpdate
   return os;
 }
 
+// VectorDataType FOMStringUpdateRateList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringUpdateRateList& value)
@@ -7776,6 +8129,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringUpdate
   return os;
 }
 
+// StructDataType FOMStringSwitch
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringSwitch& value)
@@ -7788,6 +8142,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringSwitch
   return os;
 }
 
+// VectorDataType FOMStringSwitchList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringSwitchList& value)
@@ -7804,6 +8159,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringSwitch
   return os;
 }
 
+// StructDataType FOMStringModule
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringModule& value)
@@ -7832,6 +8188,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringModule
   return os;
 }
 
+// VectorDataType FOMStringModuleList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringModuleList& value)
@@ -7848,6 +8205,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringModule
   return os;
 }
 
+// StructDataType FOMTransportationType
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMTransportationType& value)
@@ -7860,6 +8218,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMTransportati
   return os;
 }
 
+// VectorDataType FOMTransportationTypeList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMTransportationTypeList& value)
@@ -7876,6 +8235,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMTransportati
   return os;
 }
 
+// StructDataType FOMDimension
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMDimension& value)
@@ -7890,6 +8250,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMDimension& v
   return os;
 }
 
+// VectorDataType FOMDimensionList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMDimensionList& value)
@@ -7906,6 +8267,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMDimensionLis
   return os;
 }
 
+// StructDataType FOMRoutingSpace
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMRoutingSpace& value)
@@ -7920,6 +8282,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMRoutingSpace
   return os;
 }
 
+// VectorDataType FOMRoutingSpaceList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMRoutingSpaceList& value)
@@ -7936,6 +8299,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMRoutingSpace
   return os;
 }
 
+// StructDataType FOMParameter
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMParameter& value)
@@ -7948,6 +8312,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMParameter& v
   return os;
 }
 
+// VectorDataType FOMParameterList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMParameterList& value)
@@ -7964,6 +8329,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMParameterLis
   return os;
 }
 
+// StructDataType FOMInteractionClass
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMInteractionClass& value)
@@ -7986,6 +8352,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMInteractionC
   return os;
 }
 
+// VectorDataType FOMInteractionClassList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMInteractionClassList& value)
@@ -8002,6 +8369,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMInteractionC
   return os;
 }
 
+// StructDataType FOMAttribute
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMAttribute& value)
@@ -8020,6 +8388,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMAttribute& v
   return os;
 }
 
+// VectorDataType FOMAttributeList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMAttributeList& value)
@@ -8036,6 +8405,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMAttributeLis
   return os;
 }
 
+// StructDataType FOMObjectClass
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMObjectClass& value)
@@ -8052,6 +8422,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMObjectClass&
   return os;
 }
 
+// VectorDataType FOMObjectClassList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMObjectClassList& value)
@@ -8068,6 +8439,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMObjectClassL
   return os;
 }
 
+// StructDataType FOMUpdateRate
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMUpdateRate& value)
@@ -8082,6 +8454,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMUpdateRate& 
   return os;
 }
 
+// VectorDataType FOMUpdateRateList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMUpdateRateList& value)
@@ -8098,6 +8471,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMUpdateRateLi
   return os;
 }
 
+// StructDataType FOMSwitch
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMSwitch& value)
@@ -8110,6 +8484,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMSwitch& valu
   return os;
 }
 
+// VectorDataType FOMSwitchList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMSwitchList& value)
@@ -8126,6 +8501,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMSwitchList& 
   return os;
 }
 
+// StructDataType FOMModule
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMModule& value)
@@ -8156,6 +8532,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMModule& valu
   return os;
 }
 
+// VectorDataType FOMModuleList
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMModuleList& value)
@@ -8172,6 +8549,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMModuleList& 
   return os;
 }
 
+// MessageDataType ConnectionLostMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ConnectionLostMessage& value)
@@ -8182,6 +8560,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ConnectionLostM
   return os;
 }
 
+// MessageDataType CreateFederationExecutionRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const CreateFederationExecutionRequestMessage& value)
@@ -8196,6 +8575,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const CreateFederatio
   return os;
 }
 
+// MessageDataType CreateFederationExecutionResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const CreateFederationExecutionResponseMessage& value)
@@ -8208,6 +8588,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const CreateFederatio
   return os;
 }
 
+// MessageDataType DestroyFederationExecutionRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DestroyFederationExecutionRequestMessage& value)
@@ -8218,6 +8599,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DestroyFederati
   return os;
 }
 
+// MessageDataType DestroyFederationExecutionResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DestroyFederationExecutionResponseMessage& value)
@@ -8228,6 +8610,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DestroyFederati
   return os;
 }
 
+// MessageDataType EnumerateFederationExecutionsRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const EnumerateFederationExecutionsRequestMessage& value)
@@ -8237,6 +8620,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const EnumerateFedera
   return os;
 }
 
+// MessageDataType EnumerateFederationExecutionsResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const EnumerateFederationExecutionsResponseMessage& value)
@@ -8247,13 +8631,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const EnumerateFedera
   return os;
 }
 
+// MessageDataType InsertFederationExecutionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertFederationExecutionMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "federationName: " << value.getFederationName();
   os << ", ";
   os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
@@ -8263,6 +8649,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertFederatio
   return os;
 }
 
+// MessageDataType ShutdownFederationExecutionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ShutdownFederationExecutionMessage& value)
@@ -8273,6 +8660,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ShutdownFederat
   return os;
 }
 
+// MessageDataType EraseFederationExecutionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const EraseFederationExecutionMessage& value)
@@ -8283,6 +8671,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const EraseFederation
   return os;
 }
 
+// MessageDataType ReleaseFederationHandleMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ReleaseFederationHandleMessage& value)
@@ -8293,18 +8682,22 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ReleaseFederati
   return os;
 }
 
+// MessageDataType InsertModulesMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertModulesMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "fOMModuleList: " << value.getFOMModuleList();
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  // StructField fOMModuleList (hidden)
+  //os << "fOMModuleList: " << value.getFOMModuleList();
   os << " }";
   return os;
 }
 
+// MessageDataType JoinFederationExecutionRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationExecutionRequestMessage& value)
@@ -8323,6 +8716,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationE
   return os;
 }
 
+// MessageDataType JoinFederationExecutionResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationExecutionResponseMessage& value)
@@ -8343,6 +8737,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationE
   return os;
 }
 
+// MessageDataType ResignFederationExecutionLeafRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignFederationExecutionLeafRequestMessage& value)
@@ -8357,6 +8752,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignFederatio
   return os;
 }
 
+// MessageDataType ResignFederationExecutionRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignFederationExecutionRequestMessage& value)
@@ -8369,15 +8765,18 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignFederatio
   return os;
 }
 
+// MessageDataType JoinFederateNotifyMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederateNotifyMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  // StructField federateHandle (hidden)
+  //os << "federateHandle: " << value.getFederateHandle();
+  //os << ", ";
   os << "federateType: " << value.getFederateType();
   os << ", ";
   os << "federateName: " << value.getFederateName();
@@ -8385,6 +8784,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederateNot
   return os;
 }
 
+// MessageDataType ResignFederateNotifyMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignFederateNotifyMessage& value)
@@ -8397,6 +8797,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignFederateN
   return os;
 }
 
+// MessageDataType ChangeAutomaticResignDirectiveMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeAutomaticResignDirectiveMessage& value)
@@ -8411,13 +8812,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeAutomatic
   return os;
 }
 
+// MessageDataType RegisterFederationSynchronizationPointMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegisterFederationSynchronizationPointMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
   os << ", ";
   os << "label: " << value.getLabel();
@@ -8429,13 +8832,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegisterFederat
   return os;
 }
 
+// MessageDataType RegisterFederationSynchronizationPointResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegisterFederationSynchronizationPointResponseMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
   os << ", ";
   os << "label: " << value.getLabel();
@@ -8445,13 +8850,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegisterFederat
   return os;
 }
 
+// MessageDataType AnnounceSynchronizationPointMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AnnounceSynchronizationPointMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "label: " << value.getLabel();
   os << ", ";
   os << "tag: " << value.getTag();
@@ -8463,13 +8870,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AnnounceSynchro
   return os;
 }
 
+// MessageDataType SynchronizationPointAchievedMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const SynchronizationPointAchievedMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "label: " << value.getLabel();
   os << ", ";
   os << "federateHandleBoolPairVector: " << value.getFederateHandleBoolPairVector();
@@ -8477,13 +8886,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const Synchronization
   return os;
 }
 
+// MessageDataType FederationSynchronizedMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationSynchronizedMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "label: " << value.getLabel();
   os << ", ";
   os << "federateHandleBoolPairVector: " << value.getFederateHandleBoolPairVector();
@@ -8491,13 +8902,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationSynch
   return os;
 }
 
+// MessageDataType EnableTimeRegulationRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const EnableTimeRegulationRequestMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
   os << ", ";
   os << "timeStamp: " << value.getTimeStamp();
@@ -8507,13 +8920,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const EnableTimeRegul
   return os;
 }
 
+// MessageDataType EnableTimeRegulationResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const EnableTimeRegulationResponseMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
   os << ", ";
   os << "respondingFederateHandle: " << value.getRespondingFederateHandle();
@@ -8525,6 +8940,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const EnableTimeRegul
   return os;
 }
 
+// MessageDataType DisableTimeRegulationRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DisableTimeRegulationRequestMessage& value)
@@ -8537,6 +8953,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DisableTimeRegu
   return os;
 }
 
+// MessageDataType CommitLowerBoundTimeStampMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitLowerBoundTimeStampMessage& value)
@@ -8544,8 +8961,9 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitLowerBoun
   os << "{ ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
+  // StructField federateHandle (hidden)
+  //os << "federateHandle: " << value.getFederateHandle();
+  //os << ", ";
   os << "timeStamp: " << value.getTimeStamp();
   os << ", ";
   os << "commitType: " << value.getCommitType();
@@ -8555,13 +8973,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitLowerBoun
   return os;
 }
 
+// MessageDataType CommitLowerBoundTimeStampResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitLowerBoundTimeStampResponseMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
   os << ", ";
   os << "sendingFederateHandle: " << value.getSendingFederateHandle();
@@ -8571,13 +8991,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitLowerBoun
   return os;
 }
 
+// MessageDataType LockedByNextMessageRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const LockedByNextMessageRequestMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "sendingFederateHandle: " << value.getSendingFederateHandle();
   os << ", ";
   os << "lockedByNextMessage: " << value.getLockedByNextMessage();
@@ -8585,6 +9007,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const LockedByNextMes
   return os;
 }
 
+// MessageDataType TimeConstrainedEnabledMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeConstrainedEnabledMessage& value)
@@ -8594,6 +9017,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeConstrained
   return os;
 }
 
+// MessageDataType TimeRegulationEnabledMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeRegulationEnabledMessage& value)
@@ -8603,6 +9027,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeRegulationE
   return os;
 }
 
+// MessageDataType TimeAdvanceGrantedMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeAdvanceGrantedMessage& value)
@@ -8612,6 +9037,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeAdvanceGran
   return os;
 }
 
+// MessageDataType InsertRegionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertRegionMessage& value)
@@ -8624,6 +9050,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertRegionMes
   return os;
 }
 
+// MessageDataType CommitRegionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitRegionMessage& value)
@@ -8636,6 +9063,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitRegionMes
   return os;
 }
 
+// MessageDataType EraseRegionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const EraseRegionMessage& value)
@@ -8648,13 +9076,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const EraseRegionMess
   return os;
 }
 
+// MessageDataType ChangeInteractionClassPublicationMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeInteractionClassPublicationMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "publicationType: " << value.getPublicationType();
   os << ", ";
   os << "interactionClassHandle: " << value.getInteractionClassHandle();
@@ -8662,13 +9092,15 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeInteracti
   return os;
 }
 
+// MessageDataType ChangeObjectClassPublicationMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeObjectClassPublicationMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "publicationType: " << value.getPublicationType();
   os << ", ";
   os << "objectClassHandle: " << value.getObjectClassHandle();
@@ -8678,27 +9110,33 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeObjectCla
   return os;
 }
 
+// MessageDataType ChangeInteractionClassSubscriptionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeInteractionClassSubscriptionMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "subscriptionType: " << value.getSubscriptionType();
   os << ", ";
   os << "interactionClassHandle: " << value.getInteractionClassHandle();
+  os << ", ";
+  os << "parameterFilterValues: " << value.getParameterFilterValues();
   os << " }";
   return os;
 }
 
+// MessageDataType ChangeObjectClassSubscriptionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeObjectClassSubscriptionMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "subscriptionType: " << value.getSubscriptionType();
   os << ", ";
   os << "objectClassHandle: " << value.getObjectClassHandle();
@@ -8708,6 +9146,25 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeObjectCla
   return os;
 }
 
+// MessageDataType ChangeObjectInstanceSubscriptionMessage
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeObjectInstanceSubscriptionMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "subscriptionType: " << value.getSubscriptionType();
+  os << ", ";
+  os << "objectClassHandle: " << value.getObjectClassHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType RegistrationForObjectClassMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegistrationForObjectClassMessage& value)
@@ -8720,6 +9177,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegistrationFor
   return os;
 }
 
+// MessageDataType AttributesInScopeMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributesInScopeMessage& value)
@@ -8734,6 +9192,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributesInSco
   return os;
 }
 
+// MessageDataType TurnUpdatesOnForInstanceMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const TurnUpdatesOnForInstanceMessage& value)
@@ -8750,6 +9209,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const TurnUpdatesOnFo
   return os;
 }
 
+// MessageDataType TurnInteractionsOnMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const TurnInteractionsOnMessage& value)
@@ -8762,6 +9222,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const TurnInteraction
   return os;
 }
 
+// MessageDataType InteractionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const InteractionMessage& value)
@@ -8782,6 +9243,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const InteractionMess
   return os;
 }
 
+// MessageDataType TimeStampedInteractionMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeStampedInteractionMessage& value)
@@ -8808,6 +9270,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeStampedInte
   return os;
 }
 
+// MessageDataType ObjectInstanceHandlesRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandlesRequestMessage& value)
@@ -8822,6 +9285,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceH
   return os;
 }
 
+// MessageDataType ObjectInstanceHandlesResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandlesResponseMessage& value)
@@ -8836,6 +9300,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceH
   return os;
 }
 
+// MessageDataType ReleaseMultipleObjectInstanceNameHandlePairsMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
@@ -8848,6 +9313,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ReleaseMultiple
   return os;
 }
 
+// MessageDataType ReserveObjectInstanceNameRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveObjectInstanceNameRequestMessage& value)
@@ -8862,6 +9328,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveObjectIn
   return os;
 }
 
+// MessageDataType ReserveObjectInstanceNameResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveObjectInstanceNameResponseMessage& value)
@@ -8878,6 +9345,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveObjectIn
   return os;
 }
 
+// MessageDataType ReserveMultipleObjectInstanceNameRequestMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveMultipleObjectInstanceNameRequestMessage& value)
@@ -8892,6 +9360,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveMultiple
   return os;
 }
 
+// MessageDataType ReserveMultipleObjectInstanceNameResponseMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveMultipleObjectInstanceNameResponseMessage& value)
@@ -8908,6 +9377,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveMultiple
   return os;
 }
 
+// MessageDataType InsertObjectInstanceMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertObjectInstanceMessage& value)
@@ -8926,6 +9396,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertObjectIns
   return os;
 }
 
+// MessageDataType DeleteObjectInstanceMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DeleteObjectInstanceMessage& value)
@@ -8942,6 +9413,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DeleteObjectIns
   return os;
 }
 
+// MessageDataType TimeStampedDeleteObjectInstanceMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeStampedDeleteObjectInstanceMessage& value)
@@ -8964,6 +9436,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeStampedDele
   return os;
 }
 
+// MessageDataType AttributeUpdateMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeUpdateMessage& value)
@@ -8984,6 +9457,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeUpdate
   return os;
 }
 
+// MessageDataType TimeStampedAttributeUpdateMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeStampedAttributeUpdateMessage& value)
@@ -9010,6 +9484,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeStampedAttr
   return os;
 }
 
+// MessageDataType RequestAttributeUpdateMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RequestAttributeUpdateMessage& value)
@@ -9026,6 +9501,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RequestAttribut
   return os;
 }
 
+// MessageDataType RequestClassAttributeUpdateMessage
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RequestClassAttributeUpdateMessage& value)
@@ -9040,6 +9516,695 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RequestClassAtt
   os << "tag: " << value.getTag();
   os << " }";
   return os;
+}
+
+
+// StructDataType RangeBoundsValue
+inline std::string to_string(const RangeBoundsValue& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType AttributeState
+inline std::string to_string(const AttributeState& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType ParameterValue
+inline std::string to_string(const ParameterValue& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType AttributeValue
+inline std::string to_string(const AttributeValue& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FederationExecutionInformation
+inline std::string to_string(const FederationExecutionInformation& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringTransportationType
+inline std::string to_string(const FOMStringTransportationType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringDimension
+inline std::string to_string(const FOMStringDimension& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringRoutingSpace
+inline std::string to_string(const FOMStringRoutingSpace& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringParameter
+inline std::string to_string(const FOMStringParameter& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringInteractionClass
+inline std::string to_string(const FOMStringInteractionClass& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringAttribute
+inline std::string to_string(const FOMStringAttribute& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringObjectClass
+inline std::string to_string(const FOMStringObjectClass& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringUpdateRate
+inline std::string to_string(const FOMStringUpdateRate& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringSwitch
+inline std::string to_string(const FOMStringSwitch& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringModule
+inline std::string to_string(const FOMStringModule& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMTransportationType
+inline std::string to_string(const FOMTransportationType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMDimension
+inline std::string to_string(const FOMDimension& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMRoutingSpace
+inline std::string to_string(const FOMRoutingSpace& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMParameter
+inline std::string to_string(const FOMParameter& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMInteractionClass
+inline std::string to_string(const FOMInteractionClass& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMAttribute
+inline std::string to_string(const FOMAttribute& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMObjectClass
+inline std::string to_string(const FOMObjectClass& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMUpdateRate
+inline std::string to_string(const FOMUpdateRate& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMSwitch
+inline std::string to_string(const FOMSwitch& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMModule
+inline std::string to_string(const FOMModule& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ConnectionLostMessage
+inline std::string to_string(const ConnectionLostMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType CreateFederationExecutionRequestMessage
+inline std::string to_string(const CreateFederationExecutionRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType CreateFederationExecutionResponseMessage
+inline std::string to_string(const CreateFederationExecutionResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType DestroyFederationExecutionRequestMessage
+inline std::string to_string(const DestroyFederationExecutionRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType DestroyFederationExecutionResponseMessage
+inline std::string to_string(const DestroyFederationExecutionResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType EnumerateFederationExecutionsRequestMessage
+inline std::string to_string(const EnumerateFederationExecutionsRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType EnumerateFederationExecutionsResponseMessage
+inline std::string to_string(const EnumerateFederationExecutionsResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType InsertFederationExecutionMessage
+inline std::string to_string(const InsertFederationExecutionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ShutdownFederationExecutionMessage
+inline std::string to_string(const ShutdownFederationExecutionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType EraseFederationExecutionMessage
+inline std::string to_string(const EraseFederationExecutionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ReleaseFederationHandleMessage
+inline std::string to_string(const ReleaseFederationHandleMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType InsertModulesMessage
+inline std::string to_string(const InsertModulesMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType JoinFederationExecutionRequestMessage
+inline std::string to_string(const JoinFederationExecutionRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType JoinFederationExecutionResponseMessage
+inline std::string to_string(const JoinFederationExecutionResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ResignFederationExecutionLeafRequestMessage
+inline std::string to_string(const ResignFederationExecutionLeafRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ResignFederationExecutionRequestMessage
+inline std::string to_string(const ResignFederationExecutionRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType JoinFederateNotifyMessage
+inline std::string to_string(const JoinFederateNotifyMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ResignFederateNotifyMessage
+inline std::string to_string(const ResignFederateNotifyMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ChangeAutomaticResignDirectiveMessage
+inline std::string to_string(const ChangeAutomaticResignDirectiveMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType RegisterFederationSynchronizationPointMessage
+inline std::string to_string(const RegisterFederationSynchronizationPointMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType RegisterFederationSynchronizationPointResponseMessage
+inline std::string to_string(const RegisterFederationSynchronizationPointResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType AnnounceSynchronizationPointMessage
+inline std::string to_string(const AnnounceSynchronizationPointMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType SynchronizationPointAchievedMessage
+inline std::string to_string(const SynchronizationPointAchievedMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType FederationSynchronizedMessage
+inline std::string to_string(const FederationSynchronizedMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType EnableTimeRegulationRequestMessage
+inline std::string to_string(const EnableTimeRegulationRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType EnableTimeRegulationResponseMessage
+inline std::string to_string(const EnableTimeRegulationResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType DisableTimeRegulationRequestMessage
+inline std::string to_string(const DisableTimeRegulationRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType CommitLowerBoundTimeStampMessage
+inline std::string to_string(const CommitLowerBoundTimeStampMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType CommitLowerBoundTimeStampResponseMessage
+inline std::string to_string(const CommitLowerBoundTimeStampResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType LockedByNextMessageRequestMessage
+inline std::string to_string(const LockedByNextMessageRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType TimeConstrainedEnabledMessage
+inline std::string to_string(const TimeConstrainedEnabledMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType TimeRegulationEnabledMessage
+inline std::string to_string(const TimeRegulationEnabledMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType TimeAdvanceGrantedMessage
+inline std::string to_string(const TimeAdvanceGrantedMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType InsertRegionMessage
+inline std::string to_string(const InsertRegionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType CommitRegionMessage
+inline std::string to_string(const CommitRegionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType EraseRegionMessage
+inline std::string to_string(const EraseRegionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ChangeInteractionClassPublicationMessage
+inline std::string to_string(const ChangeInteractionClassPublicationMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ChangeObjectClassPublicationMessage
+inline std::string to_string(const ChangeObjectClassPublicationMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ChangeInteractionClassSubscriptionMessage
+inline std::string to_string(const ChangeInteractionClassSubscriptionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ChangeObjectClassSubscriptionMessage
+inline std::string to_string(const ChangeObjectClassSubscriptionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ChangeObjectInstanceSubscriptionMessage
+inline std::string to_string(const ChangeObjectInstanceSubscriptionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType RegistrationForObjectClassMessage
+inline std::string to_string(const RegistrationForObjectClassMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType AttributesInScopeMessage
+inline std::string to_string(const AttributesInScopeMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType TurnUpdatesOnForInstanceMessage
+inline std::string to_string(const TurnUpdatesOnForInstanceMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType TurnInteractionsOnMessage
+inline std::string to_string(const TurnInteractionsOnMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType InteractionMessage
+inline std::string to_string(const InteractionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType TimeStampedInteractionMessage
+inline std::string to_string(const TimeStampedInteractionMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ObjectInstanceHandlesRequestMessage
+inline std::string to_string(const ObjectInstanceHandlesRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ObjectInstanceHandlesResponseMessage
+inline std::string to_string(const ObjectInstanceHandlesResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ReleaseMultipleObjectInstanceNameHandlePairsMessage
+inline std::string to_string(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ReserveObjectInstanceNameRequestMessage
+inline std::string to_string(const ReserveObjectInstanceNameRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ReserveObjectInstanceNameResponseMessage
+inline std::string to_string(const ReserveObjectInstanceNameResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ReserveMultipleObjectInstanceNameRequestMessage
+inline std::string to_string(const ReserveMultipleObjectInstanceNameRequestMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType ReserveMultipleObjectInstanceNameResponseMessage
+inline std::string to_string(const ReserveMultipleObjectInstanceNameResponseMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType InsertObjectInstanceMessage
+inline std::string to_string(const InsertObjectInstanceMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType DeleteObjectInstanceMessage
+inline std::string to_string(const DeleteObjectInstanceMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType TimeStampedDeleteObjectInstanceMessage
+inline std::string to_string(const TimeStampedDeleteObjectInstanceMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType AttributeUpdateMessage
+inline std::string to_string(const AttributeUpdateMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType TimeStampedAttributeUpdateMessage
+inline std::string to_string(const TimeStampedAttributeUpdateMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType RequestAttributeUpdateMessage
+inline std::string to_string(const RequestAttributeUpdateMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// MessageDataType RequestClassAttributeUpdateMessage
+inline std::string to_string(const RequestClassAttributeUpdateMessage& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
 }
 
 } // namespace OpenRTI

@@ -169,7 +169,7 @@ public:
     FederationBarrier(unsigned numThreads) :
       _numThreads(numThreads),
       _numWaitingThreads(0),
-      _serial(-17),
+      _serial((unsigned)-17),
       _successCount(0),
       _failCount(0)
     { }

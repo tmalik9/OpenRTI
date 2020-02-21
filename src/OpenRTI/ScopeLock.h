@@ -22,9 +22,13 @@
 
 #include "Mutex.h"
 
+#ifndef __CPlusPlusStd
+#error "must include OpenRTIConfig.h!"
+#endif
+
 namespace OpenRTI {
 
-#if 201103L <= __cplusplus
+#if 201103L <= __CPlusPlusStd
 
 class ScopeLock : public std::unique_lock<std::mutex> {
 public:

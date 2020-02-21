@@ -32,16 +32,6 @@ AbstractSocketEvent::~AbstractSocketEvent()
 }
 
 void
-AbstractSocketEvent::read(SocketEventDispatcher& dispatcher)
-{
-}
-
-void
-AbstractSocketEvent::write(SocketEventDispatcher& dispatcher)
-{
-}
-
-void
 AbstractSocketEvent::timeout(SocketEventDispatcher& dispatcher)
 {
 }

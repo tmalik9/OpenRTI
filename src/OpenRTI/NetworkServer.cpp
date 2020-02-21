@@ -44,6 +44,7 @@
 #include "SocketServerAcceptEvent.h"
 #include "SocketTCP.h"
 #include "StringUtils.h"
+#include "LogStream.h"
 
 namespace OpenRTI {
 
@@ -78,8 +79,13 @@ NetworkServer::setUpFromConfig(const std::string& config)
     setUpFromConfig(stream);
   } else {
     URL url = URL::fromUrl(config);
-    if (url.getProtocol() == "file" || url.getProtocol().empty()) {
+    if (url.getProtocol() == "file") {
       std::ifstream stream(utf8ToLocale(url.getPath()).c_str());
+      if (!stream.is_open())
+        throw RTIinternalError("Could not open server config file: \"" + url.str() + "\"!");
+      setUpFromConfig(stream);
+    } else if (!config.empty()) {
+      std::ifstream stream(config.c_str());
       if (!stream.is_open())
         throw RTIinternalError("Could not open server config file: \"" + url.str() + "\"!");
       setUpFromConfig(stream);
@@ -106,6 +112,11 @@ NetworkServer::setUpFromConfig(std::istream& stream)
   std::string errorMessage = errorHandler->getMessages();
   if (!errorMessage.empty())
     throw RTIinternalError(errorMessage);
+
+  if (contentHandler->isLogPrioritySet()) LogStream::setPriority(contentHandler->getLogPriority());
+  if (contentHandler->isLogCategorySet()) LogStream::setCategory(contentHandler->getLogCategory());
+  if (contentHandler->isLogFileSet()) LogStream::AddLogFile(contentHandler->getLogFile());
+  if (contentHandler->isLogToConsoleSet()) LogStream::EnableLogToConsole(contentHandler->getLogToConsole());
 
   getServerNode().getServerOptions()._preferCompression = contentHandler->getEnableZLibCompression();
   getServerNode().getServerOptions()._permitTimeRegulation = contentHandler->getPermitTimeRegulation();
@@ -326,6 +337,7 @@ NetworkServer::_postMessage(const _MessageConnectHandlePair& messageConnectHandl
 {
   ScopeLock scopeLock(_mutex);
   bool empty = _queue.empty();
+  //DebugPrintf("%s: message=%s\n", __FUNCTION__, messageConnectHandlePair.first.valid() ? messageConnectHandlePair.first->toString().c_str() : "null");
   _queue.push_back(messageConnectHandlePair, _pool);
   // If the list already contains some unsent messages,
   // the socket event dispatcher is already informed and will also catch this new message.

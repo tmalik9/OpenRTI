@@ -64,12 +64,6 @@ set(LIB_RTI1516E_SOURCES
         HLAopaqueData.cpp
         HLAvariableArray.cpp
         HLAvariantRecord.cpp
-        HLAfloat64Interval.cpp
-        HLAfloat64Time.cpp
-        HLAfloat64TimeFactory.cpp
-        HLAinteger64Interval.cpp
-        HLAinteger64Time.cpp
-        HLAinteger64TimeFactory.cpp
         HLAlogicalTimeFactoryFactory.cpp
         LogicalTime.cpp
         LogicalTimeFactory.cpp
@@ -86,14 +80,21 @@ set(LIB_RTI1516E_SOURCES
 )
 
 set(LIB_FEDTIME1516E_SOURCES
+        HLAfloat64Interval.cpp
+        HLAfloat64Time.cpp
+        HLAfloat64TimeFactory.cpp
+        HLAinteger64Interval.cpp
+        HLAinteger64Time.cpp
+        HLAinteger64TimeFactory.cpp
         LogicalTimeFactoryFactory.cpp
 )
 
 if(OPENRTI_BUILD_SHARED)
   add_library(rti1516e SHARED ${LIB_RTI1516E_SOURCES})
   set_property(TARGET rti1516e APPEND PROPERTY COMPILE_DEFINITIONS BUILDING_RTI)
-  set_property(TARGET rti1516e PROPERTY VERSION 1.0.0)
-  set_property(TARGET rti1516e PROPERTY SOVERSION 1)
+# ems: disable CMake so library versioning
+#  set_property(TARGET rti1516e PROPERTY VERSION 1.0.0)
+#  set_property(TARGET rti1516e PROPERTY SOVERSION 1)
 
   # rti1516e, the circular reference is tricky on win32
   if(MSVC)
@@ -143,8 +144,9 @@ endif()
 if(OPENRTI_BUILD_SHARED)
   add_library(fedtime1516e SHARED ${LIB_FEDTIME1516E_SOURCES})
   set_property(TARGET fedtime1516e APPEND PROPERTY COMPILE_DEFINITIONS BUILDING_FEDTIME)
-  set_property(TARGET fedtime1516e PROPERTY VERSION 1.0.0)
-  set_property(TARGET fedtime1516e PROPERTY SOVERSION 1)
+# ems: disable CMake so library versioning
+#  set_property(TARGET fedtime1516e PROPERTY VERSION 1.0.0)
+#  set_property(TARGET fedtime1516e PROPERTY SOVERSION 1)
   if(OPENRTI_INSTALL_WITH_RPATH)
     set_property(TARGET fedtime1516e PROPERTY INSTALL_RPATH "$ORIGIN")
     set_property(TARGET fedtime1516e APPEND PROPERTY LINK_FLAGS "${OPENRTI_RPATH_LINK_FLAGS}")

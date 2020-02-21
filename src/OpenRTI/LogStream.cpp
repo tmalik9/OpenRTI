@@ -17,6 +17,11 @@
  *
  */
 
+#if defined(_WIN32)
+#include <windows.h>
+#include <processenv.h>
+#endif
+
 #include "LogStream.h"
 
 #include <cstdlib>
@@ -31,9 +36,15 @@
 #include "StringUtils.h"
 #include "ThreadLocal.h"
 
+#ifdef _MSC_VER
+#include <filesystem>
+
+namespace fs = std::experimental::filesystem;
+#endif
 namespace OpenRTI {
 
-struct OPENRTI_LOCAL LogStream::StreamPair {
+class OPENRTI_LOCAL LogStream::StreamPair {
+public:
   // The reason for that not just being a static is that
   // we can guarantee that the mutex only dies if its last
   // user has died. This is hard to guarantee if it's just
@@ -50,9 +61,18 @@ struct OPENRTI_LOCAL LogStream::StreamPair {
   struct OPENRTI_LOCAL StreamBuf : public std::stringbuf {
   public:
     StreamBuf(std::ostream& stream) :
-      _stream(stream),
       _referencedMutex(getReferencedMutex())
-    { }
+    {
+      AddStream(stream);
+    }
+    void AddStream(std::ostream& stream)
+    {
+      _streams.push_back(&stream);
+    }
+    void RemoveStream(std::ostream& stream)
+    {
+      _streams.remove(&stream);
+    }
     virtual ~StreamBuf()
     {
       sync();
@@ -77,13 +97,17 @@ struct OPENRTI_LOCAL LogStream::StreamPair {
       size_t count = pptr() - base;
       if (count <= 0)
         return 0;
-      _stream.write(base, count);
+      for (auto stream : _streams)
+      {
+        stream->write(base, count);
+      }
       pubseekpos(0, std::ios_base::out);
       return 0;
     }
 
   private:
-    std::ostream& _stream;
+    //std::ostream* _stream = nullptr;
+    std::list<std::ostream*> _streams;
     SharedPtr<ReferencedMutex> _referencedMutex;
   };
 
@@ -104,15 +128,36 @@ struct OPENRTI_LOCAL LogStream::StreamPair {
     _errStream(std::cerr)
   { }
 
+  void AddOutStream(std::ostream& stream)
+  {
+    _outStream._streamBuf.AddStream(stream);
+  }
+  void RemoveOutStream(std::ostream& stream)
+  {
+    _outStream._streamBuf.RemoveStream(stream);
+  }
+  void AddErrStream(std::ostream& stream)
+  {
+    _errStream._streamBuf.AddStream(stream);
+  }
+  void RemoveErrStream(std::ostream& stream)
+  {
+    _errStream._streamBuf.RemoveStream(stream);
+  }
+  std::ostream* getOutStream()  { return &_outStream._stream; }
+  std::ostream* getErrStream()  { return &_errStream._stream; }
   static StreamPair* getStreamPair()
   {
-    static ThreadLocal<StreamPair> streamPair;
-    return streamPair.instance();
+    return _Instance.instance();
   }
 
+private:
   Stream _outStream;
   Stream _errStream;
+  static ThreadLocal<StreamPair> _Instance;
 };
+
+ThreadLocal<LogStream::StreamPair> LogStream::StreamPair::_Instance;
 
 static unsigned
 atou(const char* s)
@@ -127,6 +172,12 @@ atou(const char* s)
     return 0u;
 
   return value;
+}
+
+void
+LogStream::setCategory(LogStream::Category category)
+{
+  Instance().mCategory = category;
 }
 
 void
@@ -153,6 +204,46 @@ LogStream::setPriority(LogStream::Priority priority)
   logger.mPriority = priority;
 }
 
+void LogStream::AddLogFile(const std::string& path)
+{
+  std::string expandedPath = path;
+#if defined(_WIN32)
+  DWORD requiredSize = ExpandEnvironmentStringsA(path.c_str(), NULL, 0);
+  char* buffer = new char[requiredSize];
+  DWORD expandedSize = ExpandEnvironmentStringsA(path.c_str(), buffer, requiredSize);
+  if (expandedSize == requiredSize - 1)
+  {
+    expandedPath = buffer;
+  }
+  fs::path directory = fs::path(expandedPath).parent_path();
+  if (!directory.empty() && !fs::exists(directory))
+  {
+    fs::create_directories(directory);
+  }
+#endif
+  LogStream& logger = Instance();
+  std::cout << "Logging to \"" << expandedPath << "\"" << std::endl;
+  logger.mLogFile.open(expandedPath);
+  StreamPair::getStreamPair()->AddOutStream(logger.mLogFile);
+}
+
+void LogStream::EnableLogToConsole(bool enable)
+{
+  //LogStream& logger = Instance();
+  if (enable)
+  {
+    std::cout << "Console logging enabled" << std::endl;
+    StreamPair::getStreamPair()->AddOutStream(std::cout);
+    StreamPair::getStreamPair()->AddErrStream(std::cerr);
+  }
+  else
+  {
+    std::cout << "Console logging disabled" << std::endl;
+    StreamPair::getStreamPair()->RemoveOutStream(std::cout);
+    StreamPair::getStreamPair()->RemoveErrStream(std::cerr);
+  }
+}
+
 LogStream&
 LogStream::Instance(void)
 {
@@ -170,9 +261,9 @@ LogStream::getStream(Category category, LogStream::Priority priority)
   if (!streamPair)
     return 0;
   if (Info <= priority)
-    return &streamPair->_outStream._stream;
+    return streamPair->getOutStream();
   else
-    return &streamPair->_errStream._stream;
+    return streamPair->getErrStream();
 }
 
 LogStream::LogStream() :
@@ -189,13 +280,12 @@ LogStream::LogStream() :
     std::vector<std::string> categories = split(env, ", |");
     if (!categories.empty()) {
       mCategory = 0;
-      for (std::vector<std::string>::const_iterator i = categories.begin();
-           i != categories.end(); ++i) {
+      for (std::vector<std::string>::const_iterator i = categories.begin(); i != categories.end(); ++i) {
 
         static const struct {
           const char* name;
           Category bit;
-        } categories[] = {
+        } sCategories[] = {
 #define CATEGORY(name) { #name, name }
           CATEGORY(Assert),
           CATEGORY(Network),
@@ -210,9 +300,9 @@ LogStream::LogStream() :
 #undef CATEGORY
         };
 
-        for (unsigned j = 0; j < sizeof(categories)/sizeof(categories[0]); ++j) {
-          if (*i == categories[j].name)
-            mCategory |= categories[j].bit;
+        for (unsigned j = 0; j < sizeof(sCategories)/sizeof(sCategories[0]); ++j) {
+          if (*i == sCategories[j].name)
+            mCategory |= sCategories[j].bit;
         }
       }
     }

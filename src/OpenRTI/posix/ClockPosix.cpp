@@ -17,14 +17,14 @@
  *
  */
 
-#include "OpenRTIConfig.h"
-#include "Clock.h"
-#include "ClockPosix.h"
-
 #include <poll.h>
 #include <time.h>
 #include <unistd.h>
 #include <pthread.h>
+
+#include "../OpenRTIConfig.h"
+#include "../Clock.h"
+#include "ClockPosix.h"
 
 #include "Atomic.h"
 

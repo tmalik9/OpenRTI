@@ -70,8 +70,8 @@ public:
   { return compare_exchange_weak(oldValue, newValue, _toStdMemoryOrder(memoryOrder)); }
 
 private:
-  Atomic(const Atomic&);
-  Atomic& operator=(const Atomic&);
+  Atomic(const Atomic&) = delete;
+  Atomic& operator=(const Atomic&) = delete;
 
   static std::memory_order _toStdMemoryOrder(MemoryOrder memoryOrder)
   {

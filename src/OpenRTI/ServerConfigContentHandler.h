@@ -26,6 +26,7 @@
 #include "Attributes.h"
 #include "ContentHandler.h"
 #include "Exception.h"
+#include "LogStream.h"
 
 namespace OpenRTI {
 
@@ -72,7 +73,18 @@ public:
     return _listenConfig[index];
   }
 
+  LogStream::Priority getLogPriority() const { return _LogPriority; }
+  bool isLogPrioritySet() const { return _LogPrioritySet; }
+  LogStream::Category getLogCategory() const { return static_cast<LogStream::Category>(_LogCategory); }
+  bool isLogCategorySet() const { return _LogCategorySet; }
+  std::string  getLogFile()     const { return _LogFile; }
+  bool isLogFileSet() const { return _LogFileSet; }
+  bool getLogToConsole() const { return _LogToConsole; }
+  bool isLogToConsoleSet() const { return _LogToConsoleSet; }
+  bool getEnableNetworkStatistics() const { return _enableNetworkStatistics; }
+
 private:
+  void parseLogCategory(const std::string& s);
   // poor man's schema checking ...
   enum Mode {
     UnknownMode,
@@ -82,7 +94,13 @@ private:
     ParentServerMode,
     PermitTimeRegulationMode,
     EnableZLibCompressionMode,
-    ListenMode
+    ListenMode,
+    LogPriorityMode,
+    LogCategoryMode,
+    LogFileMode,
+    LogToConsoleMode,
+    LogToDebugMode,
+    NetworkStatisticsMode
   };
 
   Mode getCurrentMode()
@@ -99,11 +117,20 @@ private:
   std::string _parentServerUrl;
 
   /// Server defaults for time regulation and protocol compression
-  bool _permitTimeRegulation;
-  bool _enableZLibCompression;
-
+  bool _permitTimeRegulation = true;
+  bool _enableZLibCompression = true;
+  bool _enableNetworkStatistics = false;
   /// The config file configured listens
   std::vector<ListenConfig> _listenConfig;
+
+  unsigned                  _LogCategory;
+  bool                      _LogCategorySet = false;
+  LogStream::Priority       _LogPriority;
+  bool                      _LogPrioritySet = false;
+  std::string               _LogFile;
+  bool                      _LogFileSet = false;
+  bool                      _LogToConsole = false;
+  bool                      _LogToConsoleSet = false;
 };
 
 }

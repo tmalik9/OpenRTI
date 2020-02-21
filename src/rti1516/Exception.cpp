@@ -25,6 +25,8 @@
 
 #include <sstream>
 
+#pragma warning(disable: 4100)
+
 namespace rti1516
 {
 

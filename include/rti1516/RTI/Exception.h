@@ -12,6 +12,8 @@
 // The RTI::exception class follows the interface of the C++ standard exception
 // class.  The key method, what, returns a null terminated character string that
 // describes details of the exception that has occured.
+#pragma warning( disable : 4290 )
+#pragma warning( disable : 4251 )
 
 namespace rti1516
 {

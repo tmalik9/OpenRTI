@@ -17,8 +17,6 @@
  *
  */
 
-#include "StringUtils.h"
-
 #include <algorithm>
 #include <cstring>
 #include <wctype.h>
@@ -29,6 +27,7 @@
 #include <sstream>
 
 #include "OpenRTIConfig.h"
+#include "StringUtils.h"
 #include "Types.h"
 
 namespace OpenRTI {
@@ -245,7 +244,7 @@ utf8ToUtf16BE(const std::string& utf8, bool bom)
     if (c <= 0x7fff) {
       std::size_t offset = utf16.size();
       utf16.resize(offset + 2);
-      utf16.setAlignedUInt16BE(c, offset);
+      utf16.setAlignedUInt16BE((uint16_t)c, offset);
     } else if (c <= 0x1fffffff) {
       std::size_t offset = utf16.size();
       utf16.resize(offset + 4);
@@ -333,12 +332,12 @@ parseInetAddress(const std::string& address)
         hostname = address;
       } else {
         // Ipv4 mode 'address:port'
-        std::string::size_type pos = address.rfind(':');
-        if (pos == std::string::npos) {
+        std::string::size_type pos2 = address.rfind(':');
+        if (pos2 == std::string::npos) {
           hostname = address;
         } else {
-          hostname = address.substr(0, pos);
-          port = address.substr(pos + 1);
+          hostname = address.substr(0, pos2);
+          port = address.substr(pos2 + 1);
         }
       }
     }

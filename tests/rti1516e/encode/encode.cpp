@@ -403,7 +403,7 @@ bool testDataElementEncoding(const DataType& dataType)
       return false;
     }
 
-    std::auto_ptr<rti1516e::DataElement> dataElement2 = dataElement->clone();
+    std::unique_ptr<rti1516e::DataElement> dataElement2 = dataElement->clone();
     try {
       dataElement2->decode(variableLengthData);
     } catch (...) {

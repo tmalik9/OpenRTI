@@ -18,7 +18,7 @@
  */
 
 // This time, the first include is above the api include.
-// because of auto_ptr in the ambassador header
+// because of unique_ptr in the ambassador header
 #include <memory>
 
 #include <RTI/RTIambassador.h>
@@ -27,7 +27,6 @@ namespace rti1516e
 {
 
 RTIambassador::RTIambassador()
-  throw ()
 {
 }
 
