@@ -300,6 +300,8 @@ Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "TimeConstrainedFederate", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "python", "python", "{273881B2-D2F7-4F61-BA41-5AB4F8F3C7BF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InteractionFilters", "tests\OpenRTI\InteractionFilters\InteractionFilters.vcxproj", "{BFD91164-25B0-4AEB-9764-D578590CB17D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug All|Any CPU = Debug All|Any CPU
@@ -988,6 +990,25 @@ Global
 		{F3B68F89-3AF6-4E21-A7F8-B9D31B30874B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3B68F89-3AF6-4E21-A7F8-B9D31B30874B}.Release|Win32.ActiveCfg = Release|Any CPU
 		{F3B68F89-3AF6-4E21-A7F8-B9D31B30874B}.Release|x64.ActiveCfg = Release|Any CPU
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Debug All|Any CPU.ActiveCfg = Release|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Debug All|Any CPU.Build.0 = Release|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Debug All|Win32.ActiveCfg = Debug|Win32
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Debug All|Win32.Build.0 = Debug|Win32
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Debug All|x64.ActiveCfg = Debug|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Debug All|x64.Build.0 = Debug|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Debug|x64.ActiveCfg = Debug|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release All|Any CPU.ActiveCfg = Release|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release All|Any CPU.Build.0 = Release|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release All|Win32.ActiveCfg = Release|Win32
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release All|Win32.Build.0 = Release|Win32
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release All|x64.ActiveCfg = Release|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release All|x64.Build.0 = Release|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release|Any CPU.ActiveCfg = Release|Win32
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release|Win32.ActiveCfg = Release|Win32
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release|x64.ActiveCfg = Release|x64
+		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1026,6 +1047,7 @@ Global
 		{4B6705BB-9922-4573-BA5E-6DFFC6AF3532} = {75B6DA76-31E1-43C6-BF36-4D26FB1EA572}
 		{F3B68F89-3AF6-4E21-A7F8-B9D31B30874B} = {273881B2-D2F7-4F61-BA41-5AB4F8F3C7BF}
 		{273881B2-D2F7-4F61-BA41-5AB4F8F3C7BF} = {C007F7FB-94FD-4294-899D-5B1FAF53C8E3}
+		{BFD91164-25B0-4AEB-9764-D578590CB17D} = {C007F7FB-94FD-4294-899D-5B1FAF53C8E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		VisualSVNWorkingCopyRoot = .

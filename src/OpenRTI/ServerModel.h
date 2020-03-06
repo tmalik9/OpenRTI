@@ -29,6 +29,7 @@
 #include "HandleAllocator.h"
 #include "IntrusiveList.h"
 #include "IntrusiveUnorderedMap.h"
+#include "VariableLengthDataTuple.h"
 #include "Referenced.h"
 #include "RegionSet.h"
 #include "ServerOptions.h"
@@ -1050,12 +1051,10 @@ private:
 
 ////////////////////////////////////////////////////////////
 
-// a set of unique values
-typedef std::set<VariableLengthData> VariableLengthDataSet;
+// a set of data vectors
 // associates parameter handles with filter value list
-typedef std::map<ParameterHandle, VariableLengthDataSet> ParameterFilterMap;
 // associates federates with parameter filter maps
-typedef std::map<ConnectHandle, ParameterFilterMap> ParameterFilterMapByConnect;
+typedef std::map<ConnectHandle, VariableLengthDataTupleSet> ParameterFilterMapByConnect;
 
 class OPENRTI_LOCAL InteractionClass : public ModuleClassEntity<InteractionClass, InteractionClassHandle>, public PublishSubscribe /*FIXME*/ {
 public:
@@ -1148,15 +1147,15 @@ public:
   // returns true if the filter changes for given connect
   bool updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues);
   bool hasFilterSubscriptions() const;
-  bool isFiltered(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues) const;
-  ParameterValueVector getParameterFilters(const ConnectHandle& connectHandle);
+  bool isMatching(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues) const;
+  std::list<ParameterValueVector> getParameterFilters(const ConnectHandle& connectHandle);
 private:
   InteractionClass(const InteractionClass&) = delete;
   InteractionClass& operator=(const InteractionClass&) = delete;
 
-  void Dump(const char* prefix, const VariableLengthDataSet& filterValues) const;
-  void Dump(const char* prefix, const ParameterFilterMapByConnect& filtersByFederate) const;
-  bool AddParameterFilterValues(ParameterFilterMap& filterMap, const ParameterValueVector& parameterFilters);
+  ParameterValueVector getParameterFilterPrototype() const;
+  void NormalizeFilterValues(const VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVectorReturn, VariableLengthDataTuple& filterValueVectorReturn) const;
+  bool AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters);
 
   Federation& _federation;
 
@@ -1173,6 +1172,7 @@ private:
   ParameterDefinition::NameMap _parameterNameParameterMap;
 
   ClassParameter::HandleMap _parameterHandleClassParameterMap;
+  ParameterHandleVector _parameterFilterKeyPrototype;
   ParameterFilterMapByConnect _parameterFiltersByConnect;
 };
 

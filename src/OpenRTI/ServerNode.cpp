@@ -793,12 +793,19 @@ public:
             subscription->setFederationHandle(getFederationHandle());
             subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
             subscription->setSubscriptionType(subscriptionType);
-            ParameterValueVector parameters = interactionClass->getParameterFilters(subscriber);
-            if (!parameters.empty())
+            std::list<ParameterValueVector> parameterFilters = interactionClass->getParameterFilters(subscriber);
+            if (parameterFilters.empty())
             {
-              subscription->setParameterFilterValues(parameters);
+              send(connectHandle, subscription);
             }
-            send(connectHandle, subscription);
+            else
+            {
+              for (auto&& parameters : parameterFilters)
+              {
+                subscription->setParameterFilterValues(parameters);
+                send(connectHandle, subscription);
+              }
+            }
           }
         }
         else
@@ -1578,7 +1585,7 @@ public:
         if (currentInteractionClass->getSubscriptionType(subscriberConnectHandle) != Unsubscribed) {
           if (currentInteractionClass == interactionClass) {
             // interaction class specified in message
-            if (interactionClass->isFiltered(subscriberConnectHandle, message->getParameterValues())) {
+            if (interactionClass->isMatching(subscriberConnectHandle, message->getParameterValues())) {
               send(subscriberConnectHandle, message);
             }
           } else {
