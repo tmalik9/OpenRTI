@@ -6,8 +6,8 @@
 #define OPENRTI_MAJOR_NUMBER_STRING      "1"
 
 // Minornumber of OPENRTI library
-#define OPENRTI_MINOR_NUMBER              1
-#define OPENRTI_MINOR_NUMBER_STRING      "1"
+#define OPENRTI_MINOR_NUMBER              2
+#define OPENRTI_MINOR_NUMBER_STRING      "2"
 
 // Buildnumber of OPENRTI library
 #define OPENRTI_BUILD_NUMBER              0

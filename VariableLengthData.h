@@ -30,6 +30,8 @@
 #include <list>
 #include <ostream>
 #include <string>
+#include <vector>
+#include <iomanip>
 
 #ifndef __CPlusPlusStd
 #error "must include OpenRTIConfig.h!"
@@ -39,6 +41,7 @@ namespace OpenRTI {
 
 class VariableLengthData;
 typedef std::list<VariableLengthData> VariableLengthDataList;
+typedef std::vector<VariableLengthData> VariableLengthDataVector;
 
 /// Class for an opaque byte array.
 /// The class behaves similar to a std::vector as it does not reallocate when clearing or
@@ -991,11 +994,35 @@ private:
   size_t _offset;
 };
 
+template<typename TInputIter>
+static inline std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercase = true, bool insert_spaces = false)
+{
+  std::ostringstream ss;
+  ss << std::hex << std::setfill('0');
+  if (use_uppercase)
+    ss << std::uppercase;
+  while (first != last)
+  {
+    unsigned char currentByte = (*first++) & 0xff;
+    ss << std::setw(2) << (static_cast<unsigned int>(currentByte) & 0x000000ff);
+    if (insert_spaces && first != last)
+      ss << " ";
+  }
+  return ss.str();
+}
+
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const VariableLengthData& value)
 {
-  os << "{ size: " << value.size() << ", data: [...] }";
+  if (value.size() == 0)
+  {
+    os << "<empty>";
+  }
+  else
+  {
+    os << "{sz=" << value.size() << " ["<< make_hex_string(value.charData(), value.charData() + value.size(), true, true) << "]}";
+  }
   return os;
 }
 

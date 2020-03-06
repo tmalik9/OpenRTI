@@ -689,35 +689,42 @@ InteractionClass::insert(ParameterDefinition& parameterDefinition)
   insertClassParameterFor(parameterDefinition);
 }
 
-bool InteractionClass::AddParameterFilterValues(ParameterFilterMap& filterMap, const ParameterValueVector& parameterFilters)
+void InteractionClass::NormalizeFilterValues(const VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVector, VariableLengthDataTuple& filterValueTuple) const
 {
-  bool result = false;
-  for (auto& parameterFilterValue : parameterFilters) {
-    auto existingValueMapIter = filterMap.find(parameterFilterValue.getParameterHandle());
-    if (existingValueMapIter == filterMap.end()) {
-      // parameter not filtered yet: insert list with one element ...
-      VariableLengthDataSet values;
-      values.insert(parameterFilterValue.getValue());
-      // ... into existing map
-      filterMap.insert(ParameterFilterMap::value_type(parameterFilterValue.getParameterHandle(), values));
-      //DebugPrintf("%s(%s): parameter added\n", __FUNCTION__, getFQName().c_str());
-      result = true;
-    } else {
-      // parameter already has filter: insert value to existing list of values
-      // first scan the value list if value already associated with parameter
-      VariableLengthDataSet& values = existingValueMapIter->second;
-      if (values.find(parameterFilterValue.getValue()) != values.end())
-      {
-        // value already exists - continue with next parameterFilterValue
-        continue;
-      }
-      // new value: add to list
-      existingValueMapIter->second.insert(parameterFilterValue.getValue());
-      //DebugPrintf("%s(%s): value added\n", __FUNCTION__, getFQName().c_str());
-      result = true;
+  filterKeyVector = ParameterHandleVector(_parameterFilterKeyPrototype);
+  filterValueTuple = VariableLengthDataTuple(filterKeyVector.size());
+  int valueIndex = 0;
+  for (auto& filterKey : filterKeyVector)
+  {
+    auto where = std::find_if(parameterFilters.begin(), parameterFilters.end(),
+      [filterKey](ParameterValue parameterValue) { return parameterValue.getParameterHandle() == filterKey; });
+    if (where == parameterFilters.end())
+    {
+      filterKey = ParameterHandle();
+      filterValueTuple[valueIndex] = VariableLengthData();
+    }
+    else
+    {
+      filterValueTuple[valueIndex] = where->getValue();
+    }
+    valueIndex++;
+  }
+}
+
+bool InteractionClass::AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters)
+{
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple(filterKeyVector.size());
+  for (auto& item : parameterFilters)
+  {
+    if (std::find(_parameterFilterKeyPrototype.begin(), _parameterFilterKeyPrototype.end(), item.getParameterHandle()) == _parameterFilterKeyPrototype.end())
+    {
+      _parameterFilterKeyPrototype.push_back(item.getParameterHandle());
     }
   }
-  return result;
+  NormalizeFilterValues(filterValueTuples, parameterFilters, filterKeyVector, filterValueTuple);
+  filterValueTuples.Insert(filterValueTuple);
+  return true;
 }
 
 bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilters)
@@ -741,11 +748,11 @@ bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectH
   else if (where == _parameterFiltersByConnect.end())
   {
     // connect handle not yet in filter: add
-    ParameterFilterMap newFilterMap;
+    VariableLengthDataTupleSet newFilterValueTupleSet;
     // convert vector <ParameterHandle, Value> to map<ParameterHandle : list of Values>
-    AddParameterFilterValues(newFilterMap, parameterFilters);
+    AddParameterFilterValues(newFilterValueTupleSet, parameterFilters);
     // now associate connect handle with ParameterFilterMap constructed above
-    _parameterFiltersByConnect.insert(ParameterFilterMapByConnect::value_type(connectHandle, newFilterMap));
+    _parameterFiltersByConnect.insert(ParameterFilterMapByConnect::value_type(connectHandle, newFilterValueTupleSet));
     //DebugPrintf("%s(%s): added connect %s\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
     result = true;
   }
@@ -785,7 +792,7 @@ std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercas
 // In the parameter filter set defined in _parameterFiltersByConnect, test if all parameters from parameterValues match a given value.
 // if no parameter filter is defined for connectHandle, return true (all parameters 'match').
 // If there is no parameter filter specified for any of the parameters in parameterValues, also return true.
-bool InteractionClass::isFiltered(const ConnectHandle& connectHandle, const ParameterValueVector& parameterValues) const
+bool InteractionClass::isMatching(const ConnectHandle& connectHandle, const ParameterValueVector& parameterValues) const
 {
   auto where = _parameterFiltersByConnect.find(connectHandle);
   if (where == _parameterFiltersByConnect.end())
@@ -794,81 +801,56 @@ bool InteractionClass::isFiltered(const ConnectHandle& connectHandle, const Para
     return true;
   }
   // filter exists for given connect ...
-  const ParameterFilterMap& parameterFilterValues = where->second;
-  // match vector <ParameterHandle, Value> with existing map<ParameterHandle : list of Values>
+  const VariableLengthDataTupleSet& parameterFilterMap = where->second;
+  
   // go through received parameter value vector ...
-  if (parameterFilterValues.empty())
+  if (parameterFilterMap.empty())
   {
     //DebugPrintf("%s(name=%s): connect %s has no filter parameters\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
     //Dump(__FUNCTION__, _parameterFiltersByConnect);
     return true;
   }
-  // go through all parameters specified in interaction ...
-  for (auto& parameterValue : parameterValues)
-  {
-    // ... and match parameter handles against each handle specified by filter subscriptions
-    auto parameterFilterIter = parameterFilterValues.find(parameterValue.getParameterHandle());
-    if (parameterFilterIter != parameterFilterValues.end())
-    {
-      //DebugPrintf("%s(name=%s): %s in list\n", __FUNCTION__, getFQName().c_str(), parameterValue.getParameterHandle().toString().c_str());
-      const VariableLengthData& parameterData = parameterValue.getValue();
-      // now go through each specified valid filter value for given parameter
-      const VariableLengthDataSet& values = parameterFilterIter->second;
-      if (values.find(parameterData) == values.end())
-      {
-        // value not found in set of allowed values for the current filter parameter => mismatch
-        return false;
-      }
-    }
-    // else: there is no filter for specified parameter, skip
-  }
-  // no mismatch found => match
-  return true;
+
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple(filterKeyVector.size());
+
+  NormalizeFilterValues(parameterFilterMap, parameterValues, filterKeyVector, filterValueTuple);
+  return parameterFilterMap.FindNormalized(filterValueTuple);
 }
 
-
-ParameterValueVector InteractionClass::getParameterFilters(const ConnectHandle& connectHandle)
+ParameterValueVector InteractionClass::getParameterFilterPrototype() const
 {
-  ParameterValueVector result;
-  auto where = _parameterFiltersByConnect.find(connectHandle);
-  if (where != _parameterFiltersByConnect.end())
+  ParameterValueVector result(_parameterFilterKeyPrototype.size());
+  for (size_t index=0;index<result.size();index++)
   {
-    // filter exists for given connect ...
-    auto& parameterFilterValues = where->second;
-    for (auto& parameterFilter : parameterFilterValues)
-    {
-      for (auto& value : parameterFilter.second)
-      {
-        ParameterValue parameterValue;
-        parameterValue.setParameterHandle(parameterFilter.first);
-        parameterValue.setValue(value);
-        result.push_back(parameterValue);
-      }
-    }
+    result[index].setParameterHandle(_parameterFilterKeyPrototype[index]);
   }
   return result;
 }
 
-void InteractionClass::Dump(const char* prefix, const VariableLengthDataSet& filterValues) const
+std::list<ParameterValueVector> InteractionClass::getParameterFilters(const ConnectHandle& connectHandle)
 {
-  for (auto& parameterData : filterValues)
+  std::list<ParameterValueVector> result;
+  auto where = _parameterFiltersByConnect.find(connectHandle);
+  if (where != _parameterFiltersByConnect.end())
   {
-    std::string dataRepr = make_hex_string(parameterData.charData(), parameterData.charData() + parameterData.size(), true, true);
-    DebugPrintf("%s(%s):     %s\n", prefix, getFQName().c_str(), dataRepr.c_str());
-  }
-}
-
-void InteractionClass::Dump(const char* prefix, const ParameterFilterMapByConnect& filterValuesByConnect) const
-{
-  for (auto& [filteredConnectHandle, parameterFilterValues] : filterValuesByConnect)
-  {
-    DebugPrintf("%s(%s): connect %s has %d filter parameters\n", prefix, getFQName().c_str(), filteredConnectHandle.toString().c_str(), parameterFilterValues.size());
-    for (auto& parameterFilter : parameterFilterValues)
+    // filter exists for given connect ...
+    const VariableLengthDataTupleSet& parameterFilterValues = where->second;
+    // iterate whole set of tuples ...
+    for (auto& parameterTuple : parameterFilterValues)
     {
-      DebugPrintf("%s(%s):   %s\n", prefix, getFQName().c_str(), parameterFilter.first.toString().c_str());
-      Dump(prefix, parameterFilter.second);
+      ParameterValueVector resultElement(getParameterFilterPrototype());
+      auto resultElementIter = resultElement.begin();
+      // fill ParameterValueVector with values from tuple ...
+      for (auto& parameterValue : parameterTuple)
+      {
+        resultElementIter->setValue(parameterValue);
+        resultElementIter++;
+      }
+      result.push_back(resultElement);
     }
   }
+  return result;
 }
 
 ParameterDefinition*
