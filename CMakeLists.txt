@@ -203,6 +203,7 @@ set(OpenRTI_SOURCES
   TightBE1MessageEncoding.cpp
   ThreadServer.cpp
   URL.cpp
+  VariableLengthDataTuple.cpp
   WeakReferenced.cpp
   XMLReader.cpp
   dprintf.cpp
