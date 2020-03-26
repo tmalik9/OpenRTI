@@ -157,12 +157,12 @@ struct SocketEventDispatcher::PrivateData
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             (LPTSTR)&lpMsgBuf,
             0, NULL);
-          DebugPrintf("%s: %S\n", __FUNCTION__, lpMsgBuf);
+          DebugPrintf("%s: WSAWaitForMultipleEvents failed: %S\n", __FUNCTION__, lpMsgBuf);
           LocalFree(lpMsgBuf);
           DebugPrintf("%s: %d handles:\n", __FUNCTION__, notificationEvents.size());
           for (size_t i = 0; i < notificationEvents.size(); i++)
           {
-            DebugPrintf("%s: i: 0x%08x:\n", __FUNCTION__, i, notificationEvents.data()[i]);
+            DebugPrintf("%s: notificationEvents[%d] = 0x%08x\n", __FUNCTION__, i, notificationEvents[i]);
           }
           retv = -1;
           break;
@@ -210,7 +210,7 @@ struct SocketEventDispatcher::PrivateData
 
               if (networkEvents.lNetworkEvents & FD_CLOSE)
               {
-                dispatcher.write(socketEvent);
+                dispatcher.erase(socketEvent);
               }
               if (networkEvents.lNetworkEvents & FD_ACCEPT)
               {
