@@ -3,6 +3,8 @@
 #pragma once
 
 #include "RTI/RTIAmbassador.h"
+#include <list>
+#include <map>
 
 using namespace rti1516e;
 
@@ -53,11 +55,10 @@ class Mom
     MomHandleTree* momTree;
 
     // Lookup tables for mom types
-
-    std::map<uint32_t, MomTreeNode*> objectLookup;
-    std::map<uint32_t, MomTreeNode*> attributeLookup;
-    std::map<uint32_t, MomTreeNode*> interactionLookup;
-    std::map<uint32_t, MomTreeNode*> parameterLookup;
+    std::map<rti1516e::ObjectClassHandle, MomTreeNode*> objectLookup;
+    std::map<rti1516e::AttributeHandle, MomTreeNode*> attributeLookup;
+    std::map<rti1516e::InteractionClassHandle, MomTreeNode*> interactionLookup;
+    std::map<rti1516e::ParameterHandle, MomTreeNode*> parameterLookup;
 
     //----------------------------------------------------------
     //                      CONSTRUCTORS
@@ -126,7 +127,7 @@ class Mom
      * @return the name of the desired attribute, or <code>nullptr</code> if the specified
      *         class does not exist or does not contain the specified attribute
      */
-    std::wstring getMomAttributeName(int attributeHandle);
+    std::wstring getMomAttributeName(rti1516e::AttributeHandle attributeHandle);
 
     /**
      * Fetch the handle for the MOM interaction class of the given name. If the class name is unknown,
@@ -158,7 +159,7 @@ class Mom
      * @return the name of the desired interaction class, or <code>nullptr</code> if the specified
      *         class does not exist
      */
-    std::wstring getMomInteractionName(int handle, bool qualified);
+    std::wstring getMomInteractionName(rti1516e::InteractionClassHandle, bool qualified);
 
     /**
      * Fetch the name of the MOM Interaction Parameter of the specified handle.
@@ -169,7 +170,7 @@ class Mom
      * @param version the HLA version of the MOM naming scheme to format the name for
      * @param parameterHandle the handle of the parameter to fetch the name for
      */
-    std::wstring getMomParameterName(int parameterHandle);
+    std::wstring getMomParameterName(rti1516e::ParameterHandle parameterHandle);
 
     /////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////// Object Model Update Methods //////////////////////////////
@@ -210,7 +211,7 @@ class Mom
         int attributeCounter = 0;
         int interactionCounter = 0;
         int parameterCounter = 0;
-        std::map<rti1516e::ObjectInstanceHandle, MomTreeNode*> objectLookup;
+        std::map<rti1516e::ObjectClassHandle, MomTreeNode*> objectLookup;
         std::map<rti1516e::AttributeHandle, MomTreeNode*> attributeLookup;
         std::map<rti1516e::InteractionClassHandle, MomTreeNode*> interactionLookup;
         std::map<rti1516e::ParameterHandle, MomTreeNode*> parameterLookup;
@@ -314,22 +315,22 @@ class Mom
           return this->mContextStack.front();
         }
 
-        std::map<uint32_t, MomTreeNode*>& getObjectLookup()
+        std::map<rti1516e::ObjectClassHandle, MomTreeNode*>& getObjectLookup()
         {
           return this->objectLookup;
         }
 
-        std::map<uint32_t, MomTreeNode*>& getAttributeLookup()
+        std::map<rti1516e::AttributeHandle, MomTreeNode*>& getAttributeLookup()
         {
           return this->attributeLookup;
         }
 
-        std::map<uint32_t, MomTreeNode*>& getInteractionLookup()
+        std::map<rti1516e::InteractionClassHandle, MomTreeNode*>& getInteractionLookup()
         {
           return this->interactionLookup;
         }
 
-        std::map<uint32_t, MomTreeNode*>& getParameterLookup()
+        std::map<rti1516e::ParameterHandle, MomTreeNode*>& getParameterLookup()
         {
           return this->parameterLookup;
         }
@@ -438,7 +439,8 @@ class Mom
 
         MomTreeNode(std::wstring name,
                     MomType type,
-                    rti1516e::AttributeHandle handle)
+                    rti1516e::AttributeHandle handle,
+                    std::wstring datatype)
         {
           this->mName = name;
           this->parent = nullptr;
@@ -449,7 +451,6 @@ class Mom
 
         MomTreeNode(std::wstring name,
                     MomType type,
-                    std::wstring datatype,
                     rti1516e::InteractionClassHandle handle)
         {
           this->mName = name;
@@ -461,8 +462,8 @@ class Mom
 
         MomTreeNode(std::wstring name,
                     MomType type,
-                    std::wstring datatype,
-                    rti1516e::ParameterHandle handle)
+                    rti1516e::ParameterHandle handle,
+                    std::wstring datatype)
         {
           this->mName = name;
           this->parent = nullptr;

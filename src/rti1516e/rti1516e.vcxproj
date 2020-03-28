@@ -204,12 +204,17 @@
     <ResourceCompile Include="rti1516e.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\share\rti1516e\HLAstandardMIM.xml" />
+    <Xml Include="..\..\share\rti1516e\HLAstandardMIM.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\share\rti1516e\IEEE1516-DIF-2010.xsd" />
     <None Include="..\..\share\rti1516e\IEEE1516-FDD-2010.xsd" />
     <None Include="..\..\share\rti1516e\IEEE1516-OMT-2010.xsd" />
+    <ClInclude Include="HLAstandardMIM.inc">
+      <FileType>Document</FileType>
+    </ClInclude>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

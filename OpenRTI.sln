@@ -302,6 +302,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "python", "python", "{273881
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InteractionFilters", "tests\OpenRTI\InteractionFilters\InteractionFilters.vcxproj", "{BFD91164-25B0-4AEB-9764-D578590CB17D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ManagerFederate", "tests\rti1516e\mom\ManagerFederate\ManagerFederate.vcxproj", "{D449BBED-638D-47F7-9363-6F856C0C7F0B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug All|Any CPU = Debug All|Any CPU
@@ -1009,6 +1011,28 @@ Global
 		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release|Win32.ActiveCfg = Release|Win32
 		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release|x64.ActiveCfg = Release|x64
 		{BFD91164-25B0-4AEB-9764-D578590CB17D}.Release|x64.Build.0 = Release|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug All|Any CPU.ActiveCfg = Release|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug All|Any CPU.Build.0 = Release|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug All|Win32.ActiveCfg = Debug|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug All|Win32.Build.0 = Debug|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug All|x64.ActiveCfg = Debug|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug All|x64.Build.0 = Debug|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug|Win32.Build.0 = Debug|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug|x64.ActiveCfg = Debug|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug|x64.Build.0 = Debug|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release All|Any CPU.ActiveCfg = Release|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release All|Any CPU.Build.0 = Release|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release All|Win32.ActiveCfg = Release|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release All|Win32.Build.0 = Release|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release All|x64.ActiveCfg = Release|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release All|x64.Build.0 = Release|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release|Any CPU.ActiveCfg = Release|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release|Win32.ActiveCfg = Release|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release|Win32.Build.0 = Release|Win32
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release|x64.ActiveCfg = Release|x64
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1048,9 +1072,10 @@ Global
 		{F3B68F89-3AF6-4E21-A7F8-B9D31B30874B} = {273881B2-D2F7-4F61-BA41-5AB4F8F3C7BF}
 		{273881B2-D2F7-4F61-BA41-5AB4F8F3C7BF} = {C007F7FB-94FD-4294-899D-5B1FAF53C8E3}
 		{BFD91164-25B0-4AEB-9764-D578590CB17D} = {C007F7FB-94FD-4294-899D-5B1FAF53C8E3}
+		{D449BBED-638D-47F7-9363-6F856C0C7F0B} = {C06666B1-53E9-40DC-A7C2-22123791AA32}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		VisualSVNWorkingCopyRoot = .
 		SolutionGuid = {6CCC775F-F456-34F4-B339-8B27EB672AAC}
+		VisualSVNWorkingCopyRoot = .
 	EndGlobalSection
 EndGlobal

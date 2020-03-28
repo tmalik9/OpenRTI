@@ -1,5 +1,6 @@
 #include "Mom.h"
 #include "StringUtils.h"
+#include <iostream>
 
 void Mom::initialize(RTIambassador* rtiAmb)
 {
@@ -53,7 +54,6 @@ void Mom::initialize(RTIambassador* rtiAmb)
         .attribute(L"HLAfederationName", L"HLAunicodeString")
         .attribute(L"HLAfederatesInFederation", L"HLAhandleList")
         .attribute(L"HLARTIversion", L"HLAunicodeString")
-        .attribute(L"HLAFEDid", L"HLAunicodeString")
         .attribute(L"HLAMIMdesignator", L"HLAunicodeString")
         .attribute(L"HLAFOMmoduleDesignatorList", L"HLAmoduleDesignatorList")
         .attribute(L"HLAcurrentFDD", L"HLAunicodeString")
@@ -62,7 +62,7 @@ void Mom::initialize(RTIambassador* rtiAmb)
         .attribute(L"HLAlastSaveTime", L"HLAlogicalTime")
         .attribute(L"HLAnextSaveName", L"HLAunicodeString")
         .attribute(L"HLAnextSaveTime", L"HLAlogicalTime")
-        .attribute(L"HLAconveyRegionDesignatorSets", L"HLAswitch")
+        //.attribute(L"HLAconveyRegionDesignatorSets", L"HLAswitch")
         .attribute(L"HLAautoProvide", L"HLAswitch")
       .end()
     .end();
@@ -92,8 +92,8 @@ void Mom::initialize(RTIambassador* rtiAmb)
             .parameter(L"HLAreportingState", L"HLAboolean")
           .end()
           .interaction(L"HLAsetSwitches")
-            .parameter(L"HLAconveyRegionDesignatorSets", L"HLAswitch")
-            .parameter(L"HLAconveyProducingFederate", L"HLAswitch")
+            //.parameter(L"HLAconveyRegionDesignatorSets", L"HLAswitch")
+            //.parameter(L"HLAconveyProducingFederate", L"HLAswitch")
           .end()
         .end()
         .interaction(L"HLArequest")
@@ -163,29 +163,27 @@ void Mom::initialize(RTIambassador* rtiAmb)
             .parameter(L"HLAregisteredClass", L"HLAhandle")
             .parameter(L"HLAknownClass", L"HLAhandle")
           .end()
-          .interaction(L"Alert")
-            .parameter(L"AlertSeverity", L"HLAunicodeString")
-            .parameter(L"AlertDescription", L"HLAunicodeString")
-            .parameter(L"AlertID", L"HLAunicodeString")
-          .end()
+          //.interaction(L"Alert")
+          //  .parameter(L"AlertSeverity", L"HLAunicodeString")
+          //  .parameter(L"AlertDescription", L"HLAunicodeString")
+          //  .parameter(L"AlertID", L"HLAunicodeString")
+          //.end()
           .interaction(L"HLAreportException")
             .parameter(L"HLAservice", L"HLAunicodeString")
             .parameter(L"HLAexception", L"HLAunicodeString")
           .end()
           .interaction(L"HLAreportServiceInvocation")
             .parameter(L"HLAservice", L"HLAunicodeString")
-            .parameter(L"Initiator", L"HLAunicodeString")
+            //.parameter(L"Initiator", L"HLAunicodeString")
             .parameter(L"HLAsuccessIndicator", L"HLAboolean")
             .parameter(L"HLAsuppliedArguments", L"HLAargumentList")
-            .parameter(L"SuppliedArgument1", L"HLAunicodeString")
-            .parameter(L"SuppliedArgument2", L"HLAunicodeString")
-            .parameter(L"SuppliedArgument3", L"HLAunicodeString")
-            .parameter(L"SuppliedArgument4", L"HLAunicodeString")
-            .parameter(L"SuppliedArgument5", L"HLAunicodeString")
+            //.parameter(L"SuppliedArgument1", L"HLAunicodeString")
+            //.parameter(L"SuppliedArgument2", L"HLAunicodeString")
+            //.parameter(L"SuppliedArgument3", L"HLAunicodeString")
+            //.parameter(L"SuppliedArgument4", L"HLAunicodeString")
+            //.parameter(L"SuppliedArgument5", L"HLAunicodeString")
             .parameter(L"HLAreturnedArguments", L"HLAargumentList")
-            .parameter(L"ReturnedArgument", L"HLAunicodeString")
             .parameter(L"HLAexception", L"HLAunicodeString")
-            .parameter(L"ExceptionID", L"HLAunicodeString")
             .parameter(L"HLAserialNumber", L"HLAcount")
           .end()
           .interaction(L"HLAreportMOMexception")       // TODO 1516e only?
@@ -269,7 +267,7 @@ void Mom::initialize(RTIambassador* rtiAmb)
             .parameter(L"HLAattributeList", L"HLAhandleList")
           .end()
           .interaction(L"HLAenableTimeRegulation")
-            .parameter(L"FederationTime", L"HLAlogicalTime")
+            //.parameter(L"FederationTime", L"HLAlogicalTime")
             .parameter(L"HLAlookahead", L"HLAtimeInterval")
           .end()
           .interaction(L"HLAdisableTimeRegulation").end()
@@ -314,9 +312,7 @@ void Mom::initialize(RTIambassador* rtiAmb)
         .end()
         .interaction(L"HLArequest")
           .interaction(L"HLArequestSynchronizationPoints").end()
-          .interaction(L"HLArequestSynchronizationPointStatus")
-            .parameter(L"HLAsyncPointName", L"HLAunicodeString")  // This param is listed in the spec but not in the MIM xml :(
-          .end()
+          .interaction(L"HLArequestSynchronizationPointStatus").end()
           .interaction(L"HLArequestFOMmoduleData")
             .parameter(L"HLAFOMmoduleIndicator", L"HLAindex")
           .end()
@@ -370,8 +366,8 @@ int Mom::getMomAttributeHandle(int classHandle, std::wstring name)
   int attributeHandle = 0;
 
   MomTreeNode* objectNode = momTree->find(MomType::Object,
-                            classHandle,
-                            momTree->objectRoot);
+                                          classHandle,
+                                          momTree->objectRoot);
 
   if (objectNode != nullptr)
   {
@@ -383,7 +379,7 @@ int Mom::getMomAttributeHandle(int classHandle, std::wstring name)
   return attributeHandle;
 }
 
-std::wstring Mom::getMomAttributeName(int attributeHandle)
+std::wstring Mom::getMomAttributeName(rti1516e::AttributeHandle attributeHandle)
 {
   std::wstring name;
   decltype(attributeLookup)::iterator iter = attributeLookup.find(attributeHandle);
@@ -411,7 +407,7 @@ int Mom::getMomInteractionHandle(std::wstring className)
 }
 
 
-std::wstring Mom::getMomInteractionName(int handle, bool qualified)
+std::wstring Mom::getMomInteractionName(rti1516e::InteractionClassHandle handle, bool qualified)
 {
   std::wstring name;
   decltype(interactionLookup)::iterator iter = interactionLookup.find(handle);
@@ -430,7 +426,18 @@ std::wstring Mom::getMomInteractionName(int handle, bool qualified)
   return name;
 }
 
-
+std::wstring Mom::getMomParameterName(rti1516e::ParameterHandle parameterHandle)
+{
+  std::wstring name;
+  decltype(parameterLookup)::iterator iter = parameterLookup.find(parameterHandle);
+  if (iter != parameterLookup.end())
+  {
+    MomTreeNode* paramNode = iter->second;
+    if (paramNode != nullptr)
+      name = paramNode->getName();
+  }
+  return name;
+}
 
 std::wstring Mom::MomTreeNode::getQualifiedName()
 {
@@ -531,7 +538,7 @@ Mom::MomTreeNode* Mom::MomHandleTree::find(MomType type, int handle, MomTreeNode
 
 std::vector<std::wstring> Mom::MomHandleTree::tokenizeName(std::wstring name)
 {
-  return OpenRTI::split(name, ".");
+  return OpenRTI::split(name, L".");
 }
 
 
@@ -561,12 +568,24 @@ void Mom::MomTreeNodeBuilder::addAndPush(MomTreeNode* newNode)
 
 Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::object(std::wstring name)
 {
-  int handle = objectCounter++;
-  MomTreeNode* node = new MomTreeNode(name, MomType::Object, handle);
+  try
+  {
+    rti1516e::ObjectClassHandle handle = mRtiAmb->getObjectClassHandle(name);
+    MomTreeNode* node = new MomTreeNode(name, MomType::Object, handle);
 
-  this->addAndPush(node);
-  objectLookup[handle] = node;
-  return *this;
+    this->addAndPush(node);
+    objectLookup[handle] = node;
+    return *this;
+  }
+  catch (const rti1516e::NameNotFound& e)
+  {
+    std::wcerr << L"object class name not found: " << name << L" : " << e.what() << std::endl;
+    throw;
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcerr << L"Exception: " << e.what() << std::endl;
+  }
 }
 
 Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::attribute(std::wstring name, std::wstring datatype)
@@ -577,23 +596,45 @@ Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::attribute(std::wstring name, s
   if (mContextStack.front()->type != MomType::Object)
     throw IllegalStateException("attribute can only be added to an object");
 
-
-  int handle = attributeCounter++;
-  MomTreeNode* node = new MomTreeNode(name, MomType::Attribute, datatype, handle);
-  this->add(node);
-  this->attributeLookup[handle] = node;
-  return *this;
+  try
+  {
+    rti1516e::AttributeHandle handle = mRtiAmb->getAttributeHandle(mContextStack.front()->objectClassHandle, name);
+    MomTreeNode* node = new MomTreeNode(name, MomType::Attribute, handle, datatype);
+    this->add(node);
+    this->attributeLookup[handle] = node;
+    return *this;
+  }
+  catch (const rti1516e::NameNotFound& e)
+  {
+    std::wcerr << L"attribute name not found: " << name << L" : " << e.what() << std::endl;
+    throw;
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcerr << L"Exception: " << e.what() << std::endl;
+  }
 }
 
 Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::interaction(std::wstring name)
 {
+  try
+  {
+    rti1516e::InteractionClassHandle handle = mRtiAmb->getInteractionClassHandle(name);
+    MomTreeNode* node = new MomTreeNode(name, MomType::Interaction, handle);
 
-  int handle = interactionCounter++;
-  MomTreeNode* node = new MomTreeNode(name, MomType::Interaction, handle);
-
-  this->addAndPush(node);
-  this->interactionLookup[handle] = node;
-  return *this;
+    this->addAndPush(node);
+    this->interactionLookup[handle] = node;
+    return *this;
+  }
+  catch (const rti1516e::NameNotFound& e)
+  {
+    std::wcerr << L"interaction class name not found: " << name << L" : " << e.what() << std::endl;
+    throw;
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcerr << L"Exception: " << e.what() << std::endl;
+  }
 }
 
 Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::parameter(std::wstring name, std::wstring datatype)
@@ -604,10 +645,42 @@ Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::parameter(std::wstring name, s
   if (mContextStack.front()->type != MomType::Interaction)
     throw new IllegalStateException("parameter can only be added to an interaction");
 
+  try
+  {
+    rti1516e::ParameterHandle handle = mRtiAmb->getParameterHandle(mContextStack.front()->interactionClassHandle, name);
+    MomTreeNode* node = new MomTreeNode(name, MomType::Parameter, handle, datatype);
+    this->add(node);
+    this->parameterLookup[handle] = node;
+    return *this;
+  }
+  catch (const rti1516e::NameNotFound& e)
+  {
+    std::wcerr << L"parameter name \"" << name << "\" not found in interaction class " << mContextStack.front()->getQualifiedName() << L" : " << e.what() << std::endl;
+    std::wcerr << L" in " << mRtiAmb->getInteractionClassName(mContextStack.front()->interactionClassHandle) << std::endl;
+    throw;
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcerr << L"Exception: " << e.what() << std::endl;
+  }
+}
 
-  int handle = parameterCounter++;
-  MomTreeNode* node = new MomTreeNode(name, MomType::Parameter, datatype, handle);
-  this->add(node);
-  this->parameterLookup[handle] = node;
-  return *this;
+IllegalStateException::IllegalStateException(std::string t) : std::exception(t.c_str())
+{
+
+}
+
+IllegalStateException::IllegalStateException(std::wstring t) : std::exception(OpenRTI::ucsToUtf8(t).c_str())
+{
+
+}
+
+IllegalArgumentException::IllegalArgumentException(std::string t) : std::exception(t.c_str())
+{
+
+}
+
+IllegalArgumentException::IllegalArgumentException(std::wstring t) : std::exception(OpenRTI::ucsToUtf8(t).c_str())
+{
+
 }

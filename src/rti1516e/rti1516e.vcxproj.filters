@@ -227,6 +227,9 @@
     <ClInclude Include="..\OpenRTI\dprintf.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="HLAstandardMIM.inc">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="rti1516e.rc">
@@ -239,14 +242,8 @@
     </Xml>
   </ItemGroup>
   <ItemGroup>
-    <Xsd Include="..\..\share\rti1516e\IEEE1516-DIF-2010.xsd">
-      <Filter>Shared</Filter>
-    </Xsd>
-    <Xsd Include="..\..\share\rti1516e\IEEE1516-FDD-2010.xsd">
-      <Filter>Shared</Filter>
-    </Xsd>
-    <Xsd Include="..\..\share\rti1516e\IEEE1516-OMT-2010.xsd">
-      <Filter>Shared</Filter>
-    </Xsd>
+    <None Include="..\..\share\rti1516e\IEEE1516-DIF-2010.xsd" />
+    <None Include="..\..\share\rti1516e\IEEE1516-FDD-2010.xsd" />
+    <None Include="..\..\share\rti1516e\IEEE1516-OMT-2010.xsd" />
   </ItemGroup>
 </Project>
