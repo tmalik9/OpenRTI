@@ -18,7 +18,6 @@
  */
 
 #include "ServerModel.h"
-
 #include "ServerOptions.h"
 #include <sstream>
 #include <iomanip>
@@ -2529,6 +2528,20 @@ Federation::getInteractionClass(const InteractionClassHandle& interactionClassHa
   return i.get();
 }
 
+
+InteractionClassHandle
+Federation::getInteractionClassHandle(const std::string& fqInteractionClassName)
+{
+  StringVector interactionClassName = split(fqInteractionClassName, ".");
+  InteractionClass::NameMap::iterator i;
+  i = _interactionClassNameInteractionClassMap.find(interactionClassName);
+  if (i != _interactionClassNameInteractionClassMap.end())
+  {
+    return i->getInteractionClassHandle();
+  }
+  return ObjectClassHandle::invalid();
+}
+
 ObjectClass*
 Federation::getObjectClass(const ObjectClassHandle& objectClassHandle)
 {
@@ -2537,6 +2550,20 @@ Federation::getObjectClass(const ObjectClassHandle& objectClassHandle)
     return 0;
   return i.get();
 }
+
+ObjectClassHandle
+Federation::getObjectClassHandle(const std::string& fqClassName)
+{
+  StringVector className = split(fqClassName, ".");
+  ObjectClass::NameMap::iterator i;
+  i = _objectClassNameObjectClassMap.find(className);
+  if (i != _objectClassNameObjectClassMap.end())
+  {
+    return i->getObjectClassHandle();
+  }
+  return ObjectClassHandle::invalid();
+}
+
 
 OrderType
 Federation::resolveOrderType(const std::string& orderType)

@@ -1743,12 +1743,16 @@ public:
 
   Dimension* getDimension(const DimensionHandle& dimensionHandle);
   UpdateRate* getUpdateRate(const UpdateRateHandle& updateRateHandle);
+
   InteractionClass* getInteractionClass(const InteractionClassHandle& interactionClassHandle);
   InteractionClass::HandleMap& getInteractionClassHandleInteractionClassMap()
   { return _interactionClassHandleInteractionClassMap; }
+  InteractionClassHandle getInteractionClassHandle(const std::string& fqInteractionClassName);
+
   ObjectClass* getObjectClass(const ObjectClassHandle& objectClassHandle);
   ObjectClass::HandleMap& getObjectClassHandleObjectClassMap()
   { return _objectClassHandleObjectClassMap; }
+  ObjectClassHandle getObjectClassHandle(const std::string& fqClassName);
 
   OrderType resolveOrderType(const std::string& orderType);
   TransportationType resolveTransportationType(const std::string& transportationType);
@@ -1789,7 +1793,6 @@ public:
 
   /// Syncronization state FIXME
   Synchronization::NameMap _synchronizationNameSynchronizationMap;
-
 
 private:
   Federation(const Federation&) = delete;
@@ -1850,6 +1853,7 @@ private:
   ObjectInstance::HandleMap _objectInstanceHandleObjectInstanceMap;
   ObjectInstance::NameMap _objectInstanceNameObjectInstanceMap;
   HandleAllocator<ObjectInstanceHandle> _objectInstanceHandleAllocator;
+
 };
 
 ////////////////////////////////////////////////////////////
