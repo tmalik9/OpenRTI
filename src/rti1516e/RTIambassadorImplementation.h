@@ -202,8 +202,11 @@ public:
 
   virtual rti1516e::ObjectInstanceHandle
   registerObjectInstance(rti1516e::ObjectClassHandle rti1516ObjectClassHandle,
-                         std::wstring const & objectInstanceName);
+                         std::wstring const & objectInstanceName) override;
 
+  rti1516e::ObjectInstanceHandle
+  registerObjectInstance(rti1516e::ObjectClassHandle rti1516ObjectClassHandle,
+                                   std::wstring const & objectInstanceName, bool allowUnreservedObjectNames) override;
   // 6.6
   virtual void
   updateAttributeValues(rti1516e::ObjectInstanceHandle rti1516ObjectInstanceHandle,

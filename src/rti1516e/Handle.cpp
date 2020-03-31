@@ -28,160 +28,186 @@
 namespace rti1516e
 {
 
-#define IMPLEMENT_HANDLE_CLASS(HandleKind)                              \
-  HandleKind::HandleKind() :                                            \
-    _impl(HandleKind##Implementation::create(OpenRTI::HandleKind()))    \
-  {                                                                     \
-    HandleKind##Implementation::get(_impl);                             \
-  }                                                                     \
-                                                                        \
-  HandleKind::~HandleKind()                                             \
-  {                                                                     \
-    HandleKind##Implementation::putAndDelete(_impl);                    \
-  }                                                                     \
-                                                                        \
-  HandleKind::HandleKind(HandleKind const & rhs) :                      \
-    _impl(rhs._impl)                                                    \
-  {                                                                     \
-    HandleKind##Implementation::get(_impl);                             \
-  }                                                                     \
-                                                                        \
-  HandleKind &                                                          \
-  HandleKind::operator=(HandleKind const & rhs)                         \
-  {                                                                     \
-    if (_impl != rhs._impl) {                                           \
-      HandleKind##Implementation::get(rhs._impl);                       \
-      HandleKind##Implementation::putAndDelete(_impl);                  \
-      _impl = rhs._impl;                                                \
-    }                                                                   \
-    return *this;                                                       \
-  }                                                                     \
-                                                                        \
-  bool                                                                  \
-  HandleKind::isValid() const                                           \
-  {                                                                     \
-    return HandleKind##Implementation::getHandle(_impl).valid();        \
-  }                                                                     \
-                                                                        \
-  bool HandleKind::operator==(HandleKind const & rhs) const             \
-  {                                                                     \
-    return HandleKind##Implementation::getHandle(_impl) ==              \
-      HandleKind##Implementation::getHandle(rhs._impl);                 \
-  }                                                                     \
-  bool HandleKind::operator!=(HandleKind const & rhs) const             \
-  {                                                                     \
-    return HandleKind##Implementation::getHandle(_impl) !=              \
-      HandleKind##Implementation::getHandle(rhs._impl);                 \
-  }                                                                     \
-  bool HandleKind::operator<(HandleKind const & rhs) const              \
-  {                                                                     \
-    return HandleKind##Implementation::getHandle(_impl) <               \
-      HandleKind##Implementation::getHandle(rhs._impl);                 \
-  }                                                                     \
-                                                                        \
-  long HandleKind::hash() const                                         \
-  {                                                                     \
-    return long(HandleKind##Implementation::getHandle(_impl));          \
-  }                                                                     \
-                                                                        \
-  VariableLengthData                                                    \
-  HandleKind::encode() const                                            \
-  {                                                                     \
-    OpenRTI::HandleKind handle;                                         \
-    handle = HandleKind##Implementation::getHandle(_impl);              \
-    size_t encodedLength = handle.getEncodedLength();                   \
-    OpenRTI::VariableLengthData data(encodedLength);                    \
-    handle.encode(data.data());                                         \
-    return VariableLengthDataFriend::create(data);                      \
-  }                                                                     \
-                                                                        \
-  void                                                                  \
-  HandleKind::encode(VariableLengthData& buffer) const                  \
-  {                                                                     \
-    OpenRTI::HandleKind handle;                                         \
-    handle = HandleKind##Implementation::getHandle(_impl);              \
-    size_t encodedLength = handle.getEncodedLength();                   \
-    OpenRTI::VariableLengthData data(encodedLength);                    \
-    handle.encode(data.data());                                         \
-    buffer = VariableLengthDataFriend::create(data);                    \
-  }                                                                     \
-                                                                        \
-  size_t                                                                \
-  HandleKind::encode(void* buffer, size_t bufferSize) const             \
-  {                                                                     \
-    OpenRTI::HandleKind handle;                                         \
-    handle = HandleKind##Implementation::getHandle(_impl);              \
-    size_t encodedLength = handle.getEncodedLength();                   \
-    if (bufferSize < encodedLength)                                     \
-      throw CouldNotEncode(toString());                                 \
-    handle.encode(buffer);                                              \
-    return encodedLength;                                               \
-  }                                                                     \
-                                                                        \
-  size_t                                                                \
-  HandleKind::encodedLength() const                                     \
-  {                                                                     \
-    OpenRTI::HandleKind handle;                                         \
-    handle = HandleKind##Implementation::getHandle(_impl);              \
-    return handle.getEncodedLength();                                   \
-  }                                                                     \
-                                                                        \
-  std::wstring HandleKind::toString() const                             \
-  {                                                                     \
-    OpenRTI::HandleKind handle;                                         \
-    handle = HandleKind##Implementation::getHandle(_impl);              \
-    std::wstringstream stream;                                          \
-    if (handle.valid())                                                 \
-      stream << "rti1516e::" #HandleKind "(" <<handle.getHandle()<< ")";\
-    else                                                                \
-      stream << "rti1516e::" #HandleKind "(Invalid)";                   \
-    return stream.str();                                                \
-  }                                                                     \
-                                                                        \
-                                                                        \
-  const HandleKind##Implementation*                                     \
-  HandleKind::getImplementation() const                                 \
-  {                                                                     \
-    return _impl;                                                       \
-  }                                                                     \
-                                                                        \
-  HandleKind##Implementation*                                           \
-  HandleKind::getImplementation()                                       \
-  {                                                                     \
-    if (!HandleKind##Implementation::useImplementationClass())          \
-      return _impl;                                                     \
-    if (OpenRTI::Referenced::count(_impl) <= 1)                         \
-      return _impl;                                                     \
-    HandleKind##Implementation* impl;                                   \
-    impl = new HandleKind##Implementation(*_impl);                      \
-    HandleKind##Implementation::putAndDelete(_impl);                    \
-    _impl = impl;                                                       \
-    HandleKind##Implementation::get(_impl);                             \
-    return _impl;                                                       \
-  }                                                                     \
-                                                                        \
-  HandleKind::HandleKind(HandleKind##Implementation* impl) :            \
-    _impl(impl)                                                         \
-  {                                                                     \
-    HandleKind##Implementation::get(_impl);                             \
-  }                                                                     \
-                                                                        \
-  HandleKind::HandleKind(VariableLengthData const & encodedValue) :     \
-    _impl(0)                                                            \
-  {                                                                     \
-    OpenRTI::HandleKind handle;                                         \
-    if (encodedValue.size() < handle.getEncodedLength())                \
-      throw OpenRTI::CouldNotDecode(#HandleKind);                       \
-    handle.decode(encodedValue.data());                                 \
-    _impl = HandleKind##Implementation::create(handle);                 \
-    HandleKind##Implementation::get(_impl);                             \
-  }                                                                     \
-                                                                        \
-  std::wostream&                                                        \
-  operator<<(std::wostream& stream, HandleKind const& handle)           \
-  {                                                                     \
-    return stream << handle.toString();                                 \
+template <typename HandleKind>
+Handle<HandleKind>::Handle()
+  : _impl(HandleImplementation<HandleKind>::create(HandleImplementation<HandleKind>::OpenRTIHandleClass()))
+{
+  HandleImplementation<HandleKind>::get(_impl);
+}
+
+template <typename HandleKind>
+Handle<HandleKind>::~Handle()
+{
+  HandleImplementation<HandleKind>::putAndDelete(_impl);
+}
+
+template <typename HandleKind>
+Handle<HandleKind>::Handle(Handle const& rhs)
+  : _impl(rhs._impl)
+{
+  HandleImplementation<HandleKind>::get(_impl);
+}
+
+template <typename HandleKind>
+Handle<HandleKind>&
+Handle<HandleKind>::operator=(Handle const& rhs)
+{
+  if(_impl != rhs._impl)
+  {
+    HandleImplementation<HandleKind>::get(rhs._impl);
+    HandleImplementation<HandleKind>::putAndDelete(_impl);
+    _impl = rhs._impl;
   }
+  return *this;
+}
+
+template <typename HandleKind>
+bool
+Handle<HandleKind>::isValid() const
+{
+  return HandleImplementation<HandleKind>::getHandle(_impl).valid();
+}
+
+template <typename HandleKind>
+bool Handle<HandleKind>::operator==(Handle const& rhs) const
+{
+  return HandleImplementation<HandleKind>::getHandle(_impl) ==
+         HandleImplementation<HandleKind>::getHandle(rhs._impl);
+}
+template <typename HandleKind>
+bool Handle<HandleKind>::operator!=(Handle const& rhs) const
+{
+  return HandleImplementation<HandleKind>::getHandle(_impl) !=
+         HandleImplementation<HandleKind>::getHandle(rhs._impl);
+}
+template <typename HandleKind>
+bool Handle<HandleKind>::operator<(Handle const& rhs) const
+{
+  return HandleImplementation<HandleKind>::getHandle(_impl) <
+         HandleImplementation<HandleKind>::getHandle(rhs._impl);
+}
+
+template <typename HandleKind>
+long Handle<HandleKind>::hash() const
+{
+  return long(HandleImplementation<HandleKind>::getHandle(_impl));
+}
+
+template <typename HandleKind>
+VariableLengthData
+Handle<HandleKind>::encode() const
+{
+  HandleImplementation<HandleKind>::OpenRTIHandleClass handle;
+  handle = HandleImplementation<HandleKind>::getHandle(_impl);
+  size_t encodedLength = handle.getEncodedLength();
+  OpenRTI::VariableLengthData data(encodedLength);
+  handle.encode(data.data());
+  return VariableLengthDataFriend::create(data);
+}
+
+template <typename HandleKind>
+void
+Handle<HandleKind>::encode(VariableLengthData& buffer) const
+{
+  HandleImplementation<HandleKind>::OpenRTIHandleClass handle;
+  handle = HandleImplementation<HandleKind>::getHandle(_impl);
+  size_t encodedLength = handle.getEncodedLength();
+  OpenRTI::VariableLengthData data(encodedLength);
+  handle.encode(data.data());
+  buffer = VariableLengthDataFriend::create(data);
+}
+
+template <typename HandleKind>
+size_t
+Handle<HandleKind>::encode(void* buffer, size_t bufferSize) const
+{
+  HandleImplementation<HandleKind>::OpenRTIHandleClass handle;
+  handle = HandleImplementation<HandleKind>::getHandle(_impl);
+  size_t encodedLength = handle.getEncodedLength();
+  if(bufferSize < encodedLength)
+    throw CouldNotEncode(toString());
+  handle.encode(buffer);
+  return encodedLength;
+}
+
+template <typename HandleKind>
+size_t
+Handle<HandleKind>::encodedLength() const
+{
+  HandleImplementation<HandleKind>::OpenRTIHandleClass handle;
+  handle = HandleImplementation<HandleKind>::getHandle(_impl);
+  return handle.getEncodedLength();
+}
+
+template <typename HandleKind>
+std::wstring Handle<HandleKind>::toString() const
+{
+  HandleImplementation<HandleKind>::OpenRTIHandleClass handle;
+  handle = HandleImplementation<HandleKind>::getHandle(_impl);
+  std::wstringstream stream;
+  if(handle.valid())
+    stream << typeid(HandleKind).name() << "(" <<handle.getHandle()<< ")";\
+  else
+    stream << typeid(HandleKind).name() << "(Invalid)";
+  return stream.str();
+}
+
+
+template <typename HandleKind>
+const HandleImplementation<HandleKind>*
+Handle<HandleKind>::getImplementation() const
+{
+  return _impl;
+}
+
+template <typename HandleKind>
+HandleImplementation<HandleKind>*
+Handle<HandleKind>::getImplementation()
+{
+  if(!HandleImplementation<HandleKind>::useImplementationClass())
+    return _impl;
+  if(OpenRTI::Referenced::count(_impl) <= 1)
+    return _impl;
+  HandleImplementation<HandleKind>* impl;
+  impl = new HandleImplementation<HandleKind>(*_impl);
+  HandleImplementation<HandleKind>::putAndDelete(_impl);
+  _impl = impl;
+  HandleImplementation<HandleKind>::get(_impl);
+  return _impl;
+}
+
+template <typename HandleKind>
+Handle<HandleKind>::Handle(HandleImplementation<HandleKind>* impl) :
+  _impl(impl)
+{
+  HandleImplementation<HandleKind>::get(_impl);
+}
+
+template <typename HandleKind>
+Handle<HandleKind>::Handle(VariableLengthData const& encodedValue) :
+  _impl(0)
+{
+  HandleImplementation<HandleKind>::OpenRTIHandleClass handle;
+  if(encodedValue.size() < handle.getEncodedLength())
+    throw OpenRTI::CouldNotDecode(QUOTE(HandleKind));
+  handle.decode(encodedValue.data());
+  _impl = HandleImplementation<HandleKind>::create(handle);
+  HandleImplementation<HandleKind>::get(_impl);
+}
+
+template <typename HandleKind>
+RTI_EXPORT std::wostream& 
+operator<<(std::wostream& stream, Handle<HandleKind> const& handle)
+{
+  return stream << handle.toString();
+}
+
+//template class Handle<FederateHandleKind>;
+
+#define IMPLEMENT_HANDLE_CLASS(HandleKind) \
+template class Handle<HandleKind##Kind>;   \
+template class HandleImplementation<HandleKind##Kind>;   \
+template RTI_EXPORT std::wostream& operator<<(std::wostream& stream, Handle<HandleKind##Kind> const& handle);
 
 IMPLEMENT_HANDLE_CLASS(FederateHandle)
 IMPLEMENT_HANDLE_CLASS(ObjectClassHandle)

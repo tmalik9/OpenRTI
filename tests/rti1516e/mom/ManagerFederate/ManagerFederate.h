@@ -54,9 +54,18 @@ class ManagerFederate : public NullFederateAmbassador
     bool isRegulating;
     bool isConstrained;
     bool isAdvancing;
+    bool federationsReported = false;
 
     // methods //
     // implementation of RTI::FederateAmbassador
+    virtual void connectionLost (
+        std::wstring const & faultDescription) override;
+
+    // 4.8
+    virtual void reportFederationExecutions (
+        FederationExecutionInformationVector const &
+        theFederationExecutionInformationList) override;
+
     ///////////////////////////////////
     // synchronization point methods //
     ///////////////////////////////////
@@ -178,7 +187,6 @@ class ManagerFederate : public NullFederateAmbassador
 
 
   private:
-    void publishAndSubscribe();
     //ObjectInstanceHandle registerObject(const wchar_t* className);
     void deleteObject(ObjectInstanceHandle objectHandle);
 

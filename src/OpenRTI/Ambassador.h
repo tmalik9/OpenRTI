@@ -113,8 +113,12 @@ public:
     request->setFOMStringModuleList(fomModules);
 
     // The maximum abstime to try to connect
-    Clock abstime = Clock::now() + Clock::fromSeconds(70);
 
+#ifdef _DEBUG
+    Clock abstime = Clock::max();
+#else
+    Clock abstime = Clock::now() + Clock::fromSeconds(70);
+#endif
     // Send this message and wait for the response
     send(request);
 
@@ -195,7 +199,11 @@ public:
       throw FederateAlreadyExecutionMember();
 
     // The maximum abstime to try to connect
+#ifdef _DEBUG
+    Clock abstime = Clock::max();
+#else
     Clock abstime = Clock::now() + Clock::fromSeconds(70);
+#endif
 
     // The destroy request message
     SharedPtr<JoinFederationExecutionRequestMessage> request;

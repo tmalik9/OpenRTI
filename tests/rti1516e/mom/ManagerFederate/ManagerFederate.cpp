@@ -156,6 +156,19 @@ void ManagerFederate::initialize(std::string address, std::string fom)
     printf("%s: could not connect to %s: %S\n", __FUNCTION__, address.c_str(), e.what().c_str());
     return;
   }
+  /// list existing federations
+  try
+  {
+    /// create the federate ambassador and connect to RTI
+    mRtiAmb->listFederationExecutions();
+  }
+  catch (ConnectionFailed e)
+  {
+    printf("%s: could not connect to %s: %S\n", __FUNCTION__, address.c_str(), e.what().c_str());
+    return;
+  }
+  while (!federationsReported)
+    mRtiAmb->evokeCallback(1);
   ///
   /// 2. create and join to the federation
   /// NOTE: some other federate may have already created the federation,
@@ -177,40 +190,9 @@ void ManagerFederate::initialize(std::string address, std::string fom)
   std::cout << "Joined Federation as " << federateName << std::endl;
   /// initialize the handles - have to wait until we are joined
   initializeHandles();
-  publishAndSubscribe();
 }
 
 
-/**
- * This method will inform the RTI about the types of data that the federate will
- * be creating, and the types of data we are interested in hearing about as other
- * federates produce it.
- */
-void ManagerFederate::publishAndSubscribe()
-{
-  /////////////////////////////////////////////
-  /// publish all attributes of ObjectRoot.A
-  /////////////////////////////////////////////
-  /// before we can register instance of the object class ObjectRoot.A and
-  /// update the values of the various attributes, we need to tell the RTI
-  /// that we intend to publish this information\n
-  /// package the information into a handle set
-  AttributeHandleSet attributesOfFederation;
-  attributesOfFederation.insert(mFederationNameAttributeHandle);
-  attributesOfFederation.insert(mFederatesInFederationAttributeHandle);
-
-  AttributeHandleSet attributesOfFederate;
-  /// do the actual publication
-  //rtiamb->publishObjectClassAttributes(myPublishedObjectClass, myPublishedAttributes);
-
-  //////////////////////////////////////////////////
-  /// subscribe to all attributes of ObjectRoot.A
-  //////////////////////////////////////////////////
-  /// we also want to hear about the same sort of information as it is
-  /// created and altered in other federates, so we need to subscribe to it
-  mRtiAmb->subscribeObjectClassAttributes(mFederationClassHandle, attributesOfFederation, true);
-  //rtiamb->subscribeObjectClassAttributes(mFederateClassHandle, attributesOfFederate, true);
-}
 
 /**
  * This method will attempt to delete the object instance of the given
@@ -228,12 +210,13 @@ void ManagerFederate::deleteObject(ObjectInstanceHandle objectHandle)
  */
 void ManagerFederate::initializeHandles()
 {
+  mom = new Mom(mRtiAmb.get());
+  mom->registerFederateObject(mRtiAmb.get(), federateName, federationName);
+
   mFederationClassHandle = mRtiAmb->getObjectClassHandle(L"HLAobjectRoot.HLAmanager.HLAfederation");
   mFederateClassHandle = mRtiAmb->getObjectClassHandle(L"HLAobjectRoot.HLAmanager.HLAfederate");
   mFederationNameAttributeHandle = mRtiAmb->getAttributeHandle(mFederationClassHandle, L"HLAfederationName");
   mFederatesInFederationAttributeHandle = mRtiAmb->getAttributeHandle(mFederationClassHandle, L"HLAfederatesInFederation");
-
-  mom = new Mom(mRtiAmb.get());
 
 }
 
@@ -252,6 +235,24 @@ double ManagerFederate::getFederateTime() const
 double ManagerFederate::getLbts() const
 {
   return (federateTime + federateLookahead);
+}
+
+
+void ManagerFederate::connectionLost(std::wstring const & faultDescription)
+{
+  std::wcout << __FUNCTIONW__ << std::endl;
+}
+
+
+void ManagerFederate::reportFederationExecutions(FederationExecutionInformationVector const & theFederationExecutionInformationList)
+{
+  std::wcout << __FUNCTIONW__ << std::endl;
+
+  for (auto& entry : theFederationExecutionInformationList)
+  {
+    std::wcout << L"  " << entry.federationExecutionName << std::endl;
+  }
+  federationsReported = true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

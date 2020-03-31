@@ -1,14 +1,12 @@
 #include "Mom.h"
 #include "StringUtils.h"
+#include "RTI/encoding/BasicDataElements.h"
+
+
 #include <iostream>
 
 void Mom::initialize(RTIambassador* rtiAmb)
 {
-  // Declaratively build the tree. The creator methods convert the provided names into a
-  // {@link VersionedName} so that nodes can be resolved based on the naming conventions of all
-  // HLA specification versions
-  //
-  // NOTE: Handles generated here will be consistent across all federations running in the RTI
   MomTreeNodeBuilder b(rtiAmb);
 
   //
@@ -340,106 +338,65 @@ void Mom::initialize(RTIambassador* rtiAmb)
   MomTreeNode* interactionRoot = b.getContext();
   b.end();
 
-  this->momTree = new MomHandleTree(objectRoot, interactionRoot);
-  this->objectLookup = b.getObjectLookup();
-  this->attributeLookup = b.getAttributeLookup();
-  this->interactionLookup = b.getInteractionLookup();
-  this->parameterLookup = b.getParameterLookup();
+  mMomHandleTree = new MomHandleTree(objectRoot, interactionRoot);
+
+  mMomHandleTree->publishLeafObjectClasses(rtiAmb, mMomHandleTree->objectRoot);
+  mMomHandleTree->subscribeLeafObjectClasses(rtiAmb, mMomHandleTree->objectRoot);
+  mMomHandleTree->publishLeafInteractionClasses(rtiAmb, mMomHandleTree->interactionRoot);
+  mMomHandleTree->subscribeLeafInteractionClasses(rtiAmb, mMomHandleTree->interactionRoot);
+
 }
 
-int Mom::getMomObjectClassHandle(std::wstring className)
+void Mom::registerFederateObject(rti1516e::RTIambassador* rtiAmb, const std::wstring& federationName, const std::wstring& federateName)
 {
-  MomTreeNode* node = momTree->find(className, momTree->objectRoot);
-  if (node != nullptr)
+  //ObjectClassHandle federationClass = rtiAmb->getObjectClassHandle(L"HLAobjectRoot.HLAmanager.HLAfederation");
+  ObjectClassHandle federationClass = getObjects()[L"HLAmanager"][L"HLAfederation"];
+  //ObjectClassHandle federateClass = rtiAmb->getObjectClassHandle(L"HLAobjectRoot.HLAmanager.HLAfederate");
+  ObjectClassHandle federateClass = getObjects()[L"HLAmanager"][L"HLAfederate"];
+
+  try
   {
-    return node->getHandle();
+    federationObject = rtiAmb->getObjectInstanceHandle(federationName);
   }
-  else
+  catch (const ObjectInstanceNotKnown& e)
   {
-    return 0;
-  }
-}
-
-
-int Mom::getMomAttributeHandle(int classHandle, std::wstring name)
-{
-  int attributeHandle = 0;
-
-  MomTreeNode* objectNode = momTree->find(MomType::Object,
-                                          classHandle,
-                                          momTree->objectRoot);
-
-  if (objectNode != nullptr)
-  {
-    MomTreeNode* attributeNode = momTree->find(name, objectNode);
-    if (attributeNode != nullptr)
-      attributeHandle = attributeNode->getHandle();
-  }
-
-  return attributeHandle;
-}
-
-std::wstring Mom::getMomAttributeName(rti1516e::AttributeHandle attributeHandle)
-{
-  std::wstring name;
-  decltype(attributeLookup)::iterator iter = attributeLookup.find(attributeHandle);
-  if (iter != attributeLookup.end())
-  {
-    MomTreeNode* attributeNode = iter->second;
-    if (attributeNode != nullptr)
-      name = attributeNode->getName();
-  }
-  return name;
-}
-
-
-int Mom::getMomInteractionHandle(std::wstring className)
-{
-  MomTreeNode* node = momTree->find(className, momTree->interactionRoot);
-  if (node != nullptr)
-  {
-    return node->getHandle();
-  }
-  else
-  {
-    return 0;
-  }
-}
-
-
-std::wstring Mom::getMomInteractionName(rti1516e::InteractionClassHandle handle, bool qualified)
-{
-  std::wstring name;
-  decltype(interactionLookup)::iterator iter = interactionLookup.find(handle);
-  if (iter != interactionLookup.end())
-  {
-    MomTreeNode* interactionNode = iter->second;
-
-    if (interactionNode != nullptr)
+    DebugPrintf("%s: %S (create our own)\n", __FUNCTION__, e.what().c_str());
+    try
     {
-      if (qualified)
-        name = interactionNode->getQualifiedName();
-      else
-        name = interactionNode->getName();
+      federationObject = rtiAmb->registerObjectInstance(federationClass, federationName, true);
+    }
+    catch (const ObjectInstanceNameInUse& e)
+    {
+      DebugPrintf("%s: %S\n", __FUNCTION__, e.what().c_str());
+    }
+    catch (const Exception& e)
+    {
+      DebugPrintf("%s: %S\n", __FUNCTION__, e.what().c_str());
+      throw;
     }
   }
-  return name;
-}
 
-std::wstring Mom::getMomParameterName(rti1516e::ParameterHandle parameterHandle)
-{
-  std::wstring name;
-  decltype(parameterLookup)::iterator iter = parameterLookup.find(parameterHandle);
-  if (iter != parameterLookup.end())
+  try
   {
-    MomTreeNode* paramNode = iter->second;
-    if (paramNode != nullptr)
-      name = paramNode->getName();
+    federateObject = rtiAmb->registerObjectInstance(federateClass, federateName, true);
   }
-  return name;
+  catch (const ObjectInstanceNameInUse& e)
+  {
+    DebugPrintf("%s: %S\n", __FUNCTION__, e.what().c_str());
+  }
+  catch (const Exception& e)
+  {
+    DebugPrintf("%s: %S\n", __FUNCTION__, e.what().c_str());
+    throw;
+  }
+  AttributeHandleValueMap attributes;
+  VariableLengthData tag;
+  AttributeHandle h1 = getObjects()[L"HLAmanager"][L"HLAfederation"].attributes[L"HLAfederatesInFederation"];
+  attributes[h1] = VariableLengthData();
+  rtiAmb->updateAttributeValues(federateObject, attributes, tag);
 }
 
-std::wstring Mom::MomTreeNode::getQualifiedName()
+std::wstring Mom::MomTreeNode::getQualifiedName() const
 {
   std::wstring qualifiedName = this->getName();
   if (this->parent != nullptr)
@@ -469,78 +426,130 @@ Mom::MomHandleTree::MomHandleTree(MomTreeNode* objectRoot, MomTreeNode* interact
   this->interactionRoot = interactionRoot;
 }
 
-Mom::MomTreeNode* Mom::MomHandleTree::find(std::wstring name, MomTreeNode* root)
-{
-  // Break the qualified name into tokens
-  std::vector<std::wstring> nameTokens = tokenizeName(name);
-
-  MomTreeNode* context = root;
-  for (auto& matchName : nameTokens)
-  {
-    // The current token we are searching for
-    //std::wstring matchName = nameTokens[i].toLowerCase();
-    MomTreeNode* nextContext = nullptr;
-
-    // Iterate over all child nodes in the current context, searching for the one that matches
-    // the current token
-    //std::list<MomTreeNode*>& children = context->getChildren();
-    for (MomTreeNode* child : context->getChildren())
-    {
-      std::wstring childName = child->getName()/*.toLowerCase()*/;
-      if (childName == matchName)
-      {
-        // This node matches the current token that we're looking for, so it becomes the
-        // context for the next token
-        nextContext = child;
-        break;
-      }
-    }
-
-    if (nextContext == nullptr)
-    {
-      // Next part in the chain wasn't found, so break from the loop, returning nullptr
-      break;
-    }
-    else
-    {
-      context = nextContext;
-    }
-  }
-
-  return context;
-}
-
-
-Mom::MomTreeNode* Mom::MomHandleTree::find(MomType type, int handle, MomTreeNode* root)
-{
-  // TODO This could be optimized by caching found results, or creating a lookup tree on
-  // startup
-
-  MomTreeNode* found = nullptr;
-  if (root->type == type && root->handle == handle)
-  {
-    // This is the node!
-    found = root;
-  }
-  else
-  {
-    // Recurse find over all child nodes
-    for (MomTreeNode* child : root->children)
-    {
-      found = find(type, handle, child);
-      if (found != nullptr)
-        break;
-    }
-  }
-
-  return found;
-}
-
 std::vector<std::wstring> Mom::MomHandleTree::tokenizeName(std::wstring name)
 {
   return OpenRTI::split(name, L".");
 }
 
+bool Mom::MomHandleTree::publishLeafInteractionClasses(RTIambassador* rtiAmb, MomTreeNode* root)
+{
+  if (root->type != MomType::Interaction) return false;
+  bool publishedChild = false;
+  // Recurse find over all child nodes
+  for (MomTreeNode* child : root->children)
+  {
+    if (child->type == MomType::Interaction)
+    {
+      publishedChild = publishLeafInteractionClasses(rtiAmb, child);
+    }
+  }
+  if (!publishedChild && root->interactionClassHandle.isValid())
+  {
+    rtiAmb->publishInteractionClass(root->interactionClassHandle);
+    DebugPrintf("publishing interaction class %S\n",root->getQualifiedName().c_str());
+  }
+  return true;
+}
+
+
+bool Mom::MomHandleTree::subscribeLeafInteractionClasses(RTIambassador* rtiAmb, MomTreeNode* root)
+{
+  if (root->type != MomType::Interaction) return false;
+  bool publishedChild = false;
+  // Recurse find over all child nodes
+  for (MomTreeNode* child : root->children)
+  {
+    if (child->type == MomType::Interaction)
+    {
+      publishedChild = subscribeLeafInteractionClasses(rtiAmb, child);
+    }
+  }
+  if (!publishedChild && root->interactionClassHandle.isValid())
+  {
+    rtiAmb->subscribeInteractionClass(root->interactionClassHandle);
+    DebugPrintf("subscribed interaction class %S\n", rtiAmb->getInteractionClassName(root->interactionClassHandle).c_str());
+  }
+  return true;
+}
+
+void Mom::MomHandleTree::getClassAttributes(AttributeHandleSet& attributes, MomTreeNode* objectClassNode)
+{
+  for (MomTreeNode* child : objectClassNode->children)
+  {
+    if (child->type == MomType::Attribute)
+    {
+      assert(child->attributeHandle.isValid());
+      attributes.insert(child->attributeHandle);
+    }
+  }
+  if (objectClassNode->parent != nullptr)
+  {
+    getClassAttributes(attributes, objectClassNode->parent);
+  }
+}
+
+void Mom::MomHandleTree::getClassAttributesValueVector(AttributeHandleValueMap& attributes, MomTreeNode* objectClassNode)
+{
+  for (MomTreeNode* child : objectClassNode->children)
+  {
+    if (child->type == MomType::Attribute)
+    {
+      assert(child->attributeHandle.isValid());
+      attributes.insert(std::make_pair(child->attributeHandle, VariableLengthData()));
+    }
+  }
+  if (objectClassNode->parent != nullptr)
+  {
+    getClassAttributesValueVector(attributes, objectClassNode->parent);
+  }
+}
+
+bool Mom::MomHandleTree::publishLeafObjectClasses(RTIambassador* rtiAmb, MomTreeNode* root)
+{
+  if (root->type != MomType::Object) return false;
+  bool publishedChild = false;
+  // Recurse find over all child nodes
+  for (MomTreeNode* child : root->children)
+  {
+    if (child->type == MomType::Object)
+    {
+      publishedChild = publishLeafObjectClasses(rtiAmb, child);
+    }
+  }
+  if (!publishedChild && root->objectClassHandle.isValid())
+  {
+    // we reached a leaf object class
+    AttributeHandleSet attributes;
+    getClassAttributes(attributes, root);
+    rtiAmb->publishObjectClassAttributes(root->objectClassHandle, attributes);
+    DebugPrintf("published object class %S (%d attributes)\n", root->getQualifiedName().c_str(), attributes.size());
+  }
+  return true;
+}
+
+
+bool Mom::MomHandleTree::subscribeLeafObjectClasses(RTIambassador* rtiAmb, MomTreeNode* root)
+{
+  if (root->type != MomType::Object) return false;
+  bool publishedChild = false;
+  // Recurse find over all child nodes
+  for (MomTreeNode* child : root->children)
+  {
+    if (child->type == MomType::Object)
+    {
+      publishedChild = subscribeLeafObjectClasses(rtiAmb, child);
+    }
+  }
+  if (!publishedChild && root->objectClassHandle.isValid())
+  {
+    // we reached a leaf object class
+    AttributeHandleSet attributes;
+    getClassAttributes(attributes, root);
+    rtiAmb->subscribeObjectClassAttributes(root->objectClassHandle, attributes);
+    DebugPrintf("subscribed object class %S (%d attributes)\n", root->getQualifiedName().c_str(), attributes.size());
+  }
+  return true;
+}
 
 void Mom::MomTreeNodeBuilder::add(MomTreeNode* newNode)
 {
@@ -570,21 +579,27 @@ Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::object(std::wstring name)
 {
   try
   {
-    rti1516e::ObjectClassHandle handle = mRtiAmb->getObjectClassHandle(name);
+    std::wstring fqName;
+    if (!mContextStack.empty())
+      fqName = mContextStack.front()->getQualifiedName() + L"." + name;
+    else
+      fqName = name;
+    rti1516e::ObjectClassHandle handle = mRtiAmb->getObjectClassHandle(fqName);
+    if (!handle.isValid())
+      throw NameNotFound(name.c_str());
     MomTreeNode* node = new MomTreeNode(name, MomType::Object, handle);
 
     this->addAndPush(node);
-    objectLookup[handle] = node;
     return *this;
   }
   catch (const rti1516e::NameNotFound& e)
   {
-    std::wcerr << L"object class name not found: " << name << L" : " << e.what() << std::endl;
+    DebugPrintf("%s: object class %s not found: %s", __FUNCTION__, name.c_str(), e.what().c_str());
     throw;
   }
   catch (const rti1516e::Exception& e)
   {
-    std::wcerr << L"Exception: " << e.what() << std::endl;
+    DebugPrintf("%s: Exception: %s", __FUNCTION__, e.what().c_str());
   }
 }
 
@@ -599,19 +614,21 @@ Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::attribute(std::wstring name, s
   try
   {
     rti1516e::AttributeHandle handle = mRtiAmb->getAttributeHandle(mContextStack.front()->objectClassHandle, name);
+    DebugPrintf("%s: \"%S\" => %S\n", __FUNCTION__, name.c_str(), handle.toString().c_str());
+    if (!handle.isValid())
+      throw NameNotFound(name.c_str());
     MomTreeNode* node = new MomTreeNode(name, MomType::Attribute, handle, datatype);
     this->add(node);
-    this->attributeLookup[handle] = node;
     return *this;
   }
   catch (const rti1516e::NameNotFound& e)
   {
-    std::wcerr << L"attribute name not found: " << name << L" : " << e.what() << std::endl;
+    DebugPrintf("%s: attribute %s not found: %S", __FUNCTION__, name.c_str(), e.what().c_str());
     throw;
   }
   catch (const rti1516e::Exception& e)
   {
-    std::wcerr << L"Exception: " << e.what() << std::endl;
+    DebugPrintf("%s: Exception: %S", __FUNCTION__, e.what().c_str());
   }
 }
 
@@ -619,21 +636,27 @@ Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::interaction(std::wstring name)
 {
   try
   {
+    std::wstring fqName;
+    if (!mContextStack.empty())
+      fqName = mContextStack.front()->getQualifiedName() + L"." + name;
+    else
+      fqName = name;
     rti1516e::InteractionClassHandle handle = mRtiAmb->getInteractionClassHandle(name);
+    if (!handle.isValid())
+      throw NameNotFound(name.c_str());
     MomTreeNode* node = new MomTreeNode(name, MomType::Interaction, handle);
 
     this->addAndPush(node);
-    this->interactionLookup[handle] = node;
     return *this;
   }
   catch (const rti1516e::NameNotFound& e)
   {
-    std::wcerr << L"interaction class name not found: " << name << L" : " << e.what() << std::endl;
+    DebugPrintf("%s: interaction class %S not found: %S", __FUNCTION__, name.c_str(), e.what().c_str());
     throw;
   }
   catch (const rti1516e::Exception& e)
   {
-    std::wcerr << L"Exception: " << e.what() << std::endl;
+    DebugPrintf("%s: Exception: %S", __FUNCTION__, e.what().c_str());
   }
 }
 
@@ -647,21 +670,22 @@ Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::parameter(std::wstring name, s
 
   try
   {
+    InteractionClassHandle interactionClass = mContextStack.front()->interactionClassHandle;
     rti1516e::ParameterHandle handle = mRtiAmb->getParameterHandle(mContextStack.front()->interactionClassHandle, name);
+    assert(handle.isValid());
     MomTreeNode* node = new MomTreeNode(name, MomType::Parameter, handle, datatype);
     this->add(node);
-    this->parameterLookup[handle] = node;
     return *this;
   }
   catch (const rti1516e::NameNotFound& e)
   {
-    std::wcerr << L"parameter name \"" << name << "\" not found in interaction class " << mContextStack.front()->getQualifiedName() << L" : " << e.what() << std::endl;
-    std::wcerr << L" in " << mRtiAmb->getInteractionClassName(mContextStack.front()->interactionClassHandle) << std::endl;
+    DebugPrintf("%s: parameter %s not found: %S", __FUNCTION__, name.c_str(), e.what().c_str());
+    DebugPrintf("%s:  in interaction class %S\n", __FUNCTION__, mRtiAmb->getInteractionClassName(mContextStack.front()->interactionClassHandle).c_str());
     throw;
   }
   catch (const rti1516e::Exception& e)
   {
-    std::wcerr << L"Exception: " << e.what() << std::endl;
+    DebugPrintf("%s: Exception: %s", __FUNCTION__, e.what().c_str());
   }
 }
 
