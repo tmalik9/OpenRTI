@@ -6,10 +6,9 @@
 
 #include <cstdio>
 #include "dprintf.h"
-#include <iostream>
 
 bool sEnableDebugPrintf = true;
-bool sDebugToConsole = true;
+
 void DebugPrintf(const char* fmt, ...)
 {
 #ifndef linux
@@ -45,10 +44,6 @@ void DebugPrintf(const char* fmt, ...)
     va_end(args);
     //fputs(buffer, stdout);
     OutputDebugStringA(buffer);
-    if (sDebugToConsole)
-    {
-      std::cout << buffer;
-    }
     free(buffer);
   }
 #endif

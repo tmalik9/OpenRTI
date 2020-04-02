@@ -279,24 +279,6 @@ split(const std::string& s, const char* c)
   return v;
 }
 
-
-OPENRTI_API std::vector<std::wstring>
-split(const std::wstring& s, const wchar_t* c)
-{
-  std::vector<std::wstring> v;
-  std::wstring::size_type p0 = 0;
-  std::wstring::size_type p = s.find_first_of(c);
-  while (p != std::wstring::npos) {
-    v.push_back(s.substr(p0, p - p0));
-    p0 = s.find_first_not_of(c, p);
-    if (p0 == std::string::npos)
-      return v;
-    p = s.find_first_of(c, p0);
-  }
-  v.push_back(s.substr(p0, p - p0));
-  return v;
-}
-
 OPENRTI_API std::string
 trim(std::string s, const char* c)
 {
