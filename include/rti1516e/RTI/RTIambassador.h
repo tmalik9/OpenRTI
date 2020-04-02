@@ -226,13 +226,6 @@ namespace rti1516e
          ObjectClassHandle theClass,
          std::wstring const & theObjectInstanceName) = 0;
 
-      // >>> Vector extension
-      virtual rti1516e::ObjectInstanceHandle
-      registerObjectInstance(rti1516e::ObjectClassHandle rti1516ObjectClassHandle,
-        std::wstring const & objectInstanceName,
-        bool allowUnreservedObjectNames) = 0;
-      // <<<
-
       // 6.10
       virtual void updateAttributeValues (
          ObjectInstanceHandle theObject,

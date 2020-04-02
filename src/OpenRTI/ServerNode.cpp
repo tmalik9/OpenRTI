@@ -2143,7 +2143,7 @@ public:
     FederationServer* federationServer = getFederation(message->getFederationExecution());
     if (!federationServer) {
       Log(ServerFederation, Debug) << getServerPath()
-                                   << ": DestroyFederationExecutionRequestMessage failed for unknown federation named \""
+                                   << ": DestroyFederationExecutionRequestMessage faild for unknown federation named \""
                                    << message->getFederationExecution() << "\"!" << std::endl;
       // Ok, have an inactive federation, destroy needs to fail
       SharedPtr<DestroyFederationExecutionResponseMessage> response;
@@ -2154,7 +2154,7 @@ public:
 
       // Federates currently joined?
       if (federationServer->hasJoinedFederates()) {
-        Log(ServerFederation, Debug) << getServerPath() << ": DestroyFederationExecutionRequestMessage failed for \""
+        Log(ServerFederation, Debug) << getServerPath() << ": DestroyFederationExecutionRequestMessage faild for \""
                                      << message->getFederationExecution() << "\", federates joined!" << std::endl;
         // federates there, so, no
         SharedPtr<DestroyFederationExecutionResponseMessage> response;
