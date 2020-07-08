@@ -124,6 +124,45 @@ AbstractServer::_Connect::getMessageReceiver()
   return _messageReceiver.get();
 }
 
+// an AbstractConnect without a receiver
+class OPENRTI_LOCAL AbstractServer::_OneWayConnect : public AbstractConnect {
+public:
+  _OneWayConnect(const SharedPtr<AbstractMessageSender>& messageSender);
+  virtual ~_OneWayConnect();
+
+  virtual AbstractMessageSender* getMessageSender();
+  virtual AbstractMessageReceiver* getMessageReceiver();
+
+private:
+  SharedPtr<AbstractMessageSender> _messageSender;
+};
+
+AbstractServer::_OneWayConnect::_OneWayConnect(const SharedPtr<AbstractMessageSender>& messageSender)
+  : _messageSender(messageSender)
+{
+}
+
+AbstractServer::_OneWayConnect::~_OneWayConnect()
+{
+  /*
+  if (_messageSender.valid())
+    _messageSender->close();
+  */
+  _messageSender.clear();
+}
+
+AbstractMessageSender*
+AbstractServer::_OneWayConnect::getMessageSender()
+{
+  return _messageSender.get();
+}
+
+AbstractMessageReceiver*
+AbstractServer::_OneWayConnect::getMessageReceiver()
+{
+  return nullptr;
+}
+
 class OPENRTI_LOCAL AbstractServer::_ConnectOperation : public AbstractServer::_Operation {
 public:
   _ConnectOperation(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& clientOptions);
@@ -273,7 +312,7 @@ public:
   virtual ~_SendingMessageSender();
   virtual void send(const SharedPtr<const AbstractMessage>& message);
   virtual void close();
-
+  //void setConnectHandle(ConnectHandle handle) { _connectHandle = handle; }
 private:
   SharedPtr<AbstractServerNode> _serverNode;
   ConnectHandle _connectHandle;
@@ -315,6 +354,7 @@ AbstractServer::AbstractServer(const SharedPtr<AbstractServerNode>& serverNode) 
   _done(false)
 {
   OpenRTIAssert(_serverNode.valid());
+  serverNode->setServer(this);
 }
 
 AbstractServer::~AbstractServer()
@@ -355,6 +395,17 @@ AbstractServer::sendConnect(const StringStringListMap& optionMap, bool parent)
   SharedPtr<AbstractMessageSender> messageSender;
   messageSender = new _SendingMessageSender(&getServerNode(), connectHandle);
   return new _Connect(messageSender, messageQueue);
+}
+
+SharedPtr<AbstractConnect>
+AbstractServer::sendDirectConnect(SharedPtr<AbstractMessageSender> sender, const StringStringListMap& optionMap)
+{
+  ConnectHandle connectHandle = getServerNode()._insertConnect(sender, optionMap);
+  if (!connectHandle.valid())
+    return 0;
+  SharedPtr<AbstractMessageSender> messageSender;
+  messageSender = new _SendingMessageSender(&getServerNode(), connectHandle);
+  return new _OneWayConnect(messageSender);
 }
 
 ConnectHandle

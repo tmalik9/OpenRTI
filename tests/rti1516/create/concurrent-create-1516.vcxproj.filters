@@ -13,7 +13,4 @@
   <ItemGroup>
     <ClInclude Include="..\include\RTI1516TestLib.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
 </Project>

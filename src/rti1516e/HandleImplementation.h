@@ -107,6 +107,10 @@ namespace rti1516e
     static void                                                         \
     copy(HandleKind& dst, OpenRTI::HandleKind const& src)               \
     { dst = HandleKind(HandleKind##Implementation::create(src)); }      \
+    static size_t                                                       \
+    getEncodedLength() {                                                \
+       return OpenRTI::HandleKind::kFixedHandleSize;                    \
+    }                                                                   \
   };
 
 DECLARE_HANDLE_CLASS(FederateHandle)

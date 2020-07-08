@@ -601,6 +601,7 @@ public:
   void writeAttributeState(const AttributeState& value)
   {
     writeAttributeHandle(value.getAttributeHandle());
+    writeFederateHandle(value.getOwnerFederate());
   }
 
   void writeAttributeStateVector(const AttributeStateVector& value)
@@ -800,6 +801,126 @@ public:
     }
   }
 
+  void writeFOMStringSimpleDataType(const FOMStringSimpleDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getRepresentation());
+  }
+
+  void writeFOMStringSimpleDataTypeList(const FOMStringSimpleDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringSimpleDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringSimpleDataType(*i);
+    }
+  }
+
+  void writeFOMStringEnumerator(const FOMStringEnumerator& value)
+  {
+    writeString(value.getName());
+    writeUnsigned(value.getValue());
+  }
+
+  void writeFOMStringEnumeratorList(const FOMStringEnumeratorList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringEnumeratorList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringEnumerator(*i);
+    }
+  }
+
+  void writeFOMStringEnumeratedDataType(const FOMStringEnumeratedDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getRepresentation());
+    writeFOMStringEnumeratorList(value.getEnumerators());
+  }
+
+  void writeFOMStringEnumeratedDataTypeList(const FOMStringEnumeratedDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringEnumeratedDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringEnumeratedDataType(*i);
+    }
+  }
+
+  void writeFOMStringArrayDataType(const FOMStringArrayDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getDataType());
+    writeString(value.getCardinality());
+    writeString(value.getEncoding());
+  }
+
+  void writeFOMStringArrayDataTypeList(const FOMStringArrayDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringArrayDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringArrayDataType(*i);
+    }
+  }
+
+  void writeFOMStringFixedRecordField(const FOMStringFixedRecordField& value)
+  {
+    writeString(value.getName());
+    writeUnsigned(value.getDataType());
+  }
+
+  void writeFOMStringFixedRecordFieldList(const FOMStringFixedRecordFieldList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringFixedRecordFieldList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringFixedRecordField(*i);
+    }
+  }
+
+  void writeFOMStringFixedRecordDataType(const FOMStringFixedRecordDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getEncoding());
+    writeFOMStringFixedRecordFieldList(value.getFields());
+  }
+
+  void writeFOMStringFixedRecordDataTypeList(const FOMStringFixedRecordDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringFixedRecordDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringFixedRecordDataType(*i);
+    }
+  }
+
+  void writeFOMStringVariantRecordAlternative(const FOMStringVariantRecordAlternative& value)
+  {
+    writeString(value.getEnumerator());
+    writeString(value.getName());
+    writeUnsigned(value.getDataType());
+  }
+
+  void writeFOMStringVariantRecordAlternativeList(const FOMStringVariantRecordAlternativeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringVariantRecordAlternativeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringVariantRecordAlternative(*i);
+    }
+  }
+
+  void writeFOMStringVariantRecordDataType(const FOMStringVariantRecordDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getDiscriminant());
+    writeString(value.getDataType());
+    writeFOMStringVariantRecordAlternativeList(value.getAlternatives());
+    writeString(value.getEncoding());
+  }
+
+  void writeFOMStringVariantRecordDataTypeList(const FOMStringVariantRecordDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringVariantRecordDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringVariantRecordDataType(*i);
+    }
+  }
+
   void writeFOMStringTransportationType(const FOMStringTransportationType& value)
   {
     writeString(value.getName());
@@ -844,6 +965,7 @@ public:
   void writeFOMStringParameter(const FOMStringParameter& value)
   {
     writeString(value.getName());
+    writeString(value.getDataType());
   }
 
   void writeFOMStringParameterList(const FOMStringParameterList& value)
@@ -875,6 +997,7 @@ public:
   void writeFOMStringAttribute(const FOMStringAttribute& value)
   {
     writeString(value.getName());
+    writeString(value.getDataType());
     writeString(value.getOrderType());
     writeString(value.getTransportationType());
     writeString(value.getRoutingSpace());
@@ -933,7 +1056,7 @@ public:
 
   void writeFOMStringModule(const FOMStringModule& value)
   {
-    writeString(value.getContent());
+    writeString(value.getDesignator());
     writeFOMStringTransportationTypeList(value.getTransportationTypeList());
     writeFOMStringDimensionList(value.getDimensionList());
     writeFOMStringRoutingSpaceList(value.getRoutingSpaceList());
@@ -941,6 +1064,11 @@ public:
     writeFOMStringObjectClassList(value.getObjectClassList());
     writeFOMStringUpdateRateList(value.getUpdateRateList());
     writeFOMStringSwitchList(value.getSwitchList());
+    writeFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
+    writeFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
+    writeFOMStringArrayDataTypeList(value.getArrayDataTypeList());
+    writeFOMStringFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
+    writeFOMStringVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
     writeBool(value.getArtificialInteractionRoot());
     writeBool(value.getArtificialObjectRoot());
   }
@@ -1000,6 +1128,7 @@ public:
   void writeFOMParameter(const FOMParameter& value)
   {
     writeString(value.getName());
+    writeString(value.getDataType());
     writeParameterHandle(value.getParameterHandle());
   }
 
@@ -1033,6 +1162,7 @@ public:
   void writeFOMAttribute(const FOMAttribute& value)
   {
     writeString(value.getName());
+    writeString(value.getDataType());
     writeAttributeHandle(value.getAttributeHandle());
     writeOrderType(value.getOrderType());
     writeTransportationType(value.getTransportationType());
@@ -1104,7 +1234,7 @@ public:
     writeFOMSwitchList(value.getSwitchList());
     writeBool(value.getArtificialInteractionRoot());
     writeBool(value.getArtificialObjectRoot());
-    writeString(value.getContent());
+    writeString(value.getDesignator());
   }
 
   void writeFOMModuleList(const FOMModuleList& value)
@@ -1188,6 +1318,7 @@ public:
     writeString(value.getFederateName());
     writeFOMStringModuleList(value.getFOMStringModuleList());
     writeConfigurationParameterMap(value.getConfigurationParameterMap());
+    writeBool(value.getIsInternal());
   }
 
   void writeJoinFederationExecutionResponseMessage(const JoinFederationExecutionResponseMessage& value)
@@ -1219,6 +1350,7 @@ public:
     writeFederateHandle(value.getFederateHandle());
     writeString(value.getFederateType());
     writeString(value.getFederateName());
+    writeBool(value.getIsInternal());
   }
 
   void writeResignFederateNotifyMessage(const ResignFederateNotifyMessage& value)
@@ -1292,6 +1424,18 @@ public:
   }
 
   void writeDisableTimeRegulationRequestMessage(const DisableTimeRegulationRequestMessage& value)
+  {
+    writeFederationHandle(value.getFederationHandle());
+    writeFederateHandle(value.getFederateHandle());
+  }
+
+  void writeEnableTimeConstrainedNotifyMessage(const EnableTimeConstrainedNotifyMessage& value)
+  {
+    writeFederationHandle(value.getFederationHandle());
+    writeFederateHandle(value.getFederateHandle());
+  }
+
+  void writeDisableTimeConstrainedNotifyMessage(const DisableTimeConstrainedNotifyMessage& value)
   {
     writeFederationHandle(value.getFederationHandle());
     writeFederateHandle(value.getFederateHandle());
@@ -1465,6 +1609,7 @@ public:
     writeFederationHandle(value.getFederationHandle());
     writeFederateHandle(value.getFederateHandle());
     writeString(value.getName());
+    writeBool(value.getIsInternal());
   }
 
   void writeReserveObjectInstanceNameResponseMessage(const ReserveObjectInstanceNameResponseMessage& value)
@@ -1555,6 +1700,21 @@ public:
     writeObjectClassHandle(value.getObjectClassHandle());
     writeAttributeHandleVector(value.getAttributeHandles());
     writeVariableLengthData(value.getTag());
+  }
+
+  void writeQueryAttributeOwnershipRequestMessage(const QueryAttributeOwnershipRequestMessage& value)
+  {
+    writeFederationHandle(value.getFederationHandle());
+    writeObjectInstanceHandle(value.getObjectInstanceHandle());
+    writeAttributeHandle(value.getAttributeHandle());
+  }
+
+  void writeQueryAttributeOwnershipResponseMessage(const QueryAttributeOwnershipResponseMessage& value)
+  {
+    writeFederationHandle(value.getFederationHandle());
+    writeObjectInstanceHandle(value.getObjectInstanceHandle());
+    writeAttributeHandle(value.getAttributeHandle());
+    writeFederateHandle(value.getOwner());
   }
 
   TightBE1MessageEncoding& _messageEncoding;
@@ -1837,6 +1997,26 @@ public:
   }
 
   void
+  encode(TightBE1MessageEncoding& messageEncoding, const EnableTimeConstrainedNotifyMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(100);
+    encodeStream.writeEnableTimeConstrainedNotifyMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const DisableTimeConstrainedNotifyMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(101);
+    encodeStream.writeDisableTimeConstrainedNotifyMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
   encode(TightBE1MessageEncoding& messageEncoding, const CommitLowerBoundTimeStampMessage& message) const
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
@@ -2103,6 +2283,26 @@ public:
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
     encodeStream.writeUInt16Compressed(98);
     encodeStream.writeRequestClassAttributeUpdateMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipRequestMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(102);
+    encodeStream.writeQueryAttributeOwnershipRequestMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipResponseMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(103);
+    encodeStream.writeQueryAttributeOwnershipResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
@@ -2681,6 +2881,7 @@ public:
   void readAttributeState(AttributeState& value)
   {
     readAttributeHandle(value.getAttributeHandle());
+    readFederateHandle(value.getOwnerFederate());
   }
 
   void readAttributeStateVector(AttributeStateVector& value)
@@ -2881,6 +3082,126 @@ public:
     }
   }
 
+  void readFOMStringSimpleDataType(FOMStringSimpleDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getRepresentation());
+  }
+
+  void readFOMStringSimpleDataTypeList(FOMStringSimpleDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringSimpleDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringSimpleDataType(*i);
+    }
+  }
+
+  void readFOMStringEnumerator(FOMStringEnumerator& value)
+  {
+    readString(value.getName());
+    readUnsigned(value.getValue());
+  }
+
+  void readFOMStringEnumeratorList(FOMStringEnumeratorList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringEnumeratorList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringEnumerator(*i);
+    }
+  }
+
+  void readFOMStringEnumeratedDataType(FOMStringEnumeratedDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getRepresentation());
+    readFOMStringEnumeratorList(value.getEnumerators());
+  }
+
+  void readFOMStringEnumeratedDataTypeList(FOMStringEnumeratedDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringEnumeratedDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringEnumeratedDataType(*i);
+    }
+  }
+
+  void readFOMStringArrayDataType(FOMStringArrayDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getDataType());
+    readString(value.getCardinality());
+    readString(value.getEncoding());
+  }
+
+  void readFOMStringArrayDataTypeList(FOMStringArrayDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringArrayDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringArrayDataType(*i);
+    }
+  }
+
+  void readFOMStringFixedRecordField(FOMStringFixedRecordField& value)
+  {
+    readString(value.getName());
+    readUnsigned(value.getDataType());
+  }
+
+  void readFOMStringFixedRecordFieldList(FOMStringFixedRecordFieldList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringFixedRecordFieldList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringFixedRecordField(*i);
+    }
+  }
+
+  void readFOMStringFixedRecordDataType(FOMStringFixedRecordDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getEncoding());
+    readFOMStringFixedRecordFieldList(value.getFields());
+  }
+
+  void readFOMStringFixedRecordDataTypeList(FOMStringFixedRecordDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringFixedRecordDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringFixedRecordDataType(*i);
+    }
+  }
+
+  void readFOMStringVariantRecordAlternative(FOMStringVariantRecordAlternative& value)
+  {
+    readString(value.getEnumerator());
+    readString(value.getName());
+    readUnsigned(value.getDataType());
+  }
+
+  void readFOMStringVariantRecordAlternativeList(FOMStringVariantRecordAlternativeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringVariantRecordAlternativeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringVariantRecordAlternative(*i);
+    }
+  }
+
+  void readFOMStringVariantRecordDataType(FOMStringVariantRecordDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getDiscriminant());
+    readString(value.getDataType());
+    readFOMStringVariantRecordAlternativeList(value.getAlternatives());
+    readString(value.getEncoding());
+  }
+
+  void readFOMStringVariantRecordDataTypeList(FOMStringVariantRecordDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringVariantRecordDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringVariantRecordDataType(*i);
+    }
+  }
+
   void readFOMStringTransportationType(FOMStringTransportationType& value)
   {
     readString(value.getName());
@@ -2925,6 +3246,7 @@ public:
   void readFOMStringParameter(FOMStringParameter& value)
   {
     readString(value.getName());
+    readString(value.getDataType());
   }
 
   void readFOMStringParameterList(FOMStringParameterList& value)
@@ -2956,6 +3278,7 @@ public:
   void readFOMStringAttribute(FOMStringAttribute& value)
   {
     readString(value.getName());
+    readString(value.getDataType());
     readString(value.getOrderType());
     readString(value.getTransportationType());
     readString(value.getRoutingSpace());
@@ -3014,7 +3337,7 @@ public:
 
   void readFOMStringModule(FOMStringModule& value)
   {
-    readString(value.getContent());
+    readString(value.getDesignator());
     readFOMStringTransportationTypeList(value.getTransportationTypeList());
     readFOMStringDimensionList(value.getDimensionList());
     readFOMStringRoutingSpaceList(value.getRoutingSpaceList());
@@ -3022,6 +3345,11 @@ public:
     readFOMStringObjectClassList(value.getObjectClassList());
     readFOMStringUpdateRateList(value.getUpdateRateList());
     readFOMStringSwitchList(value.getSwitchList());
+    readFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
+    readFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
+    readFOMStringArrayDataTypeList(value.getArrayDataTypeList());
+    readFOMStringFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
+    readFOMStringVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
     readBool(value.getArtificialInteractionRoot());
     readBool(value.getArtificialObjectRoot());
   }
@@ -3081,6 +3409,7 @@ public:
   void readFOMParameter(FOMParameter& value)
   {
     readString(value.getName());
+    readString(value.getDataType());
     readParameterHandle(value.getParameterHandle());
   }
 
@@ -3114,6 +3443,7 @@ public:
   void readFOMAttribute(FOMAttribute& value)
   {
     readString(value.getName());
+    readString(value.getDataType());
     readAttributeHandle(value.getAttributeHandle());
     readOrderType(value.getOrderType());
     readTransportationType(value.getTransportationType());
@@ -3185,7 +3515,7 @@ public:
     readFOMSwitchList(value.getSwitchList());
     readBool(value.getArtificialInteractionRoot());
     readBool(value.getArtificialObjectRoot());
-    readString(value.getContent());
+    readString(value.getDesignator());
   }
 
   void readFOMModuleList(FOMModuleList& value)
@@ -3269,6 +3599,7 @@ public:
     readString(value.getFederateName());
     readFOMStringModuleList(value.getFOMStringModuleList());
     readConfigurationParameterMap(value.getConfigurationParameterMap());
+    readBool(value.getIsInternal());
   }
 
   void readJoinFederationExecutionResponseMessage(JoinFederationExecutionResponseMessage& value)
@@ -3300,6 +3631,7 @@ public:
     readFederateHandle(value.getFederateHandle());
     readString(value.getFederateType());
     readString(value.getFederateName());
+    readBool(value.getIsInternal());
   }
 
   void readResignFederateNotifyMessage(ResignFederateNotifyMessage& value)
@@ -3373,6 +3705,18 @@ public:
   }
 
   void readDisableTimeRegulationRequestMessage(DisableTimeRegulationRequestMessage& value)
+  {
+    readFederationHandle(value.getFederationHandle());
+    readFederateHandle(value.getFederateHandle());
+  }
+
+  void readEnableTimeConstrainedNotifyMessage(EnableTimeConstrainedNotifyMessage& value)
+  {
+    readFederationHandle(value.getFederationHandle());
+    readFederateHandle(value.getFederateHandle());
+  }
+
+  void readDisableTimeConstrainedNotifyMessage(DisableTimeConstrainedNotifyMessage& value)
   {
     readFederationHandle(value.getFederationHandle());
     readFederateHandle(value.getFederateHandle());
@@ -3546,6 +3890,7 @@ public:
     readFederationHandle(value.getFederationHandle());
     readFederateHandle(value.getFederateHandle());
     readString(value.getName());
+    readBool(value.getIsInternal());
   }
 
   void readReserveObjectInstanceNameResponseMessage(ReserveObjectInstanceNameResponseMessage& value)
@@ -3636,6 +3981,21 @@ public:
     readObjectClassHandle(value.getObjectClassHandle());
     readAttributeHandleVector(value.getAttributeHandles());
     readVariableLengthData(value.getTag());
+  }
+
+  void readQueryAttributeOwnershipRequestMessage(QueryAttributeOwnershipRequestMessage& value)
+  {
+    readFederationHandle(value.getFederationHandle());
+    readObjectInstanceHandle(value.getObjectInstanceHandle());
+    readAttributeHandle(value.getAttributeHandle());
+  }
+
+  void readQueryAttributeOwnershipResponseMessage(QueryAttributeOwnershipResponseMessage& value)
+  {
+    readFederationHandle(value.getFederationHandle());
+    readObjectInstanceHandle(value.getObjectInstanceHandle());
+    readAttributeHandle(value.getAttributeHandle());
+    readFederateHandle(value.getOwner());
   }
 
 private:
@@ -3905,6 +4265,14 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
     _message = new DisableTimeRegulationRequestMessage;
     decodeStream.readDisableTimeRegulationRequestMessage(static_cast<DisableTimeRegulationRequestMessage&>(*_message));
     break;
+  case 100:
+    _message = new EnableTimeConstrainedNotifyMessage;
+    decodeStream.readEnableTimeConstrainedNotifyMessage(static_cast<EnableTimeConstrainedNotifyMessage&>(*_message));
+    break;
+  case 101:
+    _message = new DisableTimeConstrainedNotifyMessage;
+    decodeStream.readDisableTimeConstrainedNotifyMessage(static_cast<DisableTimeConstrainedNotifyMessage&>(*_message));
+    break;
   case 43:
     _message = new CommitLowerBoundTimeStampMessage;
     decodeStream.readCommitLowerBoundTimeStampMessage(static_cast<CommitLowerBoundTimeStampMessage&>(*_message));
@@ -4012,6 +4380,14 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
   case 98:
     _message = new RequestClassAttributeUpdateMessage;
     decodeStream.readRequestClassAttributeUpdateMessage(static_cast<RequestClassAttributeUpdateMessage&>(*_message));
+    break;
+  case 102:
+    _message = new QueryAttributeOwnershipRequestMessage;
+    decodeStream.readQueryAttributeOwnershipRequestMessage(static_cast<QueryAttributeOwnershipRequestMessage&>(*_message));
+    break;
+  case 103:
+    _message = new QueryAttributeOwnershipResponseMessage;
+    decodeStream.readQueryAttributeOwnershipResponseMessage(static_cast<QueryAttributeOwnershipResponseMessage&>(*_message));
     break;
   default:
     break;

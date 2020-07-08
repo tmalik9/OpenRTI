@@ -39,7 +39,11 @@
 #ifdef _MSC_VER
 #include <filesystem>
 
+#if _MSC_VER >= 1925
+namespace fs = std::filesystem;
+#else
 namespace fs = std::experimental::filesystem;
+#endif
 #endif
 namespace OpenRTI {
 

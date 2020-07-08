@@ -59,11 +59,13 @@ set(LIB_RTI1516E_SOURCES
         Exception.cpp
         FederateAmbassador.cpp
         Handle.cpp
+		HandleFactory.cpp
         HLAfixedArray.cpp
         HLAfixedRecord.cpp
         HLAopaqueData.cpp
         HLAvariableArray.cpp
         HLAvariantRecord.cpp
+        HLAhandle.cpp
         HLAlogicalTimeFactoryFactory.cpp
         LogicalTime.cpp
         LogicalTimeFactory.cpp

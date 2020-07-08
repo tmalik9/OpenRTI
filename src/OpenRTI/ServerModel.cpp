@@ -22,9 +22,36 @@
 #include "ServerOptions.h"
 #include <sstream>
 #include <iomanip>
+#include "MessageQueue.h"
+#include "ServerNode.h"
+#include "mom/MomServer.h"
+#include "mom/MomFederateMetrics.h"
+#include "mom/AbstractFederateMetrics.h"
 
 namespace OpenRTI {
 namespace ServerModel {
+
+static const unsigned int kIndentSpaces = 2;
+
+static inline std::string normalizeTransportationType(const TransportationType& value)
+{
+  switch (value)
+  {
+    case RELIABLE: return "HLAreliable";
+    case BEST_EFFORT: return "HLAbestEffort";
+    default: return "";
+  }
+}
+
+static inline std::string normalizeOrderType(const OrderType& value)
+{
+  switch (value)
+  {
+    case RECEIVE: return "Receive";
+    case TIMESTAMP: return "TimeStamp";
+    default: return "";
+  }
+}
 
 ////////////////////////////////////////////////////////////
 
@@ -63,6 +90,15 @@ InstanceAttribute::setAttributeHandle(const AttributeHandle& attributeHandle)
   HandleEntity<InstanceAttribute, AttributeHandle>::_setHandle(attributeHandle);
 }
 
+
+void InstanceAttribute::setOwnerFederate(const FederateHandle& federateHandle)
+{
+  //DebugPrintf("%s: name=%s.%s FederateHandle(%d) => FederateHandle(%d)\n", __FUNCTION__, 
+  //            _classAttribute.getObjectClass().getFQName().c_str(),
+  //            _classAttribute.getAttributeDefinition().getName().c_str(), 
+  //            _ownerFederate.getHandle(), federateHandle.getHandle());
+  _ownerFederate = federateHandle;
+}
 
 void InstanceAttribute::removeConnect(const ConnectHandle& connectHandle)
 {
@@ -152,7 +188,7 @@ ObjectInstance::reference(FederationConnect& federationConnect)
     return;
   ObjectInstanceConnect* objectInstanceConnect;
   objectInstanceConnect = new ObjectInstanceConnect(*this, federationConnect);
-  insert(*objectInstanceConnect);
+  _connectHandleObjectInstanceConnectMap.insert(*objectInstanceConnect);
   federationConnect.insert(*objectInstanceConnect);
 }
 
@@ -195,16 +231,6 @@ ObjectInstance::setObjectClass(ObjectClass* objectClass)
       setSubscriptionType(subscriber, SubscribedActive);
     }
   }
-  /*
-  size_t numSubscribers2 = getSubscribedConnectHandleSet().size();
-  DebugPrintf("%s: name=%s class=%s %d subscribers before, %d now\n", __FUNCTION__,
-              getName().c_str(), objectClass->getFQName().c_str(),
-              numSubscribers, numSubscribers2);
-  for (auto& subscriber : getSubscribedConnectHandleSet())
-  {
-    DebugPrintf("%s: subscriber=%s\n", __FUNCTION__, subscriber.toString().c_str());
-  }
-  */
 }
 
 ////////////////////////////////////////////////////////////
@@ -275,6 +301,15 @@ Synchronization::insert(Federate& federate)
   OpenRTIAssert(_achievedFederateSyncronizationMap.find(federate.getFederateHandle()) == _achievedFederateSyncronizationMap.end());
   if (federate.getResignPending())
     return;
+  if (federate.getIsInternal())
+  {
+    //DebugPrintf("%s(label=%s): federate %s is internal\n", __FUNCTION__, getLabel().c_str(), federate.getName().c_str());
+    return;
+  }
+  //else
+  //{
+  //  DebugPrintf("%s(label=%s): inserted federate %s\n", __FUNCTION__, getLabel().c_str(), federate.getName().c_str());
+  //}
   SynchronizationFederate* synchronizationFederate = new SynchronizationFederate(*this, federate);
   synchronizationFederate->setFederateHandle(federate.getFederateHandle());
   federate.insert(*synchronizationFederate);
@@ -298,12 +333,14 @@ Synchronization::achieved(const FederateHandle& federateHandle, bool successful)
 
 ////////////////////////////////////////////////////////////
 
-Federate::Federate(Federation& federation) :
-  _federation(federation),
-  _resignAction(CANCEL_THEN_DELETE_THEN_DIVEST),
-  _resignPending(false),
-  _federationConnect(0),
-  _commitId()
+Federate::Federate(Federation& federation)
+  : _federation(federation)
+  , _resignAction(CANCEL_THEN_DELETE_THEN_DIVEST)
+  , _resignPending(false)
+  , _federationConnect(0)
+  , _commitId()
+  , _isInternal(false)
+  , _isTimeConstrained(false)
 {
 }
 
@@ -560,6 +597,17 @@ ParameterDefinition::setParameterHandle(const ParameterHandle& parameterHandle)
   HandleStringEntity<ParameterDefinition, ParameterHandle>::_setHandle(parameterHandle);
 }
 
+
+void ParameterDefinition::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level+1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<parameter>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<dataType>)XML" << getDataType() << R"XML(</dataType>)XML" << std::endl;
+  out << indent << R"XML(</parameter>)XML" << std::endl;
+}
+
 ////////////////////////////////////////////////////////////
 
 InteractionClass::InteractionClass(Federation& federation, InteractionClass* parentInteractionClass) :
@@ -663,18 +711,18 @@ InteractionClass::eraseParameterDefinitions()
   OpenRTIAssert(_parameterNameParameterMap.empty());
 }
 
-std::size_t
+uint32_t
 InteractionClass::getNumParameterDefinitions() const
 {
   // FIXME O(N)
-  return _parameterHandleParameterMap.size();
+  return static_cast<uint32_t>(_parameterHandleParameterMap.size());
 }
 
 ParameterHandle
 InteractionClass::getFirstUnusedParameterHandle()
 {
   // FIXME this is O(N)
-  std::size_t numParameters = 0;
+  uint32_t numParameters = 0;
   if (_parentInteractionClass)
     numParameters += _parentInteractionClass->getFirstUnusedParameterHandle().getHandle();
   numParameters += getNumParameterDefinitions();
@@ -853,6 +901,25 @@ std::list<ParameterValueVector> InteractionClass::getParameterFilters(const Conn
   return result;
 }
 
+
+void InteractionClass::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level+1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<interactionClass>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName().back() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<order>)XML" << normalizeOrderType(getOrderType()) << R"XML(</order>)XML" << std::endl;
+  for (const ParameterDefinition& parameter : _parameterHandleParameterMap)
+  {
+    parameter.writeCurrentFDD(out, level + 1);
+  }
+  for (const InteractionClass& childClass : getChildInteractionClassList())
+  {
+    childClass.writeCurrentFDD(out, level + 1);
+  }
+  out << indent << R"XML(</interactionClass>)XML" << std::endl;
+}
+
 ParameterDefinition*
 InteractionClass::getParameterDefinition(const std::string& name)
 {
@@ -970,6 +1037,24 @@ AttributeDefinition::setTransportationType(TransportationType transportationType
   _transportationType = transportationType;
 }
 
+void AttributeDefinition::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level+1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<attribute>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<dataType>)XML" << getDataType() << R"XML(</dataType>)XML" << std::endl;
+  out << indent1 << R"XML(<order>)XML" << normalizeOrderType(getOrderType()) << R"XML(</order>)XML" << std::endl;
+  out << indent1 << R"XML(<transportation>)XML" << normalizeTransportationType(getTransportationType()) << R"XML(</transportation>)XML" << std::endl;
+            //<updateType>Static</updateType>
+            //<updateCondition>NA</updateCondition>
+            //<ownership>DivestAcquire</ownership>
+            //<sharing>PublishSubscribe</sharing>
+            //<transportation>HLAreliable</transportation>
+            //<order>TimeStamp</order>
+  out << indent << R"XML(</attribute>)XML" << std::endl;
+}
+
 ////////////////////////////////////////////////////////////
 
 ObjectClass::ObjectClass(Federation& federation, ObjectClass* parentObjectClass) :
@@ -1057,18 +1142,18 @@ ObjectClass::eraseAttributeDefinitions()
   OpenRTIAssert(_attributeNameAttributeDefinitionMap.empty());
 }
 
-std::size_t
+uint32_t
 ObjectClass::getNumAttributeDefinitions() const
 {
   // FIXME O(N)
-  return _attributeHandleAttributeDefinitionMap.size();
+  return static_cast<uint32_t>(_attributeHandleAttributeDefinitionMap.size());
 }
 
 AttributeHandle
 ObjectClass::getFirstUnusedAttributeHandle()
 {
   // FIXME this is O(N)
-  std::size_t numAttributes = 0;
+  uint32_t numAttributes = 0;
   if (_parentObjectClass)
     numAttributes += _parentObjectClass->getFirstUnusedAttributeHandle().getHandle();
   numAttributes += getNumAttributeDefinitions();
@@ -1222,12 +1307,31 @@ void ObjectClass::_updateCumulativeSubscription(const ConnectHandle& connectHand
   }
 }
 
+
+void ObjectClass::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level+1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<objectClass>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName().back() << R"XML(</name>)XML" << std::endl;
+  for (const AttributeDefinition& attribute : _attributeHandleAttributeDefinitionMap)
+  {
+    attribute.writeCurrentFDD(out, level + 1);
+  }
+  for (const ObjectClass& childClass : getChildObjectClassList())
+  {
+    childClass.writeCurrentFDD(out, level + 1);
+  }
+  out << indent << R"XML(</objectClass>)XML" << std::endl;
+}
+
 ////////////////////////////////////////////////////////////
 
-Module::Module(Federation& federation) :
+Module::Module(Federation& federation, const std::string& designator) :
   _federation(federation),
   _artificialInteractionRoot(false),
-  _artificialObjectRoot(false)
+  _artificialObjectRoot(false),
+  _designator(designator)
 {
 }
 
@@ -1272,7 +1376,7 @@ Module::getModule(FOMModule& module)
   // FOMSwitchList _switchList;
   module.setArtificialInteractionRoot(getArtificialInteractionRoot());
   module.setArtificialObjectRoot(getArtificialObjectRoot());
-  module.setContent(getContent());
+  module.setDesignator(getDesignator());
 
   module.getDimensionList().reserve(_dimensionModuleList.size());
   for (DimensionModule::FirstList::iterator i = _dimensionModuleList.begin();
@@ -1319,12 +1423,12 @@ Module::getModule(FOMModule& module)
       // If so, add them too
       ++j;
       fomInteractionClass.getParameterList().reserve(interactionClass.getNumParameterDefinitions());
-      for (ParameterDefinition::HandleMap::iterator k = interactionClass.getParameterHandleParameterMap().begin();
-           k != interactionClass.getParameterHandleParameterMap().end(); ++k) {
+      for (const ParameterDefinition& parameter : interactionClass.getParameterHandleParameterMap()) {
         fomInteractionClass.getParameterList().push_back(FOMParameter());
         FOMParameter& fomParameter = fomInteractionClass.getParameterList().back();
-        fomParameter.setName(k->getName());
-        fomParameter.setParameterHandle(k->getParameterHandle());
+        fomParameter.setName(parameter.getName());
+        fomParameter.setDataType(parameter.getDataType());
+        fomParameter.setParameterHandle(parameter.getParameterHandle());
       }
     }
   }
@@ -1354,6 +1458,7 @@ Module::getModule(FOMModule& module)
         fomObjectClass.getAttributeList().push_back(FOMAttribute());
         FOMAttribute& fomAttribute = fomObjectClass.getAttributeList().back();
         fomAttribute.setName(k->getName());
+        fomAttribute.setDataType(k->getDataType());
         fomAttribute.setAttributeHandle(k->getAttributeHandle());
         fomAttribute.setOrderType(k->getOrderType());
         fomAttribute.setTransportationType(k->getTransportationType());
@@ -1520,16 +1625,28 @@ FederationConnect::send(const SharedPtr<const AbstractMessage>& message)
   _nodeConnect.send(message);
 }
 
+void
+FederationConnect::sendAndDeactivate(const SharedPtr<const AbstractMessage>& message)
+{
+  if (!_active)
+    return;
+  _active = false;
+  _nodeConnect.send(message);
+}
+
 ////////////////////////////////////////////////////////////
 
-Federation::Federation(Node& serverNode) :
-  _serverNode(serverNode),
-  _objectInstanceHandleObjectInstanceMap(16384/*hash size*/)
+Federation::Federation(Node& serverNode)
+  : _serverNode(serverNode)
+  , _objectInstanceHandleObjectInstanceMap(16384/*hash size*/)
+  , _momServer()
 {
 }
 
 Federation::~Federation()
 {
+  DebugPrintf("%s: name=%s\n", __FUNCTION__, getName().c_str());
+  _momServer.clear();
   // In case of an exception tis can be non empty
   _objectInstanceHandleObjectInstanceMap.clear();
 
@@ -1778,6 +1895,12 @@ Federation::insert(Module& module)
   _moduleHandleModuleMap.insert(module);
 }
 
+
+void Federation::insert(Module& module, const FOMTransportationType& fomObjectClass)
+{
+
+}
+
 bool
 Federation::insertOrCheck(Module& module, const FOMStringDimension& stringDimension)
 {
@@ -1925,23 +2048,21 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
     if (!stringInteractionClass.getParameterList().empty())
       module.insertParameters(*interactionClass);
 
-    ParameterHandle nextParameterHandle = interactionClass->getFirstUnusedParameterHandle();
-    for (FOMStringParameterList::const_iterator dimSetIter = stringInteractionClass.getParameterList().begin();
-         dimSetIter != stringInteractionClass.getParameterList().end(); ++dimSetIter) {
-      if (interactionClass->getParameterDefinition(dimSetIter->getName())) {
+    for (const FOMStringParameter& stringParameter : stringInteractionClass.getParameterList()) {
+      if (interactionClass->getParameterDefinition(stringParameter.getName())) {
         std::stringstream ss;
-        ss << "Duplicate parameter name \"" << dimSetIter->getName() << "\" in InteractionClass \""
+        ss << "Duplicate parameter name \"" << stringParameter.getName() << "\" in InteractionClass \""
            << interactionClass->getName() << "\"!";
         throw InconsistentFDD(ss.str());
       }
 
       ParameterDefinition* parameterDefinition;
       parameterDefinition = new ParameterDefinition(*interactionClass);
-      parameterDefinition->setName(dimSetIter->getName());
-      parameterDefinition->setParameterHandle(nextParameterHandle);
+      parameterDefinition->setName(stringParameter.getName());
+      parameterDefinition->setDataType(stringParameter.getDataType());
+      parameterDefinition->setParameterHandle(module.getFederation()._parameterHandleAllocator.get());
       interactionClass->insert(*parameterDefinition);
 
-      nextParameterHandle = ParameterHandle(nextParameterHandle.getHandle() + 1);
     }
 
     return true;
@@ -1960,36 +2081,35 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
     if (!stringObjectClass.getAttributeList().empty()) {
       std::vector<AttributeHandle> attributeHandles;
       attributeHandles.reserve(stringObjectClass.getAttributeList().size());
-      for (FOMStringAttributeList::const_iterator j = stringObjectClass.getAttributeList().begin();
-           j != stringObjectClass.getAttributeList().end(); ++j) {
+      for (const FOMStringAttribute& stringAttribute :  stringObjectClass.getAttributeList()) {
         AttributeDefinition* attributeDefinition;
-        attributeDefinition = i->getAttributeDefinition(j->getName());
+        attributeDefinition = i->getAttributeDefinition(stringAttribute.getName());
         if (!attributeDefinition) {
           std::stringstream ss;
           ss << "Inconsistent ObjectClass \"" << stringObjectClass.getName() << "\": Attribute \""
-             << j->getName() << "\" not present in already established object class!";
+             << stringAttribute.getName() << "\" not present in already established object class!";
           throw InconsistentFDD(ss.str());
         }
-        if (attributeDefinition->getOrderType() != resolveOrderType(j->getOrderType())) {
+        if (attributeDefinition->getOrderType() != resolveOrderType(stringAttribute.getOrderType())) {
           std::stringstream ss;
           ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
-             << j->getName() << "\": OrderType " << j->getOrderType()
+             << stringAttribute.getName() << "\": OrderType " << stringAttribute.getOrderType()
              << " does not match the already established value of "
              << attributeDefinition->getOrderType() << "!";
           throw InconsistentFDD(ss.str());
         }
-        if (attributeDefinition->getTransportationType() != resolveTransportationType(j->getTransportationType())) {
+        if (attributeDefinition->getTransportationType() != resolveTransportationType(stringAttribute.getTransportationType())) {
           std::stringstream ss;
           ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
-             << j->getName() << "\": TransportationType " << j->getTransportationType()
+             << stringAttribute.getName() << "\": TransportationType " << stringAttribute.getTransportationType()
              << " does not match the already established value of "
              << attributeDefinition->getTransportationType() << "!";
           throw InconsistentFDD(ss.str());
         }
 
         DimensionHandleSet dimensionHandleSet;
-        for (StringSet::const_iterator k = j->getDimensionSet().begin();
-             k != j->getDimensionSet().end(); ++k) {
+        for (StringSet::const_iterator k = stringAttribute.getDimensionSet().begin();
+             k != stringAttribute.getDimensionSet().end(); ++k) {
           Dimension* dimension = resolveDimension(*k);
           if (!dimension)
             throw InconsistentFDD("Cannot resolve dimension \"" + *k + "\"!");
@@ -1999,7 +2119,7 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
         if (attributeDefinition->_dimensionHandleSet != dimensionHandleSet) {
           std::stringstream ss;
           ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
-             << j->getName() << "\": Dimensions do not match the already established value!";
+             << stringAttribute.getName() << "\": Dimensions do not match the already established value!";
           throw InconsistentFDD(ss.str());
         }
 
@@ -2047,6 +2167,7 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
       AttributeDefinition* attributeDefinition;
       attributeDefinition = new AttributeDefinition(*objectClass);
       attributeDefinition->setName(attrListIter->getName());
+      attributeDefinition->setDataType(attrListIter->getDataType());
       attributeDefinition->setAttributeHandle(nextAttributeHandle);
       objectClass->insert(*attributeDefinition);
 
@@ -2068,12 +2189,36 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
   }
 }
 
+bool Federation::insertOrCheck(Module& module, const FOMStringSimpleDataType& dataType)
+{
+  return false;
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringEnumeratedDataType& dataType)
+{
+  return false;
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType& dataType)
+{
+  return false;
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringFixedRecordDataType& dataType)
+{
+  return false;
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringVariantRecordDataType& dataType)
+{
+  return false;
+}
+
 ModuleHandle
 Federation::insert(const FOMStringModule& stringModule)
 {
-  Module* module = new Module(*this);
+  Module* module = new Module(*this, stringModule.getDesignator());
   module->setModuleHandle(_moduleHandleAllocator.get());
-  module->setContent(stringModule.getContent());
   module->setArtificialInteractionRoot(stringModule.getArtificialInteractionRoot());
   module->setArtificialObjectRoot(stringModule.getArtificialObjectRoot());
   insert(*module);
@@ -2081,27 +2226,48 @@ Federation::insert(const FOMStringModule& stringModule)
   bool created = false;
   try {
 
-    for (FOMStringDimensionList::const_iterator j = stringModule.getDimensionList().begin();
-         j != stringModule.getDimensionList().end(); ++j) {
-      if (insertOrCheck(*module, *j))
+    for (auto& stringDimension : stringModule.getDimensionList()) {
+      if (insertOrCheck(*module, stringDimension))
         created = true;
     }
 
-    for (FOMStringUpdateRateList::const_iterator j = stringModule.getUpdateRateList().begin();
-         j != stringModule.getUpdateRateList().end(); ++j) {
-      if (insertOrCheck(*module, *j))
+    for (auto& stringUpdateRate : stringModule.getUpdateRateList()) {
+      if (insertOrCheck(*module, stringUpdateRate))
         created = true;
     }
 
-    for (FOMStringInteractionClassList::const_iterator j = stringModule.getInteractionClassList().begin();
-         j != stringModule.getInteractionClassList().end(); ++j) {
-      if (insertOrCheck(*module, *j))
+    for (auto& stringInteractionClassList : stringModule.getInteractionClassList()) {
+      if (insertOrCheck(*module, stringInteractionClassList))
         created = true;
     }
 
-    for (FOMStringObjectClassList::const_iterator j = stringModule.getObjectClassList().begin();
-         j != stringModule.getObjectClassList().end(); ++j) {
-      if (insertOrCheck(*module, *j))
+    for (auto& stringObjectClass : stringModule.getObjectClassList()) {
+      if (insertOrCheck(*module, stringObjectClass))
+        created = true;
+    }
+
+    for (auto& simpleDataType : stringModule.getSimpleDataTypeList()) {
+      if (insertOrCheck(*module, simpleDataType))
+        created = true;
+    }
+
+    for (auto& enumeratedDataType : stringModule.getEnumeratedDataTypeList()) {
+      if (insertOrCheck(*module, enumeratedDataType))
+        created = true;
+    }
+
+    for (auto& arrayDataType : stringModule.getArrayDataTypeList()) {
+      if (insertOrCheck(*module, arrayDataType))
+        created = true;
+    }
+
+    for (auto& fixedRecordDataType : stringModule.getFixedRecordDataTypeList()) {
+      if (insertOrCheck(*module, fixedRecordDataType))
+        created = true;
+    }
+
+    for (auto& variantRecordDataType : stringModule.getVariantRecordDataTypeList()) {
+      if (insertOrCheck(*module, variantRecordDataType))
         created = true;
     }
 
@@ -2297,6 +2463,7 @@ Federation::insert(Module& module, const FOMObjectClass& fomObjectClass)
           AttributeDefinition* attributeDefinition;
           attributeDefinition = new AttributeDefinition(*i);
           attributeDefinition->setName(j->getName());
+          attributeDefinition->setDataType(j->getDataType());
           attributeDefinition->setAttributeHandle(j->getAttributeHandle());
           i->insert(*attributeDefinition);
           attributeDefinition->setOrderType(j->getOrderType());
@@ -2354,6 +2521,7 @@ Federation::insert(Module& module, const FOMObjectClass& fomObjectClass)
       AttributeDefinition* attributeDefinition;
       attributeDefinition = new AttributeDefinition(*objectClass);
       attributeDefinition->setName(j->getName());
+      attributeDefinition->setDataType(j->getDataType());
       attributeDefinition->setAttributeHandle(j->getAttributeHandle());
       objectClass->insert(*attributeDefinition);
       attributeDefinition->setOrderType(j->getOrderType());
@@ -2369,31 +2537,29 @@ Federation::insert(const FOMModule& fomModule)
   Module::HandleMap::iterator i = _moduleHandleModuleMap.find(fomModule.getModuleHandle());
   if (i == _moduleHandleModuleMap.end()) {
     _moduleHandleAllocator.take(fomModule.getModuleHandle());
-    Module* module = new Module(*this);
+    Module* module = new Module(*this, fomModule.getDesignator());
     module->setModuleHandle(fomModule.getModuleHandle());
-    module->setContent(fomModule.getContent());
     module->setArtificialInteractionRoot(fomModule.getArtificialInteractionRoot());
     module->setArtificialObjectRoot(fomModule.getArtificialObjectRoot());
     insert(*module);
 
-    for (FOMDimensionList::const_iterator j = fomModule.getDimensionList().begin();
-         j != fomModule.getDimensionList().end(); ++j) {
-      insert(*module, *j);
+    for (auto& dimension : fomModule.getDimensionList()) {
+      insert(*module, dimension);
     }
 
-    for (FOMUpdateRateList::const_iterator j = fomModule.getUpdateRateList().begin();
-         j != fomModule.getUpdateRateList().end(); ++j) {
-      insert(*module, *j);
+    for (auto& updateRate : fomModule.getUpdateRateList()) {
+      insert(*module, updateRate);
     }
 
-    for (FOMInteractionClassList::const_iterator j = fomModule.getInteractionClassList().begin();
-         j != fomModule.getInteractionClassList().end(); ++j) {
-      insert(*module, *j);
+    for (auto& interactionClass : fomModule.getInteractionClassList()) {
+      insert(*module, interactionClass);
     }
 
-    for (FOMObjectClassList::const_iterator j = fomModule.getObjectClassList().begin();
-         j != fomModule.getObjectClassList().end(); ++j) {
-      insert(*module, *j);
+    for (auto& objectClass : fomModule.getObjectClassList()) {
+      insert(*module, objectClass);
+    }
+    for (auto& transportationType : fomModule.getTransportationTypeList()) {
+      insert(*module, transportationType);
     }
   }
 }
@@ -2493,6 +2659,61 @@ Federation::getModuleList(FOMModuleList& moduleList, const ModuleHandleVector& m
   }
 }
 
+
+void Federation::writeCurrentFDD(std::ostream& out) const
+{
+  out << R"XML(<?xml version="1.0" encoding="UTF-8"?>)XML" << std::endl;
+  out << R"XML(<objectModel xmlns="http://standards.ieee.org/IEEE1516-2010" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 http://standards.ieee.org/downloads/1516/1516.2-2010/IEEE1516-DIF-2010.xsd">)XML" << std::endl;
+  std::string indent(kIndentSpaces, ' ');
+
+  if (!_objectClassNameObjectClassMap.empty())
+  {
+    out << indent << R"XML(<objects>)XML" << std::endl;
+    for (const ServerModel::ObjectClass& objectClass : _objectClassNameObjectClassMap)
+    {
+      if (!objectClass.getParentObjectClassHandle().valid())
+      {
+        objectClass.writeCurrentFDD(out, 2);
+      }
+    }
+    out << indent << R"XML(</objects>)XML" << std::endl;
+  }
+  if (!_interactionClassNameInteractionClassMap.empty())
+  {
+    out << indent << R"XML(<interactions>)XML" << std::endl;
+    for (const ServerModel::InteractionClass& interactionClass : _interactionClassNameInteractionClassMap)
+    {
+      if (!interactionClass.getParentInteractionClassHandle().valid())
+      {
+        interactionClass.writeCurrentFDD(out, 2);
+      }
+    }
+    out << indent << R"XML(</interactions>)XML" << std::endl;
+  }
+  out << indent << R"XML(<dimensions>)XML" << std::endl;
+  out << indent << R"XML(</dimensions>)XML" << std::endl;
+  /*
+  if (!_transpo.empty())
+  {
+    out << indent << R"XML(<interactions>)XML" << std::endl;
+    for (const ServerModel::InteractionClass& interactionClass : _interactionClassNameInteractionClassMap)
+    {
+      if (!interactionClass.getParentInteractionClassHandle().valid())
+      {
+        interactionClass.writeCurrentFDD(out, 2);
+      }
+    }
+    out << indent << R"XML(</interactions>)XML" << std::endl;
+  }
+  */
+  out << indent << R"XML(<transportations>)XML" << std::endl;
+  out << indent << R"XML(</transportations>)XML" << std::endl;
+
+  out << indent << R"XML(<dataTypes>)XML" << std::endl;
+  out << indent << R"XML(</dataTypes>)XML" << std::endl;
+  out << R"XML(</objectModel>)XML" << std::endl;
+}
+
 Module*
 Federation::getModule(const ModuleHandle& moduleHandle)
 {
@@ -2529,6 +2750,20 @@ Federation::getInteractionClass(const InteractionClassHandle& interactionClassHa
   return i.get();
 }
 
+
+InteractionClassHandle
+Federation::getInteractionClassHandle(const std::string& fqInteractionClassName)
+{
+  StringVector interactionClassName = split(fqInteractionClassName, ".");
+  InteractionClass::NameMap::iterator i;
+  i = _interactionClassNameInteractionClassMap.find(interactionClassName);
+  if (i != _interactionClassNameInteractionClassMap.end())
+  {
+    return i->getInteractionClassHandle();
+  }
+  return ObjectClassHandle::invalid();
+}
+
 ObjectClass*
 Federation::getObjectClass(const ObjectClassHandle& objectClassHandle)
 {
@@ -2537,6 +2772,20 @@ Federation::getObjectClass(const ObjectClassHandle& objectClassHandle)
     return 0;
   return i.get();
 }
+
+ObjectClassHandle
+Federation::getObjectClassHandle(const std::string& fqClassName)
+{
+  StringVector className = split(fqClassName, ".");
+  ObjectClass::NameMap::iterator i;
+  i = _objectClassNameObjectClassMap.find(className);
+  if (i != _objectClassNameObjectClassMap.end())
+  {
+    return i->getObjectClassHandle();
+  }
+  return ObjectClassHandle::invalid();
+}
+
 
 OrderType
 Federation::resolveOrderType(const std::string& orderType)
@@ -2718,8 +2967,15 @@ Federation::getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle)
 void
 Federation::erase(ObjectInstance& objectInstance)
 {
+#if !defined(NDEBUG) && !defined(_NDEBUG)
+  auto handle = objectInstance.getObjectInstanceHandle();
+  auto name = objectInstance.getName();
+#endif
   _objectInstanceHandleAllocator.put(objectInstance.getObjectInstanceHandle());
   ObjectInstance::HandleMap::erase(objectInstance);
+
+  OpenRTIAssert(_objectInstanceHandleObjectInstanceMap.find(handle) == _objectInstanceHandleObjectInstanceMap.end());
+  OpenRTIAssert(!isObjectInstanceNameInUse(name));
 }
 
 bool
@@ -2738,12 +2994,140 @@ Federation::insertObjectInstance(const ObjectInstanceHandle& objectInstanceHandl
   return objectInstance;
 }
 
+void Federation::initializeMom(AbstractServer* server, FederateHandle federateHandle)
+{
+  // be careful: we always get called twice: once for the RTI federate, a second time for the application federate
+  if (_momServer == nullptr)
+  {
+    bool isRoot = !federateHandle.valid();
+    _momServer = new MomServer(this, server, isRoot, federateHandle);
+  }
+}
+
+
+void Federation::resignMomServer()
+{
+  if (_momServer != nullptr)
+  {
+    _momServer->resignFederationExecution();
+  }
+}
+
+SharedPtr<MomServer> Federation::getMomServer() const
+{
+  return _momServer;
+}
+
+std::shared_ptr<AbstractFederateMetrics> Federation::getFederateMetrics(const ConnectHandle& connectHandle)
+{
+  if (_momServer != nullptr)
+  {
+    for (auto iter = _federateHandleFederateMap.begin(); iter != _federateHandleFederateMap.end(); iter++)
+    {
+      if (connectHandle == iter->getConnectHandle())
+      {
+        return _momServer->getFederateMetrics();
+      }
+    }
+  }
+  return std::shared_ptr<AbstractFederateMetrics>();
+}
+
+// conditionally increment the counters, if the connectHandle belongs to a ambassador which connects to this federation
+// through the given connectHandle. In that case, there will be a local/client MomManager with a
+// federate metrics data collector connected to this server.
+void Federation::interactionSent(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionSent(interactionClass->getInteractionClassHandle());
+}
+
+void Federation::interactionReceived(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionReceived(interactionClass->getInteractionClassHandle());
+}
+
+void Federation::interactionClassSubscribed(const ConnectHandle& connectHandle, InteractionClass* interactionClass, bool active)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionSubscribed(interactionClass->getInteractionClassHandle(), active);
+}
+void Federation::interactionClassUnsubscribed(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionUnsubscribed(interactionClass->getInteractionClassHandle());
+}
+void Federation::interactionClassPublished(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionPublished(interactionClass->getInteractionClassHandle());
+}
+void Federation::interactionClassUnpublished(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionUnpublished(interactionClass->getInteractionClassHandle());
+}
+
+void Federation::objectClassSubscribed(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes, bool active)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->objectClassSubscribed(objectClass->getObjectClassHandle(), attributes, active);
+}
+void Federation::objectClassUnsubscribed(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->objectClassUnsubscribed(objectClass->getObjectClassHandle(), attributes);
+}
+void Federation::objectClassPublished(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->objectClassPublished(objectClass->getObjectClassHandle(), attributes);
+}
+void Federation::objectClassUnpublished(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->objectClassUnpublished(objectClass->getObjectClassHandle(), attributes);
+}
+
+void Federation::objectInstanceReflectionReceived(const ConnectHandle& connectHandle, ObjectInstance* objectInstance)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+  {
+    ObjectInstanceHandle instanceHandle = objectInstance->getObjectInstanceHandle();
+    ObjectClassHandle classHandle = objectInstance->getObjectClass()->getObjectClassHandle();
+    metrics->reflectionReceived(classHandle, instanceHandle);
+  }
+}
+
+
+void Federation::objectInstanceUpdateSent(const ConnectHandle& connectHandle, ObjectInstance* objectInstance)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+  {
+    ObjectInstanceHandle instanceHandle = objectInstance->getObjectInstanceHandle();
+    ObjectClassHandle classHandle = objectInstance->getObjectClass()->getObjectClassHandle();
+    metrics->sentUpdate(classHandle, instanceHandle);
+  }
+}
+
 ////////////////////////////////////////////////////////////
 
 NodeConnect::NodeConnect() :
   _isParentConnect(false)
 {
-  //DebugPrintf("%s\n", __FUNCTION__);
 }
 
 NodeConnect::~NodeConnect()
@@ -2800,18 +3184,6 @@ NodeConnect::setOptions(const StringStringListMap& options)
     _name = i->second.front();
   else
     _name.clear();
-  i = options.find("isLeaf");
-  if (i != options.end() && !i->second.empty())
-  {
-    if (i->second.front() == "true") 
-    {
-      HandleMap::Hook::getModifiableKey().setLeafConnect(true);
-    }
-  }
-  else
-  {
-    _name.clear();
-  }
 }
 
 void
@@ -2873,10 +3245,9 @@ Node::getNodeConnect(const ConnectHandle& connectHandle)
 }
 
 NodeConnect*
-Node::insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName)
+Node::insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
 {
   NodeConnect* nodeConnect = new NodeConnect;
-  nodeConnect->setName(connectName);
   // >>> ### THIS ALLOCATES THE CONNECT HANDLE ###
   insert(*nodeConnect);
   // <<< ### THIS ALLOCATES THE CONNECT HANDLE ###
@@ -2889,20 +3260,18 @@ NodeConnect*
 Node::insertParentNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
 {
   OpenRTIAssert(!_parentConnectHandle.valid());
-  NodeConnect* nodeConnect = insertNodeConnect(messageSender, options, "ParentNodeConnect");
+  NodeConnect* nodeConnect = insertNodeConnect(messageSender, options);
   nodeConnect->setIsParentConnect(true);
   _parentConnectHandle = nodeConnect->getConnectHandle();
-  //DebugPrintf("%s: _parentConnectHandle=%s\n", __FUNCTION__, _parentConnectHandle.toString().c_str());
   return nodeConnect;
 }
 
 void
 Node::insert(NodeConnect& nodeConnect)
 {
-  ConnectHandle newConnectHandle = _connectHandleAllocator.getOrTake(nodeConnect.getConnectHandle());
-  newConnectHandle.setName(nodeConnect.getName());
-  //DebugPrintf("%s: newConnectHandle=%s\n", __FUNCTION__, newConnectHandle.toString().c_str());
-  nodeConnect.setConnectHandle(newConnectHandle);
+  // >>> ### THIS ALLOCATES THE CONNECT HANDLE ###
+  nodeConnect.setConnectHandle(_connectHandleAllocator.getOrTake(nodeConnect.getConnectHandle()));
+  // <<< ### THIS ALLOCATES THE CONNECT HANDLE ###
   _connectHandleNodeConnectMap.insert(nodeConnect);
 }
 
@@ -3007,8 +3376,6 @@ Node::broadcast(const SharedPtr<const AbstractMessage>& message)
 void
 Node::broadcast(const ConnectHandle& connectHandle, const SharedPtr<const AbstractMessage>& message)
 {
-  //for (NodeConnect::HandleMap::iterator i = _connectHandleNodeConnectMap.begin();
-  //     i != _connectHandleNodeConnectMap.end(); ++i) {
   for (auto& connect : _connectHandleNodeConnectMap) {
     if (connect.getConnectHandle() == connectHandle)
       continue;

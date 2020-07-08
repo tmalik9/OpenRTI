@@ -124,31 +124,33 @@
     <ClCompile Include="EncodingExceptions.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="FederateAmbassador.cpp" />
-    <ClCompile Include="Handle.cpp" />
+    <ClCompile Include="HandleFactory.cpp" />
     <ClCompile Include="HLAfixedArray.cpp" />
     <ClCompile Include="HLAfixedRecord.cpp" />
-    <ClCompile Include="HLAopaqueData.cpp" />
-    <ClCompile Include="HLAvariableArray.cpp" />
-    <ClCompile Include="HLAvariantRecord.cpp" />
     <ClCompile Include="HLAfloat64Interval.cpp" />
     <ClCompile Include="HLAfloat64Time.cpp" />
     <ClCompile Include="HLAfloat64TimeFactory.cpp" />
+    <ClCompile Include="HLAhandle.cpp" />
     <ClCompile Include="HLAinteger64Interval.cpp" />
     <ClCompile Include="HLAinteger64Time.cpp" />
     <ClCompile Include="HLAinteger64TimeFactory.cpp" />
     <ClCompile Include="HLAlogicalTimeFactoryFactory.cpp" />
+    <ClCompile Include="HLAopaqueData.cpp" />
+    <ClCompile Include="HLAvariableArray.cpp" />
+    <ClCompile Include="HLAvariantRecord.cpp" />
+    <ClCompile Include="Handle.cpp" />
     <ClCompile Include="LogicalTime.cpp" />
     <ClCompile Include="LogicalTimeFactory.cpp" />
     <ClCompile Include="LogicalTimeInterval.cpp" />
     <ClCompile Include="NullFederateAmbassador.cpp" />
-    <ClCompile Include="RangeBounds.cpp" />
-    <ClCompile Include="VariableLengthData.cpp" />
-    <ClCompile Include="Version.cpp" />
     <ClCompile Include="RTI1516ELogicalTimeFactory.cpp" />
     <ClCompile Include="RTIambassador.cpp" />
     <ClCompile Include="RTIambassadorFactory.cpp" />
     <ClCompile Include="RTIambassadorImplementation.cpp" />
+    <ClCompile Include="RangeBounds.cpp" />
     <ClCompile Include="Typedefs.cpp" />
+    <ClCompile Include="VariableLengthData.cpp" />
+    <ClCompile Include="Version.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OpenRTI\OpenRTI.vcxproj">
@@ -167,6 +169,7 @@
     <ClInclude Include="..\..\include\rti1516e\RTI\encoding\EncodingExceptions.h" />
     <ClInclude Include="..\..\include\rti1516e\RTI\encoding\HLAfixedArray.h" />
     <ClInclude Include="..\..\include\rti1516e\RTI\encoding\HLAfixedRecord.h" />
+    <ClInclude Include="..\..\include\rti1516e\RTI\encoding\HLAhandle.h" />
     <ClInclude Include="..\..\include\rti1516e\RTI\encoding\HLAopaqueData.h" />
     <ClInclude Include="..\..\include\rti1516e\RTI\encoding\HLAvariableArray.h" />
     <ClInclude Include="..\..\include\rti1516e\RTI\encoding\HLAvariantRecord.h" />
@@ -193,10 +196,11 @@
     <ClInclude Include="..\..\include\rti1516e\RTI\VariableLengthData.h" />
     <ClInclude Include="..\OpenRTI\dprintf.h" />
     <ClInclude Include="Encoding.h" />
+    <ClInclude Include="HandleFactory.h" />
     <ClInclude Include="HandleImplementation.h" />
+    <ClInclude Include="RTI1516ELogicalTimeFactory.h" />
     <ClInclude Include="RTI1516Efloat64TimeFactory.h" />
     <ClInclude Include="RTI1516Einteger64TimeFactory.h" />
-    <ClInclude Include="RTI1516ELogicalTimeFactory.h" />
     <ClInclude Include="RTIambassadorImplementation.h" />
     <ClInclude Include="VariableLengthDataImplementation.h" />
   </ItemGroup>
@@ -204,12 +208,17 @@
     <ResourceCompile Include="rti1516e.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="..\..\share\rti1516e\HLAstandardMIM.xml" />
+    <Xml Include="..\..\share\rti1516e\HLAstandardMIM.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\share\rti1516e\IEEE1516-DIF-2010.xsd" />
     <None Include="..\..\share\rti1516e\IEEE1516-FDD-2010.xsd" />
     <None Include="..\..\share\rti1516e\IEEE1516-OMT-2010.xsd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

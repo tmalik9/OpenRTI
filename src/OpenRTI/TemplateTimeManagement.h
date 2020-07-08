@@ -231,7 +231,7 @@ public:
 
     // 8.6 tells that after getting time constrained the federate can receive messages
     // with timestamp == the granted logical time as time stamp order messages.
-    // So, since this call introduces contraints on incomming messages, just set second to zero.
+    // So, since this call introduces constraints on incoming messages, just set second to zero.
     _pendingLogicalTime.first = _logicalTime.first;
     _pendingLogicalTime.second = 0;
 
@@ -239,7 +239,13 @@ public:
 
     SharedPtr<TimeConstrainedEnabledMessage> message = new TimeConstrainedEnabledMessage;
     queueTimeStampedMessage(_pendingLogicalTime, *message);
-  }
+
+    SharedPtr<EnableTimeConstrainedNotifyMessage> request;
+    request = new EnableTimeConstrainedNotifyMessage;
+    request->setFederationHandle(ambassador.getFederate()->getFederationHandle());
+    request->setFederateHandle(ambassador.getFederate()->getFederateHandle());
+    ambassador.send(request);
+ }
 
   virtual void disableTimeConstrained(InternalAmbassador& ambassador)
   {
@@ -1042,7 +1048,7 @@ public:
 
     InternalTimeManagement::setTimeRegulationMode(InternalTimeManagement::TimeRegulationEnabled);
     _logicalTime = _pendingLogicalTime;
-    // Note that the _outboundLowerBoundTimeStamp is already eactly computed when
+    // Note that the _outboundLowerBoundTimeStamp is already exactly computed when
     // the regulation responses are evaluated. This way we can take the exact bound value
     // here instead of the one past two times roundoff.
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnabled() || _committedOutboundLowerBoundTimeStamp <= _toLogicalTime(_outboundLowerBoundTimeStamp));
@@ -1142,7 +1148,6 @@ public:
         message.swap(messageListElement._message);
         _messageListPool.push_back(messageListElement);
 
-        //CondDebugPrintf("%s: dispatch RO message=%s\n", __FUNCTION__, message->toString().c_str());
         message->dispatch(dispatcher);
         return true;
       }

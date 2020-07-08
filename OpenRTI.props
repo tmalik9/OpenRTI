@@ -1,14 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <!-- <BuildType>Local</BuildType> -->
+    <BuildType>Local</BuildType>
+  </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x64'">
-    <BIN_DIR>$(SolutionDir)..\..\bin</BIN_DIR>
     <OBJ_DIR>$(SolutionDir)Obj64</OBJ_DIR>
     <SOURCE_DIR>.\</SOURCE_DIR>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='Win32'">
-    <BIN_DIR>$(SolutionDir)..\..\bin</BIN_DIR>
     <OBJ_DIR>$(SolutionDir)Obj32</OBJ_DIR>
     <SOURCE_DIR>.\</SOURCE_DIR>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(BuildType)'=='CANoe'">
+    <BIN_DIR>$(SolutionDir)..\..\bin</BIN_DIR>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(BuildType)'=='Local'">
+    <BIN_DIR>$(SolutionDir)bin</BIN_DIR>
   </PropertyGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
@@ -36,7 +44,7 @@
     <Link>
       <AdditionalDependencies>delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(TargetDir)$(TargetName).map</MapFileName>
       <ImportLibrary>$(TargetDir)$(TargetName).lib</ImportLibrary>
@@ -49,6 +57,9 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <BuildMacro Include="BuildType">
+      <Value>$(BuildType)</Value>
+    </BuildMacro>
     <BuildMacro Include="BIN_DIR">
       <Value>$(BIN_DIR)</Value>
     </BuildMacro>

@@ -150,7 +150,7 @@ HLAopaqueData::encode(VariableLengthData& inData) const
   std::vector<Octet> buffer;
   buffer.reserve(getEncodedLength());
   encodeInto(buffer);
-  inData.setData(&buffer.front(), buffer.size());
+  if (buffer.size() > 0) inData.setData(&buffer.front(), buffer.size());
 }
 
 void
@@ -162,7 +162,7 @@ HLAopaqueData::encodeInto(std::vector<Octet>& buffer) const
 void HLAopaqueData::decode(VariableLengthData const & inData)
 {
   std::vector<Octet> buffer(inData.size());
-  std::memcpy(&buffer.front(), inData.data(), inData.size());
+  if (inData.size() > 0) std::memcpy(&buffer.front(), inData.data(), inData.size());
   decodeFrom(buffer, 0);
 }
 

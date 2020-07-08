@@ -23,6 +23,7 @@
 #include <netinet/in.h>
 #include <sys/un.h>
 #include <sstream>
+#include <unistd.h>
 
 #include "Exception.h"
 #include "StringUtils.h"
@@ -332,6 +333,17 @@ SocketAddress::cmp(const SocketAddress& socketAddress) const
       return ret;
     return 1;
   }
+}
+
+std::wstring SocketAddress::getHostName()
+{
+  char buffer[_SC_HOST_NAME_MAX + 1];
+  std::wstring result;
+  if (gethostname(buffer, sizeof(buffer) / sizeof(buffer[0])) == 0)
+  {
+    return localeToUcs(buffer);
+  }
+  return result;
 }
 
 SocketAddress::PrivateData*

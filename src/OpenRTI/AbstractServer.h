@@ -58,6 +58,7 @@ public:
   /// Connect to the server - independent of the actual implementation
   SharedPtr<AbstractConnect> postConnect(const StringStringListMap& clientOptions);
   SharedPtr<AbstractConnect> sendConnect(const StringStringListMap& clientOptions, bool parent);
+  SharedPtr<AbstractConnect> sendDirectConnect(SharedPtr<AbstractMessageSender> sender, const StringStringListMap& clientOptions);
 
 protected:
   typedef std::pair<SharedPtr<const AbstractMessage>, ConnectHandle> _MessageConnectHandlePair;
@@ -111,6 +112,7 @@ private:
   AbstractServer& operator=(const AbstractServer&) = delete;
 
   class _Connect;
+  class _OneWayConnect;
   class _ConnectOperation;
   class _DisconnectOperation;
   class _DoneOperation;

@@ -136,16 +136,7 @@
     <ClCompile Include="WeakReferenced.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xml\xmlparse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="XMLReader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="xml\xmlrole.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="xml\xmltok.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="win32\ClockWin32.cpp">
@@ -223,6 +214,57 @@
     <ClCompile Include="VariableLengthDataTuple.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="xml\xmlrole.c">
+      <Filter>Source Files\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="xml\xmltok.c">
+      <Filter>Source Files\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="xml\xmlparse.c">
+      <Filter>Source Files\xml</Filter>
+    </ClCompile>
+    <ClCompile Include="mom\MomFederate.cpp">
+      <Filter>Source Files\mom</Filter>
+    </ClCompile>
+    <ClCompile Include="mom\MomFederateMetrics.cpp">
+      <Filter>Source Files\mom</Filter>
+    </ClCompile>
+    <ClCompile Include="mom\MomFederation.cpp">
+      <Filter>Source Files\mom</Filter>
+    </ClCompile>
+    <ClCompile Include="mom\MomInteractions.cpp">
+      <Filter>Source Files\mom</Filter>
+    </ClCompile>
+    <ClCompile Include="mom\MomManager.cpp">
+      <Filter>Source Files\mom</Filter>
+    </ClCompile>
+    <ClCompile Include="mom\MomServer.cpp">
+      <Filter>Source Files\mom</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\BasicDataElements.cpp">
+      <Filter>Source Files\encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\DataElement.cpp">
+      <Filter>Source Files\encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\HLAfixedArray.cpp">
+      <Filter>Source Files\encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\HLAfixedRecord.cpp">
+      <Filter>Source Files\encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\HLAhandle.cpp">
+      <Filter>Source Files\encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\HLAvariableArray.cpp">
+      <Filter>Source Files\encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\HLAvariantRecord.cpp">
+      <Filter>Source Files\encoding</Filter>
+    </ClCompile>
+    <ClCompile Include="encoding\HLAopaqueData.cpp">
+      <Filter>Source Files\encoding</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -236,6 +278,18 @@
     </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{2d9d25c5-1ecd-4632-bc83-b0c34eda7d08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="codegen">
+      <UniqueIdentifier>{1e16f8bc-1361-4064-b2eb-759378e9f997}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\xml">
+      <UniqueIdentifier>{c871d423-7a8b-48fb-9458-1f996ca78647}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mom">
+      <UniqueIdentifier>{0b9e019c-3d49-4492-87ef-77f87d8990b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\encoding">
+      <UniqueIdentifier>{d8d0c631-a699-4118-aad9-ff9ee02c01b4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -575,12 +629,6 @@
     <ClInclude Include="win32\NetworkStatisticsWin32.h">
       <Filter>Source Files\win32</Filter>
     </ClInclude>
-    <ClInclude Include="xml\xmltok_impl.c">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="xml\xmltok_ns.c">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="win32\PerformanceCounterStopWatch.h">
       <Filter>Source Files\win32</Filter>
     </ClInclude>
@@ -590,13 +638,123 @@
     <ClInclude Include="VariableLengthDataTuple.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="xml\xmltok_impl.c">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\xmltok_ns.c">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\ascii.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\asciitab.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\expat.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\expat_external.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\iasciitab.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\internal.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\latin1tab.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\nametab.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\utf8tab.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\winconfig.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\xmlrole.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\xmltok.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="xml\xmltok_impl.h">
+      <Filter>Source Files\xml</Filter>
+    </ClInclude>
+    <ClInclude Include="mom\MomFederate.h">
+      <Filter>Source Files\mom</Filter>
+    </ClInclude>
+    <ClInclude Include="mom\MomFederateMetrics.h">
+      <Filter>Source Files\mom</Filter>
+    </ClInclude>
+    <ClInclude Include="mom\MomFederation.h">
+      <Filter>Source Files\mom</Filter>
+    </ClInclude>
+    <ClInclude Include="mom\MomInteractions.h">
+      <Filter>Source Files\mom</Filter>
+    </ClInclude>
+    <ClInclude Include="mom\MomManager.h">
+      <Filter>Source Files\mom</Filter>
+    </ClInclude>
+    <ClInclude Include="mom\MomServer.h">
+      <Filter>Source Files\mom</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\BasicDataElements.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\DataElement.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\Encoding.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\EncodingConfig.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\EncodingExceptions.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\HLAfixedArray.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\HLAfixedRecord.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\HLAhandle.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\HLAopaqueData.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\HLAvariableArray.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="encoding\HLAvariantRecord.h">
+      <Filter>Source Files\encoding</Filter>
+    </ClInclude>
+    <ClInclude Include="mom\MomTypes.h">
+      <Filter>Source Files\mom</Filter>
+    </ClInclude>
+    <ClInclude Include="mom\AbstractFederateMetrics.h">
+      <Filter>Source Files\mom</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="codegen\messagegen.py">
+      <Filter>codegen</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="OpenRTI.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="codegen\Message.xml">
+      <Filter>codegen</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

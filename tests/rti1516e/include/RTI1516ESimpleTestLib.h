@@ -3,24 +3,34 @@
 
 #include <RTI/NullFederateAmbassador.h>
 #include <RTI/RTIambassador.h>
+#include <atomic>
+#include <chrono>
+
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
 using namespace rti1516e;
 
 #define READY_TO_RUN L"ReadyToRun"
 #define ALL_DONE L"AllDone"
 
-class SimpleTestAmbassador;
 class SimpleTestFederate;
 
 double convertTime(LogicalTime const& theTime);
-std::wstring convertStringToWstring(const std::string& str);
+
+std::wstring to_wstring(const std::string& str);
+std::string to_string(const std::wstring& str);
+
+std::vector<std::string> split(const std::string& s, const char* c);
+std::vector<std::wstring> split(const std::wstring& s, const wchar_t* c);
 std::wstring variableLengthDataToWstring(const VariableLengthData& variableLengthData);
 VariableLengthData toVariableLengthData(const wchar_t* s);
 
 
-class SimpleTestFederate
+class SimpleTestFederate : public NullFederateAmbassador
 {
+#ifdef _WIN32
     struct VRTNotificationHandle : public rti1516e::RTInotificationHandle
     {
       VRTNotificationHandle() {
@@ -36,66 +46,32 @@ class SimpleTestFederate
       void operator=(const VRTNotificationHandle&) = delete;
       HANDLE mHandle;
     };
-
+#endif
 
   public:
-    std::unique_ptr<RTIambassador> rtiamb; /*!< RTI ambassador to comunicate with RTI */
-    std::unique_ptr<SimpleTestAmbassador> fedamb; /*!< Own Federate Ambassador implementation */
+    std::unique_ptr<RTIambassador> mRtiAmb; /*!< RTI ambassador to comunicate with RTI */
 
     // public methods //
     //! Constructor
     SimpleTestFederate();
     //! Destructor
     virtual ~SimpleTestFederate();
-    void initialize(std::string address, std::string federateName, std::string fom, bool regulating, bool constrained);
-    void initializeHandles();
+    void join(const std::string& address, const std::string& federateName, const std::string& fom, const std::string& federationName, bool regulating, bool constrained);
+    virtual void initializeSimulation() = 0;
+    virtual void cleanupSimulation() = 0;
+    virtual void disconnect();
+    void run(unsigned int milliSeconds);
+    virtual void step() = 0;
+    void setDone() { _done = true; }
+
     void waitForUser();
     void advanceTime(double timestep);
-    void sendInteraction();
     double getFederateTime() const;
     double getLbts() const;
 
-protected:
-    /// fom handles
-    std::map<std::string, ObjectClassHandle> mObjectClassHandles;
-    std::map<std::string, std::map<std::string, AttributeHandle> > mAttributeHandles;
-    //ObjectClassHandle      aHandle;
-    AttributeHandle        aaHandle;
-    AttributeHandle        abHandle;
-    AttributeHandle        acHandle;
-    //ObjectClassHandle      bHandle;
-    AttributeHandle        baHandle;
-    AttributeHandle        bbHandle;
-    AttributeHandle        bcHandle;
-    InteractionClassHandle xHandle;
-    ParameterHandle        xaHandle;
-    ParameterHandle        xbHandle;
-
-    std::unique_ptr<VRTNotificationHandle> mHandle;
-
-};
-
-class SimpleTestAmbassador : public NullFederateAmbassador
-{
-  public:
-    RTIambassador* rtiamb; /*!< RTI ambassador to comunicate with RTI */
-    double federateTime;
-    double federateLookahead;
-
-    bool isRegulating;
-    bool isConstrained;
-    bool isAdvancing;
-    bool isAnnouncedReadyToRun;
-    bool isAnnouncedAllDone;
-    bool isReadyToRun;
-    bool allDone;
-    // methods //
-    //! Constructor
-    SimpleTestAmbassador(RTIambassador* rtiamb);
-    //! Destructor
-    virtual ~SimpleTestAmbassador();
-
-
+#ifdef _WIN32
+    void setNotificationHandle();
+#endif
     // implementation of RTI::FederateAmbassador
     ///////////////////////////////////
     // synchronization point methods //
@@ -206,4 +182,24 @@ class SimpleTestAmbassador : public NullFederateAmbassador
       OrderType receivedOrder,
       MessageRetractionHandle theHandle,
       SupplementalRemoveInfo theRemoveInfo) override;
+
+protected:
+#ifdef _WIN32
+    std::unique_ptr<VRTNotificationHandle> mHandle;
+#endif
+    std::wstring mFederationName;
+    FederateHandle mFederateHandle;
+
+    double federateTime;
+    double federateLookahead;
+
+    bool isRegulating;
+    bool isConstrained;
+    bool isAdvancing;
+    bool isAnnouncedReadyToRun;
+    bool isAnnouncedAllDone;
+    bool _syncedReadyToRun;
+    bool _syncedAllDone;
+
+    std::atomic_bool _done = false;
 };

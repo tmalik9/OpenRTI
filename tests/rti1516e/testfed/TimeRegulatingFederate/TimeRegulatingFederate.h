@@ -15,25 +15,36 @@ class TimeRegulatingFederate : public SimpleTestFederate
 {
 
   public:
-
-    // public methods //
-    //! Constructor
     TimeRegulatingFederate();
-    //! Destructor
     virtual ~TimeRegulatingFederate();
-    //! Main Simulation Method
-    void runFederate(unsigned int iterations);
-
+    void step() override;
+    void initializeSimulation() override;
+    void cleanupSimulation() override;
   private:
+    //ObjectInstanceHandle registerObject(const wchar_t* className);
+    void sendInteraction();
+    void updateAttributeValues(ObjectInstanceHandle objectHandle);
+    void deleteObject(ObjectInstanceHandle objectHandle);
+
+    /// fom handles
+    std::map<std::string, ObjectClassHandle> mObjectClassHandles;
+    std::map<std::string, std::map<std::string, AttributeHandle> > mAttributeHandles;
+    //ObjectClassHandle      aHandle;
+    AttributeHandle        aaHandle;
+    AttributeHandle        abHandle;
+    AttributeHandle        acHandle;
+    //ObjectClassHandle      bHandle;
+    AttributeHandle        baHandle;
+    AttributeHandle        bbHandle;
+    AttributeHandle        bcHandle;
+    InteractionClassHandle xHandle;
+    ParameterHandle        xaHandle;
+    ParameterHandle        xbHandle;
+
     // instance specific
     ObjectClassHandle      myPublishedObjectClass;
     ObjectInstanceHandle   myPublishedObject;
     AttributeHandleSet     myPublishedAttributes;
-
-    void publishAndSubscribe();
-    //ObjectInstanceHandle registerObject(const wchar_t* className);
-    void updateAttributeValues(ObjectInstanceHandle objectHandle);
-    void deleteObject(ObjectInstanceHandle objectHandle);
 
 };
 

@@ -88,7 +88,7 @@ Federate::PublishSubscribe::setTransportationType(TransportationType transportat
 bool
 Federate::PublishSubscribe::setSubscriptionType(SubscriptionType subscriptionType)
 {
-  Log(ServerFederate, Info) << __FUNCTION__ << ": " << _name << ":" << subscriptionType << std::endl;
+  //Log(ServerFederate, Info) << __FUNCTION__ << ": " << _name << ":" << subscriptionType << std::endl;
 
   std::swap(_subscriptionType, subscriptionType);
   return _subscriptionType != subscriptionType;
@@ -199,6 +199,19 @@ Federate::InteractionClass::insertChildInteractionClass(InteractionClass& intera
   interactionClass._nameParameterHandleMap = _nameParameterHandleMap;
 
   _childInteractionClassList.push_back(interactionClass);
+}
+
+
+void Federate::InteractionClass::getFOMInteractionClass(FOMInteractionClass& fomInteractionClass)
+{
+  fomInteractionClass.setName(getName());
+  for (auto [name, parameterHandle] : _nameParameterHandleMap)
+  {
+    FOMParameter fomParameter;
+    fomParameter.setName(name);
+    fomParameter.setParameterHandle(parameterHandle);
+    fomInteractionClass.getParameterList().push_back(fomParameter);
+  }
 }
 
 Federate::ObjectClass::ObjectClass() :
@@ -446,10 +459,10 @@ Federate::ObjectInstance::ObjectInstance(NameObjectInstanceHandleMap::iterator n
   _subscriptionType(Unsubscribed)
 {
   _objectClass = &objectClass;
-  size_t numAttributes = objectClass.getNumAttributes();
+  uint32_t numAttributes = objectClass.getNumAttributes();
   _instanceAttributeVector.reserve(numAttributes);
-  for (size_t k = 0; k < numAttributes; ++k) {
-    const Attribute* attribute = objectClass.getAttribute(k);
+  for (uint32_t k = 0; k < numAttributes; ++k) {
+    const Attribute* attribute = objectClass.getAttribute(AttributeHandle(k));
     if (attribute) {
       if (objectClass.isAttributePublished(AttributeHandle(k)))
         _instanceAttributeVector.push_back(new InstanceAttribute(*attribute, owned));
@@ -505,7 +518,7 @@ Federate::ObjectInstance::isOwnedByFederate() const
 bool
 Federate::ObjectInstance::ownsAnyAttribute() const
 {
-  for (size_t i = 0; i < _instanceAttributeVector.size(); ++i) {
+  for (uint32_t i = 0; i < static_cast<uint32_t>(_instanceAttributeVector.size()); ++i) {
     const InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(i));
     if (!instanceAttribute)
       continue;
@@ -677,7 +690,7 @@ Federate::insertTransportationType(const std::string& name, TransportationType t
 {
   OpenRTIAssert(_nameTransportationTypeMap.find(name) == _nameTransportationTypeMap.end());
   _nameTransportationTypeMap[name] = transportationType;
-  // Only insert the first occurance of transportationType to the type to name map
+  // Only insert the first occurrence of transportationType to the type to name map
   // This way we should get the standard name back even if we map a custom transportation
   // type name to the same resulting transportation.
   _transportationTypeNameMap.insert(TransportationTypeNameMap::value_type(transportationType, name));
@@ -945,7 +958,7 @@ Federate::insertObjectClass(const FOMObjectClass& module, bool artificialObjectR
   if (!_objectClassVector[index].valid()) {
     _objectClassVector[index] = new ObjectClass;
     ObjectClass* objectClass = _objectClassVector[index].get();
-
+    objectClass->setClassHandle(module.getObjectClassHandle());
     ObjectClassHandle parentHandle = module.getParentObjectClassHandle();
 
     std::string fqName;
@@ -1027,7 +1040,7 @@ Federate::eraseObjectInstance(const ObjectInstanceHandle& objectInstanceHandle)
 {
   ObjectInstanceHandleMap::iterator i = _objectInstanceHandleMap.find(objectInstanceHandle);
   if (i == _objectInstanceHandleMap.end()) {
-    Log(FederateAmbassador, Warning) << "Federate: \"" << getFederateType() << "\": Cannot remove object instance with object handle: "
+    Log(FederateAmbassador, Warning) << "Federate: \"" << getFederateType() << "\": Cannot remove object instance with handle: "
                                      << objectInstanceHandle.getHandle() << std::endl;
     return;
   }
@@ -1131,7 +1144,7 @@ Federate::eraseFederate(const FederateHandle& federateHandle)
 {
   FederateHandleMap::iterator i = _federateHandleMap.find(federateHandle);
   if (i == _federateHandleMap.end()) {
-    Log(FederateAmbassador, Warning) << "Federate: \"" << getFederateType() << "\": Cannot remove object instance with object handle: "
+    Log(FederateAmbassador, Warning) << "Federate: name=\"" << getFederateName() << "\" type=\"" << getFederateType() << "\" : Cannot remove federate with handle: "
                                      << federateHandle.getHandle() << std::endl;
     return;
   }
@@ -1181,13 +1194,27 @@ Federate::insertFOMModule(const FOMModule& module)
   for (FOMSwitchList::const_iterator i = module.getSwitchList().begin();
        i != module.getSwitchList().end(); ++i)
     applySwitch(*i);
+  _moduleMap.insert(std::make_pair(module.getModuleHandle(), module));
 }
 
 void
 Federate::insertFOMModuleList(const FOMModuleList& moduleList)
 {
-  for (FOMModuleList::const_iterator i = moduleList.begin(); i != moduleList.end(); ++i)
-    insertFOMModule(*i);
+  for (auto& fomModule : moduleList)
+    insertFOMModule(fomModule);
+}
+
+
+void Federate::getFOMModule(FOMModule& module)
+{
+  FOMInteractionClassList interactionClassList;
+  for (auto ic : _interactionClassVector)
+  {
+    FOMInteractionClass fomInteractionClass;
+    module.getInteractionClassList().push_back(fomInteractionClass);
+  }
+  FOMObjectClassList objectClassList;
+
 }
 
 }

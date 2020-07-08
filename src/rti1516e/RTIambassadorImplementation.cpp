@@ -55,11 +55,11 @@
 
 namespace OpenRTI {
 
-static std::list<std::string> findHLAstandardMIMCandidates()
+static std::list<std::string> findHLAstandardMIMFileCandidates()
 {
   std::list<std::string> candidates;
 
-  std::string moduleName = DynamicModule::getFileNameForAddress((const void*)findHLAstandardMIMCandidates);
+  std::string moduleName = DynamicModule::getFileNameForAddress((const void*)findHLAstandardMIMFileCandidates);
   if (!moduleName.empty()) {
     moduleName = getBasePart(moduleName);
     // This gets us to the parent directory
@@ -74,10 +74,12 @@ static std::list<std::string> findHLAstandardMIMCandidates()
   return candidates;
 }
 
-static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, std::istream& stream, const std::string& encoding)
+static void loadModuleFromStream(OpenRTI::FOMStringModuleList& fomModuleList, std::istream& stream, const std::string& designator, const std::string& encoding)
 {
   try {
-    fomModuleList.push_back(OpenRTI::FDD1516EFileReader::read(stream, encoding));
+    FOMStringModule module = OpenRTI::FDD1516EFileReader::read(stream, encoding);
+    module.setDesignator(designator);
+    fomModuleList.push_back(std::move(module));
   } catch (const OpenRTI::Exception& e) {
     throw rti1516e::ErrorReadingFDD(OpenRTI::utf8ToUcs(e.what()));
   } catch (...) {
@@ -87,46 +89,57 @@ static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, std::istream
 
 static void loadHLAstandardMIM(OpenRTI::FOMStringModuleList& fomModuleList)
 {
-  std::list<std::string> candidates = findHLAstandardMIMCandidates();
-  for (std::list<std::string>::const_iterator i = candidates.begin(); i != candidates.end(); ++i) {
-    std::ifstream stream(utf8ToLocale(*i).c_str());
+  std::list<std::string> fileCandidates = findHLAstandardMIMFileCandidates();
+  for (auto designator : fileCandidates) {
+    std::ifstream stream(utf8ToLocale(designator).c_str());
     if (!stream.is_open())
       continue;
 
-    loadModule(fomModuleList, stream, std::string());
+    loadModuleFromStream(fomModuleList, stream, designator, std::string());
     break;
   }
   if (fomModuleList.empty()) {
     std::string s(HLAstandardMIM_xml, sizeof(HLAstandardMIM_xml));
     std::istringstream stream(s);
-    loadModule(fomModuleList, stream, "UTF-8");
+    loadModuleFromStream(fomModuleList, stream, "HLAStandardMIM.xml", "UTF-8");
   }
 }
 
-static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, const std::wstring& fomModule)
+static void loadModuleFromFile(OpenRTI::FOMStringModuleList& fomModuleList, const std::string& fileName)
 {
-  if (fomModule.empty())
-    throw rti1516e::CouldNotOpenFDD(L"Empty module.");
-  std::ifstream stream(OpenRTI::ucsToLocale(fomModule).c_str());
+  std::string designator = std::string("file:///") + fileName;
+  std::ifstream stream(fileName.c_str());
   if (stream.is_open()) {
-    loadModule(fomModuleList, stream, std::string());
-  } else if (fomModule.compare(0, 8, L"file:///") == 0) {
-    loadModule(fomModuleList, fomModule.substr(8));
-  } else if (fomModule.compare(0, 16, L"data:text/plain,") == 0) {
-    std::stringstream stream(ucsToUtf8(fomModule.substr(16)));
-    loadModule(fomModuleList, stream, "UTF-8");
-  } else if (fomModule.compare(0, 6, L"data:,") == 0) {
-    std::stringstream stream(ucsToUtf8(fomModule.substr(6)));
-    loadModule(fomModuleList, stream, "UTF-8");
+    loadModuleFromStream(fomModuleList, stream, designator, std::string());
   } else {
-    throw rti1516e::CouldNotOpenFDD(fomModule);
+    throw rti1516e::CouldNotOpenFDD(utf8ToUcs(designator));
+  }
+}
+
+static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, const std::wstring& fomModuleDesignator)
+{
+  if (fomModuleDesignator.empty())
+    throw rti1516e::CouldNotOpenFDD(L"Empty module.");
+  FOMModule module;
+  if (fomModuleDesignator.compare(0, 8, L"file:///") == 0) {
+    loadModuleFromFile(fomModuleList, ucsToUtf8(fomModuleDesignator.substr(8)));
+  } else if (fomModuleDesignator.compare(0, 16, L"data:text/plain,") == 0) {
+    std::stringstream stream(ucsToUtf8(fomModuleDesignator.substr(16)));
+    std::string designator = string_printf("data:text/plain,<%d bytes>", fomModuleDesignator.size()-16);
+    loadModuleFromStream(fomModuleList, stream, ucsToUtf8(fomModuleDesignator), "UTF-8");
+  } else if (fomModuleDesignator.compare(0, 6, L"data:,") == 0) {
+    std::stringstream stream(ucsToUtf8(fomModuleDesignator.substr(6)));
+    std::string designator = string_printf("data:,<%d bytes>", fomModuleDesignator.size()-6);
+    loadModuleFromStream(fomModuleList, stream, designator, "UTF-8");
+  } else {
+    loadModuleFromFile(fomModuleList, ucsToUtf8(fomModuleDesignator));
   }
 }
 
 static void loadModules(OpenRTI::FOMStringModuleList& fomModuleList, const std::vector<std::wstring>& fomModules)
 {
-  for (std::vector<std::wstring>::const_iterator i = fomModules.begin(); i != fomModules.end(); ++i)
-    loadModule(fomModuleList, *i);
+  for (auto& fomModule : fomModules)
+    loadModule(fomModuleList, fomModule);
 }
 
 // unreferenced local function has been removed
@@ -555,12 +568,18 @@ public:
   typedef rti1516e::LogicalTimeInterval NativeLogicalTimeInterval;
 };
 
+// This class subclasses the OpenRTI::Ambassador template and acts as a bridge between the RTIambassador and 
+// the application's FederateAmbassador. It holds a reference to the FederateAmbassador and 
+// translates the (OpenRTI-) internal callback messages into callback invocations of the FederateAmbassador.
+// As a subclass of OpenRTI::Ambassador, this class also has access to the callback queues (inherited from InternalAmbassador).
+// The MomManager must live here, because this is the place to decide whether to route callbacks into the MomManager only
+// or into the FederateAmbassador also.
 class OPENRTI_LOCAL RTIambassadorImplementation::RTI1516EAmbassadorInterface : public OpenRTI::Ambassador<RTI1516ETraits> {
 public:
-  RTI1516EAmbassadorInterface() :
-    Ambassador<RTI1516ETraits>(),
-    _federateAmbassador(0),
-    _inCallback(false)
+  RTI1516EAmbassadorInterface()
+    : Ambassador<RTI1516ETraits>()
+    , _federateAmbassador(0)
+    , _inCallback(false)
   { }
 
   class OPENRTI_LOCAL CallbackScope {
@@ -1085,9 +1104,10 @@ public:
     }
   }
 
-  virtual void reflectAttributeValues(const Federate::ObjectClass& objectClass, ObjectInstanceHandle objectInstanceHandle,
-                                      const AttributeValueVector& attributeValueVector, const VariableLengthData& tag,
-                                      OrderType sentOrder, TransportationType transportationType, FederateHandle federateHandle)
+  virtual void reflectAttributeValues (const Federate::ObjectClass& objectClass,
+                                       ObjectInstanceHandle objectInstanceHandle,
+                                       const AttributeValueVector& attributeValueVector, const VariableLengthData& tag,
+                                       OrderType sentOrder, TransportationType transportationType, FederateHandle federateHandle)
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1665,9 +1685,6 @@ RTIambassadorImplementation::connect(rti1516e::FederateAmbassador & federateAmba
       throw OpenRTI::CallNotAllowedFromWithinCallback();
     URL url = URL::fromUrl(ucsToUtf8(localSettingsDesignator));
     StringStringListMap clientoptions;
-    StringList optionValue;
-    optionValue.push_back("true");
-    clientoptions["isLeaf"] = optionValue;
     _ambassadorInterface->connect(url, clientoptions);
     _ambassadorInterface->_federateAmbassador = &federateAmbassador;
   } catch (const OpenRTI::ConnectionFailed& e) {
@@ -2701,6 +2718,36 @@ RTIambassadorImplementation::registerObjectInstance(rti1516e::ObjectClassHandle 
   }
 }
 
+rti1516e::ObjectInstanceHandle
+RTIambassadorImplementation::registerObjectInstance(rti1516e::ObjectClassHandle rti1516ObjectClassHandle,
+                                                    std::wstring const & objectInstanceName, bool allowUnreservedObjectNames)
+{
+  try {
+    OpenRTI::_I1516EObjectClassHandle objectClassHandle(rti1516ObjectClassHandle);
+    return OpenRTI::_O1516EObjectInstanceHandle(_ambassadorInterface->registerObjectInstance(objectClassHandle, ucsToUtf8(objectInstanceName), allowUnreservedObjectNames));
+  } catch (const OpenRTI::ObjectClassNotDefined& e) {
+    throw rti1516e::ObjectClassNotDefined(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::ObjectClassNotPublished& e) {
+    throw rti1516e::ObjectClassNotPublished(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::ObjectInstanceNameNotReserved& e) {
+    throw rti1516e::ObjectInstanceNameNotReserved(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::ObjectInstanceNameInUse& e) {
+    throw rti1516e::ObjectInstanceNameInUse(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::FederateNotExecutionMember& e) {
+    throw rti1516e::FederateNotExecutionMember(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::SaveInProgress& e) {
+    throw rti1516e::SaveInProgress(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::RestoreInProgress& e) {
+    throw rti1516e::RestoreInProgress(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::NotConnected& e) {
+    throw rti1516e::NotConnected(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const std::exception& e) {
+    throw rti1516e::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
+  } catch (...) {
+    throw rti1516e::RTIinternalError(L"Unknown internal error!");
+  }
+}
+
 void
 RTIambassadorImplementation::updateAttributeValues(rti1516e::ObjectInstanceHandle rti1516ObjectInstanceHandle,
                                                    const rti1516e::AttributeHandleValueMap& rti1516AttributeHandleValueMap,
@@ -2915,6 +2962,7 @@ RTIambassadorImplementation::localDeleteObjectInstance(rti1516e::ObjectInstanceH
   }
 }
 
+/*
 void
 RTIambassadorImplementation::changeAttributeTransportationType(rti1516e::ObjectInstanceHandle rti1516ObjectInstanceHandle,
                                                                rti1516e::AttributeHandleSet const & rti1516AttributeHandleSet,
@@ -2972,6 +3020,7 @@ RTIambassadorImplementation::changeInteractionTransportationType(rti1516e::Inter
     throw rti1516e::RTIinternalError(L"Unknown internal error!");
   }
 }
+*/
 
 void
 RTIambassadorImplementation::requestAttributeValueUpdate(rti1516e::ObjectInstanceHandle rti1516ObjectInstanceHandle,
@@ -5501,7 +5550,6 @@ RTIambassadorImplementation::decodeRegionHandle(rti1516e::VariableLengthData con
     throw rti1516e::RTIinternalError(L"Unknown internal error!");
   }
 }
-
 
 void RTIambassadorImplementation::setNotificationHandle(rti1516e::RTInotificationHandle* h)
 {

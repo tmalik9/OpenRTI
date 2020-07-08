@@ -37,7 +37,14 @@
 #include "Types.h"
 #include "LogStream.h"
 
+#include <memory>
+
 namespace OpenRTI {
+
+class MomServer;
+class AbstractServer;
+struct AbstractFederateMetrics;
+
 namespace ServerModel {
 
 // Helper return type for some publish/subscribe stuff.
@@ -223,6 +230,7 @@ public:
 
   const ConnectHandleSet& getSubscribedConnectHandleSet() const
   { return _subscribedConnects.getConnectHandleSet(); }
+
   void getSubscribedAndIntersectingConnectHandleSet(ConnectHandleSet& connectHandleSet, const RegionSet& regionSet) const
   { connectHandleSet = _subscribedConnects.getConnectHandleSet(); }
 
@@ -231,9 +239,9 @@ public:
     // FIXME, should not use this
     setSubscriptionType(connectHandle, Unsubscribed);
 
-    // The the unpublish must have happened before, so just make sure that it is empty
+    // The unpublish must have happened before, so just make sure that it is empty
     OpenRTIAssert(!_publishedConnects.contains(connectHandle));
-    // The the unsubscribe must have happened before, so just make sure that it is empty
+    // The unsubscribe must have happened before, so just make sure that it is empty
     OpenRTIAssert(!_activeSubscribedConnects.contains(connectHandle));
     OpenRTIAssert(!_subscribedConnects.contains(connectHandle));
   }
@@ -403,28 +411,26 @@ public:
   InstanceAttribute(ObjectInstance& objectInstance, ClassAttribute& classAttribute);
   ~InstanceAttribute();
 
-  const AttributeHandle& getAttributeHandle() const
-  { return HandleEntity<InstanceAttribute, AttributeHandle>::_getHandle(); }
+  const AttributeHandle& getAttributeHandle() const {
+    return HandleEntity<InstanceAttribute, AttributeHandle>::_getHandle();
+  }
   void setAttributeHandle(const AttributeHandle& attributeHandle);
 
-  const ObjectInstance& getObjectInstance() const
-  { return _objectInstance; }
-  ObjectInstance& getObjectInstance()
-  { return _objectInstance; }
+  const ObjectInstance& getObjectInstance() const { return _objectInstance; }
+  ObjectInstance& getObjectInstance() { return _objectInstance; }
 
-  const ClassAttribute& getClassAttribute() const
-  { return _classAttribute; }
-  ClassAttribute& getClassAttribute()
-  { return _classAttribute; }
+  const ClassAttribute& getClassAttribute() const { return _classAttribute; }
+  ClassAttribute& getClassAttribute() { return _classAttribute; }
 
   /// Get the ConnectHandle this attribute is owned
-  const ConnectHandle& getOwnerConnectHandle() const
-  { return _ownerConnectHandle; }
+  const ConnectHandle& getOwnerConnectHandle() const { return _ownerConnectHandle; }
   void setOwnerConnectHandle(const ConnectHandle& connectHandle)
   {
     _receivingConnects.erase(connectHandle);
     _ownerConnectHandle = connectHandle;
   }
+  const FederateHandle& getOwnerFederate() const { return _ownerFederate; }
+  void setOwnerFederate(const FederateHandle& federateHandle);
 
   void removeConnect(const ConnectHandle& connectHandle);
 
@@ -434,6 +440,9 @@ public:
 
   /// The connect this attribute is owned by
   ConnectHandle _ownerConnectHandle;
+
+  /// The federate this attribute is owned by
+  FederateHandle _ownerFederate;
 
 private:
   InstanceAttribute(const InstanceAttribute&) = delete;
@@ -516,8 +525,6 @@ public:
   InstanceAttribute::HandleMap& getAttributeHandleInstanceAttributeMap()
   { return _attributeHandleInstanceAttributeMap; }
 
-  void insert(ObjectInstanceConnect& objectInstanceConnect)
-  { _connectHandleObjectInstanceConnectMap.insert(objectInstanceConnect); }
   ObjectInstanceConnect::HandleMap& getConnectHandleObjectInstanceConnectMap()
   { return _connectHandleObjectInstanceConnectMap; }
   /// Mark the name handle pair also represented with this as used in the federationConnect
@@ -545,6 +552,21 @@ public:
     if (!instanceAttribute)
       return;
     instanceAttribute->setOwnerConnectHandle(connectHandle);
+  }
+
+  FederateHandle getOwnerFederate()
+  {
+    InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
+    if (!instanceAttribute)
+      return FederateHandle();
+    return instanceAttribute->getOwnerFederate();
+  }
+  void setOwnerFederate(const FederateHandle& federateHandle)
+  {
+    InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
+    if (!instanceAttribute)
+      return;
+    instanceAttribute->setOwnerFederate(federateHandle);
   }
 
 private:
@@ -722,30 +744,31 @@ public:
   FederationConnect* getFederationConnect() const
   { return _federationConnect; }
   ConnectHandle getConnectHandle() const;
+
+  void setIsInternal(bool isInternal) { _isInternal=isInternal; }
+  bool getIsInternal() const { return _isInternal; }
   void send(const SharedPtr<const AbstractMessage>& message);
 
+  bool getIsTimeConstrained() const { return _isTimeConstrained; }
+  void setIsTimeConstrained(bool value) { _isTimeConstrained = value; }
 private:
-  Federate(const Federate&);
-  Federate& operator=(const Federate&);
+  Federate(const Federate&) = delete;
+  Federate& operator=(const Federate&) = delete;
 
   Federation& _federation;
-
   std::string _federateType;
-
   ResignAction _resignAction;
-
   bool _resignPending;
-
   FederationConnect* _federationConnect;
-
   SynchronizationFederate::FirstList _synchronizationFederateList;
-
   Region::HandleMap _regionHandleRegionMap;
 
   // Time constrained federates current state
   VariableLengthData _timeAdvanceTimeStamp;
   VariableLengthData _nextMessageTimeStamp;
   Unsigned _commitId;
+  bool _isInternal;
+  bool _isTimeConstrained;
 };
 
 ////////////////////////////////////////////////////////////
@@ -1026,6 +1049,9 @@ public:
   { return HandleStringEntity<ParameterDefinition, ParameterHandle>::_getString(); }
   void setName(const std::string& name);
 
+  const std::string& getDataType() const { return _dataType; }
+  void setDataType(const std::string& dataType) { _dataType = dataType; }
+
   const ParameterHandle& getParameterHandle() const
   { return HandleStringEntity<ParameterDefinition, ParameterHandle>::_getHandle(); }
   void setParameterHandle(const ParameterHandle& parameterHandle);
@@ -1040,6 +1066,8 @@ public:
   ClassParameter::FirstList& getClassParameterList()
   { return _classParameterList; }
 
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
 private:
   ParameterDefinition(const ParameterDefinition&);
   ParameterDefinition& operator=(const ParameterDefinition&);
@@ -1047,6 +1075,7 @@ private:
   InteractionClass& _interactionClass;
 
   ClassParameter::FirstList _classParameterList;
+  std::string _dataType;
 };
 
 ////////////////////////////////////////////////////////////
@@ -1090,14 +1119,14 @@ public:
   InteractionClass* getParentInteractionClass();
   InteractionClassHandle getParentInteractionClassHandle() const;
 
-  ChildList& getChildInteractionClassList()
-  { return _childInteractionClassList; }
+  ChildList& getChildInteractionClassList() { return _childInteractionClassList; }
+  const ChildList& getChildInteractionClassList() const { return _childInteractionClassList; }
 
   bool getIsReferencedByAnyModule() const;
   bool getAreParametersReferencedByAnyModule() const;
 
   void eraseParameterDefinitions();
-  std::size_t getNumParameterDefinitions() const;
+  uint32_t getNumParameterDefinitions() const;
   ParameterHandle getFirstUnusedParameterHandle();
 
   void insert(ParameterDefinition& parameterDefinition);
@@ -1149,6 +1178,7 @@ public:
   bool hasFilterSubscriptions() const;
   bool isMatching(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues) const;
   std::list<ParameterValueVector> getParameterFilters(const ConnectHandle& connectHandle);
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
 private:
   InteractionClass(const InteractionClass&) = delete;
   InteractionClass& operator=(const InteractionClass&) = delete;
@@ -1282,6 +1312,9 @@ public:
   { return HandleStringEntity<AttributeDefinition, AttributeHandle>::_getString(); }
   void setName(const std::string& name);
 
+  const std::string& getDataType() const { return _dataType; }
+  void setDataType(const std::string& dataType) { _dataType = dataType; }
+
   const AttributeHandle& getAttributeHandle() const
   { return HandleStringEntity<AttributeDefinition, AttributeHandle>::_getHandle(); }
   void setAttributeHandle(const AttributeHandle& attributeHandle);
@@ -1305,6 +1338,8 @@ public:
   { return _classAttributeList; }
 
 
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
   // FIXME temporarily in this way
   DimensionHandleSet _dimensionHandleSet;
 
@@ -1318,6 +1353,7 @@ private:
   TransportationType _transportationType;
 
   ClassAttribute::FirstList _classAttributeList;
+  std::string _dataType;
 };
 
 ////////////////////////////////////////////////////////////
@@ -1347,14 +1383,14 @@ public:
   ObjectClass* getParentObjectClass();
   ObjectClassHandle getParentObjectClassHandle() const;
 
-  ChildList& getChildObjectClassList()
-  { return _childObjectClassList; }
+  ChildList& getChildObjectClassList() { return _childObjectClassList; }
+  const ChildList& getChildObjectClassList() const { return _childObjectClassList; }
 
   bool getIsReferencedByAnyModule() const;
   bool getAreAttributesReferencedByAnyModule() const;
 
   void eraseAttributeDefinitions();
-  std::size_t getNumAttributeDefinitions() const;
+  uint32_t getNumAttributeDefinitions() const;
   AttributeHandle getFirstUnusedAttributeHandle();
 
   void insert(AttributeDefinition& attributeDefinition);
@@ -1404,6 +1440,8 @@ public:
       i->accumulateAllPublications(connectHandleSet);
     }
   }
+
+  void writeCurrentFDD(std::ostream& out, unsigned int level = 2) const;
 
 private:
   ObjectClass(const ObjectClass&);
@@ -1462,7 +1500,7 @@ class OPENRTI_LOCAL Module : public HandleEntity<Module, ModuleHandle> {
 public:
   typedef HandleEntity<Module, ModuleHandle>::HandleMap HandleMap;
 
-  Module(Federation& federation);
+  Module(Federation& federation, const std::string& designator);
   ~Module();
 
   const Federation& getFederation() const
@@ -1477,6 +1515,9 @@ public:
   const std::string& getContent() const
   { return _content; }
   void setContent(const std::string& content);
+
+  const std::string& getDesignator() const
+  { return _designator; }
 
   bool getArtificialInteractionRoot() const
   { return _artificialInteractionRoot; }
@@ -1534,7 +1575,7 @@ private:
   Federation& _federation;
 
   std::string _content;
-
+  std::string _designator;
   bool _artificialInteractionRoot;
   bool _artificialObjectRoot;
 
@@ -1604,6 +1645,11 @@ public:
     OpenRTIAssert(this == federate.getFederationConnect());
     _federateList.unlink(federate);
     federate.setFederationConnect(0);
+    //DebugPrintf("%s(this=%p federate=%s): %d federates left\n", __FUNCTION__, this, federate.getName().c_str(), _federateList.size());
+    //for (auto iter=_federateList.begin(); iter != _federateList.end(); iter++)
+    //{
+    //  DebugPrintf("\t%s %s\n",iter->getFederateHandle().toString().c_str(), iter->getName().c_str());
+    //}
   }
 
   /// The time regulating federates hidden behind this connect
@@ -1622,6 +1668,7 @@ public:
   /// We can actually send something there
   void send(const SharedPtr<const AbstractMessage>& message);
 
+  void sendAndDeactivate(const SharedPtr<const AbstractMessage>& message);
 private:
   FederationConnect(const FederationConnect&) = delete;
   FederationConnect& operator=(const FederationConnect&) = delete;
@@ -1649,6 +1696,7 @@ private:
 class Node;
 
 class OPENRTI_LOCAL Federation : public HandleStringEntity<Federation, FederationHandle> {
+private:
 public:
   typedef HandleStringEntity<Federation, FederationHandle>::HandleMap HandleMap;
   typedef HandleStringEntity<Federation, FederationHandle>::StringMap NameMap;
@@ -1717,6 +1765,11 @@ public:
   bool insertOrCheck(Module& module, const FOMStringUpdateRate& stringUpdateRate);
   bool insertOrCheck(Module& module, const FOMStringInteractionClass& stringInteractionClass);
   bool insertOrCheck(Module& module, const FOMStringObjectClass& stringObjectClass);
+  bool insertOrCheck(Module& module, const FOMStringSimpleDataType& dataType);
+  bool insertOrCheck(Module& module, const FOMStringEnumeratedDataType& dataType);
+  bool insertOrCheck(Module& module, const FOMStringArrayDataType& dataType);
+  bool insertOrCheck(Module& module, const FOMStringFixedRecordDataType& dataType);
+  bool insertOrCheck(Module& module, const FOMStringVariantRecordDataType& dataType);
 
   /// This is for inserting the initial object model
   ModuleHandle insert(const FOMStringModule& stringModule);
@@ -1729,6 +1782,7 @@ public:
   void insert(Module& module, const FOMUpdateRate& fomUpdateRate);
   void insert(Module& module, const FOMInteractionClass& fomInteractionClass);
   void insert(Module& module, const FOMObjectClass& fomObjectClass);
+  void insert(Module& module, const FOMTransportationType& fomObjectClass);
 
   void insert(const FOMModule& fomModule);
   void insert(const FOMModuleList& fomModuleList);
@@ -1738,7 +1792,7 @@ public:
   /// To push this to other server nodes, we need to collect the module data for the message.
   void getModuleList(FOMModuleList& moduleList) const;
   void getModuleList(FOMModuleList& moduleList, const ModuleHandleVector& moduleHandleVector) const;
-
+  void writeCurrentFDD(std::ostream& out) const;
   Module* getModule(const ModuleHandle& moduleHandle);
 
   Dimension* getDimension(const DimensionHandle& dimensionHandle);
@@ -1746,9 +1800,12 @@ public:
   InteractionClass* getInteractionClass(const InteractionClassHandle& interactionClassHandle);
   InteractionClass::HandleMap& getInteractionClassHandleInteractionClassMap()
   { return _interactionClassHandleInteractionClassMap; }
+  InteractionClassHandle getInteractionClassHandle(const std::string& fqInteractionClassName);
+
   ObjectClass* getObjectClass(const ObjectClassHandle& objectClassHandle);
   ObjectClass::HandleMap& getObjectClassHandleObjectClassMap()
   { return _objectClassHandleObjectClassMap; }
+  ObjectClassHandle getObjectClassHandle(const std::string& fqClassName);
 
   OrderType resolveOrderType(const std::string& orderType);
   TransportationType resolveTransportationType(const std::string& transportationType);
@@ -1787,9 +1844,28 @@ public:
   /// FIXME
   ObjectInstance* insertObjectInstance(const ObjectInstanceHandle& objectInstanceHandle, const std::string& objectInstanceName);
 
-  /// Syncronization state FIXME
-  Synchronization::NameMap _synchronizationNameSynchronizationMap;
+  // when the federateHandle is valid, it's assumed to run in a root server
+  // otherwise it's a leaf server
+  void initializeMom(AbstractServer* server, FederateHandle federateHandle);
+  void resignMomServer();
+  SharedPtr<MomServer> getMomServer() const;
 
+  // federate metrics stuff
+  std::shared_ptr<AbstractFederateMetrics> getFederateMetrics(const ConnectHandle& connectHandle);
+  void interactionSent(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
+  void interactionReceived(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
+  void interactionClassSubscribed(const ConnectHandle& connectHandle, InteractionClass* interactionClass, bool active);
+  void interactionClassUnsubscribed(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
+  void interactionClassPublished(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
+  void interactionClassUnpublished(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
+  void objectClassSubscribed(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes, bool active);
+  void objectClassUnsubscribed(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes);
+  void objectClassPublished(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes);
+  void objectClassUnpublished(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes);
+  void objectInstanceReflectionReceived(const ConnectHandle& connectHandle, ObjectInstance* objectInstance);
+  void objectInstanceUpdateSent(const ConnectHandle& connectHandle, ObjectInstance* objectInstance);
+  /// Synchronization state FIXME
+  Synchronization::NameMap _synchronizationNameSynchronizationMap;
 
 private:
   Federation(const Federation&) = delete;
@@ -1797,6 +1873,8 @@ private:
 
   /// The server node this Federation belongs to
   Node& _serverNode;
+  /// The MOM server of this federation
+  SharedPtr<MomServer> _momServer;
 
   /// The name of the logical time factory
   std::string _logicalTimeFactoryName;
@@ -1833,6 +1911,8 @@ private:
   InteractionClass::NameMap _interactionClassNameInteractionClassMap;
   InteractionClass::HandleMap _interactionClassHandleInteractionClassMap;
   HandleAllocator<InteractionClassHandle> _interactionClassHandleAllocator;
+
+  HandleAllocator<ParameterHandle> _parameterHandleAllocator;
 
   ObjectClass::NameMap _objectClassNameObjectClassMap;
   ObjectClass::HandleMap _objectClassHandleObjectClassMap;
@@ -1927,7 +2007,7 @@ public:
   { return _parentConnectHandle; }
 
   NodeConnect* getNodeConnect(const ConnectHandle& connectHandle);
-  NodeConnect* insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName);
+  NodeConnect* insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options);
   NodeConnect* insertParentNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options);
   void insert(NodeConnect& nodeConnect);
   void erase(const ConnectHandle& connectHandle);

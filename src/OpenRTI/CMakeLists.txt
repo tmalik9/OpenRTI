@@ -207,6 +207,20 @@ set(OpenRTI_SOURCES
   WeakReferenced.cpp
   XMLReader.cpp
   dprintf.cpp
+  encoding/BasicDataElements.cpp
+  encoding/DataElement.cpp
+  encoding/HLAfixedArray.cpp
+  encoding/HLAfixedRecord.cpp
+  encoding/HLAhandle.cpp
+  encoding/HLAopaqueData.cpp
+  encoding/HLAvariableArray.cpp
+  encoding/HLAvariantRecord.cpp
+  mom/MomFederate.cpp
+  mom/MomFederateMetrics.cpp
+  mom/MomFederation.cpp
+  mom/MomInteractions.cpp
+  mom/MomManager.cpp
+  mom/MomServer.cpp
   ${OpenRTI_OS_SOURCES}
   ${OpenRTI_EXPAT_SOURCES}
   ${OpenRTI_ZLIB_SOURCES}

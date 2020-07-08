@@ -4,6 +4,7 @@
 #include "RTI/time/HLAfloat64Time.h"
 #include <iostream>
 #include "dprintf.h"
+#include <cassert>
 
 using namespace rti1516e;
 
@@ -35,16 +36,76 @@ double convertTime(LogicalTime const& theTime)
   return castedTime.getTime();
 }
 
-/**
- * convert normal C++-Strings to C++-Wstrings
- * Wstrings are used by openrti
- */
-std::wstring convertStringToWstring(const std::string& str)
+using std::to_string;
+using std::to_wstring;
+
+std::wstring to_wstring(const std::string& str)
 {
+  if (str.empty()) return std::wstring();
   const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
   std::vector<wchar_t> wideStringBuffer(str.length());
   CType.widen(str.data(), str.data() + str.length(), &wideStringBuffer[0]);
   return std::wstring(&wideStringBuffer[0], wideStringBuffer.size());
+}
+
+std::string to_string(const std::wstring& str)
+{
+  if (str.empty()) return std::string();
+  const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
+  std::vector<char> stringBuffer(str.length());
+  CType.narrow(str.data(), str.data() + str.length(), '_', &stringBuffer[0]);
+  return std::string(&stringBuffer[0], stringBuffer.size());
+}
+
+std::string to_string(OrderType orderType)
+{
+  switch (orderType)
+  {
+    case OrderType::RECEIVE:
+      return "RECEIVE";
+    case OrderType::TIMESTAMP:
+      return "TIMESTAMP";
+    default:
+      return "<invalid OrderType>";
+      break;
+  }
+}
+
+
+
+std::vector<std::string>
+split(const std::string& s, const char* c)
+{
+  std::vector<std::string> v;
+  std::string::size_type p0 = 0;
+  std::string::size_type p = s.find_first_of(c);
+  while (p != std::string::npos) {
+    v.push_back(s.substr(p0, p - p0));
+    p0 = s.find_first_not_of(c, p);
+    if (p0 == std::string::npos)
+      return v;
+    p = s.find_first_of(c, p0);
+  }
+  v.push_back(s.substr(p0, p - p0));
+  return v;
+}
+
+
+std::vector<std::wstring>
+split(const std::wstring& s, const wchar_t* c)
+{
+  std::vector<std::wstring> v;
+  std::wstring::size_type p0 = 0;
+  std::wstring::size_type p = s.find_first_of(c);
+  while (p != std::wstring::npos) {
+    v.push_back(s.substr(p0, p - p0));
+    p0 = s.find_first_not_of(c, p);
+    if (p0 == std::string::npos)
+      return v;
+    p = s.find_first_of(c, p0);
+  }
+  v.push_back(s.substr(p0, p - p0));
+  return v;
 }
 
 /**
@@ -74,10 +135,23 @@ rti1516e::VariableLengthData toVariableLengthData(const wchar_t* s)
 /////////////////////// class SimpleTestFederate   ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
+static const wchar_t kFederateType[] = L"Example";
 
 SimpleTestFederate::SimpleTestFederate()
 {
+#ifdef _WIN32
   mHandle = std::make_unique<VRTNotificationHandle>();
+#endif
+
+  federateTime      = 0.0;
+  federateLookahead = 1.0;
+  isRegulating  = false;
+  isConstrained = false;
+  isAdvancing   = false;
+  isAnnouncedReadyToRun   = false;
+  isAnnouncedAllDone   = false;
+  _syncedReadyToRun  = false;
+  _syncedAllDone  = false;
 }
 
 SimpleTestFederate::~SimpleTestFederate()
@@ -85,24 +159,26 @@ SimpleTestFederate::~SimpleTestFederate()
 }
 
 
-void SimpleTestFederate::initialize(std::string address, std::string federateName, std::string fom, bool regulating, bool constrained)
+void SimpleTestFederate::join(const std::string& address, const std::string& federateName, const std::string& fom, const std::string& federationName, bool regulating, bool constrained)
 {
+  mFederationName = to_wstring(federationName);
   ///
   /// 1. create the RTIambassador
   ///
+  std::vector<std::wstring> fomModules;
+
   rti1516e::RTIambassadorFactory factory;
-  this->rtiamb = factory.createRTIambassador();
+  mRtiAmb = factory.createRTIambassador();
   /// create the federate ambassador
   try
   {
     /// create the federate ambassador and connect to RTI
-    fedamb = std::make_unique<SimpleTestAmbassador>(this->rtiamb.get());
-    rtiamb->connect(*fedamb, rti1516e::HLA_EVOKED,  convertStringToWstring(address));
-    printf("%s: connected to rtinode at %s\n", __FUNCTION__, address.c_str());
+    mRtiAmb->connect(*this, rti1516e::HLA_EVOKED,  to_wstring(address));
+    DebugPrintf("%s: connected to rtinode at %s\n", __FUNCTION__, address.c_str());
   }
   catch (ConnectionFailed e)
   {
-    printf("%s: could not connect to %s: %S\n", __FUNCTION__, address.c_str(), e.what().c_str());
+    DebugPrintf("%s: could not connect to %s: %S\n", __FUNCTION__, address.c_str(), e.what().c_str());
     return;
   }
   ///
@@ -112,34 +188,72 @@ void SimpleTestFederate::initialize(std::string address, std::string federateNam
   ///
   try
   {
-    rtiamb->createFederationExecution(L"ExampleFederation", convertStringToWstring(fom), L"HLAfloat64Time");
+    mRtiAmb->createFederationExecution(mFederationName, to_wstring(fom), L"HLAfloat64Time");
     DebugPrintf("Created Federation\n");
   }
   catch (FederationExecutionAlreadyExists exists)
   {
-    DebugPrintf("Didn't create federation, it already existed\n");
+    std::cout << "Didn't create federation, it already existed" << std::endl;
+    fomModules.push_back(to_wstring(fom));
   }
   /////////////////////////////
   /// 3. join the federation
   /////////////////////////////
-  rtiamb->joinFederationExecution(convertStringToWstring(federateName),
-    convertStringToWstring("ExampleFederation"));
-  std::cout << "Joined Federation as " << federateName << std::endl;
-  /// initialize the handles - have to wait until we are joined
-  initializeHandles();
+  if (federateName.empty())
+  {
+    mFederateHandle = mRtiAmb->joinFederationExecution(L"ExampleFederate", mFederationName, fomModules);
+  }
+  else
+  {
+    mFederateHandle = mRtiAmb->joinFederationExecution(to_wstring(federateName), L"ExampleFederate", mFederationName, fomModules);
+  }
+  std::wcout << L"Joined Federation as " << mRtiAmb->getFederateName(mFederateHandle) << std::endl;
+  /////////////////////////////
+  // 6. enable time policies
+  /////////////////////////////
+  if (regulating)
+  {
+    /////////////////////////////
+    /// enable time regulation
+    /////////////////////////////
+    HLAfloat64Interval lookahead(federateLookahead);
+    mRtiAmb->enableTimeRegulation(lookahead);
+    /// wait for callback
+    while (isRegulating == false)
+    {
+      mRtiAmb->evokeCallback(12.0);
+    }
+    DebugPrintf("Time Regulation Enabled\n");
+  }
+  if (constrained)
+  {
+    /////////////////////////////
+    /// enable time constrained
+    /////////////////////////////
+    mRtiAmb->enableTimeConstrained();
+    /// wait for callback
+    while (isConstrained == false)
+    {
+      mRtiAmb->evokeCallback(12.0);
+    }
+    DebugPrintf("Time Constrained Enabled\n");
+  }
   /////////////////////////////////
   /// 4. announce the sync point
   /////////////////////////////////
   /// announce a sync point to get everyone on the same page. if the point
   /// has already been registered, we'll get a callback saying it failed,
   /// but we don't care about that, as long as someone registered it
-  rtiamb->registerFederationSynchronizationPoint(READY_TO_RUN, toVariableLengthData(L""));
-  rtiamb->registerFederationSynchronizationPoint(ALL_DONE, toVariableLengthData(L""));
+  mRtiAmb->registerFederationSynchronizationPoint(READY_TO_RUN, toVariableLengthData(L""));
+  mRtiAmb->registerFederationSynchronizationPoint(ALL_DONE, toVariableLengthData(L""));
   std::cout << "SynchronizationPoint registered" << std::endl;
-  while (!fedamb->isAnnouncedReadyToRun || !fedamb->isAnnouncedAllDone)
+  while (!isAnnouncedReadyToRun || !isAnnouncedAllDone)
   {
-    rtiamb->evokeCallback(12.0);
+    mRtiAmb->evokeCallback(12.0);
   }
+
+  initializeSimulation();
+
   /// WAIT FOR USER TO KICK US OFF.\n
   /// So that there is time to add other federates, we will wait until the
   /// user hits enter before proceeding. That was, you have time to start
@@ -150,66 +264,71 @@ void SimpleTestFederate::initialize(std::string address, std::string federateNam
   ////////////////////////////////////////////////////////
   /// tell the RTI we are ready to move past the sync point and then wait
   /// until the federation has synchronized on
-  rtiamb->synchronizationPointAchieved(READY_TO_RUN);
+  mRtiAmb->synchronizationPointAchieved(READY_TO_RUN);
   std::wcout << L"Achieved sync point: " << READY_TO_RUN << L", waiting for federation..." << std::endl;
-  while (fedamb->isReadyToRun == false)
+  while (_syncedReadyToRun == false)
   {
-    rtiamb->evokeCallback(12.0);
-  }
-  /////////////////////////////
-  // 6. enable time policies
-  /////////////////////////////
-  if (regulating)
-  {
-    /////////////////////////////
-    /// enable time regulation
-    /////////////////////////////
-    HLAfloat64Interval lookahead(fedamb->federateLookahead);
-    rtiamb->enableTimeRegulation(lookahead);
-    /// wait for callback
-    while (fedamb->isRegulating == false)
-    {
-      rtiamb->evokeCallback(12.0);
-    }
-    DebugPrintf("Time Regulation Enabled\n");
-  }
-  if (constrained)
-  {
-    /////////////////////////////
-    /// enable time constrained
-    /////////////////////////////
-    rtiamb->enableTimeConstrained();
-    /// wait for callback
-    while (fedamb->isConstrained == false)
-    {
-      rtiamb->evokeCallback(12.0);
-    }
-    DebugPrintf("Time Constrained Enabled\n");
+    mRtiAmb->evokeCallback(12.0);
   }
 }
 
-/**
- * This method will get all the relevant handle information from the RTIambassador
- */
-void SimpleTestFederate::initializeHandles()
+
+void SimpleTestFederate::run(unsigned int stepMs)
 {
-  ObjectClassHandle aHandle = rtiamb->getObjectClassHandle(L"HLAobjectRoot.A");
-  ObjectClassHandle bHandle = rtiamb->getObjectClassHandle(L"HLAobjectRoot.B");
-  mObjectClassHandles["HLAobjectRoot.A"] = aHandle;
-  mObjectClassHandles["HLAobjectRoot.B"] = bHandle;
-  //this->aHandle  = rtiamb->getObjectClassHandle(L"HLAobjectRoot.A");
-  this->aaHandle = rtiamb->getAttributeHandle(aHandle, L"aa");
-  this->abHandle = rtiamb->getAttributeHandle(aHandle, L"ab");
-  this->acHandle = rtiamb->getAttributeHandle(aHandle, L"ac");
-  //this->bHandle  = rtiamb->getObjectClassHandle(L"HLAobjectRoot.B");
-  this->baHandle = rtiamb->getAttributeHandle(bHandle, L"ba");
-  this->bbHandle = rtiamb->getAttributeHandle(bHandle, L"bb");
-  this->bcHandle = rtiamb->getAttributeHandle(bHandle, L"bc");
-  this->xHandle  = rtiamb->getInteractionClassHandle(L"HLAinteractionRoot.X");
-  this->xaHandle = rtiamb->getParameterHandle(this->xHandle, convertStringToWstring("xa"));
-  this->xbHandle = rtiamb->getParameterHandle(this->xHandle, convertStringToWstring("xb"));
+  //mRtiAmb->setNotificationHandle(mHandle.get());
+  std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
+  double evokeSeconds = double(stepMs) / 1000.0;
+  while (!_done)
+  {
+    mRtiAmb->evokeCallback(evokeSeconds);
+    std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    int64_t milliSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastTime).count();
+    if (milliSeconds >= stepMs)
+    {
+      step();
+      lastTime = currentTime;
+    }
+  }
 }
 
+void SimpleTestFederate::disconnect()
+{
+  //////////////////////////////////////
+  // 10. delete the object we created
+  //////////////////////////////////////
+  mRtiAmb->synchronizationPointAchieved(ALL_DONE);
+  while (_syncedAllDone == false)
+  {
+    mRtiAmb->evokeCallback(12.0);
+  }
+
+  cleanupSimulation();
+
+  ////////////////////////////////////
+  // 11. resign from the federation
+  ////////////////////////////////////
+  mRtiAmb->resignFederationExecution(NO_ACTION);
+  DebugPrintf("Resigned from Federation\n");
+  ////////////////////////////////////////
+  // 12. try and destroy the federation
+  ////////////////////////////////////////
+  // NOTE: we won't die if we can't do this because other federates
+  //       remain. in that case we'll leave it for them to clean up
+  try
+  {
+    mRtiAmb->destroyFederationExecution(mFederationName);
+    DebugPrintf("Destroyed Federation");
+  }
+  catch (FederationExecutionDoesNotExist dne)
+  {
+    DebugPrintf("No need to destroy federation, it doesn't exist");
+  }
+  catch (FederatesCurrentlyJoined fcj)
+  {
+    DebugPrintf("Didn't destroy federation, federates still joined");
+  }
+  mRtiAmb->disconnect();
+}
 void SimpleTestFederate::waitForUser()
 {
   std::cout << " >>>>>>>>>> Press Enter to Continue <<<<<<<<<<" << std::endl;
@@ -224,28 +343,29 @@ void SimpleTestFederate::waitForUser()
  */
 void SimpleTestFederate::advanceTime(double timestep)
 {
-  DebugPrintf("%s: timestep=%f time=%0.6f\n", __FUNCTION__, timestep,  fedamb->federateTime);
+  DebugPrintf("%s: timestep=%f time=%0.6f\n", __FUNCTION__, timestep,  federateTime);
   /// request the advance
-  fedamb->isAdvancing = true;
-  HLAfloat64Time newTime = (fedamb->federateTime + timestep);
-  rtiamb->timeAdvanceRequest(newTime);
+  isAdvancing = true;
+  HLAfloat64Time newTime = (federateTime + timestep);
+  mRtiAmb->timeAdvanceRequest(newTime);
   /// wait for the time advance to be granted. ticking will tell the
   /// LRC to start delivering callbacks to the federate
-  while (fedamb->isAdvancing)
+  while (isAdvancing)
   {
+#ifdef _WIN32
     DWORD waitResult = WaitForSingleObject(mHandle->mHandle, 200);
     switch (waitResult)
     {
       case WAIT_OBJECT_0:
         DebugPrintf("%s: TID=%d: handle triggered\n", __FUNCTION__, ::GetCurrentThreadId());
-        while (rtiamb->evokeCallback(0.001))
+        while (mRtiAmb->evokeCallback(0.001))
         {
           DebugPrintf("%s: TID=%d: callbacks evoked\n", __FUNCTION__, ::GetCurrentThreadId());
         }
         break;
       case WAIT_TIMEOUT:
         DebugPrintf("%s: TID=%d: timeout\n", __FUNCTION__, ::GetCurrentThreadId());
-        //rtiamb->evokeCallback(1.0);
+        //mRtiAmb->evokeCallback(1.0);
         break;
       case WAIT_FAILED:
         DebugPrintf("%s: TID=%d: failed\n", __FUNCTION__, ::GetCurrentThreadId());
@@ -254,112 +374,72 @@ void SimpleTestFederate::advanceTime(double timestep)
         DebugPrintf("%s: TID=%d: abandoned\n", __FUNCTION__, ::GetCurrentThreadId());
         break;
     }
+#else
+    mRtiAmb->evokeCallback(0.1);
+#endif
   }
-  DebugPrintf("%0.6f %s: new time=%f\n",  fedamb->federateTime, __FUNCTION__, fedamb->federateTime);
-}
-
-/**
- * This method will send out an interaction of the type InteractionRoot.X. Any
- * federates which are subscribed to it will receive a notification the next time
- * they tick(). Here we are passing only two of the three parameters we could be
- * passing, but we don't actually have to pass any at all!
- */
-void SimpleTestFederate::sendInteraction()
-{
-  ////////////////////////////////////////////////
-  /// create the necessary container and values
-  ////////////////////////////////////////////////
-  /// create the collection to store the values in
-  ParameterHandleValueMap parameters;
-  /// generate the new values
-  wchar_t xaValue[16], xbValue[16];
-  swprintf(xaValue, 16, L"xa:%f", getLbts());
-  swprintf(xbValue, 16, L"xb:%f", getLbts());
-  parameters[xaHandle] = toVariableLengthData(xaValue);
-  parameters[xbHandle] = toVariableLengthData(xbValue);
-  ///////////////////////////
-  /// send the interaction
-  ///////////////////////////
-  //rtiamb->sendInteraction(xHandle, parameters, toVariableLengthData(L"hi!"));
-  /// if you want to associate a particular timestamp with the
-  /// interaction, you will have to supply it to the RTI. Here
-  /// we send another interaction, this time with a timestamp:
-  HLAfloat64Time time = fedamb->federateTime + fedamb->federateLookahead;
-  rtiamb->sendInteraction(xHandle, parameters, toVariableLengthData(L"hi!"), time);
+  DebugPrintf("%0.6f %s: new time=%f\n",  federateTime, __FUNCTION__, federateTime);
 }
 
 double SimpleTestFederate::getFederateTime() const
 {
-  return fedamb->federateTime;
+  return federateTime;
 }
 
 double SimpleTestFederate::getLbts() const
 {
-  return (fedamb->federateTime + fedamb->federateLookahead);
+  return (federateTime + federateLookahead);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/////////////////////// class SimpleTestAmbassador ////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-SimpleTestAmbassador::SimpleTestAmbassador(RTIambassador* rtiamb)
+#ifdef _WIN32
+void SimpleTestFederate::setNotificationHandle()
 {
-  // initialize all the variable values
-  this->rtiamb = rtiamb;
-  this->federateTime      = 0.0;
-  this->federateLookahead = 1.0;
-  this->isRegulating  = false;
-  this->isConstrained = false;
-  this->isAdvancing   = false;
-  this->isAnnouncedReadyToRun   = false;
-  this->isAnnouncedAllDone   = false;
-  this->isReadyToRun  = false;
-  this->allDone  = false;
+  assert(mHandle != nullptr);
+  mRtiAmb->setNotificationHandle(mHandle.get());
+  DebugPrintf("%s: TID=%d: starting loop\n", __FUNCTION__, ::GetCurrentThreadId());
 }
-
-SimpleTestAmbassador::~SimpleTestAmbassador()
-{
-}
-
+#endif
 ///////////////////////////////////////////////////////////////////////////////
 /////////////////////// Synchronization Point Callbacks ///////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-void SimpleTestAmbassador::synchronizationPointRegistrationSucceeded(std::wstring const& label)
+void SimpleTestFederate::synchronizationPointRegistrationSucceeded(std::wstring const& label)
 {
-  std::wcout << L"Successfully registered sync point: " << label << std::endl;
+  DebugPrintf("Successfully registered sync point: %ls\n", label.c_str());
 }
 
-void SimpleTestAmbassador::synchronizationPointRegistrationFailed(std::wstring const& label, SynchronizationPointFailureReason reason)
+void SimpleTestFederate::synchronizationPointRegistrationFailed(std::wstring const& label, SynchronizationPointFailureReason reason)
 {
-  std::wcout << L"Failed to register sync point: " << label << std::endl;
+  DebugPrintf("Failed to register sync point: %ls\n", label.c_str());
 }
 
-void SimpleTestAmbassador::announceSynchronizationPoint(std::wstring const& label, VariableLengthData const& theUserSuppliedTag)
+void SimpleTestFederate::announceSynchronizationPoint(std::wstring const& label, VariableLengthData const& theUserSuppliedTag)
 {
-  std::wcout << L"Synchronization point announced: " << label << std::endl;
+  DebugPrintf("Synchronization point announced: %ls\n", label.c_str());
   std::wstring compair = L"ReadyToRun";
   if (label ==  READY_TO_RUN)
   {
-    this->isAnnouncedReadyToRun = true;
+    isAnnouncedReadyToRun = true;
   }
   else if (label == ALL_DONE)
   {
-    this->isAnnouncedAllDone = true;
+    isAnnouncedAllDone = true;
+  }
+  else
+  {
+    mRtiAmb->synchronizationPointAchieved(label);
   }
 }
 
-void SimpleTestAmbassador::federationSynchronized(
-  std::wstring const& label,
-  FederateHandleSet const& failedToSyncSet)
+void SimpleTestFederate::federationSynchronized(std::wstring const& label, FederateHandleSet const& failedToSyncSet)
 {
-  std::wcout << L"Federation Synchronized: " << label << std::endl;
+  DebugPrintf("Federation Synchronized: %ls\n", label.c_str());
   if (label == READY_TO_RUN)
   {
-    this->isReadyToRun = true;
+    _syncedReadyToRun = true;
   }
   else if (label == ALL_DONE)
   {
-    this->allDone = true;
+    _syncedAllDone = true;
   }
 }
 
@@ -367,29 +447,29 @@ void SimpleTestAmbassador::federationSynchronized(
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// Time Callbacks ///////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-void SimpleTestAmbassador::timeRegulationEnabled(LogicalTime const& theFederateTime)
+void SimpleTestFederate::timeRegulationEnabled(LogicalTime const& theFederateTime)
 {
-  this->isRegulating = true;
-  this->federateTime = convertTime(theFederateTime);
+  isRegulating = true;
+  federateTime = convertTime(theFederateTime);
 }
 
-void SimpleTestAmbassador::timeConstrainedEnabled(LogicalTime const& theFederateTime)
+void SimpleTestFederate::timeConstrainedEnabled(LogicalTime const& theFederateTime)
 {
-  this->isConstrained = true;
-  this->federateTime = convertTime(theFederateTime);
+  isConstrained = true;
+  federateTime = convertTime(theFederateTime);
 }
 
-void SimpleTestAmbassador::timeAdvanceGrant(LogicalTime const& theTime)
+void SimpleTestFederate::timeAdvanceGrant(LogicalTime const& theTime)
 {
-  this->isAdvancing = false;
-  this->federateTime = convertTime(theTime);
-  DebugPrintf("timeAdvanceGrant(%.9f)\n", this->federateTime);
+  isAdvancing = false;
+  federateTime = convertTime(theTime);
+  DebugPrintf("timeAdvanceGrant(%.9f)\n", federateTime);
 }
 
 //                                 //
 // Reflect Attribute Value Methods //
 //                                 //
-void SimpleTestAmbassador::reflectAttributeValues(
+void SimpleTestFederate::reflectAttributeValues(
   ObjectInstanceHandle theObject,
   AttributeHandleValueMap const& theAttributeValues,
   VariableLengthData const& theUserSuppliedTag,
@@ -397,20 +477,19 @@ void SimpleTestAmbassador::reflectAttributeValues(
   TransportationType theType,
   SupplementalReflectInfo theReflectInfo)
 {
-  ObjectClassHandle theObjectClass = rtiamb->getKnownObjectClassHandle(theObject);
-  std::wcout << __FUNCTIONW__ << L": "
-    << L"instance=" << rtiamb->getObjectInstanceName(theObject)
-    << L", class=" << rtiamb->getObjectClassName(theObjectClass);
-  std::wcout << ", sentOrder=" << sentOrder;
-  std::wcout << std::endl;
+  ObjectClassHandle theObjectClass = mRtiAmb->getKnownObjectClassHandle(theObject);
+  DebugPrintf("%s: instance=%ls class=%ls sentOrder=%s", __FUNCTION__, 
+              mRtiAmb->getObjectInstanceName(theObject).c_str(),
+              mRtiAmb->getObjectClassName(theObjectClass).c_str(),
+              to_string(sentOrder).c_str());
   for (auto attr : theAttributeValues)
   {
     std::wstring strData(static_cast<const wchar_t*>(attr.second.data()), attr.second.size() / sizeof(wchar_t));
-    std::wcout << L"    attribute=" << rtiamb->getAttributeName(theObjectClass, attr.first) << L" value=" << strData << std::endl;
+    DebugPrintf("    attribute=%ls value=%ls", mRtiAmb->getAttributeName(theObjectClass, attr.first).c_str(), strData.c_str());
   }
 }
 
-void SimpleTestAmbassador::reflectAttributeValues(
+void SimpleTestFederate::reflectAttributeValues(
   ObjectInstanceHandle theObject,
   AttributeHandleValueMap const& theAttributeValues,
   VariableLengthData const& theUserSuppliedTag,
@@ -420,24 +499,23 @@ void SimpleTestAmbassador::reflectAttributeValues(
   OrderType receivedOrder,
   SupplementalReflectInfo theReflectInfo)
 {
-  ObjectClassHandle theObjectClass = rtiamb->getKnownObjectClassHandle(theObject);
-  std::wcout << __FUNCTIONW__ << L": "
-    << L"instance=" << rtiamb->getObjectInstanceName(theObject)
-    << L", class=" << rtiamb->getObjectClassName(theObjectClass);
-  std::wcout << ", theTime=" << theTime.toString();
-  std::wcout << ", sentOrder=" << sentOrder;
-  std::wcout << ", receivedOrder=" << receivedOrder;
-  std::wcout << std::endl;
+  ObjectClassHandle theObjectClass = mRtiAmb->getKnownObjectClassHandle(theObject);
+  DebugPrintf("%s: instance=%ls class=%ls time=%ls sentOrder=%s receiveOrder=%s", __FUNCTION__, 
+              mRtiAmb->getObjectInstanceName(theObject).c_str(),
+              mRtiAmb->getObjectClassName(theObjectClass).c_str(),
+              theTime.toString().c_str(),
+              to_string(sentOrder).c_str(),
+              to_string(receivedOrder).c_str());
   for (auto attr : theAttributeValues)
   {
-    std::wcout << L"    attribute=" << rtiamb->getAttributeName(theObjectClass, attr.first) << std::endl;
+    DebugPrintf("    attribute=%ls", mRtiAmb->getAttributeName(theObjectClass, attr.first).c_str());
   }
 }
 
 /**
  * receiveInteraction with some detailed output
  */
-void SimpleTestAmbassador::receiveInteraction(
+void SimpleTestFederate::receiveInteraction(
   InteractionClassHandle theInteraction,
   ParameterHandleValueMap const& theParameterValues,
   VariableLengthData const& theUserSuppliedTag,
@@ -465,7 +543,7 @@ void SimpleTestAmbassador::receiveInteraction(
   }
 }
 
-void SimpleTestAmbassador::receiveInteraction(
+void SimpleTestFederate::receiveInteraction(
   InteractionClassHandle theInteraction,
   ParameterHandleValueMap const& theParameterValues,
   VariableLengthData const& theUserSuppliedTag,
@@ -498,7 +576,7 @@ void SimpleTestAmbassador::receiveInteraction(
   }
 }
 
-void SimpleTestAmbassador::receiveInteraction(
+void SimpleTestFederate::receiveInteraction(
   InteractionClassHandle theInteraction,
   ParameterHandleValueMap const& theParameterValues,
   VariableLengthData const& theUserSuppliedTag,
@@ -540,54 +618,54 @@ void SimpleTestAmbassador::receiveInteraction(
 //                         //
 // Discover Object Methods //
 //                         //
-void SimpleTestAmbassador::discoverObjectInstance(ObjectInstanceHandle theObject,
+void SimpleTestFederate::discoverObjectInstance(ObjectInstanceHandle theObject,
   ObjectClassHandle theObjectClass,
   std::wstring const& theObjectInstanceName)
 {
-  std::wcout <<  __FUNCTIONW__ << L": "
-    << " handle=" << theObject << L" instance=" << rtiamb->getObjectInstanceName(theObject)
-    << L", classHandle=" << rtiamb->getObjectClassName(theObjectClass)
-    << L", name=" << theObjectInstanceName << std::endl;
+  DebugPrintf("%s: instanceHandle=%ls class=%ls name=%ls", __FUNCTION__, 
+              theObject.toString().c_str(),
+              mRtiAmb->getObjectClassName(theObjectClass).c_str(),
+              theObjectInstanceName.c_str());
 }
 
 
-void SimpleTestAmbassador::attributesInScope(ObjectInstanceHandle theObject,
+void SimpleTestFederate::attributesInScope(ObjectInstanceHandle theObject,
   const AttributeHandleSet& theAttributeValues)
 {
-  ObjectClassHandle theObjectClass = rtiamb->getKnownObjectClassHandle(theObject);
-  std::wcout << __FUNCTIONW__ << L": "
-    << L"instance=" << rtiamb->getObjectInstanceName(theObject)
-    << L", class=" << rtiamb->getObjectClassName(theObjectClass) << std::endl;
+  ObjectClassHandle theObjectClass = mRtiAmb->getKnownObjectClassHandle(theObject);
+  std::wcout << to_wstring(__FUNCTION__) << L": "
+    << L"instance=" << mRtiAmb->getObjectInstanceName(theObject)
+    << L", class=" << mRtiAmb->getObjectClassName(theObjectClass) << std::endl;
   for (auto attr : theAttributeValues)
   {
-    std::wcout << L"    attribute=" << rtiamb->getAttributeName(theObjectClass, attr) << std::endl;
+    std::wcout << L"    attribute=" << mRtiAmb->getAttributeName(theObjectClass, attr) << std::endl;
   }
 }
 
 
-void SimpleTestAmbassador::attributesOutOfScope(ObjectInstanceHandle theObject,
+void SimpleTestFederate::attributesOutOfScope(ObjectInstanceHandle theObject,
   const AttributeHandleSet& theAttributeValues)
 {
-  ObjectClassHandle theObjectClass = rtiamb->getKnownObjectClassHandle(theObject);
-  std::wcout << __FUNCTIONW__ << L": "
-    << L"instance=" << rtiamb->getObjectInstanceName(theObject)
-    << L", class=" << rtiamb->getObjectClassName(theObjectClass) << std::endl;
+  ObjectClassHandle theObjectClass = mRtiAmb->getKnownObjectClassHandle(theObject);
+  std::wcout << to_wstring(__FUNCTION__) << L": "
+    << L"instance=" << mRtiAmb->getObjectInstanceName(theObject)
+    << L", class=" << mRtiAmb->getObjectClassName(theObjectClass) << std::endl;
   for (auto attr : theAttributeValues)
   {
-    std::wcout << L"    attribute=" << rtiamb->getAttributeName(theObjectClass, attr) << std::endl;
+    std::wcout << L"    attribute=" << mRtiAmb->getAttributeName(theObjectClass, attr) << std::endl;
   }
 }
 
-void SimpleTestAmbassador::provideAttributeValueUpdate(ObjectInstanceHandle theObject, AttributeHandleSet const& theAttributes,
+void SimpleTestFederate::provideAttributeValueUpdate(ObjectInstanceHandle theObject, AttributeHandleSet const& theAttributes,
   VariableLengthData const& theUserSuppliedTag)
 {
-  ObjectClassHandle theObjectClass = rtiamb->getKnownObjectClassHandle(theObject);
-  std::wcout << __FUNCTIONW__ << L": "
-    << L"instance=" << rtiamb->getObjectInstanceName(theObject)
-    << L", class=" << rtiamb->getObjectClassName(theObjectClass) << std::endl;
+  ObjectClassHandle theObjectClass = mRtiAmb->getKnownObjectClassHandle(theObject);
+  std::wcout << to_wstring(__FUNCTION__) << L": "
+    << L"instance=" << mRtiAmb->getObjectInstanceName(theObject)
+    << L", class=" << mRtiAmb->getObjectClassName(theObjectClass) << std::endl;
   for (auto attr : theAttributes)
   {
-    std::wcout << L"    attribute=" << rtiamb->getAttributeName(theObjectClass, attr) << std::endl;
+    std::wcout << L"    attribute=" << mRtiAmb->getAttributeName(theObjectClass, attr) << std::endl;
   }
 }
 
@@ -595,7 +673,7 @@ void SimpleTestAmbassador::provideAttributeValueUpdate(ObjectInstanceHandle theO
 //                       //
 // Remove Object Methods //
 //                       //
-void SimpleTestAmbassador::removeObjectInstance(
+void SimpleTestFederate::removeObjectInstance(
   ObjectInstanceHandle theObject,
   VariableLengthData const& theUserSuppliedTag,
   OrderType sentOrder,
@@ -604,7 +682,7 @@ void SimpleTestAmbassador::removeObjectInstance(
   std::wcout << L"Object Removed: handle=" << theObject << std::endl;
 }
 
-void SimpleTestAmbassador::removeObjectInstance(
+void SimpleTestFederate::removeObjectInstance(
   ObjectInstanceHandle theObject,
   VariableLengthData const& theUserSuppliedTag,
   OrderType sentOrder,
@@ -615,7 +693,7 @@ void SimpleTestAmbassador::removeObjectInstance(
   std::wcout << L"Object Removed: handle=" << theObject << std::endl;
 }
 
-void SimpleTestAmbassador::removeObjectInstance(
+void SimpleTestFederate::removeObjectInstance(
   ObjectInstanceHandle theObject,
   VariableLengthData const& theUserSuppliedTag,
   OrderType sentOrder,

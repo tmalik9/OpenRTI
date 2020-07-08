@@ -121,9 +121,6 @@
   <ItemGroup>
     <ClInclude Include="..\include\RTI1516ETestLib.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

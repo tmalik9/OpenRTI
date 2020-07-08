@@ -16,9 +16,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
-  <ItemGroup>
     <Xml Include="fdd-1.xml" />
     <Xml Include="fdd-2.xml" />
   </ItemGroup>

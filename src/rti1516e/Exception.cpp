@@ -24,6 +24,7 @@
 #include <RTI/Exception.h>
 
 #include <sstream>
+#include "StringUtils.h"
 
 #pragma warning(disable: 4100)
 
@@ -52,6 +53,12 @@ std::wostream&
 operator<<(std::wostream& stream, Exception const& e)
 {
   return stream << e.what();
+}
+
+std::ostream&
+operator<<(std::ostream& stream, Exception const& e)
+{
+  return stream << OpenRTI::ucsToUtf8(e.what());
 }
 
 #define IMPLEMENT_RTI_EXCEPTION(A)             \

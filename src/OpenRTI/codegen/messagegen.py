@@ -288,7 +288,7 @@ class SetDataType(DataType):
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
-        sourceStream.writeline('// ' + str(self))
+        sourceStream.writeline('// SetDataType ' + self.getName())
         sourceStream.writeline('template<typename char_type, typename traits_type>')
         sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
         sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
@@ -415,7 +415,7 @@ class PairDataType(DataType):
         getattr(messageEncoding, 'writePair' + component)(self, sourceStream)
 
     def writeStreamOut(self, sourceStream):
-        sourceStream.writeline('// ' + str(self))
+        sourceStream.writeline('// PairDataType ' + self.getName())
         sourceStream.writeline('template<typename char_type, typename traits_type>')
         sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
         sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
@@ -551,20 +551,36 @@ class StructDataType(DataType):
             constValuePrefix = 'getConstImpl().'
         else:
             fieldCount = len(self.getFieldList())
-            if fieldCount == 0:
-                sourceStream.writeline('{name}()'.format(name = self.getName()))
-            else:
-                sourceStream.writeline('{name}() :'.format(name = self.getName()))
-            sourceStream.pushIndent()
-            index = 0
-            for field in self.getFieldList():
-                line = '{memberName}()'.format(memberName = field.getMemberName())
-                index = index + 1
-                if index < fieldCount:
-                    line += ','
-                sourceStream.writeline(line)
-            sourceStream.popIndent()
-            sourceStream.writeline('{ }')
+            # default constructor
+            sourceStream.writeline('{name}()'.format(name = self.getName()) + ' { }')
+
+            if fieldCount > 0:
+                sourceStream.writeline('{name}('.format(name = self.getName()))
+                sourceStream.pushIndent()
+                index = 0
+                for field in self.getFieldList():
+                    line = '{fieldTypeName} {paramName}'.format(paramName = field.getLowerName(), fieldTypeName=field.getTypeName())
+                    index = index + 1
+                    if index < fieldCount:
+                        line += ','
+                    else:
+                        line += ')'
+                    sourceStream.writeline(line)
+                index = 0
+                sourceStream.pushIndent()
+                for field in self.getFieldList():
+                    if (index == 0): 
+                        line = ': '
+                    else:
+                        line =', '
+                    line += '{memberName}({paramName})'.format(paramName = field.getLowerName(), memberName = field.getMemberName())
+                    index = index + 1
+                    sourceStream.writeline(line)
+                sourceStream.popIndent()
+                sourceStream.writeline('{ }')
+                sourceStream.popIndent()
+
+
             valuePrefix = ''
             constValuePrefix = ''
 
@@ -875,7 +891,9 @@ class MessageDataType(StructDataType):
 
         sourceStream.writeline()
 
-
+    def writeToString(self, sourceStream):
+        pass
+ 
 ###############################################################################
 class MessageEncoding(object):
     def __init__(self, name):
@@ -937,7 +955,11 @@ class MessageEncoding(object):
             'TimeStampedAttributeUpdateMessage' : 96,
             'RequestAttributeUpdateMessage' : 97,
             'RequestClassAttributeUpdateMessage' : 98,
-            'ChangeObjectInstanceSubscriptionMessage' : 99
+            'ChangeObjectInstanceSubscriptionMessage' : 99,
+            'EnableTimeConstrainedNotifyMessage' : 100,
+            'DisableTimeConstrainedNotifyMessage' : 101,
+            'QueryAttributeOwnershipRequestMessage' : 102,
+            'QueryAttributeOwnershipResponseMessage' : 103,
         }
 
     def getName(self):
@@ -1302,7 +1324,7 @@ class MessageEncoding(object):
         sourceStream.writeline('#include "AbstractNetworkStatistics.h"')
         sourceStream.writeline()
         sourceStream.writeline('#ifndef __CPlusPlusStd')
-        sourceStream.writeline('#error "must include "OpenRTIConfig.h!"')
+        sourceStream.writeline('#error "must include OpenRTIConfig.h!"')
         sourceStream.writeline('#endif')
         sourceStream.writeline()
 
@@ -1513,7 +1535,7 @@ class MessageEncoding(object):
         sourceStream.pushIndent()
         sourceStream.writeline('message.dispatchFunctor(DispatchFunctor(*this));')
         sourceStream.writelineNoIndent('#ifdef ENABLE_NETWORKSTATISTICS')
-        sourceStream.writeline('GetNetworkStatistics().MessageSent(message->getTypeName());')
+        sourceStream.writeline('GetNetworkStatistics().MessageSent(message.getTypeName());')
         sourceStream.writelineNoIndent('#endif')
         sourceStream.popIndent()
         sourceStream.writeline('}')
@@ -1622,7 +1644,7 @@ class TypeMap(object):
         sourceStream.writeline('#include "VariableLengthData.h"')
         sourceStream.writeline()
         sourceStream.writeline('#ifndef __CPlusPlusStd')
-        sourceStream.writeline('#error "must include "OpenRTIConfig.h!"')
+        sourceStream.writeline('#error "must include OpenRTIConfig.h!"')
         sourceStream.writeline('#endif')
         sourceStream.writeline()
         sourceStream.writeline('namespace OpenRTI {')

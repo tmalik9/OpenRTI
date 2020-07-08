@@ -27,3 +27,5 @@ std::string string_printf(__format_string const char* fmt, ...);
 std::string string_vprintf(const char* fmt, va_list args);
 
 extern bool sEnableDebugPrintf;
+extern bool sDebugToConsole;
+

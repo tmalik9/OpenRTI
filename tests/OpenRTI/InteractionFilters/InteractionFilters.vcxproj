@@ -112,9 +112,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="..\..\..\src\OpenRTI\dprintf.cpp" />
     <ClCompile Include="..\..\..\src\OpenRTI\ServerModel.cpp" />
     <ClCompile Include="..\..\..\src\OpenRTI\VariableLengthDataTuple.cpp" />

@@ -44,10 +44,8 @@ namespace rti1516e
    };
 
    // Output operator for Exceptions
-   std::wostream RTI_EXPORT &
-   operator<< (
-   std::wostream &,
-   Exception const &);
+   std::wostream RTI_EXPORT &operator<<(std::wostream &, Exception const &);
+   std::ostream RTI_EXPORT &operator<<(std::ostream &, Exception const &);
 
    #define RTI_EXCEPTION(A)               \
    class RTI_EXPORT A : public Exception  \

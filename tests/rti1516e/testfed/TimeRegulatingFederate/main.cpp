@@ -1,28 +1,21 @@
-/**
- * @file
- *
- * Copyright (C) 2013 Max Oberberger <max@oberbergers.de>
- *
- * Last modified: 2013 February 23, 20:05:02 by max
- *
- * This file is part of ba-hla.
- *
- * ba-hla is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * ba-hla is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with ba-hla.  If not, see <http://www.gnu.org/licenses/>.
- */
 
 #include "TimeRegulatingFederate.h"
 #include "RTI/Exception.h"
+#include <signal.h>
+
+TimeRegulatingFederate* federate = nullptr;
+
+extern "C" {
+
+static void sighandler(int sig)
+{
+  if (federate != nullptr)
+  {
+    federate->setDone();
+  }
+}
+
+}
 
 void helpmenu(const char* progname)
 {
@@ -37,30 +30,28 @@ int main(int argc, char* argv[])
 {
   // check to see if we have a federate name
   //char *federateName = "exampleFederate";
-  std::string federateName, fomPath, rtiAddress;
-  bool name = false, fom = false, address = false, iterationsGiven =false;
-  unsigned int iterations = 20;
+  std::string federateName;
+  std::string fomPath = "testfom.xml";
+  std::string rtiAddress = "127.0.0.1";
+  std::string federationName = "ExampleFederation";
+
   for (int i = 0; i < argc; i++)
   {
     if (strcmp(argv[i], "--name") == 0)
     {
-      federateName = argv[i + 1];
-      name = true;
+      federateName = argv[i + 1]; i++;
+    }
+    else if (strcmp(argv[i], "--federation") == 0)
+    {
+      federationName = argv[i + 1]; i++;
     }
     else if (strcmp(argv[i], "--fom") == 0)
     {
-      fom = true;
-      fomPath = argv[i + 1];
+      fomPath = argv[i + 1]; i++;
     }
     else if (strcmp(argv[i], "--address") == 0)
     {
-      address = true;
-      rtiAddress = argv[i + 1];
-    }
-    else if (strcmp(argv[i], "--iterations") == 0)
-    {
-      iterationsGiven = true;
-      iterations = strtoul( argv[i + 1], nullptr, 10);
+      rtiAddress = argv[i + 1]; i++;
     }
     else if (strcmp(argv[i], "--help") == 0)
     {
@@ -68,30 +59,24 @@ int main(int argc, char* argv[])
       exit(0);
     }
   }
+
+  ::signal(SIGTERM, sighandler);
+  ::signal(SIGINT, sighandler);
+
   // create and run the federate
-  TimeRegulatingFederate* federate = nullptr;
-  if (name && fom)
-  {
-    try {
-      if (!address) { rtiAddress = "127.0.0.1"; }
-      federate = new TimeRegulatingFederate();
-      federate->initialize(rtiAddress, federateName, fomPath, true, false);
-      federate->runFederate(iterations);
-    }
-    catch( rti1516e::Exception& e)
-    {
-      printf("%S", e.what().c_str());
-    }
-    catch( std::exception& e)
-    {
-      printf("std::exception: %s", e.what());
-    }
+  try {
+    federate = new TimeRegulatingFederate();
+    federate->join(rtiAddress, federateName, fomPath, federationName, true, false);
+    federate->run(1000);
+    federate->disconnect();
   }
-  else
+  catch( Exception& e)
   {
-    if (!name) { printf("No Federatename given\n"); }
-    if (!fom) { printf("No FOM location given\n"); }
-    exit(1);
+    printf("%S", e.what().c_str());
+  }
+  catch( std::exception& e)
+  {
+    printf("std::exception: %s", e.what());
   }
   // clean up
   delete federate;

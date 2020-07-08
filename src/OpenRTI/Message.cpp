@@ -671,7 +671,8 @@ JoinFederationExecutionRequestMessage::JoinFederationExecutionRequestMessage() :
   _federateType(),
   _federateName(),
   _fOMStringModuleList(),
-  _configurationParameterMap()
+  _configurationParameterMap(),
+  _isInternal()
 {
 }
 
@@ -714,6 +715,7 @@ JoinFederationExecutionRequestMessage::operator==(const JoinFederationExecutionR
   if (getFederateName() != rhs.getFederateName()) return false;
   if (getFOMStringModuleList() != rhs.getFOMStringModuleList()) return false;
   if (getConfigurationParameterMap() != rhs.getConfigurationParameterMap()) return false;
+  if (getIsInternal() != rhs.getIsInternal()) return false;
   return true;
 }
 
@@ -730,6 +732,8 @@ JoinFederationExecutionRequestMessage::operator<(const JoinFederationExecutionRe
   if (rhs.getFOMStringModuleList() < getFOMStringModuleList()) return false;
   if (getConfigurationParameterMap() < rhs.getConfigurationParameterMap()) return true;
   if (rhs.getConfigurationParameterMap() < getConfigurationParameterMap()) return false;
+  if (getIsInternal() < rhs.getIsInternal()) return true;
+  if (rhs.getIsInternal() < getIsInternal()) return false;
   return false;
 }
 
@@ -922,7 +926,8 @@ JoinFederateNotifyMessage::JoinFederateNotifyMessage() :
   _federationHandle(),
   _federateHandle(),
   _federateType(),
-  _federateName()
+  _federateName(),
+  _isInternal()
 {
 }
 
@@ -964,6 +969,7 @@ JoinFederateNotifyMessage::operator==(const JoinFederateNotifyMessage& rhs) cons
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
   if (getFederateType() != rhs.getFederateType()) return false;
   if (getFederateName() != rhs.getFederateName()) return false;
+  if (getIsInternal() != rhs.getIsInternal()) return false;
   return true;
 }
 
@@ -978,6 +984,8 @@ JoinFederateNotifyMessage::operator<(const JoinFederateNotifyMessage& rhs) const
   if (rhs.getFederateType() < getFederateType()) return false;
   if (getFederateName() < rhs.getFederateName()) return true;
   if (rhs.getFederateName() < getFederateName()) return false;
+  if (getIsInternal() < rhs.getIsInternal()) return true;
+  if (rhs.getIsInternal() < getIsInternal()) return false;
   return false;
 }
 
@@ -1587,6 +1595,116 @@ DisableTimeRegulationRequestMessage::operator==(const DisableTimeRegulationReque
 
 bool
 DisableTimeRegulationRequestMessage::operator<(const DisableTimeRegulationRequestMessage& rhs) const
+{
+  if (getFederationHandle() < rhs.getFederationHandle()) return true;
+  if (rhs.getFederationHandle() < getFederationHandle()) return false;
+  if (getFederateHandle() < rhs.getFederateHandle()) return true;
+  if (rhs.getFederateHandle() < getFederateHandle()) return false;
+  return false;
+}
+
+EnableTimeConstrainedNotifyMessage::EnableTimeConstrainedNotifyMessage() :
+  _federationHandle(),
+  _federateHandle()
+{
+}
+
+EnableTimeConstrainedNotifyMessage::~EnableTimeConstrainedNotifyMessage()
+{
+}
+
+const char*
+EnableTimeConstrainedNotifyMessage::getTypeName() const
+{
+  return "EnableTimeConstrainedNotifyMessage";
+}
+
+void
+EnableTimeConstrainedNotifyMessage::out(std::ostream& os) const
+{
+  os << "EnableTimeConstrainedNotifyMessage " << *this;
+}
+
+void
+EnableTimeConstrainedNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
+{
+  dispatcher.accept(*this);
+}
+
+bool
+EnableTimeConstrainedNotifyMessage::operator==(const AbstractMessage& rhs) const
+{
+  const EnableTimeConstrainedNotifyMessage* message = dynamic_cast<const EnableTimeConstrainedNotifyMessage*>(&rhs);
+  if (!message)
+    return false;
+  return operator==(*message);
+}
+
+bool
+EnableTimeConstrainedNotifyMessage::operator==(const EnableTimeConstrainedNotifyMessage& rhs) const
+{
+  if (getFederationHandle() != rhs.getFederationHandle()) return false;
+  if (getFederateHandle() != rhs.getFederateHandle()) return false;
+  return true;
+}
+
+bool
+EnableTimeConstrainedNotifyMessage::operator<(const EnableTimeConstrainedNotifyMessage& rhs) const
+{
+  if (getFederationHandle() < rhs.getFederationHandle()) return true;
+  if (rhs.getFederationHandle() < getFederationHandle()) return false;
+  if (getFederateHandle() < rhs.getFederateHandle()) return true;
+  if (rhs.getFederateHandle() < getFederateHandle()) return false;
+  return false;
+}
+
+DisableTimeConstrainedNotifyMessage::DisableTimeConstrainedNotifyMessage() :
+  _federationHandle(),
+  _federateHandle()
+{
+}
+
+DisableTimeConstrainedNotifyMessage::~DisableTimeConstrainedNotifyMessage()
+{
+}
+
+const char*
+DisableTimeConstrainedNotifyMessage::getTypeName() const
+{
+  return "DisableTimeConstrainedNotifyMessage";
+}
+
+void
+DisableTimeConstrainedNotifyMessage::out(std::ostream& os) const
+{
+  os << "DisableTimeConstrainedNotifyMessage " << *this;
+}
+
+void
+DisableTimeConstrainedNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
+{
+  dispatcher.accept(*this);
+}
+
+bool
+DisableTimeConstrainedNotifyMessage::operator==(const AbstractMessage& rhs) const
+{
+  const DisableTimeConstrainedNotifyMessage* message = dynamic_cast<const DisableTimeConstrainedNotifyMessage*>(&rhs);
+  if (!message)
+    return false;
+  return operator==(*message);
+}
+
+bool
+DisableTimeConstrainedNotifyMessage::operator==(const DisableTimeConstrainedNotifyMessage& rhs) const
+{
+  if (getFederationHandle() != rhs.getFederationHandle()) return false;
+  if (getFederateHandle() != rhs.getFederateHandle()) return false;
+  return true;
+}
+
+bool
+DisableTimeConstrainedNotifyMessage::operator<(const DisableTimeConstrainedNotifyMessage& rhs) const
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2987,7 +3105,8 @@ ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator<(const ReleaseMult
 ReserveObjectInstanceNameRequestMessage::ReserveObjectInstanceNameRequestMessage() :
   _federationHandle(),
   _federateHandle(),
-  _name()
+  _name(),
+  _isInternal()
 {
 }
 
@@ -3028,6 +3147,7 @@ ReserveObjectInstanceNameRequestMessage::operator==(const ReserveObjectInstanceN
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
   if (getName() != rhs.getName()) return false;
+  if (getIsInternal() != rhs.getIsInternal()) return false;
   return true;
 }
 
@@ -3040,6 +3160,8 @@ ReserveObjectInstanceNameRequestMessage::operator<(const ReserveObjectInstanceNa
   if (rhs.getFederateHandle() < getFederateHandle()) return false;
   if (getName() < rhs.getName()) return true;
   if (rhs.getName() < getName()) return false;
+  if (getIsInternal() < rhs.getIsInternal()) return true;
+  if (rhs.getIsInternal() < getIsInternal()) return false;
   return false;
 }
 
@@ -3758,6 +3880,128 @@ RequestClassAttributeUpdateMessage::operator<(const RequestClassAttributeUpdateM
   if (rhs.getAttributeHandles() < getAttributeHandles()) return false;
   if (getTag() < rhs.getTag()) return true;
   if (rhs.getTag() < getTag()) return false;
+  return false;
+}
+
+QueryAttributeOwnershipRequestMessage::QueryAttributeOwnershipRequestMessage() :
+  _federationHandle(),
+  _objectInstanceHandle(),
+  _attributeHandle()
+{
+}
+
+QueryAttributeOwnershipRequestMessage::~QueryAttributeOwnershipRequestMessage()
+{
+}
+
+const char*
+QueryAttributeOwnershipRequestMessage::getTypeName() const
+{
+  return "QueryAttributeOwnershipRequestMessage";
+}
+
+void
+QueryAttributeOwnershipRequestMessage::out(std::ostream& os) const
+{
+  os << "QueryAttributeOwnershipRequestMessage " << *this;
+}
+
+void
+QueryAttributeOwnershipRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
+{
+  dispatcher.accept(*this);
+}
+
+bool
+QueryAttributeOwnershipRequestMessage::operator==(const AbstractMessage& rhs) const
+{
+  const QueryAttributeOwnershipRequestMessage* message = dynamic_cast<const QueryAttributeOwnershipRequestMessage*>(&rhs);
+  if (!message)
+    return false;
+  return operator==(*message);
+}
+
+bool
+QueryAttributeOwnershipRequestMessage::operator==(const QueryAttributeOwnershipRequestMessage& rhs) const
+{
+  if (getFederationHandle() != rhs.getFederationHandle()) return false;
+  if (getObjectInstanceHandle() != rhs.getObjectInstanceHandle()) return false;
+  if (getAttributeHandle() != rhs.getAttributeHandle()) return false;
+  return true;
+}
+
+bool
+QueryAttributeOwnershipRequestMessage::operator<(const QueryAttributeOwnershipRequestMessage& rhs) const
+{
+  if (getFederationHandle() < rhs.getFederationHandle()) return true;
+  if (rhs.getFederationHandle() < getFederationHandle()) return false;
+  if (getObjectInstanceHandle() < rhs.getObjectInstanceHandle()) return true;
+  if (rhs.getObjectInstanceHandle() < getObjectInstanceHandle()) return false;
+  if (getAttributeHandle() < rhs.getAttributeHandle()) return true;
+  if (rhs.getAttributeHandle() < getAttributeHandle()) return false;
+  return false;
+}
+
+QueryAttributeOwnershipResponseMessage::QueryAttributeOwnershipResponseMessage() :
+  _federationHandle(),
+  _objectInstanceHandle(),
+  _attributeHandle(),
+  _owner()
+{
+}
+
+QueryAttributeOwnershipResponseMessage::~QueryAttributeOwnershipResponseMessage()
+{
+}
+
+const char*
+QueryAttributeOwnershipResponseMessage::getTypeName() const
+{
+  return "QueryAttributeOwnershipResponseMessage";
+}
+
+void
+QueryAttributeOwnershipResponseMessage::out(std::ostream& os) const
+{
+  os << "QueryAttributeOwnershipResponseMessage " << *this;
+}
+
+void
+QueryAttributeOwnershipResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
+{
+  dispatcher.accept(*this);
+}
+
+bool
+QueryAttributeOwnershipResponseMessage::operator==(const AbstractMessage& rhs) const
+{
+  const QueryAttributeOwnershipResponseMessage* message = dynamic_cast<const QueryAttributeOwnershipResponseMessage*>(&rhs);
+  if (!message)
+    return false;
+  return operator==(*message);
+}
+
+bool
+QueryAttributeOwnershipResponseMessage::operator==(const QueryAttributeOwnershipResponseMessage& rhs) const
+{
+  if (getFederationHandle() != rhs.getFederationHandle()) return false;
+  if (getObjectInstanceHandle() != rhs.getObjectInstanceHandle()) return false;
+  if (getAttributeHandle() != rhs.getAttributeHandle()) return false;
+  if (getOwner() != rhs.getOwner()) return false;
+  return true;
+}
+
+bool
+QueryAttributeOwnershipResponseMessage::operator<(const QueryAttributeOwnershipResponseMessage& rhs) const
+{
+  if (getFederationHandle() < rhs.getFederationHandle()) return true;
+  if (rhs.getFederationHandle() < getFederationHandle()) return false;
+  if (getObjectInstanceHandle() < rhs.getObjectInstanceHandle()) return true;
+  if (rhs.getObjectInstanceHandle() < getObjectInstanceHandle()) return false;
+  if (getAttributeHandle() < rhs.getAttributeHandle()) return true;
+  if (rhs.getAttributeHandle() < getAttributeHandle()) return false;
+  if (getOwner() < rhs.getOwner()) return true;
+  if (rhs.getOwner() < getOwner()) return false;
   return false;
 }
 

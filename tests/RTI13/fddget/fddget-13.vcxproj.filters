@@ -11,9 +11,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\include\RTI13TestLib.h">
       <Filter>Source Files</Filter>
     </ClInclude>

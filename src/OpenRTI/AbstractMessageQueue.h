@@ -62,7 +62,6 @@ private:
     {
       if (!_messageQueue.valid())
         throw RTIinternalError("Trying to send message to a closed MessageSender");
-      CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
       _messageQueue->append(message);
     }
     virtual void close()

@@ -45,8 +45,7 @@ class RTI_EXPORT HandleKind                                       \
    /* Constructs an invalid handle                           */   \
    HandleKind ();                                                 \
                                                                   \
-   ~HandleKind ()                                                 \
-      throw();                                                    \
+   ~HandleKind ();                                                \
                                                                   \
    HandleKind (                                                   \
       HandleKind const & rhs);                                    \

@@ -6,9 +6,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="InteractionFilters.cpp" />
     <ClCompile Include="..\..\..\src\OpenRTI\ServerModel.cpp" />
     <ClCompile Include="..\..\..\src\OpenRTI\dprintf.cpp" />

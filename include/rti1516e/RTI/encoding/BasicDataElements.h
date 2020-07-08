@@ -10,8 +10,8 @@
    IEEE 1516.1 High Level Architecture Interface Specification C++ API
    File: BasicDataElements.h
 ***********************************************************************/
-#ifndef RTI_BasicDataElements_h_
-#define RTI_BasicDataElements_h_
+
+#pragma once
 
 #include <RTI/encoding/DataElement.h>
 #include <RTI/encoding/EncodingConfig.h>
@@ -163,5 +163,5 @@ namespace rti1516e
 
 }
 
-#endif // RTI_BasicDataElements_h_
+#undef DEFINE_ENCODING_HELPER_CLASS
 

@@ -188,8 +188,13 @@ HLAvariableArray::HLAvariableArray(const DataElement& protoType) :
 {
 }
 
-HLAvariableArray::HLAvariableArray(HLAvariableArray const & rhs) :
+HLAvariableArray::HLAvariableArray(const HLAvariableArray & rhs) :
   _impl(new HLAvariableArrayImplementation(*rhs._impl))
+{
+}
+
+HLAvariableArray::HLAvariableArray(HLAvariableArray&& rhs) :
+  _impl(std::move(rhs._impl))
 {
 }
 
@@ -197,6 +202,20 @@ HLAvariableArray::~HLAvariableArray()
 {
   delete _impl;
   _impl = 0;
+}
+
+HLAvariableArray& HLAvariableArray::operator=(const HLAvariableArray& rhs)
+{
+  delete _impl;
+  _impl = new HLAvariableArrayImplementation(*rhs._impl);
+  return *this;
+}
+
+HLAvariableArray& HLAvariableArray::operator=(HLAvariableArray&& rhs)
+{
+  delete _impl;
+  _impl = std::move(rhs._impl);
+  return *this;
 }
 
 std::unique_ptr<DataElement>
@@ -316,5 +335,6 @@ HLAvariableArray::operator [](size_t index) const
 {
   return _impl->get(index);
 }
+
 
 }

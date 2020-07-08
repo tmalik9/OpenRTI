@@ -132,6 +132,24 @@ toUnsigned(const rti1516e::VariableLengthData& variableLengthData)
     return u;
 }
 
+inline std::wstring to_wstring(const std::string& str)
+{
+  if (str.empty()) return std::wstring();
+  const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
+  std::vector<wchar_t> wideStringBuffer(str.length());
+  CType.widen(str.data(), str.data() + str.length(), &wideStringBuffer[0]);
+  return std::wstring(&wideStringBuffer[0], wideStringBuffer.size());
+}
+
+inline std::string to_string(const std::wstring& str)
+{
+  if (str.empty()) return std::string();
+  const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
+  std::vector<char> stringBuffer(str.length());
+  CType.narrow(str.data(), str.data() + str.length(), '_', &stringBuffer[0]);
+  return std::string(&stringBuffer[0], stringBuffer.size());
+}
+
 class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public rti1516e::FederateAmbassador {
 public:
   RTI1516ETestAmbassador(const RTITest::ConstructorArgs& constructorArgs) :

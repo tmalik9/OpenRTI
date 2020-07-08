@@ -242,6 +242,30 @@ enum RegisterFederationSynchronizationPointResponseType {
 
 typedef std::map<String, StringVector> ConfigurationParameterMap;
 
+class FOMStringSimpleDataType;
+typedef std::vector<FOMStringSimpleDataType> FOMStringSimpleDataTypeList;
+
+class FOMStringEnumerator;
+typedef std::vector<FOMStringEnumerator> FOMStringEnumeratorList;
+
+class FOMStringEnumeratedDataType;
+typedef std::vector<FOMStringEnumeratedDataType> FOMStringEnumeratedDataTypeList;
+
+class FOMStringArrayDataType;
+typedef std::vector<FOMStringArrayDataType> FOMStringArrayDataTypeList;
+
+class FOMStringFixedRecordField;
+typedef std::vector<FOMStringFixedRecordField> FOMStringFixedRecordFieldList;
+
+class FOMStringFixedRecordDataType;
+typedef std::vector<FOMStringFixedRecordDataType> FOMStringFixedRecordDataTypeList;
+
+class FOMStringVariantRecordAlternative;
+typedef std::vector<FOMStringVariantRecordAlternative> FOMStringVariantRecordAlternativeList;
+
+class FOMStringVariantRecordDataType;
+typedef std::vector<FOMStringVariantRecordDataType> FOMStringVariantRecordDataTypeList;
+
 class FOMStringTransportationType;
 typedef std::vector<FOMStringTransportationType> FOMStringTransportationTypeList;
 
@@ -329,6 +353,8 @@ class FederationSynchronizedMessage;
 class EnableTimeRegulationRequestMessage;
 class EnableTimeRegulationResponseMessage;
 class DisableTimeRegulationRequestMessage;
+class EnableTimeConstrainedNotifyMessage;
+class DisableTimeConstrainedNotifyMessage;
 class CommitLowerBoundTimeStampMessage;
 class CommitLowerBoundTimeStampResponseMessage;
 class LockedByNextMessageRequestMessage;
@@ -363,6 +389,8 @@ class AttributeUpdateMessage;
 class TimeStampedAttributeUpdateMessage;
 class RequestAttributeUpdateMessage;
 class RequestClassAttributeUpdateMessage;
+class QueryAttributeOwnershipRequestMessage;
+class QueryAttributeOwnershipResponseMessage;
 
 typedef bool Bool;
 
@@ -398,10 +426,13 @@ typedef std::vector<FederateHandleBoolPair> FederateHandleBoolPairVector;
 
 class OPENRTI_API RangeBoundsValue {
 public:
-  RangeBoundsValue() :
-    _lowerBound(),
-    _upperBound()
-  { }
+  RangeBoundsValue() { }
+  RangeBoundsValue(
+    Unsigned lowerBound,
+    Unsigned upperBound)
+      : _lowerBound(lowerBound)
+      , _upperBound(upperBound)
+    { }
   void setLowerBound(const Unsigned& value)
   { _lowerBound = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -481,9 +512,13 @@ typedef std::pair<AttributeHandle, RegionValueList> AttributeHandleRegionValueLi
 
 class OPENRTI_API AttributeState {
 public:
-  AttributeState() :
-    _attributeHandle()
-  { }
+  AttributeState() { }
+  AttributeState(
+    AttributeHandle attributeHandle,
+    FederateHandle ownerFederate)
+      : _attributeHandle(attributeHandle)
+      , _ownerFederate(ownerFederate)
+    { }
   void setAttributeHandle(const AttributeHandle& value)
   { _attributeHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -495,20 +530,35 @@ public:
   const AttributeHandle& getAttributeHandle() const
   { return _attributeHandle; }
 
+  void setOwnerFederate(const FederateHandle& value)
+  { _ownerFederate = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setOwnerFederate(FederateHandle&& value)
+  { _ownerFederate = std::move(value); }
+#endif
+  FederateHandle& getOwnerFederate()
+  { return _ownerFederate; }
+  const FederateHandle& getOwnerFederate() const
+  { return _ownerFederate; }
+
   AttributeState& swap(AttributeState& rhs)
   {
     std::swap(_attributeHandle, rhs._attributeHandle);
+    std::swap(_ownerFederate, rhs._ownerFederate);
     return *this;
   }
   bool operator==(const AttributeState& rhs) const
   {
     if (getAttributeHandle() != rhs.getAttributeHandle()) return false;
+    if (getOwnerFederate() != rhs.getOwnerFederate()) return false;
     return true;
   }
   bool operator<(const AttributeState& rhs) const
   {
     if (getAttributeHandle() < rhs.getAttributeHandle()) return true;
     if (rhs.getAttributeHandle() < getAttributeHandle()) return false;
+    if (getOwnerFederate() < rhs.getOwnerFederate()) return true;
+    if (rhs.getOwnerFederate() < getOwnerFederate()) return false;
     return false;
   }
   bool operator!=(const AttributeState& rhs) const
@@ -521,16 +571,20 @@ public:
   { return !operator>(rhs); }
 private:
   AttributeHandle _attributeHandle;
+  FederateHandle _ownerFederate;
 };
 
 typedef std::vector<AttributeState> AttributeStateVector;
 
 class OPENRTI_API ParameterValue {
 public:
-  ParameterValue() :
-    _parameterHandle(),
-    _value()
-  { }
+  ParameterValue() { }
+  ParameterValue(
+    ParameterHandle parameterHandle,
+    VariableLengthData value)
+      : _parameterHandle(parameterHandle)
+      , _value(value)
+    { }
   void setParameterHandle(const ParameterHandle& value)
   { _parameterHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -590,10 +644,13 @@ typedef std::vector<ParameterValue> ParameterValueVector;
 
 class OPENRTI_API AttributeValue {
 public:
-  AttributeValue() :
-    _attributeHandle(),
-    _value()
-  { }
+  AttributeValue() { }
+  AttributeValue(
+    AttributeHandle attributeHandle,
+    VariableLengthData value)
+      : _attributeHandle(attributeHandle)
+      , _value(value)
+    { }
   void setAttributeHandle(const AttributeHandle& value)
   { _attributeHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -661,10 +718,13 @@ typedef std::vector<FederateHandleRestoreStatusPair> FederateHandleRestoreStatus
 
 class OPENRTI_API FederationExecutionInformation {
 public:
-  FederationExecutionInformation() :
-    _federationExecutionName(),
-    _logicalTimeFactoryName()
-  { }
+  FederationExecutionInformation() { }
+  FederationExecutionInformation(
+    String federationExecutionName,
+    String logicalTimeFactoryName)
+      : _federationExecutionName(federationExecutionName)
+      , _logicalTimeFactoryName(logicalTimeFactoryName)
+    { }
   void setFederationExecutionName(const String& value)
   { _federationExecutionName = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -727,6 +787,814 @@ typedef std::pair<ObjectInstanceHandle, String> ObjectInstanceHandleNamePair;
 typedef std::vector<ObjectInstanceHandleNamePair> ObjectInstanceHandleNamePairVector;
 
 typedef std::map<String, StringVector> ConfigurationParameterMap;
+
+class OPENRTI_API FOMStringSimpleDataType {
+public:
+  FOMStringSimpleDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value)
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value)
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName()
+  { return getImpl()._name; }
+  const String& getName() const
+  { return getConstImpl()._name; }
+
+  void setRepresentation(const String& value)
+  { getImpl()._representation = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setRepresentation(String&& value)
+  { getImpl()._representation = std::move(value); }
+#endif
+  String& getRepresentation()
+  { return getImpl()._representation; }
+  const String& getRepresentation() const
+  { return getConstImpl()._representation; }
+
+  FOMStringSimpleDataType& swap(FOMStringSimpleDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringSimpleDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getRepresentation() != rhs.getRepresentation()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringSimpleDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getRepresentation() < rhs.getRepresentation()) return true;
+    if (rhs.getRepresentation() < getRepresentation()) return false;
+    return false;
+  }
+  bool operator!=(const FOMStringSimpleDataType& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const FOMStringSimpleDataType& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringSimpleDataType& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringSimpleDataType& rhs) const
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation : public Referenced {
+    Implementation() :
+      _name(),
+      _representation()
+    { }
+    String _name;
+    String _representation;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = new Implementation(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringSimpleDataType> FOMStringSimpleDataTypeList;
+
+class OPENRTI_API FOMStringEnumerator {
+public:
+  FOMStringEnumerator() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value)
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value)
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName()
+  { return getImpl()._name; }
+  const String& getName() const
+  { return getConstImpl()._name; }
+
+  void setValue(const Unsigned& value)
+  { getImpl()._value = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setValue(Unsigned&& value)
+  { getImpl()._value = std::move(value); }
+#endif
+  Unsigned& getValue()
+  { return getImpl()._value; }
+  const Unsigned& getValue() const
+  { return getConstImpl()._value; }
+
+  FOMStringEnumerator& swap(FOMStringEnumerator& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringEnumerator& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getValue() != rhs.getValue()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringEnumerator& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getValue() < rhs.getValue()) return true;
+    if (rhs.getValue() < getValue()) return false;
+    return false;
+  }
+  bool operator!=(const FOMStringEnumerator& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const FOMStringEnumerator& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringEnumerator& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringEnumerator& rhs) const
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation : public Referenced {
+    Implementation() :
+      _name(),
+      _value()
+    { }
+    String _name;
+    Unsigned _value;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = new Implementation(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringEnumerator> FOMStringEnumeratorList;
+
+class OPENRTI_API FOMStringEnumeratedDataType {
+public:
+  FOMStringEnumeratedDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value)
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value)
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName()
+  { return getImpl()._name; }
+  const String& getName() const
+  { return getConstImpl()._name; }
+
+  void setRepresentation(const String& value)
+  { getImpl()._representation = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setRepresentation(String&& value)
+  { getImpl()._representation = std::move(value); }
+#endif
+  String& getRepresentation()
+  { return getImpl()._representation; }
+  const String& getRepresentation() const
+  { return getConstImpl()._representation; }
+
+  void setEnumerators(const FOMStringEnumeratorList& value)
+  { getImpl()._enumerators = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEnumerators(FOMStringEnumeratorList&& value)
+  { getImpl()._enumerators = std::move(value); }
+#endif
+  FOMStringEnumeratorList& getEnumerators()
+  { return getImpl()._enumerators; }
+  const FOMStringEnumeratorList& getEnumerators() const
+  { return getConstImpl()._enumerators; }
+
+  FOMStringEnumeratedDataType& swap(FOMStringEnumeratedDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringEnumeratedDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getRepresentation() != rhs.getRepresentation()) return false;
+    if (getEnumerators() != rhs.getEnumerators()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringEnumeratedDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getRepresentation() < rhs.getRepresentation()) return true;
+    if (rhs.getRepresentation() < getRepresentation()) return false;
+    if (getEnumerators() < rhs.getEnumerators()) return true;
+    if (rhs.getEnumerators() < getEnumerators()) return false;
+    return false;
+  }
+  bool operator!=(const FOMStringEnumeratedDataType& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const FOMStringEnumeratedDataType& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringEnumeratedDataType& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringEnumeratedDataType& rhs) const
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation : public Referenced {
+    Implementation() :
+      _name(),
+      _representation(),
+      _enumerators()
+    { }
+    String _name;
+    String _representation;
+    FOMStringEnumeratorList _enumerators;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = new Implementation(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringEnumeratedDataType> FOMStringEnumeratedDataTypeList;
+
+class OPENRTI_API FOMStringArrayDataType {
+public:
+  FOMStringArrayDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value)
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value)
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName()
+  { return getImpl()._name; }
+  const String& getName() const
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value)
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value)
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType()
+  { return getImpl()._dataType; }
+  const String& getDataType() const
+  { return getConstImpl()._dataType; }
+
+  void setCardinality(const String& value)
+  { getImpl()._cardinality = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setCardinality(String&& value)
+  { getImpl()._cardinality = std::move(value); }
+#endif
+  String& getCardinality()
+  { return getImpl()._cardinality; }
+  const String& getCardinality() const
+  { return getConstImpl()._cardinality; }
+
+  void setEncoding(const String& value)
+  { getImpl()._encoding = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEncoding(String&& value)
+  { getImpl()._encoding = std::move(value); }
+#endif
+  String& getEncoding()
+  { return getImpl()._encoding; }
+  const String& getEncoding() const
+  { return getConstImpl()._encoding; }
+
+  FOMStringArrayDataType& swap(FOMStringArrayDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringArrayDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getCardinality() != rhs.getCardinality()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringArrayDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getCardinality() < rhs.getCardinality()) return true;
+    if (rhs.getCardinality() < getCardinality()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    return false;
+  }
+  bool operator!=(const FOMStringArrayDataType& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const FOMStringArrayDataType& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringArrayDataType& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringArrayDataType& rhs) const
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation : public Referenced {
+    Implementation() :
+      _name(),
+      _dataType(),
+      _cardinality(),
+      _encoding()
+    { }
+    String _name;
+    String _dataType;
+    String _cardinality;
+    String _encoding;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = new Implementation(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringArrayDataType> FOMStringArrayDataTypeList;
+
+class OPENRTI_API FOMStringFixedRecordField {
+public:
+  FOMStringFixedRecordField() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value)
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value)
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName()
+  { return getImpl()._name; }
+  const String& getName() const
+  { return getConstImpl()._name; }
+
+  void setDataType(const Unsigned& value)
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(Unsigned&& value)
+  { getImpl()._dataType = std::move(value); }
+#endif
+  Unsigned& getDataType()
+  { return getImpl()._dataType; }
+  const Unsigned& getDataType() const
+  { return getConstImpl()._dataType; }
+
+  FOMStringFixedRecordField& swap(FOMStringFixedRecordField& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringFixedRecordField& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringFixedRecordField& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    return false;
+  }
+  bool operator!=(const FOMStringFixedRecordField& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const FOMStringFixedRecordField& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringFixedRecordField& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringFixedRecordField& rhs) const
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation : public Referenced {
+    Implementation() :
+      _name(),
+      _dataType()
+    { }
+    String _name;
+    Unsigned _dataType;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = new Implementation(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringFixedRecordField> FOMStringFixedRecordFieldList;
+
+class OPENRTI_API FOMStringFixedRecordDataType {
+public:
+  FOMStringFixedRecordDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value)
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value)
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName()
+  { return getImpl()._name; }
+  const String& getName() const
+  { return getConstImpl()._name; }
+
+  void setEncoding(const String& value)
+  { getImpl()._encoding = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEncoding(String&& value)
+  { getImpl()._encoding = std::move(value); }
+#endif
+  String& getEncoding()
+  { return getImpl()._encoding; }
+  const String& getEncoding() const
+  { return getConstImpl()._encoding; }
+
+  void setFields(const FOMStringFixedRecordFieldList& value)
+  { getImpl()._fields = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFields(FOMStringFixedRecordFieldList&& value)
+  { getImpl()._fields = std::move(value); }
+#endif
+  FOMStringFixedRecordFieldList& getFields()
+  { return getImpl()._fields; }
+  const FOMStringFixedRecordFieldList& getFields() const
+  { return getConstImpl()._fields; }
+
+  FOMStringFixedRecordDataType& swap(FOMStringFixedRecordDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringFixedRecordDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getFields() != rhs.getFields()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringFixedRecordDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getFields() < rhs.getFields()) return true;
+    if (rhs.getFields() < getFields()) return false;
+    return false;
+  }
+  bool operator!=(const FOMStringFixedRecordDataType& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const FOMStringFixedRecordDataType& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringFixedRecordDataType& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringFixedRecordDataType& rhs) const
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation : public Referenced {
+    Implementation() :
+      _name(),
+      _encoding(),
+      _fields()
+    { }
+    String _name;
+    String _encoding;
+    FOMStringFixedRecordFieldList _fields;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = new Implementation(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringFixedRecordDataType> FOMStringFixedRecordDataTypeList;
+
+class OPENRTI_API FOMStringVariantRecordAlternative {
+public:
+  FOMStringVariantRecordAlternative() : 
+    _impl(new Implementation())
+  { }
+  void setEnumerator(const String& value)
+  { getImpl()._enumerator = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEnumerator(String&& value)
+  { getImpl()._enumerator = std::move(value); }
+#endif
+  String& getEnumerator()
+  { return getImpl()._enumerator; }
+  const String& getEnumerator() const
+  { return getConstImpl()._enumerator; }
+
+  void setName(const String& value)
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value)
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName()
+  { return getImpl()._name; }
+  const String& getName() const
+  { return getConstImpl()._name; }
+
+  void setDataType(const Unsigned& value)
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(Unsigned&& value)
+  { getImpl()._dataType = std::move(value); }
+#endif
+  Unsigned& getDataType()
+  { return getImpl()._dataType; }
+  const Unsigned& getDataType() const
+  { return getConstImpl()._dataType; }
+
+  FOMStringVariantRecordAlternative& swap(FOMStringVariantRecordAlternative& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringVariantRecordAlternative& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getEnumerator() != rhs.getEnumerator()) return false;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringVariantRecordAlternative& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getEnumerator() < rhs.getEnumerator()) return true;
+    if (rhs.getEnumerator() < getEnumerator()) return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    return false;
+  }
+  bool operator!=(const FOMStringVariantRecordAlternative& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const FOMStringVariantRecordAlternative& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringVariantRecordAlternative& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringVariantRecordAlternative& rhs) const
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation : public Referenced {
+    Implementation() :
+      _enumerator(),
+      _name(),
+      _dataType()
+    { }
+    String _enumerator;
+    String _name;
+    Unsigned _dataType;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = new Implementation(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringVariantRecordAlternative> FOMStringVariantRecordAlternativeList;
+
+class OPENRTI_API FOMStringVariantRecordDataType {
+public:
+  FOMStringVariantRecordDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value)
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value)
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName()
+  { return getImpl()._name; }
+  const String& getName() const
+  { return getConstImpl()._name; }
+
+  void setDiscriminant(const String& value)
+  { getImpl()._discriminant = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDiscriminant(String&& value)
+  { getImpl()._discriminant = std::move(value); }
+#endif
+  String& getDiscriminant()
+  { return getImpl()._discriminant; }
+  const String& getDiscriminant() const
+  { return getConstImpl()._discriminant; }
+
+  void setDataType(const String& value)
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value)
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType()
+  { return getImpl()._dataType; }
+  const String& getDataType() const
+  { return getConstImpl()._dataType; }
+
+  void setAlternatives(const FOMStringVariantRecordAlternativeList& value)
+  { getImpl()._alternatives = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setAlternatives(FOMStringVariantRecordAlternativeList&& value)
+  { getImpl()._alternatives = std::move(value); }
+#endif
+  FOMStringVariantRecordAlternativeList& getAlternatives()
+  { return getImpl()._alternatives; }
+  const FOMStringVariantRecordAlternativeList& getAlternatives() const
+  { return getConstImpl()._alternatives; }
+
+  void setEncoding(const String& value)
+  { getImpl()._encoding = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEncoding(String&& value)
+  { getImpl()._encoding = std::move(value); }
+#endif
+  String& getEncoding()
+  { return getImpl()._encoding; }
+  const String& getEncoding() const
+  { return getConstImpl()._encoding; }
+
+  FOMStringVariantRecordDataType& swap(FOMStringVariantRecordDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringVariantRecordDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDiscriminant() != rhs.getDiscriminant()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getAlternatives() != rhs.getAlternatives()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringVariantRecordDataType& rhs) const
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDiscriminant() < rhs.getDiscriminant()) return true;
+    if (rhs.getDiscriminant() < getDiscriminant()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getAlternatives() < rhs.getAlternatives()) return true;
+    if (rhs.getAlternatives() < getAlternatives()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    return false;
+  }
+  bool operator!=(const FOMStringVariantRecordDataType& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const FOMStringVariantRecordDataType& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringVariantRecordDataType& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringVariantRecordDataType& rhs) const
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation : public Referenced {
+    Implementation() :
+      _name(),
+      _discriminant(),
+      _dataType(),
+      _alternatives(),
+      _encoding()
+    { }
+    String _name;
+    String _discriminant;
+    String _dataType;
+    FOMStringVariantRecordAlternativeList _alternatives;
+    String _encoding;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = new Implementation(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringVariantRecordDataType> FOMStringVariantRecordDataTypeList;
 
 class OPENRTI_API FOMStringTransportationType {
 public:
@@ -983,6 +1851,17 @@ public:
   const String& getName() const
   { return getConstImpl()._name; }
 
+  void setDataType(const String& value)
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value)
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType()
+  { return getImpl()._dataType; }
+  const String& getDataType() const
+  { return getConstImpl()._dataType; }
+
   FOMStringParameter& swap(FOMStringParameter& rhs)
   {
     _impl.swap(rhs._impl);
@@ -993,6 +1872,7 @@ public:
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
     return true;
   }
   bool operator<(const FOMStringParameter& rhs) const
@@ -1001,6 +1881,8 @@ public:
       return false;
     if (getName() < rhs.getName()) return true;
     if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
     return false;
   }
   bool operator!=(const FOMStringParameter& rhs) const
@@ -1014,9 +1896,11 @@ public:
 private:
   struct OPENRTI_API Implementation : public Referenced {
     Implementation() :
-      _name()
+      _name(),
+      _dataType()
     { }
     String _name;
+    String _dataType;
   };
 
   const Implementation& getConstImpl() const
@@ -1201,6 +2085,17 @@ public:
   const String& getName() const
   { return getConstImpl()._name; }
 
+  void setDataType(const String& value)
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value)
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType()
+  { return getImpl()._dataType; }
+  const String& getDataType() const
+  { return getConstImpl()._dataType; }
+
   void setOrderType(const String& value)
   { getImpl()._orderType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -1255,6 +2150,7 @@ public:
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
     if (getOrderType() != rhs.getOrderType()) return false;
     if (getTransportationType() != rhs.getTransportationType()) return false;
     if (getRoutingSpace() != rhs.getRoutingSpace()) return false;
@@ -1267,6 +2163,8 @@ public:
       return false;
     if (getName() < rhs.getName()) return true;
     if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
     if (getOrderType() < rhs.getOrderType()) return true;
     if (rhs.getOrderType() < getOrderType()) return false;
     if (getTransportationType() < rhs.getTransportationType()) return true;
@@ -1289,12 +2187,14 @@ private:
   struct OPENRTI_API Implementation : public Referenced {
     Implementation() :
       _name(),
+      _dataType(),
       _orderType(),
       _transportationType(),
       _routingSpace(),
       _dimensionSet()
     { }
     String _name;
+    String _dataType;
     String _orderType;
     String _transportationType;
     String _routingSpace;
@@ -1578,16 +2478,16 @@ public:
   FOMStringModule() : 
     _impl(new Implementation())
   { }
-  void setContent(const String& value)
-  { getImpl()._content = value; }
+  void setDesignator(const String& value)
+  { getImpl()._designator = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setContent(String&& value)
-  { getImpl()._content = std::move(value); }
+  void setDesignator(String&& value)
+  { getImpl()._designator = std::move(value); }
 #endif
-  String& getContent()
-  { return getImpl()._content; }
-  const String& getContent() const
-  { return getConstImpl()._content; }
+  String& getDesignator()
+  { return getImpl()._designator; }
+  const String& getDesignator() const
+  { return getConstImpl()._designator; }
 
   void setTransportationTypeList(const FOMStringTransportationTypeList& value)
   { getImpl()._transportationTypeList = value; }
@@ -1666,6 +2566,61 @@ public:
   const FOMStringSwitchList& getSwitchList() const
   { return getConstImpl()._switchList; }
 
+  void setSimpleDataTypeList(const FOMStringSimpleDataTypeList& value)
+  { getImpl()._simpleDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setSimpleDataTypeList(FOMStringSimpleDataTypeList&& value)
+  { getImpl()._simpleDataTypeList = std::move(value); }
+#endif
+  FOMStringSimpleDataTypeList& getSimpleDataTypeList()
+  { return getImpl()._simpleDataTypeList; }
+  const FOMStringSimpleDataTypeList& getSimpleDataTypeList() const
+  { return getConstImpl()._simpleDataTypeList; }
+
+  void setEnumeratedDataTypeList(const FOMStringEnumeratedDataTypeList& value)
+  { getImpl()._enumeratedDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEnumeratedDataTypeList(FOMStringEnumeratedDataTypeList&& value)
+  { getImpl()._enumeratedDataTypeList = std::move(value); }
+#endif
+  FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList()
+  { return getImpl()._enumeratedDataTypeList; }
+  const FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() const
+  { return getConstImpl()._enumeratedDataTypeList; }
+
+  void setArrayDataTypeList(const FOMStringArrayDataTypeList& value)
+  { getImpl()._arrayDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setArrayDataTypeList(FOMStringArrayDataTypeList&& value)
+  { getImpl()._arrayDataTypeList = std::move(value); }
+#endif
+  FOMStringArrayDataTypeList& getArrayDataTypeList()
+  { return getImpl()._arrayDataTypeList; }
+  const FOMStringArrayDataTypeList& getArrayDataTypeList() const
+  { return getConstImpl()._arrayDataTypeList; }
+
+  void setFixedRecordDataTypeList(const FOMStringFixedRecordDataTypeList& value)
+  { getImpl()._fixedRecordDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFixedRecordDataTypeList(FOMStringFixedRecordDataTypeList&& value)
+  { getImpl()._fixedRecordDataTypeList = std::move(value); }
+#endif
+  FOMStringFixedRecordDataTypeList& getFixedRecordDataTypeList()
+  { return getImpl()._fixedRecordDataTypeList; }
+  const FOMStringFixedRecordDataTypeList& getFixedRecordDataTypeList() const
+  { return getConstImpl()._fixedRecordDataTypeList; }
+
+  void setVariantRecordDataTypeList(const FOMStringVariantRecordDataTypeList& value)
+  { getImpl()._variantRecordDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setVariantRecordDataTypeList(FOMStringVariantRecordDataTypeList&& value)
+  { getImpl()._variantRecordDataTypeList = std::move(value); }
+#endif
+  FOMStringVariantRecordDataTypeList& getVariantRecordDataTypeList()
+  { return getImpl()._variantRecordDataTypeList; }
+  const FOMStringVariantRecordDataTypeList& getVariantRecordDataTypeList() const
+  { return getConstImpl()._variantRecordDataTypeList; }
+
   void setArtificialInteractionRoot(const Bool& value)
   { getImpl()._artificialInteractionRoot = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -1697,7 +2652,7 @@ public:
   {
     if (_impl.get() == rhs._impl.get())
       return true;
-    if (getContent() != rhs.getContent()) return false;
+    if (getDesignator() != rhs.getDesignator()) return false;
     if (getTransportationTypeList() != rhs.getTransportationTypeList()) return false;
     if (getDimensionList() != rhs.getDimensionList()) return false;
     if (getRoutingSpaceList() != rhs.getRoutingSpaceList()) return false;
@@ -1705,6 +2660,11 @@ public:
     if (getObjectClassList() != rhs.getObjectClassList()) return false;
     if (getUpdateRateList() != rhs.getUpdateRateList()) return false;
     if (getSwitchList() != rhs.getSwitchList()) return false;
+    if (getSimpleDataTypeList() != rhs.getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() != rhs.getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() != rhs.getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() != rhs.getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() != rhs.getVariantRecordDataTypeList()) return false;
     if (getArtificialInteractionRoot() != rhs.getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
     return true;
@@ -1713,8 +2673,8 @@ public:
   {
     if (_impl.get() == rhs._impl.get())
       return false;
-    if (getContent() < rhs.getContent()) return true;
-    if (rhs.getContent() < getContent()) return false;
+    if (getDesignator() < rhs.getDesignator()) return true;
+    if (rhs.getDesignator() < getDesignator()) return false;
     if (getTransportationTypeList() < rhs.getTransportationTypeList()) return true;
     if (rhs.getTransportationTypeList() < getTransportationTypeList()) return false;
     if (getDimensionList() < rhs.getDimensionList()) return true;
@@ -1729,6 +2689,16 @@ public:
     if (rhs.getUpdateRateList() < getUpdateRateList()) return false;
     if (getSwitchList() < rhs.getSwitchList()) return true;
     if (rhs.getSwitchList() < getSwitchList()) return false;
+    if (getSimpleDataTypeList() < rhs.getSimpleDataTypeList()) return true;
+    if (rhs.getSimpleDataTypeList() < getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() < rhs.getEnumeratedDataTypeList()) return true;
+    if (rhs.getEnumeratedDataTypeList() < getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() < rhs.getArrayDataTypeList()) return true;
+    if (rhs.getArrayDataTypeList() < getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() < rhs.getFixedRecordDataTypeList()) return true;
+    if (rhs.getFixedRecordDataTypeList() < getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() < rhs.getVariantRecordDataTypeList()) return true;
+    if (rhs.getVariantRecordDataTypeList() < getVariantRecordDataTypeList()) return false;
     if (getArtificialInteractionRoot() < rhs.getArtificialInteractionRoot()) return true;
     if (rhs.getArtificialInteractionRoot() < getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() < rhs.getArtificialObjectRoot()) return true;
@@ -1746,7 +2716,7 @@ public:
 private:
   struct OPENRTI_API Implementation : public Referenced {
     Implementation() :
-      _content(),
+      _designator(),
       _transportationTypeList(),
       _dimensionList(),
       _routingSpaceList(),
@@ -1754,10 +2724,15 @@ private:
       _objectClassList(),
       _updateRateList(),
       _switchList(),
+      _simpleDataTypeList(),
+      _enumeratedDataTypeList(),
+      _arrayDataTypeList(),
+      _fixedRecordDataTypeList(),
+      _variantRecordDataTypeList(),
       _artificialInteractionRoot(),
       _artificialObjectRoot()
     { }
-    String _content;
+    String _designator;
     FOMStringTransportationTypeList _transportationTypeList;
     FOMStringDimensionList _dimensionList;
     FOMStringRoutingSpaceList _routingSpaceList;
@@ -1765,6 +2740,11 @@ private:
     FOMStringObjectClassList _objectClassList;
     FOMStringUpdateRateList _updateRateList;
     FOMStringSwitchList _switchList;
+    FOMStringSimpleDataTypeList _simpleDataTypeList;
+    FOMStringEnumeratedDataTypeList _enumeratedDataTypeList;
+    FOMStringArrayDataTypeList _arrayDataTypeList;
+    FOMStringFixedRecordDataTypeList _fixedRecordDataTypeList;
+    FOMStringVariantRecordDataTypeList _variantRecordDataTypeList;
     Bool _artificialInteractionRoot;
     Bool _artificialObjectRoot;
   };
@@ -2089,6 +3069,17 @@ public:
   const String& getName() const
   { return getConstImpl()._name; }
 
+  void setDataType(const String& value)
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value)
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType()
+  { return getImpl()._dataType; }
+  const String& getDataType() const
+  { return getConstImpl()._dataType; }
+
   void setParameterHandle(const ParameterHandle& value)
   { getImpl()._parameterHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -2110,6 +3101,7 @@ public:
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
     if (getParameterHandle() != rhs.getParameterHandle()) return false;
     return true;
   }
@@ -2119,6 +3111,8 @@ public:
       return false;
     if (getName() < rhs.getName()) return true;
     if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
     if (getParameterHandle() < rhs.getParameterHandle()) return true;
     if (rhs.getParameterHandle() < getParameterHandle()) return false;
     return false;
@@ -2135,9 +3129,11 @@ private:
   struct OPENRTI_API Implementation : public Referenced {
     Implementation() :
       _name(),
+      _dataType(),
       _parameterHandle()
     { }
     String _name;
+    String _dataType;
     ParameterHandle _parameterHandle;
   };
 
@@ -2339,6 +3335,17 @@ public:
   const String& getName() const
   { return getConstImpl()._name; }
 
+  void setDataType(const String& value)
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value)
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType()
+  { return getImpl()._dataType; }
+  const String& getDataType() const
+  { return getConstImpl()._dataType; }
+
   void setAttributeHandle(const AttributeHandle& value)
   { getImpl()._attributeHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -2393,6 +3400,7 @@ public:
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
     if (getAttributeHandle() != rhs.getAttributeHandle()) return false;
     if (getOrderType() != rhs.getOrderType()) return false;
     if (getTransportationType() != rhs.getTransportationType()) return false;
@@ -2405,6 +3413,8 @@ public:
       return false;
     if (getName() < rhs.getName()) return true;
     if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
     if (getAttributeHandle() < rhs.getAttributeHandle()) return true;
     if (rhs.getAttributeHandle() < getAttributeHandle()) return false;
     if (getOrderType() < rhs.getOrderType()) return true;
@@ -2427,12 +3437,14 @@ private:
   struct OPENRTI_API Implementation : public Referenced {
     Implementation() :
       _name(),
+      _dataType(),
       _attributeHandle(),
       _orderType(),
       _transportationType(),
       _dimensionHandleSet()
     { }
     String _name;
+    String _dataType;
     AttributeHandle _attributeHandle;
     OrderType _orderType;
     TransportationType _transportationType;
@@ -2874,16 +3886,16 @@ public:
   const Bool& getArtificialObjectRoot() const
   { return getConstImpl()._artificialObjectRoot; }
 
-  void setContent(const String& value)
-  { getImpl()._content = value; }
+  void setDesignator(const String& value)
+  { getImpl()._designator = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setContent(String&& value)
-  { getImpl()._content = std::move(value); }
+  void setDesignator(String&& value)
+  { getImpl()._designator = std::move(value); }
 #endif
-  String& getContent()
-  { return getImpl()._content; }
-  const String& getContent() const
-  { return getConstImpl()._content; }
+  String& getDesignator()
+  { return getImpl()._designator; }
+  const String& getDesignator() const
+  { return getConstImpl()._designator; }
 
   FOMModule& swap(FOMModule& rhs)
   {
@@ -2904,7 +3916,7 @@ public:
     if (getSwitchList() != rhs.getSwitchList()) return false;
     if (getArtificialInteractionRoot() != rhs.getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
-    if (getContent() != rhs.getContent()) return false;
+    if (getDesignator() != rhs.getDesignator()) return false;
     return true;
   }
   bool operator<(const FOMModule& rhs) const
@@ -2931,8 +3943,8 @@ public:
     if (rhs.getArtificialInteractionRoot() < getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() < rhs.getArtificialObjectRoot()) return true;
     if (rhs.getArtificialObjectRoot() < getArtificialObjectRoot()) return false;
-    if (getContent() < rhs.getContent()) return true;
-    if (rhs.getContent() < getContent()) return false;
+    if (getDesignator() < rhs.getDesignator()) return true;
+    if (rhs.getDesignator() < getDesignator()) return false;
     return false;
   }
   bool operator!=(const FOMModule& rhs) const
@@ -2956,7 +3968,7 @@ private:
       _switchList(),
       _artificialInteractionRoot(),
       _artificialObjectRoot(),
-      _content()
+      _designator()
     { }
     ModuleHandle _moduleHandle;
     FOMTransportationTypeList _transportationTypeList;
@@ -2968,7 +3980,7 @@ private:
     FOMSwitchList _switchList;
     Bool _artificialInteractionRoot;
     Bool _artificialObjectRoot;
-    String _content;
+    String _designator;
   };
 
   const Implementation& getConstImpl() const
@@ -3568,12 +4580,24 @@ public:
   const ConfigurationParameterMap& getConfigurationParameterMap() const
   { return _configurationParameterMap; }
 
+  void setIsInternal(const Bool& value)
+  { _isInternal = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setIsInternal(Bool&& value)
+  { _isInternal = std::move(value); }
+#endif
+  Bool& getIsInternal()
+  { return _isInternal; }
+  const Bool& getIsInternal() const
+  { return _isInternal; }
+
 private:
   String _federationExecution;
   String _federateType;
   String _federateName;
   FOMStringModuleList _fOMStringModuleList;
   ConfigurationParameterMap _configurationParameterMap;
+  Bool _isInternal;
 };
 
 class OPENRTI_API JoinFederationExecutionResponseMessage : public AbstractMessage {
@@ -3845,11 +4869,23 @@ public:
   const String& getFederateName() const
   { return _federateName; }
 
+  void setIsInternal(const Bool& value)
+  { _isInternal = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setIsInternal(Bool&& value)
+  { _isInternal = std::move(value); }
+#endif
+  Bool& getIsInternal()
+  { return _isInternal; }
+  const Bool& getIsInternal() const
+  { return _isInternal; }
+
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   String _federateType;
   String _federateName;
+  Bool _isInternal;
 };
 
 class OPENRTI_API ResignFederateNotifyMessage : public AbstractMessage {
@@ -4495,6 +5531,102 @@ public:
   bool operator>=(const DisableTimeRegulationRequestMessage& rhs) const
   { return !operator<(rhs); }
   bool operator<=(const DisableTimeRegulationRequestMessage& rhs) const
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value)
+  { _federationHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederationHandle(FederationHandle&& value)
+  { _federationHandle = std::move(value); }
+#endif
+  FederationHandle& getFederationHandle()
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const
+  { return _federationHandle; }
+
+  void setFederateHandle(const FederateHandle& value)
+  { _federateHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederateHandle(FederateHandle&& value)
+  { _federateHandle = std::move(value); }
+#endif
+  FederateHandle& getFederateHandle()
+  { return _federateHandle; }
+  const FederateHandle& getFederateHandle() const
+  { return _federateHandle; }
+
+private:
+  FederationHandle _federationHandle;
+  FederateHandle _federateHandle;
+};
+
+class OPENRTI_API EnableTimeConstrainedNotifyMessage : public AbstractMessage {
+public:
+  EnableTimeConstrainedNotifyMessage();
+  virtual ~EnableTimeConstrainedNotifyMessage();
+
+  virtual const char* getTypeName() const;
+  virtual void out(std::ostream& os) const;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+
+  virtual bool operator==(const AbstractMessage& rhs) const;
+  bool operator==(const EnableTimeConstrainedNotifyMessage& rhs) const;
+  bool operator<(const EnableTimeConstrainedNotifyMessage& rhs) const;
+  bool operator!=(const EnableTimeConstrainedNotifyMessage& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const EnableTimeConstrainedNotifyMessage& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const EnableTimeConstrainedNotifyMessage& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const EnableTimeConstrainedNotifyMessage& rhs) const
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value)
+  { _federationHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederationHandle(FederationHandle&& value)
+  { _federationHandle = std::move(value); }
+#endif
+  FederationHandle& getFederationHandle()
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const
+  { return _federationHandle; }
+
+  void setFederateHandle(const FederateHandle& value)
+  { _federateHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederateHandle(FederateHandle&& value)
+  { _federateHandle = std::move(value); }
+#endif
+  FederateHandle& getFederateHandle()
+  { return _federateHandle; }
+  const FederateHandle& getFederateHandle() const
+  { return _federateHandle; }
+
+private:
+  FederationHandle _federationHandle;
+  FederateHandle _federateHandle;
+};
+
+class OPENRTI_API DisableTimeConstrainedNotifyMessage : public AbstractMessage {
+public:
+  DisableTimeConstrainedNotifyMessage();
+  virtual ~DisableTimeConstrainedNotifyMessage();
+
+  virtual const char* getTypeName() const;
+  virtual void out(std::ostream& os) const;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+
+  virtual bool operator==(const AbstractMessage& rhs) const;
+  bool operator==(const DisableTimeConstrainedNotifyMessage& rhs) const;
+  bool operator<(const DisableTimeConstrainedNotifyMessage& rhs) const;
+  bool operator!=(const DisableTimeConstrainedNotifyMessage& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const DisableTimeConstrainedNotifyMessage& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const DisableTimeConstrainedNotifyMessage& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const DisableTimeConstrainedNotifyMessage& rhs) const
   { return !operator>(rhs); }
 
   void setFederationHandle(const FederationHandle& value)
@@ -5990,10 +7122,22 @@ public:
   const String& getName() const
   { return _name; }
 
+  void setIsInternal(const Bool& value)
+  { _isInternal = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setIsInternal(Bool&& value)
+  { _isInternal = std::move(value); }
+#endif
+  Bool& getIsInternal()
+  { return _isInternal; }
+  const Bool& getIsInternal() const
+  { return _isInternal; }
+
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   String _name;
+  Bool _isInternal;
 };
 
 class OPENRTI_API ReserveObjectInstanceNameResponseMessage : public AbstractMessage {
@@ -6852,6 +7996,138 @@ private:
   VariableLengthData _tag;
 };
 
+class OPENRTI_API QueryAttributeOwnershipRequestMessage : public AbstractMessage {
+public:
+  QueryAttributeOwnershipRequestMessage();
+  virtual ~QueryAttributeOwnershipRequestMessage();
+
+  virtual const char* getTypeName() const;
+  virtual void out(std::ostream& os) const;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+
+  virtual bool operator==(const AbstractMessage& rhs) const;
+  bool operator==(const QueryAttributeOwnershipRequestMessage& rhs) const;
+  bool operator<(const QueryAttributeOwnershipRequestMessage& rhs) const;
+  bool operator!=(const QueryAttributeOwnershipRequestMessage& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const QueryAttributeOwnershipRequestMessage& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const QueryAttributeOwnershipRequestMessage& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const QueryAttributeOwnershipRequestMessage& rhs) const
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value)
+  { _federationHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederationHandle(FederationHandle&& value)
+  { _federationHandle = std::move(value); }
+#endif
+  FederationHandle& getFederationHandle()
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const
+  { return _federationHandle; }
+
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  { _objectInstanceHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  { _objectInstanceHandle = std::move(value); }
+#endif
+  ObjectInstanceHandle& getObjectInstanceHandle()
+  { return _objectInstanceHandle; }
+  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  { return _objectInstanceHandle; }
+
+  void setAttributeHandle(const AttributeHandle& value)
+  { _attributeHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setAttributeHandle(AttributeHandle&& value)
+  { _attributeHandle = std::move(value); }
+#endif
+  AttributeHandle& getAttributeHandle()
+  { return _attributeHandle; }
+  const AttributeHandle& getAttributeHandle() const
+  { return _attributeHandle; }
+
+private:
+  FederationHandle _federationHandle;
+  ObjectInstanceHandle _objectInstanceHandle;
+  AttributeHandle _attributeHandle;
+};
+
+class OPENRTI_API QueryAttributeOwnershipResponseMessage : public AbstractMessage {
+public:
+  QueryAttributeOwnershipResponseMessage();
+  virtual ~QueryAttributeOwnershipResponseMessage();
+
+  virtual const char* getTypeName() const;
+  virtual void out(std::ostream& os) const;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+
+  virtual bool operator==(const AbstractMessage& rhs) const;
+  bool operator==(const QueryAttributeOwnershipResponseMessage& rhs) const;
+  bool operator<(const QueryAttributeOwnershipResponseMessage& rhs) const;
+  bool operator!=(const QueryAttributeOwnershipResponseMessage& rhs) const
+  { return !operator==(rhs); }
+  bool operator>(const QueryAttributeOwnershipResponseMessage& rhs) const
+  { return rhs.operator<(*this); }
+  bool operator>=(const QueryAttributeOwnershipResponseMessage& rhs) const
+  { return !operator<(rhs); }
+  bool operator<=(const QueryAttributeOwnershipResponseMessage& rhs) const
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value)
+  { _federationHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederationHandle(FederationHandle&& value)
+  { _federationHandle = std::move(value); }
+#endif
+  FederationHandle& getFederationHandle()
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const
+  { return _federationHandle; }
+
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  { _objectInstanceHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  { _objectInstanceHandle = std::move(value); }
+#endif
+  ObjectInstanceHandle& getObjectInstanceHandle()
+  { return _objectInstanceHandle; }
+  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  { return _objectInstanceHandle; }
+
+  void setAttributeHandle(const AttributeHandle& value)
+  { _attributeHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setAttributeHandle(AttributeHandle&& value)
+  { _attributeHandle = std::move(value); }
+#endif
+  AttributeHandle& getAttributeHandle()
+  { return _attributeHandle; }
+  const AttributeHandle& getAttributeHandle() const
+  { return _attributeHandle; }
+
+  void setOwner(const FederateHandle& value)
+  { _owner = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setOwner(FederateHandle&& value)
+  { _owner = std::move(value); }
+#endif
+  FederateHandle& getOwner()
+  { return _owner; }
+  const FederateHandle& getOwner() const
+  { return _owner; }
+
+private:
+  FederationHandle _federationHandle;
+  ObjectInstanceHandle _objectInstanceHandle;
+  AttributeHandle _attributeHandle;
+  FederateHandle _owner;
+};
+
 
 // EnumDataType CallbackModel
 template<typename char_type, typename traits_type>
@@ -7248,7 +8524,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandle
   return os;
 }
 
-// <__main__.SetDataType object at 0x0000000002B3C0B8>
+// SetDataType DimensionHandleSet
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandleSet& value)
@@ -7333,7 +8609,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const StringVector& v
   return os;
 }
 
-// <__main__.SetDataType object at 0x0000000002B3C1D0>
+// SetDataType StringSet
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const StringSet& value)
@@ -7350,7 +8626,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const StringSet& valu
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C240>
+// PairDataType FederateHandleBoolPair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleBoolPair& value)
@@ -7392,7 +8668,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RangeBoundsValu
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C2E8>
+// PairDataType DimensionHandleRangeBoundsValuePair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandleRangeBoundsValuePair& value)
@@ -7438,7 +8714,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionValueList
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C400>
+// PairDataType RegionHandleDimensionHandleSetPair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleDimensionHandleSetPair& value)
@@ -7467,7 +8743,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleDim
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C470>
+// PairDataType RegionHandleSpaceHandlePair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleSpaceHandlePair& value)
@@ -7496,7 +8772,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleSpa
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C4E0>
+// PairDataType RegionHandleRegionValuePair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleRegionValuePair& value)
@@ -7525,7 +8801,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleReg
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C550>
+// PairDataType InteractionClassHandleRegionValueListPair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const InteractionClassHandleRegionValueListPair& value)
@@ -7537,7 +8813,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const InteractionClas
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C588>
+// PairDataType AttributeHandleRegionValueListPair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeHandleRegionValueListPair& value)
@@ -7556,6 +8832,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeState&
 {
   os << "{ ";
   os << "attributeHandle: " << value.getAttributeHandle();
+  os << ", ";
+  os << "ownerFederate: " << value.getOwnerFederate();
   os << " }";
   return os;
 }
@@ -7637,7 +8915,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeValueV
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C828>
+// PairDataType FederateHandleSaveStatusPair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleSaveStatusPair& value)
@@ -7666,7 +8944,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleS
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C898>
+// PairDataType FederateHandleRestoreStatusPair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleRestoreStatusPair& value)
@@ -7725,7 +9003,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationExecu
   return os;
 }
 
-// <__main__.PairDataType object at 0x0000000002B3C9E8>
+// PairDataType ObjectInstanceHandleNamePair
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandleNamePair& value)
@@ -7862,7 +9140,7 @@ inline std::string to_string(const RegisterFederationSynchronizationPointRespons
   }
 }
 
-// <__main__.MapDataType object at 0x0000000002B3CEF0>
+// <__main__.MapDataType object at 0x0000029906089D30>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ConfigurationParameterMap& value)
@@ -7873,6 +9151,262 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ConfigurationPa
     os << i->first << ": " << i->second;
     while (++i != value.end()) {
       os << ", " << i->first << ": " << i->second;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringSimpleDataType
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringSimpleDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "representation: " << value.getRepresentation();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringSimpleDataTypeList
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringSimpleDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringSimpleDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringEnumerator
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringEnumerator& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "value: " << value.getValue();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringEnumeratorList
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringEnumeratorList& value)
+{
+  os << "{ ";
+  FOMStringEnumeratorList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringEnumeratedDataType
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringEnumeratedDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "representation: " << value.getRepresentation();
+  os << ", ";
+  os << "enumerators: " << value.getEnumerators();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringEnumeratedDataTypeList
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringEnumeratedDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringEnumeratedDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringArrayDataType
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringArrayDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "cardinality: " << value.getCardinality();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringArrayDataTypeList
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringArrayDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringArrayDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringFixedRecordField
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringFixedRecordField& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringFixedRecordFieldList
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringFixedRecordFieldList& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordFieldList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringFixedRecordDataType
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringFixedRecordDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << ", ";
+  os << "fields: " << value.getFields();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringFixedRecordDataTypeList
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringFixedRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringVariantRecordAlternative
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringVariantRecordAlternative& value)
+{
+  os << "{ ";
+  os << "enumerator: " << value.getEnumerator();
+  os << ", ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringVariantRecordAlternativeList
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringVariantRecordAlternativeList& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordAlternativeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringVariantRecordDataType
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringVariantRecordDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "discriminant: " << value.getDiscriminant();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "alternatives: " << value.getAlternatives();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringVariantRecordDataTypeList
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringVariantRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
     }
   }
   os << " }";
@@ -7974,6 +9508,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringParame
 {
   os << "{ ";
   os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
   os << " }";
   return os;
 }
@@ -8040,6 +9576,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringAttrib
 {
   os << "{ ";
   os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
   os << ", ";
   os << "orderType: " << value.getOrderType();
   os << ", ";
@@ -8165,7 +9703,7 @@ std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringModule& value)
 {
   os << "{ ";
-  os << "content: " << value.getContent();
+  os << "designator: " << value.getDesignator();
   os << ", ";
   os << "transportationTypeList: " << value.getTransportationTypeList();
   os << ", ";
@@ -8180,6 +9718,16 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringModule
   os << "updateRateList: " << value.getUpdateRateList();
   os << ", ";
   os << "switchList: " << value.getSwitchList();
+  os << ", ";
+  os << "simpleDataTypeList: " << value.getSimpleDataTypeList();
+  os << ", ";
+  os << "enumeratedDataTypeList: " << value.getEnumeratedDataTypeList();
+  os << ", ";
+  os << "arrayDataTypeList: " << value.getArrayDataTypeList();
+  os << ", ";
+  os << "fixedRecordDataTypeList: " << value.getFixedRecordDataTypeList();
+  os << ", ";
+  os << "variantRecordDataTypeList: " << value.getVariantRecordDataTypeList();
   os << ", ";
   os << "artificialInteractionRoot: " << value.getArtificialInteractionRoot();
   os << ", ";
@@ -8307,6 +9855,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMParameter& v
   os << "{ ";
   os << "name: " << value.getName();
   os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
   os << "parameterHandle: " << value.getParameterHandle();
   os << " }";
   return os;
@@ -8376,6 +9926,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMAttribute& v
 {
   os << "{ ";
   os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
   os << ", ";
   os << "attributeHandle: " << value.getAttributeHandle();
   os << ", ";
@@ -8527,7 +10079,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMModule& valu
   os << ", ";
   os << "artificialObjectRoot: " << value.getArtificialObjectRoot();
   os << ", ";
-  os << "content: " << value.getContent();
+  os << "designator: " << value.getDesignator();
   os << " }";
   return os;
 }
@@ -8712,6 +10264,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationE
   os << "fOMStringModuleList: " << value.getFOMStringModuleList();
   os << ", ";
   os << "configurationParameterMap: " << value.getConfigurationParameterMap();
+  os << ", ";
+  os << "isInternal: " << value.getIsInternal();
   os << " }";
   return os;
 }
@@ -8771,15 +10325,15 @@ std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederateNotifyMessage& value)
 {
   os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  // StructField federateHandle (hidden)
-  //os << "federateHandle: " << value.getFederateHandle();
-  //os << ", ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
   os << "federateType: " << value.getFederateType();
   os << ", ";
   os << "federateName: " << value.getFederateName();
+  os << ", ";
+  os << "isInternal: " << value.getIsInternal();
   os << " }";
   return os;
 }
@@ -8948,6 +10502,34 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const DisableTimeRegu
   os << "{ ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType EnableTimeConstrainedNotifyMessage
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const EnableTimeConstrainedNotifyMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType DisableTimeConstrainedNotifyMessage
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const DisableTimeConstrainedNotifyMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
   os << " }";
   return os;
@@ -9291,11 +10873,13 @@ std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandlesResponseMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
   os << ", ";
-  os << "objectInstanceHandleNamePairVector: " << value.getObjectInstanceHandleNamePairVector();
+  // StructField objectInstanceHandleNamePairVector (hidden)
+  //os << "objectInstanceHandleNamePairVector: " << value.getObjectInstanceHandleNamePairVector();
   os << " }";
   return os;
 }
@@ -9324,6 +10908,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveObjectIn
   os << "federateHandle: " << value.getFederateHandle();
   os << ", ";
   os << "name: " << value.getName();
+  os << ", ";
+  os << "isInternal: " << value.getIsInternal();
   os << " }";
   return os;
 }
@@ -9370,8 +10956,9 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveMultiple
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
   os << ", ";
-  os << "objectInstanceHandleNamePairVector: " << value.getObjectInstanceHandleNamePairVector();
-  os << ", ";
+  // StructField objectInstanceHandleNamePairVector (hidden)
+  //os << "objectInstanceHandleNamePairVector: " << value.getObjectInstanceHandleNamePairVector();
+  //os << ", ";
   os << "success: " << value.getSuccess();
   os << " }";
   return os;
@@ -9391,7 +10978,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertObjectIns
   os << ", ";
   os << "name: " << value.getName();
   os << ", ";
-  os << "attributeStateVector: " << value.getAttributeStateVector();
+  // StructField attributeStateVector (hidden)
+  //os << "attributeStateVector: " << value.getAttributeStateVector();
   os << " }";
   return os;
 }
@@ -9442,17 +11030,21 @@ std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeUpdateMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
   os << ", ";
   os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
   os << ", ";
-  os << "tag: " << value.getTag();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << ", ";
-  os << "attributeValues: " << value.getAttributeValues();
+  // StructField tag (hidden)
+  //os << "tag: " << value.getTag();
+  //os << ", ";
+  // StructField transportationType (hidden)
+  //os << "transportationType: " << value.getTransportationType();
+  //os << ", ";
+  // StructField attributeValues (hidden)
+  //os << "attributeValues: " << value.getAttributeValues();
   os << " }";
   return os;
 }
@@ -9490,12 +11082,14 @@ std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const RequestAttributeUpdateMessage& value)
 {
   os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
   os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
   os << ", ";
-  os << "attributeHandles: " << value.getAttributeHandles();
-  os << ", ";
+  // StructField attributeHandles (hidden)
+  //os << "attributeHandles: " << value.getAttributeHandles();
+  //os << ", ";
   os << "tag: " << value.getTag();
   os << " }";
   return os;
@@ -9514,6 +11108,38 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const RequestClassAtt
   os << "attributeHandles: " << value.getAttributeHandles();
   os << ", ";
   os << "tag: " << value.getTag();
+  os << " }";
+  return os;
+}
+
+// MessageDataType QueryAttributeOwnershipRequestMessage
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const QueryAttributeOwnershipRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandle: " << value.getAttributeHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType QueryAttributeOwnershipResponseMessage
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const QueryAttributeOwnershipResponseMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandle: " << value.getAttributeHandle();
+  os << ", ";
+  os << "owner: " << value.getOwner();
   os << " }";
   return os;
 }
@@ -9553,6 +11179,70 @@ inline std::string to_string(const AttributeValue& value)
 
 // StructDataType FederationExecutionInformation
 inline std::string to_string(const FederationExecutionInformation& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringSimpleDataType
+inline std::string to_string(const FOMStringSimpleDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringEnumerator
+inline std::string to_string(const FOMStringEnumerator& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringEnumeratedDataType
+inline std::string to_string(const FOMStringEnumeratedDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringArrayDataType
+inline std::string to_string(const FOMStringArrayDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringFixedRecordField
+inline std::string to_string(const FOMStringFixedRecordField& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringFixedRecordDataType
+inline std::string to_string(const FOMStringFixedRecordDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringVariantRecordAlternative
+inline std::string to_string(const FOMStringVariantRecordAlternative& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringVariantRecordDataType
+inline std::string to_string(const FOMStringVariantRecordDataType& value)
 {
     std::ostringstream out;
     out << value;
@@ -9713,494 +11403,6 @@ inline std::string to_string(const FOMSwitch& value)
 
 // StructDataType FOMModule
 inline std::string to_string(const FOMModule& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ConnectionLostMessage
-inline std::string to_string(const ConnectionLostMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType CreateFederationExecutionRequestMessage
-inline std::string to_string(const CreateFederationExecutionRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType CreateFederationExecutionResponseMessage
-inline std::string to_string(const CreateFederationExecutionResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType DestroyFederationExecutionRequestMessage
-inline std::string to_string(const DestroyFederationExecutionRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType DestroyFederationExecutionResponseMessage
-inline std::string to_string(const DestroyFederationExecutionResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType EnumerateFederationExecutionsRequestMessage
-inline std::string to_string(const EnumerateFederationExecutionsRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType EnumerateFederationExecutionsResponseMessage
-inline std::string to_string(const EnumerateFederationExecutionsResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType InsertFederationExecutionMessage
-inline std::string to_string(const InsertFederationExecutionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ShutdownFederationExecutionMessage
-inline std::string to_string(const ShutdownFederationExecutionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType EraseFederationExecutionMessage
-inline std::string to_string(const EraseFederationExecutionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ReleaseFederationHandleMessage
-inline std::string to_string(const ReleaseFederationHandleMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType InsertModulesMessage
-inline std::string to_string(const InsertModulesMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType JoinFederationExecutionRequestMessage
-inline std::string to_string(const JoinFederationExecutionRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType JoinFederationExecutionResponseMessage
-inline std::string to_string(const JoinFederationExecutionResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ResignFederationExecutionLeafRequestMessage
-inline std::string to_string(const ResignFederationExecutionLeafRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ResignFederationExecutionRequestMessage
-inline std::string to_string(const ResignFederationExecutionRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType JoinFederateNotifyMessage
-inline std::string to_string(const JoinFederateNotifyMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ResignFederateNotifyMessage
-inline std::string to_string(const ResignFederateNotifyMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ChangeAutomaticResignDirectiveMessage
-inline std::string to_string(const ChangeAutomaticResignDirectiveMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType RegisterFederationSynchronizationPointMessage
-inline std::string to_string(const RegisterFederationSynchronizationPointMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType RegisterFederationSynchronizationPointResponseMessage
-inline std::string to_string(const RegisterFederationSynchronizationPointResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType AnnounceSynchronizationPointMessage
-inline std::string to_string(const AnnounceSynchronizationPointMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType SynchronizationPointAchievedMessage
-inline std::string to_string(const SynchronizationPointAchievedMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType FederationSynchronizedMessage
-inline std::string to_string(const FederationSynchronizedMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType EnableTimeRegulationRequestMessage
-inline std::string to_string(const EnableTimeRegulationRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType EnableTimeRegulationResponseMessage
-inline std::string to_string(const EnableTimeRegulationResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType DisableTimeRegulationRequestMessage
-inline std::string to_string(const DisableTimeRegulationRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType CommitLowerBoundTimeStampMessage
-inline std::string to_string(const CommitLowerBoundTimeStampMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType CommitLowerBoundTimeStampResponseMessage
-inline std::string to_string(const CommitLowerBoundTimeStampResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType LockedByNextMessageRequestMessage
-inline std::string to_string(const LockedByNextMessageRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType TimeConstrainedEnabledMessage
-inline std::string to_string(const TimeConstrainedEnabledMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType TimeRegulationEnabledMessage
-inline std::string to_string(const TimeRegulationEnabledMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType TimeAdvanceGrantedMessage
-inline std::string to_string(const TimeAdvanceGrantedMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType InsertRegionMessage
-inline std::string to_string(const InsertRegionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType CommitRegionMessage
-inline std::string to_string(const CommitRegionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType EraseRegionMessage
-inline std::string to_string(const EraseRegionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ChangeInteractionClassPublicationMessage
-inline std::string to_string(const ChangeInteractionClassPublicationMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ChangeObjectClassPublicationMessage
-inline std::string to_string(const ChangeObjectClassPublicationMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ChangeInteractionClassSubscriptionMessage
-inline std::string to_string(const ChangeInteractionClassSubscriptionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ChangeObjectClassSubscriptionMessage
-inline std::string to_string(const ChangeObjectClassSubscriptionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ChangeObjectInstanceSubscriptionMessage
-inline std::string to_string(const ChangeObjectInstanceSubscriptionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType RegistrationForObjectClassMessage
-inline std::string to_string(const RegistrationForObjectClassMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType AttributesInScopeMessage
-inline std::string to_string(const AttributesInScopeMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType TurnUpdatesOnForInstanceMessage
-inline std::string to_string(const TurnUpdatesOnForInstanceMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType TurnInteractionsOnMessage
-inline std::string to_string(const TurnInteractionsOnMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType InteractionMessage
-inline std::string to_string(const InteractionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType TimeStampedInteractionMessage
-inline std::string to_string(const TimeStampedInteractionMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ObjectInstanceHandlesRequestMessage
-inline std::string to_string(const ObjectInstanceHandlesRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ObjectInstanceHandlesResponseMessage
-inline std::string to_string(const ObjectInstanceHandlesResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ReleaseMultipleObjectInstanceNameHandlePairsMessage
-inline std::string to_string(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ReserveObjectInstanceNameRequestMessage
-inline std::string to_string(const ReserveObjectInstanceNameRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ReserveObjectInstanceNameResponseMessage
-inline std::string to_string(const ReserveObjectInstanceNameResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ReserveMultipleObjectInstanceNameRequestMessage
-inline std::string to_string(const ReserveMultipleObjectInstanceNameRequestMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType ReserveMultipleObjectInstanceNameResponseMessage
-inline std::string to_string(const ReserveMultipleObjectInstanceNameResponseMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType InsertObjectInstanceMessage
-inline std::string to_string(const InsertObjectInstanceMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType DeleteObjectInstanceMessage
-inline std::string to_string(const DeleteObjectInstanceMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType TimeStampedDeleteObjectInstanceMessage
-inline std::string to_string(const TimeStampedDeleteObjectInstanceMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType AttributeUpdateMessage
-inline std::string to_string(const AttributeUpdateMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType TimeStampedAttributeUpdateMessage
-inline std::string to_string(const TimeStampedAttributeUpdateMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType RequestAttributeUpdateMessage
-inline std::string to_string(const RequestAttributeUpdateMessage& value)
-{
-    std::ostringstream out;
-    out << value;
-    return out.str();
-}
-
-// MessageDataType RequestClassAttributeUpdateMessage
-inline std::string to_string(const RequestClassAttributeUpdateMessage& value)
 {
     std::ostringstream out;
     out << value;

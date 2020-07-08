@@ -158,9 +158,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{4cebc18d-bb3c-378a-a973-5d4f86c6ad20}</Project>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

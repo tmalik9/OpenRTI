@@ -38,7 +38,7 @@ template<typename T>
 class OPENRTI_LOCAL Handle {
 public:
   typedef T value_type;
-
+  static const size_t kFixedHandleSize = sizeof(uint64_t);
   static T invalid()
   { return std::numeric_limits<T>::max(); }
 
@@ -46,7 +46,7 @@ public:
   Handle(const Handle& handle) :
     _handle(handle._handle)
   { }
-  explicit Handle(const T& handle) :
+  Handle(const T& handle) :
     _handle(handle)
   { }
 
@@ -94,7 +94,7 @@ public:
     return ss.str();
   }
 
-  unsigned getEncodedLength() const
+  static unsigned getEncodedLength()
   { return 8; }
 
   void encode(void* buffer) const
@@ -132,12 +132,11 @@ private:
 class OPENRTI_LOCAL HandleName : public Handle<Type> {            \
 public:                                                           \
   HandleName() {}                                                 \
-  HandleName(const HandleName& ref) :                             \
-    Handle<Type>(ref.getHandle())                                 \
+  HandleName(const HandleName& handle) :                          \
+    Handle<Type>(handle)                                          \
   { }                                                             \
-  template<typename T>                                            \
-  HandleName(const T& handle) :                                   \
-    Handle<Type>(Type(handle))                                    \
+  HandleName(const Type& handle) :                                   \
+    Handle<Type>(handle)                                    \
   { }                                                             \
                                                                   \
   std::string toString() const                                    \
@@ -174,7 +173,7 @@ DECLARE_HANDLE_TYPE(FederateHandle, uint32_t)
 DECLARE_HANDLE_TYPE(FederationHandle, uint16_t)
 DECLARE_HANDLE_TYPE(ModuleHandle, uint16_t)
 
-//DECLARE_HANDLE_TYPE(ConnectHandle, unsigned)
+DECLARE_HANDLE_TYPE(ConnectHandle, unsigned)
 
 DECLARE_HANDLE_TYPE(TransportationHandle, uint8_t)
 DECLARE_HANDLE_TYPE(OrderingHandle, uint8_t)
@@ -182,78 +181,6 @@ DECLARE_HANDLE_TYPE(OrderingHandle, uint8_t)
 DECLARE_HANDLE_TYPE(DimensionHandle, uint32_t)
 DECLARE_HANDLE_TYPE(SpaceHandle, uint32_t)
 DECLARE_HANDLE_TYPE(UpdateRateHandle, uint32_t)
-
-class OPENRTI_LOCAL ConnectHandle : public Handle<unsigned> {
-  typedef Handle<unsigned> HandleBase;
-public:
-  ConnectHandle() {}
-  ConnectHandle(const ConnectHandle& handle) : HandleBase(handle), _name(handle._name), _isLeafConnect(handle._isLeafConnect)
-  { }
-  template<typename T>
-  ConnectHandle(const T& handle) : HandleBase(unsigned(handle))
-  { }
-
-  unsigned getEncodedLength() const
-  { return HandleBase::getEncodedLength() + static_cast<uint32_t>(sizeof(uint32_t) + _name.size()); }
-
-  void encode(void* buffer) const
-  {
-    HandleBase::encode(buffer);
-    uint8_t* data = static_cast<uint8_t*>(buffer);
-    data+=8;
-    const uint32_t nameSize = static_cast<uint32_t>(_name.size());
-    data[0] = uint8_t(nameSize >> 24);
-    data[1] = uint8_t(nameSize >> 16);
-    data[2] = uint8_t(nameSize >> 8);
-    data[3] = uint8_t(nameSize);
-    data+=4;
-    memcpy(data, _name.data(), nameSize);
-  }
-  void decode(const void* buffer)
-  {
-    HandleBase::decode(buffer);
-    const uint8_t* data = static_cast<const uint8_t*>(buffer);
-    data+=8;
-    uint32_t nameSize =  uint32_t(data[0]) << 24;
-    nameSize |= uint32_t(data[1]) << 16;
-    nameSize |= uint32_t(data[2]) << 8;
-    nameSize |= uint32_t(data[3]);
-    data += 4;
-    _name = std::string(reinterpret_cast<const char*>(data), nameSize);
-  }
-
-  void setName(const std::string& name) { _name=name; }
-  std::string getName() const { return _name; }
-  bool isLeafConnect() const { return _isLeafConnect; }
-  void setLeafConnect(bool isLeaf) { _isLeafConnect = isLeaf; }
-  std::string toString() const
-  {
-    std::stringstream stream;
-    stream << "<";
-    if (getName().size()) stream << getName() << " ";
-    stream << (_isLeafConnect ? "LEAF " : "" ) << "ConnectHandle(" << getHandle() << ")"  << ">";
-    return stream.str();
-  }
-private:
-  std::string _name;
-  bool _isLeafConnect = false;
-};
-
-template<>
-struct OPENRTI_LOCAL Hash<ConnectHandle> {
-  std::size_t operator()(const ConnectHandle& handle) const
-  { return handle.getHash(); }
-};
-
-template<typename char_type, typename traits_type>
-inline
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os,
-           const ConnectHandle & handle)
-{
-  os << "ConnectHandle(" << handle.getHandle() << ")";
-  return os;
-}
 
 class OPENRTI_LOCAL MessageRetractionHandle : public Handle<uint64_t> {
 public:
@@ -344,17 +271,6 @@ typedef std::vector<ObjectInstanceHandle> ObjectInstanceHandleVector;
 typedef std::pair<AttributeHandleVector, RegionHandleVector> AttributeHandleVectorRegionHandleVectorPair;
 typedef std::vector<AttributeHandleVectorRegionHandleVectorPair> AttributeHandleVectorRegionHandleVectorPairVector;
 
-inline std::string to_string(const ConnectHandleSet& connects)
-{
-  std::ostringstream to;
-  to << "{ ";
-  for (auto& connect : connects)
-  {
-    to << connect.toString() << " ";
-  }
-  to << "}";
-  return to.str();
-}
 } // namespace OpenRTI
 
 #endif

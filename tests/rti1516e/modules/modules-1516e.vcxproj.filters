@@ -15,7 +15,4 @@
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
 </Project>

@@ -10,7 +10,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
 </Project>

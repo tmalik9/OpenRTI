@@ -28,7 +28,7 @@
 
 namespace OpenRTI {
 
-class OPENRTI_API Exception /*: public std::exception*/ {
+class OPENRTI_API Exception {
 public:
   virtual ~Exception() throw();
 
@@ -198,6 +198,7 @@ RTI_EXCEPTION(TimeRegulationIsNotEnabled)
 RTI_EXCEPTION(UnableToPerformSave)
 RTI_EXCEPTION(UnknownName)
 RTI_EXCEPTION(UnsupportedCallbackModel)
+RTI_EXCEPTION(EncoderException)
 RTI_EXCEPTION(InternalError)
 #undef RTI_EXCEPTION
 
