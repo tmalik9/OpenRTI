@@ -258,6 +258,7 @@ public:
     void insertChildInteractionClass(InteractionClass& interactionClass);
     void setDeliverToSelf(bool enable) { _deliverToSelf = enable; }
     bool getDeliverToSelf() const { return _deliverToSelf; }
+    void getFOMInteractionClass(FOMInteractionClass& fomInteractionClass);
   private:
     InteractionClass(const InteractionClass&);
     InteractionClass& operator=(const InteractionClass&);
@@ -278,8 +279,8 @@ public:
   const InteractionClass* getInteractionClass(const InteractionClassHandle& interactionClassHandle) const;
   InteractionClassHandle getInteractionClassHandle(const std::string& name) const;
   void insertInteractionClass(const FOMInteractionClass& module, bool artificialObjectRoot);
-  size_t getNumInteractionClasses() const
-  { return _interactionClassVector.size(); }
+  uint32_t getNumInteractionClasses() const
+  { return static_cast<uint32_t>(_interactionClassVector.size()); }
 
   /// Object Classes
   struct OPENRTI_API Attribute : public PublishSubscribe {
@@ -311,7 +312,7 @@ public:
     const Attribute* getAttribute(const AttributeHandle& attributeHandle) const;
     Attribute* getAttribute(const AttributeHandle& attributeHandle);
     AttributeHandle getAttributeHandle(const std::string& name) const;
-    size_t getNumAttributes() const { return _attributeVector.size(); }
+    uint32_t getNumAttributes() const { return static_cast<uint32_t>(_attributeVector.size()); }
     AttributeVector& getAttributes() { return _attributeVector; }
     const AttributeVector& getAttributes() const { return _attributeVector; }
     AttributeHandleVector getAttributeHandles() const;
@@ -346,6 +347,8 @@ public:
     void setDeliverToSelf(bool enable) { _deliverToSelf = enable; }
     bool getDeliverToSelf() const { return _deliverToSelf; }
 
+    ObjectClassHandle getClassHandle() const { return _classHandle; }
+    void              setClassHandle(ObjectClassHandle handle) { _classHandle = handle; }
   private:
     ObjectClass(const ObjectClass&);
     ObjectClass& operator=(const ObjectClass&);
@@ -364,15 +367,17 @@ public:
 
     ChildObjectClassList _childObjectClassList;
     bool _deliverToSelf;
+    ObjectClassHandle _classHandle;
   };
+
   typedef std::vector<SharedPtr<ObjectClass> > ObjectClassVector;
 
   ObjectClass* getObjectClass(const ObjectClassHandle& objectClassHandle);
   const ObjectClass* getObjectClass(const ObjectClassHandle& objectClassHandle) const;
   ObjectClassHandle getObjectClassHandle(const std::string& name) const;
   void insertObjectClass(const FOMObjectClass& module, bool artificialObjectRoot);
-  size_t getNumObjectClasses() const
-  { return _objectClassVector.size(); }
+  uint32_t getNumObjectClasses() const
+  { return static_cast<uint32_t>(_objectClassVector.size()); }
 
 
   /// Object Instances
@@ -509,7 +514,7 @@ public:
   /// We need only write access to this.
   void insertFOMModule(const FOMModule& module);
   void insertFOMModuleList(const FOMModuleList& moduleList);
-
+  void getFOMModule(FOMModule& module);
 private:
   Federate(const Federate&);
   Federate& operator=(const Federate&);
@@ -576,6 +581,9 @@ private:
 
   // The synchronization lables that are currently announced
   StringSet _announcedFederationSynchonizationLabels;
+
+  typedef std::map<ModuleHandle, FOMModule> ModuleMap;
+  ModuleMap _moduleMap;
 };
 
 } // namespace OpenRTI

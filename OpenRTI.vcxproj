@@ -147,6 +147,20 @@
     <ClCompile Include="LogStream.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MessageEncodingRegistry.cpp" />
+    <ClCompile Include="encoding\BasicDataElements.cpp" />
+    <ClCompile Include="encoding\DataElement.cpp" />
+    <ClCompile Include="encoding\HLAfixedArray.cpp" />
+    <ClCompile Include="encoding\HLAfixedRecord.cpp" />
+    <ClCompile Include="encoding\HLAhandle.cpp" />
+    <ClCompile Include="encoding\HLAopaqueData.cpp" />
+    <ClCompile Include="encoding\HLAvariableArray.cpp" />
+    <ClCompile Include="encoding\HLAvariantRecord.cpp" />
+    <ClCompile Include="mom\MomServer.cpp" />
+    <ClCompile Include="mom\MomFederate.cpp" />
+    <ClCompile Include="mom\MomFederateMetrics.cpp" />
+    <ClCompile Include="mom\MomFederation.cpp" />
+    <ClCompile Include="mom\MomInteractions.cpp" />
+    <ClCompile Include="mom\MomManager.cpp" />
     <ClCompile Include="NestedProtocolLayer.cpp" />
     <ClCompile Include="NetworkServer.cpp" />
     <ClCompile Include="NetworkStatistics.cpp" />
@@ -208,12 +222,44 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClInclude Include="encoding\BasicDataElements.h" />
+    <ClInclude Include="encoding\DataElement.h" />
+    <ClInclude Include="encoding\Encoding.h" />
+    <ClInclude Include="encoding\EncodingConfig.h" />
+    <ClInclude Include="encoding\EncodingExceptions.h" />
+    <ClInclude Include="encoding\HLAfixedArray.h" />
+    <ClInclude Include="encoding\HLAfixedRecord.h" />
+    <ClInclude Include="encoding\HLAhandle.h" />
+    <ClInclude Include="encoding\HLAopaqueData.h" />
+    <ClInclude Include="encoding\HLAvariableArray.h" />
+    <ClInclude Include="encoding\HLAvariantRecord.h" />
+    <ClInclude Include="mom\AbstractFederateMetrics.h" />
+    <ClInclude Include="mom\MomServer.h" />
+    <ClInclude Include="mom\MomFederate.h" />
+    <ClInclude Include="mom\MomFederateMetrics.h" />
+    <ClInclude Include="mom\MomFederation.h" />
+    <ClInclude Include="mom\MomInteractions.h" />
+    <ClInclude Include="mom\MomManager.h" />
+    <ClInclude Include="mom\MomTypes.h" />
     <ClInclude Include="OpenRTIVersion.h" />
     <ClInclude Include="VariableLengthDataTuple.h" />
     <ClInclude Include="win32\PerformanceCounterStopWatch.h" />
+    <ClInclude Include="xml\ascii.h" />
+    <ClInclude Include="xml\asciitab.h" />
+    <ClInclude Include="xml\expat.h" />
+    <ClInclude Include="xml\expat_external.h" />
+    <ClInclude Include="xml\iasciitab.h" />
+    <ClInclude Include="xml\internal.h" />
+    <ClInclude Include="xml\latin1tab.h" />
+    <ClInclude Include="xml\nametab.h" />
+    <ClInclude Include="xml\utf8tab.h" />
+    <ClInclude Include="xml\winconfig.h" />
+    <ClInclude Include="xml\xmlrole.h" />
+    <ClInclude Include="xml\xmltok.h" />
     <ClInclude Include="xml\xmltok_impl.c">
       <FileType>CppHeader</FileType>
     </ClInclude>
+    <ClInclude Include="xml\xmltok_impl.h" />
     <ClInclude Include="xml\xmltok_ns.c">
       <FileType>CppHeader</FileType>
     </ClInclude>
@@ -335,9 +381,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="codegen\messagegen.py" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="OpenRTI.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="codegen\Message.xml">
+      <SubType>Designer</SubType>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

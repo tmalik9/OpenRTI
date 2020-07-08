@@ -120,8 +120,18 @@ operator==(const SharedPtr<T>& sharedPtr0, const SharedPtr<T>& sharedPtr1)
 
 template<typename T>
 inline bool
+operator==(const SharedPtr<T>& sharedPtr0, std::nullptr_t)
+{ return sharedPtr0.get() == nullptr; }
+
+template<typename T>
+inline bool
 operator!=(const SharedPtr<T>& sharedPtr0, const SharedPtr<T>& sharedPtr1)
 { return sharedPtr0.get() != sharedPtr1.get(); }
+
+template<typename T>
+inline bool
+operator!=(const SharedPtr<T>& sharedPtr0, std::nullptr_t)
+{ return sharedPtr0.get() != nullptr; }
 
 template<typename T>
 inline bool

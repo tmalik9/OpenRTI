@@ -112,6 +112,17 @@ split(const char* s, const char* c = ", \t\n")
   return split(std::string(s), c);
 }
 
+OPENRTI_API std::vector<std::wstring>
+split(const std::wstring& s, const wchar_t* c = L", \t\n");
+
+inline std::vector<std::wstring>
+split(const wchar_t* s, const wchar_t* c = L", \t\n")
+{
+  if (!s)
+    return std::vector<std::wstring>();
+  return split(std::wstring(s), c);
+}
+
 template<typename Iter>
 inline std::string join(Iter begin, Iter end, const std::string& sep, bool quote)
 {

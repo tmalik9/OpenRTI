@@ -54,6 +54,8 @@ class FederationSynchronizedMessage;
 class EnableTimeRegulationRequestMessage;
 class EnableTimeRegulationResponseMessage;
 class DisableTimeRegulationRequestMessage;
+class EnableTimeConstrainedNotifyMessage;
+class DisableTimeConstrainedNotifyMessage;
 class CommitLowerBoundTimeStampMessage;
 class CommitLowerBoundTimeStampResponseMessage;
 class LockedByNextMessageRequestMessage;
@@ -88,6 +90,8 @@ class AttributeUpdateMessage;
 class TimeStampedAttributeUpdateMessage;
 class RequestAttributeUpdateMessage;
 class RequestClassAttributeUpdateMessage;
+class QueryAttributeOwnershipRequestMessage;
+class QueryAttributeOwnershipResponseMessage;
 
 class OPENRTI_LOCAL AbstractMessageDispatcher {
 public:
@@ -120,6 +124,8 @@ public:
   virtual void accept(const EnableTimeRegulationRequestMessage&) const = 0;
   virtual void accept(const EnableTimeRegulationResponseMessage&) const = 0;
   virtual void accept(const DisableTimeRegulationRequestMessage&) const = 0;
+  virtual void accept(const EnableTimeConstrainedNotifyMessage&) const = 0;
+  virtual void accept(const DisableTimeConstrainedNotifyMessage&) const = 0;
   virtual void accept(const CommitLowerBoundTimeStampMessage&) const = 0;
   virtual void accept(const CommitLowerBoundTimeStampResponseMessage&) const = 0;
   virtual void accept(const LockedByNextMessageRequestMessage&) const = 0;
@@ -154,6 +160,8 @@ public:
   virtual void accept(const TimeStampedAttributeUpdateMessage&) const = 0;
   virtual void accept(const RequestAttributeUpdateMessage&) const = 0;
   virtual void accept(const RequestClassAttributeUpdateMessage&) const = 0;
+  virtual void accept(const QueryAttributeOwnershipRequestMessage&) const = 0;
+  virtual void accept(const QueryAttributeOwnershipResponseMessage&) const = 0;
 };
 
 template<typename T>
@@ -189,6 +197,8 @@ public:
   virtual void accept(const EnableTimeRegulationRequestMessage& message) const { _t(message); }
   virtual void accept(const EnableTimeRegulationResponseMessage& message) const { _t(message); }
   virtual void accept(const DisableTimeRegulationRequestMessage& message) const { _t(message); }
+  virtual void accept(const EnableTimeConstrainedNotifyMessage& message) const { _t(message); }
+  virtual void accept(const DisableTimeConstrainedNotifyMessage& message) const { _t(message); }
   virtual void accept(const CommitLowerBoundTimeStampMessage& message) const { _t(message); }
   virtual void accept(const CommitLowerBoundTimeStampResponseMessage& message) const { _t(message); }
   virtual void accept(const LockedByNextMessageRequestMessage& message) const { _t(message); }
@@ -223,6 +233,8 @@ public:
   virtual void accept(const TimeStampedAttributeUpdateMessage& message) const { _t(message); }
   virtual void accept(const RequestAttributeUpdateMessage& message) const { _t(message); }
   virtual void accept(const RequestClassAttributeUpdateMessage& message) const { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const { _t(message); }
 private:
   T& _t;
 };
@@ -260,6 +272,8 @@ public:
   virtual void accept(const EnableTimeRegulationRequestMessage& message) const { _t(message); }
   virtual void accept(const EnableTimeRegulationResponseMessage& message) const { _t(message); }
   virtual void accept(const DisableTimeRegulationRequestMessage& message) const { _t(message); }
+  virtual void accept(const EnableTimeConstrainedNotifyMessage& message) const { _t(message); }
+  virtual void accept(const DisableTimeConstrainedNotifyMessage& message) const { _t(message); }
   virtual void accept(const CommitLowerBoundTimeStampMessage& message) const { _t(message); }
   virtual void accept(const CommitLowerBoundTimeStampResponseMessage& message) const { _t(message); }
   virtual void accept(const LockedByNextMessageRequestMessage& message) const { _t(message); }
@@ -294,6 +308,8 @@ public:
   virtual void accept(const TimeStampedAttributeUpdateMessage& message) const { _t(message); }
   virtual void accept(const RequestAttributeUpdateMessage& message) const { _t(message); }
   virtual void accept(const RequestClassAttributeUpdateMessage& message) const { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const { _t(message); }
 private:
   const T& _t;
 };

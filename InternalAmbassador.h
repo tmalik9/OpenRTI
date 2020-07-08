@@ -29,6 +29,7 @@ namespace OpenRTI {
 class InternalTimeManagement;
 class Federate;
 class URL;
+class AbstractServer; 
 
 class OPENRTI_API InternalAmbassador {
 public:
@@ -70,7 +71,7 @@ public:
   void acceptInternalMessage(const EraseFederationExecutionMessage& message);
   void acceptInternalMessage(const ReleaseFederationHandleMessage& message);
   void acceptInternalMessage(const InsertModulesMessage& message);
-  void acceptInternalMessage(const JoinFederationExecutionResponseMessage& message);
+  virtual void acceptInternalMessage(const JoinFederationExecutionResponseMessage& message) = 0;
   void acceptInternalMessage(const JoinFederateNotifyMessage& message);
   void acceptInternalMessage(const ResignFederateNotifyMessage& message);
   void acceptInternalMessage(const ChangeAutomaticResignDirectiveMessage& message);
@@ -106,6 +107,8 @@ public:
   void acceptInternalMessage(const TimeStampedAttributeUpdateMessage& message);
   void acceptInternalMessage(const RequestAttributeUpdateMessage& message);
   void acceptInternalMessage(const RequestClassAttributeUpdateMessage& message);
+  void acceptInternalMessage(const QueryAttributeOwnershipRequestMessage& message);
+  void acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& message);
 
 
   std::pair<CreateFederationExecutionResponseType, std::string>
@@ -114,7 +117,7 @@ public:
   dispatchWaitDestroyFederationExecutionResponse(const Clock& abstime);
 
   std::pair<JoinFederationExecutionResponseType, std::string>
-  dispatchWaitJoinFederationExecutionResponse(const Clock& abstime);
+  dispatchWaitJoinFederationExecutionResponse(const Clock& abstime, std::string federateName);
   bool dispatchWaitEraseFederationExecutionResponse(const Clock& abstime);
 
   /// Tries to reserve the object instance name in the federate and returns
@@ -127,7 +130,6 @@ public:
 
   /// To factor out the management stuff and make this adaptable to the implementation
   virtual InternalTimeManagement* getTimeManagement() = 0;
-
 
   ///////////////////////////////////////////////////////////////////
   // processing of callback messages - this is what the ambassador user sees

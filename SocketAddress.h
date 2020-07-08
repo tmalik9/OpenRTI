@@ -71,7 +71,7 @@ public:
   resolve(const std::string& address, const std::string& service, bool passive);
   static SocketAddressList
   resolve(const std::string& address, bool passive);
-
+  static std::wstring getHostName();
   VariableLengthData getNetworkAddressData() const;
   VariableLengthData getNetworkPortData() const;
 

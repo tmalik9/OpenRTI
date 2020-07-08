@@ -144,23 +144,31 @@ public:
 
     UpdateRateMode,
     UpdateRateNameMode,
-    UpdateRateRateMode //,
+    UpdateRateRateMode,
 
-    // BasicDataRepresentationsMode,
-    // BasicDataMode,
-    // SimpleDataTypesMode,
-    // SimpleDataMode,
-    // EnumeratedDataTypesMode,
-    // EnumeratedDataMode,
-    // EnumeratorMode,
-    // ArrayDataTypesMode,
-    // ArrayDataMode,
-    // FixedRecordDataTypesMode,
-    // FixedRecordDataMode,
-    // FieldMode,
-    // VariantRecordDataTypesMode,
-    // VariantRecordDataMode,
-    // AlternativeDataMode,
+     BasicDataRepresentationsMode,
+     BasicDataMode,
+
+     SimpleDataTypesMode,
+     SimpleDataMode,
+     SimpleDataNameMode,
+     SimpleDataRepresentationMode,
+     SimpleDataUnitsMode,
+     SimpleDataResolutionMode,
+     SimpleDataAccuracyMode,
+     SimpleDataSemanticsMode,
+
+      EnumeratedDataTypesMode,
+     EnumeratedDataMode,
+     EnumeratorMode,
+     ArrayDataTypesMode,
+     ArrayDataMode,
+     FixedRecordDataTypesMode,
+     FixedRecordDataMode,
+     FieldMode,
+     VariantRecordDataTypesMode,
+     VariantRecordDataMode,
+     AlternativeDataMode,
 
     // NotesMode,
     // NoteMode
@@ -230,6 +238,9 @@ FDD1516EContentHandler::startElement(const char* uri, const char* name,
       _modeStack.push_back(TransportationNameMode);
       break;
     case UpdateRateMode:
+      _modeStack.push_back(UpdateRateNameMode);
+      break;
+    case SimpleDataMode:
       _modeStack.push_back(UpdateRateNameMode);
       break;
     default:
@@ -471,6 +482,30 @@ FDD1516EContentHandler::startElement(const char* uri, const char* name,
     if (getCurrentMode() != ObjectClassAttributeMode)
       throw ErrorReadingFDD("ownership tag outside attribute!");
     _modeStack.push_back(ObjectClassAttributeOwnershipMode);
+  } else if (strcmp(name, "basicDataRepresentations") == 0) {
+    if (getCurrentMode() != DataTypesMode)
+      throw ErrorReadingFDD("basicDataRepresentations tag outside dataTypes!");
+    _modeStack.push_back(BasicDataRepresentationsMode);
+  } else if (strcmp(name, "simpleDataTypes") == 0) {
+    if (getCurrentMode() != DataTypesMode)
+      throw ErrorReadingFDD("simpleDataTypes tag outside dataTypes!");
+    _modeStack.push_back(SimpleDataTypesMode);
+  } else if (strcmp(name, "enumeratedDataTypes") == 0) {
+    if (getCurrentMode() != DataTypesMode)
+      throw ErrorReadingFDD("enumeratedDataTypes tag outside dataTypes!");
+    _modeStack.push_back(EnumeratedDataTypesMode);
+  } else if (strcmp(name, "arrayDataTypes") == 0) {
+    if (getCurrentMode() != DataTypesMode)
+      throw ErrorReadingFDD("arrayDataTypes tag outside dataTypes!");
+    _modeStack.push_back(ArrayDataTypesMode);
+  } else if (strcmp(name, "fixedRecordDataTypes") == 0) {
+    if (getCurrentMode() != DataTypesMode)
+      throw ErrorReadingFDD("fixedRecordDataTypes tag outside dataTypes!");
+    _modeStack.push_back(FixedRecordDataTypesMode);
+  } else if (strcmp(name, "variantRecordDataTypes") == 0) {
+    if (getCurrentMode() != DataTypesMode)
+      throw ErrorReadingFDD("variantRecordDataTypes tag outside dataTypes!");
+    _modeStack.push_back(VariantRecordDataTypesMode);
 
 
     /// interactionClass hierarchies
@@ -647,6 +682,23 @@ FDD1516EContentHandler::endElement(const char* uri, const char* name, const char
   } else if (strcmp(name, "parameter") == 0) {
     if (_fomStringModuleBuilder.getCurrentInteractionClassParameter().getName().empty())
       throw ErrorReadingFDD("No or empty name given for interaction class parameter!");
+  } else if (strcmp(name, "dataType") == 0) {
+    switch (getCurrentMode()) {
+    case ObjectClassAttributeDataTypeMode:
+      if (!_fomStringModuleBuilder.getCurrentObjectClassAttribute().getDataType().empty())
+        throw ErrorReadingFDD("Duplicate name tag for object class attribute \"" +
+                              _fomStringModuleBuilder.getCurrentObjectClassAttribute().getDataType() + "\"!");
+      _fomStringModuleBuilder.getCurrentObjectClassAttribute().setDataType(_characterData);
+      break;
+    case InteractionClassParameterDataTypeMode:
+      if (!_fomStringModuleBuilder.getCurrentInteractionClassParameter().getDataType().empty())
+        throw ErrorReadingFDD("Duplicate dataType tag for interaction class parameter \"" +
+                              _fomStringModuleBuilder.getCurrentInteractionClassParameter().getDataType() + "\"!");
+      _fomStringModuleBuilder.getCurrentInteractionClassParameter().setDataType(_characterData);
+      break;
+    default:
+      break;
+    }
   }
   _modeStack.pop_back();
   _characterData.clear();

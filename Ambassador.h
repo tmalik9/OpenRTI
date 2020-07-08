@@ -113,8 +113,12 @@ public:
     request->setFOMStringModuleList(fomModules);
 
     // The maximum abstime to try to connect
-    Clock abstime = Clock::now() + Clock::fromSeconds(70);
 
+#ifdef _DEBUG
+    Clock abstime = Clock::max();
+#else
+    Clock abstime = Clock::now() + Clock::fromSeconds(70);
+#endif
     // Send this message and wait for the response
     send(request);
 
@@ -144,8 +148,11 @@ public:
     SharedPtr<DestroyFederationExecutionRequestMessage> request = new DestroyFederationExecutionRequestMessage;
     request->setFederationExecution(federationExecutionName);
 
-    // The maximum abstime to try to connect
+#ifdef _DEBUG
+    Clock abstime = Clock::max();
+#else
     Clock abstime = Clock::now() + Clock::fromSeconds(70);
+#endif
 
     // Send this message and wait for the response
     send(request);
@@ -195,7 +202,11 @@ public:
       throw FederateAlreadyExecutionMember();
 
     // The maximum abstime to try to connect
+#ifdef _DEBUG
+    Clock abstime = Clock::max();
+#else
     Clock abstime = Clock::now() + Clock::fromSeconds(70);
+#endif
 
     // The destroy request message
     SharedPtr<JoinFederationExecutionRequestMessage> request;
@@ -208,7 +219,7 @@ public:
     // Send this message and wait for the response
     send(request);
     std::pair<JoinFederationExecutionResponseType, std::string> response;
-    response = dispatchWaitJoinFederationExecutionResponse(abstime);
+    response = dispatchWaitJoinFederationExecutionResponse(abstime, federateName);
     switch (response.first) {
     case JoinFederationExecutionResponseFederateNameAlreadyInUse:
       _federate = 0;
@@ -282,8 +293,12 @@ public:
     // We should no longer respond to time regulation requests.
     _timeManagement = 0;
 
-    Clock clock = Clock::now() + Clock::fromSeconds(70);
-    if (!dispatchWaitEraseFederationExecutionResponse(clock))
+#ifdef _DEBUG
+    Clock abstime = Clock::max();
+#else
+    Clock abstime = Clock::now() + Clock::fromSeconds(70);
+#endif
+    if (!dispatchWaitEraseFederationExecutionResponse(abstime))
       throw RTIinternalError("resignFederationExecution hit timeout!");
 
     _federate = 0;
@@ -593,7 +608,7 @@ public:
     // Append this to the request if this publication has changed
     if (objectClass->setPublicationType(Unpublished))
       attributeHandleVector.push_back(AttributeHandle(0));
-    for (size_t i = 0; i < objectClass->getNumAttributes(); ++i) {
+    for (uint32_t i = 0; i < objectClass->getNumAttributes(); ++i) {
       // returns true if there is a change in the publication state
       if (!objectClass->setAttributePublicationType(AttributeHandle(i), Unpublished))
         continue;
@@ -823,7 +838,7 @@ public:
     // Append this to the request if this subscription has changed
     if (objectClass->setSubscriptionType(Unsubscribed))
       attributeHandleVector.push_back(AttributeHandle(0));
-    for (size_t i = 0; i < objectClass->getNumAttributes(); ++i) {
+    for (uint32_t i = 0; i < objectClass->getNumAttributes(); ++i) {
       // returns true if there is a change in the subscription state
       if (!objectClass->setAttributeSubscriptionType(AttributeHandle(i), Unsubscribed))
         continue;
@@ -1188,15 +1203,16 @@ public:
     request->setObjectClassHandle(objectClassHandle);
     request->setObjectInstanceHandle(handleNamePair.first);
     request->setName(handleNamePair.second);
-    std::size_t numAttributes = objectClass->getNumAttributes();
+    uint32_t numAttributes = objectClass->getNumAttributes();
     request->getAttributeStateVector().reserve(numAttributes);
     AttributeHandleVector attributeHandleVector;
     attributeHandleVector.reserve(numAttributes);
-    for (size_t i = 0; i < numAttributes; ++i) {
+    for (uint32_t i = 0; i < numAttributes; ++i) {
       if (!objectClass->isAttributePublished(AttributeHandle(i)))
         continue;
       AttributeState attributeState;
       attributeState.setAttributeHandle(AttributeHandle(i));
+      attributeState.setOwnerFederate(_federate->getFederateHandle());
       request->getAttributeStateVector().push_back(attributeState);
       attributeHandleVector.push_back(AttributeHandle(i));
     }
@@ -1282,15 +1298,16 @@ public:
     request->setObjectClassHandle(objectClassHandle);
     request->setObjectInstanceHandle(objectInstanceHandle);
     request->setName(objectInstanceName);
-    std::size_t numAttributes = objectClass->getNumAttributes();
+    uint32_t numAttributes = objectClass->getNumAttributes();
     request->getAttributeStateVector().reserve(numAttributes);
     AttributeHandleVector attributeHandleVector;
     attributeHandleVector.reserve(numAttributes);
-    for (size_t i = 0; i < numAttributes; ++i) {
+    for (uint32_t i = 0; i < numAttributes; ++i) {
       if (!objectClass->isAttributePublished(AttributeHandle(i)))
         continue;
       AttributeState attributeState;
       attributeState.setAttributeHandle(AttributeHandle(i));
+      attributeState.setOwnerFederate(_federate->getFederateHandle());
       request->getAttributeStateVector().push_back(attributeState);
       attributeHandleVector.push_back(AttributeHandle(i));
     }
@@ -1337,7 +1354,6 @@ public:
     Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
       throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
-    Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle());
     // passels
     AttributeValueVector passels[2];
     for (std::vector<OpenRTI::AttributeValue>::iterator i = attributeValues.begin(); i != attributeValues.end(); ++i) {
@@ -1346,11 +1362,14 @@ public:
         throw AttributeNotDefined(i->getAttributeHandle().toString());
       if (!instanceAttribute->getIsOwnedByFederate())
         throw AttributeNotOwned(i->getAttributeHandle().toString());
+#ifdef DEBUG_PRINTF
+      Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle());
       if (objectClass->getEffectiveAttributeSubscriptionType(i->getAttributeHandle()) == Unsubscribed)
       {
         Federate::Attribute* classAttribute = objectClass->getAttribute(i->getAttributeHandle());
         DebugPrintf("%s: InstanceAttribute %s::%s of %s is unsubscribed\n", __FUNCTION__, objectClass->getFQName().c_str(), classAttribute->getName().c_str(), objectInstance->getName().c_str());
       }
+#endif
       unsigned index = instanceAttribute->getTransportationType();
       passels[index].reserve(attributeValues.size());
       passels[index].push_back(AttributeValue());
@@ -2011,7 +2030,18 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
-    throw RTIinternalError("Not implemented");
+    const Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
+    const Federate::InstanceAttribute* attribute = objectInstance->getInstanceAttribute(attributeHandle);
+    if (!attribute)
+      throw AttributeNotDefined(attributeHandle.toString());
+    SharedPtr<QueryAttributeOwnershipRequestMessage> request;
+    request = new QueryAttributeOwnershipRequestMessage;
+    request->setFederationHandle(getFederationHandle());
+    request->setObjectInstanceHandle(objectInstanceHandle);
+    request->setAttributeHandle(attributeHandle);
+    send(request);
   }
 
   bool isAttributeOwnedByFederate(ObjectInstanceHandle objectInstanceHandle, AttributeHandle attributeHandle)
@@ -2873,6 +2903,8 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
+    if (_federate->getFederateName() == name)
+      return _federate->getFederateHandle();
     FederateHandle federateHandle = _federate->getFederateHandle(name);
     if (!federateHandle.valid())
       throw NameNotFound(name);
@@ -2890,6 +2922,8 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
+    if (_federate->getFederateHandle() == federateHandle)
+      return _federate->getFederateName();
     const Federate::_Federate* federate = _federate->getFederate(federateHandle);
     if (!federate)
       throw InvalidFederateHandle(federateHandle.toString());
@@ -3298,7 +3332,7 @@ public:
     // directly responds to the ambassadors own publication state. But
     // implementing this without real subscription tracking helps a lot of simple
     // examples to run correctly.
-    for (std::size_t i = 0; i < _federate->getNumObjectClasses(); ++i) {
+    for (uint32_t i = 0; i < _federate->getNumObjectClasses(); ++i) {
       const Federate::ObjectClass* objectClass = _federate->getObjectClass(ObjectClassHandle(i));
       if (!objectClass)
         continue;
@@ -3353,9 +3387,9 @@ public:
       const Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle());
       if (!objectClass)
         continue;
-      std::size_t numAttributes = objectClass->getNumAttributes();
+      uint32_t numAttributes = objectClass->getNumAttributes();
       AttributeHandleVector attributeHandleVector;
-      for (std::size_t j = 0; j < numAttributes; ++j) {
+      for (uint32_t j = 0; j < numAttributes; ++j) {
         const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(AttributeHandle(j));
         if (!instanceAttribute->getIsOwnedByFederate())
           continue;
@@ -3415,9 +3449,9 @@ public:
       const Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle());
       if (!objectClass)
         continue;
-      std::size_t numAttributes = objectClass->getNumAttributes();
+      uint32_t numAttributes = objectClass->getNumAttributes();
       AttributeHandleVector attributeHandleVector;
-      for (std::size_t j = 0; j < numAttributes; ++j) {
+      for (uint32_t j = 0; j < numAttributes; ++j) {
         const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(AttributeHandle(j));
         if (!instanceAttribute->getIsOwnedByFederate())
           continue;
@@ -3472,7 +3506,7 @@ public:
     // directly responds to the ambassadors own publication state. But
     // implementing this without real subscription tracking helps a lot of simple
     // examples to run correctly.
-    for (std::size_t i = 0; i < _federate->getNumInteractionClasses(); ++i) {
+    for (uint32_t i = 0; i < _federate->getNumInteractionClasses(); ++i) {
       const Federate::InteractionClass* interactionClass = _federate->getInteractionClass(InteractionClassHandle(i));
       if (!interactionClass)
         continue;
@@ -3841,6 +3875,7 @@ public:
       multipleObjectInstanceNameReservationFailed(stringVector);
     }
   }
+
   void acceptCallbackMessage(const InsertObjectInstanceMessage& message)
   {
     if (!_federate.valid())
@@ -3861,6 +3896,7 @@ public:
     _federate->insertObjectInstance(message.getObjectInstanceHandle(), message.getName(), objectClassHandle, false);
     discoverObjectInstance(message.getObjectInstanceHandle(), objectClassHandle, message.getName());
   }
+  
   void acceptCallbackMessage(const DeleteObjectInstanceMessage& message)
   {
     if (!_federate.valid())
@@ -3877,6 +3913,7 @@ public:
     }
     _releaseObjectInstance(message.getObjectInstanceHandle());
   }
+  
   void acceptCallbackMessage(const TimeStampedDeleteObjectInstanceMessage& message)
   {
     if (!_federate.valid())
@@ -3894,6 +3931,7 @@ public:
     }
     _releaseObjectInstance(message.getObjectInstanceHandle());
   }
+  
   void acceptCallbackMessage(const AttributeUpdateMessage& message)
   {
     if (!_federate.valid())
@@ -3910,6 +3948,7 @@ public:
     reflectAttributeValues(*objectClass, message.getObjectInstanceHandle(), message.getAttributeValues(), message.getTag(),
                            OpenRTI::RECEIVE, message.getTransportationType(), message.getFederateHandle());
   }
+  
   void acceptCallbackMessage(const TimeStampedAttributeUpdateMessage& message)
   {
     if (!_federate.valid())
@@ -4058,7 +4097,6 @@ public:
   virtual void removeObjectInstance(ObjectInstanceHandle objectInstanceHandle, const VariableLengthData& tag, OrderType sentOrder,
                                     const NativeLogicalTime& logicalTime, OrderType receivedOrder, FederateHandle federateHandle,
                                     MessageRetractionHandle messageRetractionHandle) = 0;
-
   virtual void receiveInteraction(const Federate::InteractionClass& interactionClass, InteractionClassHandle interactionClassHandle,
                                   const ParameterValueVector& parameterValueVector, const VariableLengthData& tag,
                                   OrderType sentOrder, TransportationType transportationType, FederateHandle federateHandle) = 0;
@@ -4111,8 +4149,11 @@ public:
   {
     return _timeManagement.get();
   }
+  
   virtual void acceptInternalMessage(const InsertFederationExecutionMessage& message)
   {
+    // IMPORTANT NOTE: this object's data will be completed later in 
+    // InternalAmbassador::acceptInternalMessage(const JoinFederationExecutionResponseMessage& message)
     _federate = new Federate;
     _federate->setFederationHandle(message.getFederationHandle());
     _federate->setLogicalTimeFactoryName(message.getLogicalTimeFactoryName());
@@ -4127,6 +4168,17 @@ public:
     _timeManagement->setNotificationHandle(_getNotificationHandle());
   }
 
+  void acceptInternalMessage(const JoinFederationExecutionResponseMessage& message) override
+  {
+    Federate* federate = getFederate();
+    if (!federate)
+      return;
+    federate->setFederateHandle(message.getFederateHandle());
+    federate->setFederateName(message.getFederateName());
+    federate->setFederateType(message.getFederateType());
+  }
+
+
   void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h)
   {
     _setNotificationHandle(h);
@@ -4137,7 +4189,7 @@ public:
   };
 
  private:
-  // True if callbck dispatch is enabled or if callbacks are held back
+  // True if callback dispatch is enabled or if callbacks are held back
   bool _callbacksEnabled;
   // The federate if available
   SharedPtr<Federate> _federate;

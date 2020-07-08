@@ -285,6 +285,20 @@ SocketAddress::cmp(const SocketAddress& socketAddress) const
   }
 }
 
+
+std::wstring SocketAddress::getHostName()
+{
+  DWORD bufferSize = 0;
+  std::wstring result;
+  BOOL ret = GetComputerNameExW(ComputerNameDnsFullyQualified, nullptr, &bufferSize);
+  if (!ret && GetLastError() == ERROR_MORE_DATA)
+  {
+    result.resize(bufferSize+1);
+    ret = GetComputerNameExW(ComputerNameDnsFullyQualified, result.data(), &bufferSize);
+  }
+  return result;
+}
+
 SocketAddress::PrivateData*
 SocketAddress::data()
 {

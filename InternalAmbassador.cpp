@@ -28,6 +28,7 @@
 #include "Message.h"
 
 #include "dprintf.h"
+#include "AbstractServer.h"
 
 namespace OpenRTI {
 
@@ -136,6 +137,11 @@ InternalAmbassador::acceptInternalMessage(const ConnectionLostMessage& message)
 }
 
 void
+InternalAmbassador::acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& message)
+{
+}
+
+void
 InternalAmbassador::acceptInternalMessage(const EnumerateFederationExecutionsResponseMessage& message)
 {
   queueCallback(message);
@@ -170,17 +176,6 @@ InternalAmbassador::acceptInternalMessage(const InsertModulesMessage& message)
   if (!federate)
     return;
   federate->insertFOMModuleList(message.getFOMModuleList());
-}
-
-void
-InternalAmbassador::acceptInternalMessage(const JoinFederationExecutionResponseMessage& message)
-{
-  Federate* federate = getFederate();
-  if (!federate)
-    return;
-  federate->setFederateHandle(message.getFederateHandle());
-  federate->setFederateName(message.getFederateName());
-  federate->setFederateType(message.getFederateType());
 }
 
 void
@@ -458,6 +453,12 @@ InternalAmbassador::acceptInternalMessage(const RequestClassAttributeUpdateMessa
   }
 }
 
+
+void InternalAmbassador::acceptInternalMessage(const QueryAttributeOwnershipRequestMessage& message)
+{
+
+}
+
 class OPENRTI_LOCAL InternalAmbassador::_CreateFederationExecutionFunctor {
 public:
   _CreateFederationExecutionFunctor(InternalAmbassador& basicAmbassador) :
@@ -538,10 +539,10 @@ InternalAmbassador::dispatchWaitDestroyFederationExecutionResponse(const Clock& 
 
 class OPENRTI_LOCAL InternalAmbassador::_JoinFederationExecutionFunctor {
 public:
-  _JoinFederationExecutionFunctor(InternalAmbassador& basicAmbassador) :
+  _JoinFederationExecutionFunctor(InternalAmbassador& basicAmbassador, std::string federateName) :
     _done(false),
     _response(JoinFederationExecutionResponseFederationExecutionDoesNotExist, std::string()),
-    _basicAmbassador(basicAmbassador)
+    _basicAmbassador(basicAmbassador), _federateName(federateName)
   { }
   void operator()(const ConnectionLostMessage& message)
   {
@@ -557,9 +558,12 @@ public:
   void operator()(const JoinFederationExecutionResponseMessage& message)
   {
     _basicAmbassador.acceptInternalMessage(message);
-    _response.first = message.getJoinFederationExecutionResponseType();
-    _response.second = message.getExceptionString();
-    _done = true;
+    if (message.getFederateName() == _federateName || (_federateName.empty() && message.getFederateName().compare(0, 11, "HLAfederate") == 0))
+    {
+      _response.first = message.getJoinFederationExecutionResponseType();
+      _response.second = message.getExceptionString();
+      _done = true;
+    }
   }
   template<typename M>
   void operator()(const M& message) const
@@ -570,12 +574,13 @@ public:
 
 private:
   InternalAmbassador& _basicAmbassador;
+  std::string _federateName;
 };
 
 std::pair<JoinFederationExecutionResponseType, std::string>
-InternalAmbassador::dispatchWaitJoinFederationExecutionResponse(const Clock& abstime)
+InternalAmbassador::dispatchWaitJoinFederationExecutionResponse(const Clock& abstime, std::string federateName)
 {
-  _JoinFederationExecutionFunctor functor(*this);
+  _JoinFederationExecutionFunctor functor(*this, federateName);
   while (!functor._done && Clock::now() <= abstime)
     receiveAndDispatch(abstime, functor);
   return functor._response;
@@ -684,7 +689,6 @@ InternalAmbassador::queueTimeStampedMessage(const VariableLengthData& timeStamp,
 void
 InternalAmbassador::queueReceiveOrderMessage(const AbstractMessage& message)
 {
-  //CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message.toString().c_str());
   if (InternalTimeManagement* timeManagement = getTimeManagement())
     timeManagement->queueReceiveOrderMessage(*this, message);
 }
@@ -696,7 +700,6 @@ InternalAmbassador::_dispatchCallbackMessage(AbstractMessageDispatcher& messageD
     SharedPtr<const AbstractMessage> message;
     message.swap(_callbackMessageList.front());
     _messageListPool.splice(_messageListPool.begin(), _callbackMessageList, _callbackMessageList.begin());
-    CondDebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message->toString().c_str());
     message->dispatch(messageDispatcher);
     return true;
   }
