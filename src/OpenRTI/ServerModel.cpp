@@ -737,6 +737,8 @@ InteractionClass::insert(ParameterDefinition& parameterDefinition)
   insertClassParameterFor(parameterDefinition);
 }
 
+// Normalize the given parameterFilters to match the this->_parameterFilterKeyPrototype. For unspecified values wildcards (empty VLD) will be inserted.
+// The result is split up to filterKeyVector (the parameter handles) and filterValueTuple.
 void InteractionClass::NormalizeFilterValues(const VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVector, VariableLengthDataTuple& filterValueTuple) const
 {
   filterKeyVector = ParameterHandleVector(_parameterFilterKeyPrototype);
@@ -759,10 +761,12 @@ void InteractionClass::NormalizeFilterValues(const VariableLengthDataTupleSet& f
   }
 }
 
+// Add the specified parameterFilters to the given VariableLengthDataTupleSet
 bool InteractionClass::AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters)
 {
   ParameterHandleVector filterKeyVector;
-  VariableLengthDataTuple filterValueTuple(filterKeyVector.size());
+  VariableLengthDataTuple filterValueTuple; // (filterKeyVector.size());
+  // update the _parameterFilterKeyPrototype, if necessary (new parameter handle specified in filter for the first time)
   for (auto& item : parameterFilters)
   {
     if (std::find(_parameterFilterKeyPrototype.begin(), _parameterFilterKeyPrototype.end(), item.getParameterHandle()) == _parameterFilterKeyPrototype.end())
@@ -770,9 +774,17 @@ bool InteractionClass::AddParameterFilterValues(VariableLengthDataTupleSet& filt
       _parameterFilterKeyPrototype.push_back(item.getParameterHandle());
     }
   }
+  // bring the parameterFilters into a form matching _parameterFilterKeyPrototype. 
   NormalizeFilterValues(filterValueTuples, parameterFilters, filterKeyVector, filterValueTuple);
-  filterValueTuples.Insert(filterValueTuple);
-  return true;
+  if (!filterValueTuples.Contains(filterValueTuple))
+  {
+    filterValueTuples.Insert(filterValueTuple);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilters)
@@ -860,7 +872,7 @@ bool InteractionClass::isMatching(const ConnectHandle& connectHandle, const Para
   }
 
   ParameterHandleVector filterKeyVector;
-  VariableLengthDataTuple filterValueTuple(filterKeyVector.size());
+  VariableLengthDataTuple filterValueTuple;
 
   NormalizeFilterValues(parameterFilterMap, parameterValues, filterKeyVector, filterValueTuple);
   return parameterFilterMap.FindNormalized(filterValueTuple);

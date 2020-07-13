@@ -96,15 +96,15 @@ MomServer::MomServer(ServerModel::Federation* federation, AbstractServer* server
   , _isRoot(isRoot)
   , _ownerFederate(ownerFederateHandle)
 {
-  DebugPrintf(">>> %s(federation=%s isRoot=%d)\n", __FUNCTION__, federation->getName().c_str(), isRoot);
+  //DebugPrintf(">>> %s(federation=%s isRoot=%d)\n", __FUNCTION__, federation->getName().c_str(), isRoot);
   connect(server);
   joinFederationExecution(federation);
-  DebugPrintf("<<< %s\n", __FUNCTION__);
+  //DebugPrintf("<<< %s\n", __FUNCTION__);
 }
 
 MomServer::~MomServer()
 {
-  DebugPrintf("%s\n", __FUNCTION__);
+  //DebugPrintf("%s\n", __FUNCTION__);
   assert(_rtiFederate == nullptr);
   assert(!_ownerFederate.valid());
 }
@@ -120,7 +120,7 @@ public:
   }
   virtual void close() override
   {
-    DebugPrintf("%s\n");
+    //DebugPrintf("%s\n");
   }
 private:
   MomServer& _momServer;
@@ -128,11 +128,11 @@ private:
 
 void MomServer::connect(AbstractServer* server)
 {
-  DebugPrintf(">>> %s\n", __FUNCTION__);
+  //DebugPrintf(">>> %s\n", __FUNCTION__);
   StringStringListMap connectOptions;
   _dispatcher = new _MomMessageDispatcher(*this);
   _connect = server->sendDirectConnect(_dispatcher, connectOptions);
-  DebugPrintf("<<< %s\n", __FUNCTION__);
+  //DebugPrintf("<<< %s\n", __FUNCTION__);
 }
 
 FederateHandle MomServer::getFederateHandle(const std::string& name)
@@ -151,12 +151,12 @@ FederateHandle MomServer::getFederateHandle(const std::string& name)
 
 void MomServer::accept(const AbstractMessage& message)
 {
-  DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
 }
 
 void MomServer::accept(const InsertFederationExecutionMessage& message)
 {
-  DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
   // IMPORTANT NOTE: this object's data will be completed later in 
   // accept(const JoinFederationExecutionResponseMessage& message)
   _rtiFederate = new Federate;
@@ -166,7 +166,7 @@ void MomServer::accept(const InsertFederationExecutionMessage& message)
 
 void MomServer::accept(const EraseFederationExecutionMessage& message)
 {
-  DebugPrintf("%s(EraseFederationExecutionMessage): dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  //DebugPrintf("%s(EraseFederationExecutionMessage): dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
   _federation = nullptr;
   SharedPtr<ReleaseFederationHandleMessage> release = new ReleaseFederationHandleMessage;
   release->setFederationHandle(message.getFederationHandle());
@@ -175,7 +175,7 @@ void MomServer::accept(const EraseFederationExecutionMessage& message)
 
 void MomServer::accept(const JoinFederationExecutionResponseMessage& message)
 {
-  DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
   _joinResponse = message.getJoinFederationExecutionResponseType();
   if (_joinResponse == JoinFederationExecutionResponseSuccess)
   {
@@ -192,7 +192,7 @@ void MomServer::accept(const JoinFederationExecutionResponseMessage& message)
 
 void MomServer::accept(const JoinFederateNotifyMessage& message)
 {
-  DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
   _rtiFederate->insertFederate(message.getFederateHandle(), message.getFederateName());
   if (!_isRoot)
   {
@@ -205,11 +205,11 @@ void MomServer::accept(const JoinFederateNotifyMessage& message)
 
 void MomServer::accept(const ResignFederateNotifyMessage& message)
 {
-  DebugPrintf("%s: ResignFederateNotifyMessage handle=%s owner=%s\n", __FUNCTION__, message.getFederateHandle().toString().c_str(), _ownerFederate.toString().c_str());
+  //DebugPrintf("%s: ResignFederateNotifyMessage handle=%s owner=%s\n", __FUNCTION__, message.getFederateHandle().toString().c_str(), _ownerFederate.toString().c_str());
   notifyFederateResigned(message.getFederateHandle());
   if (_ownerFederate.valid() && message.getFederateHandle() == _ownerFederate)
   {
-    DebugPrintf("%s: owner federate resigned\n", __FUNCTION__);
+    //DebugPrintf("%s: owner federate resigned\n", __FUNCTION__);
     _ownerFederate = FederateHandle();
   }
   if (_rtiFederate == nullptr)
@@ -219,7 +219,7 @@ void MomServer::accept(const ResignFederateNotifyMessage& message)
   if (message.getFederateHandle() == _rtiFederate->getFederateHandle())
   {
     // It's us again - now we're off.
-    DebugPrintf("%s: resigned from federation\n", __FUNCTION__);
+    //DebugPrintf("%s: resigned from federation\n", __FUNCTION__);
     _rtiFederate = nullptr;
     _federation = nullptr;
     //_connect = nullptr;
@@ -232,7 +232,7 @@ void MomServer::accept(const ResignFederateNotifyMessage& message)
 
 void MomServer::accept(const EnableTimeConstrainedNotifyMessage& message)
 {
-  DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
   if (_momManager != nullptr && message.getFederateHandle() == _ownerFederate)
   {
     if (_momManager->getFederate() != nullptr)
@@ -241,7 +241,7 @@ void MomServer::accept(const EnableTimeConstrainedNotifyMessage& message)
     }
     else
     {
-      DebugPrintf("%s(EnableTimeConstrainedNotifyMessage): owner federate not yet present\n", __FUNCTION__);
+      //DebugPrintf("%s(EnableTimeConstrainedNotifyMessage): owner federate not yet present\n", __FUNCTION__);
     }
   }
 }
@@ -298,7 +298,7 @@ void MomServer::accept(const ReserveObjectInstanceNameResponseMessage& message)
   if (!_rtiFederate.valid())
     return;
   auto& objectInstanceHandleNamePair = message.getObjectInstanceHandleNamePair();
-  //DebugPrintf("%s: success=%d %s => %s\n", __FUNCTION__, 
+  ////DebugPrintf("%s: success=%d %s => %s\n", __FUNCTION__, 
   //            message.getSuccess(), objectInstanceHandleNamePair.second.c_str(), objectInstanceHandleNamePair.first.toString().c_str());
   if (message.getSuccess())
   {
@@ -310,12 +310,12 @@ void MomServer::accept(const ReserveObjectInstanceNameResponseMessage& message)
     }
     else
     {
-      DebugPrintf("no pending object instance name reservation for %s\n", objectInstanceHandleNamePair.second.c_str());
+      //DebugPrintf("no pending object instance name reservation for %s\n", objectInstanceHandleNamePair.second.c_str());
     }
   }
   else
   {
-    DebugPrintf("%s: ReserveObjectInstanceName FAILED: %s\n", __FUNCTION__, objectInstanceHandleNamePair.second.c_str());
+    //DebugPrintf("%s: ReserveObjectInstanceName FAILED: %s\n", __FUNCTION__, objectInstanceHandleNamePair.second.c_str());
   }
 }
 
@@ -361,7 +361,7 @@ void MomServer::accept(const InsertModulesMessage& message)
 
 void MomServer::accept(const ReserveObjectInstanceNameRequestMessage& message)
 {
-  DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
 }
 
 

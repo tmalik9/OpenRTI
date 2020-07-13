@@ -76,11 +76,11 @@
         <transportation>HLAreliable</transportation>
         <parameter>
           <name>xa</name>
-          <dataType>HLAopaqueData</dataType>
+          <dataType>HLAunicodeString</dataType>
         </parameter>
         <parameter>
         <name>xb</name>
-          <dataType>HLAopaqueData</dataType>
+          <dataType>HLAunicodeString</dataType>
         </parameter>
       </interactionClass>
     </interactionClass>

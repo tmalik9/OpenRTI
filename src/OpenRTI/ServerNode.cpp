@@ -28,8 +28,19 @@
 #include "ServerOptions.h"
 #include "mom/MomServer.h"
 #include "mom/AbstractFederateMetrics.h"
+#include "StringUtils.h"
 
 namespace OpenRTI {
+
+inline std::string to_string(const ConnectHandleSet& connectHandleSet)
+{
+  StringList resultList;
+  for (auto& connectHandle : connectHandleSet)
+  {
+    resultList.push_back(connectHandle.toString());
+  }
+  return join(resultList, ", ", false);
+}
 
 class OPENRTI_LOCAL FederationServer : public ServerModel::Federation {
 public:
@@ -779,91 +790,6 @@ public:
   }
 
   // (un)publish messages for interactions
-  void accept(const ConnectHandle& connectHandle, const ChangeInteractionClassPublicationMessage* message)
-  {
-    ServerModel::InteractionClass* interactionClass = getInteractionClass(message->getInteractionClassHandle());
-    if (!interactionClass)
-      return;
-    // Change publication type for this connect ...
-    ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
-    propagationConnectPair = interactionClass->setPublicationType(connectHandle, message->getPublicationType());
-    if (message->getPublicationType() == PublicationType::Unpublished)
-    {
-      interactionClassUnpublished(connectHandle, interactionClass);
-    }
-    else
-    {
-      interactionClassPublished(connectHandle, interactionClass);
-    }
-    //DebugPrintf("%s(ChangeInteractionClassPublicationMessage): iclass=%s connectHandle=%s propagation=%s publishers=%s\n", __FUNCTION__, 
-    //            interactionClass->getFQName().c_str(),
-    //            connectHandle.toString().c_str(),
-    //            to_string(propagationConnectPair.first).c_str(),
-    //            to_string(interactionClass->getPublishingConnectHandleSet()).c_str()
-    //            );
-    // ... and propagate further if required.
-    switch (propagationConnectPair.first) {
-    case ServerModel::PropagateBroadcast:
-      broadcast(connectHandle, message);
-      break;
-    case ServerModel::PropagateSend:
-      send(propagationConnectPair.second, message);
-      break;
-    case ServerModel::PropagateNone:
-      break;
-    }
-
-    // See if and how we should respond to that publication
-    SubscriptionType subscriptionType = interactionClass->getSubscriptionTypeToConnect(connectHandle);
-    if (subscriptionType != Unsubscribed) {
-      if (message->getPublicationType() == Published) {
-        if (interactionClass->hasFilterSubscriptions())
-        {
-          auto& subscribers = interactionClass->getSubscribedConnectHandleSet();
-          for (const ConnectHandle& subscriber : subscribers)
-          {
-            // send one message per subscriber
-            SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
-            subscription = new ChangeInteractionClassSubscriptionMessage;
-            subscription->setFederationHandle(getFederationHandle());
-            subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
-            subscription->setSubscriptionType(subscriptionType);
-            std::list<ParameterValueVector> parameterFilters = interactionClass->getParameterFilters(subscriber);
-            if (parameterFilters.empty())
-            {
-              send(connectHandle, subscription);
-            }
-            else
-            {
-              for (auto&& parameters : parameterFilters)
-              {
-                subscription->setParameterFilterValues(parameters);
-                send(connectHandle, subscription);
-              }
-            }
-          }
-        }
-        else
-        {
-          // send one message, w/o filters
-          SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
-          subscription = new ChangeInteractionClassSubscriptionMessage;
-          subscription->setFederationHandle(getFederationHandle());
-          subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
-          subscription->setSubscriptionType(subscriptionType);
-          send(connectHandle, subscription);
-        }
-      } else { // != Published
-        SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
-        subscription = new ChangeInteractionClassSubscriptionMessage;
-        subscription->setFederationHandle(getFederationHandle());
-        subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
-        subscription->setSubscriptionType(Unsubscribed);
-        send(connectHandle, subscription);
-      }
-    }
-  }
-
   void accept(const ConnectHandle& connectHandle, const ChangeObjectClassPublicationMessage* message)
   {
     ServerModel::ObjectClass* objectClass = ServerModel::Federation::getObjectClass(message->getObjectClassHandle());
@@ -995,6 +921,99 @@ public:
     }
   }
 
+  void accept(const ConnectHandle& connectHandle, const ChangeInteractionClassPublicationMessage* message)
+  {
+    ServerModel::InteractionClass* interactionClass = getInteractionClass(message->getInteractionClassHandle());
+    if (!interactionClass)
+      return;
+    // Change publication type for this connect ...
+    ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
+    propagationConnectPair = interactionClass->setPublicationType(connectHandle, message->getPublicationType());
+    if (message->getPublicationType() == PublicationType::Unpublished)
+    {
+      interactionClassUnpublished(connectHandle, interactionClass);
+    }
+    else
+    {
+      interactionClassPublished(connectHandle, interactionClass);
+    }
+
+    // ... and propagate further if required.
+    switch (propagationConnectPair.first)
+    {
+      case ServerModel::PropagateBroadcast:
+        broadcast(connectHandle, message);
+        break;
+
+      case ServerModel::PropagateSend:
+        send(propagationConnectPair.second, message);
+        break;
+
+      case ServerModel::PropagateNone:
+        break;
+    }
+
+    // See if and how we should respond to that publication
+    // We need to tell the publisher (originator of the ChangeInteractionClassPublicationMessage) about possibly
+    // existing subscribers and their filters.
+    // getSubscriptionTypeToConnect yields Subscribed, if there are other subscribers besides
+    // the originator (designated by connectHandle).
+    if (message->getPublicationType() == Published)
+    {
+      // only care if the originator tells us he publishes sth.
+      SubscriptionType subscriptionType = interactionClass->getSubscriptionTypeToConnect(connectHandle);
+      if (subscriptionType != Unsubscribed)
+      {
+        if (interactionClass->hasFilterSubscriptions())
+        {
+          // there is at least one subscriber with filters - get their respective filter sets
+          auto& subscribers = interactionClass->getSubscribedConnectHandleSet();
+          for (const ConnectHandle& subscriber : subscribers)
+          {
+            // get the whole filter tuple set of the connection's subscription
+            std::list<ParameterValueVector> parameterFilters = interactionClass->getParameterFilters(subscriber);
+            if (parameterFilters.empty())
+            {
+              // the filter tuple is empty - never mind, send a regular, unfiltered subscription
+              SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
+              subscription = new ChangeInteractionClassSubscriptionMessage;
+              subscription->setFederationHandle(getFederationHandle());
+              subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
+              subscription->setSubscriptionType(subscriptionType);
+              send(connectHandle, subscription);
+            }
+            else
+            {
+              // the filter is not empty, send one message per tuple.
+              // ATTENTION SharedPtr's must not be reused here ...
+              for (auto& parameters : parameterFilters)
+              {
+                SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
+                subscription = new ChangeInteractionClassSubscriptionMessage;
+                subscription->setFederationHandle(getFederationHandle());
+                subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
+                subscription->setSubscriptionType(subscriptionType);
+                subscription->setParameterFilterValues(parameters);
+                send(connectHandle, subscription);
+              }
+            }
+          }
+        }
+        else
+        {
+          // send a regular, unfiltered subscription message to the publisher/originator
+          SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
+          subscription = new ChangeInteractionClassSubscriptionMessage;
+          subscription->setFederationHandle(getFederationHandle());
+          subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
+          subscription->setSubscriptionType(subscriptionType);
+
+          send(connectHandle, subscription);
+        }
+      }
+    }
+  }
+
   // (un)subscription messages for interactions
   void accept(const ConnectHandle& connectHandle, const ChangeInteractionClassSubscriptionMessage* message)
   {
@@ -1014,6 +1033,7 @@ public:
       interactionClassSubscribed(connectHandle, interactionClass, message->getSubscriptionType() == SubscribedActive);
     }
     bool filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues);
+
     // Update the receiving connect handle set
     interactionClass->updateCumulativeSubscription(connectHandle);
     // ... and propagate further if required.
@@ -1028,13 +1048,6 @@ public:
       // MUST still be forwarded when filter has changed => TODO: integrate filter settings into setSubscriptionType
       if (filterChanged)
       {
-        //DebugPrintf("%s(ChangeInteractionClassSubscriptionMessage): filter changed: iclass=%s connectHandle=%s #parameterFilterValues=%d filterChanged=%d propagation=%s publishers=%s\n", __FUNCTION__, 
-        //            interactionClass->getFQName().c_str(),
-        //            connectHandle.toString().c_str(),
-        //            parameterFilterValues.size(), filterChanged,
-        //            to_string(propagationConnectPair.first).c_str(),
-        //            to_string(interactionClass->getPublishingConnectHandleSet()).c_str()
-        //            );
         send(interactionClass->getPublishingConnectHandleSet(), connectHandle, message);
       }
       break;
@@ -1677,6 +1690,10 @@ public:
             // interaction class specified in message
             if (interactionClass->isMatching(subscriberConnectHandle, message->getParameterValues())) {
               send(subscriberConnectHandle, message);
+            }
+            else
+            {
+              DebugPrintf("%s(TimeStampedInteractionMessage): not matched\n", __FUNCTION__);
             }
           } else {
             // parent interaction class

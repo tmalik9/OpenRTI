@@ -112,9 +112,25 @@ caseCompare(const std::string& l, const char* r)
 }
 
 OPENRTI_API bool
+startsWith(const std::string& s, const char* head)
+{
+  size_t l = strlen(head);
+  if (l <= s.size())
+  {
+    return s.substr(0, l) == head;
+  }
+  return false;
+}
+
+OPENRTI_API bool
 endsWith(const std::string& s, const char* tail)
 {
-  return s.size() - s.rfind(tail) == std::strlen(tail);
+  size_t l = strlen(tail);
+  if (l <= s.size())
+  {
+    return s.substr(s.size()-l, l) == tail;
+  }
+  return false;
 }
 
 OPENRTI_API bool

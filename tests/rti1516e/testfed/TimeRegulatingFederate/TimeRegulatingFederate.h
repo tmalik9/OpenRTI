@@ -19,6 +19,11 @@ class TimeRegulatingFederate : public SimpleTestFederate
     virtual ~TimeRegulatingFederate();
     void step() override;
     void initializeSimulation() override;
+
+    void InitializeInteraction();
+
+    void InitializeObjects();
+
     void cleanupSimulation() override;
   private:
     //ObjectInstanceHandle registerObject(const wchar_t* className);
@@ -37,9 +42,10 @@ class TimeRegulatingFederate : public SimpleTestFederate
     AttributeHandle        baHandle;
     AttributeHandle        bbHandle;
     AttributeHandle        bcHandle;
-    InteractionClassHandle xHandle;
-    ParameterHandle        xaHandle;
-    ParameterHandle        xbHandle;
+
+    InteractionClassHandle x_InteractionClass;
+    ParameterHandle        xa_Parameter;
+    ParameterHandle        xb_Parameter;
 
     // instance specific
     ObjectClassHandle      myPublishedObjectClass;

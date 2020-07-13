@@ -13,6 +13,7 @@
 
 #include "dprintf.h"
 #include <assert.h>
+#include "RTI/encoding/BasicDataElements.h"
 
 using namespace rti1516e;
 using std::cout;
@@ -32,7 +33,7 @@ TimeRegulatingFederate::~TimeRegulatingFederate()
 void TimeRegulatingFederate::step()
 {
   /// 9.1 update the attribute values of the instance
-  updateAttributeValues(myPublishedObject);
+  //updateAttributeValues(myPublishedObject);
   /// 9.2 send an interaction
   sendInteraction();
   /// 9.3 request a time advance and wait until we get it
@@ -41,6 +42,39 @@ void TimeRegulatingFederate::step()
 }
 
 void TimeRegulatingFederate::initializeSimulation()
+{
+  //InitializeObjects();
+  waitForUser("before publish");
+  InitializeInteraction();
+  waitForUser("after publish");
+  setNotificationHandle();
+}
+
+
+void TimeRegulatingFederate::InitializeInteraction()
+{
+  x_InteractionClass = mRtiAmb->getInteractionClassHandle(L"HLAinteractionRoot.X");
+  xa_Parameter = mRtiAmb->getParameterHandle(x_InteractionClass, to_wstring("xa"));
+  xb_Parameter = mRtiAmb->getParameterHandle(x_InteractionClass, to_wstring("xb"));
+
+  //////////////////////////////////////////////////////
+  /// publish the interaction class InteractionRoot.X
+  //////////////////////////////////////////////////////
+  /// we want to send interactions of type InteractionRoot.X, so we need
+  /// to tell the RTI that we're publishing it first. We don't need to
+  /// inform it of the parameters, only the class, making it much simpler
+  /// do the publication
+  mRtiAmb->publishInteractionClass(this->x_InteractionClass);
+  printf("publish interaction %ls\n", mRtiAmb->getInteractionClassName(this->x_InteractionClass).c_str());
+  /////////////////////////////////////////////////////
+  /// subscribe to the InteractionRoot.X interaction //
+  /////////////////////////////////////////////////////
+  /// we also want to receive other interaction of the same type that are
+  /// sent out by other federates, so we have to subscribe to it first
+  //mRtiAmb->subscribeInteractionClass(this->xHandle);
+}
+
+void TimeRegulatingFederate::InitializeObjects()
 {
   ObjectClassHandle aHandle = mRtiAmb->getObjectClassHandle(L"HLAobjectRoot.A");
   ObjectClassHandle bHandle = mRtiAmb->getObjectClassHandle(L"HLAobjectRoot.B");
@@ -54,9 +88,6 @@ void TimeRegulatingFederate::initializeSimulation()
   baHandle = mRtiAmb->getAttributeHandle(bHandle, L"ba");
   bbHandle = mRtiAmb->getAttributeHandle(bHandle, L"bb");
   bcHandle = mRtiAmb->getAttributeHandle(bHandle, L"bc");
-  xHandle  = mRtiAmb->getInteractionClassHandle(L"HLAinteractionRoot.X");
-  xaHandle = mRtiAmb->getParameterHandle(xHandle, to_wstring("xa"));
-  xbHandle = mRtiAmb->getParameterHandle(xHandle, to_wstring("xb"));
 
   AttributeHandleSet attributesOfA;
   AttributeHandleSet attributesOfB;
@@ -80,30 +111,18 @@ void TimeRegulatingFederate::initializeSimulation()
   /// created and altered in other federates, so we need to subscribe to it
   mRtiAmb->subscribeObjectClassAttributes(mObjectClassHandles["HLAobjectRoot.A"], attributesOfA, true);
   mRtiAmb->subscribeObjectClassAttributes(mObjectClassHandles["HLAobjectRoot.B"], attributesOfB, true);
-  //////////////////////////////////////////////////////
-  /// publish the interaction class InteractionRoot.X
-  //////////////////////////////////////////////////////
-  /// we want to send interactions of type InteractionRoot.X, so we need
-  /// to tell the RTI that we're publishing it first. We don't need to
-  /// inform it of the parameters, only the class, making it much simpler
-  /// do the publication
-  mRtiAmb->publishInteractionClass(this->xHandle);
-  /////////////////////////////////////////////////////
-  /// subscribe to the InteractionRoot.X interaction //
-  /////////////////////////////////////////////////////
-  /// we also want to receive other interaction of the same type that are
-  /// sent out by other federates, so we have to subscribe to it first
-  mRtiAmb->subscribeInteractionClass(this->xHandle);
+  mRtiAmb->subscribeInteractionClass(this->x_InteractionClass);
   myPublishedObject = mRtiAmb->registerObjectInstance(myPublishedObjectClass);
-  DebugPrintf("Registered Object, handle=%ls class==%ls", myPublishedObject.toString().c_str(), mRtiAmb->getObjectClassName(mRtiAmb->getKnownObjectClassHandle(myPublishedObject)).c_str());
-  setNotificationHandle();
+  printf("Registered Object, handle=%ls class==%ls", myPublishedObject.toString().c_str(), mRtiAmb->getObjectClassName(mRtiAmb->getKnownObjectClassHandle(myPublishedObject)).c_str());
 }
-
 
 void TimeRegulatingFederate::cleanupSimulation()
 {
-  deleteObject(myPublishedObject);
-  DebugPrintf("Deleted Object, handle=%ls", myPublishedObject.toString().c_str());
+  if (myPublishedObject.isValid())
+  {
+    deleteObject(myPublishedObject);
+    printf("Deleted Object, handle=%ls", myPublishedObject.toString().c_str());
+  }
 }
 
 void TimeRegulatingFederate::sendInteraction()
@@ -114,11 +133,13 @@ void TimeRegulatingFederate::sendInteraction()
   /// create the collection to store the values in
   ParameterHandleValueMap parameters;
   /// generate the new values
-  wchar_t xaValue[16], xbValue[16];
-  swprintf(xaValue, 16, L"xa:%f", getLbts());
+  //wchar_t xaValue[16], xbValue[16];
+  wchar_t xbValue[16];
+  //swprintf(xaValue, 16, L"xa:%f", getLbts());
   swprintf(xbValue, 16, L"xb:%f", getLbts());
-  parameters[xaHandle] = toVariableLengthData(xaValue);
-  parameters[xbHandle] = toVariableLengthData(xbValue);
+  //parameters[xaHandle] = xaEncoded.encode();
+  parameters[xa_Parameter] = HLAunicodeString(L"test1").encode();
+  parameters[xb_Parameter] = HLAunicodeString(xbValue).encode();
   ///////////////////////////
   /// send the interaction
   ///////////////////////////
@@ -127,7 +148,8 @@ void TimeRegulatingFederate::sendInteraction()
   /// interaction, you will have to supply it to the RTI. Here
   /// we send another interaction, this time with a timestamp:
   HLAfloat64Time time = federateTime + federateLookahead;
-  mRtiAmb->sendInteraction(xHandle, parameters, toVariableLengthData(L"hi!"), time);
+  VariableLengthData tag;
+  mRtiAmb->sendInteraction(x_InteractionClass, parameters, tag, time);
 }
 
 void TimeRegulatingFederate::updateAttributeValues(ObjectInstanceHandle theObject)

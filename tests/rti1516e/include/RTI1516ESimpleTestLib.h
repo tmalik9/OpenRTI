@@ -12,6 +12,7 @@
 
 using namespace rti1516e;
 
+#define INITIALIZED L"Initialized"
 #define READY_TO_RUN L"ReadyToRun"
 #define ALL_DONE L"AllDone"
 
@@ -64,7 +65,7 @@ class SimpleTestFederate : public NullFederateAmbassador
     virtual void step() = 0;
     void setDone() { _done = true; }
 
-    void waitForUser();
+    void waitForUser(const std::string& tag);
     void advanceTime(double timestep);
     double getFederateTime() const;
     double getLbts() const;
@@ -196,8 +197,10 @@ protected:
     bool isRegulating;
     bool isConstrained;
     bool isAdvancing;
+    bool isAnnouncedInitialized;
     bool isAnnouncedReadyToRun;
     bool isAnnouncedAllDone;
+    bool _syncedInitialized;
     bool _syncedReadyToRun;
     bool _syncedAllDone;
 
