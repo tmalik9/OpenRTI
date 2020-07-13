@@ -36,7 +36,8 @@ class VariableLengthDataTuple
   public:
     typedef ImplType::size_type size_type;
 
-    VariableLengthDataTuple(size_t size);
+    VariableLengthDataTuple()  : mImpl() {}
+    VariableLengthDataTuple(size_t size)  : mImpl(size) {}
     VariableLengthDataTuple(const VariableLengthDataTuple& other) : mImpl(other.mImpl) {}
     VariableLengthDataTuple(VariableLengthDataTuple&& other) : mImpl(std::move(other.mImpl)) {}
     VariableLengthDataTuple& operator=(const VariableLengthDataTuple& other)
@@ -81,9 +82,13 @@ class VariableLengthDataTupleSet
   private:
     typedef std::vector<VariableLengthDataTuple> ImplType;
     typedef ImplType::size_type IndexType;
+    // set of row indices
     typedef std::set<IndexType> IndexSet;
+    // mapping of a VLD value, specific to a column, to row indices in which the value occurs
     typedef std::map<VariableLengthData, IndexSet> ValueToIndexSet;
+    // type of the whole container: the vector index is the respective column index
     typedef std::vector<ValueToIndexSet> ValueToIndexSets;
+    // for a given column (= index into the vector), the IndexSet (= rows) containing wildcards
     typedef std::vector<IndexSet> WildcardIndexSets;
 
   public:
@@ -102,11 +107,16 @@ class VariableLengthDataTupleSet
 
     const VariableLengthDataTuple& operator[](size_t index) const { return mImpl[index]; }
 
+    // Insert a value tuple. A match for existing tuples is not done here!
     void Insert(const VariableLengthDataTuple& newTuple);
+    // Returns true if newTuple matches any existing tuple, including wildcard match
     bool FindNormalized(const VariableLengthDataTuple& newTuple) const;
+    // Returns true if the tuple set already contains a tuple equal to newTuple. Just a linear search for the tuple will be done.
+    bool Contains(const VariableLengthDataTuple& newTuple) const;
     friend std::ostream& operator<<(std::ostream& out, const VariableLengthDataTupleSet& tupleSet);
     friend std::ostream& operator<<(std::ostream& out, const VariableLengthDataTupleSet::IndexSet& indexSet);
   private:
+    // updates the index set relating to the given column ( = positionInTuple) with the new index (row) of the given value
     void UpdateIndexSet(const VariableLengthData& value, VariableLengthDataTuple::size_type positionInTuple, VariableLengthDataTupleSet::ImplType::size_type newIndex);
     IndexType mTupleSize = 0;
     ImplType mImpl;

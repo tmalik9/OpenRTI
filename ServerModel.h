@@ -1179,6 +1179,7 @@ public:
   bool isMatching(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues) const;
   std::list<ParameterValueVector> getParameterFilters(const ConnectHandle& connectHandle);
   void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+  const ParameterFilterMapByConnect& getParameterFiltersByConnect() const { return _parameterFiltersByConnect; }
 private:
   InteractionClass(const InteractionClass&) = delete;
   InteractionClass& operator=(const InteractionClass&) = delete;

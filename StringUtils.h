@@ -55,6 +55,9 @@ OPENRTI_API bool
 caseCompare(const std::string& s, const char* cmp);
 
 OPENRTI_API bool
+startsWith(const std::string& s, const char* tail);
+
+OPENRTI_API bool
 endsWith(const std::string& s, const char* tail);
 
 /// checks for a file case insensitive extension

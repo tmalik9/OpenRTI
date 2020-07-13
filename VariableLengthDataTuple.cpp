@@ -62,6 +62,7 @@ void VariableLengthDataTupleSet::UpdateIndexSet(const VariableLengthData& value,
     }
   }
 }
+
 void VariableLengthDataTupleSet::Insert(const VariableLengthDataTuple& newTuple)
 {
   //std::cout << "Insert " << newTuple << std::endl;
@@ -86,16 +87,18 @@ void VariableLengthDataTupleSet::Insert(const VariableLengthDataTuple& newTuple)
   //std::cout << "Done Insert " << newTuple << std::endl;
 }
 
-
 bool VariableLengthDataTupleSet::FindNormalized(const VariableLengthDataTuple& valueTuple) const
 {
   //std::cout << "FindNormalized " << valueTuple << std::endl;
   if (valueTuple.size() != mTupleSize) return false;
+
+  // step 1: for each column, build sets of matched row indices, and include these index sets to a list.
   std::list<IndexSet> resultIndexSets;
-  for (VariableLengthDataTuple::size_type column = 0;column < mTupleSize; column++)
+  for (VariableLengthDataTuple::size_type column = 0; column < mTupleSize; column++)
   {
     const auto& value = valueTuple[column];
-    if (value.empty()) continue;
+    if (value.empty()) // given column value is a wildcard
+      continue;
     const ValueToIndexSet& valueToIndexSet = mIndexSets[column];
     auto indexSetIter = valueToIndexSet.find(value);
     if (indexSetIter != valueToIndexSet.end())
@@ -109,6 +112,7 @@ bool VariableLengthDataTupleSet::FindNormalized(const VariableLengthDataTuple& v
       resultIndexSets.push_back(mWildcardIndexSets[column]);
     }
   }
+  // step 2: build intersection of all index sets. The resulting set is the set of rows matching the value tuple.
   if (resultIndexSets.empty())
   {
     // trivial case: all value columns were wildcards
@@ -126,6 +130,19 @@ bool VariableLengthDataTupleSet::FindNormalized(const VariableLengthDataTuple& v
   }
   //std::cout << "intersection set=" << intersectionSet << std::endl;
   return !intersectionSet.empty();
+}
+
+
+bool VariableLengthDataTupleSet::Contains(const VariableLengthDataTuple& newTuple) const
+{
+  for (auto& tuple : mImpl)
+  {
+    if (tuple == newTuple)
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 std::ostream& operator<<(std::ostream& out, const VariableLengthDataTuple& vldTuple)
@@ -181,10 +198,5 @@ std::ostream& operator<<(std::ostream& out, const VariableLengthDataTupleSet& tu
   return out;
 }
 
-
-VariableLengthDataTuple::VariableLengthDataTuple(size_t size) : mImpl(size)
-{
-
-}
 
 } // namespace OpenRTI

@@ -421,11 +421,11 @@ void MomManager::publishSubscribeInteractions()
   for (auto handler : handlers)
   {
     InteractionClassHandle request = handler->getRequestInteractionClass();
-    DebugPrintf("%s: subscribed to request %s, %d responses\n", __FUNCTION__, _momServer->getInteractionClassName(request).c_str(), handler->getResponseInteractionClasses().size());
+    //DebugPrintf("%s: subscribed to request %s, %d responses\n", __FUNCTION__, _momServer->getInteractionClassName(request).c_str(), handler->getResponseInteractionClasses().size());
     _momServer->subscribeInteractionClassWithFilter(request, filter, true);
     for (auto ic : handler->getResponseInteractionClasses())
     {
-      DebugPrintf("%s: publish response %s\n", __FUNCTION__, _momServer->getInteractionClassName(ic).c_str());
+      //DebugPrintf("%s: publish response %s\n", __FUNCTION__, _momServer->getInteractionClassName(ic).c_str());
       _momServer->publishInteractionClass(ic);
     }
     mMomInteractionHandlers[request] = handler;
@@ -435,7 +435,7 @@ void MomManager::publishSubscribeInteractions()
 // called by the root server after the federation has been created and the RTI federate joined the federation
 void MomManager::notifyFederationCreated(const std::string& federationName)
 {
-  DebugPrintf(">>> %s\n", __FUNCTION__);
+  //DebugPrintf(">>> %s\n", __FUNCTION__);
   if (_momServer->isRoot())
   {
     try
@@ -445,7 +445,7 @@ void MomManager::notifyFederationCreated(const std::string& federationName)
         mFederationObject = _momServer->registerObjectInstance(mFederationObjectClass, federationName);
         mFederation = RegisterFederation(mFederationObject);
         provideAttributeValueUpdate(mFederationObject, mFederation->GetKnownAttributes());
-        DebugPrintf("%s: created federation object %s\n", __FUNCTION__, federationName.c_str());
+        //DebugPrintf("%s: created federation object %s\n", __FUNCTION__, federationName.c_str());
       });
     }
     catch (const Exception& e)
@@ -454,36 +454,36 @@ void MomManager::notifyFederationCreated(const std::string& federationName)
       throw;
     }
   }
-  DebugPrintf("<<< %s\n", __FUNCTION__);
+  //DebugPrintf("<<< %s\n", __FUNCTION__);
 }
 
 
 // called by all servers after the federation has been created and the RTI federate joined the federation
 void MomManager::notifyFederationJoined(FederateHandle federateHandle, const std::string& federateName, const std::string& federateType)
 {
-  DebugPrintf(">>> %s federateHandle=%s federateName=%s federateType=%s root=%d\n", __FUNCTION__,
-              federateHandle.toString().c_str(), federateName.c_str(), federateType.c_str(), _momServer->isRoot());
+  //DebugPrintf(">>> %s federateHandle=%s federateName=%s federateType=%s root=%d\n", __FUNCTION__,
+  //            federateHandle.toString().c_str(), federateName.c_str(), federateType.c_str(), _momServer->isRoot());
   // nothing special to do here - we don't register the RTI MOM federate as an object
 }
 
 // called by child servers whenever a *different* federate (e.g. an application federate or another child RTI federate) joined the federation
 void MomManager::notifyOwnerFederateJoined(FederateHandle federateHandle, const std::string& federateName, const std::string& federateType)
 {
-  DebugPrintf(">>> %s: federateHandle=%s federateName=%s federatetype=%s\n", __FUNCTION__,
-              federateHandle.toString().c_str(), federateName.c_str(), federateType.c_str());
+  //DebugPrintf(">>> %s: federateHandle=%s federateName=%s federatetype=%s\n", __FUNCTION__,
+  //            federateHandle.toString().c_str(), federateName.c_str(), federateType.c_str());
   if (_momServer->isRoot())
   {
-    DebugPrintf("%s: root server must not create federate objects\n", __FUNCTION__);
+    //DebugPrintf("%s: root server must not create federate objects\n", __FUNCTION__);
     return;
   }
   try
   {
     _momServer->reserveObjectInstanceName(federateName,  [this, federateHandle, federateName, federateType]()
     {
-      DebugPrintf("creating federate object %s\n", federateName.c_str());
+      //DebugPrintf("creating federate object %s\n", federateName.c_str());
       if (mFederation == nullptr)
       {
-        DebugPrintf("federation object not present\n");
+        //DebugPrintf("federation object not present\n");
         return;
       }
       ObjectInstanceHandle federateObject = _momServer->registerObjectInstance(mFederateObjectClass, federateName);
@@ -502,10 +502,10 @@ void MomManager::notifyOwnerFederateJoined(FederateHandle federateHandle, const 
       //    so we need to get rid of mFederate and mFederateMetrics. Then we actually require the list of federates 
       //    attached to the federation
       mFederation->AddFederate(federate);
-      DebugPrintf("%s: created federate object %s\n", __FUNCTION__, federateName.c_str());
+      //DebugPrintf("%s: created federate object %s\n", __FUNCTION__, federateName.c_str());
       if (federateHandle == _ownerFederateHandle)
       {
-        DebugPrintf("%s: owner federate joined: name=%s type=%s\n", __FUNCTION__, federateName.c_str(), federateType.c_str());
+        //DebugPrintf("%s: owner federate joined: name=%s type=%s\n", __FUNCTION__, federateName.c_str(), federateType.c_str());
         mFederate = federate;
         // While initializing, the messages indicating time constrained/time regulating usually have already passed,
         // and won't be received again.
@@ -527,7 +527,7 @@ void MomManager::notifyOwnerFederateJoined(FederateHandle federateHandle, const 
 
 void MomManager::notifyFederateResigned(FederateHandle federateHandle)
 {
-  DebugPrintf("%s: federateHandle=%s\n", __FUNCTION__, federateHandle.toString().c_str());
+  //DebugPrintf("%s: federateHandle=%s\n", __FUNCTION__, federateHandle.toString().c_str());
   auto iterByHandle = mFederatesByHandle.find(federateHandle);
   ObjectInstanceHandle federateObject;
   if (iterByHandle != mFederatesByHandle.end())
@@ -542,7 +542,7 @@ void MomManager::notifyFederateResigned(FederateHandle federateHandle)
     }
     else
     {
-      DebugPrintf("%s: federate object %s not found in FederatesByObject\n", __FUNCTION__, _momServer->getObjectInstanceName(federateObject).c_str());
+      //DebugPrintf("%s: federate object %s not found in FederatesByObject\n", __FUNCTION__, _momServer->getObjectInstanceName(federateObject).c_str());
     }
     assert(mFederation != nullptr);
     mFederation->RemoveFederate(federate);
@@ -570,25 +570,25 @@ void MomManager::discoverObjectInstance(ObjectInstanceHandle objectInstance, Obj
 {
   if (objectClass == mFederationObjectClass)
   {
-    DebugPrintf("discovered federation object %s\n", name.c_str());
+    //DebugPrintf("discovered federation object %s\n", name.c_str());
     if (mFederation != nullptr)
     {
-      DebugPrintf("federation object already present");
+      //DebugPrintf("federation object already present");
     }
     mFederationObject = objectInstance;
     mFederation = RegisterFederation(objectInstance);
   }
   else if (objectClass == mFederateObjectClass)
   {
-    DebugPrintf("discovered federate object %s\n", name.c_str());
+    //DebugPrintf("discovered federate object %s\n", name.c_str());
     if (mFederation != nullptr)
     {
       FederateHandle federateHandle;
 
       try {
         federateHandle = _momServer->getFederateHandle(name);
-        DebugPrintf("discovered federate object %s, federateName=%s federateHandle=%s\n",
-                    name.c_str(), name.c_str(), federateHandle.toString().c_str());
+        //DebugPrintf("discovered federate object %s, federateName=%s federateHandle=%s\n",
+        //            name.c_str(), name.c_str(), federateHandle.toString().c_str());
       }
       catch (const NameNotFound&)
       {
@@ -597,8 +597,8 @@ void MomManager::discoverObjectInstance(ObjectInstanceHandle objectInstance, Obj
       {
         try {
           federateHandle = _momServer->getFederateHandle("HLA" + name);
-          DebugPrintf("discovered federate object %s, federateName=%s federateHandle=%s\n",
-                      name.c_str(), ("HLA" + name).c_str(), federateHandle.toString().c_str());
+          //DebugPrintf("discovered federate object %s, federateName=%s federateHandle=%s\n",
+          //            name.c_str(), ("HLA" + name).c_str(), federateHandle.toString().c_str());
         }
         catch (const NameNotFound&)
         {
@@ -610,7 +610,7 @@ void MomManager::discoverObjectInstance(ObjectInstanceHandle objectInstance, Obj
       }
       else
       {
-        DebugPrintf("federate not found: %s\n", name.c_str());
+        //DebugPrintf("federate not found: %s\n", name.c_str());
       }
     }
   }
@@ -622,11 +622,11 @@ void MomManager::removeObjectInstance(ObjectInstanceHandle objectInstance)
   auto name = _momServer->getObjectInstanceName(objectInstance);
   if (objectClass == mFederationObjectClass)
   {
-    DebugPrintf("%s: destroyed federation object %s\n", __FUNCTION__, name.c_str());
+    //DebugPrintf("%s: destroyed federation object %s\n", __FUNCTION__, name.c_str());
   }
   else if (objectClass == mFederateObjectClass)
   {
-    DebugPrintf("%s: destroyed federate object %s\n", __FUNCTION__, name.c_str());
+    //DebugPrintf("%s: destroyed federate object %s\n", __FUNCTION__, name.c_str());
   }
 }
 
@@ -641,7 +641,7 @@ std::shared_ptr<MomFederate> MomManager::RegisterFederate(FederateHandle federat
 {
   if (!federateHandle.valid())
   {
-    DebugPrintf("%s: invalid federate handle", __FUNCTION__);
+    //DebugPrintf("%s: invalid federate handle", __FUNCTION__);
   }
 
   std::shared_ptr<MomFederate> federate = std::make_shared<MomFederate>(shared_from_this(), federateHandle, federateObject);
@@ -661,7 +661,7 @@ std::shared_ptr<MomFederate> MomManager::RegisterFederate(FederateHandle federat
 bool MomManager::provideAttributeValueUpdate(ObjectInstanceHandle theObject, AttributeHandleSet const& requestedAttributes)
 {
   ObjectClassHandle objectClass = _momServer->getKnownObjectClassHandle(theObject);
-  DebugPrintf("%s: class=%s instance=%s\n", __FUNCTION__, _momServer->getObjectClassName(objectClass).c_str(), _momServer->getObjectInstanceName(theObject).c_str());
+  //DebugPrintf("%s: class=%s instance=%s\n", __FUNCTION__, _momServer->getObjectClassName(objectClass).c_str(), _momServer->getObjectInstanceName(theObject).c_str());
   if (theObject == mFederationObject)
   {
     AttributeHandleValueMap responseAttributes = mFederation->GetAttributeValues(requestedAttributes);
@@ -669,7 +669,7 @@ bool MomManager::provideAttributeValueUpdate(ObjectInstanceHandle theObject, Att
     try
     {
       _momServer->updateAttributeValues(mFederationObject, responseAttributes);
-      DebugPrintf("%s: class=%s instance=%s: sent %d attributes for federation object\n", __FUNCTION__, _momServer->getObjectClassName(objectClass).c_str(), _momServer->getObjectInstanceName(theObject).c_str(), responseAttributes.size());
+      //DebugPrintf("%s: class=%s instance=%s: sent %d attributes for federation object\n", __FUNCTION__, _momServer->getObjectClassName(objectClass).c_str(), _momServer->getObjectInstanceName(theObject).c_str(), responseAttributes.size());
     }
     catch (const Exception& e)
     {
@@ -688,7 +688,7 @@ bool MomManager::provideAttributeValueUpdate(ObjectInstanceHandle theObject, Att
       try
       {
         _momServer->updateAttributeValues(theObject, responseAttributes);
-        DebugPrintf("%s: class=%s instance=%s: sent %d attributes for federate object\n", __FUNCTION__, _momServer->getObjectClassName(objectClass).c_str(), _momServer->getObjectInstanceName(theObject).c_str(), responseAttributes.size());
+        //DebugPrintf("%s: class=%s instance=%s: sent %d attributes for federate object\n", __FUNCTION__, _momServer->getObjectClassName(objectClass).c_str(), _momServer->getObjectInstanceName(theObject).c_str(), responseAttributes.size());
         return true;
       }
       catch (const Exception& e)
@@ -698,7 +698,7 @@ bool MomManager::provideAttributeValueUpdate(ObjectInstanceHandle theObject, Att
     }
     else
     {
-      DebugPrintf("%s: federate object not found: %s %s\n", __FUNCTION__, theObject.toString().c_str(), _momServer->getObjectInstanceName(theObject).c_str());
+      //DebugPrintf("%s: federate object not found: %s %s\n", __FUNCTION__, theObject.toString().c_str(), _momServer->getObjectInstanceName(theObject).c_str());
     }
   }
   // otherwise it'S not an object handled by this federate (e.g. we've found the federation by discovery, or it's a federate found by discovery)
@@ -710,7 +710,7 @@ void MomManager::reflectAttributeValues(ObjectInstanceHandle theObject,
                                         AttributeHandleValueMap const& theAttributeValues,
                                         VariableLengthData const& theUserSuppliedTag)
 {
-  DebugPrintf("%s\n", __FUNCTION__);
+  //DebugPrintf("%s\n", __FUNCTION__);
   try
   {
     ObjectClassHandle theObjectClass = _momServer->getKnownObjectClassHandle(theObject);
@@ -740,9 +740,9 @@ bool MomManager::receiveInteraction(InteractionClassHandle theInteraction, Param
       FederateHandle requestedFederate = handler->second->getFederateHandleFromParameters(requestParameters);
       if (requestedFederate != _ownerFederateHandle)
       {
-        DebugPrintf("%s: wrong federate in request: %s <=> %s\n", __FUNCTION__,
-                    _momServer->getFederateName(requestedFederate).c_str(),
-                    _momServer->getFederateName(_ownerFederateHandle).c_str());
+        //DebugPrintf("%s: wrong federate in request: %s <=> %s\n", __FUNCTION__,
+        //            _momServer->getFederateName(requestedFederate).c_str(),
+        //            _momServer->getFederateName(_ownerFederateHandle).c_str());
         return false;
       }
       MomInteractionHandler::ResponseList responses = (*handler->second)(requestParameters);
@@ -753,7 +753,7 @@ bool MomManager::receiveInteraction(InteractionClassHandle theInteraction, Param
         assert(responseFederate.valid());
         assert(requestedFederate == responseFederate);
         _momServer->sendInteraction(ic, pv);
-        DebugPrintf("%s: sent response %s\n", __FUNCTION__, _momServer->getInteractionClassName(ic).c_str());
+        //DebugPrintf("%s: sent response %s\n", __FUNCTION__, _momServer->getInteractionClassName(ic).c_str());
       }
       return true;
     }
