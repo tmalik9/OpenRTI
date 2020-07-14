@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros">
     <!-- <BuildType>Local</BuildType> -->
-    <BuildType>CANoe</BuildType>
+    <BuildType>Local</BuildType>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x64'">
     <OBJ_DIR>$(SolutionDir)Obj64</OBJ_DIR>
@@ -45,8 +45,6 @@
       <AdditionalDependencies>delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(TargetDir)$(TargetName).map</MapFileName>
       <ImportLibrary>$(TargetDir)$(TargetName).lib</ImportLibrary>
       <OutputFile>$(TargetPath)</OutputFile>
       <SubSystem>Console</SubSystem>
