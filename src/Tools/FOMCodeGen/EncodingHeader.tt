@@ -1,0 +1,157 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+// Code automatically generated from <#=FOM.Filename#>, do not edit
+
+#pragma once
+
+#include "RTI/encoding/BasicDataElements.h"
+#include "RTI/encoding/HLAfixedRecord.h"
+#include "RTI/encoding/HLAfixedArray.h"
+#include "RTI/encoding/HLAvariableArray.h"
+
+namespace <#=FOM.Namespace#> {
+
+<#
+foreach (var dataType in FOM.DataTypes.Values)
+{
+  if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
+  {
+    var fixedRecordDataType = dataType as FOMParser.FixedRecordDataType;
+#>
+class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedRecord
+{
+  public:
+    <#=dataType.Name#>Encoding()
+<#
+    string sep = ":";
+    foreach (var field in fixedRecordDataType.Fields.Values)
+    {
+#>
+     <#=sep#> m<#=field.Name#>(new <#=field.DataType.Encoding#>())
+<#
+      sep=",";
+    } // foreach fixedRecordDataType.Fields.Values
+#>
+    {
+<#
+    foreach (var field in fixedRecordDataType.Fields.Values)
+    {
+#>
+      rti1516e::HLAfixedRecord::appendElementPointer(m<#=field.Name#>);
+<#
+    } // foreach fixedRecordDataType.Fields.Values
+#>
+    }
+    ~<#=dataType.Name#>Encoding()
+    {
+    }
+<#
+    foreach (var field in fixedRecordDataType.Fields.Values)
+    {
+#>
+    void Set<#=field.Name#>(<#=field.DataType.CPPType#> value)
+    {
+	    m<#=field.Name#>->set(value);
+    }
+    <#=field.DataType.CPPType#> Get<#=field.Name#>()
+    {
+<#
+      if (field.DataType is FOMParser.EnumeratedDataType) {
+#>
+	    return static_cast<<#=field.DataType.CPPType#>>(m<#=field.Name#>->get());
+<#
+      } else {
+#>
+	    return m<#=field.Name#>->get();
+<#
+      } // else (field.DataType is FOMParser.EnumeratedDataType)
+#>
+    }
+<#
+    } // foreach fixedRecordDataType.Fields.Values
+#>
+
+  private:
+<#
+    foreach (var field in fixedRecordDataType.Fields.Values)
+    {
+#>
+    <#=field.DataType.Encoding#>* m<#=field.Name#>;
+<#
+    } // foreach fixedRecordDataType.Fields.Values
+#>
+}; // class <#=dataType.Name#>Encoding
+
+<#
+  } // if (dataType is FOMParser.FixedRecordDataType)
+  else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
+  {
+    var enumeratedDataType = dataType as FOMParser.EnumeratedDataType;
+#>
+enum <#=dataType.Name#>
+{
+<#
+    foreach (var enumerator in enumeratedDataType.Enumerators.Values)
+    {
+#>
+      <#=enumerator.Name#> = <#=enumerator.Value#>,
+<#
+    } // foreach enumeratedDataType.Enumerators.Values
+#>
+}; // enum <#=dataType.Name#>
+
+<#
+  } // if (dataType is FOMParser.EnumeratedDataType)
+  else if (dataType is FOMParser.ArrayDataType && dataType.Generate)
+  {
+    var arrayDataType = dataType as FOMParser.ArrayDataType;
+#>
+class <#=dataType.Name#>Encoding : public rti1516e::<#=arrayDataType.EncodingBase#>
+{
+  public:
+    <#=dataType.Name#>Encoding()
+      : <#
+    if (arrayDataType.EncodingBase == "HLAfixedArray") { 
+    #>HLAfixedArray(<#=arrayDataType.DataType.Encoding#>(), <#=arrayDataType.Cardinality#>)<#
+    } else {
+    #>HLAvariableArray(<#=arrayDataType.DataType.Encoding#>)<#
+    } #>
+
+      , mData(<#=arrayDataType.Cardinality#>)
+    {
+    }
+    <#=dataType.Name#>Encoding(const <#=arrayDataType.CPPType#>& data)
+      : <#
+    if (arrayDataType.EncodingBase == "HLAfixedArray") { 
+    #>HLAfixedArray(<#=arrayDataType.DataType.Encoding#>(), <#=arrayDataType.Cardinality#>)<#
+    } else {
+    #>HLAvariableArray(<#=arrayDataType.DataType.Encoding#>)<#
+    } #>
+
+      , mData(<#=arrayDataType.Cardinality#>)
+    {
+    }
+    void set(const <#=arrayDataType.CPPType#>& data) { mData = data; }
+    const <#=arrayDataType.CPPType#>& get() const { return mData; }
+  private:
+    <#=arrayDataType.CPPType#> mData;
+    <#=arrayDataType.DataType.Encoding#> mEncoding;
+}; // class <#=dataType.Name#>
+
+<#
+  } // if (dataType is FOMParser.ArrayDataType)
+  else // not handled
+  {
+#>
+// <#=dataType.GetType()#> <#=dataType.Name#>
+<#
+  } // else not handled
+#>
+<#
+} // foreach (var dataType in FOM.DataTypes.Values)
+#>
+} // namespace <#=FOM.Namespace#>
