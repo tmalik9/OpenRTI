@@ -20,27 +20,11 @@ Intellectual Property, IEEE Standards Association (stds-ipr@ieee.org).
 
 namespace rti1516e
 {
-   // Platform Specific Typedefs
-#if defined(_WIN32)
-   typedef int8_t      Integer8;
-   typedef int16_t     Integer16;
-   typedef int32_t     Integer32;
-   typedef int64_t     Integer64;
-#else
-#if defined(RTI_USE_64BIT_LONGS)
-   typedef char      Integer8;
-   typedef short     Integer16;
-   typedef int       Integer32;
-   typedef long      Integer64;
-#else
-   typedef char      Integer8;
-   typedef short     Integer16;
-   typedef int       Integer32;
-   typedef long long Integer64;
-#endif
-#endif
-
-   typedef Integer8  Octet;
+   typedef int8_t  Integer8;
+   typedef int16_t Integer16;
+   typedef int32_t Integer32;
+   typedef int64_t Integer64;
+   typedef uint8_t Octet;
    typedef std::pair< Octet, Octet > OctetPair;
 }
 
