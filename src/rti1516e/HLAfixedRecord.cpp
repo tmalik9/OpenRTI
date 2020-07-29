@@ -31,7 +31,7 @@
 namespace rti1516e
 {
 
-typedef std::vector<DataElement*> DataElementVector;
+typedef std::vector<std::pair<DataElement*, bool>> DataElementVector;
 
 class OPENRTI_LOCAL HLAfixedRecordImplementation {
 public:
@@ -43,16 +43,14 @@ public:
     _octetBoundary(0)
   {
     _dataElementVector.reserve(rhs._dataElementVector.size());
-    for (DataElementVector::const_iterator i = rhs._dataElementVector.begin();
-         i != rhs._dataElementVector.end(); ++i)
-      _dataElementVector.push_back((*i)->clone().release());
+    for (auto& element : rhs._dataElementVector)
+      _dataElementVector.push_back(std::make_pair(element.first->clone().release(), true));
   }
   ~HLAfixedRecordImplementation()
   {
-    for (DataElementVector::iterator i = _dataElementVector.begin();
-         i != _dataElementVector.end(); ++i) {
-      delete *i;
-      *i = 0;
+    for (auto& [dataElement, owner] : _dataElementVector) {
+      if (owner) delete dataElement;
+      dataElement = nullptr;
     }
   }
 
@@ -60,8 +58,8 @@ public:
   {
     align(buffer, getOctetBoundary());
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      align(buffer, (*i)->getOctetBoundary());
-      (*i)->encodeInto(buffer);
+      align(buffer, i->first->getOctetBoundary());
+      i->first->encodeInto(buffer);
     }
   }
 
@@ -69,8 +67,8 @@ public:
   {
     index = align(index, getOctetBoundary());
     for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      index = align(index, (*i)->getOctetBoundary());
-      index = (*i)->decodeFrom(buffer, index);
+      index = align(index, i->first->getOctetBoundary());
+      index = i->first->decodeFrom(buffer, index);
     }
     return index;
   }
@@ -79,8 +77,8 @@ public:
   {
     size_t length = 0;
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      length = align(length, (*i)->getOctetBoundary());
-      length += (*i)->getEncodedLength();
+      length = align(length, i->first->getOctetBoundary());
+      length += i->first->getEncodedLength();
     }
     return length;
   }
@@ -92,7 +90,7 @@ public:
 
     _octetBoundary = 1;
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      unsigned int octetBoundary = (*i)->getOctetBoundary();
+      unsigned int octetBoundary = i->first->getOctetBoundary();
       if (_octetBoundary < octetBoundary)
         continue;
       _octetBoundary = octetBoundary;
@@ -106,7 +104,7 @@ public:
       return false;
     for (DataElementVector::const_iterator i = _dataElementVector.begin(), j = rhs._dataElementVector.begin();
          i != _dataElementVector.end(); ++i, ++j) {
-      if (!(*i)->isSameTypeAs(**j))
+      if (!i->first->isSameTypeAs(*(j->first)))
         return false;
     }
     return true;
@@ -116,7 +114,7 @@ public:
   {
     if (_dataElementVector.size() <= index)
       return false;
-    return inData.isSameTypeAs(*_dataElementVector[index]);
+    return inData.isSameTypeAs(*(_dataElementVector[index].first));
   }
 
   size_t size() const
@@ -124,7 +122,7 @@ public:
 
   void appendElement(const DataElement& dataElement)
   {
-    _dataElementVector.push_back(dataElement.clone().release());
+    _dataElementVector.push_back(std::make_pair(dataElement.clone().release(), true));
     _octetBoundary = 0;
   }
 
@@ -132,7 +130,7 @@ public:
   {
     if (!dataElement)
       throw EncoderException(L"HLAfixedRecord::appendElementPointer: Null pointer given!");
-    _dataElementVector.push_back(dataElement);
+    _dataElementVector.push_back(std::make_pair(dataElement, false));
     _octetBoundary = 0;
   }
 
@@ -140,10 +138,12 @@ public:
   {
     if (_dataElementVector.size() <= index)
       throw EncoderException(L"HLAfixedRecord::setElement(): Index out of range!");
-    if (!_dataElementVector[index]->isSameTypeAs(dataElement))
+    auto& element = _dataElementVector[index];
+    if (!element.first->isSameTypeAs(dataElement))
       throw EncoderException(L"HLAfixedRecord::setElement(): Incompatible dataElements!");
-    delete _dataElementVector[index];
-    _dataElementVector[index] = dataElement.clone().release();
+    if (element.second) delete element.first;
+    element.first = dataElement.clone().release();
+    element.second = true;
   }
 
   void setElementPointer(size_t index, DataElement* dataElement)
@@ -152,24 +152,26 @@ public:
       throw EncoderException(L"HLAfixedRecord::setElementPointer(): Null pointer given!");
     if (_dataElementVector.size() <= index)
       throw EncoderException(L"HLAfixedRecord::setElementPointer(): Index out of range!");
-    if (!_dataElementVector[index]->isSameTypeAs(*dataElement))
+    auto& element = _dataElementVector[index];
+    if (!element.first->isSameTypeAs(*dataElement))
       throw EncoderException(L"HLAfixedRecord::setElementPointer(): Incompatible dataElements!");
-    delete _dataElementVector[index];
-    _dataElementVector[index] = dataElement;
+    if (element.second) delete element.first;
+    element.first = dataElement;
+    element.second = false;
   }
 
   const DataElement& get(size_t index) const
   {
     if (_dataElementVector.size() <= index)
       throw EncoderException(L"HLAfixedRecord::get(size_t): Index out of range!");
-    return *_dataElementVector[index];
+    return *(_dataElementVector[index].first);
   }
 
   const DataElement& arrayget(size_t index) const
   {
     if (_dataElementVector.size() <= index)
       throw EncoderException(L"HLAfixedRecord::operator[](size_t): Index out of range!");
-    return *_dataElementVector[index];
+    return *(_dataElementVector[index].first);
   }
 
   DataElementVector _dataElementVector;

@@ -32,6 +32,9 @@
 // uses a supplied references to external memory of the native type.
 // When used with a reference, the encoding and decoding is performed using
 // the referenced instance of the native type.
+namespace OpenRTI
+{
+
 #define DEFINE_ENCODING_HELPER_CLASS(EncodableDataType, SimpleDataType)       \
                                                                               \
 /* Forward declaration for the RTI-internal class used to implement        */ \
@@ -140,8 +143,6 @@ protected:                                                                    \
 };
 
 
-namespace OpenRTI
-{
    // Forward Declarations
    class VariableLengthData;
 

@@ -18,6 +18,8 @@
 #include <RTI/SpecificConfig.h>
 #include <string>
 
+namespace rti1516e
+{
 // The following macro is used to define each of the encoding helper
 // classes for basic C++ datatypes, e.g. HLAinteger16LE, HLAunicodeString,
 // etc. Each kind of encoding helper contains the same set of operators
@@ -26,6 +28,7 @@
 // uses a supplied references to external memory of the native type.
 // When used with a reference, the encoding and decoding is performed using
 // the referenced instance of the native type.
+
 #define DEFINE_ENCODING_HELPER_CLASS(EncodableDataType, SimpleDataType)       \
                                                                               \
 /* Forward declaration for the RTI-internal class used to implement        */ \
@@ -134,8 +137,6 @@ protected:                                                                    \
 };
 
 
-namespace rti1516e
-{
    // Forward Declarations
    class VariableLengthData;
 

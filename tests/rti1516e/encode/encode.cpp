@@ -78,7 +78,8 @@ struct DataType
     // aggregate data types
     HLAfixedArray,
     HLAvariableArray,
-    HLAfixedRecord
+    HLAfixedRecord_Randomized,
+    HLAfixedRecord_WithElementPointers
   };
   Type type;
   // depending on type this contains the nested data types
@@ -120,7 +121,8 @@ std::string to_string(DataType::Type type)
     case DataType::HLAparameterHandle: return "HLAparameterHandle";
     case DataType::HLAfixedArray: return "HLAfixedArray";
     case DataType::HLAvariableArray: return "HLAvariableArray";
-    case DataType::HLAfixedRecord: return "HLAfixedRecord";
+    case DataType::HLAfixedRecord_Randomized: return "HLAfixedRecord_Randomized";
+    case DataType::HLAfixedRecord_WithElementPointers: return "HLAfixedRecord_WithElementPointers";
 
     default: return "unknown-type";
   }
@@ -165,7 +167,15 @@ DataType::getAlignment() const
       return dataTypes[0]->getAlignment();
     case HLAvariableArray:
       return std::max(std::size_t(4), dataTypes[0]->getAlignment());
-    case HLAfixedRecord:
+    case HLAfixedRecord_Randomized:
+    {
+      std::size_t alignment = 1;
+      for (std::size_t i = 0; i < count; ++i)
+        alignment = std::max(alignment, dataTypes[i]->getAlignment());
+      return alignment;
+    }
+
+    case HLAfixedRecord_WithElementPointers:
     {
       std::size_t alignment = 1;
       for (std::size_t i = 0; i < count; ++i)
@@ -246,7 +256,18 @@ DataType::createDataElement(OpenRTI::Rand& rand) const
       std::unique_ptr<rti1516e::DataElement> dataElement(dataTypes[0]->createDataElement(rand));
       return new rti1516e::HLAvariableArray(*dataElement);
     }
-    case HLAfixedRecord:
+    case HLAfixedRecord_Randomized:
+    {
+      rti1516e::HLAfixedRecord* fixedRecord = new rti1516e::HLAfixedRecord;
+      for (std::size_t i = 0; i < count; ++i)
+      {
+        std::unique_ptr<rti1516e::DataElement> dataElement(dataTypes[i]->createDataElement(rand));
+        fixedRecord->appendElement(*dataElement);
+      }
+      return fixedRecord;
+    }
+
+    case HLAfixedRecord_WithElementPointers:
     {
       rti1516e::HLAfixedRecord* fixedRecord = new rti1516e::HLAfixedRecord;
       for (std::size_t i = 0; i < count; ++i)
@@ -677,20 +698,20 @@ static const DataType VecdDataType =
 
 static const DataType GeodfDataType =
 {
-  DataType::HLAfixedRecord, 3, { &HLAfloat32LEDataType, &HLAfloat32LEDataType, &HLAfloat32LEDataType, }
+  DataType::HLAfixedRecord_Randomized, 3, { &HLAfloat32LEDataType, &HLAfloat32LEDataType, &HLAfloat32LEDataType, }
 };
 static const DataType GeoddDataType =
 {
-  DataType::HLAfixedRecord, 3, { &HLAfloat64LEDataType, &HLAfloat64LEDataType, &HLAfloat64LEDataType, }
+  DataType::HLAfixedRecord_Randomized, 3, { &HLAfloat64LEDataType, &HLAfloat64LEDataType, &HLAfloat64LEDataType, }
 };
 
 static const DataType StructAlignDataType =
 {
-  DataType::HLAfixedRecord, 2, { &HLAfloat32LEDataType, &HLAfloat64LEDataType, }
+  DataType::HLAfixedRecord_Randomized, 2, { &HLAfloat32LEDataType, &HLAfloat64LEDataType, }
 };
 static const DataType StructAlign2DataType =
 {
-  DataType::HLAfixedRecord, 3, { &HLAinteger16LEDataType, &StructAlignDataType, &HLAunicodeStringDataType, }
+  DataType::HLAfixedRecord_Randomized, 3, { &HLAinteger16LEDataType, &StructAlignDataType, &HLAunicodeStringDataType, }
 };
 
 template<typename TInputIter>
@@ -712,6 +733,21 @@ static inline std::string make_hex_string(TInputIter first, TInputIter last, boo
 
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const std::vector<int8_t>& value)
+{
+  if (value.size() == 0)
+  {
+    os << "<empty>";
+  }
+  else
+  {
+    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const int8_t*>(value.data()), static_cast<const int8_t*>(value.data()) + value.size(), true, true) << "]}";
+  }
+  return os;
+}
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const rti1516e::VariableLengthData& value)
 {
   if (value.size() == 0)
@@ -720,7 +756,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const rti1516e::Varia
   }
   else
   {
-    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const char*>(value.data()), static_cast<const char*>(value.data()) + value.size(), true, true) << "]}";
+    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const int8_t*>(value.data()), static_cast<const int8_t*>(value.data()) + value.size(), true, true) << "]}";
   }
   return os;
 }
@@ -885,10 +921,155 @@ bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e
   return true;
 }
 
+bool testDataPointerEncoding()
+{
+  std::wcout << L"testing data pointer encoding" << std::endl;
+  int32_t value = 123;
+  rti1516e::HLAinteger32LE encoding1(&value);
+  rti1516e::VariableLengthData data;
+  encoding1.encode(data);
+  rti1516e::HLAinteger32LE encoding2;
+  encoding2.decode(data);
+  std::cout << "data(123)=" << data << std::endl;
+  if (encoding2.get() != value)
+  {
+    std::wcerr << L"decoded value does not match: " << encoding2.get() << L" != " << value << std::endl;
+    return false;
+  }
+
+  value = 321;
+  encoding1.encode(data);
+  encoding2.decode(data);
+  std::cout << "data(321)=" << data << std::endl;
+
+  if (encoding2.get() != value)
+  {
+    std::wcerr << L"decoded modified value does not match: " << encoding2.get() << L" != " << value << std::endl;
+    return false;
+  }
+  return true;
+}
+// test array with data elements given by 'borrowed' encoder pointers, each pointing to 'borrowed' (external) memory
+bool testDataPointerFixedArrayEncoding()
+{
+  std::wcout << L"testing fixed array to data pointer encoding" << std::endl;
+  std::vector<int8_t> data1{1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<int8_t> data2{10, 20, 30, 40, 50, 60, 70, 80};
+  rti1516e::HLAbyte encoder1[8];
+  rti1516e::HLAbyte encoder2[8];
+  rti1516e::HLAfixedArray arrayEncoder1(rti1516e::HLAbyte(), 8);
+  rti1516e::HLAfixedArray arrayEncoder2(rti1516e::HLAbyte(), 8);
+  for (int i=0;i<8;i++)
+  {
+    encoder1[i].setDataPointer(&data1.data()[i]);
+    encoder2[i].setDataPointer(&data2.data()[i]);
+    arrayEncoder1.setElementPointer(i, &encoder1[i]);
+    arrayEncoder2.setElementPointer(i, &encoder2[i]);
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+  rti1516e::VariableLengthData encodedData2 = arrayEncoder2.encode();
+  std::cout << "encodedData2=" << encodedData2 << std::endl;
+  rti1516e::HLAfixedArray arrayDecoder(rti1516e::HLAbyte(), 8);
+  for (int i=0;i<8;i++)
+  {
+    arrayDecoder.setElementPointer(i, &encoder1[i]);
+  }
+  arrayDecoder.decode(encodedData2);
+  std::cout << "deccodedData(encodedData2)=" << data1 << std::endl;
+  try {
+    arrayEncoder1.set(0, rti1516e::HLAinteger32LE());
+    std::cout << "HLAfixedArray(HLAbyte).set accepts HLAinteger32LE - bad" << std::endl;
+    return false;
+  }
+  catch (const rti1516e::EncoderException& e)
+  {
+    std::cout << "Expected EncoderException: " << e << std::endl;
+  }
+  try {
+    rti1516e::HLAinteger32LE enc;
+    arrayEncoder1.setElementPointer(0, &enc);
+    std::cout << "HLAfixedArray(HLAbyte).setElementPointer accepts HLAinteger32LE* - bad" << std::endl;
+    return false;
+  }
+  catch (const rti1516e::EncoderException& e)
+  {
+    std::cout << "Expected EncoderException: " << e << std::endl;
+  }
+  // NOTE: data2 has been decoded into data1, so both should yield the same as data2
+  std::vector<int8_t> buffer1;
+  arrayEncoder1.encodeInto(buffer1);
+  std::cout << "arrayEncoder1.encodeInto => " << buffer1 << std::endl;
+  std::vector<int8_t> buffer2;
+  arrayEncoder2.encodeInto(buffer2);
+  std::cout << "arrayEncoder2.encodeInto => " << buffer2 << std::endl;
+  return true;
+}
+
+bool testDataPointerFixedRecordEncoding()
+{
+  std::wcout << L"testing fixed record to data pointer encoding" << std::endl;
+  std::vector<int8_t> data1{1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<int8_t> data2{0, 0, 0, 0, 0, 0, 0, 0};
+  rti1516e::HLAbyte encoder1[8];
+  rti1516e::HLAbyte encoder2[8];
+  rti1516e::HLAfixedArray arrayEncoder1(rti1516e::HLAbyte(), 8);
+  rti1516e::HLAfixedArray arrayEncoder2(rti1516e::HLAbyte(), 8);
+  for (int i=0;i<8;i++)
+  {
+    encoder1[i].setDataPointer(&data1.data()[i]);
+    encoder2[i].setDataPointer(&data2.data()[i]);
+    arrayEncoder1.setElementPointer(i, &encoder1[i]);
+    arrayEncoder2.setElementPointer(i, &encoder2[i]);
+  }
+  int i1 = 123;
+  rti1516e::HLAinteger32LE intEncoder;
+  intEncoder.setDataPointer(&i1);
+  char c1 = 123;
+  rti1516e::HLAASCIIchar charEncoder;
+  charEncoder.setDataPointer(&c1);
+  rti1516e::HLAfixedRecord recordEncoder;
+  recordEncoder.appendElementPointer(&intEncoder);
+  recordEncoder.appendElementPointer(&charEncoder);
+  recordEncoder.appendElementPointer(&arrayEncoder1);
+  rti1516e::VariableLengthData encodedData1 = recordEncoder.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+  // now decode all from encodedData1:
+  // prepare recordDecoder
+  rti1516e::HLAfixedRecord recordDecoder;
+  recordDecoder.appendElement(rti1516e::HLAinteger32LE());
+  recordDecoder.appendElement(rti1516e::HLAASCIIchar());
+  // prepare array decoder
+  rti1516e::HLAfixedArray arrayDecoder(rti1516e::HLAbyte(), 8);
+  std::vector<int8_t> decodedArray{0, 0, 0, 0, 0, 0, 0, 0};
+  rti1516e::HLAbyte decoder[8];
+  for (int i=0;i<8;i++)
+  {
+    decoder[i].setDataPointer(&decodedArray.data()[i]);
+    arrayDecoder.setElementPointer(i, &decoder[i]);
+  }
+  recordDecoder.appendElementPointer(&arrayDecoder);
+  // decode
+  recordDecoder.decode(encodedData1);
+  // fields should now equal given data
+  std::cout << "field1=" << static_cast<const rti1516e::HLAinteger32LE&>(recordDecoder.get(0)).get() << std::endl;
+  std::cout << "field2=" << static_cast<int>(static_cast<const rti1516e::HLAASCIIchar&>(recordDecoder.get(1)).get()) << std::endl;
+  std::cout << "field3=" << decodedArray << std::endl;
+  const rti1516e::HLAfixedArray& array = dynamic_cast<const rti1516e::HLAfixedArray&>(recordDecoder.get(2));
+  std::cout << "data from distinct HLAbytes:" << std::endl;
+  for (int i=0;i<8;i++)
+  {
+    const rti1516e::HLAbyte& byteDecoder = dynamic_cast<const rti1516e::HLAbyte&>(array.get(i));
+    std::cout << " " << static_cast<int>(byteDecoder.get());
+  }
+  std::cout << std::endl;
+  return true;
+}
+
 int
 main(int argc, char* argv[])
 {
-
+  /*
   if (!testDataElementEncoding(HLAASCIIcharDataType))
     return EXIT_FAILURE;
   if (!testDataElementEncoding(HLAunicodeCharDataType))
@@ -949,6 +1130,15 @@ main(int argc, char* argv[])
   if (!testDataElementEncoding(StructAlignDataType))
     return EXIT_FAILURE;
   if (!testDataElementEncoding(StructAlign2DataType))
+    return EXIT_FAILURE;
+    */
+  if (!testDataPointerEncoding())
+    return EXIT_FAILURE;
+
+  if (!testDataPointerFixedArrayEncoding())
+    return EXIT_FAILURE;
+
+  if (!testDataPointerFixedRecordEncoding())
     return EXIT_FAILURE;
 
   OpenRTI::RTI1516ESimpleAmbassador ambassador;

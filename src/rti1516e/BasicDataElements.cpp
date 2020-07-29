@@ -42,30 +42,46 @@ class OPENRTI_LOCAL EncodableDataType##Implementation {                 \
 public:                                                                 \
   EncodableDataType##Implementation() :                                 \
     _value()                                                            \
-  { }                                                                   \
+  {                                                                     \
+    _valuePointer = & _value;                                           \
+  }                                                                     \
   EncodableDataType##Implementation(const SimpleDataType& value) :      \
     _value(value)                                                       \
-  { }                                                                   \
+  {                                                                     \
+    _valuePointer = & _value;                                           \
+  }                                                                     \
+  EncodableDataType##Implementation(SimpleDataType* valuePointer) :     \
+    _value()                                                            \
+  {                                                                     \
+    _valuePointer = valuePointer;                                       \
+  }                                                                     \
   EncodableDataType##Implementation(const EncodableDataType##Implementation& rhs) : \
     _value(rhs._value)                                                  \
-  { }                                                                   \
+  {                                                                     \
+    _valuePointer = & _value;                                           \
+  }                                                                     \
   virtual ~EncodableDataType##Implementation()                          \
   { }                                                                   \
                                                                         \
   EncodableDataType##Implementation&                                    \
   operator=(const EncodableDataType##Implementation& rhs)               \
-  { _value = rhs._value; return *this; }                                \
+  { set(rhs.get()); return *this; }                                     \
                                                                         \
   encoder                                                               \
                                                                         \
   void set(const SimpleDataType& inData)                                \
   {                                                                     \
-    _value = inData;                                                    \
+    *_valuePointer = inData;                                            \
+  }                                                                     \
+                                                                        \
+  void setDataPointer(SimpleDataType* inData)                           \
+  {                                                                     \
+    _valuePointer = inData;                                             \
   }                                                                     \
                                                                         \
   const SimpleDataType& get() const                                     \
   {                                                                     \
-    return _value;                                                      \
+    return *_valuePointer;                                              \
   }                                                                     \
                                                                         \
   size_t align(size_t offset, size_t alignment) const                   \
@@ -78,6 +94,7 @@ public:                                                                 \
   }                                                                     \
                                                                         \
   SimpleDataType _value;                                                \
+  SimpleDataType* _valuePointer;                                        \
 };                                                                      \
                                                                         \
 EncodableDataType::EncodableDataType() :                                \
@@ -91,9 +108,8 @@ EncodableDataType::EncodableDataType(SimpleDataType const& inData) :    \
 }                                                                       \
                                                                         \
 EncodableDataType::EncodableDataType(SimpleDataType* inData) :          \
-  _impl(new EncodableDataType##Implementation(*inData))                 \
+  _impl(new EncodableDataType##Implementation(inData))                  \
 {                                                                       \
-  delete inData;                                                        \
 }                                                                       \
                                                                         \
 EncodableDataType::EncodableDataType(EncodableDataType const& rhs) :    \
@@ -103,6 +119,7 @@ EncodableDataType::EncodableDataType(EncodableDataType const& rhs) :    \
                                                                         \
 EncodableDataType::~EncodableDataType()                                 \
 {                                                                       \
+  delete _impl;                                                         \
 }                                                                       \
                                                                         \
 EncodableDataType&                                                      \
@@ -115,7 +132,7 @@ EncodableDataType::operator=(EncodableDataType const& rhs)              \
 std::unique_ptr<DataElement>                                            \
 EncodableDataType::clone() const                                        \
 {                                                                       \
-  return std::make_unique<EncodableDataType>(*this);                          \
+  return std::make_unique<EncodableDataType>(*this);                    \
 }                                                                       \
                                                                         \
 VariableLengthData                                                      \
@@ -171,6 +188,7 @@ EncodableDataType::hash() const                                         \
 void                                                                    \
 EncodableDataType::setDataPointer(SimpleDataType* inData)               \
 {                                                                       \
+  _impl->setDataPointer(inData);                                        \
 }                                                                       \
                                                                         \
 void                                                                    \
@@ -204,27 +222,27 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getChar(0);
+  *_valuePointer = inData.getChar(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setChar(_value, 0);
+  inData.setChar(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
 {
   if (buffer.size() < index + 1)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = buffer[index];
+  *_valuePointer = buffer[index];
   return index + 1;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  buffer.push_back(_value);
+  buffer.push_back(*_valuePointer);
 }
 
 size_t
@@ -241,7 +259,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAboolean, bool,
@@ -250,27 +268,27 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = bool(inData.getChar(0));
+  *_valuePointer = bool(inData.getChar(0));
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setChar(_value, 0);
+  inData.setChar(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
 {
   if (buffer.size() < index + 1)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = bool(buffer[index]);
+  *_valuePointer = bool(buffer[index]);
   return index + 1;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  buffer.push_back(_value);
+  buffer.push_back(*_valuePointer);
 }
 
 size_t
@@ -287,7 +305,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAbyte, Octet,
@@ -296,27 +314,27 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getInt8(0);
+  *_valuePointer = inData.getInt8(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setInt8(_value, 0);
+  inData.setInt8(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
 {
   if (buffer.size() < index + 1)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = buffer[index];
+  *_valuePointer = buffer[index];
   return index + 1;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  buffer.push_back(_value);
+  buffer.push_back(*_valuePointer);
 }
 
 size_t
@@ -333,7 +351,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAoctet, Octet,
@@ -342,27 +360,27 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getInt8(0);
+  *_valuePointer = inData.getInt8(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setInt8(_value, 0);
+  inData.setInt8(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
 {
   if (buffer.size() < index + 1)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = buffer[index];
+  *_valuePointer = buffer[index];
   return index + 1;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  buffer.push_back(_value);
+  buffer.push_back(*_valuePointer);
 }
 
 size_t
@@ -379,7 +397,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 
@@ -390,14 +408,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getUInt16BE(0);
+  *_valuePointer = inData.getUInt16BE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setUInt16BE(_value, 0);
+  inData.setUInt16BE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -408,14 +426,14 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   uint16_t u;
   u = uint16_t(uint8_t(buffer[index])) << 8;
   u |= uint16_t(uint8_t(buffer[index + 1]));
-  _value = wchar_t(u);
+  *_valuePointer = wchar_t(u);
   return index + 2;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 2);
-  uint16_t u = uint16_t(_value);
+  uint16_t u = uint16_t(*_valuePointer);
   buffer.push_back(uint8_t(u >> 8));
   buffer.push_back(uint8_t(u));
 }
@@ -434,7 +452,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 
@@ -445,14 +463,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getInt16BE(0);
+  *_valuePointer = inData.getInt16BE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setInt16BE(_value, 0);
+  inData.setInt16BE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -463,14 +481,14 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   uint16_t u;
   u = uint16_t(uint8_t(buffer[index])) << 8;
   u |= uint16_t(uint8_t(buffer[index + 1]));
-  _value = Integer16(u);
+  *_valuePointer = Integer16(u);
   return index + 2;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 2);
-  uint16_t u = _value;
+  uint16_t u = *_valuePointer;
   buffer.push_back(uint8_t(u >> 8));
   buffer.push_back(uint8_t(u));
 }
@@ -489,7 +507,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger16LE, Integer16,
@@ -498,14 +516,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getInt16LE(0);
+  *_valuePointer = inData.getInt16LE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setInt16LE(_value, 0);
+  inData.setInt16LE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -516,14 +534,14 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   uint16_t u;
   u = uint16_t(uint8_t(buffer[index]));
   u |= uint16_t(uint8_t(buffer[index + 1])) << 8;
-  _value = Integer16(u);
+  *_valuePointer = Integer16(u);
   return index + 2;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 2);
-  uint16_t u = uint16_t(_value);
+  uint16_t u = uint16_t(*_valuePointer);
   buffer.push_back(uint8_t(u));
   buffer.push_back(uint8_t(u >> 8));
 }
@@ -542,7 +560,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger32BE, Integer32,
@@ -551,14 +569,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getInt32BE(0);
+  *_valuePointer = inData.getInt32BE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setInt32BE(_value, 0);
+  inData.setInt32BE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -571,14 +589,14 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   u |= uint32_t(uint8_t(buffer[index + 1])) << 16;
   u |= uint32_t(uint8_t(buffer[index + 2])) << 8;
   u |= uint32_t(uint8_t(buffer[index + 3]));
-  _value = Integer32(u);
+  *_valuePointer = Integer32(u);
   return index + 4;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 4);
-  uint32_t u = uint32_t(_value);
+  uint32_t u = uint32_t(*_valuePointer);
   buffer.push_back(uint8_t(u >> 24));
   buffer.push_back(uint8_t(u >> 16));
   buffer.push_back(uint8_t(u >> 8));
@@ -599,7 +617,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger32LE, Integer32,
@@ -608,14 +626,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getInt32LE(0);
+  *_valuePointer = inData.getInt32LE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setInt32LE(_value, 0);
+  inData.setInt32LE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -628,14 +646,14 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   u |= uint32_t(uint8_t(buffer[index + 1])) << 8;
   u |= uint32_t(uint8_t(buffer[index + 2])) << 16;
   u |= uint32_t(uint8_t(buffer[index + 3])) << 24;
-  _value = Integer32(u);
+  *_valuePointer = Integer32(u);
   return index + 4;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 4);
-  uint32_t u = uint32_t(_value);
+  uint32_t u = uint32_t(*_valuePointer);
   buffer.push_back(uint8_t(u));
   buffer.push_back(uint8_t(u >> 8));
   buffer.push_back(uint8_t(u >> 16));
@@ -656,7 +674,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger64BE, Integer64,
@@ -665,14 +683,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getInt64BE(0);
+  *_valuePointer = inData.getInt64BE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setInt64BE(_value, 0);
+  inData.setInt64BE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -689,14 +707,14 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   u |= uint64_t(uint8_t(buffer[index + 5])) << 16;
   u |= uint64_t(uint8_t(buffer[index + 6])) << 8;
   u |= uint64_t(uint8_t(buffer[index + 7]));
-  _value = Integer64(u);
+  *_valuePointer = Integer64(u);
   return index + 8;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 8);
-  uint64_t u = uint64_t(_value);
+  uint64_t u = uint64_t(*_valuePointer);
   buffer.push_back(uint8_t(u >> 56));
   buffer.push_back(uint8_t(u >> 48));
   buffer.push_back(uint8_t(u >> 40));
@@ -721,7 +739,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger64LE, Integer64,
@@ -730,14 +748,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getInt64LE(0);
+  *_valuePointer = inData.getInt64LE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setInt64LE(_value, 0);
+  inData.setInt64LE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -754,14 +772,14 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   u |= uint64_t(uint8_t(buffer[index + 5])) << 40;
   u |= uint64_t(uint8_t(buffer[index + 6])) << 48;
   u |= uint64_t(uint8_t(buffer[index + 7])) << 56;
-  _value = Integer64(u);
+  *_valuePointer = Integer64(u);
   return index + 8;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 8);
-  uint64_t u = uint64_t(_value);
+  uint64_t u = uint64_t(*_valuePointer);
   buffer.push_back(uint8_t(u));
   buffer.push_back(uint8_t(u >> 8));
   buffer.push_back(uint8_t(u >> 16));
@@ -786,7 +804,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return Integer64(_value);
+  return Integer64(*_valuePointer);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAoctetPairBE, OctetPair,
@@ -795,16 +813,16 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value.first = inData.getChar(0);
-  _value.second = inData.getChar(1);
+  _valuePointer->first = inData.getChar(0);
+  _valuePointer->second = inData.getChar(1);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setChar(_value.first, 0);
-  inData.setChar(_value.second, 1);
+  inData.setChar(_valuePointer->first, 0);
+  inData.setChar(_valuePointer->second, 1);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -812,16 +830,16 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   index = align(index, 2);
   if (buffer.size() < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value.first = buffer[index];
-  _value.second = buffer[index + 1];
+  _valuePointer->first = buffer[index];
+  _valuePointer->second = buffer[index + 1];
   return index + 2;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 2);
-  buffer.push_back(_value.first);
-  buffer.push_back(_value.second);
+  buffer.push_back(_valuePointer->first);
+  buffer.push_back(_valuePointer->second);
 }
 
 size_t
@@ -838,7 +856,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return (Integer64(_value.first) << 8) | Integer64(_value.second);
+  return (Integer64(_valuePointer->first) << 8) | Integer64(_valuePointer->second);
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAoctetPairLE, OctetPair,
@@ -847,16 +865,16 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value.second = inData.getChar(0);
-  _value.first = inData.getChar(1);
+  _valuePointer->second = inData.getChar(0);
+  _valuePointer->first = inData.getChar(1);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setChar(_value.second, 0);
-  inData.setChar(_value.first, 1);
+  inData.setChar(_valuePointer->second, 0);
+  inData.setChar(_valuePointer->first, 1);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -864,16 +882,16 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   index = align(index, 2);
   if (buffer.size() < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value.second = buffer[index];
-  _value.first = buffer[index + 1];
+  _valuePointer->second = buffer[index];
+  _valuePointer->first = buffer[index + 1];
   return index + 2;
 }
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 2);
-  buffer.push_back(_value.second);
-  buffer.push_back(_value.first);
+  buffer.push_back(_valuePointer->second);
+  buffer.push_back(_valuePointer->first);
 }
 
 size_t
@@ -890,7 +908,7 @@ getOctetBoundary() const
 
 Integer64 hash() const
 {
-  return (Integer64(_value.first) << 8) | Integer64(_value.second);
+  return (Integer64(_valuePointer->first) << 8) | Integer64(_valuePointer->second);
 }
 )
 
@@ -901,14 +919,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getFloat32BE(0);
+  *_valuePointer = inData.getFloat32BE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setFloat32BE(_value, 0);
+  inData.setFloat32BE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -924,7 +942,7 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   u.u |= uint32_t(uint8_t(buffer[index + 1])) << 16;
   u.u |= uint32_t(uint8_t(buffer[index + 2])) << 8;
   u.u |= uint32_t(uint8_t(buffer[index + 3]));
-  _value = u.s;
+  *_valuePointer = u.s;
   return index + 4;
 }
 
@@ -935,7 +953,7 @@ void encodeInto(std::vector<Octet>& buffer) const
     uint32_t u;
     float s;
   } u;
-  u.s = _value;
+  u.s = *_valuePointer;
   buffer.push_back(uint8_t(u.u >> 24));
   buffer.push_back(uint8_t(u.u >> 16));
   buffer.push_back(uint8_t(u.u >> 8));
@@ -960,7 +978,7 @@ Integer64 hash() const
     uint32_t u;
     float s;
   } u;
-  u.s = _value;
+  u.s = *_valuePointer;
   return Integer64(u.u);
 }
 )
@@ -970,14 +988,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getFloat32LE(0);
+  *_valuePointer = inData.getFloat32LE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setFloat32LE(_value, 0);
+  inData.setFloat32LE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -993,7 +1011,7 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   u.u |= uint32_t(uint8_t(buffer[index + 1])) << 8;
   u.u |= uint32_t(uint8_t(buffer[index + 2])) << 16;
   u.u |= uint32_t(uint8_t(buffer[index + 3])) << 24;
-  _value = u.s;
+  *_valuePointer = u.s;
   return index + 4;
 }
 
@@ -1004,7 +1022,7 @@ void encodeInto(std::vector<Octet>& buffer) const
     uint32_t u;
     float s;
   } u;
-  u.s = _value;
+  u.s = *_valuePointer;
   buffer.push_back(uint8_t(u.u));
   buffer.push_back(uint8_t(u.u >> 8));
   buffer.push_back(uint8_t(u.u >> 16));
@@ -1029,7 +1047,7 @@ Integer64 hash() const
     uint32_t u;
     float s;
   } u;
-  u.s = _value;
+  u.s = *_valuePointer;
   return Integer64(u.u);
 }
 )
@@ -1039,14 +1057,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getFloat64BE(0);
+  *_valuePointer = inData.getFloat64BE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setFloat64BE(_value, 0);
+  inData.setFloat64BE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -1066,7 +1084,7 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   u.u |= uint64_t(uint8_t(buffer[index + 5])) << 16;
   u.u |= uint64_t(uint8_t(buffer[index + 6])) << 8;
   u.u |= uint64_t(uint8_t(buffer[index + 7]));
-  _value = u.s;
+  *_valuePointer = u.s;
   return index + 8;
 }
 
@@ -1077,7 +1095,7 @@ void encodeInto(std::vector<Octet>& buffer) const
     uint64_t u;
     double s;
   } u;
-  u.s = _value;
+  u.s = *_valuePointer;
   buffer.push_back(uint8_t(u.u >> 56));
   buffer.push_back(uint8_t(u.u >> 48));
   buffer.push_back(uint8_t(u.u >> 40));
@@ -1106,7 +1124,7 @@ Integer64 hash() const
     uint64_t u;
     double s;
   } u;
-  u.s = _value;
+  u.s = *_valuePointer;
   return Integer64(u.u);
 }
 )
@@ -1116,14 +1134,14 @@ decode(OpenRTI::VariableLengthData const & inData)
 {
   if (inData.size() != getEncodedLength())
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value = inData.getFloat64LE(0);
+  *_valuePointer = inData.getFloat64LE(0);
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
   inData.resize(getEncodedLength());
-  inData.setFloat64LE(_value, 0);
+  inData.setFloat64LE(*_valuePointer, 0);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -1143,7 +1161,7 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
   u.u |= uint64_t(uint8_t(buffer[index + 5])) << 40;
   u.u |= uint64_t(uint8_t(buffer[index + 6])) << 48;
   u.u |= uint64_t(uint8_t(buffer[index + 7])) << 56;
-  _value = u.s;
+  *_valuePointer = u.s;
   return index + 8;
 }
 
@@ -1154,7 +1172,7 @@ void encodeInto(std::vector<Octet>& buffer) const
     uint64_t u;
     double s;
   } u;
-  u.s = _value;
+  u.s = *_valuePointer;
   buffer.push_back(uint8_t(u.u));
   buffer.push_back(uint8_t(u.u >> 8));
   buffer.push_back(uint8_t(u.u >> 16));
@@ -1183,7 +1201,7 @@ Integer64 hash() const
     uint64_t u;
     double s;
   } u;
-  u.s = _value;
+  u.s = *_valuePointer;
   return Integer64(u.u);
 }
 )
@@ -1202,23 +1220,23 @@ decode(OpenRTI::VariableLengthData const & inData)
 
   if (inData.size() < 4 + length)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value.clear();
-  _value.reserve(length);
+  _valuePointer->clear();
+  _valuePointer->reserve(length);
   for (Integer32 i = 0; i < length; ++i)
-    _value.push_back(inData.getChar(4 + i));
+    _valuePointer->push_back(inData.getChar(4 + i));
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
-  size_t length = _value.size();
+  size_t length = _valuePointer->size();
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();
   inData.resize(length + 4);
   inData.setInt32BE(static_cast<int32_t>(length), 0);
 
   for (size_t i = 0; i < length; ++i)
-    inData.setChar(_value[i], 4 + i);
+    inData.setChar((*_valuePointer)[i], 4 + i);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -1238,10 +1256,10 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
 
   if (buffer.size() < index + length)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value.clear();
-  _value.reserve(length);
+  _valuePointer->clear();
+  _valuePointer->reserve(length);
   while (0 < length--)
-    _value.push_back(buffer[index++]);
+    _valuePointer->push_back(buffer[index++]);
 
   return index;
 }
@@ -1249,7 +1267,7 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 4);
-  size_t length = _value.size();
+  size_t length = _valuePointer->size();
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();
   int32_t u = static_cast<int32_t>(length);
@@ -1259,13 +1277,13 @@ void encodeInto(std::vector<Octet>& buffer) const
   buffer.push_back(uint8_t(u));
 
   for (size_t i = 0; i < length; ++i)
-    buffer.push_back(_value[i]);
+    buffer.push_back((*_valuePointer)[i]);
 }
 
 size_t
 getEncodedLength() const
 {
-  return 4 + _value.size();
+  return 4 + _valuePointer->size();
 }
 
 unsigned int
@@ -1277,7 +1295,7 @@ getOctetBoundary() const
 Integer64 hash() const
 {
   Integer64 hash = 8191;
-  for (std::string::const_iterator i = _value.begin(); i != _value.end(); ++i)
+  for (std::string::const_iterator i = _valuePointer->begin(); i != _valuePointer->end(); ++i)
     hash = hash*Integer64(127) + Integer64(*i);
   return hash;
 }
@@ -1295,23 +1313,23 @@ decode(OpenRTI::VariableLengthData const & inData)
 
   if (inData.size() < 4 + 2*length)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value.clear();
-  _value.reserve(length);
+  _valuePointer->clear();
+  _valuePointer->reserve(length);
   for (Integer32 i = 0; i < length; ++i)
-    _value.push_back(inData.getUInt16BE(4 + 2*i));
+    _valuePointer->push_back(inData.getUInt16BE(4 + 2*i));
 }
 
 void
 encode(OpenRTI::VariableLengthData& inData) const
 {
-  size_t length = _value.size();
+  size_t length = _valuePointer->size();
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();
   inData.resize(2*length + 4);
   inData.setInt32BE(static_cast<int32_t>(length), 0);
 
   for (size_t i = 0; i < length; ++i)
-    inData.setUInt16BE(_value[i], 4 + 2*i);
+    inData.setUInt16BE((*_valuePointer)[i], 4 + 2*i);
 }
 
 size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
@@ -1331,13 +1349,13 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
 
   if (buffer.size() < index + 2*length)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  _value.clear();
-  _value.reserve(length);
+  _valuePointer->clear();
+  _valuePointer->reserve(length);
   while (0 < length--) {
     uint16_t encodedChar;
     encodedChar = uint16_t(uint8_t(buffer[index])) << 8;
     encodedChar |= uint16_t(uint8_t(buffer[index + 1]));
-    _value.push_back(wchar_t(encodedChar));
+    _valuePointer->push_back(wchar_t(encodedChar));
     index += 2;
   }
 
@@ -1347,7 +1365,7 @@ size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
 void encodeInto(std::vector<Octet>& buffer) const
 {
   align(buffer, 4);
-  size_t length = _value.size();
+  size_t length = _valuePointer->size();
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();
   buffer.push_back(uint8_t(length >> 24));
@@ -1356,7 +1374,7 @@ void encodeInto(std::vector<Octet>& buffer) const
   buffer.push_back(uint8_t(length));
 
   for (size_t i = 0; i < length; ++i) {
-    uint16_t unicodeChar = uint16_t(_value[i]);
+    uint16_t unicodeChar = uint16_t((*_valuePointer)[i]);
     buffer.push_back(uint8_t(unicodeChar >> 8));
     buffer.push_back(uint8_t(unicodeChar));
   }
@@ -1365,7 +1383,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 size_t
 getEncodedLength() const
 {
-  return 4 + 2*_value.size();
+  return 4 + 2*_valuePointer->size();
 }
 
 unsigned int
@@ -1377,7 +1395,7 @@ getOctetBoundary() const
 Integer64 hash() const
 {
   Integer64 hash = 8191;
-  for (std::wstring::const_iterator i = _value.begin(); i != _value.end(); ++i)
+  for (std::wstring::const_iterator i = _valuePointer->begin(); i != _valuePointer->end(); ++i)
     hash = hash*Integer64(127) + Integer64(*i);
   return hash;
 }
