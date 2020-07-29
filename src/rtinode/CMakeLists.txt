@@ -2,7 +2,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # The OpenRTI implementation files and may be build generated sources
 include_directories(${CMAKE_BINARY_DIR}/src/OpenRTI)
-include_directories(${CMAKE_SOURCE_DIR}/src/OpenRTI)
+include_directories(${OPENRTI_CMAKEROOTDIR}/src/OpenRTI)
 
 # The standalone main server application
 add_executable(rtinode rtinode.cpp)

@@ -159,6 +159,7 @@ if(hasNoAsNeeded)
   set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed")
 endif()
 
+set(OPENRTI_CMAKEROOTDIR "${CMAKE_CURRENT_SOURCE_DIR}") # Path used to locate files relative to this CMakeLists.txt at cmake time.
 set(OPENRTI_DATAROOTDIR "${CMAKE_INSTALL_FULL_DATAROOTDIR}/OpenRTI" CACHE PATH "Path where OpenRTI puts runtime required paths." FORCE)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")

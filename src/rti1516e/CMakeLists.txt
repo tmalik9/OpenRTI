@@ -1,15 +1,15 @@
 # The directory containing the public api for rti1516e
-set(RTI1516E_HEADER_PATH ${CMAKE_SOURCE_DIR}/include/rti1516e)
-set(RTI1516E_DATA_PATH ${CMAKE_SOURCE_DIR}/share/rti1516e)
+set(RTI1516E_HEADER_PATH ${OPENRTI_CMAKEROOTDIR}/include/rti1516e)
+set(RTI1516E_DATA_PATH ${OPENRTI_CMAKEROOTDIR}/share/rti1516e)
 
 # All the -I arguments
 include_directories(${RTI1516E_HEADER_PATH})
 # The OpenRTI implementation files and may be build generated sources
 include_directories(${CMAKE_BINARY_DIR}/src/OpenRTI)
-include_directories(${CMAKE_SOURCE_DIR}/src/OpenRTI)
+include_directories(${OPENRTI_CMAKEROOTDIR}/src/OpenRTI)
 
 include(CreateResource)
-create_resource(${CMAKE_SOURCE_DIR}/share/rti1516e/HLAstandardMIM.xml
+create_resource(${OPENRTI_CMAKEROOTDIR}/share/rti1516e/HLAstandardMIM.xml
   HLAstandardMIM_xml ${CMAKE_CURRENT_BINARY_DIR}/HLAstandardMIM.inc)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

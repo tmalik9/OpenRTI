@@ -1,5 +1,5 @@
 # The rti1516 includes
-include_directories(${CMAKE_SOURCE_DIR}/include/rti1516)
+include_directories(${OPENRTI_CMAKEROOTDIR}/include/rti1516)
 
 add_library(rti1516_py MODULE Module.cpp)
 set_property(TARGET rti1516_py PROPERTY PREFIX "")

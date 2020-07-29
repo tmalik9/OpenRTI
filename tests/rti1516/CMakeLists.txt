@@ -1,9 +1,9 @@
 # The current standard fdd used for testing
 set(RTI1516_FDD_FILE ${CMAKE_CURRENT_SOURCE_DIR}/fdd.xml)
 
-include_directories(${CMAKE_SOURCE_DIR}/include/rti1516)
+include_directories(${OPENRTI_CMAKEROOTDIR}/include/rti1516)
 include_directories(${CMAKE_BINARY_DIR}/src/OpenRTI)
-include_directories(${CMAKE_SOURCE_DIR}/src/OpenRTI)
+include_directories(${OPENRTI_CMAKEROOTDIR}/src/OpenRTI)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if(NOT OPENRTI_BUILD_SHARED)

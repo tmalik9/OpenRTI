@@ -1,12 +1,12 @@
 # The directory containing the public api for RTI13
-set(RTI13_HEADER_PATH ${CMAKE_SOURCE_DIR}/include/RTI13)
+set(RTI13_HEADER_PATH ${OPENRTI_CMAKEROOTDIR}/include/RTI13)
 
 # All the -I arguments
 include_directories(${RTI13_HEADER_PATH})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # The OpenRTI implementation files and may be build generated sources
 include_directories(${CMAKE_BINARY_DIR}/src/OpenRTI)
-include_directories(${CMAKE_SOURCE_DIR}/src/OpenRTI)
+include_directories(${OPENRTI_CMAKEROOTDIR}/src/OpenRTI)
 
 # The Headers for libRTI-NG and libFedTime
 set(RTI13_PUBLIC_HEADERS

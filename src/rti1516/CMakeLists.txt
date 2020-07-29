@@ -1,12 +1,12 @@
 # The directory containing the public api for rti1516
-set(RTI1516_HEADER_PATH ${CMAKE_SOURCE_DIR}/include/rti1516)
-set(RTI1516_DATA_PATH ${CMAKE_SOURCE_DIR}/share/rti1516)
+set(RTI1516_HEADER_PATH ${OPENRTI_CMAKEROOTDIR}/include/rti1516)
+set(RTI1516_DATA_PATH ${OPENRTI_CMAKEROOTDIR}/share/rti1516)
 
 # All the -I arguments
 include_directories(${RTI1516_HEADER_PATH})
 # The OpenRTI implementation files and may be build generated sources
 include_directories(${CMAKE_BINARY_DIR}/src/OpenRTI)
-include_directories(${CMAKE_SOURCE_DIR}/src/OpenRTI)
+include_directories(${OPENRTI_CMAKEROOTDIR}/src/OpenRTI)
 
 set(RTI1516_PUBLIC_HEADERS
         ${RTI1516_HEADER_PATH}/RTI/Enums.h
