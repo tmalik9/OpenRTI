@@ -21,21 +21,16 @@
 
 #include <utility>
 #include <vector>
-
+#include <cstdint>
 
 namespace OpenRTI
 {
    // Platform Specific Typedefs
 #if defined(_WIN32)
-   typedef char      Integer8;
-   typedef short     Integer16;
-   typedef int       Integer32;
-#if defined(__GNUC__)
-   // gcc extension, but is 64 bits on any win32 target
-   typedef long long Integer64;
-#else
-   typedef __int64   Integer64;
-#endif
+   typedef int8_t      Integer8;
+   typedef int16_t     Integer16;
+   typedef int32_t     Integer32;
+   typedef int64_t     Integer64;
 #else
 #if defined(RTI_USE_64BIT_LONGS)
    typedef char      Integer8;
