@@ -733,7 +733,7 @@ static inline std::string make_hex_string(TInputIter first, TInputIter last, boo
 
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const std::vector<int8_t>& value)
+operator<<(std::basic_ostream<char_type, traits_type>& os, const std::vector<uint8_t>& value)
 {
   if (value.size() == 0)
   {
@@ -741,7 +741,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const std::vector<int
   }
   else
   {
-    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const int8_t*>(value.data()), static_cast<const int8_t*>(value.data()) + value.size(), true, true) << "]}";
+    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const uint8_t*>(value.data()), static_cast<const uint8_t*>(value.data()) + value.size(), true, true) << "]}";
   }
   return os;
 }
@@ -756,7 +756,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const rti1516e::Varia
   }
   else
   {
-    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const int8_t*>(value.data()), static_cast<const int8_t*>(value.data()) + value.size(), true, true) << "]}";
+    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const uint8_t*>(value.data()), static_cast<const uint8_t*>(value.data()) + value.size(), true, true) << "]}";
   }
   return os;
 }
@@ -953,8 +953,8 @@ bool testDataPointerEncoding()
 bool testDataPointerFixedArrayEncoding()
 {
   std::wcout << L"testing fixed array to data pointer encoding" << std::endl;
-  std::vector<int8_t> data1{1, 2, 3, 4, 5, 6, 7, 8};
-  std::vector<int8_t> data2{10, 20, 30, 40, 50, 60, 70, 80};
+  std::vector<uint8_t> data1{1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<uint8_t> data2{10, 20, 30, 40, 50, 60, 70, 80};
   rti1516e::HLAbyte encoder1[8];
   rti1516e::HLAbyte encoder2[8];
   rti1516e::HLAfixedArray arrayEncoder1(rti1516e::HLAbyte(), 8);
@@ -997,10 +997,10 @@ bool testDataPointerFixedArrayEncoding()
     std::cout << "Expected EncoderException: " << e << std::endl;
   }
   // NOTE: data2 has been decoded into data1, so both should yield the same as data2
-  std::vector<int8_t> buffer1;
+  std::vector<uint8_t> buffer1;
   arrayEncoder1.encodeInto(buffer1);
   std::cout << "arrayEncoder1.encodeInto => " << buffer1 << std::endl;
-  std::vector<int8_t> buffer2;
+  std::vector<uint8_t> buffer2;
   arrayEncoder2.encodeInto(buffer2);
   std::cout << "arrayEncoder2.encodeInto => " << buffer2 << std::endl;
   return true;
@@ -1009,8 +1009,8 @@ bool testDataPointerFixedArrayEncoding()
 bool testDataPointerFixedRecordEncoding()
 {
   std::wcout << L"testing fixed record to data pointer encoding" << std::endl;
-  std::vector<int8_t> data1{1, 2, 3, 4, 5, 6, 7, 8};
-  std::vector<int8_t> data2{0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint8_t> data1{1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<uint8_t> data2{0, 0, 0, 0, 0, 0, 0, 0};
   rti1516e::HLAbyte encoder1[8];
   rti1516e::HLAbyte encoder2[8];
   rti1516e::HLAfixedArray arrayEncoder1(rti1516e::HLAbyte(), 8);
@@ -1041,7 +1041,7 @@ bool testDataPointerFixedRecordEncoding()
   recordDecoder.appendElement(rti1516e::HLAASCIIchar());
   // prepare array decoder
   rti1516e::HLAfixedArray arrayDecoder(rti1516e::HLAbyte(), 8);
-  std::vector<int8_t> decodedArray{0, 0, 0, 0, 0, 0, 0, 0};
+  std::vector<uint8_t> decodedArray{0, 0, 0, 0, 0, 0, 0, 0};
   rti1516e::HLAbyte decoder[8];
   for (int i=0;i<8;i++)
   {
