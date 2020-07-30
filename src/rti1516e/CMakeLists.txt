@@ -88,10 +88,21 @@ set(LIB_RTI1516E_SOURCES
         Typedefs.cpp
 )
 
-set(LIB_FEDTIME1516E_SOURCES
-        # bkd: HLATime implementation moved to rti1516e
-        LogicalTimeFactoryFactory.cpp
-)
+if(MSVC)
+  set(LIB_FEDTIME1516E_SOURCES
+    LogicalTimeFactoryFactory.cpp
+  )
+else ()
+  set(LIB_FEDTIME1516E_SOURCES
+    HLAfloat64Interval.cpp
+    HLAfloat64Time.cpp
+    HLAfloat64TimeFactory.cpp
+    HLAinteger64Interval.cpp
+    HLAinteger64Time.cpp
+    HLAinteger64TimeFactory.cpp
+    LogicalTimeFactoryFactory.cpp
+  )
+endif()
 
 if(OPENRTI_BUILD_SHARED)
   add_library(rti1516e SHARED ${LIB_RTI1516E_SOURCES})
