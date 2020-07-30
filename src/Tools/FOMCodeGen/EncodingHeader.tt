@@ -26,22 +26,12 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedRecord
 {
   public:
     <#=dataType.Name#>Encoding()
-<#
-    string sep = ":";
-    foreach (var field in fixedRecordDataType.Fields.Values)
-    {
-#>
-     <#=sep#> m<#=field.Name#>(new <#=field.DataType.Encoding#>())
-<#
-      sep=",";
-    } // foreach fixedRecordDataType.Fields.Values
-#>
     {
 <#
     foreach (var field in fixedRecordDataType.Fields.Values)
     {
 #>
-      rti1516e::HLAfixedRecord::appendElementPointer(m<#=field.Name#>);
+      rti1516e::HLAfixedRecord::appendElementPointer(&m<#=field.Name#>);
 <#
     } // foreach fixedRecordDataType.Fields.Values
 #>
@@ -55,18 +45,18 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedRecord
 #>
     void Set<#=field.Name#>(<#=field.DataType.CPPType#> value)
     {
-	    m<#=field.Name#>->set(value);
+	    m<#=field.Name#>.set(value);
     }
     <#=field.DataType.CPPType#> Get<#=field.Name#>()
     {
 <#
       if (field.DataType is FOMParser.EnumeratedDataType) {
 #>
-	    return static_cast<<#=field.DataType.CPPType#>>(m<#=field.Name#>->get());
+	    return static_cast<<#=field.DataType.CPPType#>>(m<#=field.Name#>.get());
 <#
       } else {
 #>
-	    return m<#=field.Name#>->get();
+	    return m<#=field.Name#>.get();
 <#
       } // else (field.DataType is FOMParser.EnumeratedDataType)
 #>
@@ -80,7 +70,7 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedRecord
     foreach (var field in fixedRecordDataType.Fields.Values)
     {
 #>
-    <#=field.DataType.Encoding#>* m<#=field.Name#>;
+    <#=field.DataType.Encoding#> m<#=field.Name#>;
 <#
     } // foreach fixedRecordDataType.Fields.Values
 #>

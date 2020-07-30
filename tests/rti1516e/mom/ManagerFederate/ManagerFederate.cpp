@@ -46,7 +46,7 @@ std::ostream& operator<<(std::ostream& os, OrderType orderType)
 
 std::wstring requests[]{
   //L"HLArequestPublications",
-  //L"HLArequestSubscriptions",
+  L"HLArequestSubscriptions",
   //L"HLArequestObjectInstancesUpdated",
   //L"HLArequestObjectInstancesReflected",
   L"HLArequestUpdatesSent",
@@ -191,15 +191,15 @@ void ManagerFederate::runFederate()
         {
           if (federateHandle.isValid())
           {
-            //ObjectInstanceHandle federateObject = mom->getFederation()->GetFederate(federateHandle)->GetInternalFederateObjectInstance();
-            //AttributeHandleSet attributes = mom->getFederation()->GetFederate(federateHandle)->GetKnownAttributes();
-            //mRtiAmb->requestAttributeValueUpdate(federateObject, attributes, VariableLengthData());
-            //ParameterHandleValueMap pv;
-            //VariableLengthData tag;
-            //ParameterHandle federateParam = ic.parameters[L"HLAfederate"];
-            //pv[federateParam] = HLAhandle(federateHandle).encode();
-            //mRtiAmb->sendInteraction(ic, pv, tag);
-            //std::cout << "sent " << to_string(mRtiAmb->getInteractionClassName(ic)) << " federate=" << to_string(federateHandle.toString()) << std::endl;
+            ObjectInstanceHandle federateObject = mom->getFederation()->GetFederate(federateHandle)->GetInternalFederateObjectInstance();
+            AttributeHandleSet attributes = mom->getFederation()->GetFederate(federateHandle)->GetKnownAttributes();
+            mRtiAmb->requestAttributeValueUpdate(federateObject, attributes, VariableLengthData());
+            ParameterHandleValueMap pv;
+            VariableLengthData tag;
+            ParameterHandle federateParam = ic.parameters[L"HLAfederate"];
+            pv[federateParam] = HLAhandle(federateHandle).encode();
+            mRtiAmb->sendInteraction(ic, pv, tag);
+            std::cout << "sent " << to_string(mRtiAmb->getInteractionClassName(ic)) << " federate=" << to_string(federateHandle.toString()) << std::endl;
           }
           else
           {

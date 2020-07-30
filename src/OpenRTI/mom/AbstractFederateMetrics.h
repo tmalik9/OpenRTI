@@ -25,74 +25,71 @@ class OPENRTI_LOCAL HLAobjectClassBasedCount : public HLAfixedRecord
 {
   public:
     HLAobjectClassBasedCount(ObjectClassHandle classHandle, int32_t count)
-      : mClassHandle(new HLAhandle(classHandle))
-      , mCount(new HLAcount(count))
+      : mClassHandle(classHandle)
+      , mCount(count)
     {
-      HLAfixedRecord::appendElementPointer(mClassHandle);
-      HLAfixedRecord::appendElementPointer(mCount);
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mCount);
     }
 
     ObjectClassHandle getClassHandle() const
     {
-      return mClassHandle->getObjectClassHandle();
+      return mClassHandle.getObjectClassHandle();
     }
 
     int32_t getCount()
     {
-      return mCount->get();
+      return mCount.get();
     }
 
   private:
-    // IMPORTANT NOTE: ownership will be transferred to the base class
-    HLAhandle* mClassHandle;
-    HLAcount* mCount;
+    HLAhandle mClassHandle;
+    HLAcount mCount;
 };
 
 class OPENRTI_LOCAL HLAinteractionCount : public HLAfixedRecord
 {
   public:
     HLAinteractionCount()
-      : mClassHandle(new HLAhandle(InteractionClassHandle()))
-      , mCount(new HLAcount(0))
     {
-      HLAfixedRecord::appendElementPointer(mClassHandle);
-      HLAfixedRecord::appendElementPointer(mCount);
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mCount);
     }
 
     HLAinteractionCount(InteractionClassHandle classHandle, int32_t count)
-      : mClassHandle(new HLAhandle(classHandle))
-      , mCount(new HLAcount(count))
+      : mClassHandle(classHandle)
+      , mCount(count)
     {
-      HLAfixedRecord::appendElementPointer(mClassHandle);
-      HLAfixedRecord::appendElementPointer(mCount);
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mCount);
     }
     HLAinteractionCount(const HLAinteractionCount& ref)
-      : mClassHandle(new HLAhandle(InteractionClassHandle()))
-      , mCount(new HLAcount(0))
+      : mClassHandle(ref.mClassHandle)
+      , mCount(ref.mCount)
     {
-      mClassHandle->set(ref.mClassHandle->getInteractionClassHandle());
-      mCount->set(ref.mCount->get());
-      HLAfixedRecord::appendElementPointer(mClassHandle);
-      HLAfixedRecord::appendElementPointer(mCount);
+      mClassHandle.set(ref.mClassHandle.getInteractionClassHandle());
+      mCount.set(ref.mCount.get());
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mCount);
     }
 
-    ObjectClassHandle getClassHandle() const
+    InteractionClassHandle getClassHandle() const
     {
-      return mClassHandle->getObjectClassHandle();
+      return mClassHandle.getInteractionClassHandle();
     }
 
     int32_t getCount() const
     {
-      return mCount->get();
+      return mCount.get();
     }
 
     void increment()
     {
-      mCount->set(mCount->get() + 1);
+      mCount.set(mCount.get() + 1);
     }
     void setCount(uint32_t count)
     {
-      mCount->set(count);
+      mCount.set(count);
     }
   private:
     void operator=(const HLAinteractionCount& ) = delete;
@@ -100,55 +97,45 @@ class OPENRTI_LOCAL HLAinteractionCount : public HLAfixedRecord
     //----------------------------------------------------------
     //                   INSTANCE VARIABLES
     //----------------------------------------------------------
-    // IMPORTANT NOTE: ownership will be transferred to the base class
-    HLAhandle* mClassHandle;
-    HLAcount* mCount;
+    HLAhandle mClassHandle;
+    HLAcount mCount;
 };
 
 class OPENRTI_LOCAL HLAinteractionSubscription : public HLAfixedRecord
 {
   public:
-    HLAinteractionSubscription()
-      : mClassHandle(new HLAhandle(InteractionClassHandle()))
-      , mActive(new HLAboolean(false))
-    {
-      HLAfixedRecord::appendElementPointer(mClassHandle);
-      HLAfixedRecord::appendElementPointer(mActive);
-    }
-
     HLAinteractionSubscription(InteractionClassHandle classHandle, bool active)
-      : mClassHandle(new HLAhandle(classHandle))
-      , mActive(new HLAboolean(active))
+      : mClassHandle(classHandle)
+      , mActive(active)
     {
-      HLAfixedRecord::appendElementPointer(mClassHandle);
-      HLAfixedRecord::appendElementPointer(mActive);
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mActive);
     }
     HLAinteractionSubscription(const HLAinteractionSubscription& ref)
-      : mClassHandle(new HLAhandle(InteractionClassHandle()))
-      , mActive(new HLAboolean(false))
+      : mClassHandle(ref.mClassHandle)
+      , mActive(ref.mActive)
     {
-      mClassHandle->set(ref.mClassHandle->getInteractionClassHandle());
-      mActive->set(ref.mActive->get());
-      HLAfixedRecord::appendElementPointer(mClassHandle);
-      HLAfixedRecord::appendElementPointer(mActive);
+      mClassHandle.set(ref.mClassHandle.getInteractionClassHandle());
+      mActive.set(ref.mActive.get());
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mActive);
     }
     ~HLAinteractionSubscription()
     {
-      // do NOT delete members here 
     }
-    ObjectClassHandle getClassHandle() const
+    InteractionClassHandle getClassHandle() const
     {
-      return mClassHandle->getObjectClassHandle();
+      return mClassHandle.getInteractionClassHandle();
     }
 
     bool getActive() const
     {
-      return mActive->get();
+      return mActive.get();
     }
 
-    void setCount(bool active)
+    void setActive(bool active)
     {
-      mActive->set(active);
+      mActive.set(active);
     }
   private:
     void operator=(const HLAinteractionCount& ) = delete;
@@ -156,9 +143,8 @@ class OPENRTI_LOCAL HLAinteractionSubscription : public HLAfixedRecord
     //----------------------------------------------------------
     //                   INSTANCE VARIABLES
     //----------------------------------------------------------
-    // IMPORTANT NOTE: ownership will be transferred to the base class
-    HLAhandle* mClassHandle;
-    HLAboolean* mActive;
+    HLAhandle mClassHandle;
+    HLAboolean mActive;
 };
 
 // Counts events (updates or reflections), together with the object instances concerned,
