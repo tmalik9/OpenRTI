@@ -60,6 +60,16 @@ if(LINUX)
 endif()
 
 if(MSVC)
+  # bkd Preprocessor Definitions
+  add_definitions(-DMP)
+  add_definitions(-DNOMINMAX)
+  add_definitions(-DTIME64)
+  add_definitions(-DUNICODE)
+  add_definitions(-D_UNICODE)
+  add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
+  add_definitions(-DOPENRTI_DLL)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+	
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4290")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4290")
   if(CMAKE_CL_64)
@@ -198,7 +208,8 @@ function(OPENRTI_SET_MSVC_STUB_DLL_NAME _target _name)
   endforeach()
 endfunction()
 
+# bkd: Disable tests
 add_subdirectory(python)
 add_subdirectory(src)
-add_subdirectory(tests)
+#add_subdirectory(tests)
 

@@ -69,6 +69,8 @@ if(WIN32)
     win32/DynamicModuleWin32.cpp
     win32/ErrnoWin32.cpp
     win32/MutexWin32.cpp
+    win32/NetworkStatisticsWin32.cpp
+    win32/PerformanceCounterStopWatch.cpp
     win32/SocketAddressWin32.cpp
     win32/SocketDataWin32.cpp
     win32/SocketEventDispatcherWin32.cpp

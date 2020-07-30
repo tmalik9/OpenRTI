@@ -54,6 +54,7 @@ set(RTI1516E_PUBLIC_TIME_HEADERS
 
 set(LIB_RTI1516E_SOURCES
         BasicDataElements.cpp
+        ../OpenRTI/dprintf.cpp
         DataElement.cpp
         EncodingExceptions.cpp
         Exception.cpp
@@ -67,6 +68,12 @@ set(LIB_RTI1516E_SOURCES
         HLAvariantRecord.cpp
         HLAhandle.cpp
         HLAlogicalTimeFactoryFactory.cpp
+        HLAfloat64Interval.cpp
+        HLAfloat64Time.cpp
+        HLAfloat64TimeFactory.cpp
+        HLAinteger64Interval.cpp
+        HLAinteger64Time.cpp
+        HLAinteger64TimeFactory.cpp
         LogicalTime.cpp
         LogicalTimeFactory.cpp
         LogicalTimeInterval.cpp
@@ -82,12 +89,7 @@ set(LIB_RTI1516E_SOURCES
 )
 
 set(LIB_FEDTIME1516E_SOURCES
-        HLAfloat64Interval.cpp
-        HLAfloat64Time.cpp
-        HLAfloat64TimeFactory.cpp
-        HLAinteger64Interval.cpp
-        HLAinteger64Time.cpp
-        HLAinteger64TimeFactory.cpp
+        # bkd: HLATime implementation moved to rti1516e
         LogicalTimeFactoryFactory.cpp
 )
 
@@ -106,13 +108,13 @@ if(OPENRTI_BUILD_SHARED)
     #  set_property(TARGET fedtime1516eStub APPEND PROPERTY STATIC_LIBRARY_FLAGS_DEBUG "/DEF /NAME:$<TARGET_FILE:fedtime1516e>")
     # to get the final target file name as it is produced, but STATIC_LIBRARY_FLAGS does not evaluate generator expressions
     # So use different variants of CMAKE_<CONFIG>_POSTFIX
-    openrti_set_msvc_stub_dll_name(fedtime1516eStub libfedtime1516e)
+    openrti_set_msvc_stub_dll_name(fedtime1516eStub fedtime1516e)
     openrti_target_link_private_libraries(rti1516e fedtime1516eStub OpenRTI)
   elseif(MINGW OR CYGWIN)
     add_library(fedtime1516eStub STATIC ${LIB_FEDTIME1516E_SOURCES})
     set_property(TARGET fedtime1516eStub APPEND PROPERTY COMPILE_DEFINITIONS BUILDING_FEDTIME)
     string(TOUPPER ${CMAKE_BUILD_TYPE} _CONFIG)
-    set(_fedtimeDllName libfedtime1516e${CMAKE_${_CONFIG}_POSTFIX}.dll)
+    set(_fedtimeDllName fedtime1516e${CMAKE_${_CONFIG}_POSTFIX}.dll)
     add_custom_command(TARGET fedtime1516eStub
       POST_BUILD
       COMMAND "${CMAKE_COMMAND}" -E remove -f ${_fedtimeDllName}.a
@@ -138,9 +140,10 @@ else()
   openrti_target_position_independent(rti1516e)
   openrti_target_link_private_libraries(rti1516e fedtime1516e OpenRTI)
 endif()
-if(MSVC)
-  set_property(TARGET rti1516e PROPERTY PREFIX "lib")
-endif()
+# bkd: no 'lib' for win
+#if(MSVC)
+  #set_property(TARGET rti1516e PROPERTY PREFIX "lib")
+#endif()
 
 # libfedtime1516e
 if(OPENRTI_BUILD_SHARED)
@@ -159,9 +162,10 @@ else()
   set_property(TARGET fedtime1516e PROPERTY LINK_INTERFACE_MULTIPLICITY 2)
   openrti_target_position_independent(fedtime1516e)
 endif()
-if(MSVC)
-  set_property(TARGET fedtime1516e PROPERTY PREFIX "lib")
-endif()
+# bkd: no 'lib' for win
+#if(MSVC)
+  #set_property(TARGET fedtime1516e PROPERTY PREFIX "lib")
+#endif()
 openrti_target_link_private_libraries(fedtime1516e rti1516e OpenRTI)
 
 install(TARGETS fedtime1516e rti1516e
