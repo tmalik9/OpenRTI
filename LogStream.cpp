@@ -39,12 +39,13 @@
 #ifdef _MSC_VER
 #include <filesystem>
 
-#if _MSC_VER <= 1912
-namespace std {
-  namespace filesystem = experimental::filesystem::v1;
-}
+#if _MSC_VER >= 1920
+namespace fs = std::filesystem;
+#else
+namespace fs = std::experimental::filesystem;
 #endif
 #endif
+
 namespace OpenRTI {
 
 class OPENRTI_LOCAL LogStream::StreamPair {
@@ -219,10 +220,10 @@ void LogStream::AddLogFile(const std::string& path)
   {
     expandedPath = buffer;
   }
-  std::filesystem::path directory = std::filesystem::path(expandedPath).parent_path();
-  if (!directory.empty() && !std::filesystem::exists(directory))
+  fs::path directory = fs::path(expandedPath).parent_path();
+  if (!directory.empty() && !fs::exists(directory))
   {
-    std::filesystem::create_directories(directory);
+    fs::create_directories(directory);
   }
 #endif
   LogStream& logger = Instance();
