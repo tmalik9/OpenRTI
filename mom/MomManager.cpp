@@ -560,7 +560,7 @@ void MomManager::notifyFederateResigned(FederateHandle federateHandle)
     }
     _ownerFederateHandle = FederateHandle();
   }
-  if (_momServer->isRoot())
+  if (_momServer->isRoot() && mFederation != nullptr)
   {
     provideAttributeValueUpdate(mFederationObject, mFederation->GetKnownAttributes());
   }
