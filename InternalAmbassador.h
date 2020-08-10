@@ -40,7 +40,7 @@ public:
   bool isConnected() const;
   void connect(const URL& url, const StringStringListMap& parameterMap);
   void disconnect();
-
+  void shutdown();
   /// Send a message
   void send(const SharedPtr<const AbstractMessage>& message);
 

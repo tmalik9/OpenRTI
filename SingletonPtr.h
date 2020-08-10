@@ -50,6 +50,13 @@ public:
     return _ptr;
   }
 
+  void reset()
+  {
+    _ptr.clear();
+    while (unsigned(_initialized) != 0) {
+      _initialized.decFetch();
+    }
+  }
 private:
   SingletonPtr(const SingletonPtr&);
   SingletonPtr& operator=(const SingletonPtr&);

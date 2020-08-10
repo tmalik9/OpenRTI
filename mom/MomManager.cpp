@@ -24,6 +24,13 @@ MomManager::MomManager(MomServer* rtiAmb, FederateHandle ownerFederateHandle)
 {
 }
 
+MomManager::~MomManager()
+{
+  delete objects.mRoot;
+  delete interactions.mRoot;
+}
+
+
 void MomManager::initialize()
 {
   MomTreeNodeBuilder b(_momServer);
@@ -822,6 +829,14 @@ void MomManager::setFOMModuleList(const FOMModuleList& moduleList, const std::st
 #pragma endregion
 
 #pragma region class MomManager::MomTreeNode
+
+MomManager::MomTreeNode::~MomTreeNode()
+{
+  for (auto child : children)
+  {
+    delete child;
+  }
+}
 
 std::string MomManager::MomTreeNode::getQualifiedName() const
 {

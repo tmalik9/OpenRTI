@@ -981,8 +981,8 @@ private:
 
   static Data* createOwnData(size_t capacity)
   {
-    void* data = ::operator new(capacity + sizeof(Data));
-    return new (data) Data(capacity);
+    void* data = alloc_new(capacity + sizeof(Data));
+    return placement_new<Data>(data, capacity);
   }
   static Data* createExternalData(void *data)
   {

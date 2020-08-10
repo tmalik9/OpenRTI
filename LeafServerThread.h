@@ -43,6 +43,7 @@ public:
   /// Call this to get a connect to a possibly new leaf server.
   static SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions);
 
+  static void shutdown();
 protected:
   virtual void run();
 

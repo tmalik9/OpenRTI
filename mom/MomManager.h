@@ -47,7 +47,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
     //----------------------------------------------------------
 
     MomManager(MomServer* rtiAmb, FederateHandle ownerFederateHandle);
-
+    ~MomManager();
     //----------------------------------------------------------
     //                    INSTANCE METHODS
     //----------------------------------------------------------
@@ -377,6 +377,10 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
       MomTreeNodeBuilder(MomServer* server) : mMomServer(server)
       {
       }
+      ~MomTreeNodeBuilder()
+      {
+        assert(mContextStack.size() == 0);
+      }
 
       /**
        * Adds a node to the context current node.
@@ -536,6 +540,8 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
         this->type = type;
         this->datatype = datatype;
       }
+
+      ~MomTreeNode();
       MomTreeNode* getParent()
       {
         return this->parent;
