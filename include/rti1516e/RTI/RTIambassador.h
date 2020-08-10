@@ -57,6 +57,8 @@ namespace rti1516e
       // 4.3
       virtual void disconnect () = 0;
 
+      virtual void shutdown() = 0;
+
       // 4.5
       virtual void createFederationExecution (
          std::wstring const & federationExecutionName,

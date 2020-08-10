@@ -68,6 +68,7 @@ LeafServerThread::_Registry::~_Registry()
     ScopeUnlock scopeUnlock(_mutex);
     leafServerThread->postShutdown();
   }
+  _urlServerMap.clear();
 }
 
 SharedPtr<AbstractConnect>
@@ -194,6 +195,12 @@ SharedPtr<AbstractConnect>
 LeafServerThread::connect(const StringStringListMap& clientOptions)
 {
   return _server->postConnect(clientOptions);
+}
+
+
+void LeafServerThread::shutdown()
+{
+  _Registry::_instance.reset();
 }
 
 void

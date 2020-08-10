@@ -1722,6 +1722,14 @@ RTIambassadorImplementation::disconnect()
 }
 
 void
+RTIambassadorImplementation::shutdown()
+{
+  _ambassadorInterface->shutdown();
+  delete _ambassadorInterface;
+  _ambassadorInterface = nullptr;
+}
+
+void
 RTIambassadorImplementation::createFederationExecution(std::wstring const & federationExecutionName,
                                                        std::wstring const & fomModule,
                                                        std::wstring const & logicalTimeImplementationName)

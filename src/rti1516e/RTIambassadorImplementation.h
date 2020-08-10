@@ -43,6 +43,8 @@ public:
   virtual void
   disconnect() override;
 
+  void shutdown() override;
+
   virtual void
   createFederationExecution(std::wstring const & federationExecutionName,
                             std::wstring const & fomModule,

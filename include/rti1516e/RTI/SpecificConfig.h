@@ -17,6 +17,18 @@
 #ifndef RTI_SpecificConfig_h
 #define RTI_SpecificConfig_h
 
+#ifndef _OPENRTI_PLACEMENT_NEW_DEFINED
+#pragma push_macro("new")
+#undef new
+template <class X, typename ... Types>
+inline X* placement_new(void* addr, Types&& ... args)
+{
+  return new (addr) X(std::forward<Types>(args)...);
+}
+#pragma pop_macro("new")
+#define _OPENRTI_PLACEMENT_NEW_DEFINED
+#endif
+
 #if defined(_WIN32)
 #if defined(_MSC_VER)
 // disable warning about truncating template instantiation symbol names
@@ -56,13 +68,44 @@
 #endif // BUILDING_FEDTIME
 #endif // STATIC_FEDTIME
 
+#if defined(_DEBUG)
+#if !defined ( _OPENRTI_DEBUG_NEW )
+  #include <crtdbg.h>
+  #pragma push_macro("new")
+  #undef new
+  inline void* alloc_new_impl(size_t _Size, int _BlockUse, char const* _FileName, int _LineNumber)
+  {
+    return ::operator new(_Size, _BlockUse, _FileName, _LineNumber);
+  }
+  #pragma pop_macro("new")
+  #define _OPENRTI_DEBUG_NEW new( _NORMAL_BLOCK, __FILE__, __LINE__)
+  #define new _OPENRTI_DEBUG_NEW
+  #define alloc_new(size) alloc_new_impl(size, _NORMAL_BLOCK, __FILE__, __LINE__)
+#endif // !defined ( _OPENRTI_DEBUG_NEW )
+#else // !defined(_DEBUG)
+#ifndef _OPENRTI_ALLOC_NEW_DEFINED
+  inline void* alloc_new(size_t _Size)
+  {
+    return ::operator new(_Size);
+  }
+  #define _OPENRTI_ALLOC_NEW_DEFINED
+#endif
+
+#endif // defined(_DEBUG)
 #else // !_WIN32
 #if defined(__GNUC__) && (4 <= __GNUC__) && defined(RTI_DISABLE_WARNINGS)
 #pragma GCC diagnostic ignored "-Wdeprecated"
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-// no special qualfifers are necessary on non-WIN32 platforms
+#ifndef _OPENRTI_ALLOC_NEW_DEFINED
+  inline void* alloc_new(size_t _Size)
+  {
+    return ::operator new(_Size);
+  }
+  #define _OPENRTI_ALLOC_NEW_DEFINED
+#endif
+// no special qualifiers are necessary on non-WIN32 platforms
 #define RTI_EXPORT
 #define RTI_EXPORT_FEDTIME
 #endif

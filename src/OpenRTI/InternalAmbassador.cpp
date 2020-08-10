@@ -82,6 +82,12 @@ InternalAmbassador::disconnect()
   _connect.clear();
 }
 
+
+void InternalAmbassador::shutdown()
+{
+  LeafServerThread::shutdown();
+}
+
 void
 InternalAmbassador::send(const SharedPtr<const AbstractMessage>& message)
 {

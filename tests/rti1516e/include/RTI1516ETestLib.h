@@ -755,6 +755,14 @@ public:
     setLogicalTimeFactory();
   }
 
+  void disconnect()
+  {
+    _ambassador->disconnect();
+  }
+  void shutdown()
+  {
+    _ambassador->shutdown();
+  }
   void setLogicalTimeFactory(const std::wstring& logicalTimeImplementationName = std::wstring(L"HLAinteger64Time"))
   {
     _logicalTimeImplementationName = logicalTimeImplementationName;

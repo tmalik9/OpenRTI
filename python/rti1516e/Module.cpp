@@ -21,6 +21,7 @@
 
 #include <map>
 #include <set>
+
 #include "RTI/RTI1516.h"
 #include "RTI/FederateAmbassador.h"
 #include "RTI/time/HLAfloat64Time.h"
@@ -744,7 +745,7 @@ PyObject_GetRangeBounds(rti1516e::RangeBounds& rangeBounds, PyObject* o)
     self = PyObject_New(Py ## HandleKind, &Py ## HandleKind ## Type);   \
     if (!self)                                                          \
       return 0;                                                         \
-    new (&self->ob_value) rti1516e:: HandleKind();                      \
+    placement_new<rti1516e:: HandleKind>(&self->ob_value);              \
     return (PyObject*)self;                                             \
   }                                                                     \
                                                                         \
@@ -755,7 +756,7 @@ PyObject_GetRangeBounds(rti1516e::RangeBounds& rangeBounds, PyObject* o)
     self = PyObject_New(Py ## HandleKind, &Py ## HandleKind ## Type);   \
     if (!self)                                                          \
       return 0;                                                         \
-    new (&self->ob_value) rti1516e::HandleKind(handle);                 \
+    placement_new<rti1516e:: HandleKind>(&self->ob_value, handle);      \
     return (PyObject*)self;                                             \
   }                                                                     \
                                                                         \
@@ -7260,7 +7261,14 @@ PyObject_NewRTIambassador(PyTypeObject *type, PyObject *args, PyObject * /*kwds*
   PyRTIambassadorObject *self = PyObject_New(PyRTIambassadorObject, type);
   if (!self)
     return 0;
-  new (self) PyRTIambassadorObject;
+#ifdef DEBUG_NEW
+#pragma push_macro("new")
+#undef new
+#endif
+  placement_new<PyRTIambassadorObject>(self);
+#ifdef DEBUG_NEW
+#pragma pop_macro("new")
+#endif
   self->ob_value = std::move(ambassador);
   return (PyObject*)self;
 }
