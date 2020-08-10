@@ -20,6 +20,7 @@
 // This time, the first include is above the api include.
 // because of unique_ptr in the ambassador header
 #include <memory>
+#include "DebugNew.h"
 
 #include <RTI/RTIambassador.h>
 

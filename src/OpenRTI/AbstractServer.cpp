@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractServer.h"
 
 #include "Exception.h"

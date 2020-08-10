@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/Typedefs.h>
 
 #include <ostream>

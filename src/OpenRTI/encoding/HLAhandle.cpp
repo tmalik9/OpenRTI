@@ -1,4 +1,5 @@
 
+#include "DebugNew.h"
 #include "StringUtils.h"
 #include "BasicDataElements.h"
 #include "HLAhandle.h"

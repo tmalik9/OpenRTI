@@ -22,6 +22,7 @@
 #include <processenv.h>
 #endif
 
+#include "DebugNew.h"
 #include "LogStream.h"
 
 #include <cstdlib>

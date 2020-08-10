@@ -1,4 +1,5 @@
 
+#include "DebugNew.h"
 #include "HandleFactory.h"
 #include "HandleImplementation.h"
 #include "Handle.h"

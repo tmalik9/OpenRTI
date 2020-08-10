@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "OpenRTIConfig.h"
 #include "Types.h"
 #include "VariableLengthDataTuple.h"

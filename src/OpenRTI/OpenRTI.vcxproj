@@ -222,6 +222,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClInclude Include="DebugNew.h" />
     <ClInclude Include="encoding\BasicDataElements.h" />
     <ClInclude Include="encoding\DataElement.h" />
     <ClInclude Include="encoding\Encoding.h" />

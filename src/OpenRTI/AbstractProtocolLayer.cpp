@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractProtocolLayer.h"
 
 namespace OpenRTI {

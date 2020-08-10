@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/encoding/HLAfixedRecord.h>
 
 #include <RTI/VariableLengthData.h>

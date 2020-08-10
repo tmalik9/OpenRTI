@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/encoding/BasicDataElements.h>
 
 #include <RTI/VariableLengthData.h>

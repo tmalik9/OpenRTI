@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "MessageEncodingRegistry.h"
 
 #include "LogStream.h"

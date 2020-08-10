@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Clock.h"
 #include "ClockWin32.h"
 

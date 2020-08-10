@@ -26,6 +26,7 @@
 #include <limits>
 #include <sstream>
 
+#include "DebugNew.h"
 #include "OpenRTIConfig.h"
 #include "StringUtils.h"
 #include "Types.h"

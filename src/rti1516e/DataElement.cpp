@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/encoding/DataElement.h>
 
 #pragma warning(disable: 4100)

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/LogicalTimeInterval.h>
 
 #include <string>

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "InternalTimeManagement.h"
 
 namespace OpenRTI {

@@ -939,8 +939,11 @@ bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e
 
 void Leaktest()
 {
-  for (int i = 0; i< 1000000; i++)
+  for (int i = 0; i< 1000; i++)
   {
+    auto hlaHandle = rti1516e::HLAhandle(rti1516e::createFederateHandle(1));
+    rti1516e::VariableLengthData handleData = hlaHandle.encode();
+    if (gDebugPrint) std::cout << handleData << std::endl;
     int32_t value = i;
     rti1516e::HLAinteger32LE encoding1(&value);
     rti1516e::VariableLengthData x = encoding1.encode();
@@ -1257,72 +1260,72 @@ main(int argc, char* argv[])
   if (!testDataElementEncoding(StructAlign2DataType))
     return EXIT_FAILURE;
     */
-  if (!testDataPointerEncoding())
-    return EXIT_FAILURE;
+  //if (!testDataPointerEncoding())
+  //  return EXIT_FAILURE;
 
-  if (!testDataPointerFixedArrayEncoding())
-    return EXIT_FAILURE;
+  //if (!testDataPointerFixedArrayEncoding())
+  //  return EXIT_FAILURE;
 
-  if (!testDataPointerVariableArrayEncoding())
-    return EXIT_FAILURE;
+  //if (!testDataPointerVariableArrayEncoding())
+  //  return EXIT_FAILURE;
 
-  if (!testDataPointerFixedRecordEncoding())
-    return EXIT_FAILURE;
+  //if (!testDataPointerFixedRecordEncoding())
+  //  return EXIT_FAILURE;
 
-  OpenRTI::RTI1516ESimpleAmbassador ambassador;
-  ambassador.setUseDataUrlObjectModels(false);
+  //OpenRTI::RTI1516ESimpleAmbassador ambassador;
+  //ambassador.setUseDataUrlObjectModels(false);
 
-  try
-  {
-    ambassador.connect(L"thread://");
-  }
-  catch (const rti1516e::Exception& e)
-  {
-    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::wcout << L"Unknown Exception!" << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::wstring federationExecutionName = L"test";
-  // create, must work
-  try
-  {
-    ambassador.createFederationExecution(federationExecutionName, L"fdd-1.xml");
-  }
-  catch (const rti1516e::Exception& e)
-  {
-    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::wcout << L"Unknown Exception!" << std::endl;
-    return EXIT_FAILURE;
-  }
+  //try
+  //{
+  //  ambassador.connect(L"thread://");
+  //}
+  //catch (const rti1516e::Exception& e)
+  //{
+  //  std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //catch (...)
+  //{
+  //  std::wcout << L"Unknown Exception!" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //std::wstring federationExecutionName = L"test";
+  //// create, must work
+  //try
+  //{
+  //  ambassador.createFederationExecution(federationExecutionName, L"fdd-1.xml");
+  //}
+  //catch (const rti1516e::Exception& e)
+  //{
+  //  std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //catch (...)
+  //{
+  //  std::wcout << L"Unknown Exception!" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
 
-  rti1516e::FederateHandle federateHandle;
+  //rti1516e::FederateHandle federateHandle;
 
-  // join must work
-  try
-  {
-    federateHandle = ambassador.joinFederationExecution(L"federate", federationExecutionName);
-  }
-  catch (const rti1516e::Exception& e)
-  {
-    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::wcout << L"Unknown Exception!" << std::endl;
-    return EXIT_FAILURE;
-  }
-  for (int i=0;i<doIterations;i++)
-  {
-    std::cout << "Iteration: " << i << "\r";
+  //// join must work
+  //try
+  //{
+  //  federateHandle = ambassador.joinFederationExecution(L"federate", federationExecutionName);
+  //}
+  //catch (const rti1516e::Exception& e)
+  //{
+  //  std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //catch (...)
+  //{
+  //  std::wcout << L"Unknown Exception!" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //for (int i=0;i<doIterations;i++)
+  //{
+  //  std::cout << "Iteration: " << i << "\r";
   /*
   if (!testDataElementEncoding(HLAASCIIcharDataType))
     return EXIT_FAILURE;
@@ -1386,79 +1389,79 @@ main(int argc, char* argv[])
   if (!testDataElementEncoding(StructAlign2DataType))
     return EXIT_FAILURE;
     */
-  if (!testDataPointerEncoding())
-    return EXIT_FAILURE;
+  //if (!testDataPointerEncoding())
+  //  return EXIT_FAILURE;
 
-  if (!testDataPointerFixedArrayEncoding())
-    return EXIT_FAILURE;
+  //if (!testDataPointerFixedArrayEncoding())
+  //  return EXIT_FAILURE;
 
-  if (!testDataPointerFixedRecordEncoding())
-    return EXIT_FAILURE;
+  //if (!testDataPointerFixedRecordEncoding())
+  //  return EXIT_FAILURE;
 
   // now run the tests
 
-  testHandleEncodings(ambassador, federateHandle);
+  //testHandleEncodings(ambassador, federateHandle);
 
-  rti1516e::ObjectClassHandle objectClass1 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
-  testHandleEncodings(ambassador, objectClass1);
-  rti1516e::ObjectClassHandle objectClass2 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1.ObjectClass2");
-  testHandleEncodings(ambassador, objectClass2);
-  rti1516e::InteractionClassHandle interactionClass1 = ambassador.getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
-  testHandleEncodings(ambassador, interactionClass1);
+  //rti1516e::ObjectClassHandle objectClass1 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
+  //testHandleEncodings(ambassador, objectClass1);
+  //rti1516e::ObjectClassHandle objectClass2 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1.ObjectClass2");
+  //testHandleEncodings(ambassador, objectClass2);
+  //rti1516e::InteractionClassHandle interactionClass1 = ambassador.getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
+  //testHandleEncodings(ambassador, interactionClass1);
 
-  if (!testDataElementEncoding(HLAfederateHandleDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAobjectClassHandleDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAobjectInstanceHandleDataType))
-    return EXIT_FAILURE;
-  }
+  //if (!testDataElementEncoding(HLAfederateHandleDataType))
+  //  return EXIT_FAILURE;
+  //if (!testDataElementEncoding(HLAobjectClassHandleDataType))
+  //  return EXIT_FAILURE;
+  //if (!testDataElementEncoding(HLAobjectInstanceHandleDataType))
+  //  return EXIT_FAILURE;
+  //}
   Leaktest();
-  try
-  {
-    ambassador.resignFederationExecution(rti1516e::NO_ACTION);
-  }
-  catch (const rti1516e::Exception& e)
-  {
-    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::wcout << L"Unknown Exception!" << std::endl;
-    return EXIT_FAILURE;
-  }
+  //try
+  //{
+  //  ambassador.resignFederationExecution(rti1516e::NO_ACTION);
+  //}
+  //catch (const rti1516e::Exception& e)
+  //{
+  //  std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //catch (...)
+  //{
+  //  std::wcout << L"Unknown Exception!" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
 
-  // destroy, must work
-  try
-  {
-    ambassador.destroyFederationExecution(federationExecutionName);
-  }
-  catch (const rti1516e::Exception& e)
-  {
-    std::wcout << e.what() << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::wcout << L"Unknown Exception!" << std::endl;
-    return EXIT_FAILURE;
-  }
+  //// destroy, must work
+  //try
+  //{
+  //  ambassador.destroyFederationExecution(federationExecutionName);
+  //}
+  //catch (const rti1516e::Exception& e)
+  //{
+  //  std::wcout << e.what() << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //catch (...)
+  //{
+  //  std::wcout << L"Unknown Exception!" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
 
-  try
-  {
-    ambassador.shutdown();
-  }
-  catch (const rti1516e::Exception& e)
-  {
-    std::wcout << e.what() << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::wcout << L"Unknown Exception!" << std::endl;
-    return EXIT_FAILURE;
-  }
+  //try
+  //{
+  //  ambassador.shutdown();
+  //}
+  //catch (const rti1516e::Exception& e)
+  //{
+  //  std::wcout << e.what() << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //catch (...)
+  //{
+  //  std::wcout << L"Unknown Exception!" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
 
   return EXIT_SUCCESS;
 }

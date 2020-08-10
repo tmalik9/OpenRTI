@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ServerNode.h"
 
 #include <algorithm>

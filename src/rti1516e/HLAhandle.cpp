@@ -1,4 +1,5 @@
 
+#include "DebugNew.h"
 #include "StringUtils.h"
 #include "RTI/encoding/BasicDataElements.h"
 #include "RTI/encoding/HLAhandle.h"

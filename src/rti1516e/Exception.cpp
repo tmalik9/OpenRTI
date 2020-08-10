@@ -19,6 +19,7 @@
 
 // This time, the first include is above the api include.
 // the rti1516e/Exception header misses that.
+#include "DebugNew.h"
 #include <iosfwd>
 
 #include <RTI/Exception.h>

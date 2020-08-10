@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Condition.h"
 
 #include "Clock.h"

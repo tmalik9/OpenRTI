@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/NullFederateAmbassador.h>
 #include "dprintf.h"
 

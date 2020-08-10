@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ProtocolSocketEvent.h"
 
 #include "AbstractProtocolLayer.h"

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/RTIambassadorFactory.h>
 #include "RTIambassadorImplementation.h"
 

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/encoding/EncodingExceptions.h>
 
 #include <string>

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ExpatXMLReader.h"
 
 #include <istream>

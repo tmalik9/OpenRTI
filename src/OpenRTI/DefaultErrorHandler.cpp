@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "DefaultErrorHandler.h"
 
 namespace OpenRTI {

@@ -22,6 +22,7 @@
 #include <map>
 #include <set>
 
+#include "DebugNew.h"
 #include "RTI/RTI1516.h"
 #include "RTI/FederateAmbassador.h"
 #include "RTI/time/HLAfloat64Time.h"

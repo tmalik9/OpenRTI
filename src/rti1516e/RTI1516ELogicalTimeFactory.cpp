@@ -17,6 +17,8 @@
  *
  */
 
+#include "DebugNew.h"
+
 #include "RTI1516ELogicalTimeFactory.h"
 
 #include <RTI/LogicalTime.h>

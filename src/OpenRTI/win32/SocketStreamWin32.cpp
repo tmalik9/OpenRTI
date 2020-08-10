@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketStream.h"
 
 #include "ErrnoWin32.h"

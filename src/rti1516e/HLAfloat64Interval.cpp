@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "RTI/time/HLAfloat64Interval.h"
 
 #include <cmath>

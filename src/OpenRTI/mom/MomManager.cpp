@@ -1,5 +1,6 @@
 
 
+#include "DebugNew.h"
 #include "MomManager.h"
 #include "StringUtils.h"
 

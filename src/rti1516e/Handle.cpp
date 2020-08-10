@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/Handle.h>
 
 #include "HandleImplementation.h"

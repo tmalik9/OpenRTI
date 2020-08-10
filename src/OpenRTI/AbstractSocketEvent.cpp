@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractSocketEvent.h"
 
 namespace OpenRTI {

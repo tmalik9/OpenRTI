@@ -1,5 +1,6 @@
 
 
+#include "DebugNew.h"
 #include "MomServer.h"
 #include "ServerModel.h"
 #include "AbstractMessageEncoding.h"

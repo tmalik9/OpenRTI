@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractMessage.h"
 
 namespace OpenRTI {

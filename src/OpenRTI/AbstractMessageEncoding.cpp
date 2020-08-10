@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractMessageEncoding.h"
 
 #include "Message.h"

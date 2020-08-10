@@ -21,6 +21,7 @@
  */
 
 
+#include "DebugNew.h"
 #include "TightBE1MessageEncoding.h"
 #include "AbstractMessageEncoding.h"
 #include "DecodeDataStream.h"

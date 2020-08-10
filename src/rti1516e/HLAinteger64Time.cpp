@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "RTI/time/HLAinteger64Time.h"
 
 #include <iomanip>

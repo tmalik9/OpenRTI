@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/encoding/HLAopaqueData.h>
 
 #include <RTI/VariableLengthData.h>

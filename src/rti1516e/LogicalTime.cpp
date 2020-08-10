@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/LogicalTime.h>
 
 #include <ostream>

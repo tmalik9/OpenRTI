@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "XMLReader.h"
 
 namespace OpenRTI {

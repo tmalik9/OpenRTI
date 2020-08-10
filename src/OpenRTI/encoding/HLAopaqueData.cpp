@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "HLAopaqueData.h"
 
 #include "VariableLengthData.h"

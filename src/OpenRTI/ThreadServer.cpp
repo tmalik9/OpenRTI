@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ThreadServer.h"
 
 #include "ScopeLock.h"

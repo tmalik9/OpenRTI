@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketEventDispatcher.h"
 
 #include <vector>

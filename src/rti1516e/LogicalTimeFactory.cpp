@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/LogicalTimeFactory.h>
 
 namespace rti1516e {

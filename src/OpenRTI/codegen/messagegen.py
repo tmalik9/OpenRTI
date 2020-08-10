@@ -1271,6 +1271,7 @@ class MessageEncoding(object):
         sourceStream.writeline('#ifndef OpenRTI_' + encodingName + 'MessageEncoding_h')
         sourceStream.writeline('#define OpenRTI_' + encodingName + 'MessageEncoding_h')
         sourceStream.writeline()
+        sourceStream.writeline('#include "DebugNew.h"')
         sourceStream.writeline('#include "AbstractMessageEncoding.h"')
         sourceStream.writeline('#include "Export.h"')
         sourceStream.writeline()

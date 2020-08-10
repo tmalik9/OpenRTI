@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "HLAvariantRecord.h"
 
 #include "VariableLengthData.h"

@@ -17,10 +17,10 @@
  *
  */
 
-#include <RTI/VariableLengthData.h>
-
+#include "DebugNew.h"
 #include <limits>
 #include <iosfwd>
+#include <RTI/VariableLengthData.h>
 #include <RTI/Exception.h>
 #include "VariableLengthDataImplementation.h"
 

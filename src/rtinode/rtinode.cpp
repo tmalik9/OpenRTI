@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <signal.h>
 #include <iostream>
 

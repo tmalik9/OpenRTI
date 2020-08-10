@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <RTI/FederateAmbassador.h>
 
 namespace rti1516e
