@@ -58,7 +58,11 @@ public:                                                                 \
   EncodableDataType##Implementation(const EncodableDataType##Implementation& rhs) : \
     _value(rhs._value)                                                  \
   {                                                                     \
-    _valuePointer = & _value;                                           \
+    if (rhs._valuePointer != &rhs._value) {                             \
+      _valuePointer = rhs._valuePointer;                                \
+    } else {                                                            \
+      _valuePointer = &_value;                                          \
+    }                                                                   \
   }                                                                     \
   virtual ~EncodableDataType##Implementation()                          \
   { }                                                                   \

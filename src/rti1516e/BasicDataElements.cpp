@@ -58,7 +58,11 @@ public:                                                                 \
   EncodableDataType##Implementation(const EncodableDataType##Implementation& rhs) : \
     _value(rhs._value)                                                  \
   {                                                                     \
-    _valuePointer = & _value;                                           \
+    if (rhs._valuePointer != &rhs._value) {                             \
+      _valuePointer = rhs._valuePointer;                                \
+    } else {                                                            \
+      _valuePointer = &_value;                                          \
+    }                                                                   \
   }                                                                     \
   virtual ~EncodableDataType##Implementation()                          \
   { }                                                                   \
@@ -1218,7 +1222,7 @@ decode(OpenRTI::VariableLengthData const & inData)
   if (length < 0)
     length = 0;
 
-  if (inData.size() < 4 + length)
+  if (inData.size() < static_cast<size_t>(4 + length))
     throw EncoderException(L"Insufficient buffer size for decoding!");
   _valuePointer->clear();
   _valuePointer->reserve(length);

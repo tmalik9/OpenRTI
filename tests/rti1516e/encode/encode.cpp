@@ -764,7 +764,9 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const rti1516e::Varia
 
 bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e::FederateHandle federateHandle)
 {
+  std::cout << "============================================" << std::endl;
   std::wcout << L"testing " << federateHandle << std::endl;
+  std::cout << "============================================" << std::endl;
   rti1516e::HLAhandle encodedHandle = rti1516e::HLAhandle(federateHandle);
   // encoded data from HLAhandle
   rti1516e::VariableLengthData data1 = encodedHandle.encode();
@@ -817,7 +819,9 @@ bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e
 
 bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e::ObjectClassHandle objectClassHandle)
 {
+  std::cout << "============================================" << std::endl;
   std::wcout << L"testing " << ambassador.getObjectClassName(objectClassHandle) << std::endl;
+  std::cout << "============================================" << std::endl;
   rti1516e::HLAhandle encodedHandle = rti1516e::HLAhandle(objectClassHandle);
   // encoded data from HLAhandle
   rti1516e::VariableLengthData data1 = encodedHandle.encode();
@@ -870,7 +874,9 @@ bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e
 
 bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e::InteractionClassHandle interactionClassHandle)
 {
+  std::cout << "============================================" << std::endl;
   std::wcout << L"testing interaction class" << ambassador.getInteractionClassName(interactionClassHandle)  << std::endl;
+  std::cout << "============================================" << std::endl;
   rti1516e::HLAhandle encodedHandle = rti1516e::HLAhandle(interactionClassHandle);
   // encoded data from HLAhandle
   rti1516e::VariableLengthData data1 = encodedHandle.encode();
@@ -923,7 +929,9 @@ bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e
 
 bool testDataPointerEncoding()
 {
-  std::wcout << L"testing data pointer encoding" << std::endl;
+  std::cout << "=============================" << std::endl;
+  std::cout << "testing data pointer encoding" << std::endl;
+  std::cout << "=============================" << std::endl;
   int32_t value = 123;
   rti1516e::HLAinteger32LE encoding1(&value);
   rti1516e::VariableLengthData data;
@@ -952,7 +960,9 @@ bool testDataPointerEncoding()
 // test array with data elements given by 'borrowed' encoder pointers, each pointing to 'borrowed' (external) memory
 bool testDataPointerFixedArrayEncoding()
 {
-  std::wcout << L"testing fixed array to data pointer encoding" << std::endl;
+  std::cout << "============================================" << std::endl;
+  std::cout << "testing fixed array to data pointer encoding" << std::endl;
+  std::cout << "============================================" << std::endl;
   std::vector<uint8_t> data1{1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<uint8_t> data2{10, 20, 30, 40, 50, 60, 70, 80};
   rti1516e::HLAbyte encoder1[8];
@@ -970,13 +980,33 @@ bool testDataPointerFixedArrayEncoding()
   std::cout << "encodedData1=" << encodedData1 << std::endl;
   rti1516e::VariableLengthData encodedData2 = arrayEncoder2.encode();
   std::cout << "encodedData2=" << encodedData2 << std::endl;
+
+  // set up decoder, to decode back the data produced by the encoder, before
   rti1516e::HLAfixedArray arrayDecoder(rti1516e::HLAbyte(), 8);
   for (int i=0;i<8;i++)
   {
     arrayDecoder.setElementPointer(i, &encoder1[i]);
   }
+  std::vector<uint8_t> copyOfData1 = data1;
   arrayDecoder.decode(encodedData2);
   std::cout << "deccodedData(encodedData2)=" << data1 << std::endl;
+  // NOTE: data2's content has been decoded into data1, so both should be identical now
+  if (data1 != data2)
+  {
+    std::cout << "data1 != copyOfData1" << std::endl;
+    std::cout << "data1 = " << data1 << std::endl;
+    std::cout << "copyOfData1 = " << copyOfData1 << std::endl;
+  }
+
+  // test encodeInto
+  std::vector<uint8_t> buffer1;
+  arrayEncoder1.encodeInto(buffer1);
+  std::cout << "arrayEncoder1.encodeInto => " << buffer1 << std::endl;
+  std::vector<uint8_t> buffer2;
+  arrayEncoder2.encodeInto(buffer2);
+  std::cout << "arrayEncoder2.encodeInto => " << buffer2 << std::endl;
+
+  // check prototype safety
   try {
     arrayEncoder1.set(0, rti1516e::HLAinteger32LE());
     std::cout << "HLAfixedArray(HLAbyte).set accepts HLAinteger32LE - bad" << std::endl;
@@ -996,19 +1026,90 @@ bool testDataPointerFixedArrayEncoding()
   {
     std::cout << "Expected EncoderException: " << e << std::endl;
   }
-  // NOTE: data2 has been decoded into data1, so both should yield the same as data2
+
+  std::cout << "fixed array to data pointer encoding OK" << std::endl;
+  return true;
+}
+
+// test array with data elements given by 'borrowed' encoder pointers, each pointing to 'borrowed' (external) memory
+bool testDataPointerVariableArrayEncoding()
+{
+  std::cout << "===============================================" << std::endl;
+  std::cout << "testing variable array to data pointer encoding" << std::endl;
+  std::cout << "===============================================" << std::endl;
+  std::vector<uint8_t> data1{1, 2, 3, 4, 5, 6, 7, 8};
+  std::vector<uint8_t> data2{10, 20, 30, 40, 50, 60, 70, 80};
+  rti1516e::HLAbyte encoder1[8];
+  rti1516e::HLAbyte encoder2[8];
+  rti1516e::HLAvariableArray arrayEncoder1{rti1516e::HLAbyte()};
+  rti1516e::HLAvariableArray arrayEncoder2{rti1516e::HLAbyte()};
+  for (int i=0;i<8;i++)
+  {
+    encoder1[i].setDataPointer(&data1.data()[i]);
+    encoder2[i].setDataPointer(&data2.data()[i]);
+    arrayEncoder1.addElementPointer(&encoder1[i]);
+    arrayEncoder2.addElementPointer(&encoder2[i]);
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+  rti1516e::VariableLengthData encodedData2 = arrayEncoder2.encode();
+  std::cout << "encodedData2=" << encodedData2 << std::endl;
+
+  // set up decoder, to decode back the data produced by the encoder, before
+  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAbyte()};
+  for (int i=0;i<8;i++)
+  {
+    arrayDecoder.addElementPointer(&encoder1[i]);
+  }
+  arrayDecoder.decode(encodedData2);
+  std::cout << "deccodedData(encodedData2)=" << data1 << std::endl;
+  std::cout << "deccodedData(encodedData2)=" << data1 << std::endl;
+  // NOTE: data2's content has been decoded into data1, so both should be identical now
+  if (data1 != data2)
+  {
+    std::cout << "data1 != dat2" << std::endl;
+    std::cout << "data1 = " << data1 << std::endl;
+    std::cout << "data2 = " << data2 << std::endl;
+  }
+
+  // test encodeInto
   std::vector<uint8_t> buffer1;
   arrayEncoder1.encodeInto(buffer1);
   std::cout << "arrayEncoder1.encodeInto => " << buffer1 << std::endl;
   std::vector<uint8_t> buffer2;
   arrayEncoder2.encodeInto(buffer2);
   std::cout << "arrayEncoder2.encodeInto => " << buffer2 << std::endl;
+
+  // check prototype safety
+  try {
+    arrayEncoder1.set(0, rti1516e::HLAinteger32LE());
+    std::cout << "HLAvariableArray(HLAbyte).set accepts HLAinteger32LE - bad" << std::endl;
+    return false;
+  }
+  catch (const rti1516e::EncoderException& e)
+  {
+    std::cout << "Expected EncoderException: " << e << std::endl;
+  }
+  try {
+    rti1516e::HLAinteger32LE enc;
+    arrayEncoder1.setElementPointer(0, &enc);
+    std::cout << "HLAvariableArray(HLAbyte).setElementPointer accepts HLAinteger32LE* - bad" << std::endl;
+    return false;
+  }
+  catch (const rti1516e::EncoderException& e)
+  {
+    std::cout << "Expected EncoderException: " << e << std::endl;
+  }
+  std::cout << "variable array to data pointer encoding OK" << std::endl;
   return true;
 }
 
 bool testDataPointerFixedRecordEncoding()
 {
-  std::wcout << L"testing fixed record to data pointer encoding" << std::endl;
+  std::cout << "=============================================" << std::endl;
+  std::cout << "testing fixed record to data pointer encoding" << std::endl;
+  std::cout << "=============================================" << std::endl;
+  // first set up a fixed array, to be added to a fixed record
   std::vector<uint8_t> data1{1, 2, 3, 4, 5, 6, 7, 8};
   std::vector<uint8_t> data2{0, 0, 0, 0, 0, 0, 0, 0};
   rti1516e::HLAbyte encoder1[8];
@@ -1028,6 +1129,8 @@ bool testDataPointerFixedRecordEncoding()
   char c1 = 123;
   rti1516e::HLAASCIIchar charEncoder;
   charEncoder.setDataPointer(&c1);
+
+  // now set up the fixed array
   rti1516e::HLAfixedRecord recordEncoder;
   recordEncoder.appendElementPointer(&intEncoder);
   recordEncoder.appendElementPointer(&charEncoder);
@@ -1063,6 +1166,7 @@ bool testDataPointerFixedRecordEncoding()
     std::cout << " " << static_cast<int>(byteDecoder.get());
   }
   std::cout << std::endl;
+  std::cout << "fixed record to data pointer encoding OK" << std::endl;
   return true;
 }
 
@@ -1136,6 +1240,9 @@ main(int argc, char* argv[])
     return EXIT_FAILURE;
 
   if (!testDataPointerFixedArrayEncoding())
+    return EXIT_FAILURE;
+
+  if (!testDataPointerVariableArrayEncoding())
     return EXIT_FAILURE;
 
   if (!testDataPointerFixedRecordEncoding())

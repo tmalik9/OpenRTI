@@ -35,16 +35,17 @@ class OPENRTI_LOCAL HLAfixedArrayImplementation {
 public:
   HLAfixedArrayImplementation(const DataElement& protoType, size_t length)
   {
-    _prototype = protoType.clone().release();
+    _protoType = protoType.clone().release();
     _dataElementVector.resize(length);
     for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i)
     {
-      i->first = _prototype->clone().release();
+      i->first = _protoType->clone().release();
       i->second = true;
     }
   }
   HLAfixedArrayImplementation(const HLAfixedArrayImplementation& rhs)
   {
+    _protoType = rhs._protoType->clone().release();
     _dataElementVector.resize(rhs._dataElementVector.size(), std::make_pair(nullptr, true));
     for (size_t i = 0; i < rhs._dataElementVector.size(); ++i) {
       if (_dataElementVector[i].first == nullptr)
@@ -58,6 +59,8 @@ public:
       if (i->second) delete i->first;
       i->first = nullptr;
     }
+    delete _protoType;
+    _protoType = 0;
   }
 
   size_t getEncodedLength() const
@@ -103,7 +106,7 @@ public:
     if (_dataElementVector.size() <= index)
       throw EncoderException(L"HLAfixedArray::set(): Index out of range!");
     auto& element = _dataElementVector[index];
-    if (!dataElement.isSameTypeAs(*_prototype))
+    if (!dataElement.isSameTypeAs(*_protoType))
       throw EncoderException(L"HLAfixedArray::set(): Data type is not compatible!");
     if (element.second) delete element.first;
     element.first = dataElement.clone().release();
@@ -117,7 +120,7 @@ public:
     if (!dataElement)
       throw EncoderException(L"HLAfixedArray::setElementPointer(): dataElement is zero!");
     auto& element = _dataElementVector[index];
-    if (!dataElement->isSameTypeAs(*_prototype))
+    if (!dataElement->isSameTypeAs(*_protoType))
       throw EncoderException(L"HLAfixedArray::setElementPointer(): Data type is not compatible!");
     if (element.second) delete element.first;
     element.first = dataElement;
@@ -141,13 +144,13 @@ public:
     } else {
       if (rhs._dataElementVector.empty())
         return false;
-      return _prototype->isSameTypeAs(*(rhs._dataElementVector.front().first));
+      return _protoType->isSameTypeAs(*(rhs._dataElementVector.front().first));
     }
   }
   // bool 'second' specifies whether the DataElement pointed is owned by this instance.
   typedef std::vector<std::pair<DataElement*, bool>> DataElementVector;
   DataElementVector _dataElementVector;
-  DataElement* _prototype;
+  DataElement* _protoType;
 };
 
 HLAfixedArray::HLAfixedArray(const DataElement& protoType, size_t length) :
