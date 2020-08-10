@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "InitialClientStreamProtocol.h"
 
 #include "LogStream.h"

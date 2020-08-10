@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "HLAvariableArray.h"
 
 #include "VariableLengthData.h"

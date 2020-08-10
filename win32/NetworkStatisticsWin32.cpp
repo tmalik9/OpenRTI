@@ -1,4 +1,5 @@
 
+#include "DebugNew.h"
 #include "NetworkStatisticsWin32.h"
 #include <sstream>
 

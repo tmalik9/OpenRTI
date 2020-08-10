@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "RegionSet.h"
 
 #include "Region.h"

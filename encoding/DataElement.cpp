@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "DataElement.h"
 #include "Exception.h"
 

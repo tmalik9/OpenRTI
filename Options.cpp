@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Options.h"
 
 #include <cstring>

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "InitialServerStreamProtocol.h"
 
 #include "LogStream.h"

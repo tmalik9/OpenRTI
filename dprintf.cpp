@@ -1,5 +1,6 @@
 
 
+#include "DebugNew.h"
 #ifndef linux
 #include <Windows.h>
 #endif
@@ -8,7 +9,7 @@
 #include "dprintf.h"
 #include <iostream>
 
-bool sEnableDebugPrintf = false;
+bool sEnableDebugPrintf = true;
 bool sDebugToConsole = true;
 void DebugPrintf(const char* fmt, ...)
 {

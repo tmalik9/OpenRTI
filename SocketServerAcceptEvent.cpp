@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketServerAcceptEvent.h"
 
 #include "InitialServerStreamProtocol.h"

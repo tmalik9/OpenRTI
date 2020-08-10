@@ -20,6 +20,7 @@
 #ifndef OpenRTI_VariableLengthData_h
 #define OpenRTI_VariableLengthData_h
 
+#include "DebugNew.h"
 #include "Exception.h"
 #include "Export.h"
 #include "Referenced.h"

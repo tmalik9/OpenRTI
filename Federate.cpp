@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Federate.h"
 
 #include "InternalTimeManagement.h"

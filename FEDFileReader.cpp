@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "FEDFileReader.h"
 
 #include <fstream>

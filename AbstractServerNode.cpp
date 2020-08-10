@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractServerNode.h"
 
 namespace OpenRTI {

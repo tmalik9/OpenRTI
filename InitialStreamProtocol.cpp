@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "InitialStreamProtocol.h"
 
 #include "DecodeDataStream.h"

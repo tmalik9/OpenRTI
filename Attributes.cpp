@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Attributes.h"
 
 namespace OpenRTI {

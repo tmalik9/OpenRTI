@@ -21,6 +21,7 @@
  */
 
 
+#include "DebugNew.h"
 #include "Message.h"
 
 #include <ostream>

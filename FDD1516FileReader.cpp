@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "FDD1516FileReader.h"
 
 #include "DefaultErrorHandler.h"

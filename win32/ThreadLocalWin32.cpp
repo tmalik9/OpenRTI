@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ThreadLocal.h"
 
 #include <vector>

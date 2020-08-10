@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "URL.h"
 
 #include <sstream>

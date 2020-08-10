@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketUDP.h"
 
 namespace OpenRTI {

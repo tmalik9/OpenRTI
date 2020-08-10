@@ -1,4 +1,5 @@
 
+#include "DebugNew.h"
 #include "MomFederate.h"
 #include "MomManager.h"
 #include "MomFederateMetrics.h"

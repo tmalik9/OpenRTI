@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Exception.h"
 
 #include <string>

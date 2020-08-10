@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketPipe.h"
 
 #include "SocketPrivateDataWin32.h"

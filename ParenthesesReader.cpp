@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ParenthesesReader.h"
 
 #include <istream>

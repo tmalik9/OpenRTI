@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Atomic.h"
 #ifndef __CPlusPlusStd
 #error "must include OpenRTIConfig.h!"

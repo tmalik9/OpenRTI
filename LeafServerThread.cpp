@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "LeafServerThread.h"
 
 #include "MessageQueue.h"

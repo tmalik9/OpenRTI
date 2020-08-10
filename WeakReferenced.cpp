@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "WeakReferenced.h"
 
 #include "Referenced.h"

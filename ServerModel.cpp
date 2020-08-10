@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ServerModel.h"
 
 #include "ServerOptions.h"

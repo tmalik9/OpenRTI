@@ -740,6 +740,9 @@
     <ClInclude Include="mom\AbstractFederateMetrics.h">
       <Filter>Source Files\mom</Filter>
     </ClInclude>
+    <ClInclude Include="DebugNew.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

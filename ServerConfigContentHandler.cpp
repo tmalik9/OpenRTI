@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ServerConfigContentHandler.h"
 
 #include <iosfwd>

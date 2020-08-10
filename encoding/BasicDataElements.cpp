@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "BasicDataElements.h"
 
 #include "VariableLengthData.h"

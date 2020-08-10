@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Thread.h"
 
 #ifndef NOMINMAX
