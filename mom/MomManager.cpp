@@ -660,7 +660,16 @@ std::shared_ptr<MomFederate> MomManager::RegisterFederate(FederateHandle federat
 
 bool MomManager::provideAttributeValueUpdate(ObjectInstanceHandle theObject, AttributeHandleSet const& requestedAttributes)
 {
-  ObjectClassHandle objectClass = _momServer->getKnownObjectClassHandle(theObject);
+  ObjectClassHandle objectClass;
+  try
+  {
+    objectClass = _momServer->getKnownObjectClassHandle(theObject);
+  }
+  catch (const Exception& e)
+  {
+    DebugPrintf("%s: getKnownObjectClassHandle failed: %s\n", __FUNCTION__, e.what());
+    return false;
+  }
   //DebugPrintf("%s: class=%s instance=%s\n", __FUNCTION__, _momServer->getObjectClassName(objectClass).c_str(), _momServer->getObjectInstanceName(theObject).c_str());
   if (theObject == mFederationObject)
   {
