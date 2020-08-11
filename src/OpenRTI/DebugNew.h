@@ -20,6 +20,8 @@
 #pragma once
 
 #include "OpenRTIConfig.h"
+#include <type_traits>
+#include <memory>
 
 #ifndef _OPENRTI_PLACEMENT_NEW_DEFINED
 #pragma push_macro("new")
