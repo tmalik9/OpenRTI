@@ -33,7 +33,6 @@
 #include "Referenced.h"
 #include "ScopeLock.h"
 #include "SharedPtr.h"
-#include "SingletonPtr.h"
 #include "StringUtils.h"
 #include "ThreadLocal.h"
 
@@ -58,10 +57,10 @@ public:
   struct OPENRTI_LOCAL ReferencedMutex : public Referenced {
     Mutex _mutex;
   };
-  static SharedPtr<ReferencedMutex> getReferencedMutex()
+  static SharedPtr<ReferencedMutex>& getReferencedMutex()
   {
-    static SingletonPtr<ReferencedMutex> referencedMutex;
-    return referencedMutex.get();
+    static SharedPtr<ReferencedMutex> referencedMutex = new ReferencedMutex;
+    return referencedMutex;
   }
 
   struct OPENRTI_LOCAL StreamBuf : public std::stringbuf {

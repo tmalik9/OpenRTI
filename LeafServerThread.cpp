@@ -26,7 +26,7 @@
 #include "ScopeUnlock.h"
 #include "ServerNode.h"
 #include "ServerOptions.h"
-#include "SingletonPtr.h"
+//#include "SingletonPtr.h"
 #include "ThreadServer.h"
 
 namespace OpenRTI {
@@ -35,7 +35,7 @@ class OPENRTI_LOCAL LeafServerThread::_Registry : public Referenced {
 public:
   _Registry();
   ~_Registry();
-
+  static SharedPtr<_Registry>& GetInstance();
   SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions);
 
   void erase(LeafServerThread& serverThread);
@@ -43,16 +43,16 @@ public:
   static SharedPtr<AbstractServer> createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode);
   static SharedPtr<AbstractServerNode> createServerNode();
 
-  static SingletonPtr<_Registry> _instance;
+  //static SingletonPtr<_Registry> _instance;
 
 private:
   mutable Mutex _mutex;
   UrlServerMap _urlServerMap;
 };
 
-SingletonPtr<LeafServerThread::_Registry>
-LeafServerThread::_Registry::_instance;
-
+//SingletonPtr<LeafServerThread::_Registry>
+//LeafServerThread::_Registry::_instance;
+//
 LeafServerThread::_Registry::_Registry()
 {
 }
@@ -182,6 +182,12 @@ LeafServerThread::_Registry::createServerNode()
   return new ServerNode;
 }
 
+SharedPtr<LeafServerThread::_Registry>& LeafServerThread::_Registry::GetInstance()
+{
+  static SharedPtr<LeafServerThread::_Registry> _instance = new LeafServerThread::_Registry;
+  return _instance;
+}
+
 LeafServerThread::LeafServerThread(const SharedPtr<AbstractServer>& server) :
   _server(server)
 {
@@ -201,7 +207,7 @@ LeafServerThread::connect(const StringStringListMap& clientOptions)
 
 void LeafServerThread::shutdown()
 {
-  _Registry::_instance.reset();
+  _Registry::GetInstance().clear();
 }
 
 void
@@ -214,7 +220,7 @@ LeafServerThread::postShutdown()
 SharedPtr<AbstractConnect>
 LeafServerThread::connect(const URL& url, const StringStringListMap& clientOptions)
 {
-  SharedPtr<_Registry> registry = _Registry::_instance.get();
+  SharedPtr<_Registry> registry = _Registry::GetInstance();
   if (!registry.valid())
     return SharedPtr<AbstractConnect>();
   return registry->connect(url, clientOptions);
@@ -225,7 +231,7 @@ LeafServerThread::run()
 {
   _server->exec();
 
-  SharedPtr<_Registry> registry = _Registry::_instance.get();
+  SharedPtr<_Registry> registry = _Registry::GetInstance();
   if (registry.valid())
     registry->erase(*this);
 }

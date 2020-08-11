@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "OpenRTIConfig.h"
+
 #ifndef _OPENRTI_PLACEMENT_NEW_DEFINED
 #pragma push_macro("new")
 #undef new
@@ -33,7 +35,7 @@ inline X* placement_new(void* addr, Types&& ... args)
 
 #if defined(_WIN32)
 
-#if defined(_DEBUG)
+#if defined(_DEBUG) && defined (OPENRTI_USE_DEBUG_NEW)
 #if !defined ( _OPENRTI_DEBUG_NEW )
   #include <crtdbg.h>
   #pragma push_macro("new")

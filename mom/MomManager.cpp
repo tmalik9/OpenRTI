@@ -820,10 +820,6 @@ void MomManager::setFOMModuleList(const FOMModuleList& moduleList, const std::st
     }
     mFederation->SetFOMmoduleDesignatorList(moduleDesignatorList);
     mFederation->SetCurrentFDD(utf8ToUcs(currentFDD));
-    //if (_momServer->isRoot())
-    //{
-    //  provideAttributeValueUpdate(mFederationObject, mFederation->GetKnownAttributes());
-    //}
   }
 }
 

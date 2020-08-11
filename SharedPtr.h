@@ -88,7 +88,12 @@ public:
   void clear()
   { put(); }
   SharedPtr& swap(SharedPtr& sharedPtr)
-  { T* tmp = _ptr; _ptr = sharedPtr._ptr; sharedPtr._ptr = tmp; return *this; }
+  {
+    T* tmp = _ptr;
+    _ptr = sharedPtr._ptr;
+    sharedPtr._ptr = tmp;
+    return *this;
+  }
 
 private:
   void assign(T* p)
@@ -99,7 +104,12 @@ private:
   { put(); _ptr = p; }
 
   void put(void)
-  { T* tmp = _ptr; _ptr = 0; if (!T::put(tmp)) T::destruct(tmp); }
+  {
+    T* tmp = _ptr;
+    _ptr = 0;
+    if (!T::put(tmp))
+      T::destruct(tmp);
+  }
 
   // The reference itself.
   T* _ptr;

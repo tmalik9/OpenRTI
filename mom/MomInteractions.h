@@ -42,7 +42,7 @@ protected:
   ParameterHandle mResponseFederateParameter;
   ParameterHandle mRequestFederateParameter;
   std::map<ParameterHandle, std::function<VariableLengthData()>> mParameterGetters;
-  std::shared_ptr<MomManager> mMomManager;
+  MomManager* mMomManager; // borrowed pointer, must not create circular reference
 };
 
 class OPENRTI_LOCAL InteractionHandlerFederateSetServiceReporting : public MomInteractionHandler

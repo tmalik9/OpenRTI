@@ -11,7 +11,7 @@
 
 namespace OpenRTI {
 
-MomInteractionHandler::MomInteractionHandler(std::shared_ptr<MomManager> mom) : mMomManager(mom)
+MomInteractionHandler::MomInteractionHandler(std::shared_ptr<MomManager> mom) : mMomManager(mom.get())
 {
   MomManager::InteractionClassAccessor request = mom->interactions["HLAinteractionRoot"]["HLAmanager"]["HLAfederate"]["HLArequest"];
   mRequestFederateParameter = request.parameters["HLAfederate"];
