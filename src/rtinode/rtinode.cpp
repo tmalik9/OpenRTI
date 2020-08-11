@@ -38,6 +38,15 @@ static void usage(const char* argv0)
   std::cerr << argv0 << ": [-b] [-c configfile] [-f file] [-h] [-i address] [-p parent]" << std::endl;
 }
 
+#if defined(_WIN32) && defined(_DEBUG)
+static void DumpHeap()
+{
+  _CrtDumpMemoryLeaks();
+}
+
+static int initHeapDump = atexit( DumpHeap);
+#endif
+
 class SignalNetworkServer : public OpenRTI::NetworkServer {
 public:
   SignalNetworkServer();

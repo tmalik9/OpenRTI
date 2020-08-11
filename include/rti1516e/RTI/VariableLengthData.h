@@ -16,6 +16,7 @@
 
 #include <RTI/SpecificConfig.h>
 #include <stddef.h>
+#include <memory>
 
 // A class to hold an arbitrary array of bytes for encoded values,
 // attribute values, parameter values, etc.  The class provides
@@ -89,7 +90,7 @@ namespace rti1516e
       // can access the implementation of a VariableLengthValue
       friend class VariableLengthDataFriend;
 
-      VariableLengthDataImplementation* _impl;
+      std::shared_ptr<VariableLengthDataImplementation> _impl;
    };
 }
 

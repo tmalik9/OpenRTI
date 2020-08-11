@@ -14,6 +14,13 @@ void helpmenu(const char* progname)
 
 ManagerFederate* federate = nullptr;
 
+static void DumpHeap()
+{
+  _CrtDumpMemoryLeaks();
+}
+
+static int initHeapDump = atexit( DumpHeap);
+
 extern "C" {
 
 static void sighandler(int sig)

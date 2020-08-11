@@ -37,6 +37,7 @@
 #include <RTI/encoding/HLAvariantRecord.h>
 
 #include "../../../src/rti1516e/HandleFactory.h"
+#include "../../../src/OpenRTI/DebugNew.h"
 
 #include <RTI1516ETestLib.h>
 
@@ -98,7 +99,7 @@ struct DataType
   const DataType* dataTypes[8];
 
   std::size_t getAlignment() const;
-  rti1516e::DataElement* createDataElement(OpenRTI::Rand& rand) const;
+  std::unique_ptr<rti1516e::DataElement> createDataElement(OpenRTI::Rand& rand) const;
 };
 
 std::string to_string(DataType::Type type)
@@ -199,46 +200,46 @@ DataType::getAlignment() const
   }
 }
 
-rti1516e::DataElement*
+std::unique_ptr<rti1516e::DataElement>
 DataType::createDataElement(OpenRTI::Rand& rand) const
 {
   switch (type)
   {
     case HLAASCIIchar:
-      return new rti1516e::HLAASCIIchar(static_cast<char>(rand.get()));
+      return std::make_unique<rti1516e::HLAASCIIchar>(static_cast<char>(rand.get()));
     case HLAunicodeChar:
       // under linux wchar_t is 32 bits but unicode char is only 16 bits ...
-      return new rti1516e::HLAunicodeChar(0xffff & rand.get());
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAunicodeChar(0xffff & rand.get()));
     case HLAboolean:
-      return new rti1516e::HLAboolean(rand.get());
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAboolean(rand.get()));
     case HLAbyte:
-      return new rti1516e::HLAbyte(static_cast<unsigned char>(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAbyte(static_cast<unsigned char>(rand.get())));
     case HLAoctet:
-      return new rti1516e::HLAoctet(static_cast<unsigned char>(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAoctet(static_cast<unsigned char>(rand.get())));
     case HLAoctetPairBE:
-      return new rti1516e::HLAoctetPairBE(rti1516e::OctetPair(static_cast<unsigned char>(rand.get()), static_cast<unsigned char>(rand.get())));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAoctetPairBE(rti1516e::OctetPair(static_cast<unsigned char>(rand.get()), static_cast<unsigned char>(rand.get()))));
     case HLAoctetPairLE:
-      return new rti1516e::HLAoctetPairLE(rti1516e::OctetPair(static_cast<unsigned char>(rand.get()), static_cast<unsigned char>(rand.get())));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAoctetPairLE(rti1516e::OctetPair(static_cast<unsigned char>(rand.get()), static_cast<unsigned char>(rand.get()))));
     case HLAinteger16LE:
-      return new rti1516e::HLAinteger16LE(static_cast<rti1516e::Integer16>(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAinteger16LE(static_cast<rti1516e::Integer16>(rand.get())));
     case HLAinteger16BE:
-      return new rti1516e::HLAinteger16BE(static_cast<rti1516e::Integer16>(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAinteger16BE(static_cast<rti1516e::Integer16>(rand.get())));
     case HLAinteger32BE:
-      return new rti1516e::HLAinteger32BE(rand.get());
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAinteger32BE(rand.get()));
     case HLAinteger32LE:
-      return new rti1516e::HLAinteger32LE(rand.get());
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAinteger32LE(rand.get()));
     case HLAinteger64BE:
-      return new rti1516e::HLAinteger64BE(rti1516e::Integer64(rand.get()) | rti1516e::Integer64(rand.get()) << 32);
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAinteger64BE(rti1516e::Integer64(rand.get()) | rti1516e::Integer64(rand.get()) << 32));
     case HLAinteger64LE:
-      return new rti1516e::HLAinteger64LE(rti1516e::Integer64(rand.get()) | rti1516e::Integer64(rand.get()) << 32);
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAinteger64LE(rti1516e::Integer64(rand.get()) | rti1516e::Integer64(rand.get()) << 32));
     case HLAfloat32BE:
-      return new rti1516e::HLAfloat32BE(static_cast<float>(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAfloat32BE(static_cast<float>(rand.get())));
     case HLAfloat32LE:
-      return new rti1516e::HLAfloat32LE(static_cast<float>(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAfloat32LE(static_cast<float>(rand.get())));
     case HLAfloat64BE:
-      return new rti1516e::HLAfloat64BE(static_cast<double>(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAfloat64BE(static_cast<double>(rand.get())));
     case HLAfloat64LE:
-      return new rti1516e::HLAfloat64LE(static_cast<double>(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAfloat64LE(static_cast<double>(rand.get())));
 
     case HLAASCIIstring:
     {
@@ -246,7 +247,7 @@ DataType::createDataElement(OpenRTI::Rand& rand) const
       s.resize(0xff & rand.get());
       for (std::size_t i = 0; i < s.size(); ++i)
         s[i] = static_cast<char>(rand.get());
-      return new rti1516e::HLAASCIIstring(s);
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAASCIIstring(s));
     }
     case HLAunicodeString:
     {
@@ -254,22 +255,22 @@ DataType::createDataElement(OpenRTI::Rand& rand) const
       s.resize(0xff & rand.get());
       for (std::size_t i = 0; i < s.size(); ++i)
         s[i] = 0xffff & static_cast<uint16_t>(rand.get());
-      return new rti1516e::HLAunicodeString(s);
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAunicodeString(s));
     }
 
     case HLAfixedArray:
     {
       std::unique_ptr<rti1516e::DataElement> dataElement(dataTypes[0]->createDataElement(rand));
-      return new rti1516e::HLAfixedArray(*dataElement, count);
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAfixedArray(*dataElement, count));
     }
     case HLAvariableArray:
     {
       std::unique_ptr<rti1516e::DataElement> dataElement(dataTypes[0]->createDataElement(rand));
-      return new rti1516e::HLAvariableArray(*dataElement);
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAvariableArray(*dataElement));
     }
     case HLAfixedRecord_Randomized:
     {
-      rti1516e::HLAfixedRecord* fixedRecord = new rti1516e::HLAfixedRecord;
+      std::unique_ptr<rti1516e::HLAfixedRecord> fixedRecord = std::make_unique<rti1516e::HLAfixedRecord>();
       for (std::size_t i = 0; i < count; ++i)
       {
         std::unique_ptr<rti1516e::DataElement> dataElement(dataTypes[i]->createDataElement(rand));
@@ -280,7 +281,7 @@ DataType::createDataElement(OpenRTI::Rand& rand) const
 
     case HLAfixedRecord_WithElementPointers:
     {
-      rti1516e::HLAfixedRecord* fixedRecord = new rti1516e::HLAfixedRecord;
+      std::unique_ptr<rti1516e::HLAfixedRecord> fixedRecord = std::make_unique<rti1516e::HLAfixedRecord>();
       for (std::size_t i = 0; i < count; ++i)
       {
         std::unique_ptr<rti1516e::DataElement> dataElement(dataTypes[i]->createDataElement(rand));
@@ -291,31 +292,31 @@ DataType::createDataElement(OpenRTI::Rand& rand) const
 
     case HLAfederateHandle:
     {
-      return new rti1516e::HLAhandle(rti1516e::createFederateHandle(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAhandle(rti1516e::createFederateHandle(rand.get())));
 
     }
     case HLAobjectClassHandle:
     {
-      return new rti1516e::HLAhandle(rti1516e::createObjectClassHandle(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAhandle(rti1516e::createObjectClassHandle(rand.get())));
     }
     case HLAobjectInstanceHandle:
     {
-      return new rti1516e::HLAhandle(rti1516e::createObjectInstanceHandle(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAhandle(rti1516e::createObjectInstanceHandle(rand.get())));
     }
     case HLAattributeHandle:
     {
-      return new rti1516e::HLAhandle(rti1516e::createAttributeHandle(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAhandle(rti1516e::createAttributeHandle(rand.get())));
     }
     case HLAinteractionClassHandle:
     {
-      return new rti1516e::HLAhandle(rti1516e::createInteractionClassHandle(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAhandle(rti1516e::createInteractionClassHandle(rand.get())));
     }
     case HLAparameterHandle:
     {
-      return new rti1516e::HLAhandle(rti1516e::createParameterHandle(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAhandle(rti1516e::createParameterHandle(rand.get())));
     }
     default:
-      return new rti1516e::HLAopaqueData;
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAopaqueData);
   }
 }
 
@@ -937,18 +938,58 @@ bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e
   return true;
 }
 
+void ProcessData(std::list<rti1516e::VariableLengthData>& theList, std::condition_variable& cv, std::mutex& m, std::atomic_bool& finish)
+{
+  while(!finish)
+  {
+    std::unique_lock<std::mutex> lk(m);
+    cv.wait(lk, [&theList]{return !theList.empty();});
+    while (!theList.empty())
+    {
+      std::cout << "in ProcessData:" << theList.front() << std::endl;
+      theList.pop_front();
+    }
+  }
+}
+
 void Leaktest()
 {
+  std::list<rti1516e::VariableLengthData> theData;
+  std::mutex m;
+  std::condition_variable cv;
+  std::atomic_bool finish = false;
+  std::thread process(ProcessData, std::ref(theData), std::ref(cv), std::ref(m), std::ref(finish));
+
   for (int i = 0; i< 1000; i++)
   {
     auto hlaHandle = rti1516e::HLAhandle(rti1516e::createFederateHandle(1));
     rti1516e::VariableLengthData handleData = hlaHandle.encode();
+    {
+        std::lock_guard<std::mutex> lk(m);
+        theData.push_back(handleData);
+    }
+    cv.notify_one();
     if (gDebugPrint) std::cout << handleData << std::endl;
     int32_t value = i;
     rti1516e::HLAinteger32LE encoding1(&value);
     rti1516e::VariableLengthData x = encoding1.encode();
     if (gDebugPrint) std::cout << x << std::endl;
+    rti1516e::VariableLengthData y;
+    y = x;
+    {
+      std::lock_guard<std::mutex> lk(m);
+      theData.push_back(x);
+    }
+    cv.notify_one();
+    {
+      std::lock_guard<std::mutex> lk(m);
+      theData.push_back(y);
+    }
+    cv.notify_one();
   }
+  finish.store(true);
+  process.join();
+  assert(theData.empty());
 }
 
 bool testDataPointerEncoding()
@@ -1260,72 +1301,69 @@ main(int argc, char* argv[])
   if (!testDataElementEncoding(StructAlign2DataType))
     return EXIT_FAILURE;
     */
-  //if (!testDataPointerEncoding())
-  //  return EXIT_FAILURE;
+  if (!testDataPointerEncoding())
+    return EXIT_FAILURE;
 
-  //if (!testDataPointerFixedArrayEncoding())
-  //  return EXIT_FAILURE;
+  if (!testDataPointerFixedArrayEncoding())
+    return EXIT_FAILURE;
 
-  //if (!testDataPointerVariableArrayEncoding())
-  //  return EXIT_FAILURE;
+  if (!testDataPointerVariableArrayEncoding())
+    return EXIT_FAILURE;
 
-  //if (!testDataPointerFixedRecordEncoding())
-  //  return EXIT_FAILURE;
+  if (!testDataPointerFixedRecordEncoding())
+    return EXIT_FAILURE;
 
-  //OpenRTI::RTI1516ESimpleAmbassador ambassador;
-  //ambassador.setUseDataUrlObjectModels(false);
+  OpenRTI::RTI1516ESimpleAmbassador ambassador;
+  ambassador.setUseDataUrlObjectModels(false);
 
-  //try
-  //{
-  //  ambassador.connect(L"thread://");
-  //}
-  //catch (const rti1516e::Exception& e)
-  //{
-  //  std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //catch (...)
-  //{
-  //  std::wcout << L"Unknown Exception!" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //std::wstring federationExecutionName = L"test";
-  //// create, must work
-  //try
-  //{
-  //  ambassador.createFederationExecution(federationExecutionName, L"fdd-1.xml");
-  //}
-  //catch (const rti1516e::Exception& e)
-  //{
-  //  std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //catch (...)
-  //{
-  //  std::wcout << L"Unknown Exception!" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
+  try
+  {
+    ambassador.connect(L"thread://");
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return EXIT_FAILURE;
+  }
+  std::wstring federationExecutionName = L"test";
+  // create, must work
+  try
+  {
+    ambassador.createFederationExecution(federationExecutionName, L"fdd-1.xml");
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return EXIT_FAILURE;
+  }
 
-  //rti1516e::FederateHandle federateHandle;
+  rti1516e::FederateHandle federateHandle;
 
-  //// join must work
-  //try
-  //{
-  //  federateHandle = ambassador.joinFederationExecution(L"federate", federationExecutionName);
-  //}
-  //catch (const rti1516e::Exception& e)
-  //{
-  //  std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //catch (...)
-  //{
-  //  std::wcout << L"Unknown Exception!" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //for (int i=0;i<doIterations;i++)
-  //{
-  //  std::cout << "Iteration: " << i << "\r";
+  // join must work
+  try
+  {
+    federateHandle = ambassador.joinFederationExecution(L"federate", federationExecutionName);
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return EXIT_FAILURE;
+  }
   /*
   if (!testDataElementEncoding(HLAASCIIcharDataType))
     return EXIT_FAILURE;
@@ -1389,79 +1427,79 @@ main(int argc, char* argv[])
   if (!testDataElementEncoding(StructAlign2DataType))
     return EXIT_FAILURE;
     */
-  //if (!testDataPointerEncoding())
-  //  return EXIT_FAILURE;
+  if (!testDataPointerEncoding())
+    return EXIT_FAILURE;
 
-  //if (!testDataPointerFixedArrayEncoding())
-  //  return EXIT_FAILURE;
+  if (!testDataPointerFixedArrayEncoding())
+    return EXIT_FAILURE;
 
-  //if (!testDataPointerFixedRecordEncoding())
-  //  return EXIT_FAILURE;
+  if (!testDataPointerFixedRecordEncoding())
+    return EXIT_FAILURE;
 
   // now run the tests
 
-  //testHandleEncodings(ambassador, federateHandle);
+  testHandleEncodings(ambassador, federateHandle);
 
-  //rti1516e::ObjectClassHandle objectClass1 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
-  //testHandleEncodings(ambassador, objectClass1);
-  //rti1516e::ObjectClassHandle objectClass2 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1.ObjectClass2");
-  //testHandleEncodings(ambassador, objectClass2);
-  //rti1516e::InteractionClassHandle interactionClass1 = ambassador.getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
-  //testHandleEncodings(ambassador, interactionClass1);
+  rti1516e::ObjectClassHandle objectClass1 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
+  testHandleEncodings(ambassador, objectClass1);
+  rti1516e::ObjectClassHandle objectClass2 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1.ObjectClass2");
+  testHandleEncodings(ambassador, objectClass2);
+  rti1516e::InteractionClassHandle interactionClass1 = ambassador.getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
+  testHandleEncodings(ambassador, interactionClass1);
 
-  //if (!testDataElementEncoding(HLAfederateHandleDataType))
-  //  return EXIT_FAILURE;
-  //if (!testDataElementEncoding(HLAobjectClassHandleDataType))
-  //  return EXIT_FAILURE;
-  //if (!testDataElementEncoding(HLAobjectInstanceHandleDataType))
-  //  return EXIT_FAILURE;
-  //}
+  if (!testDataElementEncoding(HLAfederateHandleDataType))
+    return EXIT_FAILURE;
+  if (!testDataElementEncoding(HLAobjectClassHandleDataType))
+    return EXIT_FAILURE;
+  if (!testDataElementEncoding(HLAobjectInstanceHandleDataType))
+    return EXIT_FAILURE;
   Leaktest();
-  //try
-  //{
-  //  ambassador.resignFederationExecution(rti1516e::NO_ACTION);
-  //}
-  //catch (const rti1516e::Exception& e)
-  //{
-  //  std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //catch (...)
-  //{
-  //  std::wcout << L"Unknown Exception!" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
 
-  //// destroy, must work
-  //try
-  //{
-  //  ambassador.destroyFederationExecution(federationExecutionName);
-  //}
-  //catch (const rti1516e::Exception& e)
-  //{
-  //  std::wcout << e.what() << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //catch (...)
-  //{
-  //  std::wcout << L"Unknown Exception!" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
+  try
+  {
+    ambassador.resignFederationExecution(rti1516e::NO_ACTION);
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return EXIT_FAILURE;
+  }
 
-  //try
-  //{
-  //  ambassador.shutdown();
-  //}
-  //catch (const rti1516e::Exception& e)
-  //{
-  //  std::wcout << e.what() << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //catch (...)
-  //{
-  //  std::wcout << L"Unknown Exception!" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
+  // destroy, must work
+  try
+  {
+    ambassador.destroyFederationExecution(federationExecutionName);
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcout << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  try
+  {
+    ambassador.shutdown();
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcout << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return EXIT_FAILURE;
+  }
 
   return EXIT_SUCCESS;
 }

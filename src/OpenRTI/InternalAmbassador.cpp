@@ -30,6 +30,7 @@
 
 #include "dprintf.h"
 #include "AbstractServer.h"
+#include "ThreadLocal.h"
 
 namespace OpenRTI {
 
@@ -87,6 +88,7 @@ InternalAmbassador::disconnect()
 void InternalAmbassador::shutdown()
 {
   LeafServerThread::shutdown();
+  AbstractThreadLocal::shutdown();
 }
 
 void

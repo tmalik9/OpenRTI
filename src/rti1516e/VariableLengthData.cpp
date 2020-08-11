@@ -29,36 +29,29 @@ namespace rti1516e
 
 // Note that the VariableLengthDataFriend implementation relies on
 // this method setting impl to zero.
-VariableLengthData::VariableLengthData() :
-  _impl(new VariableLengthDataImplementation)
+VariableLengthData::VariableLengthData()
+  : _impl(std::make_shared<VariableLengthDataImplementation>())
 {
-  VariableLengthDataImplementation::get(_impl);
 }
 
-VariableLengthData::VariableLengthData(void const* data, size_t size) :
-  _impl(new VariableLengthDataImplementation(data, size))
+VariableLengthData::VariableLengthData(void const* data, size_t size)
+  : _impl(std::make_shared<VariableLengthDataImplementation>(data, size))
 {
-  VariableLengthDataImplementation::get(_impl);
 }
 
-VariableLengthData::VariableLengthData(VariableLengthData const & rhs) :
-  _impl(rhs._impl)
+VariableLengthData::VariableLengthData(VariableLengthData const & rhs)
+  : _impl(rhs._impl)
 {
-  VariableLengthDataImplementation::get(_impl);
 }
 
 VariableLengthData::~VariableLengthData()
 {
-  VariableLengthDataImplementation::putAndDelete(_impl);
+  _impl.reset();
 }
 
 VariableLengthData &
 VariableLengthData::operator=(VariableLengthData const & rhs)
 {
-  if (_impl == rhs._impl)
-    return *this;
-  VariableLengthDataImplementation::get(rhs._impl);
-  VariableLengthDataImplementation::putAndDelete(_impl);
   _impl = rhs._impl;
   return *this;
 }
@@ -84,34 +77,17 @@ VariableLengthData::setData(void const * inData, size_t inSize)
 {
   // Note that we do not copy the old content here since we
   // will write a new content in any case
-  if (1 < VariableLengthDataImplementation::count(_impl)) {
-    VariableLengthDataImplementation::putAndDelete(_impl);
-    _impl = new VariableLengthDataImplementation;
-    VariableLengthDataImplementation::get(_impl);
-  } else if (!_impl) {
-    _impl = new VariableLengthDataImplementation;
-    VariableLengthDataImplementation::get(_impl);
-  }
-  _impl->_variableLengthData.setData(inData, inSize);
+  _impl = std::make_shared<VariableLengthDataImplementation>(inData, inSize);
 }
 
 void
 VariableLengthData::setDataPointer(void* inData, size_t inSize)
 {
-  // Note that we do not copy the old content here since we
-  // will write a new content in any case
-  if (1 < VariableLengthDataImplementation::count(_impl)) {
-    VariableLengthDataImplementation::putAndDelete(_impl);
-    _impl = new VariableLengthDataImplementation;
-    VariableLengthDataImplementation::get(_impl);
-  } else if (!_impl) {
-    _impl = new VariableLengthDataImplementation;
-    VariableLengthDataImplementation::get(_impl);
-  }
   /// FIXME: for now copy the external stuff in any case ...
-  /// First think about multithreading before optimizing that
-  // _impl->setDataPointer(inData, inSize);
+  /// First think about multi threading before optimizing that
+  _impl = std::make_shared<VariableLengthDataImplementation>();
   _impl->_variableLengthData.setData(inData, inSize);
+  // _impl->setDataPointer(inData, inSize);
 }
 
 void
@@ -120,14 +96,7 @@ VariableLengthData::takeDataPointer(void* inData, size_t inSize, VariableLengthD
   // FIXME: make use of the delete function!!!
   // Note that we do not copy the old content here since we
   // will write a new content in any case
-  if (1 < VariableLengthDataImplementation::count(_impl)) {
-    VariableLengthDataImplementation::putAndDelete(_impl);
-    _impl = new VariableLengthDataImplementation;
-    VariableLengthDataImplementation::get(_impl);
-  } else if (!_impl) {
-    _impl = new VariableLengthDataImplementation;
-    VariableLengthDataImplementation::get(_impl);
-  }
+  _impl = std::make_shared<VariableLengthDataImplementation>();
   _impl->_variableLengthData.takeDataPointer(inData, inSize);
 }
 

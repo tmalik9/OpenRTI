@@ -67,4 +67,7 @@
 #define RTI_EXPORT_FEDTIME
 #endif
 
+// #define OPENRTI_USE_DEBUG_NEW
+#undef OPENRTI_USE_DEBUG_NEW
+
 #endif // RTI_SpecificConfig_h

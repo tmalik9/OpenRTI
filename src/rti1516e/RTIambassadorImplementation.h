@@ -33,7 +33,7 @@ namespace OpenRTI {
 // The implementation class also contains the application-provided _federateAmbassador.
 class OPENRTI_LOCAL RTIambassadorImplementation : public rti1516e::RTIambassador {
 public:
-  RTIambassadorImplementation() throw ();
+  RTIambassadorImplementation();
   virtual ~RTIambassadorImplementation();
 
   virtual void

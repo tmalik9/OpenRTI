@@ -25,18 +25,19 @@
 # define NOMINMAX
 #endif
 #include <windows.h>
+#include "Referenced.h"
+#include "SharedPtr.h"
 
-#include "SingletonPtr.h"
 
 namespace OpenRTI {
 
 struct OPENRTI_LOCAL AbstractThreadLocal::_Provider : public Referenced {
   typedef std::vector<AbstractThreadLocal::_AbstractData*> ThreadLocalVector;
 
-  static SingletonPtr<_Provider> _instance;
 
   _Provider();
   ~_Provider();
+  static SharedPtr<AbstractThreadLocal::_Provider>& GetInstance();
 
   unsigned getNextIndex();
 
@@ -44,13 +45,9 @@ struct OPENRTI_LOCAL AbstractThreadLocal::_Provider : public Referenced {
   void setData(unsigned index, _AbstractData* abstractThreadLocal);
 
   ThreadLocalVector* _tlsVector();
-
   DWORD _key;
   unsigned _index;
 };
-
-SingletonPtr<AbstractThreadLocal::_Provider>
-AbstractThreadLocal::_Provider::_instance;
 
 AbstractThreadLocal::_Provider::_Provider() :
   _key(TlsAlloc()),
@@ -63,6 +60,13 @@ AbstractThreadLocal::_Provider::~_Provider()
   TlsFree(_key);
   _key = TLS_OUT_OF_INDEXES;
 }
+
+SharedPtr<AbstractThreadLocal::_Provider>& AbstractThreadLocal::_Provider::GetInstance()
+{
+  static SharedPtr<AbstractThreadLocal::_Provider> _instance = new AbstractThreadLocal::_Provider;
+  return _instance;
+}
+
 
 unsigned
 AbstractThreadLocal::_Provider::getNextIndex()
@@ -113,7 +117,7 @@ AbstractThreadLocal::_AbstractData::~_AbstractData()
 AbstractThreadLocal::AbstractThreadLocal() :
   _index(~0u)
 {
-  SharedPtr<_Provider> instance = _Provider::_instance.get();
+  SharedPtr<_Provider> instance = _Provider::GetInstance();
   if (instance.valid())
     _index = instance->getNextIndex();
 }
@@ -125,7 +129,7 @@ AbstractThreadLocal::~AbstractThreadLocal()
 AbstractThreadLocal::_AbstractData*
 AbstractThreadLocal::_get()
 {
-  SharedPtr<_Provider> instance = _Provider::_instance.get();
+  SharedPtr<_Provider> instance = _Provider::GetInstance();
   if (!instance.valid())
     return 0;
   return instance->getData(_index);
@@ -134,12 +138,18 @@ AbstractThreadLocal::_get()
 void
 AbstractThreadLocal::_set(AbstractThreadLocal::_AbstractData* abstractThreadLocal)
 {
-  SharedPtr<_Provider> instance = _Provider::_instance.get();
+  SharedPtr<_Provider> instance = _Provider::GetInstance();
   if (!instance.valid())
     return;
   if (_index == ~0u)
     return;
   instance->setData(_index, abstractThreadLocal);
+}
+
+
+void AbstractThreadLocal::shutdown()
+{
+  _Provider::GetInstance().clear();
 }
 
 } // namespace OpenRTI

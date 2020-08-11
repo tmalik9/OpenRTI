@@ -72,7 +72,7 @@ void ManagerFederate::initialize(const std::string& address, const std::string& 
   /// 1. create the RTIambassador
   ///
   rti1516e::RTIambassadorFactory factory;
-  this->mRtiAmb = factory.createRTIambassador();
+  mRtiAmb = factory.createRTIambassador();
   /// create the federate ambassador
   try
   {
@@ -243,6 +243,7 @@ void ManagerFederate::runFederate()
     if (!mRtiAmb->evokeCallback(1.0))
       break;
   mRtiAmb->disconnect();
+  mRtiAmb->shutdown();
 }
 
 void ManagerFederate::connectionLost(std::wstring const & faultDescription)

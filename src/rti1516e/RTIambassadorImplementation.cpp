@@ -1663,8 +1663,8 @@ public:
   bool _inCallback;
 };
 
-RTIambassadorImplementation::RTIambassadorImplementation() throw () :
-  _ambassadorInterface(new RTI1516EAmbassadorInterface)
+RTIambassadorImplementation::RTIambassadorImplementation()
+  : _ambassadorInterface(new RTI1516EAmbassadorInterface)
 {
 }
 

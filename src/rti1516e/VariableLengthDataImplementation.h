@@ -26,7 +26,7 @@
 namespace rti1516e
 {
 
-class VariableLengthDataImplementation : public OpenRTI::Referenced {
+class VariableLengthDataImplementation {
 public:
   VariableLengthDataImplementation()
   { }
@@ -40,13 +40,6 @@ public:
     _variableLengthData(v._variableLengthData)
   {
   }
-  static void putAndDelete(VariableLengthDataImplementation* data)
-  {
-    if (OpenRTI::Referenced::put(data))
-      return;
-    delete data;
-  }
-
   OpenRTI::VariableLengthData _variableLengthData;
 };
 
