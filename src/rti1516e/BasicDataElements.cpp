@@ -1438,8 +1438,8 @@ size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();
   //int32_t u = static_cast<int32_t>(length);
-  offset = encodeIntoBE32(buffer, bufferSize, offset, length);
-  memcpy(buffer + offset, _valuePointer->data(), length);
+  offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<int32_t>(length));
+  memcpy(buffer + offset, _valuePointer->data(), static_cast<int32_t>(length));
   return offset + length;
 }
 
