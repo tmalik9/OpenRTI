@@ -56,12 +56,20 @@ VariableLengthData::operator=(VariableLengthData const & rhs)
   return *this;
 }
 
-void const*
+const void*
 VariableLengthData::data() const
 {
   if (!_impl)
     return 0;
   return _impl->_variableLengthData.constData();
+}
+
+void*
+VariableLengthData::data()
+{
+  if (!_impl)
+    return 0;
+  return _impl->_variableLengthData.data();
 }
 
 size_t
@@ -70,6 +78,12 @@ VariableLengthData::size() const
   if (!_impl)
     return 0;
   return _impl->_variableLengthData.size();
+}
+
+
+void VariableLengthData::resize(size_t size)
+{
+  _impl->_variableLengthData.resize(size);
 }
 
 void

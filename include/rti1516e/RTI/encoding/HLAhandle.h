@@ -33,9 +33,9 @@ public:
   HLAhandle(const ParameterHandle& handle);
   ~HLAhandle();
   FederateHandle getFederateHandle() const;
+  ObjectClassHandle getObjectClassHandle() const;
   ObjectInstanceHandle getObjectInstanceHandle() const;
   AttributeHandle getAttributeHandle() const;
-  ObjectClassHandle getObjectClassHandle() const;
   InteractionClassHandle getInteractionClassHandle() const;
   ParameterHandle getParameterHandle() const;
 
@@ -55,12 +55,16 @@ public:
   void encode(VariableLengthData& inData) const override;
   void encodeInto(std::vector<Octet>& buffer) const override;
 
+  // Encode this element into a preallocated buffer
+  virtual size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override;
+
   void decode(VariableLengthData const & inData) override;
   size_t decodeFrom(std::vector<Octet> const & buffer, size_t index) override;
+  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override;
 
   size_t getEncodedLength() const override;
-
   unsigned int getOctetBoundary() const override;
+
 private:
   class Implementation;
   std::unique_ptr<Implementation> mImpl;

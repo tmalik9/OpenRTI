@@ -1692,10 +1692,6 @@ public:
             if (interactionClass->isMatching(subscriberConnectHandle, message->getParameterValues())) {
               send(subscriberConnectHandle, message);
             }
-            else
-            {
-              DebugPrintf("%s(TimeStampedInteractionMessage): not matched\n", __FUNCTION__);
-            }
           } else {
             // parent interaction class
             SharedPtr<TimeStampedInteractionMessage> message2 = new TimeStampedInteractionMessage;

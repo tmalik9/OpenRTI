@@ -107,108 +107,134 @@ foreach (var dataType in FOM.DataTypes.Values)
             this.Write("Encoding()\r\n    {\r\n    }\r\n");
             
             #line 42 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-    foreach (var field in fixedRecordDataType.Fields.Values)
-    {
-
+ foreach (var field in fixedRecordDataType.Fields.Values) { 
             
             #line default
             #line hidden
             this.Write("    void Set");
             
-            #line 46 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 43 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 46 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 43 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write(" value)\r\n    {\r\n\t    m");
             
-            #line 48 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 45 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
-            this.Write(".set(value);\r\n    }\r\n    ");
+            this.Write(".set(value);\r\n    }\r\n");
+            
+            #line 47 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+ if (field.DataType is FOMParser.ArrayDataType) {
+     var arrayDataType = field.DataType as FOMParser.ArrayDataType;
+
+            
+            #line default
+            #line hidden
+            this.Write("    void Set");
             
             #line 50 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
+            
+            #line default
+            #line hidden
+            this.Write("(const ");
+            
+            #line 50 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.CPPType));
+            
+            #line default
+            #line hidden
+            this.Write("* value, size_t size)\r\n    {\r\n\t    m");
+            
+            #line 52 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".set(value, size);\r\n    }\r\n");
+            
+            #line 54 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("    ");
+            
+            #line 55 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write(" Get");
             
-            #line 50 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 55 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("()\r\n    {\r\n");
             
-            #line 52 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-      if (field.DataType is FOMParser.EnumeratedDataType) {
-
+            #line 57 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+ if (field.DataType is FOMParser.EnumeratedDataType) { 
             
             #line default
             #line hidden
             this.Write("\t    return static_cast<");
             
-            #line 55 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 58 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write(">(m");
             
-            #line 55 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 58 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(".get());\r\n");
             
-            #line 56 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-      } else {
-
+            #line 59 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+ } else { 
             
             #line default
             #line hidden
             this.Write("\t    return m");
             
-            #line 59 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 60 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(".get();\r\n");
             
-            #line 60 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-      } // else (field.DataType is FOMParser.EnumeratedDataType)
-
+            #line 61 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+ } // else (field.DataType is FOMParser.EnumeratedDataType) 
             
             #line default
             #line hidden
             this.Write("    }\r\n");
             
-            #line 64 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-    } // foreach fixedRecordDataType.Fields.Values
-
+            #line 63 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+ } // foreach fixedRecordDataType.Fields.Values 
             
             #line default
             #line hidden
             this.Write("\r\n  private:\r\n");
             
-            #line 69 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 66 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
 
     foreach (var field in fixedRecordDataType.Fields.Values)
     {
@@ -218,21 +244,21 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("    ");
             
-            #line 73 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 70 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write(" m");
             
-            #line 73 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 70 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 74 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 71 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
 
     } // foreach fixedRecordDataType.Fields.Values
 
@@ -241,14 +267,14 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("}; // class ");
             
-            #line 77 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 74 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding\r\n\r\n");
             
-            #line 79 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 76 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
 
   } // if (dataType is FOMParser.FixedRecordDataType)
   else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
@@ -260,14 +286,14 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("enum ");
             
-            #line 85 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 82 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n");
             
-            #line 87 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 84 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
@@ -277,21 +303,21 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("      ");
             
-            #line 91 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 88 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 91 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 88 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Value));
             
             #line default
             #line hidden
             this.Write(",\r\n");
             
-            #line 92 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 89 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -300,14 +326,14 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("}; // enum ");
             
-            #line 95 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 92 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 97 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 94 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
 
   } // if (dataType is FOMParser.EnumeratedDataType)
   else if (dataType is FOMParser.ArrayDataType && dataType.Generate)
@@ -319,243 +345,295 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("class ");
             
-            #line 103 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 100 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding : public rti1516e::");
             
-            #line 103 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 100 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.EncodingBase));
             
             #line default
             #line hidden
-            this.Write("\r\n{\r\n  public:\r\n    ");
+            this.Write("\r\n{\r\n  public:\r\n");
             
-            #line 106 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 103 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+ if (arrayDataType.EncodingBase == "HLAfixedArray") { 
+            
+            #line default
+            #line hidden
+            this.Write("    ");
+            
+            #line 104 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
-            this.Write("Encoding()\r\n      : ");
+            this.Write("Encoding()\r\n      : HLAfixedArray(");
             
-            #line 107 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-    if (arrayDataType.EncodingBase == "HLAfixedArray") { 
-    
-            
-            #line default
-            #line hidden
-            this.Write("HLAfixedArray(");
-            
-            #line 109 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 105 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("(), ");
             
-            #line 109 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 105 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
             
             #line default
             #line hidden
-            this.Write(")");
+            this.Write(")\r\n      , mData(");
             
-            #line 109 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-    } else {
-    
+            #line 106 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
             
             #line default
             #line hidden
-            this.Write("HLAvariableArray(");
+            this.Write(")\r\n    {\r\n      for (int i=0; i < ");
             
-            #line 111 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.Encoding));
-            
-            #line default
-            #line hidden
-            this.Write(")");
-            
-            #line 111 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-    } 
+            #line 108 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
             
             #line default
             #line hidden
-            this.Write("\r\n      , mData(");
+            this.Write("; i++)\r\n      {\r\n        mEncoding[i].setDataPointer(&mData.data()[i]);\r\n        " +
+                    "setElementPointer(i, &mEncoding[i]);\r\n      }\r\n    }\r\n    ");
             
             #line 114 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
-            
-            #line default
-            #line hidden
-            this.Write(")\r\n    {\r\n");
-            
-            #line 116 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-    if (arrayDataType.EncodingBase == "HLAfixedArray") { 
-            
-            #line default
-            #line hidden
-            this.Write("      for (int i=0;i<");
-            
-            #line 117 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
-            
-            #line default
-            #line hidden
-            this.Write(";i++)\r\n      {\r\n        mEncoding[i].setDataPointer(&mData.data()[i]);\r\n        s" +
-                    "etElementPointer(i, &mEncoding[i]);\r\n      }\r\n");
-            
-            #line 122 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
- } 
-            
-            #line default
-            #line hidden
-            this.Write("    }\r\n    ");
-            
-            #line 124 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding(const ");
             
-            #line 124 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 114 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.CPPType));
             
             #line default
             #line hidden
-            this.Write("& data)\r\n      : ");
+            this.Write("& data)\r\n      : HLAfixedArray(");
             
-            #line 125 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-    if (arrayDataType.EncodingBase == "HLAfixedArray") { 
-    
-            
-            #line default
-            #line hidden
-            this.Write("HLAfixedArray(");
-            
-            #line 127 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 115 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("(), ");
             
-            #line 127 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 115 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
             
             #line default
             #line hidden
-            this.Write(")");
+            this.Write(")\r\n      , mData(data)\r\n    {\r\n      for (int i=0;i<");
             
-            #line 127 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-    } else {
-    
-            
-            #line default
-            #line hidden
-            this.Write("HLAvariableArray(");
-            
-            #line 129 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.Encoding));
-            
-            #line default
-            #line hidden
-            this.Write(")");
-            
-            #line 129 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-
-    } 
-            
-            #line default
-            #line hidden
-            this.Write("\r\n      , mData(data)\r\n    {\r\n");
-            
-            #line 134 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-    if (arrayDataType.EncodingBase == "HLAfixedArray") { 
-            
-            #line default
-            #line hidden
-            this.Write("      for (int i=0;i<");
-            
-            #line 135 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 118 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
             
             #line default
             #line hidden
             this.Write(";i++)\r\n      {\r\n        mEncoding[i].setDataPointer(&mData.data()[i]);\r\n        s" +
-                    "etElementPointer(i, &mEncoding[i]);\r\n      }\r\n");
+                    "etElementPointer(i, &mEncoding[i]);\r\n      }\r\n    }\r\n    void set(const ");
             
-            #line 140 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
- } 
-            
-            #line default
-            #line hidden
-            this.Write("    }\r\n    void set(const ");
-            
-            #line 142 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 124 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.CPPType));
             
             #line default
             #line hidden
-            this.Write("& data) { memcpy(mData.data(), data.data(), mData.size()); }\r\n    const ");
+            this.Write("& data) {\r\n      memcpy(mData.data(), data.data(), mData.size());\r\n    }\r\n    voi" +
+                    "d set(const ");
             
-            #line 143 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 127 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.CPPType));
+            
+            #line default
+            #line hidden
+            this.Write("* data, size_t size)\r\n    {\r\n      if (size <= ");
+            
+            #line 129 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
+            
+            #line default
+            #line hidden
+            this.Write(") {\r\n        memcpy(mData.data(), data, size);\r\n      } else {\r\n        memcpy(mD" +
+                    "ata.data(), data, ");
+            
+            #line 132 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
+            
+            #line default
+            #line hidden
+            this.Write(");\r\n      }\r\n    }\r\n    const ");
+            
+            #line 135 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.CPPType));
             
             #line default
             #line hidden
             this.Write("& get() const { return mData; }\r\n  private:\r\n    ");
             
-            #line 145 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 137 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.CPPType));
             
             #line default
             #line hidden
-            this.Write(" mData;\r\n");
+            this.Write(" mData;\r\n    ");
             
-            #line 146 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
-    if (arrayDataType.EncodingBase == "HLAfixedArray") { 
-            
-            #line default
-            #line hidden
-            this.Write("    ");
-            
-            #line 147 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 138 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write(" mEncoding[");
             
-            #line 147 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 138 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.Cardinality));
             
             #line default
             #line hidden
             this.Write("];\r\n");
             
-            #line 148 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 139 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+ } else if (arrayDataType.EncodingBase == "HLAvariableArray") { 
+            
+            #line default
+            #line hidden
+            this.Write("    ");
+            
+            #line 140 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
+            
+            #line default
+            #line hidden
+            this.Write("Encoding()\r\n      : HLAvariableArray(");
+            
+            #line 141 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.Encoding));
+            
+            #line default
+            #line hidden
+            this.Write("())\r\n      , mData()\r\n    {\r\n    }\r\n    ");
+            
+            #line 145 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
+            
+            #line default
+            #line hidden
+            this.Write("Encoding(const ");
+            
+            #line 145 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.CPPType));
+            
+            #line default
+            #line hidden
+            this.Write("& data)\r\n      : HLAvariableArray(");
+            
+            #line 146 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.Encoding));
+            
+            #line default
+            #line hidden
+            this.Write("())\r\n      , mData(data)\r\n    {\r\n      update();\r\n    }\r\n    void set(const ");
+            
+            #line 151 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.CPPType));
+            
+            #line default
+            #line hidden
+            this.Write("& data)\r\n    {\r\n      if (mData.size() != data.size()) {\r\n        mData = data;\r\n" +
+                    "        update();\r\n      } else {\r\n        memcpy(mData.data(), data.data(), mDa" +
+                    "ta.size());\r\n      }\r\n    }\r\n    void set(const ");
+            
+            #line 160 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.CPPType));
+            
+            #line default
+            #line hidden
+            this.Write("* data, size_t size)\r\n    {\r\n      if (mData.size() != size) {\r\n        mData.res" +
+                    "ize(size);\r\n        update();\r\n      }\r\n      memcpy(mData.data(), data, size);\r" +
+                    "\n    }\r\n    const ");
+            
+            #line 168 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.CPPType));
+            
+            #line default
+            #line hidden
+            this.Write(@"& get() const { return mData; }
+    void resize(size_t size)
+    {
+      mData.resize(size);
+      update();
+    }
+    // resize buffer and encoder array before actually decoding 
+    virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override
+    {
+      size_t newSize = decodedSize(buffer, bufferSize, index);
+      resize(newSize);
+      return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
+    }
+  private:
+    void update()
+    {
+      size_t size = mData.size();
+      mEncoding.resize(size);
+      for (size_t i=0; i<size; i++)
+      {
+        mEncoding[i].setDataPointer(&mData.data()[i]);
+        if (i < HLAvariableArray::size()) {
+          setElementPointer(i, &mEncoding[i]);
+        } else {
+          addElementPointer(&mEncoding[i]);
+        }
+      }
+    }
+    ");
+            
+            #line 196 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.CPPType));
+            
+            #line default
+            #line hidden
+            this.Write(" mData;\r\n    std::vector<");
+            
+            #line 197 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.Encoding));
+            
+            #line default
+            #line hidden
+            this.Write("> mEncoding;\r\n");
+            
+            #line 198 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+ } else { 
+            
+            #line default
+            #line hidden
+            this.Write("// unknown base array type: ");
+            
+            #line 199 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.EncodingBase));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 200 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("}; // class ");
             
-            #line 149 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 201 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 151 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 203 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
 
   } // if (dataType is FOMParser.ArrayDataType)
   else // not handled
@@ -566,21 +644,21 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("// ");
             
-            #line 156 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 208 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.GetType()));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 156 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 208 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 157 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 209 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
 
   } // else not handled
 
@@ -588,7 +666,7 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line default
             #line hidden
             
-            #line 160 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 212 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
 
 } // foreach (var dataType in FOM.DataTypes.Values)
 
@@ -597,7 +675,7 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("} // namespace ");
             
-            #line 163 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
+            #line 215 "D:\vfs\CANoe\feature\14.0_DistSim_HLA\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\EncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.Namespace));
             
             #line default

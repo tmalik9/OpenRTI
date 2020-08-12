@@ -74,6 +74,20 @@ public:
     return buffer.size();
   }
 
+  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+  {
+    memcpy(buffer + offset, _buffer.data(), _buffer.size());
+    return offset + _buffer.size();
+  }
+
+  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+  {
+    const Octet* i = buffer + index;
+    _buffer.clear();
+    _buffer.insert(_buffer.end(), i, buffer + bufferSize);
+    return bufferSize;
+  }
+
   void setDataPointer(Octet** inData, size_t bufferSize, size_t dataSize)
   {
     // FIXME no clue if this is right!!
@@ -134,7 +148,7 @@ HLAopaqueData::~HLAopaqueData()
 std::unique_ptr<DataElement>
 HLAopaqueData::clone () const
 {
-  return std::unique_ptr<rti1516e::DataElement>(new HLAopaqueData(*this));
+  return std::unique_ptr<DataElement>(new HLAopaqueData(*this));
 }
 
 VariableLengthData
@@ -160,17 +174,27 @@ HLAopaqueData::encodeInto(std::vector<Octet>& buffer) const
   _impl->encodeInto(buffer);
 }
 
+
+size_t HLAopaqueData::encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+{
+  return _impl->encodeInto(buffer, bufferSize, offset);
+}
+
 void HLAopaqueData::decode(VariableLengthData const & inData)
 {
-  std::vector<Octet> buffer(inData.size());
-  if (inData.size() > 0) std::memcpy(&buffer.front(), inData.data(), inData.size());
-  decodeFrom(buffer, 0);
+  _impl->decodeFrom(static_cast<const Octet*>(inData.data()), inData.size(), 0);
 }
 
 size_t
 HLAopaqueData::decodeFrom(std::vector<Octet> const & buffer, size_t index)
 {
-  return _impl->decodeFrom(buffer, index);
+  return _impl->decodeFrom(buffer.data(), buffer.size(), index);
+}
+
+
+size_t HLAopaqueData::decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+{
+  return _impl->decodeFrom(buffer, bufferSize, index);
 }
 
 size_t

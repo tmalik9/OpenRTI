@@ -169,6 +169,11 @@ void HLAhandle::encodeInto(std::vector<Octet>& buffer) const
   mImpl->encodeInto(buffer);
 }
 
+size_t HLAhandle::encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+{
+  return mImpl->encodeInto(buffer, bufferSize, offset);
+}
+
 void HLAhandle::decode(VariableLengthData const& inData)
 {
   try
@@ -186,6 +191,18 @@ size_t HLAhandle::decodeFrom(std::vector<Octet> const& buffer, size_t index)
   try
   {
     return mImpl->decodeFrom(buffer, index);
+  }
+  catch (const OpenRTI::EncoderException& e)
+  {
+    throw rti1516e::EncoderException(OpenRTI::utf8ToUcs(e.what()));
+  }
+}
+
+size_t HLAhandle::decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+{
+  try
+  {
+    return mImpl->decodeFrom(buffer, bufferSize, index);
   }
   catch (const OpenRTI::EncoderException& e)
   {

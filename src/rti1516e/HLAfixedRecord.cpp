@@ -64,12 +64,22 @@ public:
     }
   }
 
-  size_t decodeFrom(std::vector<Octet> const& buffer, size_t index)
+  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset)
+  {
+    offset = align(offset, getOctetBoundary());
+    for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
+      offset = align(offset, i->first->getOctetBoundary());
+      offset = i->first->encodeInto(buffer, bufferSize, offset);
+    }
+    return offset;
+  }
+
+  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   {
     index = align(index, getOctetBoundary());
     for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
       index = align(index, i->first->getOctetBoundary());
-      index = i->first->decodeFrom(buffer, index);
+      index = i->first->decodeFrom(buffer, bufferSize, index);
     }
     return index;
   }
@@ -210,34 +220,45 @@ HLAfixedRecord::encode() const
 }
 
 void
-HLAfixedRecord::encode(VariableLengthData& inData) const
+HLAfixedRecord::encode(VariableLengthData& outData) const
 {
-  std::vector<Octet> buffer;
-  buffer.reserve(getEncodedLength());
-  encodeInto(buffer);
-  if (!buffer.empty())
-    inData.setData(&buffer.front(), buffer.size());
+  //std::vector<Octet> buffer;
+  //buffer.reserve(getEncodedLength());
+  //encodeInto(buffer);
+  //if (!buffer.empty())
+  //  inData.setData(&buffer.front(), buffer.size());
+  outData.resize(getEncodedLength());
+  _impl->encodeInto(static_cast<Octet*>(outData.data()), outData.size(), 0);
 }
 
 void
 HLAfixedRecord::encodeInto(std::vector<Octet>& buffer) const
 {
-  _impl->encodeInto(buffer);
+  buffer.resize(getEncodedLength());
+  _impl->encodeInto(buffer.data(), buffer.size(), 0);
+}
+
+size_t HLAfixedRecord::encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+{
+  return _impl->encodeInto(buffer, bufferSize, offset);
 }
 
 void
 HLAfixedRecord::decode(VariableLengthData const& inData)
 {
-  std::vector<Octet> buffer(inData.size());
-  if (!buffer.empty())
-    std::memcpy(&buffer.front(), inData.data(), inData.size());
-  decodeFrom(buffer, 0);
+  _impl->decodeFrom(static_cast<const Octet*>(inData.data()), inData.size(), 0);
 }
 
 size_t
 HLAfixedRecord::decodeFrom(std::vector<Octet> const& buffer, size_t index)
 {
-  return _impl->decodeFrom(buffer, index);
+  return _impl->decodeFrom(buffer.data(), buffer.size(), index);
+}
+
+
+size_t HLAfixedRecord::decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+{
+  return _impl->decodeFrom(buffer, bufferSize, index);
 }
 
 size_t

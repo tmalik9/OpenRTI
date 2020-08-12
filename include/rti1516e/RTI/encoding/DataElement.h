@@ -46,6 +46,9 @@ namespace rti1516e
       virtual void encodeInto (
          std::vector<Octet>& buffer) const = 0;
 
+      // Encode this element and append it to a buffer
+      virtual size_t encodeInto (Octet* buffer, size_t bufferSize, size_t offset) const = 0;
+
       // Decode this element from the RTI's VariableLengthData.
       virtual void decode (
          VariableLengthData const & inData) = 0;
@@ -54,6 +57,8 @@ namespace rti1516e
       virtual size_t decodeFrom (
          std::vector<Octet> const & buffer,
          size_t index) = 0;
+      
+      virtual size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) = 0;
 
       // Return the size in bytes of this element's encoding.
       virtual size_t getEncodedLength () const = 0;

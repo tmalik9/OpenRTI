@@ -45,15 +45,17 @@ namespace rti1516e
       virtual std::unique_ptr<DataElement> clone () const;
 
       // Encode this element into a new VariableLengthData
-      virtual VariableLengthData encode () const;
+      virtual VariableLengthData encode () const override;
 
       // Encode this element into an existing VariableLengthData
       virtual void encode (
-         VariableLengthData& inData) const;
+         VariableLengthData& inData) const override;
 
       // Encode this element and append it to a buffer
       virtual void encodeInto (
-         std::vector<Octet>& buffer) const;
+         std::vector<Octet>& buffer) const override;
+
+      virtual size_t encodeInto (Octet* buffer, size_t bufferSize, size_t offset) const override;
 
       // Decode this element from the RTI's VariableLengthData.
       virtual void decode (
@@ -64,6 +66,8 @@ namespace rti1516e
          std::vector<Octet> const & buffer,
          size_t index);
 
+      size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override;
+
       // Return the size in bytes of this element's encoding.
       virtual size_t getEncodedLength () const;
 
@@ -72,6 +76,8 @@ namespace rti1516e
 
       // Return the number of elements in this variable array.
       virtual size_t size () const;
+
+      size_t decodedSize(const Octet* buffer, size_t bufferSize, size_t index) const;
 
       // Return true if given element is same type as this; otherwise, false.
       virtual bool isSameTypeAs(
@@ -121,6 +127,8 @@ namespace rti1516e
       // Assignment Operator not allowed
       HLAvariableArray& operator=(HLAvariableArray const & rhs);
       HLAvariableArray& operator=(HLAvariableArray&& rhs);
+
+      void setDataBuffer(void* buffer, size_t bytes);
    private:
 
       // Default Constructor not allowed

@@ -39,31 +39,28 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedRecord
     ~<#=dataType.Name#>Encoding()
     {
     }
-<#
-    foreach (var field in fixedRecordDataType.Fields.Values)
-    {
-#>
+<# foreach (var field in fixedRecordDataType.Fields.Values) { #>
     void Set<#=field.Name#>(<#=field.DataType.CPPType#> value)
     {
 	    m<#=field.Name#>.set(value);
     }
+<# if (field.DataType is FOMParser.ArrayDataType) {
+     var arrayDataType = field.DataType as FOMParser.ArrayDataType;
+#>
+    void Set<#=field.Name#>(const <#=arrayDataType.DataType.CPPType#>* value, size_t size)
+    {
+	    m<#=field.Name#>.set(value, size);
+    }
+<# } #>
     <#=field.DataType.CPPType#> Get<#=field.Name#>()
     {
-<#
-      if (field.DataType is FOMParser.EnumeratedDataType) {
-#>
+<# if (field.DataType is FOMParser.EnumeratedDataType) { #>
 	    return static_cast<<#=field.DataType.CPPType#>>(m<#=field.Name#>.get());
-<#
-      } else {
-#>
+<# } else { #>
 	    return m<#=field.Name#>.get();
-<#
-      } // else (field.DataType is FOMParser.EnumeratedDataType)
-#>
+<# } // else (field.DataType is FOMParser.EnumeratedDataType) #>
     }
-<#
-    } // foreach fixedRecordDataType.Fields.Values
-#>
+<# } // foreach fixedRecordDataType.Fields.Values #>
 
   private:
 <#
@@ -103,48 +100,103 @@ enum <#=dataType.Name#>
 class <#=dataType.Name#>Encoding : public rti1516e::<#=arrayDataType.EncodingBase#>
 {
   public:
+<# if (arrayDataType.EncodingBase == "HLAfixedArray") { #>
     <#=dataType.Name#>Encoding()
-      : <#
-    if (arrayDataType.EncodingBase == "HLAfixedArray") { 
-    #>HLAfixedArray(<#=arrayDataType.DataType.Encoding#>(), <#=arrayDataType.Cardinality#>)<#
-    } else {
-    #>HLAvariableArray(<#=arrayDataType.DataType.Encoding#>)<#
-    } #>
-
+      : HLAfixedArray(<#=arrayDataType.DataType.Encoding#>(), <#=arrayDataType.Cardinality#>)
       , mData(<#=arrayDataType.Cardinality#>)
     {
-<#    if (arrayDataType.EncodingBase == "HLAfixedArray") { #>
-      for (int i=0;i<<#=arrayDataType.Cardinality#>;i++)
+      for (int i=0; i < <#=arrayDataType.Cardinality#>; i++)
       {
         mEncoding[i].setDataPointer(&mData.data()[i]);
         setElementPointer(i, &mEncoding[i]);
       }
-<# } #>
     }
     <#=dataType.Name#>Encoding(const <#=arrayDataType.CPPType#>& data)
-      : <#
-    if (arrayDataType.EncodingBase == "HLAfixedArray") { 
-    #>HLAfixedArray(<#=arrayDataType.DataType.Encoding#>(), <#=arrayDataType.Cardinality#>)<#
-    } else {
-    #>HLAvariableArray(<#=arrayDataType.DataType.Encoding#>)<#
-    } #>
-
+      : HLAfixedArray(<#=arrayDataType.DataType.Encoding#>(), <#=arrayDataType.Cardinality#>)
       , mData(data)
     {
-<#    if (arrayDataType.EncodingBase == "HLAfixedArray") { #>
       for (int i=0;i<<#=arrayDataType.Cardinality#>;i++)
       {
         mEncoding[i].setDataPointer(&mData.data()[i]);
         setElementPointer(i, &mEncoding[i]);
       }
-<# } #>
     }
-    void set(const <#=arrayDataType.CPPType#>& data) { memcpy(mData.data(), data.data(), mData.size()); }
+    void set(const <#=arrayDataType.CPPType#>& data) {
+      memcpy(mData.data(), data.data(), mData.size());
+    }
+    void set(const <#=arrayDataType.DataType.CPPType#>* data, size_t size)
+    {
+      if (size <= <#=arrayDataType.Cardinality#>) {
+        memcpy(mData.data(), data, size);
+      } else {
+        memcpy(mData.data(), data, <#=arrayDataType.Cardinality#>);
+      }
+    }
     const <#=arrayDataType.CPPType#>& get() const { return mData; }
   private:
     <#=arrayDataType.CPPType#> mData;
-<#    if (arrayDataType.EncodingBase == "HLAfixedArray") { #>
     <#=arrayDataType.DataType.Encoding#> mEncoding[<#=arrayDataType.Cardinality#>];
+<# } else if (arrayDataType.EncodingBase == "HLAvariableArray") { #>
+    <#=dataType.Name#>Encoding()
+      : HLAvariableArray(<#=arrayDataType.DataType.Encoding#>())
+      , mData()
+    {
+    }
+    <#=dataType.Name#>Encoding(const <#=arrayDataType.CPPType#>& data)
+      : HLAvariableArray(<#=arrayDataType.DataType.Encoding#>())
+      , mData(data)
+    {
+      update();
+    }
+    void set(const <#=arrayDataType.CPPType#>& data)
+    {
+      if (mData.size() != data.size()) {
+        mData = data;
+        update();
+      } else {
+        memcpy(mData.data(), data.data(), mData.size());
+      }
+    }
+    void set(const <#=arrayDataType.DataType.CPPType#>* data, size_t size)
+    {
+      if (mData.size() != size) {
+        mData.resize(size);
+        update();
+      }
+      memcpy(mData.data(), data, size);
+    }
+    const <#=arrayDataType.CPPType#>& get() const { return mData; }
+    void resize(size_t size)
+    {
+      mData.resize(size);
+      update();
+    }
+    // resize buffer and encoder array before actually decoding 
+    virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override
+    {
+      size_t newSize = decodedSize(buffer, bufferSize, index);
+      resize(newSize);
+      return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
+    }
+  private:
+    void update()
+    {
+      size_t size = mData.size();
+      mEncoding.resize(size);
+      for (size_t i=0; i<size; i++)
+      {
+        mEncoding[i].setDataPointer(&mData.data()[i]);
+        if (i < HLAvariableArray::size()) {
+          setElementPointer(i, &mEncoding[i]);
+        } else {
+          addElementPointer(&mEncoding[i]);
+        }
+      }
+    }
+    <#=arrayDataType.CPPType#> mData;
+    std::vector<<#=arrayDataType.DataType.Encoding#>> mEncoding;
+<# } else { #>
+// unknown base array type: <#=arrayDataType.EncodingBase#>
 <# } #>
 }; // class <#=dataType.Name#>
 

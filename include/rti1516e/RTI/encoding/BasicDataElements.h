@@ -85,6 +85,9 @@ public:                                                                       \
    virtual void encodeInto (                                                  \
       std::vector<Octet>& buffer) const;                                      \
                                                                               \
+   size_t encodeInto(                                                         \
+      Octet* buffer, size_t bufferSize, size_t offset) const override;        \
+                                                                              \
    /* Decode this element from the RTI's VariableLengthData.               */ \
    virtual void decode (                                                      \
       VariableLengthData const & inData);                                     \
@@ -94,6 +97,9 @@ public:                                                                       \
    virtual size_t decodeFrom (                                                \
       std::vector<Octet> const & buffer,                                      \
       size_t index);                                                          \
+                                                                              \
+   virtual size_t decodeFrom(                                                 \
+      const Octet* buffer, size_t bufferSize, size_t index) override;         \
                                                                               \
    /* Return the size in bytes of this element's encoding.                 */ \
    virtual size_t getEncodedLength () const;                                  \

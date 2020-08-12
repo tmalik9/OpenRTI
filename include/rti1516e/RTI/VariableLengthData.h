@@ -57,9 +57,16 @@ namespace rti1516e
       // This pointer should not be expected to be valid past the
       // lifetime of this object, or past the next time this object
       // is given new data
-      void const * data () const;
+      const void* data () const;
+
+      // This pointer should not be expected to be valid past the
+      // lifetime of this object, or past the next time this object
+      // is given new data
+      void *data ();
 
       size_t size () const;
+
+      void resize(size_t size);
 
       // Caller is free to delete inData after the call
       void setData (

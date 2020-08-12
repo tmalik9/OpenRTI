@@ -53,7 +53,12 @@ public:
     /* FIXME */
   }
 
-  size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
+  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset)
+  {
+    return offset;
+  }
+
+  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   {
     /* FIXME */
     return index;
@@ -177,17 +182,26 @@ HLAvariantRecord::encodeInto(std::vector<Octet>& buffer) const
   _impl->encodeInto(buffer);
 }
 
+
+size_t HLAvariantRecord::encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+{
+  return _impl->encodeInto(buffer, bufferSize, offset);
+}
+
 void HLAvariantRecord::decode(VariableLengthData const & inData)
 {
-  std::vector<Octet> buffer(inData.size());
-  std::memcpy(&buffer.front(), inData.data(), inData.size());
-  decodeFrom(buffer, 0);
+  _impl->decodeFrom(static_cast<const Octet*>(inData.data()), inData.size(), 0);
 }
 
 size_t
 HLAvariantRecord::decodeFrom(std::vector<Octet> const & buffer, size_t index)
 {
-  return _impl->decodeFrom(buffer, index);
+  return _impl->decodeFrom(buffer.data(), buffer.size(), index);
+}
+
+size_t HLAvariantRecord::decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+{
+  return _impl->decodeFrom(buffer, bufferSize, index);
 }
 
 size_t

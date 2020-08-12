@@ -59,6 +59,11 @@ HLAhandle::HLAhandle(const ParameterHandle& handle)
 {
 }
 
+HLAhandle::~HLAhandle()
+{
+
+}
+
 FederateHandle HLAhandle::getFederateHandle() const
 {
   if (mHandleKindEncoding.get() == eFederateHandle)
@@ -178,18 +183,32 @@ void HLAhandle::encodeInto(std::vector<Octet>& buffer) const
   mHandleValueEncoding.encodeInto(buffer);
 }
 
+size_t HLAhandle::encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+{
+  offset = align(offset, getOctetBoundary());
+  offset = align(offset, mHandleKindEncoding.getOctetBoundary());
+  offset = mHandleKindEncoding.encodeInto(buffer, bufferSize, offset);
+  offset = align(offset, mHandleValueEncoding.getOctetBoundary());
+  offset = mHandleValueEncoding.encodeInto(buffer, bufferSize, offset);
+  return offset;
+}
+
 void HLAhandle::decode(VariableLengthData const& inData)
 {
-  std::vector<Octet> buffer;
-  buffer.resize(inData.size());
-  memcpy(buffer.data(), inData.data(), inData.size());
-  decodeFrom(buffer, 0);
+  decodeFrom(static_cast<const Octet*>(inData.data()), inData.size(), 0);
 }
 
 size_t HLAhandle::decodeFrom(std::vector<Octet> const& buffer, size_t index)
 {
-  index = mHandleKindEncoding.decodeFrom(buffer, index);
-  index = mHandleValueEncoding.decodeFrom(buffer, index);
+  index = mHandleKindEncoding.decodeFrom(buffer.data(), buffer.size(), index);
+  index = mHandleValueEncoding.decodeFrom(buffer.data(), buffer.size(), index);
+  return index;
+}
+
+size_t HLAhandle::decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+{
+  index = mHandleKindEncoding.decodeFrom(buffer, bufferSize, index);
+  index = mHandleValueEncoding.decodeFrom(buffer, bufferSize, index);
   return index;
 }
 
