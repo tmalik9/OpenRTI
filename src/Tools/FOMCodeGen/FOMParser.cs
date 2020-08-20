@@ -5,7 +5,7 @@ using System.Xml;
 
 namespace FOMCodeGen
 {
-  class FOMParser
+  public class FOMParser
   {
     public class DataType
     {
@@ -159,9 +159,27 @@ namespace FOMCodeGen
     {
       public FixedRecordDataType(string name) : base(name)
       {
-        Fields = new Dictionary<string, FixedRecordField>();
+        Fields = new List<FixedRecordField>();
       }
-      public Dictionary<string, FixedRecordField> Fields { get; set; }
+      public List<FixedRecordField> Fields { get; set; }
+      public List<FixedRecordField> AllFields
+      {
+        get
+        {
+          List<FixedRecordField> allFields = new List<FixedRecordField>();
+          FixedRecordDataType baseClass = BaseClass;
+          if (baseClass != null)
+          {
+            var baseClassFields = baseClass.AllFields;
+            foreach (var field in baseClassFields)
+              allFields.Add(field);
+          }
+          foreach (var field in Fields)
+            allFields.Add(field);
+          return allFields;
+        }
+      }
+      public FixedRecordDataType BaseClass { get; set; }
     }
 
     public Dictionary<string, DataType> DataTypes { get; set; }
@@ -208,7 +226,7 @@ namespace FOMCodeGen
         var simpleType = new SimpleDataType(name, DataTypes[representation] as BasicDataRepresentation);
         DataTypes[name] = simpleType;
         simpleType.Generate = (simpleDataTypeNode["nocode"] == null);
-        if (simpleDataTypeNode["semantics"] != null) simpleType.Comment = simpleDataTypeNode["semantics"].FirstChild.InnerText;
+        if (simpleDataTypeNode["semantics"] != null && simpleDataTypeNode["semantics"].FirstChild != null) simpleType.Comment = simpleDataTypeNode["semantics"].FirstChild.InnerText;
       }
 
       var enumeratedDataTypeNodes = doc.DocumentElement.SelectNodes("/objectModel/dataTypes/enumeratedDataTypes/enumeratedData");
@@ -225,7 +243,8 @@ namespace FOMCodeGen
           enumeratedDataType.Enumerators.Add(enumeratorName, new Enumerator(enumeratorName, enumeratorValue));
         }
         enumeratedDataType.Generate = (enumeratedDataTypeNode["nocode"] == null);
-        if (enumeratedDataTypeNode["semantics"] != null) enumeratedDataType.Comment = enumeratedDataTypeNode["semantics"].FirstChild.InnerText;
+        if (enumeratedDataTypeNode["semantics"] != null && enumeratedDataTypeNode["semantics"].FirstChild != null)
+          enumeratedDataType.Comment = enumeratedDataTypeNode["semantics"].FirstChild.InnerText;
       }
 
       var arrayDataTypeNodes = doc.DocumentElement.SelectNodes("/objectModel/dataTypes/arrayDataTypes/arrayData");
@@ -244,7 +263,8 @@ namespace FOMCodeGen
           var arrayDataType = new VariableArrayDataType(name, DataTypes[dataType]);
           DataTypes[name] = arrayDataType;
           arrayDataType.Generate = (arrayDataTypeNode["nocode"] == null);
-          if (arrayDataTypeNode["semantics"] != null) arrayDataType.Comment = arrayDataTypeNode["semantics"].FirstChild.InnerText;
+          if (arrayDataTypeNode["semantics"] != null && arrayDataTypeNode["semantics"].FirstChild != null)
+            arrayDataType.Comment = arrayDataTypeNode["semantics"].FirstChild.InnerText;
         }
         else if (encoding == "HLAfixedArray")
         {
@@ -273,10 +293,11 @@ namespace FOMCodeGen
         if (fixedRecordDataTypeNode["include"] != null)
         {
           var includedFixedRecordType = DataTypes[fixedRecordDataTypeNode["include"].FirstChild.InnerText] as FixedRecordDataType;
-          foreach (var field in includedFixedRecordType.Fields)
-          {
-            fixedRecordDataType.Fields.Add(field.Key, field.Value);
-          }
+          fixedRecordDataType.BaseClass = includedFixedRecordType;
+          //foreach (var field in includedFixedRecordType.Fields)
+          //{
+          //  fixedRecordDataType.Fields.Add(field.Key, field.Value);
+          //}
         }
         foreach (XmlElement fieldNode in fixedRecordDataTypeNode.SelectNodes("field"))
         {
@@ -287,7 +308,7 @@ namespace FOMCodeGen
           {
             field.Comment = fieldNode["semantics"].FirstChild.InnerText;
           }
-          fixedRecordDataType.Fields.Add(fieldName, field);
+          fixedRecordDataType.Fields.Add(field);
         }
         fixedRecordDataType.Generate = (fixedRecordDataTypeNode["nocode"] == null);
         if (fixedRecordDataTypeNode["semantics"] != null) fixedRecordDataType.Comment = fixedRecordDataTypeNode["semantics"].FirstChild.InnerText;

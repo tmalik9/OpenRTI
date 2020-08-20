@@ -78,23 +78,33 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EncodingHeaderCode.cs" />
+    <Compile Include="FOMDataTypesHeaderCode.cs" />
+    <Compile Include="FOMEncodingHeaderCode.cs" />
+    <Compile Include="FOMDataTypesHeader.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FOMDataTypesHeader.tt</DependentUpon>
+    </Compile>
     <Compile Include="FOMParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EncodingHeader.cs">
+    <Compile Include="FOMEncodingHeader.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>EncodingHeader.tt</DependentUpon>
+      <DependentUpon>FOMEncodingHeader.tt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="EncodingHeader.tt">
+    <Content Include="FOMEncodingHeader.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>EncodingHeader.cs</LastGenOutput>
+      <LastGenOutput>FOMEncodingHeader.cs</LastGenOutput>
+    </Content>
+    <Content Include="FOMDataTypesHeader.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>FOMDataTypesHeader.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

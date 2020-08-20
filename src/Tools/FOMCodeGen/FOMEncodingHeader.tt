@@ -13,52 +13,51 @@
 #include "RTI/encoding/HLAfixedRecord.h"
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
+#include "<#=DataTypesHeaderFilename#>"
 
 namespace <#=FOM.Namespace#> {
 
 <#
 foreach (var dataType in FOM.DataTypes.Values)
 {
-  if (dataType.Comment != null && dataType.Comment != "")
-  {#>
-<#=dataType.Comment#>
-<#
-  }
   if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
   {
     var fixedRecordDataType = dataType as FOMParser.FixedRecordDataType;
-#>
-class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedRecord
+    if (dataType.Comment != null && dataType.Comment != "")
+    {#>
+<#=dataType.Comment#>
+<#  } #>
+class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1516e::HLAfixedRecord
 {
   public:
     <#=dataType.Name#>Encoding()
     {
 <#
-    foreach (var field in fixedRecordDataType.Fields.Values)
+    foreach (var field in fixedRecordDataType.AllFields)
     {
 #>
       rti1516e::HLAfixedRecord::appendElementPointer(&m<#=field.Name#>);
 <#
-    } // foreach fixedRecordDataType.Fields.Values
+    } // foreach fixedRecordDataType.Fields
 #>
     }
-    ~<#=dataType.Name#>Encoding()
+    virtual ~<#=dataType.Name#>Encoding()
     {
     }
-<# foreach (var field in fixedRecordDataType.Fields.Values) { #>
-    void Set<#=field.Name#>(<#=field.DataType.CPPType#> value)
+<# foreach (var field in fixedRecordDataType.AllFields) { #>
+    void Set<#=field.Name#>(<#=field.DataType.CPPType#> value) override
     {
 	    m<#=field.Name#>.set(value);
     }
 <# if (field.DataType is FOMParser.ArrayDataType) {
      var arrayDataType = field.DataType as FOMParser.ArrayDataType;
 #>
-    void Set<#=field.Name#>(const <#=arrayDataType.DataType.CPPType#>* value, size_t size)
+    void Set<#=field.Name#>(const <#=arrayDataType.DataType.CPPType#>* value, size_t size) override
     {
 	    m<#=field.Name#>.set(value, size);
     }
 <# } #>
-    <#=field.DataType.CPPType#> Get<#=field.Name#>()
+    <#=field.DataType.CPPType#> Get<#=field.Name#>() override
     {
 <# if (field.DataType is FOMParser.EnumeratedDataType) { #>
 	    return static_cast<<#=field.DataType.CPPType#>>(m<#=field.Name#>.get());
@@ -66,43 +65,28 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedRecord
 	    return m<#=field.Name#>.get();
 <# } // else (field.DataType is FOMParser.EnumeratedDataType) #>
     }
-<# } // foreach fixedRecordDataType.Fields.Values #>
+<# } // foreach fixedRecordDataType.Fields #>
 
   private:
 <#
-    foreach (var field in fixedRecordDataType.Fields.Values)
+    foreach (var field in fixedRecordDataType.AllFields)
     {
 #>
     <#=field.DataType.Encoding#> m<#=field.Name#>;
 <#
-    } // foreach fixedRecordDataType.Fields.Values
+    } // foreach fixedRecordDataType.Fields
 #>
 }; // class <#=dataType.Name#>Encoding
 
 <#
   } // if (dataType is FOMParser.FixedRecordDataType)
-  else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
-  {
-    var enumeratedDataType = dataType as FOMParser.EnumeratedDataType;
-#>
-enum <#=dataType.Name#>
-{
-<#
-    foreach (var enumerator in enumeratedDataType.Enumerators.Values)
-    {
-#>
-      <#=enumerator.Name#> = <#=enumerator.Value#>,
-<#
-    } // foreach enumeratedDataType.Enumerators.Values
-#>
-}; // enum <#=dataType.Name#>
-
-<#
-  } // if (dataType is FOMParser.EnumeratedDataType)
   else if (dataType is FOMParser.FixedArrayDataType && dataType.Generate)
   {
     var fixedArrayDataType = dataType as FOMParser.FixedArrayDataType;
-#>
+    if (dataType.Comment != null && dataType.Comment != "")
+    {#>
+<#=dataType.Comment#>
+<#  } #>
 class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
 {
   public:
@@ -130,7 +114,7 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
     void set(<#=fixedArrayDataType.CPPType#> data) {
       set(data.data(), data.size());
     }
-    void set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size)
+    void set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size) 
     {
       if (size <= <#=fixedArrayDataType.Cardinality#>) {
         memcpy(mData.data(), data, size);
@@ -149,7 +133,10 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
   else if (dataType is FOMParser.VariableArrayDataType && dataType.Generate)
   {
     var variableArrayDataType = dataType as FOMParser.VariableArrayDataType;
-#>
+    if (dataType.Comment != null && dataType.Comment != "")
+    {#>
+<#=dataType.Comment#>
+<#  } #>
 class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
 {
   public:
@@ -215,14 +202,6 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
 
 <#
   } // if (dataType is FOMParser.ArrayDataType)
-  else // not handled
-  {
-#>
-// <#=dataType.GetType()#> <#=dataType.Name#>
-<#
-  } // else not handled
-#>
-<#
 } // foreach (var dataType in FOM.DataTypes.Values)
 #>
 } // namespace <#=FOM.Namespace#>

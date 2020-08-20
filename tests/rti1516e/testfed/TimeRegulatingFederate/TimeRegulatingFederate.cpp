@@ -71,7 +71,8 @@ void TimeRegulatingFederate::InitializeInteraction()
   /////////////////////////////////////////////////////
   /// we also want to receive other interaction of the same type that are
   /// sent out by other federates, so we have to subscribe to it first
-  //mRtiAmb->subscribeInteractionClass(this->xHandle);
+  mRtiAmb->subscribeInteractionClass(this->x_InteractionClass);
+  mRtiAmb->setInteractionClassDeliverToSelf(this->x_InteractionClass, true);
 }
 
 void TimeRegulatingFederate::InitializeObjects()
@@ -111,7 +112,6 @@ void TimeRegulatingFederate::InitializeObjects()
   /// created and altered in other federates, so we need to subscribe to it
   mRtiAmb->subscribeObjectClassAttributes(mObjectClassHandles["HLAobjectRoot.A"], attributesOfA, true);
   mRtiAmb->subscribeObjectClassAttributes(mObjectClassHandles["HLAobjectRoot.B"], attributesOfB, true);
-  mRtiAmb->subscribeInteractionClass(this->x_InteractionClass);
   myPublishedObject = mRtiAmb->registerObjectInstance(myPublishedObjectClass);
   printf("Registered Object, handle=%ls class==%ls", myPublishedObject.toString().c_str(), mRtiAmb->getObjectClassName(mRtiAmb->getKnownObjectClassHandle(myPublishedObject)).c_str());
 }
