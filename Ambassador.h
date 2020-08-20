@@ -1388,6 +1388,7 @@ public:
       request->getAttributeValues().swap(passels[i]);
       request->setTransportationType(TransportationType(i));
       request->getTag().swap(tag);
+      Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle());
       if (objectInstance->getSubscriptionType() != Unsubscribed && objectClass->getDeliverToSelf())
       {
         queueReceiveOrderMessage(*request);
