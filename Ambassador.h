@@ -1388,6 +1388,10 @@ public:
       request->getAttributeValues().swap(passels[i]);
       request->setTransportationType(TransportationType(i));
       request->getTag().swap(tag);
+      if (objectInstance->getSubscriptionType() != Unsubscribed && objectClass->getDeliverToSelf())
+      {
+        queueReceiveOrderMessage(*request);
+      }
       send(request);
     }
   }
@@ -1495,6 +1499,10 @@ public:
     request->setTransportationType(interactionClass->getTransportationType());
     request->getTag().swap(tag);
     request->getParameterValues().swap(parameterValues);
+    if (interactionClass->getSubscriptionType() != Unsubscribed && interactionClass->getDeliverToSelf())
+    {
+      queueReceiveOrderMessage(*request);
+    }
     send(request);
   }
 
