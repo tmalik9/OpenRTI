@@ -58,15 +58,15 @@ MomInteractionHandler::ResponseList MomInteractionHandler::operator()(const Para
     DebugPrintf("federate not known\n");
     return responses;
   }
-  for (auto [interaction, pv] : mResponseInteractions)
+  for (auto it_interaction_pv : mResponseInteractions)
   {
-    for (auto& [parameter, value] : pv)
+    for (auto& it_parameter_value : it_interaction_pv.second)
     {
-      assert(parameter.valid());
+      assert(it_parameter_value.first.valid());
       // NOTE: value is a reference to the in-place parameter value in the ParameterHandleValueMap
-      value = mParameterGetters[parameter]();
+      it_parameter_value.second = mParameterGetters[it_parameter_value.first]();
     }
-    responses.push_back(std::make_pair(interaction, pv));
+    responses.push_back(std::make_pair(it_interaction_pv.first, it_interaction_pv.second));
   }
   return responses;
 }
@@ -118,34 +118,34 @@ InteractionHandlerFederateRequestPublications::operator()(const ParameterHandleV
   {
     // HLAreportObjectClassPublication: Need to iterate over all object class entries in MomFederateMetrics
     // and produce one response per object class.
-    auto[interaction, pv] = mResponseInteractions[0];
-    for (auto& [parameter, value] : pv)
+    auto p_interaction_pv = mResponseInteractions[0];
+    for (auto& it_parameter_value : p_interaction_pv.second)
     {
-      assert(parameter.valid());
-      value = mParameterGetters[parameter]();
+      assert(it_parameter_value.first.valid());
+      it_parameter_value.second = mParameterGetters[it_parameter_value.first]();
     }
     auto& publications = mMomManager->getFederateMetrics()->getObjectClassPublications();
-    for (auto [objectClassHandle, attributes] : publications)
+    for (auto it_objectClassHandle_attributes : publications)
     {
-      pv[_classHandleParameter] = HLAhandle(objectClassHandle).encode();
+      p_interaction_pv.second[_classHandleParameter] = HLAhandle(it_objectClassHandle_attributes.first).encode();
       HLAvariableArray attrHandles = HLAvariableArray(HLAhandle(AttributeHandle()));
-      for (auto attr : attributes)
+      for (auto attr : it_objectClassHandle_attributes.second)
       {
         attrHandles.addElement(HLAhandle(attr));
       }
-      pv[_attributeListParameter] = attrHandles.encode();
-      responses.push_back(std::make_pair(interaction, pv));
+      p_interaction_pv.second[_attributeListParameter] = attrHandles.encode();
+      responses.push_back(std::make_pair(p_interaction_pv.first, p_interaction_pv.second));
     }
   }
   {
     // HLAreportInteractionPublication - standard
-    auto[interaction, pv] = mResponseInteractions[1];
-    for (auto& [parameter, value] : pv)
+    auto p_interaction_pv = mResponseInteractions[1];
+    for (auto& it_parameter_value : p_interaction_pv.second)
     {
-      assert(parameter.valid());
-      value = mParameterGetters[parameter]();
+      assert(it_parameter_value.first.valid());
+      it_parameter_value.second = mParameterGetters[it_parameter_value.first]();
     }
-    responses.push_back(std::make_pair(interaction, pv));
+    responses.push_back(std::make_pair(p_interaction_pv.first, p_interaction_pv.second));
   }
   return responses;
 }
@@ -207,36 +207,36 @@ MomInteractionHandler::ResponseList InteractionHandlerFederateRequestSubscriptio
   {
     // HLAreportObjectClassSubscription: Need to iterate over all object class entries in MomFederateMetrics
     // and produce one response per object class.
-    auto[interaction, pv] = mResponseInteractions[0];
-    for (auto& [parameter, value] : pv)
+    auto p_interaction_pv = mResponseInteractions[0];
+    for (auto& it_parameter_value : p_interaction_pv.second)
     {
-      assert(parameter.valid());
-      value = mParameterGetters[parameter]();
+      assert(it_parameter_value.first.valid());
+      it_parameter_value.second = mParameterGetters[it_parameter_value.first]();
     }
     auto& subscriptions = mMomManager->getFederateMetrics()->getObjectClassSubscriptions();
-    for (auto [objectClassHandle, subscription] : subscriptions)
+    for (auto it_objectClassHandle_subscription : subscriptions)
     {
-      auto& [attributes, active] = subscription;
-      pv[_classHandleParameter] = HLAhandle(objectClassHandle).encode();
+      auto& it_attributes_active = it_objectClassHandle_subscription.second;
+      p_interaction_pv.second[_classHandleParameter] = HLAhandle(it_objectClassHandle_subscription.first).encode();
       HLAvariableArray attrHandles = HLAvariableArray(HLAhandle(AttributeHandle()));
-      for (auto attr : attributes)
+      for (auto attr : it_attributes_active.first)
       {
         attrHandles.addElement(HLAhandle(attr));
       }
-      pv[_activeSubscriptionParameter] = HLAboolean(active).encode();
-      pv[_attributeListParameter] = attrHandles.encode();
-      responses.push_back(std::make_pair(interaction, pv));
+      p_interaction_pv.second[_activeSubscriptionParameter] = HLAboolean(it_attributes_active.second).encode();
+      p_interaction_pv.second[_attributeListParameter] = attrHandles.encode();
+      responses.push_back(std::make_pair(p_interaction_pv.first, p_interaction_pv.second));
     }
   }
   {
     // HLAreportInteractionSubscription - standard
-    auto[interaction, pv] = mResponseInteractions[1];
-    for (auto& [parameter, value] : pv)
+    auto p_interaction_pv = mResponseInteractions[1];
+    for (auto& it_parameter_value : p_interaction_pv.second)
     {
-      assert(parameter.valid());
-      value = mParameterGetters[parameter]();
+      assert(it_parameter_value.first.valid());
+      it_parameter_value.second = mParameterGetters[it_parameter_value.first]();
     }
-    responses.push_back(std::make_pair(interaction, pv));
+    responses.push_back(std::make_pair(p_interaction_pv.first, p_interaction_pv.second));
   }
   return responses;
 }

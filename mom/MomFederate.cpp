@@ -132,11 +132,11 @@ AttributeHandleValueMap MomFederate::GetAttributeValues(AttributeHandleSet reque
 
 void MomFederate::SetAttributeValues(const AttributeHandleValueMap& attributes)
 {
-  for (auto [attributeHandle, attributeValue] : attributes)
+  for (auto it_attributeHandle_attributeValue : attributes)
   {
-    if (mAttributeSetters.find(attributeHandle) != mAttributeSetters.end())
+    if (mAttributeSetters.find(it_attributeHandle_attributeValue.first) != mAttributeSetters.end())
     {
-      mAttributeSetters[attributeHandle](attributeValue);
+      mAttributeSetters[it_attributeHandle_attributeValue.first](it_attributeHandle_attributeValue.second);
     }
   }
 }

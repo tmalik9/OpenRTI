@@ -49,9 +49,9 @@ public:
   }
   ~HLAfixedRecordImplementation()
   {
-    for (auto& [dataElement, owner] : _dataElementVector) {
-      if (owner) delete dataElement;
-      dataElement = nullptr;
+    for (auto& it_dataElement_owner : _dataElementVector) {
+      if (it_dataElement_owner.second) delete it_dataElement_owner.first;
+      it_dataElement_owner.first = nullptr;
     }
   }
 

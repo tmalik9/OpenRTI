@@ -205,9 +205,9 @@ inline std::string to_string(const StringList& stringList)
 inline std::string to_string(const StringStringListMap& stringListMap)
 {
   StringList resultList;
-  for (auto& [key, values] : stringListMap)
+  for (auto& it : stringListMap)
   {
-    resultList.push_back(key + " : " + to_string(values));
+    resultList.push_back(it.first + " : " + to_string(it.second));
   }
   return join(resultList, ", ", false);
 }

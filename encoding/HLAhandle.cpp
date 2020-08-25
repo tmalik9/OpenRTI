@@ -156,7 +156,7 @@ void HLAhandle::set(ParameterHandle handle)
 
 std::unique_ptr<OpenRTI::DataElement> HLAhandle::clone() const
 {
-  return std::make_unique<HLAhandle>(*this);
+  return std::unique_ptr<OpenRTI::DataElement>(new HLAhandle(*this));
 }
 
 VariableLengthData HLAhandle::encode() const

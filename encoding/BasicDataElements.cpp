@@ -137,7 +137,7 @@ EncodableDataType::operator=(EncodableDataType const& rhs)              \
 std::unique_ptr<DataElement>                                            \
 EncodableDataType::clone() const                                        \
 {                                                                       \
-  return std::make_unique<EncodableDataType>(*this);                    \
+  return std::unique_ptr<DataElement>(new EncodableDataType(*this));    \
 }                                                                       \
                                                                         \
 VariableLengthData                                                      \

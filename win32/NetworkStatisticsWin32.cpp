@@ -71,14 +71,14 @@ void NetworkStatisticsWin32::DumpTotals()
   DumpStatistics();
   std::ostringstream to;
   to << "Messages sent, by type:" << std::endl;
-  for (auto [name, count] : _MessagesSentByType)
+  for (auto it_name_count : _MessagesSentByType)
   {
-    to << "  " << name << ":     " << count << std::endl;
+    to << "  " << it_name_count.first << ":     " << it_name_count.second << std::endl;
   }
   to << "Messages received, by type:" << std::endl;
-  for (auto [name, count] : _MessagesReceivedByType)
+  for (auto it_name_count : _MessagesReceivedByType)
   {
-    to << "  " << name << ":     " << count << std::endl;
+    to << "  " << it_name_count.first << ":     " << it_name_count.second << std::endl;
   }
   OutputDebugStringA(to.str().c_str());
 }

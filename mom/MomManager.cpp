@@ -763,13 +763,13 @@ bool MomManager::receiveInteraction(InteractionClassHandle theInteraction, Param
         return false;
       }
       MomInteractionHandler::ResponseList responses = (*handler->second)(requestParameters);
-      for (auto [ic, pv] : responses)
+      for (auto it_ic_pv : responses)
       {
-        FederateHandle responseFederate = handler->second->getFederateHandleFromResponse(pv);
+        FederateHandle responseFederate = handler->second->getFederateHandleFromResponse(it_ic_pv.second);
         assert(requestedFederate.valid());
         assert(responseFederate.valid());
         assert(requestedFederate == responseFederate);
-        _momServer->sendInteraction(ic, pv);
+        _momServer->sendInteraction(it_ic_pv.first, it_ic_pv.second);
         //DebugPrintf("%s: sent response %s\n", __FUNCTION__, _momServer->getInteractionClassName(ic).c_str());
       }
       return true;
