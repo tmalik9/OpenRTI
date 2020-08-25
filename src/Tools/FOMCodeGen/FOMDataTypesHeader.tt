@@ -1,0 +1,73 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+// Code automatically generated from <#=FOM.Filename#>, do not edit
+
+#pragma once
+
+#include <vector>
+
+namespace <#=FOM.Namespace#> {
+
+<#
+foreach (var dataType in FOM.DataTypes.Values)
+{
+  if (dataType is FOMParser.SimpleDataType && dataType.Generate)
+  {
+    var simpleDataType = dataType as FOMParser.SimpleDataType;
+    if (dataType.Comment != null && dataType.Comment != "")
+    {#>
+<#=dataType.Comment#><#
+    } #>
+typedef <#=simpleDataType.Representation.CPPType#> <#=simpleDataType.Name#>;
+
+<#} // if (dataType is FOMParser.SimpleDataType)
+  else if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
+  {
+    var fixedRecordDataType = dataType as FOMParser.FixedRecordDataType;
+    if (dataType.Comment != null && dataType.Comment != "")
+    {#>
+<#=fixedRecordDataType.Comment#>
+<#  } #>
+class <#=fixedRecordDataType.Name#><#=fixedRecordDataType.BaseClass != null ? " : public " + fixedRecordDataType.BaseClass.Name : ""#>
+{
+  public:
+    virtual ~<#=fixedRecordDataType.Name#>() {}
+<# foreach (var field in fixedRecordDataType.Fields) { #>
+    virtual void Set<#=field.Name#>(<#=field.DataType.CPPType#> value) = 0;
+<# if (field.DataType is FOMParser.ArrayDataType) {
+     var arrayDataType = field.DataType as FOMParser.ArrayDataType;
+#>
+    virtual void Set<#=field.Name#>(const <#=arrayDataType.DataType.CPPType#>* value, size_t size) = 0;
+<# } #>
+    virtual <#=field.DataType.CPPType#> Get<#=field.Name#>() = 0;
+<# } // foreach fixedRecordDataType.Fields #>
+
+}; // class <#=dataType.Name#>
+
+<#
+  } // if (dataType is FOMParser.FixedRecordDataType)
+  else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
+  {
+    var enumeratedDataType = dataType as FOMParser.EnumeratedDataType;
+#>
+enum <#=dataType.Name#>
+{
+<#
+    foreach (var enumerator in enumeratedDataType.Enumerators.Values)
+    {
+#>
+      <#=enumerator.Name#> = <#=enumerator.Value#>,
+<#
+    } // foreach enumeratedDataType.Enumerators.Values
+#>
+}; // enum <#=dataType.Name#>
+
+<#
+  } // if (dataType is FOMParser.EnumeratedDataType)
+} // foreach (var dataType in FOM.DataTypes.Values)
+#>
+} // namespace <#=FOM.Namespace#>

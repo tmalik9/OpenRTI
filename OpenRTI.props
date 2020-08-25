@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <BuildType>Local</BuildType>
+    <!-- <BuildType>CANoe</BuildType> -->
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x64'">
+    <OBJ_DIR>$(SolutionDir)Obj64</OBJ_DIR>
+    <SOURCE_DIR>.\</SOURCE_DIR>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='Win32'">
+    <OBJ_DIR>$(SolutionDir)Obj32</OBJ_DIR>
+    <SOURCE_DIR>.\</SOURCE_DIR>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(BuildType)'=='CANoe'">
+    <BIN_DIR>$(SolutionDir)..\..\bin</BIN_DIR>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(BuildType)'=='Local'">
+    <BIN_DIR>$(SolutionDir)bin</BIN_DIR>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <_PropertySheetDisplayName>OpenRTI</_PropertySheetDisplayName>
+    <IntDir>$(OBJ_DIR)\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj /Zm160 /d2Zi+</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;TIME64;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>Level4</WarningLevel>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <ImportLibrary>$(TargetDir)$(TargetName).lib</ImportLibrary>
+      <OutputFile>$(TargetPath)</OutputFile>
+      <SubSystem>Console</SubSystem>
+      <AdditionalOptions>/pdbcompress %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SOURCE_DIR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="BuildType">
+      <Value>$(BuildType)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BIN_DIR">
+      <Value>$(BIN_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="OBJ_DIR">
+      <Value>$(OBJ_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SOURCE_DIR">
+      <Value>$(SOURCE_DIR)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
