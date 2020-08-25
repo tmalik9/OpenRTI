@@ -138,7 +138,7 @@ static const wchar_t kFederateType[] = L"Example";
 SimpleTestFederate::SimpleTestFederate()
 {
 #ifdef _WIN32
-  mHandle = std::make_unique<VRTNotificationHandle>();
+  mHandle = std::unique_ptr<VRTNotificationHandle>(new VRTNotificationHandle());
 #endif
 
   federateTime      = 0.0;

@@ -37,7 +37,7 @@ RTIambassadorFactory::~RTIambassadorFactory()
 std::unique_ptr<RTIambassador>
 RTIambassadorFactory::createRTIambassador()
 {
-  return std::make_unique<OpenRTI::RTIambassadorImplementation>();
+  return std::unique_ptr<RTIambassador>(new OpenRTI::RTIambassadorImplementation());
 }
 
 }

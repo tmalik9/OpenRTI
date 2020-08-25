@@ -33,7 +33,7 @@ enable_language(C)
 
 # Starting with cmake 3.1 we can easily change the
 # c++ standard version using
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 
 # Some whole project sensible defines
 if(UNIX)

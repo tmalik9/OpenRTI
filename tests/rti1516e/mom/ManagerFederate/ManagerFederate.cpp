@@ -58,7 +58,7 @@ size_t numRequests = sizeof(requests) / sizeof(requests[0]);
 
 ManagerFederate::ManagerFederate() : NullFederateAmbassador()
 {
-  //mHandle = std::make_unique<VRTNotificationHandle>();
+  //mHandle = std::unique_ptr<VRTNotificationHandle>(new VRTNotificationHandle());
 }
 
 ManagerFederate::~ManagerFederate()

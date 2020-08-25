@@ -30,6 +30,7 @@
 #include <cstring>
 #include <list>
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
 #include <iomanip>

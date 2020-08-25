@@ -849,14 +849,14 @@ public:
       request->setPublicationType(message->getPublicationType());
       broadcast(connectHandle, request);
     }
-    for (auto& [targetConnectHandle, attributeHandle] : sendAttributeHandlesMap) {
+    for (auto& it_targetConnectHandle_attributeHandle : sendAttributeHandlesMap) {
       SharedPtr<ChangeObjectClassPublicationMessage> request;
       request = new ChangeObjectClassPublicationMessage;
       request->setFederationHandle(message->getFederationHandle());
       request->setObjectClassHandle(message->getObjectClassHandle());
-      request->getAttributeHandles().swap(attributeHandle);
+      request->getAttributeHandles().swap(it_targetConnectHandle_attributeHandle.second);
       request->setPublicationType(message->getPublicationType());
-      send(targetConnectHandle, request);
+      send(it_targetConnectHandle_attributeHandle.first, request);
     }
 
     // Already existing subscriptions need to be sent to the new publishing connect
@@ -1100,14 +1100,14 @@ public:
     }
 
     // Now propagate the subscription change further
-    for (auto [targetConnectHandle, attributeHandleVector] : sendAttributeHandlesMap) {
+    for (auto it_targetConnectHandle_attributeHandleVector : sendAttributeHandlesMap) {
       SharedPtr<ChangeObjectClassSubscriptionMessage> request;
       request = new ChangeObjectClassSubscriptionMessage;
       request->setFederationHandle(message->getFederationHandle());
       request->setObjectClassHandle(message->getObjectClassHandle());
-      request->getAttributeHandles().swap(attributeHandleVector);
+      request->getAttributeHandles().swap(it_targetConnectHandle_attributeHandleVector.second);
       request->setSubscriptionType(message->getSubscriptionType());
-      send(targetConnectHandle, request);
+      send(it_targetConnectHandle_attributeHandleVector.first, request);
     }
 
     // Insert all object instances that are now new to this connect
@@ -1432,8 +1432,8 @@ public:
       // If so, then release the reservations.
     } else {
       if (message->getSuccess()) {
-        for (auto& [objectInstanceHandle, name] : message->getObjectInstanceHandleNamePairVector()) {
-          ServerModel::ObjectInstance* objectInstance = insertObjectInstance(objectInstanceHandle, name);
+        for (auto& it_objectInstanceHandle_name : message->getObjectInstanceHandleNamePairVector()) {
+          ServerModel::ObjectInstance* objectInstance = insertObjectInstance(it_objectInstanceHandle_name.first, it_objectInstanceHandle_name.second);
           objectInstance->reference(*federateConnect);
         }
       }
@@ -1567,17 +1567,17 @@ public:
       }
     }
 
-    for (auto& [targetConnectHandle, attributeValueVector] : connectHandleAttributeValueVectorMap) {
+    for (auto& it_targetConnectHandle_attributeValueVector : connectHandleAttributeValueVectorMap) {
       SharedPtr<AttributeUpdateMessage> update = new AttributeUpdateMessage;
       update->setFederationHandle(getFederationHandle());
       update->setFederateHandle(message->getFederateHandle());
       update->setObjectInstanceHandle(message->getObjectInstanceHandle());
       update->setTag(message->getTag());
       update->setTransportationType(message->getTransportationType());
-      update->getAttributeValues().swap(attributeValueVector);
-      send(targetConnectHandle, update);
+      update->getAttributeValues().swap(it_targetConnectHandle_attributeValueVector.second);
+      send(it_targetConnectHandle_attributeValueVector.first, update);
       // if targetConnectHandle belongs to our local federate, it's an update we've received from the parent connect.
-      objectInstanceReflectionReceived(targetConnectHandle, objectInstance);
+      objectInstanceReflectionReceived(it_targetConnectHandle_attributeValueVector.first, objectInstance);
     }
   }
 
@@ -1611,7 +1611,7 @@ public:
       }
     }
 
-    for (auto& [targetConnectHandle, attributeValueVector] : connectHandleAttributeValueVectorMap) {
+    for (auto& it_targetConnectHandle_attributeValueVector : connectHandleAttributeValueVectorMap) {
       SharedPtr<TimeStampedAttributeUpdateMessage> update = new TimeStampedAttributeUpdateMessage;
       update->setFederationHandle(getFederationHandle());
       update->setFederateHandle(message->getFederateHandle());
@@ -1621,11 +1621,11 @@ public:
       update->setMessageRetractionHandle(message->getMessageRetractionHandle());
       update->setOrderType(message->getOrderType());
       update->setTransportationType(message->getTransportationType());
-      update->getAttributeValues().swap(attributeValueVector);
-      send(targetConnectHandle, update);
+      update->getAttributeValues().swap(it_targetConnectHandle_attributeValueVector.second);
+      send(it_targetConnectHandle_attributeValueVector.first, update);
 
       // if targetConnectHandle belongs to our local federate, it's an update we've received from the parent connect.
-      objectInstanceReflectionReceived(targetConnectHandle, objectInstance);
+      objectInstanceReflectionReceived(it_targetConnectHandle_attributeValueVector.first, objectInstance);
     }
   }
 

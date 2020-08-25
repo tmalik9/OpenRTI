@@ -295,7 +295,7 @@ std::wstring SocketAddress::getHostName()
   if (!ret && GetLastError() == ERROR_MORE_DATA)
   {
     result.resize(bufferSize+1);
-    ret = GetComputerNameExW(ComputerNameDnsFullyQualified, result.data(), &bufferSize);
+    ret = GetComputerNameExW(ComputerNameDnsFullyQualified, &result[0], &bufferSize);
   }
   return result;
 }

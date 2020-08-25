@@ -48,7 +48,7 @@ public:
 
   std::unique_ptr<DataElement> clone() const override
   {
-    return std::make_unique<HLAhandle>(*this);
+    return std::unique_ptr<DataElement>(new HLAhandle(*this));
   }
 
   VariableLengthData encode() const override;

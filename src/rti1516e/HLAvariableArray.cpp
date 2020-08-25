@@ -259,7 +259,7 @@ HLAvariableArray& HLAvariableArray::operator=(HLAvariableArray&& rhs)
 std::unique_ptr<DataElement>
 HLAvariableArray::clone () const
 {
-  return std::make_unique<HLAvariableArray>(*this);
+  return std::unique_ptr<DataElement>(new HLAvariableArray(*this));
 }
 
 VariableLengthData

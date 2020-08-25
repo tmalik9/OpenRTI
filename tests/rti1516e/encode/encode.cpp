@@ -206,7 +206,7 @@ DataType::createDataElement(OpenRTI::Rand& rand) const
   switch (type)
   {
     case HLAASCIIchar:
-      return std::make_unique<rti1516e::HLAASCIIchar>(static_cast<char>(rand.get()));
+      return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAASCIIchar(static_cast<char>(rand.get())));
     case HLAunicodeChar:
       // under linux wchar_t is 32 bits but unicode char is only 16 bits ...
       return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAunicodeChar(0xffff & rand.get()));
@@ -270,7 +270,7 @@ DataType::createDataElement(OpenRTI::Rand& rand) const
     }
     case HLAfixedRecord_Randomized:
     {
-      std::unique_ptr<rti1516e::HLAfixedRecord> fixedRecord = std::make_unique<rti1516e::HLAfixedRecord>();
+      std::unique_ptr<rti1516e::HLAfixedRecord> fixedRecord = std::unique_ptr<rti1516e::HLAfixedRecord>(new rti1516e::HLAfixedRecord());
       for (std::size_t i = 0; i < count; ++i)
       {
         std::unique_ptr<rti1516e::DataElement> dataElement(dataTypes[i]->createDataElement(rand));
@@ -281,7 +281,7 @@ DataType::createDataElement(OpenRTI::Rand& rand) const
 
     case HLAfixedRecord_WithElementPointers:
     {
-      std::unique_ptr<rti1516e::HLAfixedRecord> fixedRecord = std::make_unique<rti1516e::HLAfixedRecord>();
+      std::unique_ptr<rti1516e::HLAfixedRecord> fixedRecord = std::unique_ptr<rti1516e::HLAfixedRecord>(new rti1516e::HLAfixedRecord());
       for (std::size_t i = 0; i < count; ++i)
       {
         std::unique_ptr<rti1516e::DataElement> dataElement(dataTypes[i]->createDataElement(rand));

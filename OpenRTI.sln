@@ -1427,7 +1427,6 @@ Global
 		{BFD91164-25B0-4AEB-9764-D578590CB17D}.RTI1516E Debug|x64.ActiveCfg = Debug|x64
 		{BFD91164-25B0-4AEB-9764-D578590CB17D}.RTI1516E Release All|Win32.ActiveCfg = Release|Win32
 		{BFD91164-25B0-4AEB-9764-D578590CB17D}.RTI1516E Release All|x64.ActiveCfg = Release|x64
-		{BFD91164-25B0-4AEB-9764-D578590CB17D}.RTI1516E Release All|x64.Build.0 = Release|x64
 		{BFD91164-25B0-4AEB-9764-D578590CB17D}.RTI1516E Release|Win32.ActiveCfg = Release|Win32
 		{BFD91164-25B0-4AEB-9764-D578590CB17D}.RTI1516E Release|x64.ActiveCfg = Release|x64
 		{D449BBED-638D-47F7-9363-6F856C0C7F0B}.Debug All|Win32.ActiveCfg = Debug|Win32
@@ -1599,7 +1598,7 @@ Global
 		{7E4E8133-6A31-47CD-BCEC-19B1B835FE4D} = {22D52919-8EFC-464C-9CB3-2A77EFC7A87F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		VisualSVNWorkingCopyRoot = .
 		SolutionGuid = {6CCC775F-F456-34F4-B339-8B27EB672AAC}
+		VisualSVNWorkingCopyRoot = .
 	EndGlobalSection
 EndGlobal

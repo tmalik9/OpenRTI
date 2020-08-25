@@ -206,11 +206,11 @@ Federate::InteractionClass::insertChildInteractionClass(InteractionClass& intera
 void Federate::InteractionClass::getFOMInteractionClass(FOMInteractionClass& fomInteractionClass)
 {
   fomInteractionClass.setName(getName());
-  for (auto [name, parameterHandle] : _nameParameterHandleMap)
+  for (auto it : _nameParameterHandleMap)
   {
     FOMParameter fomParameter;
-    fomParameter.setName(name);
-    fomParameter.setParameterHandle(parameterHandle);
+    fomParameter.setName(it.first);
+    fomParameter.setParameterHandle(it.second);
     fomInteractionClass.getParameterList().push_back(fomParameter);
   }
 }

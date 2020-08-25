@@ -36,6 +36,7 @@
 #include "StringUtils.h"
 #include "ThreadLocal.h"
 
+#if __cplusplus > 199711L
 #ifdef _MSC_VER
 #include <filesystem>
 
@@ -43,6 +44,7 @@
 namespace fs = std::filesystem;
 #else
 namespace fs = std::experimental::filesystem;
+#endif
 #endif
 #endif
 
@@ -212,7 +214,8 @@ LogStream::setPriority(LogStream::Priority priority)
 void LogStream::AddLogFile(const std::string& path)
 {
   std::string expandedPath = path;
-#if defined(_WIN32)
+#if defined(_WIN32) 
+#if __cplusplus > 199711L
   DWORD requiredSize = ExpandEnvironmentStringsA(path.c_str(), NULL, 0);
   char* buffer = new char[requiredSize];
   DWORD expandedSize = ExpandEnvironmentStringsA(path.c_str(), buffer, requiredSize);
@@ -225,6 +228,7 @@ void LogStream::AddLogFile(const std::string& path)
   {
     fs::create_directories(directory);
   }
+#endif
 #endif
   LogStream& logger = Instance();
   std::cout << "Logging to \"" << expandedPath << "\"" << std::endl;

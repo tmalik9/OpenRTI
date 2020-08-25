@@ -22,41 +22,41 @@ class HLAhandle::Implementation : public OpenRTI::HLAhandle
 
 HLAhandle::HLAhandle() : mImpl()
 {
-  mImpl = std::make_unique<HLAhandle::Implementation>();
+  mImpl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation());
 }
 
 HLAhandle::HLAhandle(const HLAhandle& ref) : mImpl()
 {
-  mImpl = std::make_unique<HLAhandle::Implementation>(*ref.mImpl.get());
+  mImpl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref.mImpl.get()));
 }
 
-HLAhandle::HLAhandle(const FederateHandle& handle) : mImpl(std::make_unique<HLAhandle::Implementation>())
+HLAhandle::HLAhandle(const FederateHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
 
-HLAhandle::HLAhandle(const ObjectClassHandle& handle) : mImpl(std::make_unique<HLAhandle::Implementation>())
+HLAhandle::HLAhandle(const ObjectClassHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
 
-HLAhandle::HLAhandle(const ObjectInstanceHandle& handle) : mImpl(std::make_unique<HLAhandle::Implementation>())
+HLAhandle::HLAhandle(const ObjectInstanceHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
 
-HLAhandle::HLAhandle(const AttributeHandle& handle) : mImpl(std::make_unique<HLAhandle::Implementation>())
+HLAhandle::HLAhandle(const AttributeHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
 
 
-HLAhandle::HLAhandle(const InteractionClassHandle& handle) : mImpl(std::make_unique<HLAhandle::Implementation>())
+HLAhandle::HLAhandle(const InteractionClassHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
 
-HLAhandle::HLAhandle(const ParameterHandle& handle) : mImpl(std::make_unique<HLAhandle::Implementation>())
+HLAhandle::HLAhandle(const ParameterHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
