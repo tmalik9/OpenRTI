@@ -1,8 +1,7 @@
 # Just for propper recursion
 add_subdirectory(OpenRTI)
 add_subdirectory(rtinode)
-# bkd: Disabled Tools
-#add_subdirectory(Tools)
+add_subdirectory(Tools)
 
 if(OPENRTI_ENABLE_RTI13)
   if(NOT WIN32 OR OPENRTI_BUILD_SHARED)
