@@ -1,6 +1,7 @@
 #include "list2cpp.hpp"
-#include<iomanip>
+#include <iomanip>
 #include <functional>
+#include <fstream>
 
 namespace lst {
 
@@ -69,7 +70,8 @@ void OutputList::addItem(std::string type)
 bool OutputList::addFile(std::string name)
 {
   std::fstream file;
-  if (file.open(name, std::ios::in); !file.is_open())
+  file.open(name, std::ios::in);
+  if (!file.is_open())
   {
     std::cerr << "Error: could not open file...\n";
     return false;
@@ -101,8 +103,9 @@ bool OutputList::outputToFile(std::ostream& file, std::string varname)
 
 bool OutputList::outputToFile(std::string filename, std::string varname)
 {
-  std::fstream file;
-  if (file.open(filename, std::ios::out); !file.is_open())
+  std::fstream file; 
+  file.open(name, std::ios::out);  
+  if (!file.is_open())
   {
     std::cerr << "Error: could not open output file...\n";
     return false;

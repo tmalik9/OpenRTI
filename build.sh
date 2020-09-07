@@ -17,6 +17,7 @@ cmake -DOPENRTI_ENABLE_RTI13=Off -DOPENRTI_ENABLE_RTI1516=Off -DCMAKE_BUILD_TYPE
 make -j4 install
 mkdir pkg
 mv install/bin/rtinode pkg/
+mv install/bin/fom2cpp pkg/
 mv install/lib/*.so pkg/
 mv install/lib64/*.so pkg/
 tar czvf ${PKG_NAME} -C pkg .
