@@ -35,6 +35,7 @@ enable_language(C)
 # c++ standard version using
 set(CMAKE_CXX_STANDARD 11)
 
+
 # Some whole project sensible defines
 if(UNIX)
   # Make sure we get the right libc functions
@@ -51,6 +52,7 @@ if(SUNOS)
   endif()
 endif()
 
+
 if(LINUX)
   # Use the DEBUG2 build type on linux to do stl debugging, note that this changes the abi,
   # In theory the debug build type is the one that is the right one, but since almost nobody else uses this
@@ -58,6 +60,13 @@ if(LINUX)
   set(CMAKE_CXX_FLAGS_DEBUG2 "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_CONCEPT_CHECKS")
   set(CMAKE_C_FLAGS_DEBUG2 "${CMAKE_C_FLAGS_DEBUG}")
 endif()
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # Ignore warnings for Clang
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-inconsistent-missing-override -Wno-unused-value -Wno-implicit-exception-spec-mismatch")
+endif()
+
+
 
 if(MSVC)
   # bkd Preprocessor Definitions
@@ -207,6 +216,7 @@ function(OPENRTI_SET_MSVC_STUB_DLL_NAME _target _name)
   endforeach()
 endfunction()
 
+  
 # bkd: Disable tests
 add_subdirectory(python)
 add_subdirectory(src)
