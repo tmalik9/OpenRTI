@@ -104,7 +104,7 @@ bool OutputList::outputToFile(std::ostream& file, std::string varname)
 bool OutputList::outputToFile(std::string filename, std::string varname)
 {
   std::fstream file; 
-  file.open(name, std::ios::out);  
+  file.open(filename, std::ios::out);
   if (!file.is_open())
   {
     std::cerr << "Error: could not open output file...\n";
