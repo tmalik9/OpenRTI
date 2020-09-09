@@ -54,7 +54,7 @@ class <#=fixedRecordDataType.Name#><#=fixedRecordDataType.BaseClass != null ? " 
   {
     var enumeratedDataType = dataType as FOMParser.EnumeratedDataType;
 #>
-enum <#=dataType.Name#>
+enum <#=dataType.Name#> : <#=enumeratedDataType.Representation.CPPType#>
 {
 <#
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
