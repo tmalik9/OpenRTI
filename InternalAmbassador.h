@@ -38,7 +38,7 @@ public:
 
   /// Handle the connection to the ServerNodes.
   bool isConnected() const;
-  void connect(const URL& url, const StringStringListMap& parameterMap);
+  void connect(const URL& url, const StringStringListMap& parameterMap, uint32_t timeoutMilliSeconds);
   void disconnect();
   void shutdown();
   /// Send a message

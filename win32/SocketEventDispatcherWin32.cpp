@@ -139,7 +139,7 @@ struct SocketEventDispatcher::PrivateData
           }
           else
           {
-            timeoutMs = static_cast<uint32_t>((absTimeout - now).getNSec() / 1000ULL);
+            timeoutMs = static_cast<uint32_t>((absTimeout - now).getNSec() / 1000000ULL);
           }
         }
 

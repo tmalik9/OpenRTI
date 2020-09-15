@@ -71,9 +71,9 @@ InternalAmbassador::isConnected() const
 }
 
 void
-InternalAmbassador::connect(const URL& url, const StringStringListMap& parameterMap)
+InternalAmbassador::connect(const URL& url, const StringStringListMap& parameterMap, uint32_t timeoutMilliSeconds)
 {
-  _connect = LeafServerThread::connect(url, parameterMap);
+  _connect = LeafServerThread::connect(url, parameterMap, timeoutMilliSeconds);
 }
 
 void

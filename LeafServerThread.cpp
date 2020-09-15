@@ -36,11 +36,11 @@ public:
   _Registry();
   ~_Registry();
   static SharedPtr<_Registry>& GetInstance();
-  SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions);
+  SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
 
   void erase(LeafServerThread& serverThread);
 
-  static SharedPtr<AbstractServer> createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode);
+  static SharedPtr<AbstractServer> createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode, uint32_t timeoutMilliSeconds);
   static SharedPtr<AbstractServerNode> createServerNode();
 
   //static SingletonPtr<_Registry> _instance;
@@ -73,7 +73,7 @@ LeafServerThread::_Registry::~_Registry()
 }
 
 SharedPtr<AbstractConnect>
-LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& clientOptions)
+LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds)
 {
   ScopeLock scopeLock(_mutex);
   UrlServerMap::iterator i = _urlServerMap.find(url);
@@ -108,7 +108,7 @@ LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& 
   /// Depending on the url create a server
   SharedPtr<AbstractServer> server;
   try {
-    server = createServer(url, serverNode);
+    server = createServer(url, serverNode, timeoutMilliSeconds);
   } catch (...) {
   }
   if (!server.valid()) {
@@ -133,18 +133,14 @@ LeafServerThread::_Registry::erase(LeafServerThread& serverThread)
 }
 
 SharedPtr<AbstractServer>
-LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode)
+LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode, uint32_t timeoutMilliSeconds)
 {
   // rti://localhost connect is the default.
   if (url.getProtocol().empty() || url.getProtocol() == "rti" || url.getProtocol() == "pipe") {
     SharedPtr<NetworkServer> server = new NetworkServer(serverNode);
 
     server->setServerName("Leaf server");
-#ifdef _DEBUG
-        Clock abstime = Clock::max();
-#else
-        Clock abstime = Clock::now() + Clock::fromSeconds(70);
-#endif
+    Clock abstime = (timeoutMilliSeconds == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
     server->connectParentServer(url, abstime);
 
     return server;
@@ -161,11 +157,7 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
       } else if (stringPair.first == "listen") {
         server->listen(URL::fromUrl(stringPair.second), 20);
       } else if (stringPair.first == "parent") {
-#ifdef _DEBUG
-        Clock abstime = Clock::max();
-#else
-        Clock abstime = Clock::now() + Clock::fromSeconds(70);
-#endif
+        Clock abstime = (timeoutMilliSeconds == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
         server->connectParentServer(URL::fromUrl(stringPair.second), abstime);
       }
     }
@@ -218,12 +210,12 @@ LeafServerThread::postShutdown()
 }
 
 SharedPtr<AbstractConnect>
-LeafServerThread::connect(const URL& url, const StringStringListMap& clientOptions)
+LeafServerThread::connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds)
 {
   SharedPtr<_Registry> registry = _Registry::GetInstance();
   if (!registry.valid())
     return SharedPtr<AbstractConnect>();
-  return registry->connect(url, clientOptions);
+  return registry->connect(url, clientOptions, timeoutMilliSeconds);
 }
 
 void

@@ -37,11 +37,11 @@ public:
   /// Shutdow this thread and wait for it to finish.
   void postShutdown();
 
-  /// Connect to thi particular thread.
+  /// Connect to this particular thread.
   SharedPtr<AbstractConnect> connect(const StringStringListMap& clientOptions);
 
   /// Call this to get a connect to a possibly new leaf server.
-  static SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions);
+  static SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
 
   static void shutdown();
 protected:
