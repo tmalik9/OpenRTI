@@ -1686,7 +1686,7 @@ RTIambassadorImplementation::connect(rti1516e::FederateAmbassador & federateAmba
       throw OpenRTI::CallNotAllowedFromWithinCallback();
     URL url = URL::fromUrl(ucsToUtf8(localSettingsDesignator));
     StringStringListMap clientoptions;
-    _ambassadorInterface->connect(url, clientoptions);
+    _ambassadorInterface->connect(url, clientoptions, _ambassadorInterface->getConnectWaitTimeoutMilliSeconds());
     _ambassadorInterface->_federateAmbassador = &federateAmbassador;
   } catch (const OpenRTI::ConnectionFailed& e) {
     throw rti1516e::ConnectionFailed(OpenRTI::utf8ToUcs(e.what()));
@@ -5601,6 +5601,17 @@ void RTIambassadorImplementation::setObjectClassDeliverToSelf(rti1516e::ObjectCl
 {
   OpenRTI::_I1516EObjectClassHandle objectClassHandle(rti1516eobjectClassHandle);
 _ambassadorInterface->setObjectClassDeliverToSelf(objectClassHandle, enable);
+}
+
+
+void RTIambassadorImplementation::setConnectWaitTimeout(uint32_t timeoutMilliSeconds)
+{
+  _ambassadorInterface->setConnectWaitTimeoutMilliSeconds(timeoutMilliSeconds);
+}
+
+void RTIambassadorImplementation::setOperationWaitTimeout(uint32_t timeoutMilliSeconds)
+{
+  _ambassadorInterface->setOperationWaitTimeoutMilliSeconds(timeoutMilliSeconds);
 }
 
 }

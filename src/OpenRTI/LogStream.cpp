@@ -36,7 +36,7 @@
 #include "StringUtils.h"
 #include "ThreadLocal.h"
 
-#if __cplusplus > 199711L
+#if __CPlusPlusStd > 199711L
 #ifdef _MSC_VER
 #include <filesystem>
 
@@ -215,7 +215,7 @@ void LogStream::AddLogFile(const std::string& path)
 {
   std::string expandedPath = path;
 #if defined(_WIN32) 
-#if __cplusplus > 199711L
+#if __CPlusPlusStd > 199711L
   DWORD requiredSize = ExpandEnvironmentStringsA(path.c_str(), NULL, 0);
   char* buffer = new char[requiredSize];
   DWORD expandedSize = ExpandEnvironmentStringsA(path.c_str(), buffer, requiredSize);

@@ -95,6 +95,17 @@ public:
       return Clock(uint64_t(nsec));
     }
   }
+  static Clock fromMilliSeconds(uint32_t milliSeconds)
+  {
+    if (milliSeconds <= 0)
+      return zero();
+    // Note that the unsigned cast has a guarantee to be the same
+    // width than the int in the input argument. Those get upcasted
+    // to the bigger unsigned then.
+    if (std::numeric_limits<uint64_t>::max()/1000000ULL <= uint64_t(milliSeconds))
+      return max();
+    return Clock(milliSeconds*1000000ULL);
+  }
   /// Conversion from nanoseconds
   static Clock fromNSec(const uint64_t& nsec)
   { return Clock(nsec); }

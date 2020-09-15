@@ -749,6 +749,9 @@ namespace rti1516e
       virtual void StartNetworkStatistics(bool startTimer) = 0;
       virtual void StopNetworkStatistics() = 0;
       virtual void ResetNetworkStatistics() = 0;
+      virtual void setConnectWaitTimeout(uint32_t timeoutMilliSeconds) = 0;
+      virtual void setOperationWaitTimeout(uint32_t timeoutMilliSeconds) = 0;
+
 };
 }
 

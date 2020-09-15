@@ -50,16 +50,36 @@ public:
   typedef typename Traits::NativeLogicalTime NativeLogicalTime;
   typedef typename Traits::NativeLogicalTimeInterval NativeLogicalTimeInterval;
 
-  Ambassador() :
-    _callbacksEnabled(true)
-  { }
+  Ambassador()
+    : _callbacksEnabled(true)
+    , _connectWaitTimeout(70 * 1000)
+    , _operationWaitTimeout(70 * 1000)
+  {
+
+  }
 
   const FederateHandle& getFederateHandle() const
   { return _federate->getFederateHandle(); }
   const FederationHandle& getFederationHandle() const
   { return _federate->getFederationHandle(); }
 
-  void connect(const URL& url, const StringStringListMap& stringStringListMap)
+  void setConnectWaitTimeoutMilliSeconds(uint32_t timeoutMilliSeconds)
+  {
+    _connectWaitTimeout = timeoutMilliSeconds;
+  }
+  uint32_t getConnectWaitTimeoutMilliSeconds() const
+  {
+    return _connectWaitTimeout;
+  }
+  void setOperationWaitTimeoutMilliSeconds(uint32_t timeoutMilliSeconds)
+  {
+    _operationWaitTimeout = timeoutMilliSeconds;
+  }
+  uint32_t getOperationWaitTimeoutMilliSeconds() const
+  {
+    return _operationWaitTimeout;
+  }
+  void connect(const URL& url, const StringStringListMap& stringStringListMap, uint32_t timeoutMilliSeconds)
     // throw (ConnectionFailed,
     //        InvalidLocalSettingsDesignator,
     //        AlreadyConnected,
@@ -69,7 +89,7 @@ public:
     if (isConnected())
       throw AlreadyConnected("Ambassador is already connected!");
 
-    InternalAmbassador::connect(url, stringStringListMap);
+    InternalAmbassador::connect(url, stringStringListMap, timeoutMilliSeconds);
 
     if (!isConnected())
       throw ConnectionFailed("Connection failed!");
@@ -114,11 +134,7 @@ public:
 
     // The maximum abstime to try to connect
 
-#ifdef _DEBUG
-    Clock abstime = Clock::max();
-#else
-    Clock abstime = Clock::now() + Clock::fromSeconds(70);
-#endif
+    Clock abstime = (_operationWaitTimeout == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
     // Send this message and wait for the response
     send(request);
 
@@ -148,11 +164,7 @@ public:
     SharedPtr<DestroyFederationExecutionRequestMessage> request = new DestroyFederationExecutionRequestMessage;
     request->setFederationExecution(federationExecutionName);
 
-#ifdef _DEBUG
-    Clock abstime = Clock::max();
-#else
-    Clock abstime = Clock::now() + Clock::fromSeconds(70);
-#endif
+    Clock abstime = (_operationWaitTimeout == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
 
     // Send this message and wait for the response
     send(request);
@@ -202,11 +214,7 @@ public:
       throw FederateAlreadyExecutionMember();
 
     // The maximum abstime to try to connect
-#ifdef _DEBUG
-    Clock abstime = Clock::max();
-#else
-    Clock abstime = Clock::now() + Clock::fromSeconds(70);
-#endif
+    Clock abstime = (_operationWaitTimeout == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
 
     // The destroy request message
     SharedPtr<JoinFederationExecutionRequestMessage> request;
@@ -293,11 +301,7 @@ public:
     // We should no longer respond to time regulation requests.
     _timeManagement = 0;
 
-#ifdef _DEBUG
-    Clock abstime = Clock::max();
-#else
-    Clock abstime = Clock::now() + Clock::fromSeconds(70);
-#endif
+    Clock abstime = (_operationWaitTimeout == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
     if (!dispatchWaitEraseFederationExecutionResponse(abstime))
       throw RTIinternalError("resignFederationExecution hit timeout!");
 
@@ -4204,6 +4208,8 @@ public:
   SharedPtr<Federate> _federate;
   // The timestamped queues
   SharedPtr<TimeManagement<Traits> > _timeManagement;
+  uint32_t _connectWaitTimeout;
+  uint32_t _operationWaitTimeout;
 };
 
 } // namespace OpenRTI
