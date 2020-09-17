@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros">
-    <!-- <BuildType>Local</BuildType> -->
-    <BuildType>CANoe</BuildType>
+    <BuildType>Local</BuildType>
+    <!-- <BuildType>CANoe</BuildType> -->
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x64'">
     <OBJ_DIR>$(SolutionDir)Obj64</OBJ_DIR>
