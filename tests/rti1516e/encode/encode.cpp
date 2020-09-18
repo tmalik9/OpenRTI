@@ -716,7 +716,7 @@ void DumpDataElement(std::wostream& to, const rti1516e::DataElement* dataElement
   const rti1516e::HLAvariableArray* va = dynamic_cast<const rti1516e::HLAvariableArray*>(dataElement);
   if (va != nullptr)
   {
-    to << std::endl;
+    to << " size=" << va->size() << std::endl;
     for (size_t i = 0; i < va->size(); i++)
     {
       DumpDataElement(to, &(va->get(i)), indent + 1);
@@ -726,7 +726,7 @@ void DumpDataElement(std::wostream& to, const rti1516e::DataElement* dataElement
   const rti1516e::HLAfixedArray* fa = dynamic_cast<const rti1516e::HLAfixedArray*>(dataElement);
   if (fa != nullptr)
   {
-    to << std::endl;
+    to << " size=" << va->size() << std::endl;
     for (size_t i = 0; i < fa->size(); i++)
     {
       DumpDataElement(to, &(fa->get(i)), indent + 1);
@@ -744,6 +744,7 @@ void DumpDataElement(std::wostream& to, const rti1516e::DataElement* dataElement
 bool testDataElementEncoding(const DataType& dataType)
 {
   OpenRTI::Rand rand;
+  std::cerr << "testing " << to_string(dataType.type) << std::endl;
   for (unsigned i = 0; i < 100; ++i)
   {
     std::unique_ptr<rti1516e::DataElement> dataElement(dataType.createDataElement(rand));
@@ -823,8 +824,8 @@ bool testDataElementEncoding(const DataType& dataType)
       size_t pos = diff(encodedData, variableLengthData2);
       std::cerr << to_string(dataType.type) << ": cloned encoded data is not equal to original encoded data at pos " << pos << ": " << std::endl;
       std::cerr << "original=" << encodedData << std::endl;
-      std::cerr << "  cloned=" << variableLengthData2 << std::endl;
       DumpDataElement(std::wcerr, dataElement.get());
+      std::cerr << "  cloned=" << variableLengthData2 << std::endl;
       DumpDataElement(std::wcerr, dataElement2.get());
       return false;
     }
@@ -976,12 +977,12 @@ bool testFederateHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, 
   if (gDebugPrint) std::cout << "data2=" << data2 << std::endl;
 
   // check the basic sizes of the HLAhandle ...
-  if (encodedHandle.getEncodedLength() != 16)
+  if (encodedHandle.getEncodedLength() != 12)
   {
     std::wcerr << L"unexpected retval from HLAhandle::getEncodedLength: " << encodedHandle.getEncodedLength() << std::endl;
     return false;
   }
-  if (data1.size() != 16)
+  if (data1.size() != 12)
   {
     std::wcerr << L"unexpected encoded data size from HLAhandle: " << data1.size() << std::endl;
     return false;
@@ -994,7 +995,7 @@ bool testFederateHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, 
   }
   if (data2.size() != 8)
   {
-    std::wcerr << L"unexpected encoded data size from rti1516e::FederateHandle::encode: " << data1.size() << std::endl;
+    std::wcerr << L"unexpected encoded data size from rti1516e::FederateHandle::encode: " << data2.size() << std::endl;
     return false;
   }
 
@@ -1005,12 +1006,12 @@ bool testFederateHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, 
   }
 
   // let the ambassador decode the data stored in HLAhandle (after the handle kind discriminator)
-  rti1516e::VariableLengthData data3 = rti1516e::VariableLengthData(static_cast<const char*>(data1.data()) + 8, federateHandle.encodedLength());
-  rti1516e::FederateHandle decodedObjectClass = ambassador.decodeFederateHandle(data3);
+  rti1516e::VariableLengthData data3 = rti1516e::VariableLengthData(static_cast<const char*>(data1.data()) + 4, federateHandle.encodedLength());
+  rti1516e::FederateHandle decodedHandle = ambassador.decodeFederateHandle(data3);
 
-  if (decodedObjectClass != federateHandle)
+  if (decodedHandle != federateHandle)
   {
-    std::wcerr << L"handle decoded by ambassador differs from input: " << federateHandle << L" != " << decodedObjectClass << std::endl;
+    std::wcerr << L"handle decoded by ambassador differs from input: " << federateHandle << L" != " << decodedHandle << std::endl;
     return false;
   }
   std::wcout << federateHandle << L" OK" << std::endl;
@@ -1060,12 +1061,12 @@ bool testObjectClassHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassado
   if (gDebugPrint) std::cout << "data2=" << data2 << std::endl;
 
   // check the basic sizes of the HLAhandle ...
-  if (encodedHandle.getEncodedLength() != 16)
+  if (encodedHandle.getEncodedLength() != 12)
   {
     std::wcerr << L"unexpected retval from HLAhandle::getEncodedLength: " << encodedHandle.getEncodedLength() << std::endl;
     return false;
   }
-  if (data1.size() != 16)
+  if (data1.size() != 12)
   {
     std::wcerr << L"unexpected encoded data size from HLAhandle: " << data1.size() << std::endl;
     return false;
@@ -1089,12 +1090,12 @@ bool testObjectClassHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassado
   }
 
   // let the ambassador decode the data stored in HLAhandle (after the handle kind discriminator)
-  rti1516e::VariableLengthData data3 = rti1516e::VariableLengthData(static_cast<const char*>(data1.data()) + 8, objectClassHandle.encodedLength());
-  rti1516e::ObjectClassHandle decodedObjectClass = ambassador.decodeObjectClassHandle(data3);
+  rti1516e::VariableLengthData data3 = rti1516e::VariableLengthData(static_cast<const char*>(data1.data()) + 4, objectClassHandle.encodedLength());
+  rti1516e::ObjectClassHandle decodedHandle = ambassador.decodeObjectClassHandle(data3);
 
-  if (decodedObjectClass != objectClassHandle)
+  if (decodedHandle != objectClassHandle)
   {
-    std::wcerr << L"handle decoded by ambassador differs from input: " << objectClassHandle << L" != " << decodedObjectClass << std::endl;
+    std::wcerr << L"handle decoded by ambassador differs from input: " << objectClassHandle << L" != " << decodedHandle << std::endl;
     return false;
   }
   std::wcout << ambassador.getObjectClassName(objectClassHandle) << L" OK" << std::endl;
@@ -1115,12 +1116,12 @@ bool testInteractionClassHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& amba
   if (gDebugPrint) std::cout << "data2=" << data2 << std::endl;
 
   // check the basic sizes of the HLAhandle ...
-  if (encodedHandle.getEncodedLength() != 16)
+  if (encodedHandle.getEncodedLength() != 12)
   {
     std::wcerr << L"unexpected retval from HLAhandle::getEncodedLength: " << encodedHandle.getEncodedLength() << std::endl;
     return false;
   }
-  if (data1.size() != 16)
+  if (data1.size() != 12)
   {
     std::wcerr << L"unexpected encoded data size from HLAhandle: " << data1.size() << std::endl;
     return false;
@@ -1144,7 +1145,7 @@ bool testInteractionClassHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& amba
   }
 
   // let the ambassador decode the data stored in HLAhandle (after the handle kind discriminator)
-  rti1516e::VariableLengthData data3 = rti1516e::VariableLengthData(static_cast<const char*>(data1.data()) + 8, interactionClassHandle.encodedLength());
+  rti1516e::VariableLengthData data3 = rti1516e::VariableLengthData(static_cast<const char*>(data1.data()) + 4, interactionClassHandle.encodedLength());
   rti1516e::InteractionClassHandle decodedInteractionClass = ambassador.decodeInteractionClassHandle(data3);
 
   if (decodedInteractionClass != interactionClassHandle)
@@ -1387,9 +1388,39 @@ bool testDataPointerVariableArrayEncoding()
   return true;
 }
 
-// test array with data elements given by 'borrowed' encoder pointers, each pointing to 'borrowed' (external) memory
-bool testVariableArrayOfStringEncoding()
+bool testFixedArrayOfASCIIStringEncoding()
 {
+  if (gDebugPrint) std::cout << "=============================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing fixed array of ascii strings" << std::endl;
+  if (gDebugPrint) std::cout << "=============================================" << std::endl;
+  std::string data [] = { "one", "two", "three", "four" };
+  rti1516e::HLAfixedArray arrayEncoder1{rti1516e::HLAASCIIstring(), 4};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder1.set(i, rti1516e::HLAASCIIstring(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+
+  rti1516e::HLAfixedArray arrayDecoder{rti1516e::HLAASCIIstring(), 4};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::cout << static_cast<const rti1516e::HLAASCIIstring&>(arrayDecoder.get(i)).get() << std::endl;
+    if (static_cast<const rti1516e::HLAASCIIstring&>(arrayDecoder.get(i)).get() != data[i])
+      return false;
+  }
+  std::cout << "fixed array of ascii strings OK" << std::endl;
+  return true;
+}
+
+
+// test array with data elements given by 'borrowed' encoder pointers, each pointing to 'borrowed' (external) memory
+bool testVariableArrayOfASCIIStringEncoding()
+{
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing variable array of ascii strings" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
   std::string data [] = { "one", "two", "three", "four" };
   rti1516e::HLAvariableArray arrayEncoder1{rti1516e::HLAASCIIstring()};
   for (int i=0;i<4;i++)
@@ -1407,12 +1438,97 @@ bool testVariableArrayOfStringEncoding()
     if (static_cast<const rti1516e::HLAASCIIstring&>(arrayEncoder1.get(i)).get() != data[i])
       return false;
   }
-  std::cout << "variable array of strings OK" << std::endl;
+  std::cout << "variable array of ascii strings OK" << std::endl;
+  return true;
+}
+
+bool testFixedArrayOfUnicodeStringEncoding()
+{
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing fixed array of unicode strings" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  std::wstring data [] = { L"one", L"two", L"three", L"four" };
+  rti1516e::HLAfixedArray arrayEncoder1{rti1516e::HLAunicodeString(), 4};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder1.set(i, rti1516e::HLAunicodeString(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+
+  rti1516e::HLAfixedArray arrayDecoder{rti1516e::HLAunicodeString(), 4};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::wcout << static_cast<const rti1516e::HLAunicodeString&>(arrayEncoder1.get(i)).get() << std::endl;
+    if (static_cast<const rti1516e::HLAunicodeString&>(arrayEncoder1.get(i)).get() != data[i])
+      return false;
+  }
+  std::cout << "fixed array of unicode strings OK" << std::endl;
+  return true;
+}
+
+bool testVariableArrayOfUnicodeStringEncoding()
+{
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing variable array of unicode strings" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  std::wstring data [] = { L"one", L"two", L"three", L"four" };
+  rti1516e::HLAvariableArray arrayEncoder1{rti1516e::HLAunicodeString()};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder1.addElement(rti1516e::HLAunicodeString(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+
+  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAunicodeString()};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::wcout << static_cast<const rti1516e::HLAunicodeString&>(arrayEncoder1.get(i)).get() << std::endl;
+    if (static_cast<const rti1516e::HLAunicodeString&>(arrayEncoder1.get(i)).get() != data[i])
+      return false;
+  }
+  std::cout << "variable array of unicode strings OK" << std::endl;
+  return true;
+}
+
+bool testFixedArrayOfFederateHandlesEncoding()
+{
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing fixed array of FederateHandles" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  rti1516e::FederateHandle data [] = {
+    rti1516e::createFederateHandle(2), 
+    rti1516e::createFederateHandle(5), 
+    rti1516e::createFederateHandle(7), 
+    rti1516e::createFederateHandle(10)};
+  rti1516e::HLAfixedArray arrayEncoder1{rti1516e::HLAhandle(rti1516e::FederateHandle()), 4};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder1.set(i, rti1516e::HLAhandle(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+
+  rti1516e::HLAfixedArray arrayDecoder{rti1516e::HLAhandle(rti1516e::FederateHandle()), 4};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::wcout << static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getFederateHandle().toString() << std::endl;
+    if (static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getFederateHandle() != data[i])
+      return false;
+  }
+  std::cout << "fixed array of federate handles OK" << std::endl;
   return true;
 }
 
 bool testVariableArrayOfFederateHandlesEncoding()
 {
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing variable array of FederateHandles" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
   rti1516e::FederateHandle data [] = {
     rti1516e::createFederateHandle(2), 
     rti1516e::createFederateHandle(5), 
@@ -1426,7 +1542,7 @@ bool testVariableArrayOfFederateHandlesEncoding()
   rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
   std::cout << "encodedData1=" << encodedData1 << std::endl;
 
-  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAASCIIstring()};
+  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAhandle(rti1516e::FederateHandle())};
   arrayDecoder.decode(encodedData1);
   for (int i=0;i<4;i++)
   {
@@ -1440,6 +1556,9 @@ bool testVariableArrayOfFederateHandlesEncoding()
 
 bool testVariableArrayOfObjectClassHandlesEncoding()
 {
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing variable array of ObjectClassHandles" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
   rti1516e::ObjectClassHandle data [] = {
     rti1516e::createObjectClassHandle(2), 
     rti1516e::createObjectClassHandle(5), 
@@ -1453,7 +1572,7 @@ bool testVariableArrayOfObjectClassHandlesEncoding()
   rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
   std::cout << "encodedData1=" << encodedData1 << std::endl;
 
-  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAASCIIstring()};
+  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAhandle(rti1516e::ObjectClassHandle())};
   arrayDecoder.decode(encodedData1);
   for (int i=0;i<4;i++)
   {
@@ -1465,8 +1584,41 @@ bool testVariableArrayOfObjectClassHandlesEncoding()
   return true;
 }
 
+bool testFixedArrayOfAttributeHandlesEncoding()
+{
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing fixed array of AttributeHandles" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  rti1516e::AttributeHandle data [] = {
+    rti1516e::createAttributeHandle(2), 
+    rti1516e::createAttributeHandle(5), 
+    rti1516e::createAttributeHandle(7), 
+    rti1516e::createAttributeHandle(10)};
+  rti1516e::HLAfixedArray arrayEncoder1{rti1516e::HLAhandle(rti1516e::AttributeHandle()), 4};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder1.set(i, rti1516e::HLAhandle(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+
+  rti1516e::HLAfixedArray arrayDecoder{rti1516e::HLAhandle(rti1516e::AttributeHandle()), 4};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::wcout << static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getAttributeHandle().toString() << std::endl;
+    if (static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getAttributeHandle() != data[i])
+      return false;
+  }
+  std::cout << "fixed array of attribute handles OK" << std::endl;
+  return true;
+}
+
 bool testVariableArrayOfAttributeHandlesEncoding()
 {
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing variable array of AttributeHandles" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
   rti1516e::AttributeHandle data [] = {
     rti1516e::createAttributeHandle(2), 
     rti1516e::createAttributeHandle(5), 
@@ -1480,7 +1632,7 @@ bool testVariableArrayOfAttributeHandlesEncoding()
   rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
   std::cout << "encodedData1=" << encodedData1 << std::endl;
 
-  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAASCIIstring()};
+  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAhandle(rti1516e::AttributeHandle())};
   arrayDecoder.decode(encodedData1);
   for (int i=0;i<4;i++)
   {
@@ -1492,8 +1644,55 @@ bool testVariableArrayOfAttributeHandlesEncoding()
   return true;
 }
 
+bool testFixedArrayOfInteractionClassHandlesEncoding()
+{
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing fixed array of InteractionClassHandles" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  rti1516e::InteractionClassHandle data [] = {
+    rti1516e::createInteractionClassHandle(2), 
+    rti1516e::createInteractionClassHandle(5), 
+    rti1516e::createInteractionClassHandle(7), 
+    rti1516e::createInteractionClassHandle(10)};
+  rti1516e::HLAfixedArray arrayEncoder{rti1516e::HLAhandle(rti1516e::InteractionClassHandle()), 4};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder.set(i, rti1516e::HLAhandle(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1;
+  try
+  {
+    encodedData1 = arrayEncoder.encode();
+    std::cout << "encodedData1=" << encodedData1 << std::endl;
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::cerr << "Unexpected exception while encoding: " << e << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::cerr << "Unexpected exception while encoding!" << std::endl;
+    return false;
+  }
+
+  rti1516e::HLAfixedArray arrayDecoder{rti1516e::HLAhandle(rti1516e::InteractionClassHandle()), 4};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::wcout << L"decoded(" << i << L") = " << static_cast<const rti1516e::HLAhandle&>(arrayEncoder.get(i)).getInteractionClassHandle().toString() << std::endl;
+    if (static_cast<const rti1516e::HLAhandle&>(arrayEncoder.get(i)).getInteractionClassHandle() != data[i])
+      return false;
+  }
+  std::cout << "variable array of interaction class handles OK" << std::endl;
+  return true;
+}
+
 bool testVariableArrayOfInteractionClassHandlesEncoding()
 {
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing varaiable array of InteractionClassHandles" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
   rti1516e::InteractionClassHandle data [] = {
     rti1516e::createInteractionClassHandle(2), 
     rti1516e::createInteractionClassHandle(5), 
@@ -1602,33 +1801,6 @@ bool testVariableArrayOfInteractionSubscriptionsEncoding()
   std::cout << "variable array of interaction subscriptions OK" << std::endl;
   return true;
 }
-
-bool testFixedArrayOfStringEncoding()
-{
-  if (gDebugPrint) std::cout << "=============================================" << std::endl;
-  if (gDebugPrint) std::wcout << L"testing fixed array of strings" << std::endl;
-  if (gDebugPrint) std::cout << "=============================================" << std::endl;
-  std::string data [] = { "one", "two", "three", "four" };
-  rti1516e::HLAfixedArray arrayEncoder1{rti1516e::HLAASCIIstring(), 4};
-  for (int i=0;i<4;i++)
-  {
-    arrayEncoder1.set(i, rti1516e::HLAASCIIstring(data[i]));
-  }
-  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
-  std::cout << "encodedData1=" << encodedData1 << std::endl;
-
-  rti1516e::HLAfixedArray arrayDecoder{rti1516e::HLAASCIIstring(), 4};
-  arrayDecoder.decode(encodedData1);
-  for (int i=0;i<4;i++)
-  {
-    std::cout << static_cast<const rti1516e::HLAASCIIstring&>(arrayDecoder.get(i)).get() << std::endl;
-    if (static_cast<const rti1516e::HLAASCIIstring&>(arrayDecoder.get(i)).get() != data[i])
-      return false;
-  }
-  std::cout << "fixed array of strings OK" << std::endl;
-  return true;
-}
-
 
 bool testDataPointerFixedRecordEncoding()
 {
@@ -1762,10 +1934,16 @@ main(int argc, char* argv[])
   if (!testDataElementEncoding(StructAlign2DataType))
     return EXIT_FAILURE;
 
-  if (!testFixedArrayOfStringEncoding())
+  if (!testFixedArrayOfASCIIStringEncoding())
     return EXIT_FAILURE;
 
-  if (!testVariableArrayOfStringEncoding())
+  if (!testVariableArrayOfASCIIStringEncoding())
+    return EXIT_FAILURE;
+
+  if (!testFixedArrayOfUnicodeStringEncoding())
+    return EXIT_FAILURE;
+
+  if (!testVariableArrayOfUnicodeStringEncoding())
     return EXIT_FAILURE;
 
   if (!testDataPointerEncoding())
@@ -1782,13 +1960,22 @@ main(int argc, char* argv[])
 
 
 
+  if (!testFixedArrayOfFederateHandlesEncoding())
+    return EXIT_FAILURE;
+
   if (!testVariableArrayOfFederateHandlesEncoding())
     return EXIT_FAILURE;
 
   if (!testVariableArrayOfObjectClassHandlesEncoding())
     return EXIT_FAILURE;
 
+  if (!testFixedArrayOfAttributeHandlesEncoding())
+    return EXIT_FAILURE;
+
   if (!testVariableArrayOfAttributeHandlesEncoding())
+    return EXIT_FAILURE;
+
+  if (!testFixedArrayOfInteractionClassHandlesEncoding())
     return EXIT_FAILURE;
 
   if (!testVariableArrayOfInteractionClassHandlesEncoding())
@@ -1923,15 +2110,18 @@ main(int argc, char* argv[])
 
   // now run the tests
 
-  testFederateHandleEncodings(ambassador, federateHandle);
+  if (!testFederateHandleEncodings(ambassador, federateHandle))
+    return EXIT_FAILURE;
 
   rti1516e::ObjectClassHandle objectClass1 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
-  testObjectClassHandleEncodings(ambassador, objectClass1);
+  if (!testObjectClassHandleEncodings(ambassador, objectClass1))
+    return EXIT_FAILURE;
   rti1516e::ObjectClassHandle objectClass2 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1.ObjectClass2");
-  testObjectClassHandleEncodings(ambassador, objectClass2);
+  if (!testObjectClassHandleEncodings(ambassador, objectClass2))
+    return EXIT_FAILURE;
   rti1516e::InteractionClassHandle interactionClass1 = ambassador.getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
-  testInteractionClassHandleEncodings(ambassador, interactionClass1);
-
+  if (!testInteractionClassHandleEncodings(ambassador, interactionClass1))
+    return EXIT_FAILURE;
   if (!testDataElementEncoding(HLAfederateHandleDataType))
     return EXIT_FAILURE;
   if (!testDataElementEncoding(HLAobjectClassHandleDataType))
@@ -1985,6 +2175,6 @@ main(int argc, char* argv[])
     std::wcout << L"Unknown Exception!" << std::endl;
     return EXIT_FAILURE;
   }
-
+  if (gDebugPrint) std::wcout << "all tests SUCCEEDED!" << std::endl;
   return EXIT_SUCCESS;
 }

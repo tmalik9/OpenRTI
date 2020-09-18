@@ -79,7 +79,6 @@ public:
   {
     size_t length = 0;
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      length = align(length, i->first->getOctetBoundary());
       length += i->first->getEncodedLength();
     }
     return length;

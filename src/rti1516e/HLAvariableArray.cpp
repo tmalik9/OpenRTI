@@ -28,7 +28,7 @@
 #include <cstring>
 #include <vector>
 #include <cassert>
-#include <iostream>
+
 #include "Encoding.h"
 #include "Export.h"
 
@@ -83,8 +83,6 @@ public:
 
   size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   {
-    unsigned int octetBoundary = getOctetBoundary();
-    index = align(index, octetBoundary);
     if (bufferSize < index + 4)
       throw EncoderException(L"Insufficient buffer size for decoding!");
     uint32_t length;
@@ -113,9 +111,8 @@ public:
 
   size_t getEncodedLength() const
   {
-    size_t length = getOctetBoundary();
+    size_t length = 4u;
     for (auto& element : _dataElementVector) {
-      length = align(length, element.first->getOctetBoundary());
       length += element.first->getEncodedLength();
     }
     return length;
@@ -130,8 +127,6 @@ public:
 
   size_t decodedSize(const Octet* buffer, size_t bufferSize, size_t index)
   {
-    unsigned int octetBoundary = getOctetBoundary();
-    index = align(index, octetBoundary);
     if (bufferSize < index + 4)
       throw EncoderException(L"Insufficient buffer size for decoding!");
     uint32_t length;

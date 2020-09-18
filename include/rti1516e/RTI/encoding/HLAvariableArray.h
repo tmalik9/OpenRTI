@@ -128,7 +128,6 @@ namespace rti1516e
       HLAvariableArray& operator=(HLAvariableArray const & rhs);
       HLAvariableArray& operator=(HLAvariableArray&& rhs);
 
-      void setDataBuffer(void* buffer, size_t bytes);
    private:
 
       // Default Constructor not allowed
