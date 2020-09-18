@@ -166,29 +166,30 @@ VariableLengthData HLAhandle::encode() const
   return result;
 }
 
-void HLAhandle::encode(VariableLengthData& inData) const
+void HLAhandle::encode(VariableLengthData& outData) const
 {
-  std::vector<Octet> buffer;
-  buffer.reserve(getEncodedLength());
-  encodeInto(buffer);
-  inData.setData(buffer.data(), buffer.size());
+  size_t offset = outData.size();
+  size_t encodedLength = getEncodedLength();
+  outData.resize(offset + encodedLength);
+  encodeInto(static_cast<Octet*>(outData.data()) + offset, encodedLength, offset);
 }
 
 void HLAhandle::encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, getOctetBoundary());
-  align(buffer, mHandleKindEncoding.getOctetBoundary());
-  mHandleKindEncoding.encodeInto(buffer);
-  align(buffer, mHandleValueEncoding.getOctetBoundary());
-  mHandleValueEncoding.encodeInto(buffer);
+  size_t offset = buffer.size();
+  size_t encodedLength = getEncodedLength();
+  buffer.resize(offset + encodedLength);
+  encodeInto(static_cast<Octet*>(buffer.data()) + offset, encodedLength, offset);
 }
 
 size_t HLAhandle::encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, getOctetBoundary());
-  offset = align(offset, mHandleKindEncoding.getOctetBoundary());
+#ifdef _DEBUG
+  if (bufferSize < offset + getEncodedLength())
+    throw EncoderException("buffer to small: bufferSize=" + std::to_string(bufferSize) + " offset=" + std::to_string(offset) + " encodedLength=" + std::to_string(getEncodedLength()));
+#endif
+  offset = align(buffer, offset, getOctetBoundary());
   offset = mHandleKindEncoding.encodeInto(buffer, bufferSize, offset);
-  offset = align(offset, mHandleValueEncoding.getOctetBoundary());
   offset = mHandleValueEncoding.encodeInto(buffer, bufferSize, offset);
   return offset;
 }
@@ -200,13 +201,12 @@ void HLAhandle::decode(VariableLengthData const& inData)
 
 size_t HLAhandle::decodeFrom(std::vector<Octet> const& buffer, size_t index)
 {
-  index = mHandleKindEncoding.decodeFrom(buffer.data(), buffer.size(), index);
-  index = mHandleValueEncoding.decodeFrom(buffer.data(), buffer.size(), index);
-  return index;
+  return decodeFrom(static_cast<const Octet*>(buffer.data()), buffer.size(), 0);
 }
 
 size_t HLAhandle::decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
+  index = align(index, getOctetBoundary());
   index = mHandleKindEncoding.decodeFrom(buffer, bufferSize, index);
   index = mHandleValueEncoding.decodeFrom(buffer, bufferSize, index);
   return index;

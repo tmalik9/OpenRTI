@@ -31,6 +31,10 @@ class OPENRTI_LOCAL HLAobjectClassBasedCount : public HLAfixedRecord
       HLAfixedRecord::appendElementPointer(&mClassHandle);
       HLAfixedRecord::appendElementPointer(&mCount);
     }
+    std::unique_ptr<DataElement> clone() const override
+    {
+      return std::unique_ptr<DataElement>(new HLAobjectClassBasedCount(*this));
+    }
 
     ObjectClassHandle getClassHandle() const
     {
@@ -71,6 +75,10 @@ class OPENRTI_LOCAL HLAinteractionCount : public HLAfixedRecord
       mCount.set(ref.mCount.get());
       HLAfixedRecord::appendElementPointer(&mClassHandle);
       HLAfixedRecord::appendElementPointer(&mCount);
+    }
+    std::unique_ptr<DataElement> clone() const override
+    {
+      return std::unique_ptr<DataElement>(new HLAinteractionCount(*this));
     }
 
     InteractionClassHandle getClassHandle() const
@@ -122,6 +130,10 @@ class OPENRTI_LOCAL HLAinteractionSubscription : public HLAfixedRecord
     }
     ~HLAinteractionSubscription()
     {
+    }
+    std::unique_ptr<DataElement> clone() const override
+    {
+      return std::unique_ptr<DataElement>(new HLAinteractionSubscription(*this));
     }
     InteractionClassHandle getClassHandle() const
     {
