@@ -44,7 +44,119 @@
 #include "Rand.h"
 #include <crtdbg.h>
 
-constexpr bool gDebugPrint = false;
+typedef rti1516e::HLAinteger32BE HLAcount;
+
+class OPENRTI_LOCAL HLAinteractionCount : public rti1516e::HLAfixedRecord
+{
+  public:
+    HLAinteractionCount()
+    {
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mCount);
+    }
+
+    HLAinteractionCount(rti1516e::InteractionClassHandle classHandle, int32_t count)
+      : mClassHandle(classHandle)
+      , mCount(count)
+    {
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mCount);
+    }
+    HLAinteractionCount(const HLAinteractionCount& ref)
+      : mClassHandle(ref.mClassHandle)
+      , mCount(ref.mCount)
+    {
+      mClassHandle.set(ref.mClassHandle.getInteractionClassHandle());
+      mCount.set(ref.mCount.get());
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mCount);
+    }
+
+    std::unique_ptr<DataElement> clone() const override
+    {
+      return std::unique_ptr<DataElement>(new HLAinteractionCount(*this));
+    }
+    rti1516e::InteractionClassHandle getClassHandle() const
+    {
+      return mClassHandle.getInteractionClassHandle();
+    }
+
+    int32_t getCount() const
+    {
+      return mCount.get();
+    }
+
+    void increment()
+    {
+      mCount.set(mCount.get() + 1);
+    }
+    void setCount(uint32_t count)
+    {
+      mCount.set(count);
+    }
+  private:
+    void operator=(const HLAinteractionCount& ) = delete;
+
+    //----------------------------------------------------------
+    //                   INSTANCE VARIABLES
+    //----------------------------------------------------------
+    rti1516e::HLAhandle mClassHandle;
+    HLAcount mCount;
+};
+
+
+class OPENRTI_LOCAL HLAinteractionSubscription : public rti1516e::HLAfixedRecord
+{
+  public:
+    HLAinteractionSubscription(rti1516e::InteractionClassHandle classHandle, bool active)
+      : mClassHandle(classHandle)
+      , mActive(active)
+    {
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mActive);
+    }
+    HLAinteractionSubscription(const HLAinteractionSubscription& ref)
+      : mClassHandle(ref.mClassHandle)
+      , mActive(ref.mActive)
+    {
+      mClassHandle.set(ref.mClassHandle.getInteractionClassHandle());
+      mActive.set(ref.mActive.get());
+      HLAfixedRecord::appendElementPointer(&mClassHandle);
+      HLAfixedRecord::appendElementPointer(&mActive);
+    }
+    ~HLAinteractionSubscription()
+    {
+    }
+    std::unique_ptr<DataElement> clone() const override
+    {
+      return std::unique_ptr<DataElement>(new HLAinteractionSubscription(*this));
+    }
+    rti1516e::InteractionClassHandle getClassHandle() const
+    {
+      return mClassHandle.getInteractionClassHandle();
+    }
+
+    bool getActive() const
+    {
+      return mActive.get();
+    }
+
+    void setActive(bool active)
+    {
+      mActive.set(active);
+    }
+  private:
+    void operator=(const HLAinteractionCount& ) = delete;
+
+    //----------------------------------------------------------
+    //                   INSTANCE VARIABLES
+    //----------------------------------------------------------
+    rti1516e::HLAhandle mClassHandle;
+    rti1516e::HLAboolean mActive;
+};
+
+
+constexpr bool gDebugPrint = true;
 constexpr int doIterations = 5;
 
 static void DumpHeap()
@@ -101,6 +213,54 @@ struct DataType
   std::size_t getAlignment() const;
   std::unique_ptr<rti1516e::DataElement> createDataElement(OpenRTI::Rand& rand) const;
 };
+
+template<typename TInputIter>
+static inline std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercase = true, bool insert_spaces = false)
+{
+  std::ostringstream ss;
+  ss << std::hex << std::setfill('0');
+  if (use_uppercase)
+    ss << std::uppercase;
+  while (first != last)
+  {
+    unsigned char currentByte = (*first++) & 0xff;
+    ss << std::setw(2) << (static_cast<unsigned int>(currentByte) & 0x000000ff);
+    if (insert_spaces && first != last)
+      ss << " ";
+  }
+  return ss.str();
+}
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const std::vector<uint8_t>& value)
+{
+  if (value.size() == 0)
+  {
+    os << "<empty>";
+  }
+  else
+  {
+    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const uint8_t*>(value.data()), static_cast<const uint8_t*>(value.data()) + value.size(), true, true) << "]}";
+  }
+  return os;
+}
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, const rti1516e::VariableLengthData& value)
+{
+  if (value.size() == 0)
+  {
+    os << "<empty>";
+  }
+  else
+  {
+    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const uint8_t*>(value.data()), static_cast<const uint8_t*>(value.data()) + value.size(), true, true) << "]}";
+  }
+  return os;
+}
+
 
 std::string to_string(DataType::Type type)
 {
@@ -252,9 +412,11 @@ DataType::createDataElement(OpenRTI::Rand& rand) const
     case HLAunicodeString:
     {
       std::wstring s;
+      wchar_t chars[] = L"0123456789";
       s.resize(0xff & rand.get());
       for (std::size_t i = 0; i < s.size(); ++i)
-        s[i] = 0xffff & static_cast<uint16_t>(rand.get());
+        //s[i] = 0xffff & static_cast<uint16_t>(rand.get());
+        s[i] = chars[i%10];
       return std::unique_ptr<rti1516e::DataElement>(new rti1516e::HLAunicodeString(s));
     }
 
@@ -451,6 +613,20 @@ equal(const rti1516e::VariableLengthData& left, const rti1516e::VariableLengthDa
   return 0 == std::memcmp(left.data(), right.data(), left.size());
 }
 
+size_t
+diff(const rti1516e::VariableLengthData& left, const rti1516e::VariableLengthData& right)
+{
+  size_t compareBytes = std::min(left.size(), right.size());
+  for (size_t i=0;i<compareBytes;i++)
+  {
+    if (static_cast<const uint8_t*>(left.data())[i] != static_cast<const uint8_t*>(right.data())[i])
+    {
+      return i;
+    }
+  }
+  return compareBytes;
+}
+
 template<typename T>
 bool
 typedEqual(const rti1516e::DataElement& left, const rti1516e::DataElement& right)
@@ -522,6 +698,49 @@ equal(const rti1516e::DataElement& left, const rti1516e::DataElement& right)
   return false;
 }
 
+void DumpDataElement(std::wostream& to, const rti1516e::DataElement* dataElement, uint32_t indent = 0)
+{
+  to << std::wstring(indent * 2, L' ') << OpenRTI::to_wstring(typeid(*dataElement).name()) 
+    << L" encodedLength=" << dataElement->getEncodedLength()
+    << L" align=" << dataElement->getOctetBoundary();
+  const rti1516e::HLAfixedRecord* rec = dynamic_cast<const rti1516e::HLAfixedRecord*>(dataElement);
+  if (rec != nullptr)
+  {
+    to << std::endl;
+    for (size_t i = 0; i < rec->size(); i++)
+    {
+      DumpDataElement(to, &(rec->get(i)), indent + 1);
+    }
+    return;
+  }
+  const rti1516e::HLAvariableArray* va = dynamic_cast<const rti1516e::HLAvariableArray*>(dataElement);
+  if (va != nullptr)
+  {
+    to << std::endl;
+    for (size_t i = 0; i < va->size(); i++)
+    {
+      DumpDataElement(to, &(va->get(i)), indent + 1);
+    }
+    return;
+  }
+  const rti1516e::HLAfixedArray* fa = dynamic_cast<const rti1516e::HLAfixedArray*>(dataElement);
+  if (fa != nullptr)
+  {
+    to << std::endl;
+    for (size_t i = 0; i < fa->size(); i++)
+    {
+      DumpDataElement(to, &(fa->get(i)), indent + 1);
+    }
+    return;
+  }
+  const rti1516e::HLAunicodeString* s = dynamic_cast<const rti1516e::HLAunicodeString*>(dataElement);
+  if (s != nullptr)
+  {
+    std::wcerr << L" ==> " << s->get().size() << " \"" << s->get() << L"\"" << std::endl;
+  }
+  to << std::endl;
+}
+
 bool testDataElementEncoding(const DataType& dataType)
 {
   OpenRTI::Rand rand;
@@ -546,10 +765,10 @@ bool testDataElementEncoding(const DataType& dataType)
     //  std::cerr << "Unexpected exception while decoding empty data!" << std::endl;
     //  return false;
     //}
-    rti1516e::VariableLengthData variableLengthData;
+    rti1516e::VariableLengthData encodedData;
     try
     {
-      variableLengthData = dataElement->encode();
+      encodedData = dataElement->encode();
     }
     catch (const rti1516e::Exception& e)
     {
@@ -561,11 +780,15 @@ bool testDataElementEncoding(const DataType& dataType)
       std::cerr << "Unexpected exception while encoding!" << std::endl;
       return false;
     }
-
+    if (dataElement->getEncodedLength() != encodedData.size())
+    {
+      std::cerr << "getEncodedLength != encodedData.size: " << dataElement->getEncodedLength() << " != " << encodedData.size() << std::endl;
+      std::cerr << encodedData << std::endl;
+    }
     std::unique_ptr<rti1516e::DataElement> dataElement2 = dataElement->clone();
     try
     {
-      dataElement2->decode(variableLengthData);
+      dataElement2->decode(encodedData);
     }
     catch (const rti1516e::Exception& e)
     {
@@ -595,9 +818,14 @@ bool testDataElementEncoding(const DataType& dataType)
       return false;
     }
 
-    if (!equal(variableLengthData, variableLengthData2))
+    if (!equal(encodedData, variableLengthData2))
     {
-      std::cerr << "Encoded data is not equal!" << std::endl;
+      size_t pos = diff(encodedData, variableLengthData2);
+      std::cerr << to_string(dataType.type) << ": cloned encoded data is not equal to original encoded data at pos " << pos << ": " << std::endl;
+      std::cerr << "original=" << encodedData << std::endl;
+      std::cerr << "  cloned=" << variableLengthData2 << std::endl;
+      DumpDataElement(std::wcerr, dataElement.get());
+      DumpDataElement(std::wcerr, dataElement2.get());
       return false;
     }
   }
@@ -734,54 +962,7 @@ static const DataType StructAlign2DataType =
   DataType::HLAfixedRecord_Randomized, 3, { &HLAinteger16LEDataType, &StructAlignDataType, &HLAunicodeStringDataType, }
 };
 
-template<typename TInputIter>
-static inline std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercase = true, bool insert_spaces = false)
-{
-  std::ostringstream ss;
-  ss << std::hex << std::setfill('0');
-  if (use_uppercase)
-    ss << std::uppercase;
-  while (first != last)
-  {
-    unsigned char currentByte = (*first++) & 0xff;
-    ss << std::setw(2) << (static_cast<unsigned int>(currentByte) & 0x000000ff);
-    if (insert_spaces && first != last)
-      ss << " ";
-  }
-  return ss.str();
-}
-
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const std::vector<uint8_t>& value)
-{
-  if (value.size() == 0)
-  {
-    os << "<empty>";
-  }
-  else
-  {
-    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const uint8_t*>(value.data()), static_cast<const uint8_t*>(value.data()) + value.size(), true, true) << "]}";
-  }
-  return os;
-}
-
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const rti1516e::VariableLengthData& value)
-{
-  if (value.size() == 0)
-  {
-    os << "<empty>";
-  }
-  else
-  {
-    os << "{sz=" << value.size() << " [" << make_hex_string(static_cast<const uint8_t*>(value.data()), static_cast<const uint8_t*>(value.data()) + value.size(), true, true) << "]}";
-  }
-  return os;
-}
-
-bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e::FederateHandle federateHandle)
+bool testFederateHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e::FederateHandle federateHandle)
 {
   if (gDebugPrint) std::cout << "============================================" << std::endl;
   if (gDebugPrint) std::wcout << L"testing " << federateHandle << std::endl;
@@ -836,17 +1017,46 @@ bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e
   return true;
 }
 
-bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e::ObjectClassHandle objectClassHandle)
+bool testObjectClassHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e::ObjectClassHandle objectClassHandle)
 {
   if (gDebugPrint) std::cout << "============================================" << std::endl;
   if (gDebugPrint) std::wcout << L"testing " << ambassador.getObjectClassName(objectClassHandle) << std::endl;
   if (gDebugPrint) std::cout << "============================================" << std::endl;
   rti1516e::HLAhandle encodedHandle = rti1516e::HLAhandle(objectClassHandle);
   // encoded data from HLAhandle
-  rti1516e::VariableLengthData data1 = encodedHandle.encode();
-  if (gDebugPrint) std::cout << "data1=" << data1 << std::endl;
+  rti1516e::VariableLengthData data1;
+  try
+  {
+    data1 = encodedHandle.encode();
+    if (gDebugPrint) std::cout << "data1=" << data1 << std::endl;
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::cerr << "Unexpected exception while encoding: " << e << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::cerr << "Unexpected exception while encoding!" << std::endl;
+    return false;
+  }
   // encoded data from rti1516e::ObjectClassHandle
-  rti1516e::VariableLengthData data2 = objectClassHandle.encode();
+  rti1516e::VariableLengthData data2;
+  try
+  {
+    data2 = objectClassHandle.encode();
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::cerr << "Unexpected exception while encoding: " << e << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::cerr << "Unexpected exception while encoding!" << std::endl;
+    return false;
+  }
+
   if (gDebugPrint) std::cout << "data2=" << data2 << std::endl;
 
   // check the basic sizes of the HLAhandle ...
@@ -891,7 +1101,7 @@ bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e
   return true;
 }
 
-bool testHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e::InteractionClassHandle interactionClassHandle)
+bool testInteractionClassHandleEncodings(OpenRTI::RTI1516ESimpleAmbassador& ambassador, rti1516e::InteractionClassHandle interactionClassHandle)
 {
   if (gDebugPrint) std::cout << "============================================" << std::endl;
   if (gDebugPrint) std::wcout << L"testing interaction class" << ambassador.getInteractionClassName(interactionClassHandle)  << std::endl;
@@ -1201,8 +1411,203 @@ bool testVariableArrayOfStringEncoding()
   return true;
 }
 
+bool testVariableArrayOfFederateHandlesEncoding()
+{
+  rti1516e::FederateHandle data [] = {
+    rti1516e::createFederateHandle(2), 
+    rti1516e::createFederateHandle(5), 
+    rti1516e::createFederateHandle(7), 
+    rti1516e::createFederateHandle(10)};
+  rti1516e::HLAvariableArray arrayEncoder1{rti1516e::HLAhandle(rti1516e::FederateHandle())};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder1.addElement(rti1516e::HLAhandle(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+
+  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAASCIIstring()};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::wcout << static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getFederateHandle().toString() << std::endl;
+    if (static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getFederateHandle() != data[i])
+      return false;
+  }
+  std::cout << "variable array of federate handles OK" << std::endl;
+  return true;
+}
+
+bool testVariableArrayOfObjectClassHandlesEncoding()
+{
+  rti1516e::ObjectClassHandle data [] = {
+    rti1516e::createObjectClassHandle(2), 
+    rti1516e::createObjectClassHandle(5), 
+    rti1516e::createObjectClassHandle(7), 
+    rti1516e::createObjectClassHandle(10)};
+  rti1516e::HLAvariableArray arrayEncoder1{rti1516e::HLAhandle(rti1516e::ObjectClassHandle())};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder1.addElement(rti1516e::HLAhandle(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+
+  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAASCIIstring()};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::wcout << static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getObjectClassHandle().toString() << std::endl;
+    if (static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getObjectClassHandle() != data[i])
+      return false;
+  }
+  std::cout << "variable array of object class handles OK" << std::endl;
+  return true;
+}
+
+bool testVariableArrayOfAttributeHandlesEncoding()
+{
+  rti1516e::AttributeHandle data [] = {
+    rti1516e::createAttributeHandle(2), 
+    rti1516e::createAttributeHandle(5), 
+    rti1516e::createAttributeHandle(7), 
+    rti1516e::createAttributeHandle(10)};
+  rti1516e::HLAvariableArray arrayEncoder1{rti1516e::HLAhandle(rti1516e::AttributeHandle())};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder1.addElement(rti1516e::HLAhandle(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+
+  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAASCIIstring()};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::wcout << static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getAttributeHandle().toString() << std::endl;
+    if (static_cast<const rti1516e::HLAhandle&>(arrayEncoder1.get(i)).getAttributeHandle() != data[i])
+      return false;
+  }
+  std::cout << "variable array of attribute handles OK" << std::endl;
+  return true;
+}
+
+bool testVariableArrayOfInteractionClassHandlesEncoding()
+{
+  rti1516e::InteractionClassHandle data [] = {
+    rti1516e::createInteractionClassHandle(2), 
+    rti1516e::createInteractionClassHandle(5), 
+    rti1516e::createInteractionClassHandle(7), 
+    rti1516e::createInteractionClassHandle(10)};
+  rti1516e::HLAvariableArray arrayEncoder{rti1516e::HLAhandle(rti1516e::InteractionClassHandle())};
+  for (int i=0;i<4;i++)
+  {
+    arrayEncoder.addElement(rti1516e::HLAhandle(data[i]));
+  }
+  rti1516e::VariableLengthData encodedData1;
+  try
+  {
+    encodedData1 = arrayEncoder.encode();
+    std::cout << "encodedData1=" << encodedData1 << std::endl;
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::cerr << "Unexpected exception while encoding: " << e << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::cerr << "Unexpected exception while encoding!" << std::endl;
+    return false;
+  }
+
+  rti1516e::HLAvariableArray arrayDecoder{rti1516e::HLAhandle(rti1516e::InteractionClassHandle())};
+  arrayDecoder.decode(encodedData1);
+  for (int i=0;i<4;i++)
+  {
+    std::wcout << L"decoded(" << i << L") = " << static_cast<const rti1516e::HLAhandle&>(arrayEncoder.get(i)).getInteractionClassHandle().toString() << std::endl;
+    if (static_cast<const rti1516e::HLAhandle&>(arrayEncoder.get(i)).getInteractionClassHandle() != data[i])
+      return false;
+  }
+  std::cout << "variable array of interaction class handles OK" << std::endl;
+  return true;
+}
+
+bool testVariableArrayOfInteractionSubscriptionsEncoding()
+{
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing varaiable array of HLAinteractionSubscription" << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  std::vector<HLAinteractionSubscription> data{
+    HLAinteractionSubscription(rti1516e::createInteractionClassHandle(2), true),
+    HLAinteractionSubscription(rti1516e::createInteractionClassHandle(5), false),
+    HLAinteractionSubscription(rti1516e::createInteractionClassHandle(7), true),
+    HLAinteractionSubscription(rti1516e::createInteractionClassHandle(10), false),
+  };
+  rti1516e::HLAvariableArray arrayEncoder = rti1516e::HLAvariableArray(HLAinteractionSubscription(rti1516e::InteractionClassHandle(), rti1516e::HLAboolean()));
+  for (size_t i=0;i<data.size();i++)
+  {
+    arrayEncoder.addElement(data[i]);
+  }
+  rti1516e::VariableLengthData encodedData1;
+  std::cout << "arrayEncoder.getEncodedLength()=" << arrayEncoder.getEncodedLength() << std::endl;
+  try
+  {
+    encodedData1 = arrayEncoder.encode();
+    std::cout << "encodedData1=" << encodedData1 << std::endl;
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::cerr << "Unexpected exception while encoding: " << e << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::cerr << "Unexpected exception while encoding!" << std::endl;
+    return false;
+  }
+  rti1516e::HLAvariableArray arrayDecoder{HLAinteractionSubscription(rti1516e::InteractionClassHandle(), rti1516e::HLAboolean())};
+  try
+  {
+    arrayDecoder.decode(encodedData1);
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::cerr << "Unexpected exception while decoding: " << e << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::cerr << "Unexpected exception while decoding!" << std::endl;
+    return false;
+  }
+  if (arrayDecoder.size() != data.size())
+  {
+    std::cerr << "decoded different array size: " << arrayDecoder.size() << " != " << data.size() << std::endl;
+    return false;
+  }
+  DumpDataElement(std::wcerr, &arrayDecoder);
+  for (size_t i=0;i<data.size();i++)
+  {
+    const rti1516e::HLAfixedRecord& element = static_cast<const rti1516e::HLAfixedRecord&>(arrayDecoder.get(i));
+    const rti1516e::HLAhandle& first = static_cast<const rti1516e::HLAhandle&>(element.get(0));
+    const rti1516e::HLAboolean& second = static_cast<const rti1516e::HLAboolean&>(element.get(1));
+
+    std::wcout << L"decoded(" << i << L") = " << first.getInteractionClassHandle().toString() << ", " << second.get() << std::endl;
+    if (first.getInteractionClassHandle() != data[i].getClassHandle())
+      return false;
+    if (second != data[i].getActive())
+      return false;
+  }
+  std::cout << "variable array of interaction subscriptions OK" << std::endl;
+  return true;
+}
+
 bool testFixedArrayOfStringEncoding()
 {
+  if (gDebugPrint) std::cout << "=============================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing fixed array of strings" << std::endl;
+  if (gDebugPrint) std::cout << "=============================================" << std::endl;
   std::string data [] = { "one", "two", "three", "four" };
   rti1516e::HLAfixedArray arrayEncoder1{rti1516e::HLAASCIIstring(), 4};
   for (int i=0;i<4;i++)
@@ -1216,13 +1621,14 @@ bool testFixedArrayOfStringEncoding()
   arrayDecoder.decode(encodedData1);
   for (int i=0;i<4;i++)
   {
-    std::cout << static_cast<const rti1516e::HLAASCIIstring&>(arrayEncoder1.get(i)).get() << std::endl;
-    if (static_cast<const rti1516e::HLAASCIIstring&>(arrayEncoder1.get(i)).get() != data[i])
+    std::cout << static_cast<const rti1516e::HLAASCIIstring&>(arrayDecoder.get(i)).get() << std::endl;
+    if (static_cast<const rti1516e::HLAASCIIstring&>(arrayDecoder.get(i)).get() != data[i])
       return false;
   }
   std::cout << "fixed array of strings OK" << std::endl;
   return true;
 }
+
 
 bool testDataPointerFixedRecordEncoding()
 {
@@ -1374,6 +1780,24 @@ main(int argc, char* argv[])
   if (!testDataPointerFixedRecordEncoding())
     return EXIT_FAILURE;
 
+
+
+  if (!testVariableArrayOfFederateHandlesEncoding())
+    return EXIT_FAILURE;
+
+  if (!testVariableArrayOfObjectClassHandlesEncoding())
+    return EXIT_FAILURE;
+
+  if (!testVariableArrayOfAttributeHandlesEncoding())
+    return EXIT_FAILURE;
+
+  if (!testVariableArrayOfInteractionClassHandlesEncoding())
+    return EXIT_FAILURE;
+
+  if (!testVariableArrayOfInteractionSubscriptionsEncoding())
+    return EXIT_FAILURE;
+
+
   OpenRTI::RTI1516ESimpleAmbassador ambassador;
   ambassador.setUseDataUrlObjectModels(false);
 
@@ -1499,14 +1923,14 @@ main(int argc, char* argv[])
 
   // now run the tests
 
-  testHandleEncodings(ambassador, federateHandle);
+  testFederateHandleEncodings(ambassador, federateHandle);
 
   rti1516e::ObjectClassHandle objectClass1 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1");
-  testHandleEncodings(ambassador, objectClass1);
+  testObjectClassHandleEncodings(ambassador, objectClass1);
   rti1516e::ObjectClassHandle objectClass2 = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass1.ObjectClass2");
-  testHandleEncodings(ambassador, objectClass2);
+  testObjectClassHandleEncodings(ambassador, objectClass2);
   rti1516e::InteractionClassHandle interactionClass1 = ambassador.getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
-  testHandleEncodings(ambassador, interactionClass1);
+  testInteractionClassHandleEncodings(ambassador, interactionClass1);
 
   if (!testDataElementEncoding(HLAfederateHandleDataType))
     return EXIT_FAILURE;
@@ -1514,7 +1938,7 @@ main(int argc, char* argv[])
     return EXIT_FAILURE;
   if (!testDataElementEncoding(HLAobjectInstanceHandleDataType))
     return EXIT_FAILURE;
-  Leaktest();
+  //Leaktest();
 
   try
   {

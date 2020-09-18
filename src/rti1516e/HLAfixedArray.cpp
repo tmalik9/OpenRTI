@@ -72,17 +72,12 @@ public:
     return length;
   }
 
-  void encodeInto(std::vector<Octet>& buffer) const
-  {
-    for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      if (i->first == nullptr)
-        throw EncoderException(L"HLAfixedArray::encodeInto(): dataElement is zero!");
-      i->first->encodeInto(buffer);
-    }
-  }
-
   size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset)
   {
+#ifdef _DEBUG
+    if (bufferSize < offset + getEncodedLength())
+      throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
+#endif
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
       if (i->first == nullptr)
         throw EncoderException(L"HLAfixedArray::encodeInto(): dataElement is zero!");
@@ -194,21 +189,19 @@ HLAfixedArray::encode () const
 }
 
 void
-HLAfixedArray::encode(VariableLengthData& inData) const
+HLAfixedArray::encode(VariableLengthData& outData) const
 {
-  //std::vector<Octet> buffer;
-  //buffer.reserve(getEncodedLength());
-  //encodeInto(buffer);
-  //if (!buffer.empty())
-  //  inData.setData(&buffer.front(), buffer.size());
-  inData.resize(getEncodedLength());
-  _impl->encodeInto(static_cast<Octet*>(inData.data()), inData.size(), 0);
+  outData.resize(getEncodedLength());
+  _impl->encodeInto(static_cast<Octet*>(outData.data()), outData.size(), 0);
 }
 
 void
 HLAfixedArray::encodeInto(std::vector<Octet>& buffer) const
 {
-  _impl->encodeInto(buffer);
+  size_t offset = buffer.size();
+  size_t encodedLength = getEncodedLength();
+  buffer.resize(offset + encodedLength);
+  _impl->encodeInto(static_cast<Octet*>(buffer.data()) + offset, encodedLength, offset);
 }
 
 

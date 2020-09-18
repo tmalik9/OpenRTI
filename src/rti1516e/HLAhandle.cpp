@@ -157,11 +157,11 @@ VariableLengthData HLAhandle::encode() const
   return result;
 }
 
-void HLAhandle::encode(VariableLengthData& inData) const
+void HLAhandle::encode(VariableLengthData& outData) const
 {
   OpenRTI::VariableLengthData data;
   mImpl->encode(data);
-  inData = VariableLengthDataFriend::create(data);
+  outData = VariableLengthDataFriend::create(data);
 }
 
 void HLAhandle::encodeInto(std::vector<Octet>& buffer) const

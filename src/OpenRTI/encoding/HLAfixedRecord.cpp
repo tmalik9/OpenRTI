@@ -55,20 +55,13 @@ public:
     }
   }
 
-  void encodeInto(std::vector<Octet>& buffer)
-  {
-    align(buffer, getOctetBoundary());
-    for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      align(buffer, i->first->getOctetBoundary());
-      i->first->encodeInto(buffer);
-    }
-  }
-
   size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset)
   {
-    offset = align(offset, getOctetBoundary());
+#ifdef _DEBUG
+    if (bufferSize < offset + getEncodedLength())
+      throw EncoderException("buffer to small: bufferSize=" + std::to_string(bufferSize) + " offset=" + std::to_string(offset) + " encodedLength=" + std::to_string(getEncodedLength()));
+#endif
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      offset = align(offset, i->first->getOctetBoundary());
       offset = i->first->encodeInto(buffer, bufferSize, offset);
     }
     return offset;
@@ -76,9 +69,7 @@ public:
 
   size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   {
-    index = align(index, getOctetBoundary());
     for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      index = align(index, i->first->getOctetBoundary());
       index = i->first->decodeFrom(buffer, bufferSize, index);
     }
     return index;
@@ -96,17 +87,9 @@ public:
 
   unsigned int getOctetBoundary()
   {
-    if (_octetBoundary)
-      return _octetBoundary;
-
-    _octetBoundary = 1;
-    for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      unsigned int octetBoundary = i->first->getOctetBoundary();
-      if (_octetBoundary < octetBoundary)
-        continue;
-      _octetBoundary = octetBoundary;
-    }
-    return _octetBoundary;
+    if (_dataElementVector.empty())
+      return 1;
+    return _dataElementVector.front().first->getOctetBoundary();
   }
 
   bool isSameTypeAs(const HLAfixedRecordImplementation& rhs) const
@@ -222,11 +205,6 @@ HLAfixedRecord::encode() const
 void
 HLAfixedRecord::encode(VariableLengthData& outData) const
 {
-  //std::vector<Octet> buffer;
-  //buffer.reserve(getEncodedLength());
-  //encodeInto(buffer);
-  //if (!buffer.empty())
-  //  inData.setData(&buffer.front(), buffer.size());
   outData.resize(getEncodedLength());
   _impl->encodeInto(static_cast<Octet*>(outData.data()), outData.size(), 0);
 }
@@ -234,8 +212,10 @@ HLAfixedRecord::encode(VariableLengthData& outData) const
 void
 HLAfixedRecord::encodeInto(std::vector<Octet>& buffer) const
 {
-  buffer.resize(getEncodedLength());
-  _impl->encodeInto(buffer.data(), buffer.size(), 0);
+  size_t offset = buffer.size();
+  size_t encodedLength = getEncodedLength();
+  buffer.resize(offset + encodedLength);
+  _impl->encodeInto(static_cast<Octet*>(buffer.data()) + offset, encodedLength, offset);
 }
 
 size_t HLAfixedRecord::encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const

@@ -89,15 +89,6 @@ public:                                                                 \
     return *_valuePointer;                                              \
   }                                                                     \
                                                                         \
-  size_t align(size_t offset, size_t alignment) const                   \
-  { return (offset + alignment - 1) & ~(alignment - 1); }               \
-                                                                        \
-  void align(std::vector<Octet>& buffer, size_t alignment) const        \
-  {                                                                     \
-    while (buffer.size() % alignment)                                   \
-      buffer.push_back(0);                                              \
-  }                                                                     \
-                                                                        \
   SimpleDataType _value;                                                \
   SimpleDataType* _valuePointer;                                        \
 };                                                                      \
@@ -482,7 +473,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 2);
+  //offset = align(offset, 2);
   return encodeIntoBE16(buffer, bufferSize, offset, uint16_t(*_valuePointer));
 }
 
@@ -543,7 +534,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 2);
+  //offset = align(offset, 2);
   return encodeIntoBE16(buffer, bufferSize, offset, uint16_t(*_valuePointer));
 }
 
@@ -602,7 +593,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 2);
+  //offset = align(offset, 2);
   return encodeIntoLE16(buffer, bufferSize, offset, uint16_t(*_valuePointer));
 }
 
@@ -665,7 +656,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 4);
+  //offset = align(offset, 4);
   return encodeIntoBE32(buffer, bufferSize, offset, uint32_t(*_valuePointer));
 }
 
@@ -729,7 +720,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 4);
+  //offset = align(offset, 4);
   return encodeIntoLE32(buffer, bufferSize, offset, uint32_t(*_valuePointer));
 }
 
@@ -801,7 +792,9 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 8);
+  //size_t alignedOffset = align(offset, 8);
+  //for (Octet* p = buffer + offset; p < buffer + alignedOffset;p++)
+  //  *p = 0;
   return encodeIntoBE64(buffer, bufferSize, offset, uint64_t(*_valuePointer));
 }
 
@@ -872,7 +865,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 8);
+  //offset = align(offset, 8);
   return encodeIntoLE64(buffer, bufferSize, offset, uint64_t(*_valuePointer));
 }
 
@@ -1067,7 +1060,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 4);
+  //offset = align(offset, 4);
   union {
     uint32_t u;
     float s;
@@ -1148,7 +1141,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 4);
+  //offset = align(offset, 4);
   union {
     uint32_t u;
     float s;
@@ -1236,7 +1229,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 8);
+  //offset = align(offset, 8);
   union {
     uint64_t u;
     double s;
@@ -1325,7 +1318,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 8);
+  //offset = align(offset, 8);
   union {
     uint64_t u;
     double s;
@@ -1396,14 +1389,10 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   if (bufferSize < index + 4)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   uint32_t u;
-  u = uint32_t(uint8_t(buffer[index])) << 24;
-  u |= uint32_t(uint8_t(buffer[index + 1])) << 16;
-  u |= uint32_t(uint8_t(buffer[index + 2])) << 8;
-  u |= uint32_t(uint8_t(buffer[index + 3]));
+  index = decodeFromBE32(buffer, bufferSize, index, u);
   Integer32 length = Integer32(u);
   if (length < 0)
     length = 0;
-  index += 4;
 
   if (bufferSize < index + length)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -1433,7 +1422,7 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 4);
+  //offset = align(offset, 4);
   size_t length = _valuePointer->size();
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();
@@ -1545,7 +1534,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 4);
   size_t length = _valuePointer->size();
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();
@@ -1553,8 +1541,6 @@ size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
   for (size_t i = 0; i < length; ++i) {
     uint16_t unicodeChar = uint16_t((*_valuePointer)[i]);
     offset = encodeIntoBE16(buffer, bufferSize, offset, unicodeChar);
-    //buffer.push_back(uint8_t(unicodeChar >> 8));
-    //buffer.push_back(uint8_t(unicodeChar));
   }
   return offset;
 }

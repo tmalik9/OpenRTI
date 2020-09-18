@@ -28,7 +28,7 @@
 #include <cstring>
 #include <vector>
 #include <cassert>
-
+#include <iostream>
 #include "Encoding.h"
 #include "Export.h"
 
@@ -64,13 +64,14 @@ public:
 
   size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
   {
-    unsigned int octetBoundary = getOctetBoundary();
-    offset = align(offset, octetBoundary);
+#ifdef _DEBUG
+    if (bufferSize < offset + getEncodedLength())
+      throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
+#endif
     size_t length = _dataElementVector.size();
     if (0xffffffffu < length)
       throw EncoderException(L"HLAvariableArray::encodeInto(): array size is too big to encode!");
     offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<uint32_t>(length));
-    offset = align(offset, octetBoundary);
 
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
       if (i->first == nullptr)
@@ -79,25 +80,6 @@ public:
     }
     return offset;
   }
- void encodeInto(std::vector<Octet>& buffer) const
-  {
-    unsigned int octetBoundary = getOctetBoundary();
-    align(buffer, octetBoundary);
-    size_t length = _dataElementVector.size();
-    if (0xffffffffu < length)
-      throw EncoderException(L"HLAvariableArray::encodeInto(): array size is too big to encode!");
-    buffer.push_back(Octet(0xff & (length >> 24)));
-    buffer.push_back(Octet(0xff & (length >> 16)));
-    buffer.push_back(Octet(0xff & (length >> 8)));
-    buffer.push_back(Octet(0xff & (length)));
-    align(buffer, octetBoundary);
-
-    for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      if (i->first == nullptr)
-        throw EncoderException(L"HLAvariableArray::encodeInto(): dataElement is zero!");
-      i->first->encodeInto(buffer);
-    }
-  }
 
   size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   {
@@ -105,11 +87,8 @@ public:
     index = align(index, octetBoundary);
     if (bufferSize < index + 4)
       throw EncoderException(L"Insufficient buffer size for decoding!");
-    size_t length = size_t(buffer[index]) << 24;
-    length |= size_t(buffer[index + 1]) << 16;
-    length |= size_t(buffer[index + 2]) << 8;
-    length |= size_t(buffer[index + 3]);
-    index = align(index + 4, octetBoundary);
+    uint32_t length;
+    index = decodeFromBE32(buffer, bufferSize, index, length);
 
     // Shrink _dataElementVector if necessary, deleting owned elements.
     // Note that _dataElementVector contains DataElements.
@@ -142,8 +121,7 @@ public:
     return length;
   }
 
-  unsigned int getOctetBoundary() const
-  {
+  unsigned int getOctetBoundary() const {
     return std::max(_protoType->getOctetBoundary(), 4u);
   }
 
@@ -156,10 +134,8 @@ public:
     index = align(index, octetBoundary);
     if (bufferSize < index + 4)
       throw EncoderException(L"Insufficient buffer size for decoding!");
-    size_t length = size_t(buffer[index]) << 24;
-    length |= size_t(buffer[index + 1]) << 16;
-    length |= size_t(buffer[index + 2]) << 8;
-    length |= size_t(buffer[index + 3]);
+    uint32_t length;
+    decodeFromBE32(buffer, bufferSize, index, length);
     return length;
   }
 
@@ -280,7 +256,10 @@ HLAvariableArray::encode(VariableLengthData& outData) const
 void
 HLAvariableArray::encodeInto(std::vector<Octet>& buffer) const
 {
-  _impl->encodeInto(buffer);
+  size_t offset = buffer.size();
+  size_t encodedLength = getEncodedLength();
+  buffer.resize(offset + encodedLength);
+  _impl->encodeInto(static_cast<Octet*>(buffer.data()) + offset, encodedLength, offset);
 }
 
 size_t HLAvariableArray::encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
