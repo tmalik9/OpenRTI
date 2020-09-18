@@ -142,7 +142,9 @@ EncodableDataType::encode() const                                       \
 void                                                                    \
 EncodableDataType::encode(VariableLengthData& outData) const            \
 {                                                                       \
-  _impl->encode(outData);                                                \
+  outData.resize(getEncodedLength());                                   \
+  _impl->encodeInto(static_cast<Octet*>(outData.data()),                \
+                    outData.size(), 0);                                 \
 }                                                                       \
                                                                         \
 void                                                                    \
@@ -161,7 +163,8 @@ EncodableDataType::encodeInto(                                          \
 void                                                                    \
 EncodableDataType::decode(VariableLengthData const & inData)            \
 {                                                                       \
-  _impl->decode(inData);                                                \
+  _impl->decodeFrom(static_cast<const Octet*>(inData.data()),           \
+                   inData.size(), 0);                                   \
 }                                                                       \
                                                                         \
 size_t                                                                  \
@@ -226,21 +229,6 @@ EncodableDataType::operator SimpleDataType() const                      \
 
 // 8 bit values
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAASCIIchar, char,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getChar(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setChar(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
   if (index >= bufferSize)
@@ -278,21 +266,6 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAboolean, bool,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = bool(inData.getChar(0));
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setChar(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
   if (index >= bufferSize)
@@ -330,20 +303,6 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAbyte, Octet,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getInt8(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setInt8(*_valuePointer, 0);
-}
 
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
@@ -382,21 +341,6 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAoctet, Octet,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getInt8(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setInt8(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
   if (index >= bufferSize)
@@ -436,24 +380,8 @@ Integer64 hash() const
 
 // > 8 bit values, fixed endianess
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAunicodeChar, wchar_t,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getUInt16BE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setUInt16BE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 2);
   if (bufferSize < index + 2)
     throw EncoderException("Insufficient buffer size for decoding!");
   uint16_t u;
@@ -465,7 +393,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 2);
   uint16_t u = uint16_t(*_valuePointer);
   buffer.push_back(uint8_t(u >> 8));
   buffer.push_back(uint8_t(u));
@@ -473,7 +400,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 2);
   return encodeIntoBE16(buffer, bufferSize, offset, uint16_t(*_valuePointer));
 }
 
@@ -497,24 +423,8 @@ Integer64 hash() const
 
 // > 8 bit values, both endianess
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger16BE, Integer16,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getInt16BE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setInt16BE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 2);
   if (bufferSize < index + 2)
     throw EncoderException("Insufficient buffer size for decoding!");
   uint16_t u;
@@ -526,7 +436,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 2);
   uint16_t u = *_valuePointer;
   buffer.push_back(uint8_t(u >> 8));
   buffer.push_back(uint8_t(u));
@@ -534,7 +443,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 2);
   return encodeIntoBE16(buffer, bufferSize, offset, uint16_t(*_valuePointer));
 }
 
@@ -556,24 +464,8 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger16LE, Integer16,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getInt16LE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setInt16LE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 2);
   if (bufferSize < index + 2)
     throw EncoderException("Insufficient buffer size for decoding!");
   uint16_t u;
@@ -585,7 +477,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 2);
   uint16_t u = uint16_t(*_valuePointer);
   buffer.push_back(uint8_t(u));
   buffer.push_back(uint8_t(u >> 8));
@@ -593,7 +484,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 2);
   return encodeIntoLE16(buffer, bufferSize, offset, uint16_t(*_valuePointer));
 }
 
@@ -615,24 +505,8 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger32BE, Integer32,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getInt32BE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setInt32BE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 4);
   if (bufferSize < index + 4)
     throw EncoderException("Insufficient buffer size for decoding!");
   uint32_t u;
@@ -646,7 +520,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 4);
   uint32_t u = uint32_t(*_valuePointer);
   buffer.push_back(uint8_t(u >> 24));
   buffer.push_back(uint8_t(u >> 16));
@@ -656,7 +529,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  //offset = align(offset, 4);
   return encodeIntoBE32(buffer, bufferSize, offset, uint32_t(*_valuePointer));
 }
 
@@ -679,24 +551,8 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger32LE, Integer32,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getInt32LE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setInt32LE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 4);
   if (bufferSize < index + 4)
     throw EncoderException("Insufficient buffer size for decoding!");
   uint32_t u;
@@ -710,7 +566,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 4);
   uint32_t u = uint32_t(*_valuePointer);
   buffer.push_back(uint8_t(u));
   buffer.push_back(uint8_t(u >> 8));
@@ -720,7 +575,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  //offset = align(offset, 4);
   return encodeIntoLE32(buffer, bufferSize, offset, uint32_t(*_valuePointer));
 }
 
@@ -742,24 +596,8 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger64BE, Integer64,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getInt64BE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setInt64BE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 8);
   if (bufferSize < index + 8)
     throw EncoderException("Insufficient buffer size for decoding!");
   uint64_t u;
@@ -777,7 +615,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 8);
   uint64_t u = uint64_t(*_valuePointer);
   buffer.push_back(uint8_t(u >> 56));
   buffer.push_back(uint8_t(u >> 48));
@@ -792,9 +629,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  //size_t alignedOffset = align(offset, 8);
-  //for (Octet* p = buffer + offset; p < buffer + alignedOffset;p++)
-  //  *p = 0;
   return encodeIntoBE64(buffer, bufferSize, offset, uint64_t(*_valuePointer));
 }
 
@@ -816,24 +650,8 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger64LE, Integer64,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getInt64LE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setInt64LE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 8);
   if (bufferSize < index + 8)
     throw EncoderException("Insufficient buffer size for decoding!");
   uint64_t u;
@@ -851,7 +669,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 8);
   uint64_t u = uint64_t(*_valuePointer);
   buffer.push_back(uint8_t(u));
   buffer.push_back(uint8_t(u >> 8));
@@ -865,7 +682,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 8);
   return encodeIntoLE64(buffer, bufferSize, offset, uint64_t(*_valuePointer));
 }
 
@@ -887,26 +703,9 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAoctetPairBE, OctetPair,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  _valuePointer->first = inData.getChar(0);
-  _valuePointer->second = inData.getChar(1);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setChar(_valuePointer->first, 0);
-  inData.setChar(_valuePointer->second, 1);
-}
 
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 2);
   if (bufferSize < index + 2)
     throw EncoderException("Insufficient buffer size for decoding!");
   _valuePointer->first = buffer[index];
@@ -916,14 +715,12 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 2);
   buffer.push_back(_valuePointer->first);
   buffer.push_back(_valuePointer->second);
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 2);
   auto* p = buffer + offset;
   *p++ = _valuePointer->first;
   *p++ = _valuePointer->second;
@@ -949,26 +746,8 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAoctetPairLE, OctetPair,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  _valuePointer->second = inData.getChar(0);
-  _valuePointer->first = inData.getChar(1);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setChar(_valuePointer->second, 0);
-  inData.setChar(_valuePointer->first, 1);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 2);
   if (bufferSize < index + 2)
     throw EncoderException("Insufficient buffer size for decoding!");
   _valuePointer->second = buffer[index];
@@ -978,14 +757,12 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 2);
   buffer.push_back(_valuePointer->second);
   buffer.push_back(_valuePointer->first);
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  offset = align(offset, 2);
   auto* p = buffer + offset;
   *p++ = _valuePointer->second;
   *p++ = _valuePointer->first;
@@ -1012,24 +789,8 @@ Integer64 hash() const
 
 // float, > 8 bit values, both endianess
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAfloat32BE, float,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getFloat32BE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setFloat32BE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 4);
   if (bufferSize < index + 4)
     throw EncoderException("Insufficient buffer size for decoding!");
   union {
@@ -1046,7 +807,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 4);
   union {
     uint32_t u;
     float s;
@@ -1060,7 +820,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  //offset = align(offset, 4);
   union {
     uint32_t u;
     float s;
@@ -1093,24 +852,8 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAfloat32LE, float,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getFloat32LE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setFloat32LE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 4);
   if (bufferSize < index + 4)
     throw EncoderException("Insufficient buffer size for decoding!");
   union {
@@ -1127,7 +870,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 4);
   union {
     uint32_t u;
     float s;
@@ -1141,7 +883,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  //offset = align(offset, 4);
   union {
     uint32_t u;
     float s;
@@ -1173,24 +914,8 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAfloat64BE, double,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getFloat64BE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setFloat64BE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 8);
   if (bufferSize < index + 8)
     throw EncoderException("Insufficient buffer size for decoding!");
   union {
@@ -1211,7 +936,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 8);
   union {
     uint64_t u;
     double s;
@@ -1229,9 +953,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  //size_t alignedOffset = align(offset, 8);
-  //for (Octet* p = buffer + offset; p < buffer + alignedOffset;p++)
-  //  *p = 0;
   union {
     uint64_t u;
     double s;
@@ -1264,24 +985,8 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAfloat64LE, double,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() != getEncodedLength())
-    throw EncoderException("Insufficient buffer size for decoding!");
-  *_valuePointer = inData.getFloat64LE(0);
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  inData.resize(getEncodedLength());
-  inData.setFloat64LE(*_valuePointer, 0);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 8);
   if (bufferSize < index + 8)
     throw EncoderException("Insufficient buffer size for decoding!");
   union {
@@ -1302,7 +1007,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 8);
   union {
     uint64_t u;
     double s;
@@ -1320,7 +1024,6 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  //offset = align(offset, 8);
   union {
     uint64_t u;
     double s;
@@ -1354,40 +1057,8 @@ Integer64 hash() const
 
 // Array values
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAASCIIstring, std::string,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() < 4)
-    throw EncoderException("Insufficient buffer size for decoding!");
-
-  Integer32 length = inData.getInt32BE(0);
-  if (length < 0)
-    length = 0;
-
-  if (inData.size() < static_cast<size_t>(4 + length))
-    throw EncoderException("Insufficient buffer size for decoding!");
-  _valuePointer->clear();
-  _valuePointer->reserve(length);
-  for (Integer32 i = 0; i < length; ++i)
-    _valuePointer->push_back(inData.getChar(4 + i));
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  size_t length = _valuePointer->size();
-  if (std::numeric_limits<Integer32>::max() < length)
-    length = std::numeric_limits<Integer32>::max();
-  inData.resize(length + 4);
-  inData.setInt32BE(static_cast<int32_t>(length), 0);
-
-  for (size_t i = 0; i < length; ++i)
-    inData.setChar((*_valuePointer)[i], 4 + i);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 4);
   if (bufferSize < index + 4)
     throw EncoderException("Insufficient buffer size for decoding!");
   uint32_t u;
@@ -1408,7 +1079,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 4);
   size_t length = _valuePointer->size();
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();
@@ -1424,11 +1094,9 @@ void encodeInto(std::vector<Octet>& buffer) const
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  //offset = align(offset, 4);
   size_t length = _valuePointer->size();
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();
-  //int32_t u = static_cast<int32_t>(length);
   offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<int32_t>(length));
   memcpy(buffer + offset, _valuePointer->data(), static_cast<int32_t>(length));
   return offset + length;
@@ -1455,51 +1123,15 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAunicodeString, std::wstring,
-void
-decode(OpenRTI::VariableLengthData const & inData)
-{
-  if (inData.size() < 4)
-    throw EncoderException("Insufficient buffer size for decoding!");
-
-  Integer32 length = inData.getInt32BE(0);
-  if (length < 0)
-    length = 0;
-
-  if (inData.size() < 4 + 2*length)
-    throw EncoderException("Insufficient buffer size for decoding!");
-  _valuePointer->clear();
-  _valuePointer->reserve(length);
-  for (Integer32 i = 0; i < length; ++i)
-    _valuePointer->push_back(inData.getUInt16BE(4 + 2*i));
-}
-
-void
-encode(OpenRTI::VariableLengthData& inData) const
-{
-  size_t length = _valuePointer->size();
-  if (std::numeric_limits<Integer32>::max() < length)
-    length = std::numeric_limits<Integer32>::max();
-  inData.resize(2*length + 4);
-  inData.setInt32BE(static_cast<int32_t>(length), 0);
-
-  for (size_t i = 0; i < length; ++i)
-    inData.setUInt16BE((*_valuePointer)[i], 4 + 2*i);
-}
-
 size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
-  index = align(index, 4);
   if (bufferSize < index + 4)
     throw EncoderException("Insufficient buffer size for decoding!");
-  uint32_t encodedLength;
-  encodedLength = uint32_t(uint8_t(buffer[index])) << 24;
-  encodedLength |= uint32_t(uint8_t(buffer[index + 1])) << 16;
-  encodedLength |= uint32_t(uint8_t(buffer[index + 2])) << 8;
-  encodedLength |= uint32_t(uint8_t(buffer[index + 3]));
-  Integer32 length = Integer32(encodedLength);
+  uint32_t u;
+  index = decodeFromBE32(buffer, bufferSize, index, u);
+  Integer32 length = Integer32(u);
   if (length < 0)
     length = 0;
-  index += 4;
 
   if (bufferSize < index + 2*length)
     throw EncoderException("Insufficient buffer size for decoding!");
@@ -1518,7 +1150,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 
 void encodeInto(std::vector<Octet>& buffer) const
 {
-  align(buffer, 4);
   size_t length = _valuePointer->size();
   if (std::numeric_limits<Integer32>::max() < length)
     length = std::numeric_limits<Integer32>::max();

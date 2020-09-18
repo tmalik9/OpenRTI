@@ -66,7 +66,6 @@ public:
   {
     size_t length = 0;
     for (auto& element : _dataElementVector) {
-      length = align(length, element.first->getOctetBoundary());
       length += element.first->getEncodedLength();
     }
     return length;

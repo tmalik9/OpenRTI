@@ -48,7 +48,7 @@ namespace OpenRTI
       virtual ~HLAvariableArray ();
 
       // Return a new copy of the DataElement
-      virtual std::unique_ptr<DataElement> clone () const;
+      virtual std::unique_ptr<DataElement> clone () const override;
 
       // Encode this element into a new VariableLengthData
       virtual VariableLengthData encode () const override;
@@ -65,20 +65,20 @@ namespace OpenRTI
 
       // Decode this element from the RTI's VariableLengthData.
       virtual void decode (
-         VariableLengthData const & inData);
+         VariableLengthData const & inData) override;
 
       // Decode this element starting at the index in the provided buffer
       virtual size_t decodeFrom (
          std::vector<Octet> const & buffer,
-         size_t index);
+         size_t index) override;
 
       size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override;
 
       // Return the size in bytes of this element's encoding.
-      virtual size_t getEncodedLength () const;
+      virtual size_t getEncodedLength () const override;
 
       // Return the octet boundary of this element.
-      virtual unsigned int getOctetBoundary () const;
+      virtual unsigned int getOctetBoundary () const override;
 
       // Return the number of elements in this variable array.
       virtual size_t size () const;
@@ -87,7 +87,7 @@ namespace OpenRTI
 
       // Return true if given element is same type as this; otherwise, false.
       virtual bool isSameTypeAs(
-         DataElement const& inData ) const;
+         DataElement const& inData ) const override;
 
       // Return true if given element matches prototype of array.
       virtual bool hasPrototypeSameTypeAs(DataElement const& dataElement ) const;
@@ -134,7 +134,6 @@ namespace OpenRTI
       HLAvariableArray& operator=(HLAvariableArray const & rhs);
       HLAvariableArray& operator=(HLAvariableArray&& rhs);
 
-      void setDataBuffer(void* buffer, size_t bytes);
    private:
 
       // Default Constructor not allowed
