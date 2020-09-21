@@ -26,10 +26,12 @@
 
 // Have a central place where define the currently only supported protocol version
 #define OPENRTI_ENCODING_VERSION "8"
-// Define this if we want to are in the development phase and the protocol
-// is expected to change without further notice! This message is printed on each connect happening then!
-// #define OPENRTI_ENCODING_DEVELOPMENT_WARNING \
-// "Using development message encoding!\nMessage encoding compatibility is not enforced by OpenRTI!"
+/*
+ Define this if we want to are in the development phase and the protocol
+ is expected to change without further notice! This message is printed on each connect happening then!
+ #define OPENRTI_ENCODING_DEVELOPMENT_WARNING \
+ "Using development message encoding!\nMessage encoding compatibility is not enforced by OpenRTI!"
+ */
 
 namespace OpenRTI {
 

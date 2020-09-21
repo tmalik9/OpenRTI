@@ -59,7 +59,7 @@ InternalAmbassador::~InternalAmbassador()
   }
   catch (Exception& e)
   {
-    CondDebugPrintf("%s: %S\n", e.getReason().c_str());
+    DebugPrintf("%s: %S\n", e.getReason().c_str());
   }
   _connect.clear();
 }

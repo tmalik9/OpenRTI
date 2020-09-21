@@ -367,7 +367,9 @@ InteractionHandlerFederateRequestInteractionsReceived::InteractionHandlerFederat
   assert(mRequestInteractionHandle.valid());
   {
     MomManager::InteractionClassAccessor response = mom->interactions["HLAinteractionRoot"]["HLAmanager"]["HLAfederate"]["HLAreport"]["HLAreportInteractionsReceived"];
+#ifndef NDEBUG
     InteractionClassHandle reponseInteraction = response;
+#endif
     assert(reponseInteraction.valid());
     mResponseFederateParameter = response.parameters["HLAfederate"];
     mParameterGetters[mResponseFederateParameter] = [this] { return mMomManager->getEncodedFederateHandle(); };

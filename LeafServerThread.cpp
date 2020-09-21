@@ -30,6 +30,8 @@
 #include "ThreadServer.h"
 
 namespace OpenRTI {
+  
+static const uint32_t kInfinite = static_cast<uint32_t>(-1);
 
 class OPENRTI_LOCAL LeafServerThread::_Registry : public Referenced {
 public:
@@ -140,7 +142,7 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
     SharedPtr<NetworkServer> server = new NetworkServer(serverNode);
 
     server->setServerName("Leaf server");
-    Clock abstime = (timeoutMilliSeconds == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
+    Clock abstime = (timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
     server->connectParentServer(url, abstime);
 
     return server;
@@ -157,7 +159,7 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
       } else if (stringPair.first == "listen") {
         server->listen(URL::fromUrl(stringPair.second), 20);
       } else if (stringPair.first == "parent") {
-        Clock abstime = (timeoutMilliSeconds == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
+        Clock abstime = (timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
         server->connectParentServer(URL::fromUrl(stringPair.second), abstime);
       }
     }
