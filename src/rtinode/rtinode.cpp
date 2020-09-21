@@ -188,7 +188,12 @@ main(int argc, char* argv[])
     std::cerr << "Running in background is not yet supported!" << std::endl;
 #else
   if (background)
-    daemon(0, 0);
+  {
+    if (daemon(0, 0) != 0)
+    {
+      perror("daemon() failed");
+    }
+  }
 #endif
 
 #if !defined(_WIN32)

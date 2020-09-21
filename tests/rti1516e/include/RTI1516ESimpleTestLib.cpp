@@ -136,6 +136,7 @@ rti1516e::VariableLengthData toVariableLengthData(const wchar_t* s)
 static const wchar_t kFederateType[] = L"Example";
 
 SimpleTestFederate::SimpleTestFederate()
+  : _done(false)
 {
 #ifdef _WIN32
   mHandle = std::unique_ptr<VRTNotificationHandle>(new VRTNotificationHandle());

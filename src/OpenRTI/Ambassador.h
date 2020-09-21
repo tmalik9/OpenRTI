@@ -49,7 +49,7 @@ public:
   // Times
   typedef typename Traits::NativeLogicalTime NativeLogicalTime;
   typedef typename Traits::NativeLogicalTimeInterval NativeLogicalTimeInterval;
-
+  static const uint32_t kInfinite = static_cast<uint32_t>(-1);
   Ambassador()
     : _callbacksEnabled(true)
     , _connectWaitTimeout(70 * 1000)
@@ -134,7 +134,7 @@ public:
 
     // The maximum abstime to try to connect
 
-    Clock abstime = (_operationWaitTimeout == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
+    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
     // Send this message and wait for the response
     send(request);
 
@@ -164,7 +164,7 @@ public:
     SharedPtr<DestroyFederationExecutionRequestMessage> request = new DestroyFederationExecutionRequestMessage;
     request->setFederationExecution(federationExecutionName);
 
-    Clock abstime = (_operationWaitTimeout == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
+    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
 
     // Send this message and wait for the response
     send(request);
@@ -214,7 +214,7 @@ public:
       throw FederateAlreadyExecutionMember();
 
     // The maximum abstime to try to connect
-    Clock abstime = (_operationWaitTimeout == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
+    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
 
     // The destroy request message
     SharedPtr<JoinFederationExecutionRequestMessage> request;
@@ -301,7 +301,7 @@ public:
     // We should no longer respond to time regulation requests.
     _timeManagement = 0;
 
-    Clock abstime = (_operationWaitTimeout == -1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
+    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
     if (!dispatchWaitEraseFederationExecutionResponse(abstime))
       throw RTIinternalError("resignFederationExecution hit timeout!");
 

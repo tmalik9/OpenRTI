@@ -56,7 +56,7 @@ std::wstring requests[]{
 };
 size_t numRequests = sizeof(requests) / sizeof(requests[0]);
 
-ManagerFederate::ManagerFederate() : NullFederateAmbassador()
+ManagerFederate::ManagerFederate() : NullFederateAmbassador(), _done(false)
 {
   //mHandle = std::unique_ptr<VRTNotificationHandle>(new VRTNotificationHandle());
 }
@@ -405,7 +405,7 @@ void ManagerFederate::decodeBoolean(const VariableLengthData& value)
 {
   HLAboolean decodedValue;
   decodedValue.decode(value);
-  std::cout << " bool=" << decodedValue.get() ? "true" : "false";
+  std::cout << " bool=" << (decodedValue.get() ? "true" : "false");
 }
 
 /**
@@ -422,8 +422,10 @@ void ManagerFederate::receiveInteraction(
   std::cout << "Interaction Received: " << to_string(mRtiAmb->getInteractionClassName(theInteraction));
   std::cout << ", parameterCount=" << theParameterValues.size();
   std::cout << ", sentOrder=" << sentOrder << std::endl;
-  for (auto [p, v] : theParameterValues)
+  for (auto pv : theParameterValues)
   {
+    auto p = pv.first;
+    auto v = pv.second;
     /// print the parameter handle
     std::wstring paramName = mRtiAmb->getParameterName(theInteraction, p);
     std::cout << "\tparam=" << to_string(paramName) << " value=" << v.size() << " bytes";

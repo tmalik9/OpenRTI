@@ -55,11 +55,11 @@ rti1516e::AttributeHandleValueMap MomFederation::GetAttributeValues(AttributeHan
 
 void MomFederation::SetAttributeValues(const AttributeHandleValueMap& attributes)
 {
-  for (auto[attributeHandle, attributeValue] : attributes)
+  for (auto attribute : attributes)
   {
-    if (mAttributeSetters.find(attributeHandle) != mAttributeSetters.end())
+    if (mAttributeSetters.find(attribute.first) != mAttributeSetters.end())
     {
-      mAttributeSetters[attributeHandle](attributeValue);
+      mAttributeSetters[attribute.first](attribute.second);
     }
   }
 }

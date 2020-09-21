@@ -40,7 +40,6 @@ namespace rti1516
   }                                                                     \
                                                                         \
   HandleKind::~HandleKind()                                             \
-    throw()                                                             \
   {                                                                     \
     HandleKind##Implementation::putAndDelete(_impl);                    \
   }                                                                     \

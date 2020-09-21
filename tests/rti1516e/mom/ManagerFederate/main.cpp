@@ -14,12 +14,14 @@ void helpmenu(const char* progname)
 
 ManagerFederate* federate = nullptr;
 
+#ifdef _WIN32
 static void DumpHeap()
 {
   _CrtDumpMemoryLeaks();
 }
 
 static int initHeapDump = atexit( DumpHeap);
+#endif
 
 extern "C" {
 

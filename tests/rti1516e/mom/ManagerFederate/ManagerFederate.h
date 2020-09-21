@@ -127,6 +127,6 @@ class ManagerFederate : public NullFederateAmbassador
     std::shared_ptr<Mom> mom;
     std::map<ParameterHandle, std::function<void(const VariableLengthData&)>> mDecoders;
     std::wstring mFederationName;
-    std::atomic_bool _done = false;
+    std::atomic_bool _done;
 };
 

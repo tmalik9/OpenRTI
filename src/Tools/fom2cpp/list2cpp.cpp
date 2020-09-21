@@ -118,7 +118,7 @@ bool OutputList::outputToFile(std::string filename, std::string varname)
 void OutputList::outputToFileAsChar(std::ostream& file, std::string varname)
 {
   file << "\n#pragma once\n";
-  file << "\ninline const char *" << varname << " = \n";
+  file << "\nstatic const char *" << varname << " = \n";
   for (std::size_t i = 0; i < size(); ++i)
   {
     file << "  \"" << items[i] << "\"";

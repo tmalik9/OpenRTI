@@ -146,6 +146,8 @@ static void loadModules(OpenRTI::FOMStringModuleList& fomModuleList, const std::
 // unreferenced local function has been removed
 #pragma warning(disable: 4505)
 
+/*
+// unused yet
 static OpenRTI::CallbackModel translate(rti1516e::CallbackModel callbackModel)
 {
   switch (callbackModel) {
@@ -156,7 +158,7 @@ static OpenRTI::CallbackModel translate(rti1516e::CallbackModel callbackModel)
     return OpenRTI::HLA_EVOKED;
   }
 }
-
+*/
 static rti1516e::OrderType translate(OpenRTI::OrderType orderType)
 {
   switch (orderType) {

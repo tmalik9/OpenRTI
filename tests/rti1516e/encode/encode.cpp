@@ -42,7 +42,9 @@
 #include <RTI1516ETestLib.h>
 
 #include "Rand.h"
+#ifdef _WIN32
 #include <crtdbg.h>
+#endif
 
 typedef rti1516e::HLAinteger32BE HLAcount;
 
@@ -159,12 +161,13 @@ class OPENRTI_LOCAL HLAinteractionSubscription : public rti1516e::HLAfixedRecord
 constexpr bool gDebugPrint = true;
 constexpr int doIterations = 5;
 
+#ifdef _WIN32
 static void DumpHeap()
 {
   _CrtDumpMemoryLeaks();
 }
-
 static int initHeapDump = atexit( DumpHeap);
+#endif
 
 struct DataType
 {
@@ -359,6 +362,18 @@ DataType::getAlignment() const
       return 1;
   }
 }
+
+//template <typename T>
+//struct MyRandom
+//{
+//  static inline T operator() {
+//    return static_cast<T>(rand());
+//  }
+//};
+
+//template <> struct MyRandom<std::string>
+//{std::string operator(){std::string result;return result;}
+//};
 
 std::unique_ptr<rti1516e::DataElement>
 DataType::createDataElement(OpenRTI::Rand& rand) const
@@ -1176,7 +1191,7 @@ void Leaktest()
   std::list<rti1516e::VariableLengthData> theData;
   std::mutex m;
   std::condition_variable cv;
-  std::atomic_bool finish = false;
+  std::atomic_bool finish{false};
   std::thread process(ProcessData, std::ref(theData), std::ref(cv), std::ref(m), std::ref(finish));
 
   for (int i = 0; i< 1000; i++)

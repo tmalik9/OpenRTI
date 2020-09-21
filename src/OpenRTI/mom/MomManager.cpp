@@ -765,7 +765,9 @@ bool MomManager::receiveInteraction(InteractionClassHandle theInteraction, Param
       MomInteractionHandler::ResponseList responses = (*handler->second)(requestParameters);
       for (auto it_ic_pv : responses)
       {
+#ifndef NDEBUG
         FederateHandle responseFederate = handler->second->getFederateHandleFromResponse(it_ic_pv.second);
+#endif
         assert(requestedFederate.valid());
         assert(responseFederate.valid());
         assert(requestedFederate == responseFederate);
@@ -981,7 +983,6 @@ MomManager::MomTreeNodeBuilder& MomManager::MomTreeNodeBuilder::parameter(std::s
 
   try
   {
-    InteractionClassHandle interactionClass = mContextStack.front()->interactionClassHandle;
     ParameterHandle handle = mMomServer->getParameterHandle(mContextStack.front()->interactionClassHandle, name);
     assert(handle.valid());
     MomTreeNode* node = new MomTreeNode(name, MomType::Parameter, handle, datatype);

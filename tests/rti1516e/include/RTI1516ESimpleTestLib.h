@@ -204,5 +204,5 @@ protected:
     bool _syncedReadyToRun;
     bool _syncedAllDone;
 
-    std::atomic_bool _done = false;
+    std::atomic_bool _done;
 };

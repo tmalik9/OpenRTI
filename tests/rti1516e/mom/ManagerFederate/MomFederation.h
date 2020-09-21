@@ -50,7 +50,7 @@ class MomFederation : public std::enable_shared_from_this<MomFederation>
     void SetFOMmoduleDesignatorList(const std::vector<std::wstring>& fomDesignatorList);
 
     std::wstring GetCurrentFDD() const { return mCurrentFDD.get(); }
-    std::wstring SetCurrentFDD(const std::wstring& value) { mCurrentFDD.set(value); }
+    void SetCurrentFDD(const std::wstring& value) { mCurrentFDD.set(value); }
 
   private:
     std::map<AttributeHandle, std::function<VariableLengthData()>> mAttributeGetters;

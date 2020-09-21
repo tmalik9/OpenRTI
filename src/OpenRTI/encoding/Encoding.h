@@ -56,6 +56,42 @@ static inline size_t encodeIntoBE64(Octet* buffer, size_t bufferSize, size_t off
   return offset + 8;
 }
 
+static inline size_t decodeFromBE64(const Octet* buffer, size_t bufferSize, size_t offset, uint64_t& value)
+{
+  if (bufferSize < offset + 8)
+  {
+    throw EncoderException("provided buffer too small");
+  }
+  const Octet* p = buffer + offset;
+  value  = uint64_t(*p++) << 56;
+  value |= uint64_t(*p++) << 48;
+  value |= uint64_t(*p++) << 40;
+  value |= uint64_t(*p++) << 32;
+  value |= uint64_t(*p++) << 24;
+  value |= uint64_t(*p++) << 16;
+  value |= uint64_t(*p++) << 8;
+  value |= uint64_t(*p++);
+  return offset + 8;
+}
+
+static inline size_t decodeFromLE64(const Octet* buffer, size_t bufferSize, size_t offset, uint64_t& value)
+{
+  if (bufferSize < offset + 8)
+  {
+    throw EncoderException("provided buffer too small");
+  }
+  const Octet* p = buffer + offset;
+  value  = uint64_t(*p++);
+  value |= uint64_t(*p++) << 8;
+  value |= uint64_t(*p++) << 16;
+  value |= uint64_t(*p++) << 24;
+  value |= uint64_t(*p++) << 32;
+  value |= uint64_t(*p++) << 40;
+  value |= uint64_t(*p++) << 48;
+  value |= uint64_t(*p++) << 56;
+  return offset + 8;
+}
+
 static inline size_t encodeIntoLE32(Octet* buffer, size_t bufferSize, size_t offset, uint32_t value)
 {
   if (bufferSize < offset + 4)
@@ -90,10 +126,25 @@ static inline size_t decodeFromBE32(const Octet* buffer, size_t bufferSize, size
   {
     throw EncoderException("provided buffer too small");
   }
-  value = size_t(buffer[offset]) << 24;
-  value |= size_t(buffer[offset + 1]) << 16;
-  value |= size_t(buffer[offset + 2]) << 8;
-  value |= size_t(buffer[offset + 3]);
+  const Octet* p = buffer + offset;
+  value  = uint32_t(*p++) << 24;
+  value |= uint32_t(*p++) << 16;
+  value |= uint32_t(*p++) << 8;
+  value |= uint32_t(*p++);
+  return offset + 4;
+}
+
+static inline size_t decodeFromLE32(const Octet* buffer, size_t bufferSize, size_t offset, uint32_t& value)
+{
+  if (bufferSize < offset + 4)
+  {
+    throw EncoderException("provided buffer too small");
+  }
+  const Octet* p = buffer + offset;
+  value  = uint32_t(*p++);
+  value |= uint32_t(*p++) << 8;
+  value |= uint32_t(*p++) << 16;
+  value |= uint32_t(*p++) << 24;
   return offset + 4;
 }
 
@@ -120,5 +171,30 @@ static inline size_t encodeIntoBE16(Octet* buffer, size_t bufferSize, size_t off
   *p++ = Octet(0xff & (value));
   return offset + 2;
 }
+
+static inline size_t decodeFromBE16(const Octet* buffer, size_t bufferSize, size_t offset, uint16_t& value)
+{
+  if (bufferSize < offset + 2)
+  {
+    throw EncoderException("provided buffer too small");
+  }
+  const Octet* p = buffer + offset;
+  value  = uint16_t(*p++) << 8;
+  value |= uint16_t(*p++);
+  return offset + 2;
+}
+
+static inline size_t decodeFromLE16(const Octet* buffer, size_t bufferSize, size_t offset, uint16_t& value)
+{
+  if (bufferSize < offset + 2)
+  {
+    throw EncoderException("provided buffer too small");
+  }
+  const Octet* p = buffer + offset;
+  value  = uint16_t(*p++);
+  value |= uint16_t(*p++) << 8;
+  return offset + 2;
+}
+
 
 }

@@ -111,6 +111,7 @@ endif()
 set(OPENRTI_ENABLE_RTI13 OFF CACHE BOOL "Build and install the RTI13 interface.")
 set(OPENRTI_ENABLE_RTI1516 OFF CACHE BOOL "Build and install the RTI1516 interface.")
 set(OPENRTI_ENABLE_RTI1516E ON CACHE BOOL "Build and install the RTI1516E interface (EXPERIMENTAL).")
+OPTION(OPENRTI_ENABLE_TESTS "Build and install the test suite." OFF)
 
 set(OPENRTI_ENABLE_PYTHON_BINDINGS ON CACHE BOOL "Build python binding extension modules.")
 
@@ -161,6 +162,13 @@ if(MACOS)
   endif()
 endif()
 
+message("building with compiler \"" ${CMAKE_CXX_COMPILER_ID} "\"")
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-reorder>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unknown-pragmas>)
+endif()
 # Work around some linux linkers that seem to default to --as-needed
 # Actually this also works around cmake reordering the link dependencies
 # ... well and not to forget that the problem originates from that
@@ -220,5 +228,10 @@ endfunction()
 # bkd: Disable tests
 add_subdirectory(python)
 add_subdirectory(src)
-#add_subdirectory(tests)
+if(OPENRTI_ENABLE_TESTS)
+  message("building with tests")
+add_subdirectory(tests)
+else()
+  message(WARNING "building without tests")
+endif()
 

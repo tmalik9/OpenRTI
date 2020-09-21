@@ -150,7 +150,11 @@ EncodableDataType::encode(VariableLengthData& outData) const            \
 void                                                                    \
 EncodableDataType::encodeInto(std::vector<Octet>& buffer) const         \
 {                                                                       \
-  return _impl->encodeInto(buffer);                                     \
+  size_t offset = buffer.size();                                        \
+  size_t encodedLength = getEncodedLength();                            \
+  buffer.resize(offset + encodedLength);                                \
+  _impl->encodeInto(static_cast<Octet*>(buffer.data()) + offset,        \
+                    encodedLength, offset);                             \
 }                                                                       \
                                                                         \
 size_t                                                                  \
@@ -237,11 +241,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  buffer.push_back(*_valuePointer);
-}
-
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
   *(buffer + offset) = *_valuePointer;
@@ -272,11 +271,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   *_valuePointer = bool(buffer[index]);
   return index + 1;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  buffer.push_back(*_valuePointer);
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -312,11 +306,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  buffer.push_back(*_valuePointer);
-}
-
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
   *(buffer + offset) = *_valuePointer;
@@ -347,11 +336,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   *_valuePointer = buffer[index];
   return index + 1;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  buffer.push_back(*_valuePointer);
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -385,17 +369,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   if (bufferSize < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   uint16_t u;
-  u = uint16_t(uint8_t(buffer[index])) << 8;
-  u |= uint16_t(uint8_t(buffer[index + 1]));
+  index = decodeFromBE16(buffer, bufferSize, index, u);
   *_valuePointer = wchar_t(u);
-  return index + 2;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  uint16_t u = uint16_t(*_valuePointer);
-  buffer.push_back(uint8_t(u >> 8));
-  buffer.push_back(uint8_t(u));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -428,17 +404,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   if (bufferSize < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   uint16_t u;
-  u = uint16_t(uint8_t(buffer[index])) << 8;
-  u |= uint16_t(uint8_t(buffer[index + 1]));
+  index = decodeFromBE16(buffer, bufferSize, index, u);
   *_valuePointer = Integer16(u);
-  return index + 2;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  uint16_t u = *_valuePointer;
-  buffer.push_back(uint8_t(u >> 8));
-  buffer.push_back(uint8_t(u));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -469,17 +437,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   if (bufferSize < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   uint16_t u;
-  u = uint16_t(uint8_t(buffer[index]));
-  u |= uint16_t(uint8_t(buffer[index + 1])) << 8;
+  index = decodeFromLE16(buffer, bufferSize, index, u);
   *_valuePointer = Integer16(u);
-  return index + 2;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  uint16_t u = uint16_t(*_valuePointer);
-  buffer.push_back(uint8_t(u));
-  buffer.push_back(uint8_t(u >> 8));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -510,21 +470,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   if (bufferSize < index + 4)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   uint32_t u;
-  u = uint32_t(uint8_t(buffer[index])) << 24;
-  u |= uint32_t(uint8_t(buffer[index + 1])) << 16;
-  u |= uint32_t(uint8_t(buffer[index + 2])) << 8;
-  u |= uint32_t(uint8_t(buffer[index + 3]));
+  index = decodeFromBE32(buffer, bufferSize, index, u);
   *_valuePointer = Integer32(u);
-  return index + 4;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  uint32_t u = uint32_t(*_valuePointer);
-  buffer.push_back(uint8_t(u >> 24));
-  buffer.push_back(uint8_t(u >> 16));
-  buffer.push_back(uint8_t(u >> 8));
-  buffer.push_back(uint8_t(u));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -556,21 +504,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   if (bufferSize < index + 4)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   uint32_t u;
-  u = uint32_t(uint8_t(buffer[index]));
-  u |= uint32_t(uint8_t(buffer[index + 1])) << 8;
-  u |= uint32_t(uint8_t(buffer[index + 2])) << 16;
-  u |= uint32_t(uint8_t(buffer[index + 3])) << 24;
+  index = decodeFromLE32(buffer, bufferSize, index, u);
   *_valuePointer = Integer32(u);
-  return index + 4;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  uint32_t u = uint32_t(*_valuePointer);
-  buffer.push_back(uint8_t(u));
-  buffer.push_back(uint8_t(u >> 8));
-  buffer.push_back(uint8_t(u >> 16));
-  buffer.push_back(uint8_t(u >> 24));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -601,31 +537,10 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   if (bufferSize < index + 8)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   uint64_t u;
-  u = uint64_t(uint8_t(buffer[index])) << 56;
-  u |= uint64_t(uint8_t(buffer[index + 1])) << 48;
-  u |= uint64_t(uint8_t(buffer[index + 2])) << 40;
-  u |= uint64_t(uint8_t(buffer[index + 3])) << 32;
-  u |= uint64_t(uint8_t(buffer[index + 4])) << 24;
-  u |= uint64_t(uint8_t(buffer[index + 5])) << 16;
-  u |= uint64_t(uint8_t(buffer[index + 6])) << 8;
-  u |= uint64_t(uint8_t(buffer[index + 7]));
+  index = decodeFromBE64(buffer, bufferSize, index, u);
   *_valuePointer = Integer64(u);
-  return index + 8;
+  return index;
 }
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  uint64_t u = uint64_t(*_valuePointer);
-  buffer.push_back(uint8_t(u >> 56));
-  buffer.push_back(uint8_t(u >> 48));
-  buffer.push_back(uint8_t(u >> 40));
-  buffer.push_back(uint8_t(u >> 32));
-  buffer.push_back(uint8_t(u >> 24));
-  buffer.push_back(uint8_t(u >> 16));
-  buffer.push_back(uint8_t(u >> 8));
-  buffer.push_back(uint8_t(u));
-}
-
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
@@ -655,29 +570,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   if (bufferSize < index + 8)
     throw EncoderException(L"Insufficient buffer size for decoding!");
   uint64_t u;
-  u = uint64_t(uint8_t(buffer[index]));
-  u |= uint64_t(uint8_t(buffer[index + 1])) << 8;
-  u |= uint64_t(uint8_t(buffer[index + 2])) << 16;
-  u |= uint64_t(uint8_t(buffer[index + 3])) << 24;
-  u |= uint64_t(uint8_t(buffer[index + 4])) << 32;
-  u |= uint64_t(uint8_t(buffer[index + 5])) << 40;
-  u |= uint64_t(uint8_t(buffer[index + 6])) << 48;
-  u |= uint64_t(uint8_t(buffer[index + 7])) << 56;
+  index = decodeFromLE64(buffer, bufferSize, index, u);
   *_valuePointer = Integer64(u);
-  return index + 8;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  uint64_t u = uint64_t(*_valuePointer);
-  buffer.push_back(uint8_t(u));
-  buffer.push_back(uint8_t(u >> 8));
-  buffer.push_back(uint8_t(u >> 16));
-  buffer.push_back(uint8_t(u >> 24));
-  buffer.push_back(uint8_t(u >> 32));
-  buffer.push_back(uint8_t(u >> 40));
-  buffer.push_back(uint8_t(u >> 48));
-  buffer.push_back(uint8_t(u >> 56));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -711,12 +606,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   _valuePointer->first = buffer[index];
   _valuePointer->second = buffer[index + 1];
   return index + 2;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  buffer.push_back(_valuePointer->first);
-  buffer.push_back(_valuePointer->second);
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -755,12 +644,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 2;
 }
 
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  buffer.push_back(_valuePointer->second);
-  buffer.push_back(_valuePointer->first);
-}
-
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
   auto* p = buffer + offset;
@@ -797,25 +680,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
     uint32_t u;
     float s;
   } u;
-  u.u = uint32_t(uint8_t(buffer[index])) << 24;
-  u.u |= uint32_t(uint8_t(buffer[index + 1])) << 16;
-  u.u |= uint32_t(uint8_t(buffer[index + 2])) << 8;
-  u.u |= uint32_t(uint8_t(buffer[index + 3]));
+  index = decodeFromBE32(buffer, bufferSize, index, u.u);
   *_valuePointer = u.s;
-  return index + 4;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  union {
-    uint32_t u;
-    float s;
-  } u;
-  u.s = *_valuePointer;
-  buffer.push_back(uint8_t(u.u >> 24));
-  buffer.push_back(uint8_t(u.u >> 16));
-  buffer.push_back(uint8_t(u.u >> 8));
-  buffer.push_back(uint8_t(u.u));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -860,25 +727,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
     uint32_t u;
     float s;
   } u;
-  u.u = uint32_t(uint8_t(buffer[index]));
-  u.u |= uint32_t(uint8_t(buffer[index + 1])) << 8;
-  u.u |= uint32_t(uint8_t(buffer[index + 2])) << 16;
-  u.u |= uint32_t(uint8_t(buffer[index + 3])) << 24;
+  index = decodeFromLE32(buffer, bufferSize, index, u.u);
   *_valuePointer = u.s;
-  return index + 4;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  union {
-    uint32_t u;
-    float s;
-  } u;
-  u.s = *_valuePointer;
-  buffer.push_back(uint8_t(u.u));
-  buffer.push_back(uint8_t(u.u >> 8));
-  buffer.push_back(uint8_t(u.u >> 16));
-  buffer.push_back(uint8_t(u.u >> 24));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -922,33 +773,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
     uint64_t u;
     double s;
   } u;
-  u.u = uint64_t(uint8_t(buffer[index])) << 56;
-  u.u |= uint64_t(uint8_t(buffer[index + 1])) << 48;
-  u.u |= uint64_t(uint8_t(buffer[index + 2])) << 40;
-  u.u |= uint64_t(uint8_t(buffer[index + 3])) << 32;
-  u.u |= uint64_t(uint8_t(buffer[index + 4])) << 24;
-  u.u |= uint64_t(uint8_t(buffer[index + 5])) << 16;
-  u.u |= uint64_t(uint8_t(buffer[index + 6])) << 8;
-  u.u |= uint64_t(uint8_t(buffer[index + 7]));
+  index = decodeFromBE64(buffer, bufferSize, index, u.u);
   *_valuePointer = u.s;
-  return index + 8;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  union {
-    uint64_t u;
-    double s;
-  } u;
-  u.s = *_valuePointer;
-  buffer.push_back(uint8_t(u.u >> 56));
-  buffer.push_back(uint8_t(u.u >> 48));
-  buffer.push_back(uint8_t(u.u >> 40));
-  buffer.push_back(uint8_t(u.u >> 32));
-  buffer.push_back(uint8_t(u.u >> 24));
-  buffer.push_back(uint8_t(u.u >> 16));
-  buffer.push_back(uint8_t(u.u >> 8));
-  buffer.push_back(uint8_t(u.u));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -993,33 +820,9 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
     uint64_t u;
     double s;
   } u;
-  u.u = uint64_t(uint8_t(buffer[index]));
-  u.u |= uint64_t(uint8_t(buffer[index + 1])) << 8;
-  u.u |= uint64_t(uint8_t(buffer[index + 2])) << 16;
-  u.u |= uint64_t(uint8_t(buffer[index + 3])) << 24;
-  u.u |= uint64_t(uint8_t(buffer[index + 4])) << 32;
-  u.u |= uint64_t(uint8_t(buffer[index + 5])) << 40;
-  u.u |= uint64_t(uint8_t(buffer[index + 6])) << 48;
-  u.u |= uint64_t(uint8_t(buffer[index + 7])) << 56;
+  index = decodeFromLE64(buffer, bufferSize, index, u.u);
   *_valuePointer = u.s;
-  return index + 8;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  union {
-    uint64_t u;
-    double s;
-  } u;
-  u.s = *_valuePointer;
-  buffer.push_back(uint8_t(u.u));
-  buffer.push_back(uint8_t(u.u >> 8));
-  buffer.push_back(uint8_t(u.u >> 16));
-  buffer.push_back(uint8_t(u.u >> 24));
-  buffer.push_back(uint8_t(u.u >> 32));
-  buffer.push_back(uint8_t(u.u >> 40));
-  buffer.push_back(uint8_t(u.u >> 48));
-  buffer.push_back(uint8_t(u.u >> 56));
+  return index;
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
@@ -1077,21 +880,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  size_t length = _valuePointer->size();
-  if (std::numeric_limits<Integer32>::max() < length)
-    length = std::numeric_limits<Integer32>::max();
-  int32_t u = static_cast<int32_t>(length);
-  buffer.push_back(uint8_t(u >> 24));
-  buffer.push_back(uint8_t(u >> 16));
-  buffer.push_back(uint8_t(u >> 8));
-  buffer.push_back(uint8_t(u));
-
-  for (size_t i = 0; i < length; ++i)
-    buffer.push_back((*_valuePointer)[i]);
-}
-
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
   size_t length = _valuePointer->size();
@@ -1146,23 +934,6 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   }
 
   return index;
-}
-
-void encodeInto(std::vector<Octet>& buffer) const
-{
-  size_t length = _valuePointer->size();
-  if (std::numeric_limits<Integer32>::max() < length)
-    length = std::numeric_limits<Integer32>::max();
-  buffer.push_back(uint8_t(length >> 24));
-  buffer.push_back(uint8_t(length >> 16));
-  buffer.push_back(uint8_t(length >> 8));
-  buffer.push_back(uint8_t(length));
-
-  for (size_t i = 0; i < length; ++i) {
-    uint16_t unicodeChar = uint16_t((*_valuePointer)[i]);
-    buffer.push_back(uint8_t(unicodeChar >> 8));
-    buffer.push_back(uint8_t(unicodeChar));
-  }
 }
 
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
