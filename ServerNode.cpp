@@ -1647,9 +1647,11 @@ public:
       while (currentInteractionClass) {
         if (currentInteractionClass->getSubscriptionType(subscriberConnectHandle) != Unsubscribed) {
           if (currentInteractionClass == interactionClass) {
-            send(subscriberConnectHandle, message);
-            // check if the message goes to a locally connected federate, if so, increment the receive count.
-            interactionReceived(subscriberConnectHandle, currentInteractionClass);
+            if (interactionClass->isMatching(subscriberConnectHandle, message->getParameterValues())) {
+              send(subscriberConnectHandle, message);
+              // check if the message goes to a locally connected federate, if so, increment the receive count.
+              interactionReceived(subscriberConnectHandle, currentInteractionClass);
+            }
           } else {
             SharedPtr<InteractionMessage> message2 = new InteractionMessage;
             message2->setFederationHandle(message->getFederationHandle());
@@ -1691,6 +1693,7 @@ public:
             // interaction class specified in message
             if (interactionClass->isMatching(subscriberConnectHandle, message->getParameterValues())) {
               send(subscriberConnectHandle, message);
+              interactionReceived(subscriberConnectHandle, currentInteractionClass);
             }
           } else {
             // parent interaction class
@@ -1710,6 +1713,7 @@ public:
             }
             message2->setInteractionClassHandle(currentInteractionClass->getInteractionClassHandle());
             send(subscriberConnectHandle, message2);
+            interactionReceived(subscriberConnectHandle, currentInteractionClass);
           }
           break;
         }
