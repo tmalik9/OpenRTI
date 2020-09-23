@@ -61,12 +61,6 @@ if(LINUX)
   set(CMAKE_C_FLAGS_DEBUG2 "${CMAKE_C_FLAGS_DEBUG}")
 endif()
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # Ignore warnings for Clang
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-inconsistent-missing-override -Wno-unused-value -Wno-implicit-exception-spec-mismatch")
-endif()
-
-
 
 if(MSVC)
   # bkd Preprocessor Definitions
@@ -168,7 +162,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-reorder>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unknown-pragmas>)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-inconsistent-missing-override>)
 endif()
+
+
 # Work around some linux linkers that seem to default to --as-needed
 # Actually this also works around cmake reordering the link dependencies
 # ... well and not to forget that the problem originates from that
