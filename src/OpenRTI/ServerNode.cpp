@@ -2410,7 +2410,7 @@ public:
     if (!federationServer)
       throw MessageError("Received ShutdownFederationExecutionMessage for a non existing federation!");
     ServerModel::FederationConnect* federationConnect = federationServer->getFederationConnect(connectHandle);
-    if (!federationConnect)
+    if (federationConnect == nullptr)
       throw MessageError("Received ShutdownFederationExecutionMessage for a federation not knowing this connect!");
 
     // Check if the federation has again gained a new federate in between
