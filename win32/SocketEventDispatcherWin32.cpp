@@ -211,6 +211,7 @@ struct SocketEventDispatcher::PrivateData
 
               if (networkEvents.lNetworkEvents & FD_CLOSE)
               {
+                socketEvent->error(OpenRTI::ConnectionFailed("connection closed"));
                 dispatcher.erase(socketEvent);
               }
               if (networkEvents.lNetworkEvents & FD_ACCEPT)
