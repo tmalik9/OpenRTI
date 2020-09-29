@@ -10,7 +10,7 @@
 #include <iostream>
 
 bool sEnableDebugPrintf = true;
-bool sDebugToConsole = true;
+bool sDebugToConsole = false;
 void DebugPrintf(const char* fmt, ...)
 {
 #ifndef linux
