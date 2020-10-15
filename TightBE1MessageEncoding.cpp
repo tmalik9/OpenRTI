@@ -21,7 +21,6 @@
  */
 
 
-#include "DebugNew.h"
 #include "TightBE1MessageEncoding.h"
 #include "AbstractMessageEncoding.h"
 #include "DecodeDataStream.h"
@@ -4120,11 +4119,11 @@ public:
   Buffer::const_iterator _i;
 };
 
-TightBE1MessageEncoding::TightBE1MessageEncoding()
+TightBE1MessageEncoding::TightBE1MessageEncoding() noexcept
 {
 }
 
-TightBE1MessageEncoding::~TightBE1MessageEncoding()
+TightBE1MessageEncoding::~TightBE1MessageEncoding() noexcept
 {
 }
 
@@ -4163,231 +4162,231 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
   uint16_t opcode = decodeStream.readUInt16Compressed();
   switch (opcode) {
   case 1:
-    _message = new ConnectionLostMessage;
+    _message = MakeShared<ConnectionLostMessage>();
     decodeStream.readConnectionLostMessage(static_cast<ConnectionLostMessage&>(*_message));
     break;
   case 2:
-    _message = new CreateFederationExecutionRequestMessage;
+    _message = MakeShared<CreateFederationExecutionRequestMessage>();
     decodeStream.readCreateFederationExecutionRequestMessage(static_cast<CreateFederationExecutionRequestMessage&>(*_message));
     break;
   case 3:
-    _message = new CreateFederationExecutionResponseMessage;
+    _message = MakeShared<CreateFederationExecutionResponseMessage>();
     decodeStream.readCreateFederationExecutionResponseMessage(static_cast<CreateFederationExecutionResponseMessage&>(*_message));
     break;
   case 4:
-    _message = new DestroyFederationExecutionRequestMessage;
+    _message = MakeShared<DestroyFederationExecutionRequestMessage>();
     decodeStream.readDestroyFederationExecutionRequestMessage(static_cast<DestroyFederationExecutionRequestMessage&>(*_message));
     break;
   case 5:
-    _message = new DestroyFederationExecutionResponseMessage;
+    _message = MakeShared<DestroyFederationExecutionResponseMessage>();
     decodeStream.readDestroyFederationExecutionResponseMessage(static_cast<DestroyFederationExecutionResponseMessage&>(*_message));
     break;
   case 6:
-    _message = new EnumerateFederationExecutionsRequestMessage;
+    _message = MakeShared<EnumerateFederationExecutionsRequestMessage>();
     decodeStream.readEnumerateFederationExecutionsRequestMessage(static_cast<EnumerateFederationExecutionsRequestMessage&>(*_message));
     break;
   case 7:
-    _message = new EnumerateFederationExecutionsResponseMessage;
+    _message = MakeShared<EnumerateFederationExecutionsResponseMessage>();
     decodeStream.readEnumerateFederationExecutionsResponseMessage(static_cast<EnumerateFederationExecutionsResponseMessage&>(*_message));
     break;
   case 8:
-    _message = new InsertFederationExecutionMessage;
+    _message = MakeShared<InsertFederationExecutionMessage>();
     decodeStream.readInsertFederationExecutionMessage(static_cast<InsertFederationExecutionMessage&>(*_message));
     break;
   case 9:
-    _message = new ShutdownFederationExecutionMessage;
+    _message = MakeShared<ShutdownFederationExecutionMessage>();
     decodeStream.readShutdownFederationExecutionMessage(static_cast<ShutdownFederationExecutionMessage&>(*_message));
     break;
   case 10:
-    _message = new EraseFederationExecutionMessage;
+    _message = MakeShared<EraseFederationExecutionMessage>();
     decodeStream.readEraseFederationExecutionMessage(static_cast<EraseFederationExecutionMessage&>(*_message));
     break;
   case 11:
-    _message = new ReleaseFederationHandleMessage;
+    _message = MakeShared<ReleaseFederationHandleMessage>();
     decodeStream.readReleaseFederationHandleMessage(static_cast<ReleaseFederationHandleMessage&>(*_message));
     break;
   case 12:
-    _message = new InsertModulesMessage;
+    _message = MakeShared<InsertModulesMessage>();
     decodeStream.readInsertModulesMessage(static_cast<InsertModulesMessage&>(*_message));
     break;
   case 13:
-    _message = new JoinFederationExecutionRequestMessage;
+    _message = MakeShared<JoinFederationExecutionRequestMessage>();
     decodeStream.readJoinFederationExecutionRequestMessage(static_cast<JoinFederationExecutionRequestMessage&>(*_message));
     break;
   case 14:
-    _message = new JoinFederationExecutionResponseMessage;
+    _message = MakeShared<JoinFederationExecutionResponseMessage>();
     decodeStream.readJoinFederationExecutionResponseMessage(static_cast<JoinFederationExecutionResponseMessage&>(*_message));
     break;
   case 15:
-    _message = new ResignFederationExecutionRequestMessage;
+    _message = MakeShared<ResignFederationExecutionRequestMessage>();
     decodeStream.readResignFederationExecutionRequestMessage(static_cast<ResignFederationExecutionRequestMessage&>(*_message));
     break;
   case 16:
-    _message = new JoinFederateNotifyMessage;
+    _message = MakeShared<JoinFederateNotifyMessage>();
     decodeStream.readJoinFederateNotifyMessage(static_cast<JoinFederateNotifyMessage&>(*_message));
     break;
   case 17:
-    _message = new ResignFederateNotifyMessage;
+    _message = MakeShared<ResignFederateNotifyMessage>();
     decodeStream.readResignFederateNotifyMessage(static_cast<ResignFederateNotifyMessage&>(*_message));
     break;
   case 18:
-    _message = new ChangeAutomaticResignDirectiveMessage;
+    _message = MakeShared<ChangeAutomaticResignDirectiveMessage>();
     decodeStream.readChangeAutomaticResignDirectiveMessage(static_cast<ChangeAutomaticResignDirectiveMessage&>(*_message));
     break;
   case 30:
-    _message = new RegisterFederationSynchronizationPointMessage;
+    _message = MakeShared<RegisterFederationSynchronizationPointMessage>();
     decodeStream.readRegisterFederationSynchronizationPointMessage(static_cast<RegisterFederationSynchronizationPointMessage&>(*_message));
     break;
   case 31:
-    _message = new RegisterFederationSynchronizationPointResponseMessage;
+    _message = MakeShared<RegisterFederationSynchronizationPointResponseMessage>();
     decodeStream.readRegisterFederationSynchronizationPointResponseMessage(static_cast<RegisterFederationSynchronizationPointResponseMessage&>(*_message));
     break;
   case 32:
-    _message = new AnnounceSynchronizationPointMessage;
+    _message = MakeShared<AnnounceSynchronizationPointMessage>();
     decodeStream.readAnnounceSynchronizationPointMessage(static_cast<AnnounceSynchronizationPointMessage&>(*_message));
     break;
   case 33:
-    _message = new SynchronizationPointAchievedMessage;
+    _message = MakeShared<SynchronizationPointAchievedMessage>();
     decodeStream.readSynchronizationPointAchievedMessage(static_cast<SynchronizationPointAchievedMessage&>(*_message));
     break;
   case 34:
-    _message = new FederationSynchronizedMessage;
+    _message = MakeShared<FederationSynchronizedMessage>();
     decodeStream.readFederationSynchronizedMessage(static_cast<FederationSynchronizedMessage&>(*_message));
     break;
   case 40:
-    _message = new EnableTimeRegulationRequestMessage;
+    _message = MakeShared<EnableTimeRegulationRequestMessage>();
     decodeStream.readEnableTimeRegulationRequestMessage(static_cast<EnableTimeRegulationRequestMessage&>(*_message));
     break;
   case 41:
-    _message = new EnableTimeRegulationResponseMessage;
+    _message = MakeShared<EnableTimeRegulationResponseMessage>();
     decodeStream.readEnableTimeRegulationResponseMessage(static_cast<EnableTimeRegulationResponseMessage&>(*_message));
     break;
   case 42:
-    _message = new DisableTimeRegulationRequestMessage;
+    _message = MakeShared<DisableTimeRegulationRequestMessage>();
     decodeStream.readDisableTimeRegulationRequestMessage(static_cast<DisableTimeRegulationRequestMessage&>(*_message));
     break;
   case 100:
-    _message = new EnableTimeConstrainedNotifyMessage;
+    _message = MakeShared<EnableTimeConstrainedNotifyMessage>();
     decodeStream.readEnableTimeConstrainedNotifyMessage(static_cast<EnableTimeConstrainedNotifyMessage&>(*_message));
     break;
   case 101:
-    _message = new DisableTimeConstrainedNotifyMessage;
+    _message = MakeShared<DisableTimeConstrainedNotifyMessage>();
     decodeStream.readDisableTimeConstrainedNotifyMessage(static_cast<DisableTimeConstrainedNotifyMessage&>(*_message));
     break;
   case 43:
-    _message = new CommitLowerBoundTimeStampMessage;
+    _message = MakeShared<CommitLowerBoundTimeStampMessage>();
     decodeStream.readCommitLowerBoundTimeStampMessage(static_cast<CommitLowerBoundTimeStampMessage&>(*_message));
     break;
   case 44:
-    _message = new CommitLowerBoundTimeStampResponseMessage;
+    _message = MakeShared<CommitLowerBoundTimeStampResponseMessage>();
     decodeStream.readCommitLowerBoundTimeStampResponseMessage(static_cast<CommitLowerBoundTimeStampResponseMessage&>(*_message));
     break;
   case 45:
-    _message = new LockedByNextMessageRequestMessage;
+    _message = MakeShared<LockedByNextMessageRequestMessage>();
     decodeStream.readLockedByNextMessageRequestMessage(static_cast<LockedByNextMessageRequestMessage&>(*_message));
     break;
   case 46:
-    _message = new InsertRegionMessage;
+    _message = MakeShared<InsertRegionMessage>();
     decodeStream.readInsertRegionMessage(static_cast<InsertRegionMessage&>(*_message));
     break;
   case 47:
-    _message = new CommitRegionMessage;
+    _message = MakeShared<CommitRegionMessage>();
     decodeStream.readCommitRegionMessage(static_cast<CommitRegionMessage&>(*_message));
     break;
   case 48:
-    _message = new EraseRegionMessage;
+    _message = MakeShared<EraseRegionMessage>();
     decodeStream.readEraseRegionMessage(static_cast<EraseRegionMessage&>(*_message));
     break;
   case 50:
-    _message = new ChangeInteractionClassPublicationMessage;
+    _message = MakeShared<ChangeInteractionClassPublicationMessage>();
     decodeStream.readChangeInteractionClassPublicationMessage(static_cast<ChangeInteractionClassPublicationMessage&>(*_message));
     break;
   case 51:
-    _message = new ChangeObjectClassPublicationMessage;
+    _message = MakeShared<ChangeObjectClassPublicationMessage>();
     decodeStream.readChangeObjectClassPublicationMessage(static_cast<ChangeObjectClassPublicationMessage&>(*_message));
     break;
   case 52:
-    _message = new ChangeInteractionClassSubscriptionMessage;
+    _message = MakeShared<ChangeInteractionClassSubscriptionMessage>();
     decodeStream.readChangeInteractionClassSubscriptionMessage(static_cast<ChangeInteractionClassSubscriptionMessage&>(*_message));
     break;
   case 53:
-    _message = new ChangeObjectClassSubscriptionMessage;
+    _message = MakeShared<ChangeObjectClassSubscriptionMessage>();
     decodeStream.readChangeObjectClassSubscriptionMessage(static_cast<ChangeObjectClassSubscriptionMessage&>(*_message));
     break;
   case 99:
-    _message = new ChangeObjectInstanceSubscriptionMessage;
+    _message = MakeShared<ChangeObjectInstanceSubscriptionMessage>();
     decodeStream.readChangeObjectInstanceSubscriptionMessage(static_cast<ChangeObjectInstanceSubscriptionMessage&>(*_message));
     break;
   case 80:
-    _message = new InteractionMessage;
+    _message = MakeShared<InteractionMessage>();
     decodeStream.readInteractionMessage(static_cast<InteractionMessage&>(*_message));
     break;
   case 81:
-    _message = new TimeStampedInteractionMessage;
+    _message = MakeShared<TimeStampedInteractionMessage>();
     decodeStream.readTimeStampedInteractionMessage(static_cast<TimeStampedInteractionMessage&>(*_message));
     break;
   case 60:
-    _message = new ObjectInstanceHandlesRequestMessage;
+    _message = MakeShared<ObjectInstanceHandlesRequestMessage>();
     decodeStream.readObjectInstanceHandlesRequestMessage(static_cast<ObjectInstanceHandlesRequestMessage&>(*_message));
     break;
   case 61:
-    _message = new ObjectInstanceHandlesResponseMessage;
+    _message = MakeShared<ObjectInstanceHandlesResponseMessage>();
     decodeStream.readObjectInstanceHandlesResponseMessage(static_cast<ObjectInstanceHandlesResponseMessage&>(*_message));
     break;
   case 62:
-    _message = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
+    _message = MakeShared<ReleaseMultipleObjectInstanceNameHandlePairsMessage>();
     decodeStream.readReleaseMultipleObjectInstanceNameHandlePairsMessage(static_cast<ReleaseMultipleObjectInstanceNameHandlePairsMessage&>(*_message));
     break;
   case 63:
-    _message = new ReserveObjectInstanceNameRequestMessage;
+    _message = MakeShared<ReserveObjectInstanceNameRequestMessage>();
     decodeStream.readReserveObjectInstanceNameRequestMessage(static_cast<ReserveObjectInstanceNameRequestMessage&>(*_message));
     break;
   case 64:
-    _message = new ReserveObjectInstanceNameResponseMessage;
+    _message = MakeShared<ReserveObjectInstanceNameResponseMessage>();
     decodeStream.readReserveObjectInstanceNameResponseMessage(static_cast<ReserveObjectInstanceNameResponseMessage&>(*_message));
     break;
   case 65:
-    _message = new ReserveMultipleObjectInstanceNameRequestMessage;
+    _message = MakeShared<ReserveMultipleObjectInstanceNameRequestMessage>();
     decodeStream.readReserveMultipleObjectInstanceNameRequestMessage(static_cast<ReserveMultipleObjectInstanceNameRequestMessage&>(*_message));
     break;
   case 66:
-    _message = new ReserveMultipleObjectInstanceNameResponseMessage;
+    _message = MakeShared<ReserveMultipleObjectInstanceNameResponseMessage>();
     decodeStream.readReserveMultipleObjectInstanceNameResponseMessage(static_cast<ReserveMultipleObjectInstanceNameResponseMessage&>(*_message));
     break;
   case 90:
-    _message = new InsertObjectInstanceMessage;
+    _message = MakeShared<InsertObjectInstanceMessage>();
     decodeStream.readInsertObjectInstanceMessage(static_cast<InsertObjectInstanceMessage&>(*_message));
     break;
   case 91:
-    _message = new DeleteObjectInstanceMessage;
+    _message = MakeShared<DeleteObjectInstanceMessage>();
     decodeStream.readDeleteObjectInstanceMessage(static_cast<DeleteObjectInstanceMessage&>(*_message));
     break;
   case 92:
-    _message = new TimeStampedDeleteObjectInstanceMessage;
+    _message = MakeShared<TimeStampedDeleteObjectInstanceMessage>();
     decodeStream.readTimeStampedDeleteObjectInstanceMessage(static_cast<TimeStampedDeleteObjectInstanceMessage&>(*_message));
     break;
   case 94:
-    _message = new AttributeUpdateMessage;
+    _message = MakeShared<AttributeUpdateMessage>();
     decodeStream.readAttributeUpdateMessage(static_cast<AttributeUpdateMessage&>(*_message));
     break;
   case 96:
-    _message = new TimeStampedAttributeUpdateMessage;
+    _message = MakeShared<TimeStampedAttributeUpdateMessage>();
     decodeStream.readTimeStampedAttributeUpdateMessage(static_cast<TimeStampedAttributeUpdateMessage&>(*_message));
     break;
   case 97:
-    _message = new RequestAttributeUpdateMessage;
+    _message = MakeShared<RequestAttributeUpdateMessage>();
     decodeStream.readRequestAttributeUpdateMessage(static_cast<RequestAttributeUpdateMessage&>(*_message));
     break;
   case 98:
-    _message = new RequestClassAttributeUpdateMessage;
+    _message = MakeShared<RequestClassAttributeUpdateMessage>();
     decodeStream.readRequestClassAttributeUpdateMessage(static_cast<RequestClassAttributeUpdateMessage&>(*_message));
     break;
   case 102:
-    _message = new QueryAttributeOwnershipRequestMessage;
+    _message = MakeShared<QueryAttributeOwnershipRequestMessage>();
     decodeStream.readQueryAttributeOwnershipRequestMessage(static_cast<QueryAttributeOwnershipRequestMessage&>(*_message));
     break;
   case 103:
-    _message = new QueryAttributeOwnershipResponseMessage;
+    _message = MakeShared<QueryAttributeOwnershipResponseMessage>();
     decodeStream.readQueryAttributeOwnershipResponseMessage(static_cast<QueryAttributeOwnershipResponseMessage&>(*_message));
     break;
   default:

@@ -28,23 +28,23 @@ namespace OpenRTI {
 
 class OPENRTI_API InitialStreamProtocol : public StreamBufferProtocol {
 public:
-  InitialStreamProtocol();
-  virtual ~InitialStreamProtocol();
+  InitialStreamProtocol() = default;
+  virtual ~InitialStreamProtocol() = default;
 
   virtual void readOptionMap(const StringStringListMap& stringStringListMap) = 0;
   void writeOptionMap(const StringStringListMap& stringStringListMap);
 
-  virtual void readPacket(const Buffer& buffer);
-  virtual void writePacket();
-  virtual bool getMoreToSend() const;
+  void readPacket(const Buffer& buffer) override;
+  void writePacket() override;
+  bool getMoreToSend() const override;
 
-  virtual void read(AbstractProtocolSocket& protocolSocket);
-  virtual bool getEnableRead() const;
+  void read(AbstractProtocolSocket& protocolSocket) override;
+  bool getEnableRead() const override;
 
-  virtual void write(AbstractProtocolSocket& protocolSocket);
-  virtual bool getEnableWrite() const;
+  void write(AbstractProtocolSocket& protocolSocket) override;
+  bool getEnableWrite() const override;
 
-  virtual void error(const Exception& e);
+  void error(const Exception& e) override;
 
 protected:
   void setFollowupProtocol(const SharedPtr<AbstractProtocolLayer>& followupProtocol);

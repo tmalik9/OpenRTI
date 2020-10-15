@@ -41,19 +41,19 @@ class _IntrusiveListIterator;
 template<typename Tag>
 class OPENRTI_LOCAL _IntrusiveListHook {
 public:
-  _IntrusiveListHook()
+  _IntrusiveListHook() noexcept
   { _clear(); }
   // Don't copy list membership
-  _IntrusiveListHook(const _IntrusiveListHook& intrusiveListHook)
+  _IntrusiveListHook(const _IntrusiveListHook& intrusiveListHook) noexcept
   { _clear(); OpenRTIAssert(!intrusiveListHook.is_linked()); }
-  ~_IntrusiveListHook()
+  ~_IntrusiveListHook() noexcept
   { _unlink(); }
 
   // Don't copy list membership
   _IntrusiveListHook& operator=(const _IntrusiveListHook& intrusiveListHook)
   { OpenRTIAssert(!intrusiveListHook.is_linked()); return *this; }
 
-  bool is_linked(void) const
+  bool is_linked() const
   {
     OpenRTIAssert((_next == this) == (_prev == this));
     return _next != this;
@@ -80,15 +80,15 @@ private:
 
   // Only reinitialize our own state, do not care for other list entries
   // possible pointing to this. Use with care!
-  void _clear(void)
+  void _clear() noexcept
   { _next = this; _prev = this; }
   // Remove this entry from the list, dont care for our own state
   // possibly pointing to other nodes. Use with care!
-  void _unlink(void)
+  void _unlink() noexcept
   { _next->_prev = _prev; _prev->_next = _next; }
 
   /// Remove this entry from the list and reinitializes this list hook.
-  void _unlink_clear(void)
+  void _unlink_clear() noexcept
   {
     _unlink();
     _clear();
@@ -152,7 +152,7 @@ protected:
     _intrusiveListHook(intrusiveListHook)
   { }
 
-  void _unlink(void)
+  void _unlink()
   { return _intrusiveListHook->_unlink_clear(); }
 
   void _increment()
@@ -211,7 +211,7 @@ public:
   { return _ForwardIntrusiveListIterator(*this) -= n; }
 
   // Remove this entry from the list, and reinitialize this list node
-  // _ForwardIntrusiveListIterator unlink(void)
+  // _ForwardIntrusiveListIterator unlink()
   // { return _ForwardIntrusiveListIterator(_intrusiveListHook->_unlink_get_next()); }
 
 private:
@@ -267,7 +267,7 @@ public:
   { return _ReverseIntrusiveListIterator(*this) -= n; }
 
   // Remove this entry from the list, and reinitialize this list node
-  // _ReverseIntrusiveListIterator unlink(void)
+  // _ReverseIntrusiveListIterator unlink()
   // { return _ReverseIntrusiveListIterator(_intrusiveListHook->_unlink_get_next()); }
 
 private:

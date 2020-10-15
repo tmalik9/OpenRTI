@@ -24,16 +24,8 @@
 
 namespace OpenRTI {
 
-AbstractMessageEncoding::AbstractMessageEncoding()
-{
-}
-
-AbstractMessageEncoding::~AbstractMessageEncoding()
-{
-}
-
 bool
-AbstractMessageEncoding::getEnableRead() const
+AbstractMessageEncoding::getEnableRead() const noexcept
 {
   return true;
 }

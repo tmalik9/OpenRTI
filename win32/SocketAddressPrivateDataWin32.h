@@ -37,7 +37,7 @@
 namespace OpenRTI {
 
 struct SocketAddress::PrivateData : public Referenced {
-  PrivateData() :
+  PrivateData() noexcept :
     _addrlen(0)
   {
   }

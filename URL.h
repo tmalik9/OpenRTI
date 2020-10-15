@@ -39,16 +39,16 @@ public:
   static URL fromProtocolAddress(const std::string& protocol, const std::string& address);
   static URL fromProtocolPath(const std::string& protocol, const std::string& path);
 
-  const std::string& getProtocol() const;
+  const std::string& getProtocol() const noexcept;
   void setProtocol(const std::string& protocol);
 
-  const std::string& getHost() const;
+  const std::string& getHost() const noexcept;
   void setHost(const std::string& host);
 
-  const std::string& getService() const;
+  const std::string& getService() const noexcept;
   void setService(const std::string& service);
 
-  const std::string& getPath() const;
+  const std::string& getPath() const noexcept;
   void setPath(const std::string& path);
 
   const StringPairVector& getQuery() const;

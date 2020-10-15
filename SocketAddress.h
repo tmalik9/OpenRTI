@@ -41,9 +41,10 @@ typedef std::list<SocketAddress> SocketAddressList;
 
 class OPENRTI_API SocketAddress {
 public:
-  SocketAddress();
+  SocketAddress() noexcept;
   SocketAddress(const SocketAddress& socketAddress);
-  ~SocketAddress();
+  // NOTE: the destructor must stay in implementation file, otherwise it won't compile
+  ~SocketAddress() noexcept;
 
   SocketAddress& operator=(const SocketAddress& socketAddress);
 
@@ -61,7 +62,7 @@ public:
   { return !operator==(socketAddress); }
 
   bool valid() const;
-  bool isPipe() const;
+  bool isPipe() const noexcept;
   bool isInet4() const;
   bool isInet6() const;
 

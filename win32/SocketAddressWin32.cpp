@@ -34,7 +34,7 @@
 
 namespace OpenRTI {
 
-SocketAddress::SocketAddress()
+SocketAddress::SocketAddress() noexcept
 {
 }
 
@@ -43,7 +43,7 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress) :
 {
 }
 
-SocketAddress::~SocketAddress()
+SocketAddress::~SocketAddress() noexcept
 {
 }
 
@@ -61,7 +61,7 @@ SocketAddress::valid() const
 }
 
 bool
-SocketAddress::isPipe() const
+SocketAddress::isPipe() const noexcept
 {
   return false;
 }

@@ -23,7 +23,7 @@
 namespace OpenRTI {
 namespace XML {
 
-Attributes::~Attributes(void)
+Attributes::~Attributes() noexcept
 {
 }
 

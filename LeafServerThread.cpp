@@ -33,10 +33,11 @@ namespace OpenRTI {
   
 static const uint32_t kInfinite = static_cast<uint32_t>(-1);
 
-class OPENRTI_LOCAL LeafServerThread::_Registry : public Referenced {
+class OPENRTI_LOCAL LeafServerThread::_Registry final : public Referenced {
 public:
   _Registry();
-  ~_Registry();
+  _Registry(const _Registry&) = delete;
+  ~_Registry() noexcept;
   static SharedPtr<_Registry>& GetInstance();
   SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
 
@@ -188,7 +189,7 @@ LeafServerThread::LeafServerThread(const SharedPtr<AbstractServer>& server) :
   OpenRTIAssert(_server.valid());
 }
 
-LeafServerThread::~LeafServerThread(void)
+LeafServerThread::~LeafServerThread()
 {
 }
 

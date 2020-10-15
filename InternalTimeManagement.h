@@ -50,7 +50,7 @@ public:
   };
 
   InternalTimeManagement();
-  virtual ~InternalTimeManagement();
+  virtual ~InternalTimeManagement() noexcept = default;
 
   void setTimeRegulationMode(TimeRegulationMode timeRegulationMode)
   { _timeRegulationMode = timeRegulationMode; }

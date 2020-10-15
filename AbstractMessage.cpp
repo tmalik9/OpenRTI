@@ -22,11 +22,6 @@
 
 namespace OpenRTI {
 
-AbstractMessage::~AbstractMessage()
-{
-}
-
-
 std::string AbstractMessage::toString() const
 {
   std::ostringstream s;
@@ -35,13 +30,13 @@ std::string AbstractMessage::toString() const
 }
 
 bool
-AbstractMessage::getReliable() const
+AbstractMessage::getReliable() const noexcept
 {
   return true;
 }
 
 ObjectInstanceHandle
-AbstractMessage::getObjectInstanceHandleForMessage() const
+AbstractMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return ObjectInstanceHandle();
 }

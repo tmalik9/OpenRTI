@@ -23,12 +23,12 @@
 namespace OpenRTI {
 namespace XML {
 
-XMLReader::~XMLReader(void)
+XMLReader::~XMLReader()
 {
 }
 
 ContentHandler*
-XMLReader::getContentHandler(void) const
+XMLReader::getContentHandler() const
 {
   const ContentHandler* ch = mContentHandler.get();
   return const_cast<ContentHandler*>(ch);
@@ -41,7 +41,7 @@ XMLReader::setContentHandler(ContentHandler* contentHandler)
 }
 
 ErrorHandler*
-XMLReader::getErrorHandler(void) const
+XMLReader::getErrorHandler() const
 {
   const ErrorHandler* eh = mErrorHandler.get();
   return const_cast<ErrorHandler*>(eh);

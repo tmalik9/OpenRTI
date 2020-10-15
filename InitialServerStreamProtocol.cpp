@@ -35,7 +35,7 @@ InitialServerStreamProtocol::InitialServerStreamProtocol(AbstractServer& abstrac
   addScratchReadBuffer(12);
 }
 
-InitialServerStreamProtocol::~InitialServerStreamProtocol()
+InitialServerStreamProtocol::~InitialServerStreamProtocol() noexcept
 {
 }
 

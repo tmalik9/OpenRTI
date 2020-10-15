@@ -44,10 +44,13 @@ namespace OpenRTI {
 // win32 timeouts are just relative milliseconds which is easy to handle with any clock as long as it is consistent
 class OPENRTI_API Clock {
 public:
-  Clock() :
-    _nsec(0)
+  Clock() noexcept : _nsec(0)
   { }
-
+  Clock(const Clock&) noexcept = default;
+  Clock(Clock&&) noexcept = default;
+  ~Clock() noexcept = default;
+  Clock& operator=(const Clock&) = default;
+  Clock& operator=(Clock&&) = default;
 #if 201103L <= __CPlusPlusStd
   static Clock now()
   {
@@ -110,13 +113,13 @@ public:
   static Clock fromNSec(const uint64_t& nsec)
   { return Clock(nsec); }
 
-  const uint64_t& getNSec() const
+  const uint64_t& getNSec() const noexcept
   { return _nsec; }
-  void setNSec(const uint64_t& nsec)
+  void setNSec(const uint64_t& nsec) noexcept
   { _nsec = nsec; }
 
   // Arithmetic, note that these two do not wrap.
-  Clock& operator+=(const Clock& clock)
+  Clock& operator+=(const Clock& clock) noexcept
   {
     if (~_nsec <= clock._nsec)
       _nsec = std::numeric_limits<uint64_t>::max();
@@ -124,7 +127,7 @@ public:
       _nsec += clock._nsec;
     return *this;
   }
-  Clock& operator-=(const Clock& clock)
+  Clock& operator-=(const Clock& clock) noexcept
   {
     if (_nsec <= clock._nsec)
       _nsec = 0;
@@ -134,17 +137,17 @@ public:
   }
 
   // Compares
-  bool operator==(const Clock& clock) const
+  bool operator==(const Clock& clock) const noexcept
   { return _nsec == clock._nsec; }
-  bool operator!=(const Clock& clock) const
+  bool operator!=(const Clock& clock) const noexcept
   { return _nsec != clock._nsec; }
-  bool operator<(const Clock& clock) const
+  bool operator<(const Clock& clock) const noexcept
   { return _nsec < clock._nsec; }
-  bool operator<=(const Clock& clock) const
+  bool operator<=(const Clock& clock) const noexcept
   { return _nsec <= clock._nsec; }
-  bool operator>(const Clock& clock) const
+  bool operator>(const Clock& clock) const noexcept
   { return _nsec > clock._nsec; }
-  bool operator>=(const Clock& clock) const
+  bool operator>=(const Clock& clock) const noexcept
   { return _nsec >= clock._nsec; }
 
 private:
@@ -159,10 +162,10 @@ private:
 };
 
 inline
-Clock operator+(const Clock& clock1, const Clock& clock2)
+Clock operator+(const Clock& clock1, const Clock& clock2) noexcept
 { return Clock(clock1) += clock2; }
 inline
-Clock operator-(const Clock& clock1, const Clock& clock2)
+Clock operator-(const Clock& clock1, const Clock& clock2) noexcept
 { return Clock(clock1) -= clock2; }
 // inline
 // Clock operator*(const Clock& clock1, const Clock& clock2)

@@ -51,13 +51,13 @@ public:
   void connectParentPipeServer(const std::string& name, const Clock& abstime);
   void connectParentStreamServer(const SharedPtr<SocketStream>& socketStream, const Clock& abstime, bool compress);
 
-  virtual int exec();
+  int exec() override;
 
 protected:
-  virtual void _sendDone(bool done);
+  void _sendDone(bool done) override;
 
-  virtual void _postMessage(const _MessageConnectHandlePair& messageConnectHandlePair);
-  virtual void _postOperation(const SharedPtr<_Operation>& operation);
+  void _postMessage(const _MessageConnectHandlePair& messageConnectHandlePair) override;
+  void _postOperation(const SharedPtr<_Operation>& operation) override;
 
 private:
   NetworkServer(const NetworkServer&) = delete;

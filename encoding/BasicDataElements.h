@@ -69,7 +69,7 @@ public:                                                                       \
       EncodableDataType const & rhs);                                         \
                                                                               \
    /* Destructor                                                           */ \
-   virtual ~EncodableDataType ();                                             \
+   virtual ~EncodableDataType() noexcept;                                     \
                                                                               \
    /* Assignment Operator                                                  */ \
    /* Uses existing memory of this instance.                               */ \
@@ -78,45 +78,45 @@ public:                                                                       \
                                                                               \
    /* Return a new copy of the DataElement                                 */ \
    /* Copy uses internal memory.                                           */ \
-   virtual std::unique_ptr<DataElement> clone () const;                       \
+   std::unique_ptr<DataElement> clone () const override;                      \
                                                                               \
    /* Encode this element into a new VariableLengthData                    */ \
-   virtual VariableLengthData encode () const;                                \
+   VariableLengthData encode () const override;                               \
                                                                               \
    /* Encode this element into an existing VariableLengthData              */ \
-   virtual void encode (                                                      \
-      VariableLengthData& inData) const;                                      \
+   void encode (                                                              \
+      VariableLengthData& inData) const override;                             \
                                                                               \
    /* Encode this element and append it to a buffer                        */ \
-   virtual void encodeInto (                                                  \
-      std::vector<Octet>& buffer) const;                                      \
+   void encodeInto (                                                          \
+      std::vector<Octet>& buffer) const override;                             \
                                                                               \
    size_t encodeInto(                                                         \
       Octet* buffer, size_t bufferSize, size_t offset) const override;        \
                                                                               \
    /* Decode this element from the RTI's VariableLengthData.               */ \
-   virtual void decode (                                                      \
-      VariableLengthData const & inData);                                     \
+   void decode (                                                              \
+      VariableLengthData const & inData) override;                            \
                                                                               \
    /* Decode this element starting at the index in the provided buffer     */ \
    /* Return the index immediately after the decoded data.                 */ \
-   virtual size_t decodeFrom (                                                \
+   size_t decodeFrom (                                                        \
       std::vector<Octet> const & buffer,                                      \
-      size_t index);                                                          \
+      size_t index) override;                                                 \
                                                                               \
-   virtual size_t decodeFrom(                                                 \
+   size_t decodeFrom(                                                         \
       const Octet* buffer, size_t bufferSize, size_t index) override;         \
                                                                               \
    /* Return the size in bytes of this element's encoding.                 */ \
-   virtual size_t getEncodedLength () const;                                  \
+   size_t getEncodedLength () const override;                                 \
                                                                               \
    /* Return the octet boundary of this element.                           */ \
-   virtual unsigned int getOctetBoundary () const;                            \
+   unsigned int getOctetBoundary () const override;                           \
                                                                               \
    /* Return a hash of the encoded data                                    */ \
    /* Provides mechanism to map DataElement discriminants to variants      */ \
    /* in VariantRecord.                                                    */ \
-   virtual Integer64 hash() const;                                            \
+   Integer64 hash() const override;                                           \
                                                                               \
    /* Change this instance to use supplied external memory.                */ \
    /* Caller is responsible for ensuring that the external memory is       */ \

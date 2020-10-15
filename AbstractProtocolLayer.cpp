@@ -22,11 +22,11 @@
 
 namespace OpenRTI {
 
-AbstractProtocolLayer::AbstractProtocolLayer()
+AbstractProtocolLayer::AbstractProtocolLayer() noexcept
 {
 }
 
-AbstractProtocolLayer::~AbstractProtocolLayer()
+AbstractProtocolLayer::~AbstractProtocolLayer() noexcept
 {
 }
 

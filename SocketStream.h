@@ -45,10 +45,12 @@ class OPENRTI_API SocketStream : public SocketData {
 public:
 
   ssize_t send(const ConstBufferRange& bufferRange, bool more);
-  ssize_t sendBufferSize() const;
+
+  constexpr ssize_t sendBufferSize() const noexcept { return 64 * 1024; }
+
   ssize_t recv(const BufferRange& bufferRange, bool peek);
-  virtual void cork(bool enable);
-  virtual void shutdown();
+  virtual void cork(bool enable) = 0;
+  virtual void shutdown() = 0;
 
   SocketAddress getpeername() const;
 

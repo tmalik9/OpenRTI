@@ -55,7 +55,7 @@ public:
 
   uint8_t readUInt8LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 1;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -63,7 +63,7 @@ public:
   }
   uint8_t readUInt8BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 1;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -138,7 +138,7 @@ public:
   }
   uint16_t readAlignedUInt16LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 2;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -146,7 +146,7 @@ public:
   }
   uint16_t readAlignedUInt16BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 2;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -155,7 +155,7 @@ public:
 
   int16_t readInt16LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 2;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -163,7 +163,7 @@ public:
   }
   int16_t readInt16BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 2;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -171,7 +171,7 @@ public:
   }
   int16_t readAlignedInt16LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 2;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -179,7 +179,7 @@ public:
   }
   int16_t readAlignedInt16BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 2;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -189,7 +189,7 @@ public:
 
   uint32_t readUInt32LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -197,7 +197,7 @@ public:
   }
   uint32_t readUInt32BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -205,7 +205,7 @@ public:
   }
   uint32_t readAlignedUInt32LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -213,7 +213,7 @@ public:
   }
   uint32_t readAlignedUInt32BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -222,7 +222,7 @@ public:
 
   int32_t readInt32LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -230,7 +230,7 @@ public:
   }
   int32_t readInt32BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -238,7 +238,7 @@ public:
   }
   int32_t readAlignedInt32LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -246,7 +246,7 @@ public:
   }
   int32_t readAlignedInt32BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -256,7 +256,7 @@ public:
 
   uint64_t readUInt64LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -264,7 +264,7 @@ public:
   }
   uint64_t readUInt64BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -272,7 +272,7 @@ public:
   }
   uint64_t readAlignedUInt64LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -280,7 +280,7 @@ public:
   }
   uint64_t readAlignedUInt64BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -289,7 +289,7 @@ public:
 
   int64_t readInt64LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -297,7 +297,7 @@ public:
   }
   int64_t readInt64BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -305,7 +305,7 @@ public:
   }
   int64_t readAlignedInt64LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -313,7 +313,7 @@ public:
   }
   int64_t readAlignedInt64BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -322,7 +322,7 @@ public:
 
   float readFloat32LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -330,7 +330,7 @@ public:
   }
   float readFloat32BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -338,7 +338,7 @@ public:
   }
   float readAlignedFloat32LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -346,7 +346,7 @@ public:
   }
   float readAlignedFloat32BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 4;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -355,7 +355,7 @@ public:
 
   double readFloat64LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -363,7 +363,7 @@ public:
   }
   double readFloat64BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -371,7 +371,7 @@ public:
   }
   double readAlignedFloat64LE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -379,7 +379,7 @@ public:
   }
   double readAlignedFloat64BE()
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += 8;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -448,7 +448,7 @@ public:
 
   void readData(VariableLengthData& d, size_t size)
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += size;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");
@@ -457,7 +457,7 @@ public:
 
   void readData(void* data, size_t size)
   {
-    size_t offset = _offset;
+    const size_t offset = _offset;
     _offset += size;
     if (_variableLengthData.size() < _offset)
       throw RTIinternalError("Reading beyond the end of the packet");

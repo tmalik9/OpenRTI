@@ -22,11 +22,11 @@
 
 namespace OpenRTI {
 
-AbstractProtocolSocket::AbstractProtocolSocket()
+AbstractProtocolSocket::AbstractProtocolSocket() noexcept
 {
 }
 
-AbstractProtocolSocket::~AbstractProtocolSocket()
+AbstractProtocolSocket::~AbstractProtocolSocket() noexcept
 {
 }
 

@@ -4,6 +4,12 @@
 
 #include <stddef.h>
 
+#ifdef _MSC_VER
+#include <CodeAnalysis/Warnings.h>
+#pragma warning(disable: ALL_CODE_ANALYSIS_WARNINGS)
+#pragma warning(disable: 26408 26438 26440 26481 26429 26461 26482 26485 26493 26494 26496 26497)
+#endif
+
 #ifdef COMPILED_FROM_DSP
 #include "winconfig.h"
 #elif defined(MACOS_CLASSIC)
@@ -986,7 +992,7 @@ parsePseudoAttribute(const ENCODING *enc,
                      const char **nextTokPtr)
 {
   int c;
-  char open;
+  //char open;
   if (ptr == end) {
     *namePtr = NULL;
     return 1;
@@ -1040,7 +1046,7 @@ parsePseudoAttribute(const ENCODING *enc,
     *nextTokPtr = ptr;
     return 0;
   }
-  open = (char)c;
+  char open = (char)c;
   ptr += enc->minBytesPerChar;
   *valPtr = ptr;
   for (;; ptr += enc->minBytesPerChar) {
@@ -1259,7 +1265,7 @@ struct unknown_encoding {
 #define AS_UNKNOWN_ENCODING(enc)  ((const struct unknown_encoding *) (enc))
 
 int
-XmlSizeOfUnknownEncoding(void)
+XmlSizeOfUnknownEncoding()
 {
   return sizeof(struct unknown_encoding);
 }

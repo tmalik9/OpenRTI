@@ -32,7 +32,13 @@ class Clock;
 
 class OPENRTI_API AbstractConnect : public Referenced {
 public:
-  virtual ~AbstractConnect() {}
+  AbstractConnect() noexcept = default;
+  AbstractConnect(const AbstractConnect&) = default;
+  AbstractConnect(AbstractConnect&&) = default;
+  virtual ~AbstractConnect() noexcept = default;
+  //AbstractConnect& operator=(const AbstractConnect&) = default;
+  //AbstractConnect& operator=(AbstractConnect&&) = default;
+
   virtual AbstractMessageSender* getMessageSender() = 0;
   virtual AbstractMessageReceiver* getMessageReceiver() = 0;
 

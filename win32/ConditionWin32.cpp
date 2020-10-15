@@ -33,25 +33,25 @@ namespace OpenRTI {
 
 #if __CPlusPlusStd < 201103L
 
-Condition::Condition(void) :
+Condition::Condition() noexcept :
   _privateData(new PrivateData)
 {
 }
 
-Condition::~Condition(void)
+Condition::~Condition() noexcept
 {
   delete _privateData;
   _privateData = 0;
 }
 
 void
-Condition::notify_one(void)
+Condition::notify_one()
 {
   _privateData->notify_one();
 }
 
 void
-Condition::notify_all(void)
+Condition::notify_all()
 {
   _privateData->notify_all();
 }

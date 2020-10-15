@@ -50,7 +50,7 @@ InternalAmbassador::InternalAmbassador()
 {
 }
 
-InternalAmbassador::~InternalAmbassador()
+InternalAmbassador::~InternalAmbassador() noexcept
 {
   try
   {

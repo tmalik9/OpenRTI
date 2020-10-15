@@ -33,7 +33,7 @@ inline bool operator<(const WeakPtr<T>& p1, const WeakPtr<T>& p2);
 template<typename T>
 class OPENRTI_LOCAL WeakPtr {
 public:
-  WeakPtr(void)
+  WeakPtr()
   { }
   WeakPtr(const WeakPtr& p) : mWeakData(p.mWeakData)
   { }
@@ -45,7 +45,7 @@ public:
   { SharedPtr<T> sharedPtr = p.lock(); assign(sharedPtr.get()); }
   WeakPtr(T* ptr) // OpenRTI_DEPRECATED // Hmm, shall we??
   { assign(ptr); }
-  ~WeakPtr(void)
+  ~WeakPtr()
   { }
 
   template<typename U>
@@ -57,7 +57,7 @@ public:
   WeakPtr& operator=(const WeakPtr& p)
   { mWeakData = p.mWeakData; return *this; }
 
-  SharedPtr<T> lock(void) const
+  SharedPtr<T> lock() const
   {
     if (!mWeakData.valid())
       return SharedPtr<T>();

@@ -36,30 +36,30 @@ class InternalAmbassador;
 // It contains the data model built up by reading the FOM.
 // Internally dispatched and externally received messages change the state of the data model.
 // NOTE there is another class named _Federate, which represents the participants of the federation.
-class OPENRTI_API Federate : public Referenced {
+class OPENRTI_API Federate final : public Referenced {
 public:
   Federate();
-  virtual ~Federate();
+  virtual ~Federate() noexcept = default;
 
   /// Federate specific members
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
   void setFederateHandle(const FederateHandle& federateHandle);
 
-  const std::string& getFederateType() const
+  const std::string& getFederateType() const noexcept
   { return _federateType; }
   void setFederateType(const std::string& federateType);
 
-  const std::string& getFederateName() const
+  const std::string& getFederateName() const noexcept
   { return _federateName; }
   void setFederateName(const std::string& federateName);
 
   /// Federation specific members
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
   void setFederationHandle(const FederationHandle& federationHandle);
 
-  const std::string& getLogicalTimeFactoryName() const
+  const std::string& getLogicalTimeFactoryName() const noexcept
   { return _logicalTimeFactoryName; }
   void setLogicalTimeFactoryName(const std::string& logicalTimeFactoryName);
 
@@ -83,7 +83,7 @@ public:
   { return _interactionRelevanceAdvisorySwitchEnabled; }
   void setInteractionRelevanceAdvisorySwitchEnabled(bool interactionRelevanceAdvisorySwitchEnabled);
 
-  bool getPermitTimeRegulation() const
+  bool getPermitTimeRegulation() const noexcept
   { return _permitTimeRegulation; }
   void setPermitTimeRegulation(bool permitTimeRegulation);
 
@@ -104,7 +104,7 @@ public:
   void insertOrderType(const std::string& name, OrderType orderType);
 
   /// Dimensions
-  class OPENRTI_API Dimension : public Referenced {
+  class OPENRTI_API Dimension final : public Referenced {
   public:
     Dimension(const std::string& name, unsigned long upperBound);
     ~Dimension();
@@ -133,7 +133,7 @@ public:
 
 
   /// Regions
-  class OPENRTI_API RegionData : public Referenced {
+  class OPENRTI_API RegionData final : public Referenced {
   public:
     RegionData(const DimensionHandleSet& dimensionHandleSet);
     ~RegionData();
@@ -220,7 +220,7 @@ public:
 
 
   /// Interaction Classes
-  struct OPENRTI_API Parameter : public Referenced {
+  struct OPENRTI_API Parameter final : public Referenced {
     Parameter();
     ~Parameter();
 
@@ -239,7 +239,7 @@ public:
   struct InteractionClass;
   typedef IntrusiveList<InteractionClass> ChildInteractionClassList;
 
-  struct OPENRTI_API InteractionClass : public PublishSubscribe, public ChildInteractionClassList::Hook {
+  struct OPENRTI_API InteractionClass final : public PublishSubscribe, public ChildInteractionClassList::Hook {
     InteractionClass();
     ~InteractionClass();
 
@@ -283,7 +283,7 @@ public:
   { return static_cast<uint32_t>(_interactionClassVector.size()); }
 
   /// Object Classes
-  struct OPENRTI_API Attribute : public PublishSubscribe {
+  struct OPENRTI_API Attribute final : public PublishSubscribe {
   // private:
   //   Attribute(const Attribute&);
   //   Attribute& operator=(const Attribute&);
@@ -293,7 +293,7 @@ public:
   struct ObjectClass;
   typedef IntrusiveList<ObjectClass> ChildObjectClassList;
 
-  struct OPENRTI_API ObjectClass : public Referenced, public ChildObjectClassList::Hook {
+  struct OPENRTI_API ObjectClass final : public Referenced, public ChildObjectClassList::Hook {
     ObjectClass();
     ~ObjectClass();
 
@@ -381,7 +381,7 @@ public:
 
 
   /// Object Instances
-  struct OPENRTI_API InstanceAttribute : public Referenced {
+  struct OPENRTI_API InstanceAttribute final : public Referenced {
     InstanceAttribute(const Federate::Attribute& attribute, bool isOwnedByFederate);
     ~InstanceAttribute();
 
@@ -413,7 +413,7 @@ public:
   typedef std::vector<SharedPtr<InstanceAttribute> > InstanceAttributeVector;
 
   typedef std::map<std::string, ObjectInstanceHandle> NameObjectInstanceHandleMap;
-  struct OPENRTI_API ObjectInstance : public Referenced {
+  struct OPENRTI_API ObjectInstance final : public Referenced {
     ObjectInstance(NameObjectInstanceHandleMap::iterator nameObjectInstanceHandleMapIterator, const ObjectClass& objectClass, bool owned);
     ~ObjectInstance();
 
@@ -458,7 +458,7 @@ public:
   typedef std::map<std::string, FederateHandle> NameFederateHandleMap;
 
   // this object represents *OTHER* federates participating in the federation.
-  struct OPENRTI_API _Federate : public Referenced {
+  struct OPENRTI_API _Federate final : public Referenced {
     _Federate(NameFederateHandleMap::iterator nameFederateHandleMapIterator);
     ~_Federate();
 

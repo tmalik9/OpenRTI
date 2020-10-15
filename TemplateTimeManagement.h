@@ -47,7 +47,7 @@ inline std::wstring toWString(long long time)
 
 
 template<typename T, typename L>
-class OPENRTI_LOCAL TemplateTimeManagement : public TimeManagement<T> {
+class OPENRTI_LOCAL TemplateTimeManagement final : public TimeManagement<T> {
 public:
   typedef T Traits;
 
@@ -84,7 +84,7 @@ public:
     _currentLookahead = _logicalTimeFactory.zeroLogicalTimeInterval();
     _targetLookahead = _currentLookahead;
   }
-  virtual ~TemplateTimeManagement()
+  virtual ~TemplateTimeManagement() noexcept
   {
     while (!_logicalTimeMessageListMap.empty()) {
       _logicalTimeMessageListMap.begin()->second.clear();
@@ -95,13 +95,13 @@ public:
   }
 
   /// This is: don't do time advance to the past
-  virtual bool isLogicalTimeInThePast(const NativeLogicalTime& logicalTime)
+  bool isLogicalTimeInThePast(const NativeLogicalTime& logicalTime) override
   {
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnabled() || _committedOutboundLowerBoundTimeStamp <= _toLogicalTime(_outboundLowerBoundTimeStamp));
     return logicalTime < _logicalTimeFactory.getLogicalTime(_logicalTime.first);
   }
   /// This is: 'ok to send message with this timestamp'
-  virtual bool logicalTimeAlreadyPassed(const NativeLogicalTime& logicalTime)
+  bool logicalTimeAlreadyPassed(const NativeLogicalTime& logicalTime) override
   {
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnabled() || _committedOutboundLowerBoundTimeStamp <= _toLogicalTime(_outboundLowerBoundTimeStamp));
     if (_outboundLowerBoundTimeStamp.second) {
@@ -111,7 +111,7 @@ public:
     }
   }
 
-  virtual bool logicalTimeAlreadyPassed(const NativeLogicalTime& logicalTime, std::string& reason)
+  bool logicalTimeAlreadyPassed(const NativeLogicalTime& logicalTime, std::string& reason) override
   {
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnabled() || _committedOutboundLowerBoundTimeStamp <= _toLogicalTime(_outboundLowerBoundTimeStamp));
     if (_outboundLowerBoundTimeStamp.second) {
@@ -131,13 +131,13 @@ public:
     }
   }
 
-  virtual void enableTimeRegulation(InternalAmbassador& ambassador, const NativeLogicalTimeInterval& nativeLookahead)
+  void enableTimeRegulation(InternalAmbassador& ambassador, const NativeLogicalTimeInterval& nativeLookahead) override
   {
     LogicalTimeInterval lookahead = _logicalTimeFactory.getLogicalTimeInterval(nativeLookahead);
     _enableTimeRegulation(ambassador, _logicalTime.first, lookahead);
   }
 
-  virtual void enableTimeRegulation(InternalAmbassador& ambassador, const NativeLogicalTime& nativeLogicalTime, const NativeLogicalTimeInterval& nativeLookahead)
+  void enableTimeRegulation(InternalAmbassador& ambassador, const NativeLogicalTime& nativeLogicalTime, const NativeLogicalTimeInterval& nativeLookahead) override
   {
     LogicalTime logicalTime = _logicalTimeFactory.getLogicalTime(nativeLogicalTime);
     LogicalTimeInterval lookahead = _logicalTimeFactory.getLogicalTimeInterval(nativeLookahead);
@@ -198,7 +198,7 @@ public:
 #endif
   }
 
-  virtual void disableTimeRegulation(InternalAmbassador& ambassador)
+  void disableTimeRegulation(InternalAmbassador& ambassador) override
   {
     OpenRTIAssert(InternalTimeManagement::getTimeRegulationEnabled());
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnablePending());
@@ -221,7 +221,7 @@ public:
     ambassador.send(request);
   }
 
-  virtual void enableTimeConstrained(InternalAmbassador& ambassador)
+  void enableTimeConstrained(InternalAmbassador& ambassador) override
   {
     OpenRTIAssert(!InternalTimeManagement::getTimeConstrainedEnabledOrPending());
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnablePending());
@@ -247,7 +247,7 @@ public:
     ambassador.send(request);
  }
 
-  virtual void disableTimeConstrained(InternalAmbassador& ambassador)
+  void disableTimeConstrained(InternalAmbassador& ambassador) override
   {
     OpenRTIAssert(InternalTimeManagement::getTimeConstrainedEnabled());
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnablePending());
@@ -257,7 +257,7 @@ public:
     InternalTimeManagement::setTimeConstrainedMode(InternalTimeManagement::TimeConstrainedDisabled);
   }
 
-  virtual void timeAdvanceRequest(InternalAmbassador& ambassador, const NativeLogicalTime& nativeLogicalTime, InternalTimeManagement::TimeAdvanceMode timeAdvanceMode)
+  void timeAdvanceRequest(InternalAmbassador& ambassador, const NativeLogicalTime& nativeLogicalTime, InternalTimeManagement::TimeAdvanceMode timeAdvanceMode) override
   {
     // FIXME, delay that into the flush queue logic to get even further
     if (timeAdvanceMode == InternalTimeManagement::FlushQueueRequest)
@@ -355,7 +355,7 @@ public:
     }
   }
 
-  virtual bool queryGALT(InternalAmbassador& ambassador, NativeLogicalTime& logicalTime)
+  bool queryGALT(InternalAmbassador& ambassador, NativeLogicalTime& logicalTime) override
   {
     if (_federateLowerBoundMap.empty())
       return false;
@@ -363,12 +363,12 @@ public:
     return true;
   }
 
-  virtual void queryLogicalTime(InternalAmbassador& ambassador, NativeLogicalTime& logicalTime)
+  void queryLogicalTime(InternalAmbassador& ambassador, NativeLogicalTime& logicalTime) override
   {
     logicalTime = _logicalTimeFactory.getLogicalTime(_logicalTime.first);
   }
 
-  virtual bool queryLITS(InternalAmbassador& ambassador, NativeLogicalTime& logicalTime)
+  bool queryLITS(InternalAmbassador& ambassador, NativeLogicalTime& logicalTime) override
   {
     if (_logicalTimeMessageListMap.empty()) {
       if (_federateLowerBoundMap.empty()) {
@@ -391,7 +391,7 @@ public:
     }
   }
 
-  virtual void modifyLookahead(InternalAmbassador& ambassador, const NativeLogicalTimeInterval& nativeLookahead)
+  void modifyLookahead(InternalAmbassador& ambassador, const NativeLogicalTimeInterval& nativeLookahead) override
   {
     OpenRTIAssert(InternalTimeManagement::getTimeRegulationEnabled());
     OpenRTIAssert(!InternalTimeManagement::getTimeAdvancePending());
@@ -407,16 +407,16 @@ public:
     _sendCommitLowerBoundTimeStampIfChanged(ambassador, _outboundLowerBoundTimeStamp, TimeAdvanceAndNextMessageCommit);
   }
 
-  virtual void queryLookahead(InternalAmbassador& ambassador, NativeLogicalTimeInterval& logicalTimeInterval)
+  void queryLookahead(InternalAmbassador& ambassador, NativeLogicalTimeInterval& logicalTimeInterval) override
   {
     logicalTimeInterval = _logicalTimeFactory.getLogicalTimeInterval(_currentLookahead);
   }
 
-  virtual std::string logicalTimeToString(const NativeLogicalTime& nativeLogicalTime) override
+  std::string logicalTimeToString(const NativeLogicalTime& nativeLogicalTime) override
   {
     return _logicalTimeFactory.toString(nativeLogicalTime);
   }
-  virtual std::string logicalTimeToString(const VariableLengthData& logicalTimeData) override
+  std::string logicalTimeToString(const VariableLengthData& logicalTimeData) override
   {
     LogicalTime logicalTime = _logicalTimeFactory.decodeLogicalTime(logicalTimeData);
 
@@ -426,20 +426,20 @@ public:
   {
     return _logicalTimeFactory.toString(_logicalTimeFactory.getLogicalTime(logicalTime));
   }
-  virtual std::string logicalTimeIntervalToString(const NativeLogicalTimeInterval& nativeLogicalTimeInterval)
+  std::string logicalTimeIntervalToString(const NativeLogicalTimeInterval& nativeLogicalTimeInterval) override
   {
     return _logicalTimeFactory.toString(nativeLogicalTimeInterval);
   }
-  virtual bool isPositiveLogicalTimeInterval(const NativeLogicalTimeInterval& nativeLogicalTimeInterval)
+  bool isPositiveLogicalTimeInterval(const NativeLogicalTimeInterval& nativeLogicalTimeInterval) override
   {
     return _logicalTimeFactory.isPositiveTimeInterval(nativeLogicalTimeInterval);
   }
-  virtual VariableLengthData encodeLogicalTime(const NativeLogicalTime& nativeLogicalTime) override
+  VariableLengthData encodeLogicalTime(const NativeLogicalTime& nativeLogicalTime) override
   {
     return _logicalTimeFactory.encodeLogicalTime(nativeLogicalTime);
   }
 
-  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const JoinFederateNotifyMessage& message)
+  void acceptInternalMessage(InternalAmbassador& ambassador, const JoinFederateNotifyMessage& message) override
   {
     // Ok, this is tricky. As long as we are waiting for the root servers reply, we need to assume that the
     // time regulation request hits the root server when this federate is already joined, which means it will
@@ -450,7 +450,7 @@ public:
       _timeRegulationEnableFederateHandleSet.insert(message.getFederateHandle());
     }
   }
-  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const ResignFederateNotifyMessage& message)
+  void acceptInternalMessage(InternalAmbassador& ambassador, const ResignFederateNotifyMessage& message) override
   {
     removeFederateFromTimeManagement(ambassador, message.getFederateHandle());
   }
@@ -465,7 +465,7 @@ public:
   // new regulating federate is. So this call in effect establishes the logical time
   // entry in the map containing the time regulating federates and the timestamps.
   // Once the new federate has collected all its knowledge, it might commit a later time.
-  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const EnableTimeRegulationRequestMessage& message)
+  void acceptInternalMessage(InternalAmbassador& ambassador, const EnableTimeRegulationRequestMessage& message) override
   {
     if (ambassador.getFederate()->getFederateHandle() == message.getFederateHandle()) {
       // This is our own request looping back to ourself.
@@ -534,7 +534,8 @@ public:
       OpenRTIAssert(!_federateLowerBoundMap.empty());
     }
   }
-  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const EnableTimeRegulationResponseMessage& message)
+  
+  void acceptInternalMessage(InternalAmbassador& ambassador, const EnableTimeRegulationResponseMessage& message) override
   {
     if (!InternalTimeManagement::getTimeRegulationEnablePending()) {
       Log(Network, Warning) << "Received EnableTimeRegulationResponseMessage without waiting for that to happen!" << std::endl;
@@ -563,7 +564,8 @@ public:
     // new logical time
     checkTimeRegulationEnabled(ambassador);
   }
-  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const DisableTimeRegulationRequestMessage& message)
+  
+  void acceptInternalMessage(InternalAmbassador& ambassador, const DisableTimeRegulationRequestMessage& message) override
   {
 #ifndef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
     bool previousLockedByNextMessage = getLockedByNextMessage();
@@ -581,7 +583,7 @@ public:
     checkForPendingTimeAdvance(ambassador);
   }
 
-  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const CommitLowerBoundTimeStampMessage& message)
+  void acceptInternalMessage(InternalAmbassador& ambassador, const CommitLowerBoundTimeStampMessage& message) override
   {
     LogicalTime logicalTime = _logicalTimeFactory.decodeLogicalTime(message.getTimeStamp());
 
@@ -602,7 +604,8 @@ public:
 #endif
     checkForPendingTimeAdvance(ambassador);
   }
-  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const CommitLowerBoundTimeStampResponseMessage& message)
+  
+  void acceptInternalMessage(InternalAmbassador& ambassador, const CommitLowerBoundTimeStampResponseMessage& message) override
   {
 #ifndef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
     bool previousLockedByNextMessage = getLockedByNextMessage();
@@ -617,7 +620,8 @@ public:
     checkForPendingTimeAdvance(ambassador);
 #endif
   }
-  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const LockedByNextMessageRequestMessage& message)
+  
+  void acceptInternalMessage(InternalAmbassador& ambassador, const LockedByNextMessageRequestMessage& message) override
   {
 #ifndef EXPERIMENTAL_NO_LOCKED_BY_NEXT_MESSAGE
     bool previousLockedByNextMessage = getLockedByNextMessage();
@@ -633,7 +637,7 @@ public:
 #endif
   }
 
-  virtual void queueTimeStampedMessage(InternalAmbassador& ambassador, const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback)
+  void queueTimeStampedMessage(InternalAmbassador& ambassador, const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback) override
   {
     queueTimeStampedMessage(ambassador, _logicalTimeFactory.decodeLogicalTime(timeStamp), message, loopback);
   }
@@ -712,7 +716,7 @@ public:
       _notificationHandle->Signal();
     }
   }
-  virtual void queueReceiveOrderMessage(InternalAmbassador& ambassador, const AbstractMessage& message)
+  void queueReceiveOrderMessage(InternalAmbassador& ambassador, const AbstractMessage& message) override
   {
     if (_messageListPool.empty()) {
       _MessageListElement* messageListElement = new _MessageListElement(&message);
@@ -1028,7 +1032,7 @@ public:
     OpenRTIAssert(_targetLookahead <= _currentLookahead);
   }
 
-  virtual void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeConstrainedEnabledMessage& message)
+  void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeConstrainedEnabledMessage& message) override
   {
     OpenRTIAssert(InternalTimeManagement::getTimeConstrainedEnablePending());
     OpenRTIAssert(canAdvanceTo(_pendingLogicalTime));
@@ -1039,7 +1043,7 @@ public:
     _logicalTime = _pendingLogicalTime;
     ambassador.timeConstrainedEnabled(_logicalTimeFactory.getLogicalTime(_logicalTime.first));
   }
-  virtual void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeRegulationEnabledMessage& message)
+  void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeRegulationEnabledMessage& message) override
   {
     OpenRTIAssert(InternalTimeManagement::getTimeRegulationEnablePending());
     OpenRTIAssert(!InternalTimeManagement::getTimeConstrainedEnabled() || canAdvanceTo(_pendingLogicalTime));
@@ -1054,7 +1058,7 @@ public:
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnabled() || _committedOutboundLowerBoundTimeStamp <= _toLogicalTime(_outboundLowerBoundTimeStamp));
     ambassador.timeRegulationEnabled(_logicalTimeFactory.getLogicalTime(_logicalTime.first));
   }
-  virtual void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeAdvanceGrantedMessage& message)
+  void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeAdvanceGrantedMessage& message) override
   {
     OpenRTIAssert(InternalTimeManagement::getTimeAdvancePending());
     OpenRTIAssert(!InternalTimeManagement::getTimeConstrainedEnabled() || canAdvanceTo(_pendingLogicalTime));
@@ -1073,8 +1077,8 @@ public:
     ambassador.timeAdvanceGrant(_logicalTimeFactory.getLogicalTime(_logicalTime.first));
   }
 
-  virtual void reflectAttributeValues(Ambassador<T>& ambassador, const Federate::ObjectClass& objectClass,
-                                      const TimeStampedAttributeUpdateMessage& message)
+  void reflectAttributeValues(Ambassador<T>& ambassador, const Federate::ObjectClass& objectClass,
+                                      const TimeStampedAttributeUpdateMessage& message) override
   {
     OrderType orderType = InternalTimeManagement::getTimeStampOrderDelivery(message.getOrderType());
     LogicalTime logicalTime = _logicalTimeFactory.decodeLogicalTime(message.getTimeStamp());
@@ -1091,7 +1095,7 @@ public:
     }
   }
 
-  virtual void removeObjectInstance(Ambassador<T>& ambassador, const TimeStampedDeleteObjectInstanceMessage& message)
+  void removeObjectInstance(Ambassador<T>& ambassador, const TimeStampedDeleteObjectInstanceMessage& message) override
   {
     OrderType orderType = InternalTimeManagement::getTimeStampOrderDelivery(message.getOrderType());
     LogicalTime logicalTime = _logicalTimeFactory.decodeLogicalTime(message.getTimeStamp());
@@ -1106,7 +1110,7 @@ public:
     }
   }
 
-  virtual void eraseMessagesForObjectInstance(Ambassador<T>& ambassador, const ObjectInstanceHandle& objectInstanceHandle)
+  void eraseMessagesForObjectInstance(Ambassador<T>& ambassador, const ObjectInstanceHandle& objectInstanceHandle) override
   {
     // Remove messages targeting this object instance from the pending messages
     typename _ObjectInstanceHandleMessageListElementMap::iterator i;
@@ -1119,8 +1123,8 @@ public:
     }
   }
 
-  virtual void receiveInteraction(Ambassador<T>& ambassador, const Federate::InteractionClass& interactionClass,
-                                  const InteractionClassHandle& interactionClassHandle, const TimeStampedInteractionMessage& message)
+  void receiveInteraction(Ambassador<T>& ambassador, const Federate::InteractionClass& interactionClass,
+                                  const InteractionClassHandle& interactionClassHandle, const TimeStampedInteractionMessage& message) override
   {
     OrderType orderType = InternalTimeManagement::getTimeStampOrderDelivery(message.getOrderType());
     LogicalTime logicalTime = _logicalTimeFactory.decodeLogicalTime(message.getTimeStamp());
@@ -1137,7 +1141,7 @@ public:
     }
   }
 
-  virtual bool dispatchCallback(const AbstractMessageDispatcher& dispatcher)
+  bool dispatchCallback(const AbstractMessageDispatcher& dispatcher) override
   {
     //CondDebugPrintf("%s: _receiveOrderMessagesPermitted=%d _receiveOrderMessages.size=%d\n", __FUNCTION__, _receiveOrderMessagesPermitted(), _receiveOrderMessages.size());
     if (_receiveOrderMessagesPermitted()) {
@@ -1179,7 +1183,7 @@ public:
     return false;
   }
 
-  virtual bool callbackMessageAvailable()
+  bool callbackMessageAvailable() override
   {
     if (_receiveOrderMessagesPermitted()) {
       if (!_receiveOrderMessages.empty()) {

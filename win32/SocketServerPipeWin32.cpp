@@ -42,7 +42,7 @@ SocketServerPipe::listen(int backlog)
   throw RTIinternalError("Pipes are not implemented on WIN32");
 }
 
-SocketPipe*
+SharedPtr<SocketStream>
 SocketServerPipe::accept()
 {
   throw RTIinternalError("Pipes are not implemented on WIN32");

@@ -23,6 +23,7 @@
 #ifndef OpenRTI_TightBE1MessageEncoding_h
 #define OpenRTI_TightBE1MessageEncoding_h
 
+#include "DebugNew.h"
 #include "AbstractMessageEncoding.h"
 #include "Export.h"
 
@@ -30,15 +31,15 @@ namespace OpenRTI {
 
 class OPENRTI_LOCAL TightBE1MessageEncoding : public AbstractMessageEncoding {
 public:
-  TightBE1MessageEncoding();
-  virtual ~TightBE1MessageEncoding();
+  TightBE1MessageEncoding() noexcept;
+  virtual ~TightBE1MessageEncoding() noexcept;
 
-  virtual const char* getName() const;
+  const char* getName() const override;
 
-  virtual void readPacket(const Buffer& buffer);
+  void readPacket(const Buffer& buffer) override;
   void decodeBody(const VariableLengthData& variableLengthData);
   void decodePayload(const Buffer::const_iterator& i);
-  virtual void writeMessage(const AbstractMessage& message);
+  void writeMessage(const AbstractMessage& message) override;
 
 private:
   class DecodeStream;

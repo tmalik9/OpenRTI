@@ -22,11 +22,11 @@
 
 namespace OpenRTI {
 
-AbstractMessageSender::AbstractMessageSender()
+AbstractMessageSender::AbstractMessageSender() noexcept
 {
 }
 
-AbstractMessageSender::~AbstractMessageSender()
+AbstractMessageSender::~AbstractMessageSender() noexcept
 {
 }
 

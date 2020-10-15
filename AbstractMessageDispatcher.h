@@ -95,7 +95,7 @@ class QueryAttributeOwnershipResponseMessage;
 
 class OPENRTI_LOCAL AbstractMessageDispatcher {
 public:
-  virtual ~AbstractMessageDispatcher() {}
+  virtual ~AbstractMessageDispatcher() noexcept {}
 
   virtual void accept(const ConnectionLostMessage&) const = 0;
   virtual void accept(const CreateFederationExecutionRequestMessage&) const = 0;
@@ -168,73 +168,73 @@ template<typename T>
 class OPENRTI_LOCAL FunctorMessageDispatcher : public AbstractMessageDispatcher {
 public:
   FunctorMessageDispatcher(T& t) : _t(t) {}
-  virtual ~FunctorMessageDispatcher() {}
+  virtual ~FunctorMessageDispatcher() noexcept {}
 
-  virtual void accept(const ConnectionLostMessage& message) const { _t(message); }
-  virtual void accept(const CreateFederationExecutionRequestMessage& message) const { _t(message); }
-  virtual void accept(const CreateFederationExecutionResponseMessage& message) const { _t(message); }
-  virtual void accept(const DestroyFederationExecutionRequestMessage& message) const { _t(message); }
-  virtual void accept(const DestroyFederationExecutionResponseMessage& message) const { _t(message); }
-  virtual void accept(const EnumerateFederationExecutionsRequestMessage& message) const { _t(message); }
-  virtual void accept(const EnumerateFederationExecutionsResponseMessage& message) const { _t(message); }
-  virtual void accept(const InsertFederationExecutionMessage& message) const { _t(message); }
-  virtual void accept(const ShutdownFederationExecutionMessage& message) const { _t(message); }
-  virtual void accept(const EraseFederationExecutionMessage& message) const { _t(message); }
-  virtual void accept(const ReleaseFederationHandleMessage& message) const { _t(message); }
-  virtual void accept(const InsertModulesMessage& message) const { _t(message); }
-  virtual void accept(const JoinFederationExecutionRequestMessage& message) const { _t(message); }
-  virtual void accept(const JoinFederationExecutionResponseMessage& message) const { _t(message); }
-  virtual void accept(const ResignFederationExecutionLeafRequestMessage& message) const { _t(message); }
-  virtual void accept(const ResignFederationExecutionRequestMessage& message) const { _t(message); }
-  virtual void accept(const JoinFederateNotifyMessage& message) const { _t(message); }
-  virtual void accept(const ResignFederateNotifyMessage& message) const { _t(message); }
-  virtual void accept(const ChangeAutomaticResignDirectiveMessage& message) const { _t(message); }
-  virtual void accept(const RegisterFederationSynchronizationPointMessage& message) const { _t(message); }
-  virtual void accept(const RegisterFederationSynchronizationPointResponseMessage& message) const { _t(message); }
-  virtual void accept(const AnnounceSynchronizationPointMessage& message) const { _t(message); }
-  virtual void accept(const SynchronizationPointAchievedMessage& message) const { _t(message); }
-  virtual void accept(const FederationSynchronizedMessage& message) const { _t(message); }
-  virtual void accept(const EnableTimeRegulationRequestMessage& message) const { _t(message); }
-  virtual void accept(const EnableTimeRegulationResponseMessage& message) const { _t(message); }
-  virtual void accept(const DisableTimeRegulationRequestMessage& message) const { _t(message); }
-  virtual void accept(const EnableTimeConstrainedNotifyMessage& message) const { _t(message); }
-  virtual void accept(const DisableTimeConstrainedNotifyMessage& message) const { _t(message); }
-  virtual void accept(const CommitLowerBoundTimeStampMessage& message) const { _t(message); }
-  virtual void accept(const CommitLowerBoundTimeStampResponseMessage& message) const { _t(message); }
-  virtual void accept(const LockedByNextMessageRequestMessage& message) const { _t(message); }
-  virtual void accept(const TimeConstrainedEnabledMessage& message) const { _t(message); }
-  virtual void accept(const TimeRegulationEnabledMessage& message) const { _t(message); }
-  virtual void accept(const TimeAdvanceGrantedMessage& message) const { _t(message); }
-  virtual void accept(const InsertRegionMessage& message) const { _t(message); }
-  virtual void accept(const CommitRegionMessage& message) const { _t(message); }
-  virtual void accept(const EraseRegionMessage& message) const { _t(message); }
-  virtual void accept(const ChangeInteractionClassPublicationMessage& message) const { _t(message); }
-  virtual void accept(const ChangeObjectClassPublicationMessage& message) const { _t(message); }
-  virtual void accept(const ChangeInteractionClassSubscriptionMessage& message) const { _t(message); }
-  virtual void accept(const ChangeObjectClassSubscriptionMessage& message) const { _t(message); }
-  virtual void accept(const ChangeObjectInstanceSubscriptionMessage& message) const { _t(message); }
-  virtual void accept(const RegistrationForObjectClassMessage& message) const { _t(message); }
-  virtual void accept(const AttributesInScopeMessage& message) const { _t(message); }
-  virtual void accept(const TurnUpdatesOnForInstanceMessage& message) const { _t(message); }
-  virtual void accept(const TurnInteractionsOnMessage& message) const { _t(message); }
-  virtual void accept(const InteractionMessage& message) const { _t(message); }
-  virtual void accept(const TimeStampedInteractionMessage& message) const { _t(message); }
-  virtual void accept(const ObjectInstanceHandlesRequestMessage& message) const { _t(message); }
-  virtual void accept(const ObjectInstanceHandlesResponseMessage& message) const { _t(message); }
-  virtual void accept(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& message) const { _t(message); }
-  virtual void accept(const ReserveObjectInstanceNameRequestMessage& message) const { _t(message); }
-  virtual void accept(const ReserveObjectInstanceNameResponseMessage& message) const { _t(message); }
-  virtual void accept(const ReserveMultipleObjectInstanceNameRequestMessage& message) const { _t(message); }
-  virtual void accept(const ReserveMultipleObjectInstanceNameResponseMessage& message) const { _t(message); }
-  virtual void accept(const InsertObjectInstanceMessage& message) const { _t(message); }
-  virtual void accept(const DeleteObjectInstanceMessage& message) const { _t(message); }
-  virtual void accept(const TimeStampedDeleteObjectInstanceMessage& message) const { _t(message); }
-  virtual void accept(const AttributeUpdateMessage& message) const { _t(message); }
-  virtual void accept(const TimeStampedAttributeUpdateMessage& message) const { _t(message); }
-  virtual void accept(const RequestAttributeUpdateMessage& message) const { _t(message); }
-  virtual void accept(const RequestClassAttributeUpdateMessage& message) const { _t(message); }
-  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const { _t(message); }
-  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const { _t(message); }
+  virtual void accept(const ConnectionLostMessage& message) const override { _t(message); }
+  virtual void accept(const CreateFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const CreateFederationExecutionResponseMessage& message) const override { _t(message); }
+  virtual void accept(const DestroyFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const DestroyFederationExecutionResponseMessage& message) const override { _t(message); }
+  virtual void accept(const EnumerateFederationExecutionsRequestMessage& message) const override { _t(message); }
+  virtual void accept(const EnumerateFederationExecutionsResponseMessage& message) const override { _t(message); }
+  virtual void accept(const InsertFederationExecutionMessage& message) const override { _t(message); }
+  virtual void accept(const ShutdownFederationExecutionMessage& message) const override { _t(message); }
+  virtual void accept(const EraseFederationExecutionMessage& message) const override { _t(message); }
+  virtual void accept(const ReleaseFederationHandleMessage& message) const override { _t(message); }
+  virtual void accept(const InsertModulesMessage& message) const override { _t(message); }
+  virtual void accept(const JoinFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const JoinFederationExecutionResponseMessage& message) const override { _t(message); }
+  virtual void accept(const ResignFederationExecutionLeafRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ResignFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const JoinFederateNotifyMessage& message) const override { _t(message); }
+  virtual void accept(const ResignFederateNotifyMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeAutomaticResignDirectiveMessage& message) const override { _t(message); }
+  virtual void accept(const RegisterFederationSynchronizationPointMessage& message) const override { _t(message); }
+  virtual void accept(const RegisterFederationSynchronizationPointResponseMessage& message) const override { _t(message); }
+  virtual void accept(const AnnounceSynchronizationPointMessage& message) const override { _t(message); }
+  virtual void accept(const SynchronizationPointAchievedMessage& message) const override { _t(message); }
+  virtual void accept(const FederationSynchronizedMessage& message) const override { _t(message); }
+  virtual void accept(const EnableTimeRegulationRequestMessage& message) const override { _t(message); }
+  virtual void accept(const EnableTimeRegulationResponseMessage& message) const override { _t(message); }
+  virtual void accept(const DisableTimeRegulationRequestMessage& message) const override { _t(message); }
+  virtual void accept(const EnableTimeConstrainedNotifyMessage& message) const override { _t(message); }
+  virtual void accept(const DisableTimeConstrainedNotifyMessage& message) const override { _t(message); }
+  virtual void accept(const CommitLowerBoundTimeStampMessage& message) const override { _t(message); }
+  virtual void accept(const CommitLowerBoundTimeStampResponseMessage& message) const override { _t(message); }
+  virtual void accept(const LockedByNextMessageRequestMessage& message) const override { _t(message); }
+  virtual void accept(const TimeConstrainedEnabledMessage& message) const override { _t(message); }
+  virtual void accept(const TimeRegulationEnabledMessage& message) const override { _t(message); }
+  virtual void accept(const TimeAdvanceGrantedMessage& message) const override { _t(message); }
+  virtual void accept(const InsertRegionMessage& message) const override { _t(message); }
+  virtual void accept(const CommitRegionMessage& message) const override { _t(message); }
+  virtual void accept(const EraseRegionMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeInteractionClassPublicationMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeObjectClassPublicationMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeInteractionClassSubscriptionMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeObjectClassSubscriptionMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeObjectInstanceSubscriptionMessage& message) const override { _t(message); }
+  virtual void accept(const RegistrationForObjectClassMessage& message) const override { _t(message); }
+  virtual void accept(const AttributesInScopeMessage& message) const override { _t(message); }
+  virtual void accept(const TurnUpdatesOnForInstanceMessage& message) const override { _t(message); }
+  virtual void accept(const TurnInteractionsOnMessage& message) const override { _t(message); }
+  virtual void accept(const InteractionMessage& message) const override { _t(message); }
+  virtual void accept(const TimeStampedInteractionMessage& message) const override { _t(message); }
+  virtual void accept(const ObjectInstanceHandlesRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ObjectInstanceHandlesResponseMessage& message) const override { _t(message); }
+  virtual void accept(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& message) const override { _t(message); }
+  virtual void accept(const ReserveObjectInstanceNameRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ReserveObjectInstanceNameResponseMessage& message) const override { _t(message); }
+  virtual void accept(const ReserveMultipleObjectInstanceNameRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ReserveMultipleObjectInstanceNameResponseMessage& message) const override { _t(message); }
+  virtual void accept(const InsertObjectInstanceMessage& message) const override { _t(message); }
+  virtual void accept(const DeleteObjectInstanceMessage& message) const override { _t(message); }
+  virtual void accept(const TimeStampedDeleteObjectInstanceMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeUpdateMessage& message) const override { _t(message); }
+  virtual void accept(const TimeStampedAttributeUpdateMessage& message) const override { _t(message); }
+  virtual void accept(const RequestAttributeUpdateMessage& message) const override { _t(message); }
+  virtual void accept(const RequestClassAttributeUpdateMessage& message) const override { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const override { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const override { _t(message); }
 private:
   T& _t;
 };
@@ -243,73 +243,73 @@ template<typename T>
 class OPENRTI_LOCAL ConstFunctorMessageDispatcher : public AbstractMessageDispatcher {
 public:
   ConstFunctorMessageDispatcher(const T& t) : _t(t) {}
-  virtual ~ConstFunctorMessageDispatcher() {}
+  virtual ~ConstFunctorMessageDispatcher() noexcept {}
 
-  virtual void accept(const ConnectionLostMessage& message) const { _t(message); }
-  virtual void accept(const CreateFederationExecutionRequestMessage& message) const { _t(message); }
-  virtual void accept(const CreateFederationExecutionResponseMessage& message) const { _t(message); }
-  virtual void accept(const DestroyFederationExecutionRequestMessage& message) const { _t(message); }
-  virtual void accept(const DestroyFederationExecutionResponseMessage& message) const { _t(message); }
-  virtual void accept(const EnumerateFederationExecutionsRequestMessage& message) const { _t(message); }
-  virtual void accept(const EnumerateFederationExecutionsResponseMessage& message) const { _t(message); }
-  virtual void accept(const InsertFederationExecutionMessage& message) const { _t(message); }
-  virtual void accept(const ShutdownFederationExecutionMessage& message) const { _t(message); }
-  virtual void accept(const EraseFederationExecutionMessage& message) const { _t(message); }
-  virtual void accept(const ReleaseFederationHandleMessage& message) const { _t(message); }
-  virtual void accept(const InsertModulesMessage& message) const { _t(message); }
-  virtual void accept(const JoinFederationExecutionRequestMessage& message) const { _t(message); }
-  virtual void accept(const JoinFederationExecutionResponseMessage& message) const { _t(message); }
-  virtual void accept(const ResignFederationExecutionLeafRequestMessage& message) const { _t(message); }
-  virtual void accept(const ResignFederationExecutionRequestMessage& message) const { _t(message); }
-  virtual void accept(const JoinFederateNotifyMessage& message) const { _t(message); }
-  virtual void accept(const ResignFederateNotifyMessage& message) const { _t(message); }
-  virtual void accept(const ChangeAutomaticResignDirectiveMessage& message) const { _t(message); }
-  virtual void accept(const RegisterFederationSynchronizationPointMessage& message) const { _t(message); }
-  virtual void accept(const RegisterFederationSynchronizationPointResponseMessage& message) const { _t(message); }
-  virtual void accept(const AnnounceSynchronizationPointMessage& message) const { _t(message); }
-  virtual void accept(const SynchronizationPointAchievedMessage& message) const { _t(message); }
-  virtual void accept(const FederationSynchronizedMessage& message) const { _t(message); }
-  virtual void accept(const EnableTimeRegulationRequestMessage& message) const { _t(message); }
-  virtual void accept(const EnableTimeRegulationResponseMessage& message) const { _t(message); }
-  virtual void accept(const DisableTimeRegulationRequestMessage& message) const { _t(message); }
-  virtual void accept(const EnableTimeConstrainedNotifyMessage& message) const { _t(message); }
-  virtual void accept(const DisableTimeConstrainedNotifyMessage& message) const { _t(message); }
-  virtual void accept(const CommitLowerBoundTimeStampMessage& message) const { _t(message); }
-  virtual void accept(const CommitLowerBoundTimeStampResponseMessage& message) const { _t(message); }
-  virtual void accept(const LockedByNextMessageRequestMessage& message) const { _t(message); }
-  virtual void accept(const TimeConstrainedEnabledMessage& message) const { _t(message); }
-  virtual void accept(const TimeRegulationEnabledMessage& message) const { _t(message); }
-  virtual void accept(const TimeAdvanceGrantedMessage& message) const { _t(message); }
-  virtual void accept(const InsertRegionMessage& message) const { _t(message); }
-  virtual void accept(const CommitRegionMessage& message) const { _t(message); }
-  virtual void accept(const EraseRegionMessage& message) const { _t(message); }
-  virtual void accept(const ChangeInteractionClassPublicationMessage& message) const { _t(message); }
-  virtual void accept(const ChangeObjectClassPublicationMessage& message) const { _t(message); }
-  virtual void accept(const ChangeInteractionClassSubscriptionMessage& message) const { _t(message); }
-  virtual void accept(const ChangeObjectClassSubscriptionMessage& message) const { _t(message); }
-  virtual void accept(const ChangeObjectInstanceSubscriptionMessage& message) const { _t(message); }
-  virtual void accept(const RegistrationForObjectClassMessage& message) const { _t(message); }
-  virtual void accept(const AttributesInScopeMessage& message) const { _t(message); }
-  virtual void accept(const TurnUpdatesOnForInstanceMessage& message) const { _t(message); }
-  virtual void accept(const TurnInteractionsOnMessage& message) const { _t(message); }
-  virtual void accept(const InteractionMessage& message) const { _t(message); }
-  virtual void accept(const TimeStampedInteractionMessage& message) const { _t(message); }
-  virtual void accept(const ObjectInstanceHandlesRequestMessage& message) const { _t(message); }
-  virtual void accept(const ObjectInstanceHandlesResponseMessage& message) const { _t(message); }
-  virtual void accept(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& message) const { _t(message); }
-  virtual void accept(const ReserveObjectInstanceNameRequestMessage& message) const { _t(message); }
-  virtual void accept(const ReserveObjectInstanceNameResponseMessage& message) const { _t(message); }
-  virtual void accept(const ReserveMultipleObjectInstanceNameRequestMessage& message) const { _t(message); }
-  virtual void accept(const ReserveMultipleObjectInstanceNameResponseMessage& message) const { _t(message); }
-  virtual void accept(const InsertObjectInstanceMessage& message) const { _t(message); }
-  virtual void accept(const DeleteObjectInstanceMessage& message) const { _t(message); }
-  virtual void accept(const TimeStampedDeleteObjectInstanceMessage& message) const { _t(message); }
-  virtual void accept(const AttributeUpdateMessage& message) const { _t(message); }
-  virtual void accept(const TimeStampedAttributeUpdateMessage& message) const { _t(message); }
-  virtual void accept(const RequestAttributeUpdateMessage& message) const { _t(message); }
-  virtual void accept(const RequestClassAttributeUpdateMessage& message) const { _t(message); }
-  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const { _t(message); }
-  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const { _t(message); }
+  virtual void accept(const ConnectionLostMessage& message) const override { _t(message); }
+  virtual void accept(const CreateFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const CreateFederationExecutionResponseMessage& message) const override { _t(message); }
+  virtual void accept(const DestroyFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const DestroyFederationExecutionResponseMessage& message) const override { _t(message); }
+  virtual void accept(const EnumerateFederationExecutionsRequestMessage& message) const override { _t(message); }
+  virtual void accept(const EnumerateFederationExecutionsResponseMessage& message) const override { _t(message); }
+  virtual void accept(const InsertFederationExecutionMessage& message) const override { _t(message); }
+  virtual void accept(const ShutdownFederationExecutionMessage& message) const override { _t(message); }
+  virtual void accept(const EraseFederationExecutionMessage& message) const override { _t(message); }
+  virtual void accept(const ReleaseFederationHandleMessage& message) const override { _t(message); }
+  virtual void accept(const InsertModulesMessage& message) const override { _t(message); }
+  virtual void accept(const JoinFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const JoinFederationExecutionResponseMessage& message) const override { _t(message); }
+  virtual void accept(const ResignFederationExecutionLeafRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ResignFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const JoinFederateNotifyMessage& message) const override { _t(message); }
+  virtual void accept(const ResignFederateNotifyMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeAutomaticResignDirectiveMessage& message) const override { _t(message); }
+  virtual void accept(const RegisterFederationSynchronizationPointMessage& message) const override { _t(message); }
+  virtual void accept(const RegisterFederationSynchronizationPointResponseMessage& message) const override { _t(message); }
+  virtual void accept(const AnnounceSynchronizationPointMessage& message) const override { _t(message); }
+  virtual void accept(const SynchronizationPointAchievedMessage& message) const override { _t(message); }
+  virtual void accept(const FederationSynchronizedMessage& message) const override { _t(message); }
+  virtual void accept(const EnableTimeRegulationRequestMessage& message) const override { _t(message); }
+  virtual void accept(const EnableTimeRegulationResponseMessage& message) const override { _t(message); }
+  virtual void accept(const DisableTimeRegulationRequestMessage& message) const override { _t(message); }
+  virtual void accept(const EnableTimeConstrainedNotifyMessage& message) const override { _t(message); }
+  virtual void accept(const DisableTimeConstrainedNotifyMessage& message) const override { _t(message); }
+  virtual void accept(const CommitLowerBoundTimeStampMessage& message) const override { _t(message); }
+  virtual void accept(const CommitLowerBoundTimeStampResponseMessage& message) const override { _t(message); }
+  virtual void accept(const LockedByNextMessageRequestMessage& message) const override { _t(message); }
+  virtual void accept(const TimeConstrainedEnabledMessage& message) const override { _t(message); }
+  virtual void accept(const TimeRegulationEnabledMessage& message) const override { _t(message); }
+  virtual void accept(const TimeAdvanceGrantedMessage& message) const override { _t(message); }
+  virtual void accept(const InsertRegionMessage& message) const override { _t(message); }
+  virtual void accept(const CommitRegionMessage& message) const override { _t(message); }
+  virtual void accept(const EraseRegionMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeInteractionClassPublicationMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeObjectClassPublicationMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeInteractionClassSubscriptionMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeObjectClassSubscriptionMessage& message) const override { _t(message); }
+  virtual void accept(const ChangeObjectInstanceSubscriptionMessage& message) const override { _t(message); }
+  virtual void accept(const RegistrationForObjectClassMessage& message) const override { _t(message); }
+  virtual void accept(const AttributesInScopeMessage& message) const override { _t(message); }
+  virtual void accept(const TurnUpdatesOnForInstanceMessage& message) const override { _t(message); }
+  virtual void accept(const TurnInteractionsOnMessage& message) const override { _t(message); }
+  virtual void accept(const InteractionMessage& message) const override { _t(message); }
+  virtual void accept(const TimeStampedInteractionMessage& message) const override { _t(message); }
+  virtual void accept(const ObjectInstanceHandlesRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ObjectInstanceHandlesResponseMessage& message) const override { _t(message); }
+  virtual void accept(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& message) const override { _t(message); }
+  virtual void accept(const ReserveObjectInstanceNameRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ReserveObjectInstanceNameResponseMessage& message) const override { _t(message); }
+  virtual void accept(const ReserveMultipleObjectInstanceNameRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ReserveMultipleObjectInstanceNameResponseMessage& message) const override { _t(message); }
+  virtual void accept(const InsertObjectInstanceMessage& message) const override { _t(message); }
+  virtual void accept(const DeleteObjectInstanceMessage& message) const override { _t(message); }
+  virtual void accept(const TimeStampedDeleteObjectInstanceMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeUpdateMessage& message) const override { _t(message); }
+  virtual void accept(const TimeStampedAttributeUpdateMessage& message) const override { _t(message); }
+  virtual void accept(const RequestAttributeUpdateMessage& message) const override { _t(message); }
+  virtual void accept(const RequestClassAttributeUpdateMessage& message) const override { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const override { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const override { _t(message); }
 private:
   const T& _t;
 };

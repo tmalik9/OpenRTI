@@ -31,10 +31,6 @@ InternalTimeManagement::InternalTimeManagement() :
 {
 }
 
-InternalTimeManagement::~InternalTimeManagement()
-{
-}
-
 std::string to_string(InternalTimeManagement::TimeAdvanceMode mode)
 {
   switch (mode)

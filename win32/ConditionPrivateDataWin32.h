@@ -44,20 +44,20 @@ namespace OpenRTI {
 
 #ifdef HAVE_CONDITION_VARIABLE
 struct Condition::PrivateData {
-  PrivateData(void)
+  PrivateData()
   {
     InitializeConditionVariable(&_condition);
   }
-  ~PrivateData(void)
+  ~PrivateData()
   {
   }
 
-  void notify_one(void)
+  void notify_one()
   {
     WakeConditionVariable(&_condition);
   }
 
-  void notify_all(void)
+  void notify_all()
   {
     WakeAllConditionVariable(&_condition);
   }
@@ -73,7 +73,7 @@ struct Condition::PrivateData {
 #else
 
 struct Condition::PrivateData {
-  ~PrivateData(void)
+  ~PrivateData()
   {
     // The waiting pool should be empty anyway
     _mutex.lock();
@@ -84,7 +84,7 @@ struct Condition::PrivateData {
     _mutex.unlock();
   }
 
-  void notify_one(void)
+  void notify_one()
   {
     _mutex.lock();
     if (!_waiters.empty())
@@ -92,7 +92,7 @@ struct Condition::PrivateData {
     _mutex.unlock();
   }
 
-  void notify_all(void)
+  void notify_all()
   {
     _mutex.lock();
     for (std::list<HANDLE>::iterator i = _waiters.begin(); i != _waiters.end(); ++i)

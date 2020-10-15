@@ -40,16 +40,8 @@
 
 namespace OpenRTI {
 
-SocketAddress::SocketAddress()
-{
-}
-
 SocketAddress::SocketAddress(const SocketAddress& socketAddress) :
   _privateData(socketAddress._privateData)
-{
-}
-
-SocketAddress::~SocketAddress()
 {
 }
 
@@ -67,7 +59,7 @@ SocketAddress::valid() const
 }
 
 bool
-SocketAddress::isPipe() const
+SocketAddress::isPipe() const noexcept
 {
   const struct sockaddr* addr = SocketAddress::PrivateData::sockaddr(_privateData.get());
   if (!addr)
@@ -301,6 +293,10 @@ SocketAddress::fromInet6Network(const SocketAddress& socketAddress, const Variab
 
 SocketAddress::SocketAddress(PrivateData* privateData) :
   _privateData(privateData)
+{
+}
+
+SocketAddress::~SocketAddress() noexcept
 {
 }
 

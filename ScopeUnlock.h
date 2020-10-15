@@ -28,11 +28,11 @@ class ScopeUnlock {
 public:
   ScopeUnlock(Mutex& mutex) : mMutex(mutex)
   { mMutex.unlock(); }
-  ~ScopeUnlock(void)
+  ~ScopeUnlock()
   { mMutex.lock(); }
 
 private:
-  ScopeUnlock(void);
+  ScopeUnlock();
   ScopeUnlock(const ScopeUnlock&);
   ScopeUnlock& operator=(const ScopeUnlock&);
 

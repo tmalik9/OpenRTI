@@ -32,7 +32,7 @@ namespace OpenRTI {
 class OPENRTI_API LeafServerThread : public Thread {
 public:
   LeafServerThread(const SharedPtr<AbstractServer>& server);
-  virtual ~LeafServerThread(void);
+  virtual ~LeafServerThread() noexcept;
 
   /// Shutdow this thread and wait for it to finish.
   void postShutdown();
@@ -45,7 +45,7 @@ public:
 
   static void shutdown();
 protected:
-  virtual void run();
+  void run() override;
 
 private:
   LeafServerThread(const LeafServerThread&) = delete;

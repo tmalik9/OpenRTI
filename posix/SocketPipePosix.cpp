@@ -30,6 +30,24 @@ SocketPipe::SocketPipe() :
 {
 }
 
+SocketPipe::SocketPipe(PrivateData* privateData) :
+  SocketStream(privateData)
+{
+}
+
+SocketPipe::~SocketPipe() noexcept
+{
+  try {
+    if (_privateData->_fd == -1)
+      return;
+    ::close(_privateData->_fd);
+    _privateData->_fd = -1;
+  }
+  catch (...)
+  {
+  }
+}
+
 void
 SocketPipe::connect(const std::string& file)
 {
@@ -80,6 +98,10 @@ SocketPipe::connect(const std::string& file)
   _privateData->_fd = fd;
 }
 
+void SocketPipe::cork(bool enable)
+{
+}
+
 void
 SocketPipe::shutdown()
 {
@@ -87,19 +109,6 @@ SocketPipe::shutdown()
   if (fd == -1)
     return;
   ::shutdown(fd, SHUT_WR);
-}
-
-SocketPipe::SocketPipe(PrivateData* privateData) :
-  SocketStream(privateData)
-{
-}
-
-SocketPipe::~SocketPipe()
-{
-  if (_privateData->_fd == -1)
-    return;
-  ::close(_privateData->_fd);
-  _privateData->_fd = -1;
 }
 
 } // namespace OpenRTI

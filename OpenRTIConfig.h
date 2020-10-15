@@ -37,13 +37,13 @@
 
 #ifdef _MSVC_LANG
 #define __CPlusPlusStd _MSVC_LANG
+#pragma warning(disable : 26496) // The variable 'XXX' is assigned only once, mark it as const
+#pragma warning(disable : 26482) // Only index into arrays using constant expressions
+#pragma warning(disable : 26485) // No array to pointer decay 
+#pragma warning(disable : 26472) // Don't use a static_cast for arithmetic conversions. Use brace initialization, gsl::narrow_cast or gsl::narow
 #else
 #define __CPlusPlusStd __cplusplus
 #endif
-
-//#define XSTR(s) STR(s)
-//#define STR(s) #s
-//#pragma message("__CPlusPlusStd=" XSTR(__CPlusPlusStd) " __cplusplus=" XSTR(__cplusplus))
 
 #if 201103L <= __CPlusPlusStd
 // In any case this is the best choice as this provides a reliable api for any future

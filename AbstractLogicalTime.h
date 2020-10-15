@@ -26,7 +26,7 @@ namespace OpenRTI {
 
 class AbstractLogicalTime : public Referenced {
 public:
-  virtual ~AbstractLogicalTime() {}
+  virtual ~AbstractLogicalTime() noexcept {}
   virtual bool operator<(const AbstractLogicalTime& logicalTime) const = 0;
 };
 

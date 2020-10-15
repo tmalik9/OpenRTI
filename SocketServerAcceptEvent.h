@@ -32,15 +32,15 @@ class OPENRTI_API SocketServerAcceptEvent : public AbstractSocketEvent {
 public:
   SocketServerAcceptEvent(const SharedPtr<SocketServer>& socketServer,
                           AbstractServer& abstractServer);
-  virtual ~SocketServerAcceptEvent();
+  virtual ~SocketServerAcceptEvent() noexcept;
 
-  virtual void read(SocketEventDispatcher& dispatcher);
-  virtual bool getEnableRead() const;
+  void read(SocketEventDispatcher& dispatcher) override;
+  bool getEnableRead() const override;
 
-  virtual void write(SocketEventDispatcher& dispatcher);
-  virtual bool getEnableWrite() const;
+  void write(SocketEventDispatcher& dispatcher) override;
+  bool getEnableWrite() const override;
 
-  virtual SocketServer* getSocket() const;
+  SocketServer* getSocket() const override;
 
 private:
   SharedPtr<SocketServer> _socketServer;

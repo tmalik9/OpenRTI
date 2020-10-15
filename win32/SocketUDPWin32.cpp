@@ -19,6 +19,8 @@
 
 #include "DebugNew.h"
 #include "SocketUDP.h"
+#include "SocketPrivateDataWin32.h"
+#include "SocketAddressPrivateDataWin32.h"
 
 namespace OpenRTI {
 

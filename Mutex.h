@@ -39,29 +39,29 @@ class ScopeLock;
 class OPENRTI_API Mutex {
 public:
 #if 201103L <= __CPlusPlusStd
-  Mutex(void)
+  Mutex() noexcept
   { }
 #else
-  Mutex(void);
+  Mutex();
 #endif
 #if 201103L <= __CPlusPlusStd
-  ~Mutex(void)
+  ~Mutex() noexcept
   { }
 #else
-  ~Mutex(void);
+  ~Mutex();
 #endif
 
 #if 201103L <= __CPlusPlusStd
-  void lock(void)
+  void lock()
   { _mutex.lock(); }
 #else
-  void lock(void);
+  void lock();
 #endif
 #if 201103L <= __CPlusPlusStd
-  void unlock(void)
+  void unlock()
   { _mutex.unlock(); }
 #else
-  void unlock(void);
+  void unlock();
 #endif
 
 private:

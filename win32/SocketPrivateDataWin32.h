@@ -44,14 +44,19 @@ struct OPENRTI_LOCAL Socket::PrivateData {
     if (_socket != SOCKET_ERROR)
       wsaStartup();
   }
-  ~PrivateData()
+  ~PrivateData() noexcept
   {
-    close();
-    if (_wsaStartupCalled)
-      WSACleanup();
+    try {
+      close();
+      if (_wsaStartupCalled)
+        WSACleanup();
+    }
+    catch (...)
+    {
+    }
   }
 
-  void close()
+  void close() noexcept(false)
   {
     if (_socket != INVALID_SOCKET)
     {

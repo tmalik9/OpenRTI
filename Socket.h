@@ -29,9 +29,10 @@ class SocketEventDispatcher;
 
 class OPENRTI_API Socket : public Referenced {
 public:
-  static void destruct(Socket* socket);
+  virtual ~Socket() noexcept;
+  static void destruct(Socket* socket) noexcept;
 
-  bool isOpen() const;
+  bool isOpen() const noexcept;
   virtual void close();
 
   void setWriteable() { _mIsWritable = true; }
@@ -45,7 +46,6 @@ protected:
   bool _mIsWritable;
 
   Socket(PrivateData* privateData);
-  virtual ~Socket();
 
 private:
   Socket(const Socket &sock) = delete;

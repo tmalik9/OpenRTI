@@ -25,13 +25,13 @@
 
 namespace OpenRTI {
 
-StreamBufferProtocol::StreamBufferProtocol()
+StreamBufferProtocol::StreamBufferProtocol() noexcept
 {
   _inputIterator = _inputBuffer.byte_begin();
   _outputIterator = _outputBuffer.byte_begin();
 }
 
-StreamBufferProtocol::~StreamBufferProtocol()
+StreamBufferProtocol::~StreamBufferProtocol() noexcept
 {
 }
 

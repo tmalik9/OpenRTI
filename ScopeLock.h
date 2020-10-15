@@ -34,11 +34,11 @@ class ScopeLock : public std::unique_lock<std::mutex> {
 public:
   ScopeLock(Mutex& mutex) : std::unique_lock<std::mutex>(mutex._mutex)
   { }
-  ~ScopeLock(void)
+  ~ScopeLock() noexcept
   { }
 
 private:
-  ScopeLock(void);
+  ScopeLock();
   ScopeLock(const ScopeLock&);
   ScopeLock& operator=(const ScopeLock&);
 };
@@ -49,14 +49,14 @@ class ScopeLock {
 public:
   ScopeLock(Mutex& mutex) : mMutex(mutex)
   { mMutex.lock(); }
-  ~ScopeLock(void)
+  ~ScopeLock() noexcept
   { mMutex.unlock(); }
 
   Mutex* mutex() const
   { return &mMutex; }
 
 private:
-  ScopeLock(void);
+  ScopeLock();
   ScopeLock(const ScopeLock&);
   ScopeLock& operator=(const ScopeLock&);
 

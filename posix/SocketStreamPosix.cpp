@@ -136,11 +136,6 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
   throw TransportError(errnoToUtf8(errorNumber));
 }
 
-ssize_t SocketStream::sendBufferSize() const
-{
-  return 64*1024;
-}
-
 ssize_t
 SocketStream::recv(const BufferRange& bufferRange, bool peek)
 {

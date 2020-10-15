@@ -30,25 +30,25 @@ class AbstractProtocolLayer;
 
 /// This is the top level protocol layer that just puts data into the actual operating system socket
 /// In a next step this should just become the top level socket dispatcher event.
-class OPENRTI_API ProtocolSocketEvent : public AbstractSocketEvent {
+class OPENRTI_API ProtocolSocketEvent final : public AbstractSocketEvent {
 public:
   ProtocolSocketEvent(const SharedPtr<SocketStream>& socketStream);
-  virtual ~ProtocolSocketEvent();
+  virtual ~ProtocolSocketEvent() noexcept;
 
   // Is called from the parent protocol layer when there is data to read
-  virtual void read(SocketEventDispatcher& dispatcher) override;
-  virtual bool getEnableRead() const override;
+  void read(SocketEventDispatcher& dispatcher) override;
+  bool getEnableRead() const override;
 
   // Is called from the parent protocol layer when there is space to write something
-  virtual void write(SocketEventDispatcher& dispatcher) override;
-  virtual bool getEnableWrite() const override;
+  void write(SocketEventDispatcher& dispatcher) override;
+  bool getEnableWrite() const override;
 
-  virtual void error(const Exception& e) override;
+  void error(const Exception& e) override;
 
-  virtual SocketStream* getSocket() const override;
+  SocketStream* getSocket() const override;
 
   void setProtocolLayer(const SharedPtr<AbstractProtocolLayer>& protocolLayer);
-  const SharedPtr<AbstractProtocolLayer>& getProtocolLayer() const;
+  const SharedPtr<AbstractProtocolLayer>& getProtocolLayer() const noexcept;
 
 private:
   ProtocolSocketEvent(const ProtocolSocketEvent&) = delete;

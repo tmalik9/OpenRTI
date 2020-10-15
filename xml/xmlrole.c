@@ -4,6 +4,13 @@
 
 #include <stddef.h>
 
+#ifdef _MSC_VER
+#include <CodeAnalysis/Warnings.h>
+#pragma warning(disable: ALL_CODE_ANALYSIS_WARNINGS)
+#pragma warning(disable: 26408 26438 26440 26481 26429 26461 26482 26485 26493 26494 26496 26497)
+#pragma warning(disable : 4100 4127 4244 4456)
+#endif
+
 #ifdef COMPILED_FROM_DSP
 #include "winconfig.h"
 #elif defined(MACOS_CLASSIC)

@@ -42,7 +42,7 @@ class AbstractServer;
 class OPENRTI_API AbstractServerNode : public Referenced {
 public:
   AbstractServerNode();
-  virtual ~AbstractServerNode();
+  virtual ~AbstractServerNode() noexcept;
 
   /// Hmm, make that more callback based during connection setup, but for now ...
   virtual ServerOptions& getServerOptions() = 0;
@@ -61,7 +61,9 @@ public:
   virtual AbstractServer* getServer() const = 0;
 private:
   AbstractServerNode(const AbstractServerNode&) = delete;
+  AbstractServerNode(AbstractServerNode&&) = delete;
   AbstractServerNode& operator=(const AbstractServerNode&) = delete;
+  AbstractServerNode& operator=(AbstractServerNode&&) = delete;
 };
 
 } // namespace OpenRTI

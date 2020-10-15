@@ -29,25 +29,25 @@ namespace OpenRTI {
 
 #if __CPlusPlusStd < 201103L
 
-Mutex::Mutex(void) :
+Mutex::Mutex() :
   _privateData(new PrivateData)
 {
 }
 
-Mutex::~Mutex(void)
+Mutex::~Mutex()
 {
   delete _privateData;
   _privateData = 0;
 }
 
 void
-Mutex::lock(void)
+Mutex::lock()
 {
   _privateData->lock();
 }
 
 void
-Mutex::unlock(void)
+Mutex::unlock()
 {
   _privateData->unlock();
 }

@@ -29,16 +29,16 @@
 
 namespace OpenRTI {
 
-class OPENRTI_LOCAL FDD1516ContentHandler : public XML::ContentHandler {
+class OPENRTI_LOCAL FDD1516ContentHandler final : public XML::ContentHandler {
 public:
   FDD1516ContentHandler();
   virtual ~FDD1516ContentHandler();
 
-  virtual void startDocument(void);
-  virtual void endDocument(void);
-  virtual void startElement(const char* uri, const char* name,
-                            const char* qName, const XML::Attributes* atts);
-  virtual void endElement(const char* uri, const char* name, const char* qName);
+  void startDocument() override;
+  void endDocument() override;
+  void startElement(const char* uri, const char* name,
+                    const char* qName, const XML::Attributes* atts) override;
+  void endElement(const char* uri, const char* name, const char* qName) override;
 
   // poor man's schema checking ...
   enum Mode {
@@ -122,13 +122,13 @@ FDD1516ContentHandler::~FDD1516ContentHandler()
 }
 
 void
-FDD1516ContentHandler::startDocument(void)
+FDD1516ContentHandler::startDocument()
 {
   OpenRTIAssert(_modeStack.empty());
 }
 
 void
-FDD1516ContentHandler::endDocument(void)
+FDD1516ContentHandler::endDocument()
 {
   OpenRTIAssert(_modeStack.empty());
   _fomStringModuleBuilder.validate();

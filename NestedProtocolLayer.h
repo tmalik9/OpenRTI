@@ -31,13 +31,13 @@ public:
   virtual ~NestedProtocolLayer();
 
   // Is called from the parent protocol layer when there is data to read
-  virtual void read(AbstractProtocolSocket&) = 0;
-  virtual bool getEnableRead() const = 0;
+  void read(AbstractProtocolSocket&) override;
+  bool getEnableRead() const override;
   // Is called from the parent protocol layer when there is space to write something
-  virtual void write(AbstractProtocolSocket&) = 0;
-  virtual bool getEnableWrite() const = 0;
+  void write(AbstractProtocolSocket&) override;
+  bool getEnableWrite() const override;
 
-  virtual void error(const Exception& e) = 0;
+  void error(const Exception& e) override;
 
   void setProtocolLayer(const SharedPtr<AbstractProtocolLayer>& protocolLayer)
   { _protocolLayer = protocolLayer; }

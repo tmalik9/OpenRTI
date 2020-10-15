@@ -65,7 +65,7 @@ public:                                                                 \
       _valuePointer = &_value;                                          \
     }                                                                   \
   }                                                                     \
-  virtual ~EncodableDataType##Implementation()                          \
+  virtual ~EncodableDataType##Implementation() noexcept                 \
   { }                                                                   \
                                                                         \
   EncodableDataType##Implementation&                                    \

@@ -39,28 +39,39 @@ namespace OpenRTI {
 
 struct SocketEventDispatcher::PrivateData
 {
-    PrivateData()
+    PrivateData() noexcept
       : _wakeupEvent(WSA_INVALID_EVENT)
     {
-      WSADATA wsaData;
-      if (WSAStartup(MAKEWORD(2, 2), &wsaData))
+      try
       {
-        throw TransportError("Could not initialize windows sockets!");
+        WSADATA wsaData;
+        if (WSAStartup(MAKEWORD(2, 2), &wsaData))
+        {
+          throw TransportError("Could not initialize windows sockets!");
+        }
+        if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
+        {
+          WSACleanup();
+          throw TransportError("Could not initialize windows sockets 2.2!");
+        }
+        _wakeupEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+        _wokenUp = false;
       }
-      if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
+      catch (...)
       {
-        WSACleanup();
-        throw TransportError("Could not initialize windows sockets 2.2!");
       }
-
-      _wakeupEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-      _wokenUp = false;
     }
 
-    ~PrivateData()
+    ~PrivateData() noexcept
     {
-      CloseHandle(_wakeupEvent);
-      WSACleanup();
+      try
+      {
+        CloseHandle(_wakeupEvent);
+        WSACleanup();
+      }
+      catch (...)
+      {
+      }
     }
 
     int exec(SocketEventDispatcher& dispatcher, const Clock& absclock)
@@ -112,7 +123,7 @@ struct SocketEventDispatcher::PrivateData
             {
               // The socket has data to write, but either write has not been called before, or the previous
               // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
-              // to survey 
+              // to survey
               sockets.push_back(*i);
               notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
             }

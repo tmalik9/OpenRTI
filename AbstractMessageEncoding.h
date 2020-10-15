@@ -27,26 +27,27 @@ namespace OpenRTI {
 
 class OPENRTI_API AbstractMessageEncoding : public StreamBufferProtocol {
 public:
-  AbstractMessageEncoding();
-  virtual ~AbstractMessageEncoding();
+  AbstractMessageEncoding() noexcept {};
+  AbstractMessageEncoding(const AbstractMessageEncoding&) = delete;
+  virtual ~AbstractMessageEncoding() noexcept = default;
 
   void setConnect(const SharedPtr<AbstractConnect>& connect)
   { _connect = connect; }
-  const SharedPtr<AbstractConnect>& getConnect() const
+  const SharedPtr<AbstractConnect>& getConnect() const noexcept
   { return _connect; }
 
   /// Should return the name of the encoding
   virtual const char* getName() const = 0;
 
   /// Still to be implemented in the actual encodings
-  virtual void readPacket(const Buffer& buffer) = 0;
+  //virtual void readPacket(const Buffer& buffer) = 0;
   virtual void writeMessage(const AbstractMessage& message) = 0;
 
   /// Already implemented here
-  virtual bool getEnableRead() const;
-  virtual void writePacket();
-  virtual bool getMoreToSend() const;
-  virtual void error(const Exception& e);
+  bool getEnableRead() const noexcept override;
+  void writePacket() override;
+  bool getMoreToSend() const override;
+  void error(const Exception& e) override;
 
 protected:
   SharedPtr<AbstractConnect> _connect;

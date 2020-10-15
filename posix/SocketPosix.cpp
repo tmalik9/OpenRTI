@@ -27,13 +27,13 @@
 namespace OpenRTI {
 
 void
-Socket::destruct(Socket* socket)
+Socket::destruct(Socket* socket) noexcept
 {
   delete socket;
 }
 
 bool
-Socket::isOpen() const
+Socket::isOpen() const noexcept
 {
   if (!_privateData)
     return false;

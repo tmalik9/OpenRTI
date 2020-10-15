@@ -167,7 +167,7 @@ HLAfixedArray::HLAfixedArray(HLAfixedArray const & rhs) :
 {
 }
 
-HLAfixedArray::~HLAfixedArray()
+HLAfixedArray::~HLAfixedArray() noexcept
 {
   delete _impl;
   _impl = 0;

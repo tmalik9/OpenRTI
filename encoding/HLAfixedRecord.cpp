@@ -43,9 +43,15 @@ public:
   HLAfixedRecordImplementation(const HLAfixedRecordImplementation& rhs) :
     _octetBoundary(0)
   {
+    try {
     _dataElementVector.reserve(rhs._dataElementVector.size());
     for (auto& element : rhs._dataElementVector)
       _dataElementVector.push_back(std::make_pair(element.first->clone().release(), true));
+    }
+    catch(...)
+    {
+      DebugPrintf("%s failed\n", __FUNCTION__);
+    }
   }
   ~HLAfixedRecordImplementation()
   {

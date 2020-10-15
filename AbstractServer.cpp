@@ -88,10 +88,10 @@ class OPENRTI_LOCAL AbstractServer::_Connect : public AbstractConnect {
 public:
   _Connect(const SharedPtr<AbstractMessageSender>& messageSender,
            const SharedPtr<AbstractMessageReceiver>& messageReceiver);
-  virtual ~_Connect();
+  virtual ~_Connect() noexcept;
 
-  virtual AbstractMessageSender* getMessageSender();
-  virtual AbstractMessageReceiver* getMessageReceiver();
+  AbstractMessageSender* getMessageSender() override;
+  AbstractMessageReceiver* getMessageReceiver() override;
 
 private:
   SharedPtr<AbstractMessageSender> _messageSender;
@@ -131,8 +131,8 @@ public:
   _OneWayConnect(const SharedPtr<AbstractMessageSender>& messageSender);
   virtual ~_OneWayConnect();
 
-  virtual AbstractMessageSender* getMessageSender();
-  virtual AbstractMessageReceiver* getMessageReceiver();
+  AbstractMessageSender* getMessageSender() override;
+  AbstractMessageReceiver* getMessageReceiver() override;
 
 private:
   SharedPtr<AbstractMessageSender> _messageSender;
@@ -164,12 +164,12 @@ AbstractServer::_OneWayConnect::getMessageReceiver()
   return nullptr;
 }
 
-class OPENRTI_LOCAL AbstractServer::_ConnectOperation : public AbstractServer::_Operation {
+class OPENRTI_LOCAL AbstractServer::_ConnectOperation final : public AbstractServer::_Operation {
 public:
   _ConnectOperation(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& clientOptions);
   virtual ~_ConnectOperation();
 
-  virtual void operator()(AbstractServer& serverLoop);
+  void operator()(AbstractServer& serverLoop) override;
   void wait();
   const ConnectHandle& getConnectHandle() const;
 
@@ -219,11 +219,11 @@ AbstractServer::_ConnectOperation::getConnectHandle() const
   return _connectHandle;
 }
 
-class OPENRTI_LOCAL AbstractServer::_DisconnectOperation : public AbstractServer::_Operation {
+class OPENRTI_LOCAL AbstractServer::_DisconnectOperation final : public AbstractServer::_Operation {
 public:
   _DisconnectOperation(const ConnectHandle& connectHandle);
   virtual ~_DisconnectOperation();
-  virtual void operator()(AbstractServer& serverLoop);
+  void operator()(AbstractServer& serverLoop) override;
 
 private:
   ConnectHandle _connectHandle;
@@ -248,7 +248,7 @@ class OPENRTI_LOCAL AbstractServer::_DoneOperation : public AbstractServer::_Ope
 public:
   _DoneOperation();
   virtual ~_DoneOperation();
-  virtual void operator()(AbstractServer& serverLoop);
+  void operator()(AbstractServer& serverLoop) override;
 };
 
 AbstractServer::_DoneOperation::_DoneOperation()
@@ -271,7 +271,7 @@ public:
   virtual ~_PostingMessageSender();
 
   virtual void send(const SharedPtr<const AbstractMessage>& message) override;
-  virtual void close() override;
+  virtual void close() noexcept override;
 
 private:
   SharedPtr<AbstractServer> _serverLoop;
@@ -299,7 +299,7 @@ AbstractServer::_PostingMessageSender::send(const SharedPtr<const AbstractMessag
 }
 
 void
-AbstractServer::_PostingMessageSender::close()
+AbstractServer::_PostingMessageSender::close() noexcept
 {
   if (!_connectHandle.valid())
     return;
@@ -310,9 +310,9 @@ AbstractServer::_PostingMessageSender::close()
 class OPENRTI_LOCAL AbstractServer::_SendingMessageSender : public AbstractMessageSender {
 public:
   _SendingMessageSender(const SharedPtr<AbstractServerNode>& serverNode, const ConnectHandle& connectHandle);
-  virtual ~_SendingMessageSender();
-  virtual void send(const SharedPtr<const AbstractMessage>& message);
-  virtual void close();
+  virtual ~_SendingMessageSender() noexcept;
+  virtual void send(const SharedPtr<const AbstractMessage>& message) override;
+  virtual void close() noexcept override;
   //void setConnectHandle(ConnectHandle handle) { _connectHandle = handle; }
 private:
   SharedPtr<AbstractServerNode> _serverNode;
@@ -325,7 +325,7 @@ AbstractServer::_SendingMessageSender::_SendingMessageSender(const SharedPtr<Abs
 {
 }
 
-AbstractServer::_SendingMessageSender::~_SendingMessageSender()
+AbstractServer::_SendingMessageSender::~_SendingMessageSender() noexcept
 {
   close();
 }
@@ -341,7 +341,7 @@ AbstractServer::_SendingMessageSender::send(const SharedPtr<const AbstractMessag
 }
 
 void
-AbstractServer::_SendingMessageSender::close()
+AbstractServer::_SendingMessageSender::close() noexcept
 {
   if (!_serverNode.valid())
     return;
@@ -363,7 +363,7 @@ AbstractServer::~AbstractServer()
 }
 
 const AbstractServerNode&
-AbstractServer::getServerNode() const
+AbstractServer::getServerNode() const noexcept
 {
   return *_serverNode;
 }

@@ -28,7 +28,7 @@ namespace OpenRTI {
 
 class OPENRTI_API Thread : public WeakReferenced {
 public:
-  Thread(void);
+  Thread();
 
   static void destruct(Thread* thread);
 
@@ -36,7 +36,7 @@ public:
   void wait();
 
 protected:
-  virtual ~Thread(void);
+  virtual ~Thread() noexcept;
 
   virtual void run() = 0;
 

@@ -36,11 +36,11 @@ namespace OpenRTI {
 class OPENRTI_API AbstractServer : public Referenced {
 public:
   AbstractServer(const SharedPtr<AbstractServerNode>& serverNode);
-  virtual ~AbstractServer();
+  virtual ~AbstractServer() noexcept;
 
   /// The server node that processes the servers requests
-  /// For debugging purpose this one is exchangable
-  const AbstractServerNode& getServerNode() const;
+  /// For debugging purpose this one is exchangeable
+  const AbstractServerNode& getServerNode() const noexcept;
   AbstractServerNode& getServerNode();
 
   virtual int exec() = 0;
