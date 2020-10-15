@@ -27,18 +27,18 @@ namespace OpenRTI {
 
 class OPENRTI_API StreamBufferProtocol : public AbstractProtocolLayer {
 public:
-  StreamBufferProtocol();
-  virtual ~StreamBufferProtocol();
+  StreamBufferProtocol() noexcept;
+  virtual ~StreamBufferProtocol() noexcept;
 
   virtual void readPacket(const Buffer& buffer) = 0;
   virtual void writePacket() = 0;
   virtual bool getMoreToSend() const = 0;
 
-  virtual void read(AbstractProtocolSocket& protocolSocket);
-  virtual bool getEnableRead() const;
+  void read(AbstractProtocolSocket& protocolSocket) override;
+  bool getEnableRead() const override;
 
-  virtual void write(AbstractProtocolSocket& protocolSocket);
-  virtual bool getEnableWrite() const;
+  void write(AbstractProtocolSocket& protocolSocket) override;
+  bool getEnableWrite() const override;
 
   bool getBuffersComplete() const
   { return getInputBufferComplete() && getOutputBufferComplete(); }

@@ -554,10 +554,6 @@ Federate::Federate() :
 {
 }
 
-Federate::~Federate()
-{
-}
-
 void
 Federate::setFederateHandle(const FederateHandle& federateHandle)
 {

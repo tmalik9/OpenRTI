@@ -29,8 +29,8 @@ class AbstractProtocolLayer;
 
 class OPENRTI_API AbstractProtocolSocket {
 public:
-  AbstractProtocolSocket();
-  virtual ~AbstractProtocolSocket();
+  AbstractProtocolSocket() noexcept;
+  virtual ~AbstractProtocolSocket() noexcept;
 
   /// Can be called from the consuming layer to receive ready to read data
   virtual ssize_t recv(const BufferRange& bufferRange, bool peek) = 0;

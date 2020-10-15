@@ -36,7 +36,7 @@ namespace rti1516e
          Exception const & rhs);
 
       virtual
-      ~Exception ();
+      ~Exception () noexcept;
 
       virtual
       std::wstring
@@ -48,14 +48,14 @@ namespace rti1516e
    std::ostream RTI_EXPORT &operator<<(std::ostream &, Exception const &);
 
    #define RTI_EXCEPTION(A)               \
-   class RTI_EXPORT A : public Exception  \
+   class RTI_EXPORT A final : public Exception  \
    {                                      \
       public:                             \
       A (                                 \
          std::wstring const & message);   \
                                           \
       std::wstring                        \
-      what () const;                      \
+      what () const override;             \
                                           \
       private:                            \
       std::wstring _msg;                  \

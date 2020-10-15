@@ -35,13 +35,13 @@ namespace XML {
 class ExpatXMLAttributes : public Attributes {
 public:
   ExpatXMLAttributes(const char**atts);
-  virtual int getIndex(const char* qName) const;
-  virtual int getLength(void) const;
-  virtual const char* getLocalName(int index) const;
-  virtual Type getType(int) const;
-  virtual Type getType(const char*) const;
-  virtual const char* getValue(int index) const;
-  virtual const char* getValue(const char* qName) const;
+  int getIndex(const char* qName) const override;
+  int getLength() const override;
+  const char* getLocalName(int index) const override;
+  Type getType(int) const override;
+  Type getType(const char*) const override;
+  const char* getValue(int index) const override;
+  const char* getValue(const char* qName) const override;
 private:
   int mLength;
   const char** mAtts;
@@ -93,7 +93,7 @@ ExpatXMLAttributes::getIndex(const char* qName) const
 }
 
 int
-ExpatXMLAttributes::getLength(void) const
+ExpatXMLAttributes::getLength() const
 {
   return mLength;
 }
@@ -208,11 +208,11 @@ ExpatProcessingInstructions(void* userData, const char* target, const char* data
   }
 }
 
-ExpatXMLReader::ExpatXMLReader(void)
+ExpatXMLReader::ExpatXMLReader()
 {
 }
 
-ExpatXMLReader::~ExpatXMLReader(void)
+ExpatXMLReader::~ExpatXMLReader()
 {
 }
 

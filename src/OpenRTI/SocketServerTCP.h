@@ -34,7 +34,7 @@ public:
   void bind(const SocketAddress& socketAddress);
   void listen(int backlog);
 
-  virtual SocketTCP* accept();
+  virtual SharedPtr<SocketStream> accept() override;
 
 protected:
   virtual ~SocketServerTCP();

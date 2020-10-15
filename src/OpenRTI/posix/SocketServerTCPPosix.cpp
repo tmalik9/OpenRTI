@@ -81,7 +81,7 @@ SocketServerTCP::listen(int backlog)
   }
 }
 
-SocketTCP*
+SharedPtr<SocketStream>
 SocketServerTCP::accept()
 {
   int fd = ::accept(_privateData->_fd, 0, 0);

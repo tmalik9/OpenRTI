@@ -124,7 +124,7 @@ HLAfloat64Interval::HLAfloat64Interval(const HLAfloat64Interval& float64Interval
   HLAfloat64IntervalImpl::assign(_impl, float64Interval._impl);
 }
 
-HLAfloat64Interval::~HLAfloat64Interval() throw ()
+HLAfloat64Interval::~HLAfloat64Interval() noexcept
 {
   HLAfloat64IntervalImpl::putAndDelete(_impl);
 }

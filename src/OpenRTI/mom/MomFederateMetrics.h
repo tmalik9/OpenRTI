@@ -24,8 +24,8 @@ namespace OpenRTI {
 class OPENRTI_LOCAL MomFederateMetrics : public AbstractFederateMetrics
 {
   public:
-    MomFederateMetrics(std::shared_ptr<MomManager> mom);
-    ~MomFederateMetrics();
+    MomFederateMetrics(MomManager* mom);
+    ~MomFederateMetrics() noexcept;
 
     // counting callbacks (triggered by the appropriate accept methods in the server node)
     void reflectionReceived(ObjectClassHandle classId, ObjectInstanceHandle instanceId) override;

@@ -30,7 +30,7 @@ namespace OpenRTI {
 
 class OPENRTI_API Exception {
 public:
-  virtual ~Exception();
+  virtual ~Exception() noexcept;
 
   const char* what() const;
   const std::string& getReason() const;
@@ -47,7 +47,7 @@ class OPENRTI_API RTIinternalError : public Exception {
 public:
   RTIinternalError(const char* reason = 0);
   RTIinternalError(const std::string& reason);
-  virtual ~RTIinternalError();
+  virtual ~RTIinternalError() noexcept;
 
 private:
   static void assertMessage(const char* file, unsigned line, const char* reason = 0);
@@ -64,11 +64,11 @@ private:
 #endif
 
 #define RTI_EXCEPTION(name) \
-class OPENRTI_API name : public Exception { \
-public: \
-  name(const char* reason = 0) : Exception( #name, reason) { }  \
-  name(const std::string& reason) : Exception( #name, reason) { } \
-  virtual ~name() { } \
+class OPENRTI_API name : public Exception {                                \
+public:                                                                    \
+  name(const char* reason = 0) noexcept : Exception( #name, reason) { }    \
+  name(const std::string& reason) noexcept : Exception( #name, reason) { } \
+  virtual ~name() noexcept { }                                             \
 };
 
 // OpenRTI exceptions

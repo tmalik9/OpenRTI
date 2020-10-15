@@ -30,16 +30,21 @@
 namespace OpenRTI {
 
 struct OPENRTI_LOCAL Thread::PrivateData {
-  PrivateData() :
-    _handle(INVALID_HANDLE_VALUE)
+  PrivateData() : _handle(INVALID_HANDLE_VALUE)
   {
   }
-  ~PrivateData()
+  PrivateData(const PrivateData&) = delete;
+  ~PrivateData() noexcept
   {
-    if (_handle == INVALID_HANDLE_VALUE)
-      return;
-    CloseHandle(_handle);
-    _handle = INVALID_HANDLE_VALUE;
+    try {
+      if (_handle == INVALID_HANDLE_VALUE)
+        return;
+      CloseHandle(_handle);
+      _handle = INVALID_HANDLE_VALUE;
+    }
+    catch (...)
+    {
+    }
   }
 
   static DWORD WINAPI start_routine(LPVOID data)
@@ -78,12 +83,12 @@ struct OPENRTI_LOCAL Thread::PrivateData {
   HANDLE _handle;
 };
 
-Thread::Thread(void) :
+Thread::Thread() :
   _privateData(new PrivateData)
 {
 }
 
-Thread::~Thread(void)
+Thread::~Thread() noexcept
 {
   OpenRTIAssert(!Thread::count(this));
   delete _privateData;

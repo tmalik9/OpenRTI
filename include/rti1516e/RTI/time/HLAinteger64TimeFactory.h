@@ -36,16 +36,16 @@ namespace rti1516e
       virtual ~HLAinteger64TimeFactory ();
 
       // Return a LogicalTime with a value of "initial"
-      virtual std::unique_ptr< LogicalTime > makeInitial();
+      std::unique_ptr< LogicalTime > makeInitial() override;
 
       // Return a LogicalTime with a value of "final"
-      virtual std::unique_ptr< LogicalTime > makeFinal();
+      std::unique_ptr< LogicalTime > makeFinal() override;
 
       // Return a LogicalTimeInterval with a value of "zero"
-      virtual std::unique_ptr< LogicalTimeInterval > makeZero();
+      std::unique_ptr< LogicalTimeInterval > makeZero() override;
 
       // Return a LogicalTimeInterval with a value of "epsilon"
-      virtual std::unique_ptr< LogicalTimeInterval > makeEpsilon();
+      std::unique_ptr< LogicalTimeInterval > makeEpsilon() override;
 
       virtual std::unique_ptr< HLAinteger64Time > makeLogicalTime (
          Integer64 value);
@@ -54,24 +54,24 @@ namespace rti1516e
          Integer64 value);
 
       // LogicalTime decode from an encoded LogicalTime
-      virtual std::unique_ptr< LogicalTime > decodeLogicalTime (
-         VariableLengthData const & encodedLogicalTime);
+      std::unique_ptr< LogicalTime > decodeLogicalTime (
+         VariableLengthData const & encodedLogicalTime) override;
 
       // Alternate LogicalTime decode that reads directly from a buffer
-      virtual std::unique_ptr< LogicalTime > decodeLogicalTime (
+      std::unique_ptr< LogicalTime > decodeLogicalTime (
          void* buffer,
-         size_t bufferSize);
+         size_t bufferSize) override;
 
       // LogicalTimeInterval decode from an encoded LogicalTimeInterval
-      virtual std::unique_ptr< LogicalTimeInterval > decodeLogicalTimeInterval (
-         VariableLengthData const & encodedValue);
+      std::unique_ptr< LogicalTimeInterval > decodeLogicalTimeInterval (
+         VariableLengthData const & encodedValue) override;
 
       // Alternate LogicalTimeInterval decode that reads directly from a buffer
-      virtual std::unique_ptr< LogicalTimeInterval > decodeLogicalTimeInterval (
+      std::unique_ptr< LogicalTimeInterval > decodeLogicalTimeInterval (
          void* buffer,
-         size_t bufferSize);
+         size_t bufferSize) override;
 
-      virtual std::wstring getName () const;
+      virtual std::wstring getName () const override;
    };
 }
 

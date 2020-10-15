@@ -43,7 +43,7 @@ inline std::string to_string(const ConnectHandleSet& connectHandleSet)
   return join(resultList, ", ", false);
 }
 
-class OPENRTI_LOCAL FederationServer : public ServerModel::Federation {
+class OPENRTI_LOCAL FederationServer final : public ServerModel::Federation {
 public:
   FederationServer(ServerModel::Node& serverNode) :
     ServerModel::Federation(serverNode),

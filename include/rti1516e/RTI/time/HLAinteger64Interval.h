@@ -42,78 +42,78 @@ namespace rti1516e
          Integer64);
 
       // Destructor
-      virtual ~HLAinteger64Interval();
+      virtual ~HLAinteger64Interval() noexcept;
 
       // Basic accessors/mutators
 
-      virtual void setZero ();
+      void setZero () override;
 
-      virtual bool isZero () const;
+      bool isZero () const override;
 
-      virtual void setEpsilon ();
+      void setEpsilon () override;
 
-      virtual bool isEpsilon () const;
+      bool isEpsilon () const override;
 
       // Operators
 
-      virtual rti1516e::LogicalTimeInterval& operator= (
-         rti1516e::LogicalTimeInterval const & value);
+      rti1516e::LogicalTimeInterval& operator= (
+         rti1516e::LogicalTimeInterval const & value) override;
 
-      virtual rti1516e::LogicalTimeInterval& operator+= (
-         rti1516e::LogicalTimeInterval const & addend);
+      rti1516e::LogicalTimeInterval& operator+= (
+         rti1516e::LogicalTimeInterval const & addend) override;
 
-      virtual rti1516e::LogicalTimeInterval& operator-= (
-         rti1516e::LogicalTimeInterval const & subtrahend);
+      rti1516e::LogicalTimeInterval& operator-= (
+         rti1516e::LogicalTimeInterval const & subtrahend) override;
 
-      virtual bool operator> (
-         rti1516e::LogicalTimeInterval const & value) const;
+      bool operator> (
+         rti1516e::LogicalTimeInterval const & value) const override;
 
-      virtual bool operator< (
-         rti1516e::LogicalTimeInterval const & value) const;
+      bool operator< (
+         rti1516e::LogicalTimeInterval const & value) const override;
 
-      virtual bool operator== (
-         rti1516e::LogicalTimeInterval const & value) const;
+      bool operator== (
+         rti1516e::LogicalTimeInterval const & value) const override;
 
-      virtual bool operator>= (
-         rti1516e::LogicalTimeInterval const & value) const;
+      bool operator>= (
+         rti1516e::LogicalTimeInterval const & value) const override;
 
-      virtual bool operator<= (
-         rti1516e::LogicalTimeInterval const & value) const;
+      bool operator<= (
+         rti1516e::LogicalTimeInterval const & value) const override;
 
       // Set self to the difference between two LogicalTimes
-      virtual void setToDifference (
+      void setToDifference (
          rti1516e::LogicalTime const & minuend,
-         rti1516e::LogicalTime const& subtrahend);
+         rti1516e::LogicalTime const& subtrahend) override;
 
       // Generates an encoded value that can be used to send
       // LogicalTimeIntervals to other federates in updates or interactions
-      virtual rti1516e::VariableLengthData encode () const;
+      rti1516e::VariableLengthData encode () const override;
 
       // Alternate encode for directly filling a buffer
       // Return the length of encoded data
-      virtual size_t encode (
+      size_t encode (
          void* buffer,
-         size_t bufferSize) const;
+         size_t bufferSize) const override;
 
       // The length of the encoded data
-      virtual size_t encodedLength () const;
+      size_t encodedLength () const override;
 
       // Decode encodedValue into self
-      virtual void decode (
-         rti1516e::VariableLengthData const & encodedValue);
+      void decode (
+         rti1516e::VariableLengthData const & encodedValue) override;
 
       // Decode encodedValue into self
       // Alternate decode that reads directly from a buffer
-      virtual void decode (
+      void decode (
          void* buffer,
-         size_t bufferSize);
+         size_t bufferSize) override;
 
       // Diagnostic string representation of time
-      virtual std::wstring toString () const;
+      std::wstring toString () const override;
 
       // Return the name of the Implementation, as needed by
       // createFederationExecution.
-      virtual std::wstring implementationName () const;
+      std::wstring implementationName () const override;
 
    public:
 

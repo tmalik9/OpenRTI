@@ -44,7 +44,7 @@ public:
     RangeBoundsValue(rangeBoundsValue)
   {
   }
-
+  ~RangeBounds() noexcept = default;
   bool empty() const
   { return getUpperBound() <= getLowerBound(); }
 

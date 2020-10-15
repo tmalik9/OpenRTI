@@ -36,26 +36,26 @@
 
 class PySharedPtr {
 public:
-  PySharedPtr(void) : _ptr(0)
+  PySharedPtr() : _ptr(0)
   {}
   PySharedPtr(const PySharedPtr& /*p*/) : _ptr(0)
   { assign(_ptr); }
-  ~PySharedPtr(void)
+  ~PySharedPtr()
   { put(); }
 
   PySharedPtr& operator=(const PySharedPtr& p)
   { assign(p.get()); return *this; }
 
-  PyObject* operator->(void) const
+  PyObject* operator->() const
   { return _ptr; }
 
-  PyObject& operator*(void) const
+  PyObject& operator*() const
   { return *_ptr; }
 
   PyObject* get() const
   { return _ptr; }
 
-  bool valid(void) const
+  bool valid() const
   { return 0 != _ptr; }
 
   void clear()
@@ -71,7 +71,7 @@ private:
   { if (p) Py_IncRef(p); put(); _ptr = p; }
   void assignNonRef(PyObject* p)
   { put(); _ptr = p; }
-  void put(void)
+  void put()
   { if (!_ptr) return; Py_DecRef(_ptr); _ptr = 0; }
 
   // The reference itself.
@@ -7354,7 +7354,7 @@ static struct PyModuleDef moduledef = {
 #endif
 
 PyMODINIT_FUNC
-INITFUNCNAME(void)
+INITFUNCNAME()
 {
   if (PyType_Ready(&PyFederateHandleType) < 0)
     INITERROR;

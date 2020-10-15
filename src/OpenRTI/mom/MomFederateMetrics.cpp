@@ -10,7 +10,7 @@
 
 namespace OpenRTI {
 
-MomFederateMetrics::MomFederateMetrics(std::shared_ptr<MomManager> mom)
+MomFederateMetrics::MomFederateMetrics(MomManager* mom)
 {
   mFederate = mom->getFederate();
 }

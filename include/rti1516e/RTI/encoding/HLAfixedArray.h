@@ -40,45 +40,45 @@ namespace rti1516e
          HLAfixedArray const & rhs);
 
       // Destructor
-      virtual ~HLAfixedArray();
+      virtual ~HLAfixedArray() noexcept;
 
       // Return a new copy of the array
-      virtual std::unique_ptr<DataElement> clone () const;
+      std::unique_ptr<DataElement> clone () const override;
 
       // Encode this element into a new VariableLengthData
-      virtual VariableLengthData encode () const;
+      VariableLengthData encode () const override;
 
       // Encode this element into an existing VariableLengthData
-      virtual void encode (
-         VariableLengthData& inData) const;
+      void encode (
+         VariableLengthData& inData) const override;
 
       // Encode this element and append it to a buffer
-      virtual void encodeInto (
-         std::vector<Octet>& buffer) const;
+      void encodeInto (
+         std::vector<Octet>& buffer) const override;
 
       // Encode this element into a preallocated buffer
-      virtual size_t encodeInto (Octet* buffer, size_t bufferSize, size_t offset) const override;
+      size_t encodeInto (Octet* buffer, size_t bufferSize, size_t offset) const override;
 
       // Decode this element from the RTI's VariableLengthData.
-      virtual void decode (
-         VariableLengthData const & inData);
+      void decode (
+         VariableLengthData const & inData) override;
 
       // Decode this element starting at the index in the provided buffer
-      virtual size_t decodeFrom (
+      size_t decodeFrom (
          std::vector<Octet> const & buffer,
-         size_t index);
+         size_t index) override;
 
       size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override;
 
       // Return the size in bytes of this element's encoding.
-      virtual size_t getEncodedLength () const;
+      size_t getEncodedLength () const override;
 
       // Return the octet boundary of this element.
-      virtual unsigned int getOctetBoundary () const;
+      unsigned int getOctetBoundary () const override;
 
       // Return true if given element is same type as this; otherwise, false.
-      virtual bool isSameTypeAs(
-         DataElement const& inData ) const;
+      bool isSameTypeAs(
+         DataElement const& inData ) const override;
 
       // Return true if given element matches prototype of this array.
       virtual bool hasPrototypeSameTypeAs(DataElement const& dataElement ) const;

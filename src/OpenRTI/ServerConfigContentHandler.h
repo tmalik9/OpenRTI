@@ -32,30 +32,30 @@ namespace OpenRTI {
 
 class OPENRTI_LOCAL ServerConfigContentHandler : public XML::ContentHandler {
 public:
-  ServerConfigContentHandler();
-  virtual ~ServerConfigContentHandler();
+  ServerConfigContentHandler() noexcept;
+  virtual ~ServerConfigContentHandler() noexcept;
 
-  virtual void startDocument(void);
-  virtual void endDocument(void);
-  virtual void startElement(const char* uri, const char* name,
-                            const char* qName, const XML::Attributes* atts);
-  virtual void endElement(const char* uri, const char* name, const char* qName);
+  void startDocument() override;
+  void endDocument() override;
+  void startElement(const char* uri, const char* name,
+                            const char* qName, const XML::Attributes* atts) override;
+  void endElement(const char* uri, const char* name, const char* qName) override;
 
   /// The parent server url from the config file
-  const std::string& getParentServerUrl() const
+  const std::string& getParentServerUrl() const noexcept
   { return _parentServerUrl; }
 
   /// The server global default for clients being allowed getting time regulating
-  bool getPermitTimeRegulation() const
+  bool getPermitTimeRegulation() const noexcept
   { return _permitTimeRegulation; }
 
   /// The server global default for clients connects using zlib conpression
-  bool getEnableZLibCompression() const
+  bool getEnableZLibCompression() const noexcept
   { return _enableZLibCompression; }
 
   /// Each listen tag in the config file is represented with such a struct
   struct ListenConfig {
-    const std::string& getUrl() const
+    const std::string& getUrl() const noexcept
     { return _url; }
 
   private:
@@ -64,7 +64,7 @@ public:
     std::string _url;
   };
 
-  unsigned getNumListenConfig() const
+  unsigned getNumListenConfig() const noexcept
   { return unsigned(_listenConfig.size()); }
 
   const ListenConfig& getListenConfig(unsigned index) const

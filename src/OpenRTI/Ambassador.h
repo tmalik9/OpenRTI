@@ -80,11 +80,6 @@ public:
     return _operationWaitTimeout;
   }
   void connect(const URL& url, const StringStringListMap& stringStringListMap, uint32_t timeoutMilliSeconds)
-    // throw (ConnectionFailed,
-    //        InvalidLocalSettingsDesignator,
-    //        AlreadyConnected,
-    //        CallNotAllowedFromWithinCallback,
-    //        RTIinternalError)
   {
     if (isConnected())
       throw AlreadyConnected("Ambassador is already connected!");
@@ -96,9 +91,6 @@ public:
   }
 
   void disconnect()
-    // throw (FederateIsExecutionMember,
-    //        CallNotAllowedFromWithinCallback,
-    //        RTIinternalError)
   {
     if (_federate.valid())
       throw FederateIsExecutionMember();
@@ -111,16 +103,6 @@ public:
   void createFederationExecution(const std::string& federationExecutionName,
                                  const FOMStringModuleList& fomModules,
                                  const std::string& logicalTimeFactoryName)
-    // throw (FederationExecutionAlreadyExists,
-    //        // InconsistentFDD,
-    //        // CouldNotOpenFDD,
-    //        // ErrorReadingFDD,
-    //        // DesignatorIsHLAstandardMIM,
-    //        // ErrorReadingMIM,
-    //        // CouldNotOpenMIM,
-    //        CouldNotCreateLogicalTimeFactory,
-    //        NotConnected,
-    //        RTIinternalError)
   {
     if (!isConnected())
       throw NotConnected(std::string("Could not get connect RTI of federation execution \"") +
@@ -194,18 +176,6 @@ public:
   FederateHandle joinFederationExecution(const std::string& federateName, const std::string& federateType,
                                          const std::string& federationExecutionName,
                                          const FOMStringModuleList& fomModules)
-    // throw (CouldNotCreateLogicalTimeFactory,
-    //        FederationExecutionDoesNotExist,
-    //        FederateNameAlreadyInUse,
-    //        InconsistentFDD,
-    //        // ErrorReadingFDD,
-    //        // CouldNotOpenFDD,
-    //        FederateAlreadyExecutionMember,
-    //        SaveInProgress,
-    //        RestoreInProgress,
-    //        NotConnected,
-    //        CallNotAllowedFromWithinCallback,
-    //        RTIinternalError)
   {
     if (!isConnected())
       throw NotConnected(std::string("Could not get connect RTI of federation execution \"") +
@@ -273,11 +243,6 @@ public:
   }
 
   void resignFederationExecution(ResignAction resignAction)
-    // throw (OwnershipAcquisitionPending,
-    //        FederateOwnsAttributes,
-    //        FederateNotExecutionMember,
-    //        NotConnected,
-    //        RTIinternalError)
   {
     if (!isConnected())
       throw NotConnected();
@@ -4154,16 +4119,16 @@ public:
 
   virtual TimeManagement<Traits>* createTimeManagement(Federate& federate) = 0;
 
-  virtual Federate* getFederate()
+  Federate* getFederate() override
   {
     return _federate.get();
   }
-  virtual TimeManagement<Traits>* getTimeManagement()
+  TimeManagement<Traits>* getTimeManagement() override
   {
     return _timeManagement.get();
   }
   
-  virtual void acceptInternalMessage(const InsertFederationExecutionMessage& message)
+  void acceptInternalMessage(const InsertFederationExecutionMessage& message) override
   {
     // IMPORTANT NOTE: this object's data will be completed later in 
     // InternalAmbassador::acceptInternalMessage(const JoinFederationExecutionResponseMessage& message)
@@ -4190,7 +4155,6 @@ public:
     federate->setFederateName(message.getFederateName());
     federate->setFederateType(message.getFederateType());
   }
-
 
   void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h)
   {

@@ -23,7 +23,7 @@
 namespace OpenRTI {
 namespace XML {
 
-ContentHandler::~ContentHandler(void)
+ContentHandler::~ContentHandler() noexcept
 {
 }
 
@@ -38,12 +38,12 @@ ContentHandler::comment(const char* commentData, unsigned length)
 }
 
 void
-ContentHandler::startDocument(void)
+ContentHandler::startDocument()
 {
 }
 
 void
-ContentHandler::endDocument(void)
+ContentHandler::endDocument()
 {
 }
 

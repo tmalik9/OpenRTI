@@ -45,12 +45,12 @@ struct Mutex::PrivateData {
     DeleteCriticalSection((LPCRITICAL_SECTION)&_criticalSection);
   }
 
-  void lock(void)
+  void lock()
   {
     EnterCriticalSection((LPCRITICAL_SECTION)&_criticalSection);
   }
 
-  void unlock(void)
+  void unlock()
   {
     LeaveCriticalSection((LPCRITICAL_SECTION)&_criticalSection);
   }

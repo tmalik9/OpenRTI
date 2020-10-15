@@ -35,36 +35,33 @@ namespace OpenRTI {
 // The timeout in the receive call is just ignored since
 // single threaded use does not have any chance to fill the queue
 // if that single thread is waiting for exactly that queue.
-class OPENRTI_LOCAL LocalMessageQueue : public AbstractMessageQueue {
+class OPENRTI_LOCAL LocalMessageQueue final : public AbstractMessageQueue {
 public:
   LocalMessageQueue() :
     _isClosed(false)
   { }
-  virtual SharedPtr<const AbstractMessage> receive()
+  SharedPtr<const AbstractMessage> receive() override
   {
     return _messageList.pop_front();
   }
-  virtual SharedPtr<const AbstractMessage> receive(const Clock&)
+  SharedPtr<const AbstractMessage> receive(const Clock&) override
   {
     return _messageList.pop_front();
   }
-  virtual bool isOpen() const
-  { return !_isClosed; }
-  virtual bool empty() const
-  { return _messageList.empty(); }
-  virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) override
+  bool isOpen() const override { return !_isClosed; }
+  bool empty() const override { return _messageList.empty(); }
+  void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) override
   {
     assert(!"not implemented");
   }
 
 protected:
-  virtual void append(const SharedPtr<const AbstractMessage>& message)
+  void append(const SharedPtr<const AbstractMessage>& message) override
   {
     //CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
     _messageList.push_back(message);
   }
-  virtual void close()
-  { _isClosed = true; }
+  void close() override { _isClosed = true; }
 
 private:
   PooledMessageList _messageList;
@@ -72,12 +69,12 @@ private:
 };
 
 // Thread safe queue with condition/mutex based signaling of new messages
-class OPENRTI_LOCAL ThreadMessageQueue : public AbstractMessageQueue {
+class OPENRTI_LOCAL ThreadMessageQueue final : public AbstractMessageQueue {
 public:
   ThreadMessageQueue() :
     _isClosed(false)
   { }
-  virtual SharedPtr<const AbstractMessage> receive()
+  virtual SharedPtr<const AbstractMessage> receive() override
   {
     ScopeLock scopeLock(_mutex);
     if (_messageList.empty())
@@ -86,7 +83,7 @@ public:
     //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
     return message;
   }
-  virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout)
+  virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout) override
   {
     ScopeLock scopeLock(_mutex);
     while (_messageList.empty()) {
@@ -104,12 +101,12 @@ public:
     //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
     return message;
   }
-  virtual bool isOpen() const
+  virtual bool isOpen() const override
   {
     ScopeLock scopeLock(_mutex);
     return !_isClosed;
   }
-  virtual bool empty() const
+  virtual bool empty() const override
   {
     ScopeLock scopeLock(_mutex);
     return _messageList.empty();
@@ -129,7 +126,7 @@ protected:
       }
     }
   }
-  virtual void append(const SharedPtr<const AbstractMessage>& message)
+  void append(const SharedPtr<const AbstractMessage>& message) override
   {
     ScopeLock scopeLock(_mutex);
     bool needSignal = _messageList.empty();
@@ -138,9 +135,6 @@ protected:
     {
       _condition.notify_one();
     }
-#ifdef _MSC_VER
-#pragma message(__FILE__LINE__ "revisit: notify only once")
-#endif
     //CondDebugPrintf("%s: signal _notificationHandle=%p empty=%d needSignal=%d\n", __FUNCTION__,
     //            _notificationHandle.get(), _messageList.empty(), needSignal);
     if (!_messageList.empty() && _notificationHandle != nullptr)
@@ -148,7 +142,7 @@ protected:
       _notificationHandle->Signal();
     }
   }
-  virtual void close()
+  void close() override
   {
     ScopeLock scopeLock(_mutex);
     _isClosed = true;

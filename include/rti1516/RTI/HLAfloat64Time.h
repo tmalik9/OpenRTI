@@ -31,7 +31,7 @@ public:
   HLAfloat64Time(double value);
   HLAfloat64Time(const rti1516::LogicalTime& logicalTime);
   HLAfloat64Time(const HLAfloat64Time& logicalTime);
-  virtual ~HLAfloat64Time() throw ();
+  virtual ~HLAfloat64Time() noexcept;
 
   virtual void setInitial();
   virtual bool isInitial() const;

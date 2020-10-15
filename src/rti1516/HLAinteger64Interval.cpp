@@ -71,7 +71,7 @@ HLAinteger64Interval::HLAinteger64Interval(const HLAinteger64Interval& integer64
   HLAinteger64IntervalImpl::assign(_impl, integer64Interval._impl);
 }
 
-HLAinteger64Interval::~HLAinteger64Interval() throw ()
+HLAinteger64Interval::~HLAinteger64Interval() noexcept
 {
   HLAinteger64IntervalImpl::putAndDelete(_impl);
 }

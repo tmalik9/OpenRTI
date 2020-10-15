@@ -25,7 +25,7 @@ namespace rti1516e
    public:
       EncoderException (std::wstring const & message);
 
-      std::wstring what () const;
+      std::wstring what () const override;
 
    private:
       std::wstring _msg;

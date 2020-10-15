@@ -100,7 +100,7 @@ SocketServerPipe::listen(int backlog)
   }
 }
 
-SocketPipe*
+SharedPtr<SocketStream>
 SocketServerPipe::accept()
 {
   int fd = ::accept(_privateData->_fd, 0, 0);

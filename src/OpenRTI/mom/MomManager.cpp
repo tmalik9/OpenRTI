@@ -367,7 +367,7 @@ void MomManager::initialize()
 
   objects = objectRoot;
   interactions = interactionRoot;
-  mFederateMetrics = std::make_shared<MomFederateMetrics>(shared_from_this());
+  mFederateMetrics = std::make_shared<MomFederateMetrics>(this);
 
   mFederationObjectClass = objects["HLAobjectRoot"]["HLAmanager"]["HLAfederation"];;
   assert(mFederationObjectClass.valid());
@@ -829,7 +829,7 @@ void MomManager::setFOMModuleList(const FOMModuleList& moduleList, const std::st
 
 #pragma region class MomManager::MomTreeNode
 
-MomManager::MomTreeNode::~MomTreeNode()
+MomManager::MomTreeNode::~MomTreeNode() noexcept
 {
   for (auto child : children)
   {
@@ -837,20 +837,20 @@ MomManager::MomTreeNode::~MomTreeNode()
   }
 }
 
-std::string MomManager::MomTreeNode::getQualifiedName() const
+const std::string MomManager::MomTreeNode::getQualifiedName() const
 {
   std::string qualifiedName = this->getName();
-  if (this->parent != nullptr)
-    qualifiedName = this->parent->getQualifiedName() + "." + qualifiedName;
+  if (this->mParent != nullptr)
+    qualifiedName = this->mParent->getQualifiedName() + "." + qualifiedName;
 
   return qualifiedName;
 }
 
 void MomManager::MomTreeNode::addChild(MomTreeNode* node)
 {
-  if (node->parent == nullptr)
+  if (node->mParent == nullptr)
   {
-    node->parent = this;
+    node->mParent = this;
     this->children.push_back(node);
   }
   else
@@ -876,6 +876,7 @@ void MomManager::MomTreeNodeBuilder::add(MomTreeNode* newNode)
 
 void MomManager::MomTreeNodeBuilder::addAndPush(MomTreeNode* newNode)
 {
+  assert(newNode->getType() == Object || newNode->getType() == Attribute || newNode->getType() == Interaction|| newNode->getType() == Parameter);
   if (!this->mContextStack.empty())
   {
     MomTreeNode* currentContext = this->mContextStack.front();
@@ -919,7 +920,7 @@ MomManager::MomTreeNodeBuilder& MomManager::MomTreeNodeBuilder::attribute(std::s
   if (mContextStack.size() == 0)
     throw RTIinternalError("attribute cannot be root node");
 
-  if (mContextStack.front()->type != MomType::Object)
+  if (mContextStack.front()->getType() != MomType::Object)
     throw RTIinternalError("attribute can only be added to an object");
 
   try
@@ -976,10 +977,10 @@ MomManager::MomTreeNodeBuilder& MomManager::MomTreeNodeBuilder::interaction(std:
 MomManager::MomTreeNodeBuilder& MomManager::MomTreeNodeBuilder::parameter(std::string name, std::string datatype)
 {
   if (mContextStack.size() == 0)
-    throw new RTIinternalError("parameter cannot be root node");
+    throw RTIinternalError("parameter cannot be root node");
 
-  if (mContextStack.front()->type != MomType::Interaction)
-    throw new RTIinternalError("parameter can only be added to an interaction");
+  if (mContextStack.front()->getType() != MomType::Interaction)
+    throw RTIinternalError("parameter can only be added to an interaction");
 
   try
   {

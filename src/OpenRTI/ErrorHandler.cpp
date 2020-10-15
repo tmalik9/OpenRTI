@@ -23,7 +23,7 @@
 namespace OpenRTI {
 namespace XML {
 
-ErrorHandler::~ErrorHandler(void)
+ErrorHandler::~ErrorHandler()
 {
 }
 

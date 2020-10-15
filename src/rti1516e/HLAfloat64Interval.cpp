@@ -123,13 +123,13 @@ HLAfloat64Interval::HLAfloat64Interval(const HLAfloat64Interval& float64Interval
   HLAfloat64IntervalImpl::assign(_impl, float64Interval._impl);
 }
 
-HLAfloat64Interval::~HLAfloat64Interval() 
+HLAfloat64Interval::~HLAfloat64Interval() noexcept
 {
   HLAfloat64IntervalImpl::putAndDelete(_impl);
 }
 
 void
-HLAfloat64Interval::setZero()
+HLAfloat64Interval::setZero() noexcept
 {
   HLAfloat64IntervalImpl::setValue(_impl, 0);
 }
@@ -144,7 +144,7 @@ HLAfloat64Interval::isZero() const
 }
 
 void
-HLAfloat64Interval::setEpsilon()
+HLAfloat64Interval::setEpsilon() noexcept
 {
   HLAfloat64IntervalImpl::setValue(_impl, std::numeric_limits<double>::denorm_min());
 }

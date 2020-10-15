@@ -139,7 +139,7 @@ HLAopaqueData::HLAopaqueData(HLAopaqueData const & rhs) :
 {
 }
 
-HLAopaqueData::~HLAopaqueData()
+HLAopaqueData::~HLAopaqueData() noexcept
 {
   delete _impl;
   _impl = 0;

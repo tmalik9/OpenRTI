@@ -53,27 +53,28 @@ public:
     MemoryOrderSeqCst
   };
 
-  Atomic(unsigned value = 0) : std::atomic<unsigned>(value)
+  Atomic(unsigned value = 0) noexcept : std::atomic<unsigned>(value)
   { }
+  Atomic(const Atomic&) = delete;
+  Atomic(Atomic&&) = delete;
+	Atomic& operator=(const Atomic&) = delete;
+	//Atomic& operator=(const Atomic&) volatile = delete;
+  //unsigned operator++()
+  //{ return incFetch(); }
+  //unsigned operator--()
+  //{ return decFetch(); }
 
-  unsigned operator++()
-  { return incFetch(); }
-  unsigned operator--()
-  { return decFetch(); }
-
-  unsigned incFetch(MemoryOrder memoryOrder = MemoryOrderSeqCst)
+  unsigned incFetch(MemoryOrder memoryOrder = MemoryOrderSeqCst) noexcept
   { return fetch_add(1, _toStdMemoryOrder(memoryOrder)) + 1; }
-  unsigned decFetch(MemoryOrder memoryOrder = MemoryOrderSeqCst)
+  unsigned decFetch(MemoryOrder memoryOrder = MemoryOrderSeqCst) noexcept
   { return fetch_sub(1, _toStdMemoryOrder(memoryOrder)) - 1; }
 
-  bool compareAndExchange(unsigned oldValue, unsigned newValue, MemoryOrder memoryOrder = MemoryOrderSeqCst)
+  bool compareAndExchange(unsigned oldValue, unsigned newValue, MemoryOrder memoryOrder = MemoryOrderSeqCst) noexcept
   { return compare_exchange_weak(oldValue, newValue, _toStdMemoryOrder(memoryOrder)); }
 
 private:
-  Atomic(const Atomic&) = delete;
-  Atomic& operator=(const Atomic&) = delete;
 
-  static std::memory_order _toStdMemoryOrder(MemoryOrder memoryOrder)
+  static std::memory_order _toStdMemoryOrder(MemoryOrder memoryOrder) noexcept
   {
     switch (memoryOrder) {
     case MemoryOrderRelaxed:
@@ -195,8 +196,6 @@ public:
   }
 
 private:
-  Atomic(const Atomic&);
-  Atomic& operator=(const Atomic&);
 
 #if defined OpenRTI_ATOMIC_USE_LIBRARY
   unsigned inc();

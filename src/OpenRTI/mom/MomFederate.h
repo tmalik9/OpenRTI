@@ -20,7 +20,7 @@ class OPENRTI_LOCAL MomFederate : public std::enable_shared_from_this<MomFederat
 {
   public:
     MomFederate(std::shared_ptr<MomManager> mom, FederateHandle federateHandle, ObjectInstanceHandle federateObjectInstance);
-    ~MomFederate();
+    ~MomFederate() noexcept;
     // return AttributeHandleValueMap fully prepared for sending attribute update, with all attributes given in parameter
     AttributeHandleValueMap GetAttributeValues(AttributeHandleSet attributes);
     void SetAttributeValues(const AttributeHandleValueMap& attributes);

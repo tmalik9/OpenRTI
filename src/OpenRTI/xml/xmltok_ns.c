@@ -6,13 +6,13 @@
 #ifdef XML_TOK_NS_C
 
 const ENCODING *
-NS(XmlGetUtf8InternalEncoding)(void)
+NS(XmlGetUtf8InternalEncoding)()
 {
   return &ns(internal_utf8_encoding).enc;
 }
 
 const ENCODING *
-NS(XmlGetUtf16InternalEncoding)(void)
+NS(XmlGetUtf16InternalEncoding)()
 {
 #if BYTEORDER == 1234
   return &ns(internal_little2_encoding).enc;

@@ -24,10 +24,6 @@
 
 namespace OpenRTI {
 
-ParenthesesReader::ContentHandler::~ContentHandler()
-{
-}
-
 void
 ParenthesesReader::ContentHandler::startDocument()
 {
@@ -48,7 +44,7 @@ ParenthesesReader::ContentHandler::endElement()
 {
 }
 
-ParenthesesReader::ErrorHandler::~ErrorHandler(void)
+ParenthesesReader::ErrorHandler::~ErrorHandler()
 {
 }
 

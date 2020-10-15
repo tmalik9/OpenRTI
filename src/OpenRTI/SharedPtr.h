@@ -35,7 +35,7 @@ class WeakPtr;
 template<typename T>
 class OPENRTI_LOCAL SharedPtr {
 public:
-  SharedPtr(void) : _ptr(0)
+  SharedPtr() : _ptr(0)
   {}
   SharedPtr(T* ptr) : _ptr(ptr) // explicit???
   { T::getFirst(_ptr); }
@@ -48,7 +48,7 @@ public:
   template<typename U>
   SharedPtr(const SharedPtr<U>& p) : _ptr(p.get())
   { T::get(_ptr); }
-  ~SharedPtr(void)
+  ~SharedPtr()
   { put(); }
 
   SharedPtr& operator=(const SharedPtr& p)
@@ -64,10 +64,10 @@ public:
   SharedPtr& operator=(U* p)
   { assignFirst(p); return *this; }
 
-  T* operator->(void) const
+  T* operator->() const
   { return _ptr; }
 
-  T& operator*(void) const
+  T& operator*() const
   { return *_ptr; }
 
   T* get() const
@@ -77,12 +77,12 @@ public:
   SharedPtr take()
   { SharedPtr sharedPtr; sharedPtr.swap(*this); return sharedPtr; }
 
-  bool isShared(void) const
+  bool isShared() const
   { return T::shared(_ptr); }
-  unsigned getNumRefs(void) const
+  unsigned getNumRefs() const
   { return T::count(_ptr); }
 
-  bool valid(void) const
+  bool valid() const noexcept
   { return 0 != _ptr; }
 
   void clear()
@@ -103,7 +103,7 @@ private:
   void assignNonRef(T* p)
   { put(); _ptr = p; }
 
-  void put(void)
+  void put()
   {
     T* tmp = _ptr;
     _ptr = 0;
@@ -117,6 +117,15 @@ private:
   template<typename U>
   friend class WeakPtr;
 };
+
+#pragma warning(push)
+#pragma warning(disable : 26409) // Avoid calling new and delete explicitly, use std::make_unique<T> instead
+template<class T, class ...Args>
+SharedPtr<T> MakeShared(Args... args)
+{
+  return SharedPtr<T>(new T(args...));
+}
+#pragma warning(pop)
 
 // Hmmm, what if we get an automatic cast to a shared pointer of a fresh
 // allocated object pointer?

@@ -22,6 +22,7 @@
 
 #include "Export.h"
 #include "Socket.h"
+#include <SharedPtr.h>
 
 namespace OpenRTI {
 
@@ -30,13 +31,13 @@ class SocketStream;
 
 class OPENRTI_API SocketServer : public Socket {
 public:
-  virtual SocketStream* accept() = 0;
+  virtual SharedPtr<SocketStream> accept() = 0;
 
   SocketAddress getsockname() const;
 
 protected:
   SocketServer(PrivateData* privateData);
-  virtual ~SocketServer();
+  virtual ~SocketServer() noexcept;
 };
 
 } // namespace OpenRTI

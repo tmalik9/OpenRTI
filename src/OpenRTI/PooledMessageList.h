@@ -27,7 +27,7 @@ namespace OpenRTI {
 
 class OPENRTI_API PooledMessageList {
 public:
-  bool empty() const
+  bool empty() const noexcept
   { return _list.empty(); }
   void push_back(const SharedPtr<const AbstractMessage>& message)
   {

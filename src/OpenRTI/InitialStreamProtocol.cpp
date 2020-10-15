@@ -106,14 +106,6 @@ public:
   }
 };
 
-InitialStreamProtocol::InitialStreamProtocol()
-{
-}
-
-InitialStreamProtocol::~InitialStreamProtocol()
-{
-}
-
 void
 InitialStreamProtocol::writeOptionMap(const StringStringListMap& stringStringListMap)
 {

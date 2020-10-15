@@ -16,63 +16,61 @@
 
 #include <RTI/LogicalTimeFactory.h>
 
-namespace rti1516e
+namespace rti1516e {
+class HLAfloat64Time;
+class HLAfloat64Interval;
+
+// Defines interface for HLAfloat64TimeFactory which presents a
+// floating point-based time/interval representation in the range 0 - 2^63-1.
+
+const std::wstring HLAfloat64TimeName(L"HLAfloat64Time");
+
+class RTI_EXPORT HLAfloat64TimeFactory : public rti1516e::LogicalTimeFactory
 {
-   class HLAfloat64Time;
-   class HLAfloat64Interval;
+  public:
+    HLAfloat64TimeFactory();
 
-   // Defines interface for HLAfloat64TimeFactory which presents a
-   // floating point-based time/interval representation in the range 0 - 2^63-1.
+    virtual ~HLAfloat64TimeFactory() noexcept;
 
-   const std::wstring HLAfloat64TimeName(L"HLAfloat64Time");
+    // Return a LogicalTime with the given value
+    /*virtual */std::unique_ptr< HLAfloat64Time > makeLogicalTime(double value);
 
-   class RTI_EXPORT HLAfloat64TimeFactory : public rti1516e::LogicalTimeFactory
-   {
-   public:
-      HLAfloat64TimeFactory ();
+    // Return a LogicalTime with a value of "initial"
+    virtual std::unique_ptr< LogicalTime > makeInitial() override;
 
-      virtual ~HLAfloat64TimeFactory ();
+    // Return a LogicalTime with a value of "final"
+    virtual std::unique_ptr< LogicalTime > makeFinal() override;
 
-      // Return a LogicalTime with the given value
-      virtual std::unique_ptr< HLAfloat64Time > makeLogicalTime (
-         double value);
+    // Return a LogicalTimeInterval with the given value
+    /*virtual*/ std::unique_ptr< HLAfloat64Interval > makeLogicalTimeInterval(
+      double value);
 
-      // Return a LogicalTime with a value of "initial"
-      virtual std::unique_ptr< LogicalTime > makeInitial();
+    // Return a LogicalTimeInterval with a value of "zero"
+    virtual std::unique_ptr< LogicalTimeInterval > makeZero() override;
 
-      // Return a LogicalTime with a value of "final"
-      virtual std::unique_ptr< LogicalTime > makeFinal();
+    // Return a LogicalTimeInterval with a value of "epsilon"
+    virtual std::unique_ptr< LogicalTimeInterval > makeEpsilon() override;
 
-      // Return a LogicalTimeInterval with the given value
-      virtual std::unique_ptr< HLAfloat64Interval > makeLogicalTimeInterval (
-         double value);
+    // LogicalTime decode from an encoded LogicalTime
+    virtual std::unique_ptr< LogicalTime > decodeLogicalTime(
+      VariableLengthData const& encodedLogicalTime) override;
 
-      // Return a LogicalTimeInterval with a value of "zero"
-      virtual std::unique_ptr< LogicalTimeInterval > makeZero();
+    // Alternate LogicalTime decode that reads directly from a buffer
+    std::unique_ptr< LogicalTime > decodeLogicalTime(
+      void* buffer,
+      size_t bufferSize) override;
 
-      // Return a LogicalTimeInterval with a value of "epsilon"
-      virtual std::unique_ptr< LogicalTimeInterval > makeEpsilon();
+    // LogicalTimeInterval decode from an encoded LogicalTimeInterval
+    std::unique_ptr< LogicalTimeInterval > decodeLogicalTimeInterval(
+      VariableLengthData const& encodedValue) override;
 
-      // LogicalTime decode from an encoded LogicalTime
-      virtual std::unique_ptr< LogicalTime > decodeLogicalTime (
-         VariableLengthData const & encodedLogicalTime);
+    // Alternate LogicalTimeInterval decode that reads directly from a buffer
+    virtual std::unique_ptr< LogicalTimeInterval > decodeLogicalTimeInterval(
+      void* buffer,
+      size_t bufferSize) override;
 
-      // Alternate LogicalTime decode that reads directly from a buffer
-      virtual std::unique_ptr< LogicalTime > decodeLogicalTime (
-         void* buffer,
-         size_t bufferSize);
-
-      // LogicalTimeInterval decode from an encoded LogicalTimeInterval
-      virtual std::unique_ptr< LogicalTimeInterval > decodeLogicalTimeInterval (
-         VariableLengthData const & encodedValue);
-
-      // Alternate LogicalTimeInterval decode that reads directly from a buffer
-      virtual std::unique_ptr< LogicalTimeInterval > decodeLogicalTimeInterval (
-         void* buffer,
-         size_t bufferSize);
-
-      virtual std::wstring getName () const;
-   };
+    virtual std::wstring getName() const override;
+};
 }
 
 #endif // RTI_HLAfloat64TimeFactory_H_

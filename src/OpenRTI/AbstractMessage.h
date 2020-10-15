@@ -40,15 +40,18 @@ class SharedPtr;
 
 class OPENRTI_API AbstractMessage : public Referenced {
 public:
-  virtual ~AbstractMessage();
+  AbstractMessage() noexcept = default;
+  AbstractMessage(const AbstractMessage&) = default;
+  AbstractMessage(AbstractMessage&&) = default;
+  virtual ~AbstractMessage() noexcept = default;
 
   virtual const char* getTypeName() const = 0;
   virtual void out(std::ostream& os) const = 0;
   virtual void dispatch(const AbstractMessageDispatcher&) const = 0;
   std::string toString() const;
   // For testing of the transport implementation
-  virtual bool operator==(const AbstractMessage&) const = 0;
-  bool operator!=(const AbstractMessage& message) const
+  virtual bool operator==(const AbstractMessage&) const noexcept = 0;
+  bool operator!=(const AbstractMessage& message) const noexcept
   { return ! operator==(message); }
 
   template<typename F>
@@ -61,12 +64,12 @@ public:
   // Returns true if the message needs to be reliably sent or not.
   // The default implementation returns true. Interaction and attribute
   // update messages will provide a dynamic implementation for that.
-  virtual bool getReliable() const;
+  virtual bool getReliable() const noexcept;
 
   // Returns the object instance handle this message is targeting at.
   // The default implementation returns an invalid handle.
   // This is used to throw out messages for object instances that are already deleted.
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept;
 };
 
 inline std::ostream&

@@ -35,7 +35,7 @@ public:
   RTI1516fedTime(double value);
   RTI1516fedTime(const rti1516::LogicalTime& logicalTime);
   RTI1516fedTime(const RTI1516fedTime& fedTime);
-  virtual ~RTI1516fedTime();
+  virtual ~RTI1516fedTime() noexcept;
 
   virtual std::wstring implementationName() const;
 
@@ -63,7 +63,7 @@ public:
 class RTI_EXPORT_FEDTIME RTI1516fedTimeFactory : public rti1516::LogicalTimeFactory {
 public:
   RTI1516fedTimeFactory();
-  virtual ~RTI1516fedTimeFactory() throw ();
+  virtual ~RTI1516fedTimeFactory() noexcept;
   virtual std::unique_ptr<rti1516::LogicalTime> makeLogicalTime();
   virtual std::unique_ptr<rti1516::LogicalTimeInterval> makeLogicalTimeInterval();
 };

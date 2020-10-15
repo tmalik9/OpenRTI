@@ -85,7 +85,7 @@ public:
     }
 
   protected:
-    virtual int sync()
+    int sync() override
     {
       // Not having the mutex here can only happen in weired circumstances.
       // But if so, do not hold back the message.
@@ -253,7 +253,7 @@ void LogStream::EnableLogToConsole(bool enable)
 }
 
 LogStream&
-LogStream::Instance(void)
+LogStream::Instance()
 {
   static LogStream logStreamInstance;
   return logStreamInstance;

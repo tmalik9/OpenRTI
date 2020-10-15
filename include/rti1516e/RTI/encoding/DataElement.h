@@ -30,7 +30,7 @@ namespace rti1516e
    public:
 
       // Destructor
-      virtual ~DataElement () = 0;
+      virtual ~DataElement() noexcept = 0;
 
       // Return a new copy of the DataElement
       virtual std::unique_ptr<DataElement> clone () const = 0;

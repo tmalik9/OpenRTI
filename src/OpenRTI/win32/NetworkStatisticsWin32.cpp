@@ -8,14 +8,14 @@
 namespace OpenRTI {
 
 
-NetworkStatisticsWin32::NetworkStatisticsWin32()
+NetworkStatisticsWin32::NetworkStatisticsWin32() noexcept
 #ifdef ENABLE_NETWORKSTATISTICS
   : mTimer(0)
 #endif
 {
 }
 
-NetworkStatisticsWin32::~NetworkStatisticsWin32()
+NetworkStatisticsWin32::~NetworkStatisticsWin32() noexcept
 {
 }
 

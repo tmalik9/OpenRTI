@@ -45,7 +45,7 @@ RTI1516fedTime::RTI1516fedTime(const RTI1516fedTime& fedTime) :
 {
 }
 
-RTI1516fedTime::~RTI1516fedTime() throw ()
+RTI1516fedTime::~RTI1516fedTime() noexcept
 {
 }
 

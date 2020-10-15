@@ -104,17 +104,11 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
   throw TransportError(errnoToUtf8(errorNumber));
 }
 
-
-ssize_t SocketStream::sendBufferSize() const
-{
-  return 64*1024;
-}
-
 ssize_t
 SocketStream::recv(const BufferRange& bufferRange, bool peek)
 {
   size_t bytelen = 0;
-  size_t readBufferSize = 64*1024; /* FIXME Use the real read buffer size instead */
+  constexpr size_t readBufferSize = 64*1024; /* FIXME Use the real read buffer size instead */
   // Currently fixed to max of 100
   // For stream sockets it does not matter: If we could not receive all in one chunk, the next chunk will receive the rest.
   WSABUF buffers[100];
@@ -131,7 +125,7 @@ SocketStream::recv(const BufferRange& bufferRange, bool peek)
     size = 1;
 #endif
 
-    buffers[bufferCount].buf = (char*)i.data();
+    buffers[bufferCount].buf = static_cast<char*>(i.data());
     buffers[bufferCount].len = ULONG(size);
     bytelen += size;
     i += size;

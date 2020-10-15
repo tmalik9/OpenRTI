@@ -30,13 +30,13 @@ class SocketServerPipe;
 class OPENRTI_API SocketPipe : public SocketStream {
 public:
   SocketPipe();
-
+  SocketPipe(PrivateData* privateData);
+  virtual ~SocketPipe() noexcept;
   void connect(const std::string& file);
-  virtual void shutdown();
+  void cork(bool enable) override;
+  void shutdown() override;
 
 protected:
-  SocketPipe(PrivateData* privateData);
-  virtual ~SocketPipe();
 
   friend class SocketServerPipe;
 };

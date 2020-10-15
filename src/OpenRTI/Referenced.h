@@ -28,26 +28,29 @@ namespace OpenRTI {
 
 class OPENRTI_API Referenced {
 public:
-  Referenced(void) : _refcount(0u)
+  Referenced() noexcept : _refcount(0u)
   {}
   /// Do not copy reference counts. Each new object has it's own counter
-  Referenced(const Referenced&) : _refcount(0u)
+  Referenced(const Referenced&) noexcept : _refcount(0u)
   {}
+  Referenced(Referenced&&) noexcept = default;
+  virtual ~Referenced() noexcept {}
   /// Do not copy reference counts. Each new object has it's own counter
-  Referenced& operator=(const Referenced&)
+  Referenced& operator=(const Referenced&) noexcept
   { return *this; }
+  Referenced& operator=(Referenced&&) = default;
 
-  static void get(const Referenced* ref)
+  static void get(const Referenced* ref) noexcept
   { if (!ref) return; ref->_refcount.incFetch(Atomic::MemoryOrderRelease); }
   static void getFirst(const Referenced* ref)
   { get(ref); }
-  static unsigned put(const Referenced* ref)
+  static unsigned put(const Referenced* ref) noexcept
   { if (ref) return ref->_refcount.decFetch(Atomic::MemoryOrderAcqRel); else return ~0u; }
-  static void release(const Referenced* ref)
+  static void release(const Referenced* ref) noexcept
   { if (!ref) return; ref->_refcount.decFetch(Atomic::MemoryOrderRelease); }
-  static unsigned count(const Referenced* ref)
+  static unsigned count(const Referenced* ref) noexcept
   { if (ref) return ref->_refcount; else return 0u; }
-  static bool shared(const Referenced* ref)
+  static bool shared(const Referenced* ref) noexcept
   { if (ref) return 1u < ref->_refcount; else return false; }
 
   template<typename T>

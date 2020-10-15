@@ -86,7 +86,7 @@ ProtocolSocketEvent::ProtocolSocketEvent(const SharedPtr<SocketStream>& socketSt
 {
 }
 
-ProtocolSocketEvent::~ProtocolSocketEvent()
+ProtocolSocketEvent::~ProtocolSocketEvent() noexcept
 {
   delete _protocolSocket;
   _protocolSocket = 0;
@@ -148,7 +148,7 @@ ProtocolSocketEvent::setProtocolLayer(const SharedPtr<AbstractProtocolLayer>& pr
 }
 
 const SharedPtr<AbstractProtocolLayer>&
-ProtocolSocketEvent::getProtocolLayer() const
+ProtocolSocketEvent::getProtocolLayer() const noexcept
 {
   return _protocolSocket->_protocolLayer;
 }

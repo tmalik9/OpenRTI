@@ -29,11 +29,11 @@ class AbstractMessage;
 
 class OPENRTI_API AbstractMessageSender : public Referenced {
 public:
-  AbstractMessageSender();
-  virtual ~AbstractMessageSender();
+  AbstractMessageSender() noexcept;
+  virtual ~AbstractMessageSender() noexcept;
 
   virtual void send(const SharedPtr<const AbstractMessage>& message) = 0;
-  virtual void close() = 0;
+  virtual void close() noexcept = 0;
   // virtual bool isOpen() const = 0;
 };
 

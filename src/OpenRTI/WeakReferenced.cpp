@@ -31,7 +31,7 @@ WeakReferenced::WeakData::WeakData(WeakReferenced* weakReferenced) :
 {
 }
 
-WeakReferenced::WeakData::~WeakData()
+WeakReferenced::WeakData::~WeakData() noexcept
 {
 }
 

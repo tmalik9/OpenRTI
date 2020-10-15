@@ -27,7 +27,7 @@ namespace XML {
 
 class ErrorHandler : public Referenced {
 public:
-  virtual ~ErrorHandler(void);
+  virtual ~ErrorHandler();
   virtual void error(const char* msg, unsigned line, unsigned col);
   virtual void fatalError(const char* msg, unsigned line, unsigned col);
   virtual void warning(const char* msg, unsigned line, unsigned col);

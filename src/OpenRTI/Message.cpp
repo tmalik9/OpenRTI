@@ -21,7 +21,6 @@
  */
 
 
-#include "DebugNew.h"
 #include "Message.h"
 
 #include <ostream>
@@ -31,12 +30,12 @@
 
 namespace OpenRTI {
 
-ConnectionLostMessage::ConnectionLostMessage() :
+ConnectionLostMessage::ConnectionLostMessage() noexcept :
   _faultDescription()
 {
 }
 
-ConnectionLostMessage::~ConnectionLostMessage()
+ConnectionLostMessage::~ConnectionLostMessage() noexcept
 {
 }
 
@@ -59,7 +58,7 @@ ConnectionLostMessage::dispatch(const AbstractMessageDispatcher& dispatcher) con
 }
 
 bool
-ConnectionLostMessage::operator==(const AbstractMessage& rhs) const
+ConnectionLostMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ConnectionLostMessage* message = dynamic_cast<const ConnectionLostMessage*>(&rhs);
   if (!message)
@@ -68,28 +67,28 @@ ConnectionLostMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-ConnectionLostMessage::operator==(const ConnectionLostMessage& rhs) const
+ConnectionLostMessage::operator==(const ConnectionLostMessage& rhs) const noexcept
 {
   if (getFaultDescription() != rhs.getFaultDescription()) return false;
   return true;
 }
 
 bool
-ConnectionLostMessage::operator<(const ConnectionLostMessage& rhs) const
+ConnectionLostMessage::operator<(const ConnectionLostMessage& rhs) const noexcept
 {
   if (getFaultDescription() < rhs.getFaultDescription()) return true;
   if (rhs.getFaultDescription() < getFaultDescription()) return false;
   return false;
 }
 
-CreateFederationExecutionRequestMessage::CreateFederationExecutionRequestMessage() :
+CreateFederationExecutionRequestMessage::CreateFederationExecutionRequestMessage() noexcept :
   _federationExecution(),
   _logicalTimeFactoryName(),
   _fOMStringModuleList()
 {
 }
 
-CreateFederationExecutionRequestMessage::~CreateFederationExecutionRequestMessage()
+CreateFederationExecutionRequestMessage::~CreateFederationExecutionRequestMessage() noexcept
 {
 }
 
@@ -112,7 +111,7 @@ CreateFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatche
 }
 
 bool
-CreateFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) const
+CreateFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const CreateFederationExecutionRequestMessage* message = dynamic_cast<const CreateFederationExecutionRequestMessage*>(&rhs);
   if (!message)
@@ -121,7 +120,7 @@ CreateFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) 
 }
 
 bool
-CreateFederationExecutionRequestMessage::operator==(const CreateFederationExecutionRequestMessage& rhs) const
+CreateFederationExecutionRequestMessage::operator==(const CreateFederationExecutionRequestMessage& rhs) const noexcept
 {
   if (getFederationExecution() != rhs.getFederationExecution()) return false;
   if (getLogicalTimeFactoryName() != rhs.getLogicalTimeFactoryName()) return false;
@@ -130,7 +129,7 @@ CreateFederationExecutionRequestMessage::operator==(const CreateFederationExecut
 }
 
 bool
-CreateFederationExecutionRequestMessage::operator<(const CreateFederationExecutionRequestMessage& rhs) const
+CreateFederationExecutionRequestMessage::operator<(const CreateFederationExecutionRequestMessage& rhs) const noexcept
 {
   if (getFederationExecution() < rhs.getFederationExecution()) return true;
   if (rhs.getFederationExecution() < getFederationExecution()) return false;
@@ -141,13 +140,13 @@ CreateFederationExecutionRequestMessage::operator<(const CreateFederationExecuti
   return false;
 }
 
-CreateFederationExecutionResponseMessage::CreateFederationExecutionResponseMessage() :
+CreateFederationExecutionResponseMessage::CreateFederationExecutionResponseMessage() noexcept :
   _createFederationExecutionResponseType(),
   _exceptionString()
 {
 }
 
-CreateFederationExecutionResponseMessage::~CreateFederationExecutionResponseMessage()
+CreateFederationExecutionResponseMessage::~CreateFederationExecutionResponseMessage() noexcept
 {
 }
 
@@ -170,7 +169,7 @@ CreateFederationExecutionResponseMessage::dispatch(const AbstractMessageDispatch
 }
 
 bool
-CreateFederationExecutionResponseMessage::operator==(const AbstractMessage& rhs) const
+CreateFederationExecutionResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const CreateFederationExecutionResponseMessage* message = dynamic_cast<const CreateFederationExecutionResponseMessage*>(&rhs);
   if (!message)
@@ -179,7 +178,7 @@ CreateFederationExecutionResponseMessage::operator==(const AbstractMessage& rhs)
 }
 
 bool
-CreateFederationExecutionResponseMessage::operator==(const CreateFederationExecutionResponseMessage& rhs) const
+CreateFederationExecutionResponseMessage::operator==(const CreateFederationExecutionResponseMessage& rhs) const noexcept
 {
   if (getCreateFederationExecutionResponseType() != rhs.getCreateFederationExecutionResponseType()) return false;
   if (getExceptionString() != rhs.getExceptionString()) return false;
@@ -187,7 +186,7 @@ CreateFederationExecutionResponseMessage::operator==(const CreateFederationExecu
 }
 
 bool
-CreateFederationExecutionResponseMessage::operator<(const CreateFederationExecutionResponseMessage& rhs) const
+CreateFederationExecutionResponseMessage::operator<(const CreateFederationExecutionResponseMessage& rhs) const noexcept
 {
   if (getCreateFederationExecutionResponseType() < rhs.getCreateFederationExecutionResponseType()) return true;
   if (rhs.getCreateFederationExecutionResponseType() < getCreateFederationExecutionResponseType()) return false;
@@ -196,12 +195,12 @@ CreateFederationExecutionResponseMessage::operator<(const CreateFederationExecut
   return false;
 }
 
-DestroyFederationExecutionRequestMessage::DestroyFederationExecutionRequestMessage() :
+DestroyFederationExecutionRequestMessage::DestroyFederationExecutionRequestMessage() noexcept :
   _federationExecution()
 {
 }
 
-DestroyFederationExecutionRequestMessage::~DestroyFederationExecutionRequestMessage()
+DestroyFederationExecutionRequestMessage::~DestroyFederationExecutionRequestMessage() noexcept
 {
 }
 
@@ -224,7 +223,7 @@ DestroyFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatch
 }
 
 bool
-DestroyFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) const
+DestroyFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const DestroyFederationExecutionRequestMessage* message = dynamic_cast<const DestroyFederationExecutionRequestMessage*>(&rhs);
   if (!message)
@@ -233,26 +232,26 @@ DestroyFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs)
 }
 
 bool
-DestroyFederationExecutionRequestMessage::operator==(const DestroyFederationExecutionRequestMessage& rhs) const
+DestroyFederationExecutionRequestMessage::operator==(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
 {
   if (getFederationExecution() != rhs.getFederationExecution()) return false;
   return true;
 }
 
 bool
-DestroyFederationExecutionRequestMessage::operator<(const DestroyFederationExecutionRequestMessage& rhs) const
+DestroyFederationExecutionRequestMessage::operator<(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
 {
   if (getFederationExecution() < rhs.getFederationExecution()) return true;
   if (rhs.getFederationExecution() < getFederationExecution()) return false;
   return false;
 }
 
-DestroyFederationExecutionResponseMessage::DestroyFederationExecutionResponseMessage() :
+DestroyFederationExecutionResponseMessage::DestroyFederationExecutionResponseMessage() noexcept :
   _destroyFederationExecutionResponseType()
 {
 }
 
-DestroyFederationExecutionResponseMessage::~DestroyFederationExecutionResponseMessage()
+DestroyFederationExecutionResponseMessage::~DestroyFederationExecutionResponseMessage() noexcept
 {
 }
 
@@ -275,7 +274,7 @@ DestroyFederationExecutionResponseMessage::dispatch(const AbstractMessageDispatc
 }
 
 bool
-DestroyFederationExecutionResponseMessage::operator==(const AbstractMessage& rhs) const
+DestroyFederationExecutionResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const DestroyFederationExecutionResponseMessage* message = dynamic_cast<const DestroyFederationExecutionResponseMessage*>(&rhs);
   if (!message)
@@ -284,25 +283,25 @@ DestroyFederationExecutionResponseMessage::operator==(const AbstractMessage& rhs
 }
 
 bool
-DestroyFederationExecutionResponseMessage::operator==(const DestroyFederationExecutionResponseMessage& rhs) const
+DestroyFederationExecutionResponseMessage::operator==(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
 {
   if (getDestroyFederationExecutionResponseType() != rhs.getDestroyFederationExecutionResponseType()) return false;
   return true;
 }
 
 bool
-DestroyFederationExecutionResponseMessage::operator<(const DestroyFederationExecutionResponseMessage& rhs) const
+DestroyFederationExecutionResponseMessage::operator<(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
 {
   if (getDestroyFederationExecutionResponseType() < rhs.getDestroyFederationExecutionResponseType()) return true;
   if (rhs.getDestroyFederationExecutionResponseType() < getDestroyFederationExecutionResponseType()) return false;
   return false;
 }
 
-EnumerateFederationExecutionsRequestMessage::EnumerateFederationExecutionsRequestMessage()
+EnumerateFederationExecutionsRequestMessage::EnumerateFederationExecutionsRequestMessage() noexcept
 {
 }
 
-EnumerateFederationExecutionsRequestMessage::~EnumerateFederationExecutionsRequestMessage()
+EnumerateFederationExecutionsRequestMessage::~EnumerateFederationExecutionsRequestMessage() noexcept
 {
 }
 
@@ -325,7 +324,7 @@ EnumerateFederationExecutionsRequestMessage::dispatch(const AbstractMessageDispa
 }
 
 bool
-EnumerateFederationExecutionsRequestMessage::operator==(const AbstractMessage& rhs) const
+EnumerateFederationExecutionsRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const EnumerateFederationExecutionsRequestMessage* message = dynamic_cast<const EnumerateFederationExecutionsRequestMessage*>(&rhs);
   if (!message)
@@ -334,23 +333,23 @@ EnumerateFederationExecutionsRequestMessage::operator==(const AbstractMessage& r
 }
 
 bool
-EnumerateFederationExecutionsRequestMessage::operator==(const EnumerateFederationExecutionsRequestMessage& rhs) const
+EnumerateFederationExecutionsRequestMessage::operator==(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
 {
   return true;
 }
 
 bool
-EnumerateFederationExecutionsRequestMessage::operator<(const EnumerateFederationExecutionsRequestMessage& rhs) const
+EnumerateFederationExecutionsRequestMessage::operator<(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
 {
   return false;
 }
 
-EnumerateFederationExecutionsResponseMessage::EnumerateFederationExecutionsResponseMessage() :
+EnumerateFederationExecutionsResponseMessage::EnumerateFederationExecutionsResponseMessage() noexcept :
   _federationExecutionInformationVector()
 {
 }
 
-EnumerateFederationExecutionsResponseMessage::~EnumerateFederationExecutionsResponseMessage()
+EnumerateFederationExecutionsResponseMessage::~EnumerateFederationExecutionsResponseMessage() noexcept
 {
 }
 
@@ -373,7 +372,7 @@ EnumerateFederationExecutionsResponseMessage::dispatch(const AbstractMessageDisp
 }
 
 bool
-EnumerateFederationExecutionsResponseMessage::operator==(const AbstractMessage& rhs) const
+EnumerateFederationExecutionsResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const EnumerateFederationExecutionsResponseMessage* message = dynamic_cast<const EnumerateFederationExecutionsResponseMessage*>(&rhs);
   if (!message)
@@ -382,21 +381,21 @@ EnumerateFederationExecutionsResponseMessage::operator==(const AbstractMessage& 
 }
 
 bool
-EnumerateFederationExecutionsResponseMessage::operator==(const EnumerateFederationExecutionsResponseMessage& rhs) const
+EnumerateFederationExecutionsResponseMessage::operator==(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
 {
   if (getFederationExecutionInformationVector() != rhs.getFederationExecutionInformationVector()) return false;
   return true;
 }
 
 bool
-EnumerateFederationExecutionsResponseMessage::operator<(const EnumerateFederationExecutionsResponseMessage& rhs) const
+EnumerateFederationExecutionsResponseMessage::operator<(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
 {
   if (getFederationExecutionInformationVector() < rhs.getFederationExecutionInformationVector()) return true;
   if (rhs.getFederationExecutionInformationVector() < getFederationExecutionInformationVector()) return false;
   return false;
 }
 
-InsertFederationExecutionMessage::InsertFederationExecutionMessage() :
+InsertFederationExecutionMessage::InsertFederationExecutionMessage() noexcept :
   _federationHandle(),
   _federationName(),
   _logicalTimeFactoryName(),
@@ -404,7 +403,7 @@ InsertFederationExecutionMessage::InsertFederationExecutionMessage() :
 {
 }
 
-InsertFederationExecutionMessage::~InsertFederationExecutionMessage()
+InsertFederationExecutionMessage::~InsertFederationExecutionMessage() noexcept
 {
 }
 
@@ -427,7 +426,7 @@ InsertFederationExecutionMessage::dispatch(const AbstractMessageDispatcher& disp
 }
 
 bool
-InsertFederationExecutionMessage::operator==(const AbstractMessage& rhs) const
+InsertFederationExecutionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const InsertFederationExecutionMessage* message = dynamic_cast<const InsertFederationExecutionMessage*>(&rhs);
   if (!message)
@@ -436,7 +435,7 @@ InsertFederationExecutionMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-InsertFederationExecutionMessage::operator==(const InsertFederationExecutionMessage& rhs) const
+InsertFederationExecutionMessage::operator==(const InsertFederationExecutionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederationName() != rhs.getFederationName()) return false;
@@ -446,7 +445,7 @@ InsertFederationExecutionMessage::operator==(const InsertFederationExecutionMess
 }
 
 bool
-InsertFederationExecutionMessage::operator<(const InsertFederationExecutionMessage& rhs) const
+InsertFederationExecutionMessage::operator<(const InsertFederationExecutionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -459,12 +458,12 @@ InsertFederationExecutionMessage::operator<(const InsertFederationExecutionMessa
   return false;
 }
 
-ShutdownFederationExecutionMessage::ShutdownFederationExecutionMessage() :
+ShutdownFederationExecutionMessage::ShutdownFederationExecutionMessage() noexcept :
   _federationHandle()
 {
 }
 
-ShutdownFederationExecutionMessage::~ShutdownFederationExecutionMessage()
+ShutdownFederationExecutionMessage::~ShutdownFederationExecutionMessage() noexcept
 {
 }
 
@@ -487,7 +486,7 @@ ShutdownFederationExecutionMessage::dispatch(const AbstractMessageDispatcher& di
 }
 
 bool
-ShutdownFederationExecutionMessage::operator==(const AbstractMessage& rhs) const
+ShutdownFederationExecutionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ShutdownFederationExecutionMessage* message = dynamic_cast<const ShutdownFederationExecutionMessage*>(&rhs);
   if (!message)
@@ -496,26 +495,26 @@ ShutdownFederationExecutionMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-ShutdownFederationExecutionMessage::operator==(const ShutdownFederationExecutionMessage& rhs) const
+ShutdownFederationExecutionMessage::operator==(const ShutdownFederationExecutionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   return true;
 }
 
 bool
-ShutdownFederationExecutionMessage::operator<(const ShutdownFederationExecutionMessage& rhs) const
+ShutdownFederationExecutionMessage::operator<(const ShutdownFederationExecutionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
   return false;
 }
 
-EraseFederationExecutionMessage::EraseFederationExecutionMessage() :
+EraseFederationExecutionMessage::EraseFederationExecutionMessage() noexcept :
   _federationHandle()
 {
 }
 
-EraseFederationExecutionMessage::~EraseFederationExecutionMessage()
+EraseFederationExecutionMessage::~EraseFederationExecutionMessage() noexcept
 {
 }
 
@@ -538,7 +537,7 @@ EraseFederationExecutionMessage::dispatch(const AbstractMessageDispatcher& dispa
 }
 
 bool
-EraseFederationExecutionMessage::operator==(const AbstractMessage& rhs) const
+EraseFederationExecutionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const EraseFederationExecutionMessage* message = dynamic_cast<const EraseFederationExecutionMessage*>(&rhs);
   if (!message)
@@ -547,26 +546,26 @@ EraseFederationExecutionMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-EraseFederationExecutionMessage::operator==(const EraseFederationExecutionMessage& rhs) const
+EraseFederationExecutionMessage::operator==(const EraseFederationExecutionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   return true;
 }
 
 bool
-EraseFederationExecutionMessage::operator<(const EraseFederationExecutionMessage& rhs) const
+EraseFederationExecutionMessage::operator<(const EraseFederationExecutionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
   return false;
 }
 
-ReleaseFederationHandleMessage::ReleaseFederationHandleMessage() :
+ReleaseFederationHandleMessage::ReleaseFederationHandleMessage() noexcept :
   _federationHandle()
 {
 }
 
-ReleaseFederationHandleMessage::~ReleaseFederationHandleMessage()
+ReleaseFederationHandleMessage::~ReleaseFederationHandleMessage() noexcept
 {
 }
 
@@ -589,7 +588,7 @@ ReleaseFederationHandleMessage::dispatch(const AbstractMessageDispatcher& dispat
 }
 
 bool
-ReleaseFederationHandleMessage::operator==(const AbstractMessage& rhs) const
+ReleaseFederationHandleMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ReleaseFederationHandleMessage* message = dynamic_cast<const ReleaseFederationHandleMessage*>(&rhs);
   if (!message)
@@ -598,27 +597,27 @@ ReleaseFederationHandleMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-ReleaseFederationHandleMessage::operator==(const ReleaseFederationHandleMessage& rhs) const
+ReleaseFederationHandleMessage::operator==(const ReleaseFederationHandleMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   return true;
 }
 
 bool
-ReleaseFederationHandleMessage::operator<(const ReleaseFederationHandleMessage& rhs) const
+ReleaseFederationHandleMessage::operator<(const ReleaseFederationHandleMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
   return false;
 }
 
-InsertModulesMessage::InsertModulesMessage() :
+InsertModulesMessage::InsertModulesMessage() noexcept :
   _federationHandle(),
   _fOMModuleList()
 {
 }
 
-InsertModulesMessage::~InsertModulesMessage()
+InsertModulesMessage::~InsertModulesMessage() noexcept
 {
 }
 
@@ -641,7 +640,7 @@ InsertModulesMessage::dispatch(const AbstractMessageDispatcher& dispatcher) cons
 }
 
 bool
-InsertModulesMessage::operator==(const AbstractMessage& rhs) const
+InsertModulesMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const InsertModulesMessage* message = dynamic_cast<const InsertModulesMessage*>(&rhs);
   if (!message)
@@ -650,7 +649,7 @@ InsertModulesMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-InsertModulesMessage::operator==(const InsertModulesMessage& rhs) const
+InsertModulesMessage::operator==(const InsertModulesMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFOMModuleList() != rhs.getFOMModuleList()) return false;
@@ -658,7 +657,7 @@ InsertModulesMessage::operator==(const InsertModulesMessage& rhs) const
 }
 
 bool
-InsertModulesMessage::operator<(const InsertModulesMessage& rhs) const
+InsertModulesMessage::operator<(const InsertModulesMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -667,7 +666,7 @@ InsertModulesMessage::operator<(const InsertModulesMessage& rhs) const
   return false;
 }
 
-JoinFederationExecutionRequestMessage::JoinFederationExecutionRequestMessage() :
+JoinFederationExecutionRequestMessage::JoinFederationExecutionRequestMessage() noexcept :
   _federationExecution(),
   _federateType(),
   _federateName(),
@@ -677,7 +676,7 @@ JoinFederationExecutionRequestMessage::JoinFederationExecutionRequestMessage() :
 {
 }
 
-JoinFederationExecutionRequestMessage::~JoinFederationExecutionRequestMessage()
+JoinFederationExecutionRequestMessage::~JoinFederationExecutionRequestMessage() noexcept
 {
 }
 
@@ -700,7 +699,7 @@ JoinFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatcher&
 }
 
 bool
-JoinFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) const
+JoinFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const JoinFederationExecutionRequestMessage* message = dynamic_cast<const JoinFederationExecutionRequestMessage*>(&rhs);
   if (!message)
@@ -709,7 +708,7 @@ JoinFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) co
 }
 
 bool
-JoinFederationExecutionRequestMessage::operator==(const JoinFederationExecutionRequestMessage& rhs) const
+JoinFederationExecutionRequestMessage::operator==(const JoinFederationExecutionRequestMessage& rhs) const noexcept
 {
   if (getFederationExecution() != rhs.getFederationExecution()) return false;
   if (getFederateType() != rhs.getFederateType()) return false;
@@ -721,7 +720,7 @@ JoinFederationExecutionRequestMessage::operator==(const JoinFederationExecutionR
 }
 
 bool
-JoinFederationExecutionRequestMessage::operator<(const JoinFederationExecutionRequestMessage& rhs) const
+JoinFederationExecutionRequestMessage::operator<(const JoinFederationExecutionRequestMessage& rhs) const noexcept
 {
   if (getFederationExecution() < rhs.getFederationExecution()) return true;
   if (rhs.getFederationExecution() < getFederationExecution()) return false;
@@ -738,7 +737,7 @@ JoinFederationExecutionRequestMessage::operator<(const JoinFederationExecutionRe
   return false;
 }
 
-JoinFederationExecutionResponseMessage::JoinFederationExecutionResponseMessage() :
+JoinFederationExecutionResponseMessage::JoinFederationExecutionResponseMessage() noexcept :
   _federationHandle(),
   _joinFederationExecutionResponseType(),
   _exceptionString(),
@@ -748,7 +747,7 @@ JoinFederationExecutionResponseMessage::JoinFederationExecutionResponseMessage()
 {
 }
 
-JoinFederationExecutionResponseMessage::~JoinFederationExecutionResponseMessage()
+JoinFederationExecutionResponseMessage::~JoinFederationExecutionResponseMessage() noexcept
 {
 }
 
@@ -771,7 +770,7 @@ JoinFederationExecutionResponseMessage::dispatch(const AbstractMessageDispatcher
 }
 
 bool
-JoinFederationExecutionResponseMessage::operator==(const AbstractMessage& rhs) const
+JoinFederationExecutionResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const JoinFederationExecutionResponseMessage* message = dynamic_cast<const JoinFederationExecutionResponseMessage*>(&rhs);
   if (!message)
@@ -780,7 +779,7 @@ JoinFederationExecutionResponseMessage::operator==(const AbstractMessage& rhs) c
 }
 
 bool
-JoinFederationExecutionResponseMessage::operator==(const JoinFederationExecutionResponseMessage& rhs) const
+JoinFederationExecutionResponseMessage::operator==(const JoinFederationExecutionResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getJoinFederationExecutionResponseType() != rhs.getJoinFederationExecutionResponseType()) return false;
@@ -792,7 +791,7 @@ JoinFederationExecutionResponseMessage::operator==(const JoinFederationExecution
 }
 
 bool
-JoinFederationExecutionResponseMessage::operator<(const JoinFederationExecutionResponseMessage& rhs) const
+JoinFederationExecutionResponseMessage::operator<(const JoinFederationExecutionResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -809,14 +808,14 @@ JoinFederationExecutionResponseMessage::operator<(const JoinFederationExecutionR
   return false;
 }
 
-ResignFederationExecutionLeafRequestMessage::ResignFederationExecutionLeafRequestMessage() :
+ResignFederationExecutionLeafRequestMessage::ResignFederationExecutionLeafRequestMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _resignAction()
 {
 }
 
-ResignFederationExecutionLeafRequestMessage::~ResignFederationExecutionLeafRequestMessage()
+ResignFederationExecutionLeafRequestMessage::~ResignFederationExecutionLeafRequestMessage() noexcept
 {
 }
 
@@ -839,7 +838,7 @@ ResignFederationExecutionLeafRequestMessage::dispatch(const AbstractMessageDispa
 }
 
 bool
-ResignFederationExecutionLeafRequestMessage::operator==(const AbstractMessage& rhs) const
+ResignFederationExecutionLeafRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ResignFederationExecutionLeafRequestMessage* message = dynamic_cast<const ResignFederationExecutionLeafRequestMessage*>(&rhs);
   if (!message)
@@ -848,7 +847,7 @@ ResignFederationExecutionLeafRequestMessage::operator==(const AbstractMessage& r
 }
 
 bool
-ResignFederationExecutionLeafRequestMessage::operator==(const ResignFederationExecutionLeafRequestMessage& rhs) const
+ResignFederationExecutionLeafRequestMessage::operator==(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -857,7 +856,7 @@ ResignFederationExecutionLeafRequestMessage::operator==(const ResignFederationEx
 }
 
 bool
-ResignFederationExecutionLeafRequestMessage::operator<(const ResignFederationExecutionLeafRequestMessage& rhs) const
+ResignFederationExecutionLeafRequestMessage::operator<(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -868,13 +867,13 @@ ResignFederationExecutionLeafRequestMessage::operator<(const ResignFederationExe
   return false;
 }
 
-ResignFederationExecutionRequestMessage::ResignFederationExecutionRequestMessage() :
+ResignFederationExecutionRequestMessage::ResignFederationExecutionRequestMessage() noexcept :
   _federationHandle(),
   _federateHandle()
 {
 }
 
-ResignFederationExecutionRequestMessage::~ResignFederationExecutionRequestMessage()
+ResignFederationExecutionRequestMessage::~ResignFederationExecutionRequestMessage() noexcept
 {
 }
 
@@ -897,7 +896,7 @@ ResignFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatche
 }
 
 bool
-ResignFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) const
+ResignFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ResignFederationExecutionRequestMessage* message = dynamic_cast<const ResignFederationExecutionRequestMessage*>(&rhs);
   if (!message)
@@ -906,7 +905,7 @@ ResignFederationExecutionRequestMessage::operator==(const AbstractMessage& rhs) 
 }
 
 bool
-ResignFederationExecutionRequestMessage::operator==(const ResignFederationExecutionRequestMessage& rhs) const
+ResignFederationExecutionRequestMessage::operator==(const ResignFederationExecutionRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -914,7 +913,7 @@ ResignFederationExecutionRequestMessage::operator==(const ResignFederationExecut
 }
 
 bool
-ResignFederationExecutionRequestMessage::operator<(const ResignFederationExecutionRequestMessage& rhs) const
+ResignFederationExecutionRequestMessage::operator<(const ResignFederationExecutionRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -923,7 +922,7 @@ ResignFederationExecutionRequestMessage::operator<(const ResignFederationExecuti
   return false;
 }
 
-JoinFederateNotifyMessage::JoinFederateNotifyMessage() :
+JoinFederateNotifyMessage::JoinFederateNotifyMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _federateType(),
@@ -932,7 +931,7 @@ JoinFederateNotifyMessage::JoinFederateNotifyMessage() :
 {
 }
 
-JoinFederateNotifyMessage::~JoinFederateNotifyMessage()
+JoinFederateNotifyMessage::~JoinFederateNotifyMessage() noexcept
 {
 }
 
@@ -955,7 +954,7 @@ JoinFederateNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatcher)
 }
 
 bool
-JoinFederateNotifyMessage::operator==(const AbstractMessage& rhs) const
+JoinFederateNotifyMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const JoinFederateNotifyMessage* message = dynamic_cast<const JoinFederateNotifyMessage*>(&rhs);
   if (!message)
@@ -964,7 +963,7 @@ JoinFederateNotifyMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-JoinFederateNotifyMessage::operator==(const JoinFederateNotifyMessage& rhs) const
+JoinFederateNotifyMessage::operator==(const JoinFederateNotifyMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -975,7 +974,7 @@ JoinFederateNotifyMessage::operator==(const JoinFederateNotifyMessage& rhs) cons
 }
 
 bool
-JoinFederateNotifyMessage::operator<(const JoinFederateNotifyMessage& rhs) const
+JoinFederateNotifyMessage::operator<(const JoinFederateNotifyMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -990,13 +989,13 @@ JoinFederateNotifyMessage::operator<(const JoinFederateNotifyMessage& rhs) const
   return false;
 }
 
-ResignFederateNotifyMessage::ResignFederateNotifyMessage() :
+ResignFederateNotifyMessage::ResignFederateNotifyMessage() noexcept :
   _federationHandle(),
   _federateHandle()
 {
 }
 
-ResignFederateNotifyMessage::~ResignFederateNotifyMessage()
+ResignFederateNotifyMessage::~ResignFederateNotifyMessage() noexcept
 {
 }
 
@@ -1019,7 +1018,7 @@ ResignFederateNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatche
 }
 
 bool
-ResignFederateNotifyMessage::operator==(const AbstractMessage& rhs) const
+ResignFederateNotifyMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ResignFederateNotifyMessage* message = dynamic_cast<const ResignFederateNotifyMessage*>(&rhs);
   if (!message)
@@ -1028,7 +1027,7 @@ ResignFederateNotifyMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-ResignFederateNotifyMessage::operator==(const ResignFederateNotifyMessage& rhs) const
+ResignFederateNotifyMessage::operator==(const ResignFederateNotifyMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1036,7 +1035,7 @@ ResignFederateNotifyMessage::operator==(const ResignFederateNotifyMessage& rhs) 
 }
 
 bool
-ResignFederateNotifyMessage::operator<(const ResignFederateNotifyMessage& rhs) const
+ResignFederateNotifyMessage::operator<(const ResignFederateNotifyMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1045,14 +1044,14 @@ ResignFederateNotifyMessage::operator<(const ResignFederateNotifyMessage& rhs) c
   return false;
 }
 
-ChangeAutomaticResignDirectiveMessage::ChangeAutomaticResignDirectiveMessage() :
+ChangeAutomaticResignDirectiveMessage::ChangeAutomaticResignDirectiveMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _resignAction()
 {
 }
 
-ChangeAutomaticResignDirectiveMessage::~ChangeAutomaticResignDirectiveMessage()
+ChangeAutomaticResignDirectiveMessage::~ChangeAutomaticResignDirectiveMessage() noexcept
 {
 }
 
@@ -1075,7 +1074,7 @@ ChangeAutomaticResignDirectiveMessage::dispatch(const AbstractMessageDispatcher&
 }
 
 bool
-ChangeAutomaticResignDirectiveMessage::operator==(const AbstractMessage& rhs) const
+ChangeAutomaticResignDirectiveMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ChangeAutomaticResignDirectiveMessage* message = dynamic_cast<const ChangeAutomaticResignDirectiveMessage*>(&rhs);
   if (!message)
@@ -1084,7 +1083,7 @@ ChangeAutomaticResignDirectiveMessage::operator==(const AbstractMessage& rhs) co
 }
 
 bool
-ChangeAutomaticResignDirectiveMessage::operator==(const ChangeAutomaticResignDirectiveMessage& rhs) const
+ChangeAutomaticResignDirectiveMessage::operator==(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1093,7 +1092,7 @@ ChangeAutomaticResignDirectiveMessage::operator==(const ChangeAutomaticResignDir
 }
 
 bool
-ChangeAutomaticResignDirectiveMessage::operator<(const ChangeAutomaticResignDirectiveMessage& rhs) const
+ChangeAutomaticResignDirectiveMessage::operator<(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1104,7 +1103,7 @@ ChangeAutomaticResignDirectiveMessage::operator<(const ChangeAutomaticResignDire
   return false;
 }
 
-RegisterFederationSynchronizationPointMessage::RegisterFederationSynchronizationPointMessage() :
+RegisterFederationSynchronizationPointMessage::RegisterFederationSynchronizationPointMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _label(),
@@ -1113,7 +1112,7 @@ RegisterFederationSynchronizationPointMessage::RegisterFederationSynchronization
 {
 }
 
-RegisterFederationSynchronizationPointMessage::~RegisterFederationSynchronizationPointMessage()
+RegisterFederationSynchronizationPointMessage::~RegisterFederationSynchronizationPointMessage() noexcept
 {
 }
 
@@ -1136,7 +1135,7 @@ RegisterFederationSynchronizationPointMessage::dispatch(const AbstractMessageDis
 }
 
 bool
-RegisterFederationSynchronizationPointMessage::operator==(const AbstractMessage& rhs) const
+RegisterFederationSynchronizationPointMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const RegisterFederationSynchronizationPointMessage* message = dynamic_cast<const RegisterFederationSynchronizationPointMessage*>(&rhs);
   if (!message)
@@ -1145,7 +1144,7 @@ RegisterFederationSynchronizationPointMessage::operator==(const AbstractMessage&
 }
 
 bool
-RegisterFederationSynchronizationPointMessage::operator==(const RegisterFederationSynchronizationPointMessage& rhs) const
+RegisterFederationSynchronizationPointMessage::operator==(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1156,7 +1155,7 @@ RegisterFederationSynchronizationPointMessage::operator==(const RegisterFederati
 }
 
 bool
-RegisterFederationSynchronizationPointMessage::operator<(const RegisterFederationSynchronizationPointMessage& rhs) const
+RegisterFederationSynchronizationPointMessage::operator<(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1171,7 +1170,7 @@ RegisterFederationSynchronizationPointMessage::operator<(const RegisterFederatio
   return false;
 }
 
-RegisterFederationSynchronizationPointResponseMessage::RegisterFederationSynchronizationPointResponseMessage() :
+RegisterFederationSynchronizationPointResponseMessage::RegisterFederationSynchronizationPointResponseMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _label(),
@@ -1179,7 +1178,7 @@ RegisterFederationSynchronizationPointResponseMessage::RegisterFederationSynchro
 {
 }
 
-RegisterFederationSynchronizationPointResponseMessage::~RegisterFederationSynchronizationPointResponseMessage()
+RegisterFederationSynchronizationPointResponseMessage::~RegisterFederationSynchronizationPointResponseMessage() noexcept
 {
 }
 
@@ -1202,7 +1201,7 @@ RegisterFederationSynchronizationPointResponseMessage::dispatch(const AbstractMe
 }
 
 bool
-RegisterFederationSynchronizationPointResponseMessage::operator==(const AbstractMessage& rhs) const
+RegisterFederationSynchronizationPointResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const RegisterFederationSynchronizationPointResponseMessage* message = dynamic_cast<const RegisterFederationSynchronizationPointResponseMessage*>(&rhs);
   if (!message)
@@ -1211,7 +1210,7 @@ RegisterFederationSynchronizationPointResponseMessage::operator==(const Abstract
 }
 
 bool
-RegisterFederationSynchronizationPointResponseMessage::operator==(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+RegisterFederationSynchronizationPointResponseMessage::operator==(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1221,7 +1220,7 @@ RegisterFederationSynchronizationPointResponseMessage::operator==(const Register
 }
 
 bool
-RegisterFederationSynchronizationPointResponseMessage::operator<(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+RegisterFederationSynchronizationPointResponseMessage::operator<(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1234,7 +1233,7 @@ RegisterFederationSynchronizationPointResponseMessage::operator<(const RegisterF
   return false;
 }
 
-AnnounceSynchronizationPointMessage::AnnounceSynchronizationPointMessage() :
+AnnounceSynchronizationPointMessage::AnnounceSynchronizationPointMessage() noexcept :
   _federationHandle(),
   _label(),
   _tag(),
@@ -1243,7 +1242,7 @@ AnnounceSynchronizationPointMessage::AnnounceSynchronizationPointMessage() :
 {
 }
 
-AnnounceSynchronizationPointMessage::~AnnounceSynchronizationPointMessage()
+AnnounceSynchronizationPointMessage::~AnnounceSynchronizationPointMessage() noexcept
 {
 }
 
@@ -1266,7 +1265,7 @@ AnnounceSynchronizationPointMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 bool
-AnnounceSynchronizationPointMessage::operator==(const AbstractMessage& rhs) const
+AnnounceSynchronizationPointMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const AnnounceSynchronizationPointMessage* message = dynamic_cast<const AnnounceSynchronizationPointMessage*>(&rhs);
   if (!message)
@@ -1275,7 +1274,7 @@ AnnounceSynchronizationPointMessage::operator==(const AbstractMessage& rhs) cons
 }
 
 bool
-AnnounceSynchronizationPointMessage::operator==(const AnnounceSynchronizationPointMessage& rhs) const
+AnnounceSynchronizationPointMessage::operator==(const AnnounceSynchronizationPointMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getLabel() != rhs.getLabel()) return false;
@@ -1286,7 +1285,7 @@ AnnounceSynchronizationPointMessage::operator==(const AnnounceSynchronizationPoi
 }
 
 bool
-AnnounceSynchronizationPointMessage::operator<(const AnnounceSynchronizationPointMessage& rhs) const
+AnnounceSynchronizationPointMessage::operator<(const AnnounceSynchronizationPointMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1301,14 +1300,14 @@ AnnounceSynchronizationPointMessage::operator<(const AnnounceSynchronizationPoin
   return false;
 }
 
-SynchronizationPointAchievedMessage::SynchronizationPointAchievedMessage() :
+SynchronizationPointAchievedMessage::SynchronizationPointAchievedMessage() noexcept :
   _federationHandle(),
   _label(),
   _federateHandleBoolPairVector()
 {
 }
 
-SynchronizationPointAchievedMessage::~SynchronizationPointAchievedMessage()
+SynchronizationPointAchievedMessage::~SynchronizationPointAchievedMessage() noexcept
 {
 }
 
@@ -1331,7 +1330,7 @@ SynchronizationPointAchievedMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 bool
-SynchronizationPointAchievedMessage::operator==(const AbstractMessage& rhs) const
+SynchronizationPointAchievedMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const SynchronizationPointAchievedMessage* message = dynamic_cast<const SynchronizationPointAchievedMessage*>(&rhs);
   if (!message)
@@ -1340,7 +1339,7 @@ SynchronizationPointAchievedMessage::operator==(const AbstractMessage& rhs) cons
 }
 
 bool
-SynchronizationPointAchievedMessage::operator==(const SynchronizationPointAchievedMessage& rhs) const
+SynchronizationPointAchievedMessage::operator==(const SynchronizationPointAchievedMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getLabel() != rhs.getLabel()) return false;
@@ -1349,7 +1348,7 @@ SynchronizationPointAchievedMessage::operator==(const SynchronizationPointAchiev
 }
 
 bool
-SynchronizationPointAchievedMessage::operator<(const SynchronizationPointAchievedMessage& rhs) const
+SynchronizationPointAchievedMessage::operator<(const SynchronizationPointAchievedMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1360,14 +1359,14 @@ SynchronizationPointAchievedMessage::operator<(const SynchronizationPointAchieve
   return false;
 }
 
-FederationSynchronizedMessage::FederationSynchronizedMessage() :
+FederationSynchronizedMessage::FederationSynchronizedMessage() noexcept :
   _federationHandle(),
   _label(),
   _federateHandleBoolPairVector()
 {
 }
 
-FederationSynchronizedMessage::~FederationSynchronizedMessage()
+FederationSynchronizedMessage::~FederationSynchronizedMessage() noexcept
 {
 }
 
@@ -1390,7 +1389,7 @@ FederationSynchronizedMessage::dispatch(const AbstractMessageDispatcher& dispatc
 }
 
 bool
-FederationSynchronizedMessage::operator==(const AbstractMessage& rhs) const
+FederationSynchronizedMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const FederationSynchronizedMessage* message = dynamic_cast<const FederationSynchronizedMessage*>(&rhs);
   if (!message)
@@ -1399,7 +1398,7 @@ FederationSynchronizedMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-FederationSynchronizedMessage::operator==(const FederationSynchronizedMessage& rhs) const
+FederationSynchronizedMessage::operator==(const FederationSynchronizedMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getLabel() != rhs.getLabel()) return false;
@@ -1408,7 +1407,7 @@ FederationSynchronizedMessage::operator==(const FederationSynchronizedMessage& r
 }
 
 bool
-FederationSynchronizedMessage::operator<(const FederationSynchronizedMessage& rhs) const
+FederationSynchronizedMessage::operator<(const FederationSynchronizedMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1419,7 +1418,7 @@ FederationSynchronizedMessage::operator<(const FederationSynchronizedMessage& rh
   return false;
 }
 
-EnableTimeRegulationRequestMessage::EnableTimeRegulationRequestMessage() :
+EnableTimeRegulationRequestMessage::EnableTimeRegulationRequestMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _timeStamp(),
@@ -1427,7 +1426,7 @@ EnableTimeRegulationRequestMessage::EnableTimeRegulationRequestMessage() :
 {
 }
 
-EnableTimeRegulationRequestMessage::~EnableTimeRegulationRequestMessage()
+EnableTimeRegulationRequestMessage::~EnableTimeRegulationRequestMessage() noexcept
 {
 }
 
@@ -1450,7 +1449,7 @@ EnableTimeRegulationRequestMessage::dispatch(const AbstractMessageDispatcher& di
 }
 
 bool
-EnableTimeRegulationRequestMessage::operator==(const AbstractMessage& rhs) const
+EnableTimeRegulationRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const EnableTimeRegulationRequestMessage* message = dynamic_cast<const EnableTimeRegulationRequestMessage*>(&rhs);
   if (!message)
@@ -1459,7 +1458,7 @@ EnableTimeRegulationRequestMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-EnableTimeRegulationRequestMessage::operator==(const EnableTimeRegulationRequestMessage& rhs) const
+EnableTimeRegulationRequestMessage::operator==(const EnableTimeRegulationRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1469,7 +1468,7 @@ EnableTimeRegulationRequestMessage::operator==(const EnableTimeRegulationRequest
 }
 
 bool
-EnableTimeRegulationRequestMessage::operator<(const EnableTimeRegulationRequestMessage& rhs) const
+EnableTimeRegulationRequestMessage::operator<(const EnableTimeRegulationRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1482,7 +1481,7 @@ EnableTimeRegulationRequestMessage::operator<(const EnableTimeRegulationRequestM
   return false;
 }
 
-EnableTimeRegulationResponseMessage::EnableTimeRegulationResponseMessage() :
+EnableTimeRegulationResponseMessage::EnableTimeRegulationResponseMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _respondingFederateHandle(),
@@ -1491,7 +1490,7 @@ EnableTimeRegulationResponseMessage::EnableTimeRegulationResponseMessage() :
 {
 }
 
-EnableTimeRegulationResponseMessage::~EnableTimeRegulationResponseMessage()
+EnableTimeRegulationResponseMessage::~EnableTimeRegulationResponseMessage() noexcept
 {
 }
 
@@ -1514,7 +1513,7 @@ EnableTimeRegulationResponseMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 bool
-EnableTimeRegulationResponseMessage::operator==(const AbstractMessage& rhs) const
+EnableTimeRegulationResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const EnableTimeRegulationResponseMessage* message = dynamic_cast<const EnableTimeRegulationResponseMessage*>(&rhs);
   if (!message)
@@ -1523,7 +1522,7 @@ EnableTimeRegulationResponseMessage::operator==(const AbstractMessage& rhs) cons
 }
 
 bool
-EnableTimeRegulationResponseMessage::operator==(const EnableTimeRegulationResponseMessage& rhs) const
+EnableTimeRegulationResponseMessage::operator==(const EnableTimeRegulationResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1534,7 +1533,7 @@ EnableTimeRegulationResponseMessage::operator==(const EnableTimeRegulationRespon
 }
 
 bool
-EnableTimeRegulationResponseMessage::operator<(const EnableTimeRegulationResponseMessage& rhs) const
+EnableTimeRegulationResponseMessage::operator<(const EnableTimeRegulationResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1549,13 +1548,13 @@ EnableTimeRegulationResponseMessage::operator<(const EnableTimeRegulationRespons
   return false;
 }
 
-DisableTimeRegulationRequestMessage::DisableTimeRegulationRequestMessage() :
+DisableTimeRegulationRequestMessage::DisableTimeRegulationRequestMessage() noexcept :
   _federationHandle(),
   _federateHandle()
 {
 }
 
-DisableTimeRegulationRequestMessage::~DisableTimeRegulationRequestMessage()
+DisableTimeRegulationRequestMessage::~DisableTimeRegulationRequestMessage() noexcept
 {
 }
 
@@ -1578,7 +1577,7 @@ DisableTimeRegulationRequestMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 bool
-DisableTimeRegulationRequestMessage::operator==(const AbstractMessage& rhs) const
+DisableTimeRegulationRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const DisableTimeRegulationRequestMessage* message = dynamic_cast<const DisableTimeRegulationRequestMessage*>(&rhs);
   if (!message)
@@ -1587,7 +1586,7 @@ DisableTimeRegulationRequestMessage::operator==(const AbstractMessage& rhs) cons
 }
 
 bool
-DisableTimeRegulationRequestMessage::operator==(const DisableTimeRegulationRequestMessage& rhs) const
+DisableTimeRegulationRequestMessage::operator==(const DisableTimeRegulationRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1595,7 +1594,7 @@ DisableTimeRegulationRequestMessage::operator==(const DisableTimeRegulationReque
 }
 
 bool
-DisableTimeRegulationRequestMessage::operator<(const DisableTimeRegulationRequestMessage& rhs) const
+DisableTimeRegulationRequestMessage::operator<(const DisableTimeRegulationRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1604,13 +1603,13 @@ DisableTimeRegulationRequestMessage::operator<(const DisableTimeRegulationReques
   return false;
 }
 
-EnableTimeConstrainedNotifyMessage::EnableTimeConstrainedNotifyMessage() :
+EnableTimeConstrainedNotifyMessage::EnableTimeConstrainedNotifyMessage() noexcept :
   _federationHandle(),
   _federateHandle()
 {
 }
 
-EnableTimeConstrainedNotifyMessage::~EnableTimeConstrainedNotifyMessage()
+EnableTimeConstrainedNotifyMessage::~EnableTimeConstrainedNotifyMessage() noexcept
 {
 }
 
@@ -1633,7 +1632,7 @@ EnableTimeConstrainedNotifyMessage::dispatch(const AbstractMessageDispatcher& di
 }
 
 bool
-EnableTimeConstrainedNotifyMessage::operator==(const AbstractMessage& rhs) const
+EnableTimeConstrainedNotifyMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const EnableTimeConstrainedNotifyMessage* message = dynamic_cast<const EnableTimeConstrainedNotifyMessage*>(&rhs);
   if (!message)
@@ -1642,7 +1641,7 @@ EnableTimeConstrainedNotifyMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-EnableTimeConstrainedNotifyMessage::operator==(const EnableTimeConstrainedNotifyMessage& rhs) const
+EnableTimeConstrainedNotifyMessage::operator==(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1650,7 +1649,7 @@ EnableTimeConstrainedNotifyMessage::operator==(const EnableTimeConstrainedNotify
 }
 
 bool
-EnableTimeConstrainedNotifyMessage::operator<(const EnableTimeConstrainedNotifyMessage& rhs) const
+EnableTimeConstrainedNotifyMessage::operator<(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1659,13 +1658,13 @@ EnableTimeConstrainedNotifyMessage::operator<(const EnableTimeConstrainedNotifyM
   return false;
 }
 
-DisableTimeConstrainedNotifyMessage::DisableTimeConstrainedNotifyMessage() :
+DisableTimeConstrainedNotifyMessage::DisableTimeConstrainedNotifyMessage() noexcept :
   _federationHandle(),
   _federateHandle()
 {
 }
 
-DisableTimeConstrainedNotifyMessage::~DisableTimeConstrainedNotifyMessage()
+DisableTimeConstrainedNotifyMessage::~DisableTimeConstrainedNotifyMessage() noexcept
 {
 }
 
@@ -1688,7 +1687,7 @@ DisableTimeConstrainedNotifyMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 bool
-DisableTimeConstrainedNotifyMessage::operator==(const AbstractMessage& rhs) const
+DisableTimeConstrainedNotifyMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const DisableTimeConstrainedNotifyMessage* message = dynamic_cast<const DisableTimeConstrainedNotifyMessage*>(&rhs);
   if (!message)
@@ -1697,7 +1696,7 @@ DisableTimeConstrainedNotifyMessage::operator==(const AbstractMessage& rhs) cons
 }
 
 bool
-DisableTimeConstrainedNotifyMessage::operator==(const DisableTimeConstrainedNotifyMessage& rhs) const
+DisableTimeConstrainedNotifyMessage::operator==(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1705,7 +1704,7 @@ DisableTimeConstrainedNotifyMessage::operator==(const DisableTimeConstrainedNoti
 }
 
 bool
-DisableTimeConstrainedNotifyMessage::operator<(const DisableTimeConstrainedNotifyMessage& rhs) const
+DisableTimeConstrainedNotifyMessage::operator<(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1714,7 +1713,7 @@ DisableTimeConstrainedNotifyMessage::operator<(const DisableTimeConstrainedNotif
   return false;
 }
 
-CommitLowerBoundTimeStampMessage::CommitLowerBoundTimeStampMessage() :
+CommitLowerBoundTimeStampMessage::CommitLowerBoundTimeStampMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _timeStamp(),
@@ -1723,7 +1722,7 @@ CommitLowerBoundTimeStampMessage::CommitLowerBoundTimeStampMessage() :
 {
 }
 
-CommitLowerBoundTimeStampMessage::~CommitLowerBoundTimeStampMessage()
+CommitLowerBoundTimeStampMessage::~CommitLowerBoundTimeStampMessage() noexcept
 {
 }
 
@@ -1746,7 +1745,7 @@ CommitLowerBoundTimeStampMessage::dispatch(const AbstractMessageDispatcher& disp
 }
 
 bool
-CommitLowerBoundTimeStampMessage::operator==(const AbstractMessage& rhs) const
+CommitLowerBoundTimeStampMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const CommitLowerBoundTimeStampMessage* message = dynamic_cast<const CommitLowerBoundTimeStampMessage*>(&rhs);
   if (!message)
@@ -1755,7 +1754,7 @@ CommitLowerBoundTimeStampMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-CommitLowerBoundTimeStampMessage::operator==(const CommitLowerBoundTimeStampMessage& rhs) const
+CommitLowerBoundTimeStampMessage::operator==(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1766,7 +1765,7 @@ CommitLowerBoundTimeStampMessage::operator==(const CommitLowerBoundTimeStampMess
 }
 
 bool
-CommitLowerBoundTimeStampMessage::operator<(const CommitLowerBoundTimeStampMessage& rhs) const
+CommitLowerBoundTimeStampMessage::operator<(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1781,7 +1780,7 @@ CommitLowerBoundTimeStampMessage::operator<(const CommitLowerBoundTimeStampMessa
   return false;
 }
 
-CommitLowerBoundTimeStampResponseMessage::CommitLowerBoundTimeStampResponseMessage() :
+CommitLowerBoundTimeStampResponseMessage::CommitLowerBoundTimeStampResponseMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _sendingFederateHandle(),
@@ -1789,7 +1788,7 @@ CommitLowerBoundTimeStampResponseMessage::CommitLowerBoundTimeStampResponseMessa
 {
 }
 
-CommitLowerBoundTimeStampResponseMessage::~CommitLowerBoundTimeStampResponseMessage()
+CommitLowerBoundTimeStampResponseMessage::~CommitLowerBoundTimeStampResponseMessage() noexcept
 {
 }
 
@@ -1812,7 +1811,7 @@ CommitLowerBoundTimeStampResponseMessage::dispatch(const AbstractMessageDispatch
 }
 
 bool
-CommitLowerBoundTimeStampResponseMessage::operator==(const AbstractMessage& rhs) const
+CommitLowerBoundTimeStampResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const CommitLowerBoundTimeStampResponseMessage* message = dynamic_cast<const CommitLowerBoundTimeStampResponseMessage*>(&rhs);
   if (!message)
@@ -1821,7 +1820,7 @@ CommitLowerBoundTimeStampResponseMessage::operator==(const AbstractMessage& rhs)
 }
 
 bool
-CommitLowerBoundTimeStampResponseMessage::operator==(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+CommitLowerBoundTimeStampResponseMessage::operator==(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -1831,7 +1830,7 @@ CommitLowerBoundTimeStampResponseMessage::operator==(const CommitLowerBoundTimeS
 }
 
 bool
-CommitLowerBoundTimeStampResponseMessage::operator<(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+CommitLowerBoundTimeStampResponseMessage::operator<(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1844,14 +1843,14 @@ CommitLowerBoundTimeStampResponseMessage::operator<(const CommitLowerBoundTimeSt
   return false;
 }
 
-LockedByNextMessageRequestMessage::LockedByNextMessageRequestMessage() :
+LockedByNextMessageRequestMessage::LockedByNextMessageRequestMessage() noexcept :
   _federationHandle(),
   _sendingFederateHandle(),
   _lockedByNextMessage()
 {
 }
 
-LockedByNextMessageRequestMessage::~LockedByNextMessageRequestMessage()
+LockedByNextMessageRequestMessage::~LockedByNextMessageRequestMessage() noexcept
 {
 }
 
@@ -1874,7 +1873,7 @@ LockedByNextMessageRequestMessage::dispatch(const AbstractMessageDispatcher& dis
 }
 
 bool
-LockedByNextMessageRequestMessage::operator==(const AbstractMessage& rhs) const
+LockedByNextMessageRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const LockedByNextMessageRequestMessage* message = dynamic_cast<const LockedByNextMessageRequestMessage*>(&rhs);
   if (!message)
@@ -1883,7 +1882,7 @@ LockedByNextMessageRequestMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-LockedByNextMessageRequestMessage::operator==(const LockedByNextMessageRequestMessage& rhs) const
+LockedByNextMessageRequestMessage::operator==(const LockedByNextMessageRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getSendingFederateHandle() != rhs.getSendingFederateHandle()) return false;
@@ -1892,7 +1891,7 @@ LockedByNextMessageRequestMessage::operator==(const LockedByNextMessageRequestMe
 }
 
 bool
-LockedByNextMessageRequestMessage::operator<(const LockedByNextMessageRequestMessage& rhs) const
+LockedByNextMessageRequestMessage::operator<(const LockedByNextMessageRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -1903,11 +1902,11 @@ LockedByNextMessageRequestMessage::operator<(const LockedByNextMessageRequestMes
   return false;
 }
 
-TimeConstrainedEnabledMessage::TimeConstrainedEnabledMessage()
+TimeConstrainedEnabledMessage::TimeConstrainedEnabledMessage() noexcept
 {
 }
 
-TimeConstrainedEnabledMessage::~TimeConstrainedEnabledMessage()
+TimeConstrainedEnabledMessage::~TimeConstrainedEnabledMessage() noexcept
 {
 }
 
@@ -1930,7 +1929,7 @@ TimeConstrainedEnabledMessage::dispatch(const AbstractMessageDispatcher& dispatc
 }
 
 bool
-TimeConstrainedEnabledMessage::operator==(const AbstractMessage& rhs) const
+TimeConstrainedEnabledMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const TimeConstrainedEnabledMessage* message = dynamic_cast<const TimeConstrainedEnabledMessage*>(&rhs);
   if (!message)
@@ -1939,22 +1938,22 @@ TimeConstrainedEnabledMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-TimeConstrainedEnabledMessage::operator==(const TimeConstrainedEnabledMessage& rhs) const
+TimeConstrainedEnabledMessage::operator==(const TimeConstrainedEnabledMessage& rhs) const noexcept
 {
   return true;
 }
 
 bool
-TimeConstrainedEnabledMessage::operator<(const TimeConstrainedEnabledMessage& rhs) const
+TimeConstrainedEnabledMessage::operator<(const TimeConstrainedEnabledMessage& rhs) const noexcept
 {
   return false;
 }
 
-TimeRegulationEnabledMessage::TimeRegulationEnabledMessage()
+TimeRegulationEnabledMessage::TimeRegulationEnabledMessage() noexcept
 {
 }
 
-TimeRegulationEnabledMessage::~TimeRegulationEnabledMessage()
+TimeRegulationEnabledMessage::~TimeRegulationEnabledMessage() noexcept
 {
 }
 
@@ -1977,7 +1976,7 @@ TimeRegulationEnabledMessage::dispatch(const AbstractMessageDispatcher& dispatch
 }
 
 bool
-TimeRegulationEnabledMessage::operator==(const AbstractMessage& rhs) const
+TimeRegulationEnabledMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const TimeRegulationEnabledMessage* message = dynamic_cast<const TimeRegulationEnabledMessage*>(&rhs);
   if (!message)
@@ -1986,22 +1985,22 @@ TimeRegulationEnabledMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-TimeRegulationEnabledMessage::operator==(const TimeRegulationEnabledMessage& rhs) const
+TimeRegulationEnabledMessage::operator==(const TimeRegulationEnabledMessage& rhs) const noexcept
 {
   return true;
 }
 
 bool
-TimeRegulationEnabledMessage::operator<(const TimeRegulationEnabledMessage& rhs) const
+TimeRegulationEnabledMessage::operator<(const TimeRegulationEnabledMessage& rhs) const noexcept
 {
   return false;
 }
 
-TimeAdvanceGrantedMessage::TimeAdvanceGrantedMessage()
+TimeAdvanceGrantedMessage::TimeAdvanceGrantedMessage() noexcept
 {
 }
 
-TimeAdvanceGrantedMessage::~TimeAdvanceGrantedMessage()
+TimeAdvanceGrantedMessage::~TimeAdvanceGrantedMessage() noexcept
 {
 }
 
@@ -2024,7 +2023,7 @@ TimeAdvanceGrantedMessage::dispatch(const AbstractMessageDispatcher& dispatcher)
 }
 
 bool
-TimeAdvanceGrantedMessage::operator==(const AbstractMessage& rhs) const
+TimeAdvanceGrantedMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const TimeAdvanceGrantedMessage* message = dynamic_cast<const TimeAdvanceGrantedMessage*>(&rhs);
   if (!message)
@@ -2033,24 +2032,24 @@ TimeAdvanceGrantedMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-TimeAdvanceGrantedMessage::operator==(const TimeAdvanceGrantedMessage& rhs) const
+TimeAdvanceGrantedMessage::operator==(const TimeAdvanceGrantedMessage& rhs) const noexcept
 {
   return true;
 }
 
 bool
-TimeAdvanceGrantedMessage::operator<(const TimeAdvanceGrantedMessage& rhs) const
+TimeAdvanceGrantedMessage::operator<(const TimeAdvanceGrantedMessage& rhs) const noexcept
 {
   return false;
 }
 
-InsertRegionMessage::InsertRegionMessage() :
+InsertRegionMessage::InsertRegionMessage() noexcept :
   _federationHandle(),
   _regionHandleDimensionHandleSetPairVector()
 {
 }
 
-InsertRegionMessage::~InsertRegionMessage()
+InsertRegionMessage::~InsertRegionMessage() noexcept
 {
 }
 
@@ -2073,7 +2072,7 @@ InsertRegionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 }
 
 bool
-InsertRegionMessage::operator==(const AbstractMessage& rhs) const
+InsertRegionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const InsertRegionMessage* message = dynamic_cast<const InsertRegionMessage*>(&rhs);
   if (!message)
@@ -2082,7 +2081,7 @@ InsertRegionMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-InsertRegionMessage::operator==(const InsertRegionMessage& rhs) const
+InsertRegionMessage::operator==(const InsertRegionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getRegionHandleDimensionHandleSetPairVector() != rhs.getRegionHandleDimensionHandleSetPairVector()) return false;
@@ -2090,7 +2089,7 @@ InsertRegionMessage::operator==(const InsertRegionMessage& rhs) const
 }
 
 bool
-InsertRegionMessage::operator<(const InsertRegionMessage& rhs) const
+InsertRegionMessage::operator<(const InsertRegionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2099,13 +2098,13 @@ InsertRegionMessage::operator<(const InsertRegionMessage& rhs) const
   return false;
 }
 
-CommitRegionMessage::CommitRegionMessage() :
+CommitRegionMessage::CommitRegionMessage() noexcept :
   _federationHandle(),
   _regionHandleRegionValuePairVector()
 {
 }
 
-CommitRegionMessage::~CommitRegionMessage()
+CommitRegionMessage::~CommitRegionMessage() noexcept
 {
 }
 
@@ -2128,7 +2127,7 @@ CommitRegionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 }
 
 bool
-CommitRegionMessage::operator==(const AbstractMessage& rhs) const
+CommitRegionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const CommitRegionMessage* message = dynamic_cast<const CommitRegionMessage*>(&rhs);
   if (!message)
@@ -2137,7 +2136,7 @@ CommitRegionMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-CommitRegionMessage::operator==(const CommitRegionMessage& rhs) const
+CommitRegionMessage::operator==(const CommitRegionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getRegionHandleRegionValuePairVector() != rhs.getRegionHandleRegionValuePairVector()) return false;
@@ -2145,7 +2144,7 @@ CommitRegionMessage::operator==(const CommitRegionMessage& rhs) const
 }
 
 bool
-CommitRegionMessage::operator<(const CommitRegionMessage& rhs) const
+CommitRegionMessage::operator<(const CommitRegionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2154,13 +2153,13 @@ CommitRegionMessage::operator<(const CommitRegionMessage& rhs) const
   return false;
 }
 
-EraseRegionMessage::EraseRegionMessage() :
+EraseRegionMessage::EraseRegionMessage() noexcept :
   _federationHandle(),
   _regionHandleVector()
 {
 }
 
-EraseRegionMessage::~EraseRegionMessage()
+EraseRegionMessage::~EraseRegionMessage() noexcept
 {
 }
 
@@ -2183,7 +2182,7 @@ EraseRegionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 }
 
 bool
-EraseRegionMessage::operator==(const AbstractMessage& rhs) const
+EraseRegionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const EraseRegionMessage* message = dynamic_cast<const EraseRegionMessage*>(&rhs);
   if (!message)
@@ -2192,7 +2191,7 @@ EraseRegionMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-EraseRegionMessage::operator==(const EraseRegionMessage& rhs) const
+EraseRegionMessage::operator==(const EraseRegionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getRegionHandleVector() != rhs.getRegionHandleVector()) return false;
@@ -2200,7 +2199,7 @@ EraseRegionMessage::operator==(const EraseRegionMessage& rhs) const
 }
 
 bool
-EraseRegionMessage::operator<(const EraseRegionMessage& rhs) const
+EraseRegionMessage::operator<(const EraseRegionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2209,14 +2208,14 @@ EraseRegionMessage::operator<(const EraseRegionMessage& rhs) const
   return false;
 }
 
-ChangeInteractionClassPublicationMessage::ChangeInteractionClassPublicationMessage() :
+ChangeInteractionClassPublicationMessage::ChangeInteractionClassPublicationMessage() noexcept :
   _federationHandle(),
   _publicationType(),
   _interactionClassHandle()
 {
 }
 
-ChangeInteractionClassPublicationMessage::~ChangeInteractionClassPublicationMessage()
+ChangeInteractionClassPublicationMessage::~ChangeInteractionClassPublicationMessage() noexcept
 {
 }
 
@@ -2239,7 +2238,7 @@ ChangeInteractionClassPublicationMessage::dispatch(const AbstractMessageDispatch
 }
 
 bool
-ChangeInteractionClassPublicationMessage::operator==(const AbstractMessage& rhs) const
+ChangeInteractionClassPublicationMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ChangeInteractionClassPublicationMessage* message = dynamic_cast<const ChangeInteractionClassPublicationMessage*>(&rhs);
   if (!message)
@@ -2248,7 +2247,7 @@ ChangeInteractionClassPublicationMessage::operator==(const AbstractMessage& rhs)
 }
 
 bool
-ChangeInteractionClassPublicationMessage::operator==(const ChangeInteractionClassPublicationMessage& rhs) const
+ChangeInteractionClassPublicationMessage::operator==(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getPublicationType() != rhs.getPublicationType()) return false;
@@ -2257,7 +2256,7 @@ ChangeInteractionClassPublicationMessage::operator==(const ChangeInteractionClas
 }
 
 bool
-ChangeInteractionClassPublicationMessage::operator<(const ChangeInteractionClassPublicationMessage& rhs) const
+ChangeInteractionClassPublicationMessage::operator<(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2268,7 +2267,7 @@ ChangeInteractionClassPublicationMessage::operator<(const ChangeInteractionClass
   return false;
 }
 
-ChangeObjectClassPublicationMessage::ChangeObjectClassPublicationMessage() :
+ChangeObjectClassPublicationMessage::ChangeObjectClassPublicationMessage() noexcept :
   _federationHandle(),
   _publicationType(),
   _objectClassHandle(),
@@ -2276,7 +2275,7 @@ ChangeObjectClassPublicationMessage::ChangeObjectClassPublicationMessage() :
 {
 }
 
-ChangeObjectClassPublicationMessage::~ChangeObjectClassPublicationMessage()
+ChangeObjectClassPublicationMessage::~ChangeObjectClassPublicationMessage() noexcept
 {
 }
 
@@ -2299,7 +2298,7 @@ ChangeObjectClassPublicationMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 bool
-ChangeObjectClassPublicationMessage::operator==(const AbstractMessage& rhs) const
+ChangeObjectClassPublicationMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ChangeObjectClassPublicationMessage* message = dynamic_cast<const ChangeObjectClassPublicationMessage*>(&rhs);
   if (!message)
@@ -2308,7 +2307,7 @@ ChangeObjectClassPublicationMessage::operator==(const AbstractMessage& rhs) cons
 }
 
 bool
-ChangeObjectClassPublicationMessage::operator==(const ChangeObjectClassPublicationMessage& rhs) const
+ChangeObjectClassPublicationMessage::operator==(const ChangeObjectClassPublicationMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getPublicationType() != rhs.getPublicationType()) return false;
@@ -2318,7 +2317,7 @@ ChangeObjectClassPublicationMessage::operator==(const ChangeObjectClassPublicati
 }
 
 bool
-ChangeObjectClassPublicationMessage::operator<(const ChangeObjectClassPublicationMessage& rhs) const
+ChangeObjectClassPublicationMessage::operator<(const ChangeObjectClassPublicationMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2331,7 +2330,7 @@ ChangeObjectClassPublicationMessage::operator<(const ChangeObjectClassPublicatio
   return false;
 }
 
-ChangeInteractionClassSubscriptionMessage::ChangeInteractionClassSubscriptionMessage() :
+ChangeInteractionClassSubscriptionMessage::ChangeInteractionClassSubscriptionMessage() noexcept :
   _federationHandle(),
   _subscriptionType(),
   _interactionClassHandle(),
@@ -2339,7 +2338,7 @@ ChangeInteractionClassSubscriptionMessage::ChangeInteractionClassSubscriptionMes
 {
 }
 
-ChangeInteractionClassSubscriptionMessage::~ChangeInteractionClassSubscriptionMessage()
+ChangeInteractionClassSubscriptionMessage::~ChangeInteractionClassSubscriptionMessage() noexcept
 {
 }
 
@@ -2362,7 +2361,7 @@ ChangeInteractionClassSubscriptionMessage::dispatch(const AbstractMessageDispatc
 }
 
 bool
-ChangeInteractionClassSubscriptionMessage::operator==(const AbstractMessage& rhs) const
+ChangeInteractionClassSubscriptionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ChangeInteractionClassSubscriptionMessage* message = dynamic_cast<const ChangeInteractionClassSubscriptionMessage*>(&rhs);
   if (!message)
@@ -2371,7 +2370,7 @@ ChangeInteractionClassSubscriptionMessage::operator==(const AbstractMessage& rhs
 }
 
 bool
-ChangeInteractionClassSubscriptionMessage::operator==(const ChangeInteractionClassSubscriptionMessage& rhs) const
+ChangeInteractionClassSubscriptionMessage::operator==(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getSubscriptionType() != rhs.getSubscriptionType()) return false;
@@ -2381,7 +2380,7 @@ ChangeInteractionClassSubscriptionMessage::operator==(const ChangeInteractionCla
 }
 
 bool
-ChangeInteractionClassSubscriptionMessage::operator<(const ChangeInteractionClassSubscriptionMessage& rhs) const
+ChangeInteractionClassSubscriptionMessage::operator<(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2394,7 +2393,7 @@ ChangeInteractionClassSubscriptionMessage::operator<(const ChangeInteractionClas
   return false;
 }
 
-ChangeObjectClassSubscriptionMessage::ChangeObjectClassSubscriptionMessage() :
+ChangeObjectClassSubscriptionMessage::ChangeObjectClassSubscriptionMessage() noexcept :
   _federationHandle(),
   _subscriptionType(),
   _objectClassHandle(),
@@ -2402,7 +2401,7 @@ ChangeObjectClassSubscriptionMessage::ChangeObjectClassSubscriptionMessage() :
 {
 }
 
-ChangeObjectClassSubscriptionMessage::~ChangeObjectClassSubscriptionMessage()
+ChangeObjectClassSubscriptionMessage::~ChangeObjectClassSubscriptionMessage() noexcept
 {
 }
 
@@ -2425,7 +2424,7 @@ ChangeObjectClassSubscriptionMessage::dispatch(const AbstractMessageDispatcher& 
 }
 
 bool
-ChangeObjectClassSubscriptionMessage::operator==(const AbstractMessage& rhs) const
+ChangeObjectClassSubscriptionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ChangeObjectClassSubscriptionMessage* message = dynamic_cast<const ChangeObjectClassSubscriptionMessage*>(&rhs);
   if (!message)
@@ -2434,7 +2433,7 @@ ChangeObjectClassSubscriptionMessage::operator==(const AbstractMessage& rhs) con
 }
 
 bool
-ChangeObjectClassSubscriptionMessage::operator==(const ChangeObjectClassSubscriptionMessage& rhs) const
+ChangeObjectClassSubscriptionMessage::operator==(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getSubscriptionType() != rhs.getSubscriptionType()) return false;
@@ -2444,7 +2443,7 @@ ChangeObjectClassSubscriptionMessage::operator==(const ChangeObjectClassSubscrip
 }
 
 bool
-ChangeObjectClassSubscriptionMessage::operator<(const ChangeObjectClassSubscriptionMessage& rhs) const
+ChangeObjectClassSubscriptionMessage::operator<(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2457,7 +2456,7 @@ ChangeObjectClassSubscriptionMessage::operator<(const ChangeObjectClassSubscript
   return false;
 }
 
-ChangeObjectInstanceSubscriptionMessage::ChangeObjectInstanceSubscriptionMessage() :
+ChangeObjectInstanceSubscriptionMessage::ChangeObjectInstanceSubscriptionMessage() noexcept :
   _federationHandle(),
   _subscriptionType(),
   _objectClassHandle(),
@@ -2465,7 +2464,7 @@ ChangeObjectInstanceSubscriptionMessage::ChangeObjectInstanceSubscriptionMessage
 {
 }
 
-ChangeObjectInstanceSubscriptionMessage::~ChangeObjectInstanceSubscriptionMessage()
+ChangeObjectInstanceSubscriptionMessage::~ChangeObjectInstanceSubscriptionMessage() noexcept
 {
 }
 
@@ -2488,7 +2487,7 @@ ChangeObjectInstanceSubscriptionMessage::dispatch(const AbstractMessageDispatche
 }
 
 bool
-ChangeObjectInstanceSubscriptionMessage::operator==(const AbstractMessage& rhs) const
+ChangeObjectInstanceSubscriptionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ChangeObjectInstanceSubscriptionMessage* message = dynamic_cast<const ChangeObjectInstanceSubscriptionMessage*>(&rhs);
   if (!message)
@@ -2497,7 +2496,7 @@ ChangeObjectInstanceSubscriptionMessage::operator==(const AbstractMessage& rhs) 
 }
 
 bool
-ChangeObjectInstanceSubscriptionMessage::operator==(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+ChangeObjectInstanceSubscriptionMessage::operator==(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getSubscriptionType() != rhs.getSubscriptionType()) return false;
@@ -2507,7 +2506,7 @@ ChangeObjectInstanceSubscriptionMessage::operator==(const ChangeObjectInstanceSu
 }
 
 bool
-ChangeObjectInstanceSubscriptionMessage::operator<(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+ChangeObjectInstanceSubscriptionMessage::operator<(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2520,13 +2519,13 @@ ChangeObjectInstanceSubscriptionMessage::operator<(const ChangeObjectInstanceSub
   return false;
 }
 
-RegistrationForObjectClassMessage::RegistrationForObjectClassMessage() :
+RegistrationForObjectClassMessage::RegistrationForObjectClassMessage() noexcept :
   _objectClassHandle(),
   _start()
 {
 }
 
-RegistrationForObjectClassMessage::~RegistrationForObjectClassMessage()
+RegistrationForObjectClassMessage::~RegistrationForObjectClassMessage() noexcept
 {
 }
 
@@ -2549,7 +2548,7 @@ RegistrationForObjectClassMessage::dispatch(const AbstractMessageDispatcher& dis
 }
 
 bool
-RegistrationForObjectClassMessage::operator==(const AbstractMessage& rhs) const
+RegistrationForObjectClassMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const RegistrationForObjectClassMessage* message = dynamic_cast<const RegistrationForObjectClassMessage*>(&rhs);
   if (!message)
@@ -2558,7 +2557,7 @@ RegistrationForObjectClassMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-RegistrationForObjectClassMessage::operator==(const RegistrationForObjectClassMessage& rhs) const
+RegistrationForObjectClassMessage::operator==(const RegistrationForObjectClassMessage& rhs) const noexcept
 {
   if (getObjectClassHandle() != rhs.getObjectClassHandle()) return false;
   if (getStart() != rhs.getStart()) return false;
@@ -2566,7 +2565,7 @@ RegistrationForObjectClassMessage::operator==(const RegistrationForObjectClassMe
 }
 
 bool
-RegistrationForObjectClassMessage::operator<(const RegistrationForObjectClassMessage& rhs) const
+RegistrationForObjectClassMessage::operator<(const RegistrationForObjectClassMessage& rhs) const noexcept
 {
   if (getObjectClassHandle() < rhs.getObjectClassHandle()) return true;
   if (rhs.getObjectClassHandle() < getObjectClassHandle()) return false;
@@ -2575,14 +2574,14 @@ RegistrationForObjectClassMessage::operator<(const RegistrationForObjectClassMes
   return false;
 }
 
-AttributesInScopeMessage::AttributesInScopeMessage() :
+AttributesInScopeMessage::AttributesInScopeMessage() noexcept :
   _objectInstanceHandle(),
   _attributeHandles(),
   _inScope()
 {
 }
 
-AttributesInScopeMessage::~AttributesInScopeMessage()
+AttributesInScopeMessage::~AttributesInScopeMessage() noexcept
 {
 }
 
@@ -2605,7 +2604,7 @@ AttributesInScopeMessage::dispatch(const AbstractMessageDispatcher& dispatcher) 
 }
 
 bool
-AttributesInScopeMessage::operator==(const AbstractMessage& rhs) const
+AttributesInScopeMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const AttributesInScopeMessage* message = dynamic_cast<const AttributesInScopeMessage*>(&rhs);
   if (!message)
@@ -2614,7 +2613,7 @@ AttributesInScopeMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-AttributesInScopeMessage::operator==(const AttributesInScopeMessage& rhs) const
+AttributesInScopeMessage::operator==(const AttributesInScopeMessage& rhs) const noexcept
 {
   if (getObjectInstanceHandle() != rhs.getObjectInstanceHandle()) return false;
   if (getAttributeHandles() != rhs.getAttributeHandles()) return false;
@@ -2623,7 +2622,7 @@ AttributesInScopeMessage::operator==(const AttributesInScopeMessage& rhs) const
 }
 
 bool
-AttributesInScopeMessage::operator<(const AttributesInScopeMessage& rhs) const
+AttributesInScopeMessage::operator<(const AttributesInScopeMessage& rhs) const noexcept
 {
   if (getObjectInstanceHandle() < rhs.getObjectInstanceHandle()) return true;
   if (rhs.getObjectInstanceHandle() < getObjectInstanceHandle()) return false;
@@ -2635,12 +2634,12 @@ AttributesInScopeMessage::operator<(const AttributesInScopeMessage& rhs) const
 }
 
 ObjectInstanceHandle
-AttributesInScopeMessage::getObjectInstanceHandleForMessage() const
+AttributesInScopeMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return getObjectInstanceHandle();
 }
 
-TurnUpdatesOnForInstanceMessage::TurnUpdatesOnForInstanceMessage() :
+TurnUpdatesOnForInstanceMessage::TurnUpdatesOnForInstanceMessage() noexcept :
   _objectInstanceHandle(),
   _attributeHandles(),
   _updateRate(),
@@ -2648,7 +2647,7 @@ TurnUpdatesOnForInstanceMessage::TurnUpdatesOnForInstanceMessage() :
 {
 }
 
-TurnUpdatesOnForInstanceMessage::~TurnUpdatesOnForInstanceMessage()
+TurnUpdatesOnForInstanceMessage::~TurnUpdatesOnForInstanceMessage() noexcept
 {
 }
 
@@ -2671,7 +2670,7 @@ TurnUpdatesOnForInstanceMessage::dispatch(const AbstractMessageDispatcher& dispa
 }
 
 bool
-TurnUpdatesOnForInstanceMessage::operator==(const AbstractMessage& rhs) const
+TurnUpdatesOnForInstanceMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const TurnUpdatesOnForInstanceMessage* message = dynamic_cast<const TurnUpdatesOnForInstanceMessage*>(&rhs);
   if (!message)
@@ -2680,7 +2679,7 @@ TurnUpdatesOnForInstanceMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-TurnUpdatesOnForInstanceMessage::operator==(const TurnUpdatesOnForInstanceMessage& rhs) const
+TurnUpdatesOnForInstanceMessage::operator==(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
 {
   if (getObjectInstanceHandle() != rhs.getObjectInstanceHandle()) return false;
   if (getAttributeHandles() != rhs.getAttributeHandles()) return false;
@@ -2690,7 +2689,7 @@ TurnUpdatesOnForInstanceMessage::operator==(const TurnUpdatesOnForInstanceMessag
 }
 
 bool
-TurnUpdatesOnForInstanceMessage::operator<(const TurnUpdatesOnForInstanceMessage& rhs) const
+TurnUpdatesOnForInstanceMessage::operator<(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
 {
   if (getObjectInstanceHandle() < rhs.getObjectInstanceHandle()) return true;
   if (rhs.getObjectInstanceHandle() < getObjectInstanceHandle()) return false;
@@ -2704,18 +2703,18 @@ TurnUpdatesOnForInstanceMessage::operator<(const TurnUpdatesOnForInstanceMessage
 }
 
 ObjectInstanceHandle
-TurnUpdatesOnForInstanceMessage::getObjectInstanceHandleForMessage() const
+TurnUpdatesOnForInstanceMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return getObjectInstanceHandle();
 }
 
-TurnInteractionsOnMessage::TurnInteractionsOnMessage() :
+TurnInteractionsOnMessage::TurnInteractionsOnMessage() noexcept :
   _interactionClassHandle(),
   _on()
 {
 }
 
-TurnInteractionsOnMessage::~TurnInteractionsOnMessage()
+TurnInteractionsOnMessage::~TurnInteractionsOnMessage() noexcept
 {
 }
 
@@ -2738,7 +2737,7 @@ TurnInteractionsOnMessage::dispatch(const AbstractMessageDispatcher& dispatcher)
 }
 
 bool
-TurnInteractionsOnMessage::operator==(const AbstractMessage& rhs) const
+TurnInteractionsOnMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const TurnInteractionsOnMessage* message = dynamic_cast<const TurnInteractionsOnMessage*>(&rhs);
   if (!message)
@@ -2747,7 +2746,7 @@ TurnInteractionsOnMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-TurnInteractionsOnMessage::operator==(const TurnInteractionsOnMessage& rhs) const
+TurnInteractionsOnMessage::operator==(const TurnInteractionsOnMessage& rhs) const noexcept
 {
   if (getInteractionClassHandle() != rhs.getInteractionClassHandle()) return false;
   if (getOn() != rhs.getOn()) return false;
@@ -2755,7 +2754,7 @@ TurnInteractionsOnMessage::operator==(const TurnInteractionsOnMessage& rhs) cons
 }
 
 bool
-TurnInteractionsOnMessage::operator<(const TurnInteractionsOnMessage& rhs) const
+TurnInteractionsOnMessage::operator<(const TurnInteractionsOnMessage& rhs) const noexcept
 {
   if (getInteractionClassHandle() < rhs.getInteractionClassHandle()) return true;
   if (rhs.getInteractionClassHandle() < getInteractionClassHandle()) return false;
@@ -2764,7 +2763,7 @@ TurnInteractionsOnMessage::operator<(const TurnInteractionsOnMessage& rhs) const
   return false;
 }
 
-InteractionMessage::InteractionMessage() :
+InteractionMessage::InteractionMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _interactionClassHandle(),
@@ -2774,7 +2773,7 @@ InteractionMessage::InteractionMessage() :
 {
 }
 
-InteractionMessage::~InteractionMessage()
+InteractionMessage::~InteractionMessage() noexcept
 {
 }
 
@@ -2797,7 +2796,7 @@ InteractionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 }
 
 bool
-InteractionMessage::operator==(const AbstractMessage& rhs) const
+InteractionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const InteractionMessage* message = dynamic_cast<const InteractionMessage*>(&rhs);
   if (!message)
@@ -2806,7 +2805,7 @@ InteractionMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-InteractionMessage::operator==(const InteractionMessage& rhs) const
+InteractionMessage::operator==(const InteractionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -2818,7 +2817,7 @@ InteractionMessage::operator==(const InteractionMessage& rhs) const
 }
 
 bool
-InteractionMessage::operator<(const InteractionMessage& rhs) const
+InteractionMessage::operator<(const InteractionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2836,12 +2835,12 @@ InteractionMessage::operator<(const InteractionMessage& rhs) const
 }
 
 bool
-InteractionMessage::getReliable() const
+InteractionMessage::getReliable() const noexcept
 {
   return getTransportationType() == RELIABLE;
 }
 
-TimeStampedInteractionMessage::TimeStampedInteractionMessage() :
+TimeStampedInteractionMessage::TimeStampedInteractionMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _interactionClassHandle(),
@@ -2854,7 +2853,7 @@ TimeStampedInteractionMessage::TimeStampedInteractionMessage() :
 {
 }
 
-TimeStampedInteractionMessage::~TimeStampedInteractionMessage()
+TimeStampedInteractionMessage::~TimeStampedInteractionMessage() noexcept
 {
 }
 
@@ -2877,7 +2876,7 @@ TimeStampedInteractionMessage::dispatch(const AbstractMessageDispatcher& dispatc
 }
 
 bool
-TimeStampedInteractionMessage::operator==(const AbstractMessage& rhs) const
+TimeStampedInteractionMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const TimeStampedInteractionMessage* message = dynamic_cast<const TimeStampedInteractionMessage*>(&rhs);
   if (!message)
@@ -2886,7 +2885,7 @@ TimeStampedInteractionMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-TimeStampedInteractionMessage::operator==(const TimeStampedInteractionMessage& rhs) const
+TimeStampedInteractionMessage::operator==(const TimeStampedInteractionMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -2901,7 +2900,7 @@ TimeStampedInteractionMessage::operator==(const TimeStampedInteractionMessage& r
 }
 
 bool
-TimeStampedInteractionMessage::operator<(const TimeStampedInteractionMessage& rhs) const
+TimeStampedInteractionMessage::operator<(const TimeStampedInteractionMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2925,19 +2924,19 @@ TimeStampedInteractionMessage::operator<(const TimeStampedInteractionMessage& rh
 }
 
 bool
-TimeStampedInteractionMessage::getReliable() const
+TimeStampedInteractionMessage::getReliable() const noexcept
 {
   return getTransportationType() == RELIABLE;
 }
 
-ObjectInstanceHandlesRequestMessage::ObjectInstanceHandlesRequestMessage() :
+ObjectInstanceHandlesRequestMessage::ObjectInstanceHandlesRequestMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _count()
 {
 }
 
-ObjectInstanceHandlesRequestMessage::~ObjectInstanceHandlesRequestMessage()
+ObjectInstanceHandlesRequestMessage::~ObjectInstanceHandlesRequestMessage() noexcept
 {
 }
 
@@ -2960,7 +2959,7 @@ ObjectInstanceHandlesRequestMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 bool
-ObjectInstanceHandlesRequestMessage::operator==(const AbstractMessage& rhs) const
+ObjectInstanceHandlesRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ObjectInstanceHandlesRequestMessage* message = dynamic_cast<const ObjectInstanceHandlesRequestMessage*>(&rhs);
   if (!message)
@@ -2969,7 +2968,7 @@ ObjectInstanceHandlesRequestMessage::operator==(const AbstractMessage& rhs) cons
 }
 
 bool
-ObjectInstanceHandlesRequestMessage::operator==(const ObjectInstanceHandlesRequestMessage& rhs) const
+ObjectInstanceHandlesRequestMessage::operator==(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -2978,7 +2977,7 @@ ObjectInstanceHandlesRequestMessage::operator==(const ObjectInstanceHandlesReque
 }
 
 bool
-ObjectInstanceHandlesRequestMessage::operator<(const ObjectInstanceHandlesRequestMessage& rhs) const
+ObjectInstanceHandlesRequestMessage::operator<(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -2989,14 +2988,14 @@ ObjectInstanceHandlesRequestMessage::operator<(const ObjectInstanceHandlesReques
   return false;
 }
 
-ObjectInstanceHandlesResponseMessage::ObjectInstanceHandlesResponseMessage() :
+ObjectInstanceHandlesResponseMessage::ObjectInstanceHandlesResponseMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _objectInstanceHandleNamePairVector()
 {
 }
 
-ObjectInstanceHandlesResponseMessage::~ObjectInstanceHandlesResponseMessage()
+ObjectInstanceHandlesResponseMessage::~ObjectInstanceHandlesResponseMessage() noexcept
 {
 }
 
@@ -3019,7 +3018,7 @@ ObjectInstanceHandlesResponseMessage::dispatch(const AbstractMessageDispatcher& 
 }
 
 bool
-ObjectInstanceHandlesResponseMessage::operator==(const AbstractMessage& rhs) const
+ObjectInstanceHandlesResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ObjectInstanceHandlesResponseMessage* message = dynamic_cast<const ObjectInstanceHandlesResponseMessage*>(&rhs);
   if (!message)
@@ -3028,7 +3027,7 @@ ObjectInstanceHandlesResponseMessage::operator==(const AbstractMessage& rhs) con
 }
 
 bool
-ObjectInstanceHandlesResponseMessage::operator==(const ObjectInstanceHandlesResponseMessage& rhs) const
+ObjectInstanceHandlesResponseMessage::operator==(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -3037,7 +3036,7 @@ ObjectInstanceHandlesResponseMessage::operator==(const ObjectInstanceHandlesResp
 }
 
 bool
-ObjectInstanceHandlesResponseMessage::operator<(const ObjectInstanceHandlesResponseMessage& rhs) const
+ObjectInstanceHandlesResponseMessage::operator<(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3048,13 +3047,13 @@ ObjectInstanceHandlesResponseMessage::operator<(const ObjectInstanceHandlesRespo
   return false;
 }
 
-ReleaseMultipleObjectInstanceNameHandlePairsMessage::ReleaseMultipleObjectInstanceNameHandlePairsMessage() :
+ReleaseMultipleObjectInstanceNameHandlePairsMessage::ReleaseMultipleObjectInstanceNameHandlePairsMessage() noexcept :
   _federationHandle(),
   _objectInstanceHandleVector()
 {
 }
 
-ReleaseMultipleObjectInstanceNameHandlePairsMessage::~ReleaseMultipleObjectInstanceNameHandlePairsMessage()
+ReleaseMultipleObjectInstanceNameHandlePairsMessage::~ReleaseMultipleObjectInstanceNameHandlePairsMessage() noexcept
 {
 }
 
@@ -3077,7 +3076,7 @@ ReleaseMultipleObjectInstanceNameHandlePairsMessage::dispatch(const AbstractMess
 }
 
 bool
-ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator==(const AbstractMessage& rhs) const
+ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ReleaseMultipleObjectInstanceNameHandlePairsMessage* message = dynamic_cast<const ReleaseMultipleObjectInstanceNameHandlePairsMessage*>(&rhs);
   if (!message)
@@ -3086,7 +3085,7 @@ ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator==(const AbstractMe
 }
 
 bool
-ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator==(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator==(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getObjectInstanceHandleVector() != rhs.getObjectInstanceHandleVector()) return false;
@@ -3094,7 +3093,7 @@ ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator==(const ReleaseMul
 }
 
 bool
-ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator<(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator<(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3103,7 +3102,7 @@ ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator<(const ReleaseMult
   return false;
 }
 
-ReserveObjectInstanceNameRequestMessage::ReserveObjectInstanceNameRequestMessage() :
+ReserveObjectInstanceNameRequestMessage::ReserveObjectInstanceNameRequestMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _name(),
@@ -3111,7 +3110,7 @@ ReserveObjectInstanceNameRequestMessage::ReserveObjectInstanceNameRequestMessage
 {
 }
 
-ReserveObjectInstanceNameRequestMessage::~ReserveObjectInstanceNameRequestMessage()
+ReserveObjectInstanceNameRequestMessage::~ReserveObjectInstanceNameRequestMessage() noexcept
 {
 }
 
@@ -3134,7 +3133,7 @@ ReserveObjectInstanceNameRequestMessage::dispatch(const AbstractMessageDispatche
 }
 
 bool
-ReserveObjectInstanceNameRequestMessage::operator==(const AbstractMessage& rhs) const
+ReserveObjectInstanceNameRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ReserveObjectInstanceNameRequestMessage* message = dynamic_cast<const ReserveObjectInstanceNameRequestMessage*>(&rhs);
   if (!message)
@@ -3143,7 +3142,7 @@ ReserveObjectInstanceNameRequestMessage::operator==(const AbstractMessage& rhs) 
 }
 
 bool
-ReserveObjectInstanceNameRequestMessage::operator==(const ReserveObjectInstanceNameRequestMessage& rhs) const
+ReserveObjectInstanceNameRequestMessage::operator==(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -3153,7 +3152,7 @@ ReserveObjectInstanceNameRequestMessage::operator==(const ReserveObjectInstanceN
 }
 
 bool
-ReserveObjectInstanceNameRequestMessage::operator<(const ReserveObjectInstanceNameRequestMessage& rhs) const
+ReserveObjectInstanceNameRequestMessage::operator<(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3166,7 +3165,7 @@ ReserveObjectInstanceNameRequestMessage::operator<(const ReserveObjectInstanceNa
   return false;
 }
 
-ReserveObjectInstanceNameResponseMessage::ReserveObjectInstanceNameResponseMessage() :
+ReserveObjectInstanceNameResponseMessage::ReserveObjectInstanceNameResponseMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _objectInstanceHandleNamePair(),
@@ -3174,7 +3173,7 @@ ReserveObjectInstanceNameResponseMessage::ReserveObjectInstanceNameResponseMessa
 {
 }
 
-ReserveObjectInstanceNameResponseMessage::~ReserveObjectInstanceNameResponseMessage()
+ReserveObjectInstanceNameResponseMessage::~ReserveObjectInstanceNameResponseMessage() noexcept
 {
 }
 
@@ -3197,7 +3196,7 @@ ReserveObjectInstanceNameResponseMessage::dispatch(const AbstractMessageDispatch
 }
 
 bool
-ReserveObjectInstanceNameResponseMessage::operator==(const AbstractMessage& rhs) const
+ReserveObjectInstanceNameResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ReserveObjectInstanceNameResponseMessage* message = dynamic_cast<const ReserveObjectInstanceNameResponseMessage*>(&rhs);
   if (!message)
@@ -3206,7 +3205,7 @@ ReserveObjectInstanceNameResponseMessage::operator==(const AbstractMessage& rhs)
 }
 
 bool
-ReserveObjectInstanceNameResponseMessage::operator==(const ReserveObjectInstanceNameResponseMessage& rhs) const
+ReserveObjectInstanceNameResponseMessage::operator==(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -3216,7 +3215,7 @@ ReserveObjectInstanceNameResponseMessage::operator==(const ReserveObjectInstance
 }
 
 bool
-ReserveObjectInstanceNameResponseMessage::operator<(const ReserveObjectInstanceNameResponseMessage& rhs) const
+ReserveObjectInstanceNameResponseMessage::operator<(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3229,14 +3228,14 @@ ReserveObjectInstanceNameResponseMessage::operator<(const ReserveObjectInstanceN
   return false;
 }
 
-ReserveMultipleObjectInstanceNameRequestMessage::ReserveMultipleObjectInstanceNameRequestMessage() :
+ReserveMultipleObjectInstanceNameRequestMessage::ReserveMultipleObjectInstanceNameRequestMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _nameList()
 {
 }
 
-ReserveMultipleObjectInstanceNameRequestMessage::~ReserveMultipleObjectInstanceNameRequestMessage()
+ReserveMultipleObjectInstanceNameRequestMessage::~ReserveMultipleObjectInstanceNameRequestMessage() noexcept
 {
 }
 
@@ -3259,7 +3258,7 @@ ReserveMultipleObjectInstanceNameRequestMessage::dispatch(const AbstractMessageD
 }
 
 bool
-ReserveMultipleObjectInstanceNameRequestMessage::operator==(const AbstractMessage& rhs) const
+ReserveMultipleObjectInstanceNameRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ReserveMultipleObjectInstanceNameRequestMessage* message = dynamic_cast<const ReserveMultipleObjectInstanceNameRequestMessage*>(&rhs);
   if (!message)
@@ -3268,7 +3267,7 @@ ReserveMultipleObjectInstanceNameRequestMessage::operator==(const AbstractMessag
 }
 
 bool
-ReserveMultipleObjectInstanceNameRequestMessage::operator==(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+ReserveMultipleObjectInstanceNameRequestMessage::operator==(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -3277,7 +3276,7 @@ ReserveMultipleObjectInstanceNameRequestMessage::operator==(const ReserveMultipl
 }
 
 bool
-ReserveMultipleObjectInstanceNameRequestMessage::operator<(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+ReserveMultipleObjectInstanceNameRequestMessage::operator<(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3288,7 +3287,7 @@ ReserveMultipleObjectInstanceNameRequestMessage::operator<(const ReserveMultiple
   return false;
 }
 
-ReserveMultipleObjectInstanceNameResponseMessage::ReserveMultipleObjectInstanceNameResponseMessage() :
+ReserveMultipleObjectInstanceNameResponseMessage::ReserveMultipleObjectInstanceNameResponseMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _objectInstanceHandleNamePairVector(),
@@ -3296,7 +3295,7 @@ ReserveMultipleObjectInstanceNameResponseMessage::ReserveMultipleObjectInstanceN
 {
 }
 
-ReserveMultipleObjectInstanceNameResponseMessage::~ReserveMultipleObjectInstanceNameResponseMessage()
+ReserveMultipleObjectInstanceNameResponseMessage::~ReserveMultipleObjectInstanceNameResponseMessage() noexcept
 {
 }
 
@@ -3319,7 +3318,7 @@ ReserveMultipleObjectInstanceNameResponseMessage::dispatch(const AbstractMessage
 }
 
 bool
-ReserveMultipleObjectInstanceNameResponseMessage::operator==(const AbstractMessage& rhs) const
+ReserveMultipleObjectInstanceNameResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const ReserveMultipleObjectInstanceNameResponseMessage* message = dynamic_cast<const ReserveMultipleObjectInstanceNameResponseMessage*>(&rhs);
   if (!message)
@@ -3328,7 +3327,7 @@ ReserveMultipleObjectInstanceNameResponseMessage::operator==(const AbstractMessa
 }
 
 bool
-ReserveMultipleObjectInstanceNameResponseMessage::operator==(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+ReserveMultipleObjectInstanceNameResponseMessage::operator==(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -3338,7 +3337,7 @@ ReserveMultipleObjectInstanceNameResponseMessage::operator==(const ReserveMultip
 }
 
 bool
-ReserveMultipleObjectInstanceNameResponseMessage::operator<(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+ReserveMultipleObjectInstanceNameResponseMessage::operator<(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3351,7 +3350,7 @@ ReserveMultipleObjectInstanceNameResponseMessage::operator<(const ReserveMultipl
   return false;
 }
 
-InsertObjectInstanceMessage::InsertObjectInstanceMessage() :
+InsertObjectInstanceMessage::InsertObjectInstanceMessage() noexcept :
   _federationHandle(),
   _objectClassHandle(),
   _objectInstanceHandle(),
@@ -3360,7 +3359,7 @@ InsertObjectInstanceMessage::InsertObjectInstanceMessage() :
 {
 }
 
-InsertObjectInstanceMessage::~InsertObjectInstanceMessage()
+InsertObjectInstanceMessage::~InsertObjectInstanceMessage() noexcept
 {
 }
 
@@ -3383,7 +3382,7 @@ InsertObjectInstanceMessage::dispatch(const AbstractMessageDispatcher& dispatche
 }
 
 bool
-InsertObjectInstanceMessage::operator==(const AbstractMessage& rhs) const
+InsertObjectInstanceMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const InsertObjectInstanceMessage* message = dynamic_cast<const InsertObjectInstanceMessage*>(&rhs);
   if (!message)
@@ -3392,7 +3391,7 @@ InsertObjectInstanceMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-InsertObjectInstanceMessage::operator==(const InsertObjectInstanceMessage& rhs) const
+InsertObjectInstanceMessage::operator==(const InsertObjectInstanceMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getObjectClassHandle() != rhs.getObjectClassHandle()) return false;
@@ -3403,7 +3402,7 @@ InsertObjectInstanceMessage::operator==(const InsertObjectInstanceMessage& rhs) 
 }
 
 bool
-InsertObjectInstanceMessage::operator<(const InsertObjectInstanceMessage& rhs) const
+InsertObjectInstanceMessage::operator<(const InsertObjectInstanceMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3419,12 +3418,12 @@ InsertObjectInstanceMessage::operator<(const InsertObjectInstanceMessage& rhs) c
 }
 
 ObjectInstanceHandle
-InsertObjectInstanceMessage::getObjectInstanceHandleForMessage() const
+InsertObjectInstanceMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return getObjectInstanceHandle();
 }
 
-DeleteObjectInstanceMessage::DeleteObjectInstanceMessage() :
+DeleteObjectInstanceMessage::DeleteObjectInstanceMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _objectInstanceHandle(),
@@ -3432,7 +3431,7 @@ DeleteObjectInstanceMessage::DeleteObjectInstanceMessage() :
 {
 }
 
-DeleteObjectInstanceMessage::~DeleteObjectInstanceMessage()
+DeleteObjectInstanceMessage::~DeleteObjectInstanceMessage() noexcept
 {
 }
 
@@ -3455,7 +3454,7 @@ DeleteObjectInstanceMessage::dispatch(const AbstractMessageDispatcher& dispatche
 }
 
 bool
-DeleteObjectInstanceMessage::operator==(const AbstractMessage& rhs) const
+DeleteObjectInstanceMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const DeleteObjectInstanceMessage* message = dynamic_cast<const DeleteObjectInstanceMessage*>(&rhs);
   if (!message)
@@ -3464,7 +3463,7 @@ DeleteObjectInstanceMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-DeleteObjectInstanceMessage::operator==(const DeleteObjectInstanceMessage& rhs) const
+DeleteObjectInstanceMessage::operator==(const DeleteObjectInstanceMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -3474,7 +3473,7 @@ DeleteObjectInstanceMessage::operator==(const DeleteObjectInstanceMessage& rhs) 
 }
 
 bool
-DeleteObjectInstanceMessage::operator<(const DeleteObjectInstanceMessage& rhs) const
+DeleteObjectInstanceMessage::operator<(const DeleteObjectInstanceMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3488,12 +3487,12 @@ DeleteObjectInstanceMessage::operator<(const DeleteObjectInstanceMessage& rhs) c
 }
 
 ObjectInstanceHandle
-DeleteObjectInstanceMessage::getObjectInstanceHandleForMessage() const
+DeleteObjectInstanceMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return getObjectInstanceHandle();
 }
 
-TimeStampedDeleteObjectInstanceMessage::TimeStampedDeleteObjectInstanceMessage() :
+TimeStampedDeleteObjectInstanceMessage::TimeStampedDeleteObjectInstanceMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _objectInstanceHandle(),
@@ -3504,7 +3503,7 @@ TimeStampedDeleteObjectInstanceMessage::TimeStampedDeleteObjectInstanceMessage()
 {
 }
 
-TimeStampedDeleteObjectInstanceMessage::~TimeStampedDeleteObjectInstanceMessage()
+TimeStampedDeleteObjectInstanceMessage::~TimeStampedDeleteObjectInstanceMessage() noexcept
 {
 }
 
@@ -3527,7 +3526,7 @@ TimeStampedDeleteObjectInstanceMessage::dispatch(const AbstractMessageDispatcher
 }
 
 bool
-TimeStampedDeleteObjectInstanceMessage::operator==(const AbstractMessage& rhs) const
+TimeStampedDeleteObjectInstanceMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const TimeStampedDeleteObjectInstanceMessage* message = dynamic_cast<const TimeStampedDeleteObjectInstanceMessage*>(&rhs);
   if (!message)
@@ -3536,7 +3535,7 @@ TimeStampedDeleteObjectInstanceMessage::operator==(const AbstractMessage& rhs) c
 }
 
 bool
-TimeStampedDeleteObjectInstanceMessage::operator==(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+TimeStampedDeleteObjectInstanceMessage::operator==(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -3549,7 +3548,7 @@ TimeStampedDeleteObjectInstanceMessage::operator==(const TimeStampedDeleteObject
 }
 
 bool
-TimeStampedDeleteObjectInstanceMessage::operator<(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+TimeStampedDeleteObjectInstanceMessage::operator<(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3569,12 +3568,12 @@ TimeStampedDeleteObjectInstanceMessage::operator<(const TimeStampedDeleteObjectI
 }
 
 ObjectInstanceHandle
-TimeStampedDeleteObjectInstanceMessage::getObjectInstanceHandleForMessage() const
+TimeStampedDeleteObjectInstanceMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return getObjectInstanceHandle();
 }
 
-AttributeUpdateMessage::AttributeUpdateMessage() :
+AttributeUpdateMessage::AttributeUpdateMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _objectInstanceHandle(),
@@ -3584,7 +3583,7 @@ AttributeUpdateMessage::AttributeUpdateMessage() :
 {
 }
 
-AttributeUpdateMessage::~AttributeUpdateMessage()
+AttributeUpdateMessage::~AttributeUpdateMessage() noexcept
 {
 }
 
@@ -3607,7 +3606,7 @@ AttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dispatcher) co
 }
 
 bool
-AttributeUpdateMessage::operator==(const AbstractMessage& rhs) const
+AttributeUpdateMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const AttributeUpdateMessage* message = dynamic_cast<const AttributeUpdateMessage*>(&rhs);
   if (!message)
@@ -3616,7 +3615,7 @@ AttributeUpdateMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-AttributeUpdateMessage::operator==(const AttributeUpdateMessage& rhs) const
+AttributeUpdateMessage::operator==(const AttributeUpdateMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -3628,7 +3627,7 @@ AttributeUpdateMessage::operator==(const AttributeUpdateMessage& rhs) const
 }
 
 bool
-AttributeUpdateMessage::operator<(const AttributeUpdateMessage& rhs) const
+AttributeUpdateMessage::operator<(const AttributeUpdateMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3646,18 +3645,18 @@ AttributeUpdateMessage::operator<(const AttributeUpdateMessage& rhs) const
 }
 
 bool
-AttributeUpdateMessage::getReliable() const
+AttributeUpdateMessage::getReliable() const noexcept
 {
   return getTransportationType() == RELIABLE;
 }
 
 ObjectInstanceHandle
-AttributeUpdateMessage::getObjectInstanceHandleForMessage() const
+AttributeUpdateMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return getObjectInstanceHandle();
 }
 
-TimeStampedAttributeUpdateMessage::TimeStampedAttributeUpdateMessage() :
+TimeStampedAttributeUpdateMessage::TimeStampedAttributeUpdateMessage() noexcept :
   _federationHandle(),
   _federateHandle(),
   _objectInstanceHandle(),
@@ -3670,7 +3669,7 @@ TimeStampedAttributeUpdateMessage::TimeStampedAttributeUpdateMessage() :
 {
 }
 
-TimeStampedAttributeUpdateMessage::~TimeStampedAttributeUpdateMessage()
+TimeStampedAttributeUpdateMessage::~TimeStampedAttributeUpdateMessage() noexcept
 {
 }
 
@@ -3693,7 +3692,7 @@ TimeStampedAttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dis
 }
 
 bool
-TimeStampedAttributeUpdateMessage::operator==(const AbstractMessage& rhs) const
+TimeStampedAttributeUpdateMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const TimeStampedAttributeUpdateMessage* message = dynamic_cast<const TimeStampedAttributeUpdateMessage*>(&rhs);
   if (!message)
@@ -3702,7 +3701,7 @@ TimeStampedAttributeUpdateMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-TimeStampedAttributeUpdateMessage::operator==(const TimeStampedAttributeUpdateMessage& rhs) const
+TimeStampedAttributeUpdateMessage::operator==(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getFederateHandle() != rhs.getFederateHandle()) return false;
@@ -3717,7 +3716,7 @@ TimeStampedAttributeUpdateMessage::operator==(const TimeStampedAttributeUpdateMe
 }
 
 bool
-TimeStampedAttributeUpdateMessage::operator<(const TimeStampedAttributeUpdateMessage& rhs) const
+TimeStampedAttributeUpdateMessage::operator<(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3741,18 +3740,18 @@ TimeStampedAttributeUpdateMessage::operator<(const TimeStampedAttributeUpdateMes
 }
 
 bool
-TimeStampedAttributeUpdateMessage::getReliable() const
+TimeStampedAttributeUpdateMessage::getReliable() const noexcept
 {
   return getTransportationType() == RELIABLE;
 }
 
 ObjectInstanceHandle
-TimeStampedAttributeUpdateMessage::getObjectInstanceHandleForMessage() const
+TimeStampedAttributeUpdateMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return getObjectInstanceHandle();
 }
 
-RequestAttributeUpdateMessage::RequestAttributeUpdateMessage() :
+RequestAttributeUpdateMessage::RequestAttributeUpdateMessage() noexcept :
   _federationHandle(),
   _objectInstanceHandle(),
   _attributeHandles(),
@@ -3760,7 +3759,7 @@ RequestAttributeUpdateMessage::RequestAttributeUpdateMessage() :
 {
 }
 
-RequestAttributeUpdateMessage::~RequestAttributeUpdateMessage()
+RequestAttributeUpdateMessage::~RequestAttributeUpdateMessage() noexcept
 {
 }
 
@@ -3783,7 +3782,7 @@ RequestAttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dispatc
 }
 
 bool
-RequestAttributeUpdateMessage::operator==(const AbstractMessage& rhs) const
+RequestAttributeUpdateMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const RequestAttributeUpdateMessage* message = dynamic_cast<const RequestAttributeUpdateMessage*>(&rhs);
   if (!message)
@@ -3792,7 +3791,7 @@ RequestAttributeUpdateMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-RequestAttributeUpdateMessage::operator==(const RequestAttributeUpdateMessage& rhs) const
+RequestAttributeUpdateMessage::operator==(const RequestAttributeUpdateMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getObjectInstanceHandle() != rhs.getObjectInstanceHandle()) return false;
@@ -3802,7 +3801,7 @@ RequestAttributeUpdateMessage::operator==(const RequestAttributeUpdateMessage& r
 }
 
 bool
-RequestAttributeUpdateMessage::operator<(const RequestAttributeUpdateMessage& rhs) const
+RequestAttributeUpdateMessage::operator<(const RequestAttributeUpdateMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3816,12 +3815,12 @@ RequestAttributeUpdateMessage::operator<(const RequestAttributeUpdateMessage& rh
 }
 
 ObjectInstanceHandle
-RequestAttributeUpdateMessage::getObjectInstanceHandleForMessage() const
+RequestAttributeUpdateMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return getObjectInstanceHandle();
 }
 
-RequestClassAttributeUpdateMessage::RequestClassAttributeUpdateMessage() :
+RequestClassAttributeUpdateMessage::RequestClassAttributeUpdateMessage() noexcept :
   _federationHandle(),
   _objectClassHandle(),
   _attributeHandles(),
@@ -3829,7 +3828,7 @@ RequestClassAttributeUpdateMessage::RequestClassAttributeUpdateMessage() :
 {
 }
 
-RequestClassAttributeUpdateMessage::~RequestClassAttributeUpdateMessage()
+RequestClassAttributeUpdateMessage::~RequestClassAttributeUpdateMessage() noexcept
 {
 }
 
@@ -3852,7 +3851,7 @@ RequestClassAttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& di
 }
 
 bool
-RequestClassAttributeUpdateMessage::operator==(const AbstractMessage& rhs) const
+RequestClassAttributeUpdateMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const RequestClassAttributeUpdateMessage* message = dynamic_cast<const RequestClassAttributeUpdateMessage*>(&rhs);
   if (!message)
@@ -3861,7 +3860,7 @@ RequestClassAttributeUpdateMessage::operator==(const AbstractMessage& rhs) const
 }
 
 bool
-RequestClassAttributeUpdateMessage::operator==(const RequestClassAttributeUpdateMessage& rhs) const
+RequestClassAttributeUpdateMessage::operator==(const RequestClassAttributeUpdateMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getObjectClassHandle() != rhs.getObjectClassHandle()) return false;
@@ -3871,7 +3870,7 @@ RequestClassAttributeUpdateMessage::operator==(const RequestClassAttributeUpdate
 }
 
 bool
-RequestClassAttributeUpdateMessage::operator<(const RequestClassAttributeUpdateMessage& rhs) const
+RequestClassAttributeUpdateMessage::operator<(const RequestClassAttributeUpdateMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3884,14 +3883,14 @@ RequestClassAttributeUpdateMessage::operator<(const RequestClassAttributeUpdateM
   return false;
 }
 
-QueryAttributeOwnershipRequestMessage::QueryAttributeOwnershipRequestMessage() :
+QueryAttributeOwnershipRequestMessage::QueryAttributeOwnershipRequestMessage() noexcept :
   _federationHandle(),
   _objectInstanceHandle(),
   _attributeHandle()
 {
 }
 
-QueryAttributeOwnershipRequestMessage::~QueryAttributeOwnershipRequestMessage()
+QueryAttributeOwnershipRequestMessage::~QueryAttributeOwnershipRequestMessage() noexcept
 {
 }
 
@@ -3914,7 +3913,7 @@ QueryAttributeOwnershipRequestMessage::dispatch(const AbstractMessageDispatcher&
 }
 
 bool
-QueryAttributeOwnershipRequestMessage::operator==(const AbstractMessage& rhs) const
+QueryAttributeOwnershipRequestMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const QueryAttributeOwnershipRequestMessage* message = dynamic_cast<const QueryAttributeOwnershipRequestMessage*>(&rhs);
   if (!message)
@@ -3923,7 +3922,7 @@ QueryAttributeOwnershipRequestMessage::operator==(const AbstractMessage& rhs) co
 }
 
 bool
-QueryAttributeOwnershipRequestMessage::operator==(const QueryAttributeOwnershipRequestMessage& rhs) const
+QueryAttributeOwnershipRequestMessage::operator==(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getObjectInstanceHandle() != rhs.getObjectInstanceHandle()) return false;
@@ -3932,7 +3931,7 @@ QueryAttributeOwnershipRequestMessage::operator==(const QueryAttributeOwnershipR
 }
 
 bool
-QueryAttributeOwnershipRequestMessage::operator<(const QueryAttributeOwnershipRequestMessage& rhs) const
+QueryAttributeOwnershipRequestMessage::operator<(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;
@@ -3943,7 +3942,7 @@ QueryAttributeOwnershipRequestMessage::operator<(const QueryAttributeOwnershipRe
   return false;
 }
 
-QueryAttributeOwnershipResponseMessage::QueryAttributeOwnershipResponseMessage() :
+QueryAttributeOwnershipResponseMessage::QueryAttributeOwnershipResponseMessage() noexcept :
   _federationHandle(),
   _objectInstanceHandle(),
   _attributeHandle(),
@@ -3951,7 +3950,7 @@ QueryAttributeOwnershipResponseMessage::QueryAttributeOwnershipResponseMessage()
 {
 }
 
-QueryAttributeOwnershipResponseMessage::~QueryAttributeOwnershipResponseMessage()
+QueryAttributeOwnershipResponseMessage::~QueryAttributeOwnershipResponseMessage() noexcept
 {
 }
 
@@ -3974,7 +3973,7 @@ QueryAttributeOwnershipResponseMessage::dispatch(const AbstractMessageDispatcher
 }
 
 bool
-QueryAttributeOwnershipResponseMessage::operator==(const AbstractMessage& rhs) const
+QueryAttributeOwnershipResponseMessage::operator==(const AbstractMessage& rhs) const noexcept
 {
   const QueryAttributeOwnershipResponseMessage* message = dynamic_cast<const QueryAttributeOwnershipResponseMessage*>(&rhs);
   if (!message)
@@ -3983,7 +3982,7 @@ QueryAttributeOwnershipResponseMessage::operator==(const AbstractMessage& rhs) c
 }
 
 bool
-QueryAttributeOwnershipResponseMessage::operator==(const QueryAttributeOwnershipResponseMessage& rhs) const
+QueryAttributeOwnershipResponseMessage::operator==(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() != rhs.getFederationHandle()) return false;
   if (getObjectInstanceHandle() != rhs.getObjectInstanceHandle()) return false;
@@ -3993,7 +3992,7 @@ QueryAttributeOwnershipResponseMessage::operator==(const QueryAttributeOwnership
 }
 
 bool
-QueryAttributeOwnershipResponseMessage::operator<(const QueryAttributeOwnershipResponseMessage& rhs) const
+QueryAttributeOwnershipResponseMessage::operator<(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
 {
   if (getFederationHandle() < rhs.getFederationHandle()) return true;
   if (rhs.getFederationHandle() < getFederationHandle()) return false;

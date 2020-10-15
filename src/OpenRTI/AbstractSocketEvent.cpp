@@ -28,10 +28,6 @@ AbstractSocketEvent::AbstractSocketEvent() :
 {
 }
 
-AbstractSocketEvent::~AbstractSocketEvent()
-{
-}
-
 void
 AbstractSocketEvent::timeout(SocketEventDispatcher& dispatcher)
 {

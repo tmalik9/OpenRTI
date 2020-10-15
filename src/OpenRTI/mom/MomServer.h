@@ -48,7 +48,7 @@ class OPENRTI_LOCAL MomServer : public Referenced
     {
       return _rtiFederate->getFederationHandle();
     }
-    bool isRoot() const { return _isRoot; }
+    bool isRoot() const noexcept { return _isRoot; }
 
     void accept(const AbstractMessage& message);
 

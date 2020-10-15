@@ -29,18 +29,18 @@
 
 namespace OpenRTI {
 
-class OPENRTI_LOCAL FDD1516EContentHandler : public XML::ContentHandler {
+class OPENRTI_LOCAL FDD1516EContentHandler final : public XML::ContentHandler {
 public:
-  FDD1516EContentHandler();
-  virtual ~FDD1516EContentHandler();
+  FDD1516EContentHandler() noexcept;
+  virtual ~FDD1516EContentHandler() noexcept;
 
-  virtual void startDocument(void);
-  virtual void endDocument(void);
-  virtual void startElement(const char* uri, const char* name,
-                            const char* qName, const XML::Attributes* atts);
-  virtual void endElement(const char* uri, const char* name, const char* qName);
+  void startDocument() override;
+  void endDocument() override;
+  void startElement(const char* uri, const char* name,
+                            const char* qName, const XML::Attributes* atts) override;
+  void endElement(const char* uri, const char* name, const char* qName) override;
 
-  virtual void characters(const char* data, unsigned length);
+  void characters(const char* data, unsigned length) override;
 
   // poor man's schema checking ...
   enum Mode {
@@ -192,22 +192,22 @@ public:
   FOMStringModuleBuilder _fomStringModuleBuilder;
 };
 
-FDD1516EContentHandler::FDD1516EContentHandler()
+FDD1516EContentHandler::FDD1516EContentHandler() noexcept
 {
 }
 
-FDD1516EContentHandler::~FDD1516EContentHandler()
+FDD1516EContentHandler::~FDD1516EContentHandler() noexcept
 {
 }
 
 void
-FDD1516EContentHandler::startDocument(void)
+FDD1516EContentHandler::startDocument()
 {
   OpenRTIAssert(_modeStack.empty());
 }
 
 void
-FDD1516EContentHandler::endDocument(void)
+FDD1516EContentHandler::endDocument()
 {
   OpenRTIAssert(_modeStack.empty());
   _fomStringModuleBuilder.validate();

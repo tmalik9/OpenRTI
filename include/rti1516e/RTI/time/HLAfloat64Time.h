@@ -40,68 +40,68 @@ namespace rti1516e
       virtual ~HLAfloat64Time ();
 
       // Basic accessors/mutators
-      virtual void setInitial ();
+      virtual void setInitial () override;
 
-      virtual bool isInitial () const;
+      virtual bool isInitial () const override;
 
-      virtual void setFinal ();
+      virtual void setFinal () override;
 
-      virtual bool isFinal () const;
+      virtual bool isFinal () const override;
 
       // Assignment
       virtual rti1516e::LogicalTime& operator= (
-         rti1516e::LogicalTime const & value);
+         rti1516e::LogicalTime const & value) override;
 
       // Operators
 
       virtual rti1516e::LogicalTime& operator+= (
-         rti1516e::LogicalTimeInterval const & addend);
+         rti1516e::LogicalTimeInterval const & addend) override;
 
       virtual rti1516e::LogicalTime& operator-= (
-         rti1516e::LogicalTimeInterval const & subtrahend);
+         rti1516e::LogicalTimeInterval const & subtrahend) override;
 
       virtual bool operator> (
-         rti1516e::LogicalTime const & value) const;
+         rti1516e::LogicalTime const & value) const override;
 
       virtual bool operator< (
-         rti1516e::LogicalTime const & value) const;
+         rti1516e::LogicalTime const & value) const override;
 
       virtual bool operator== (
-         rti1516e::LogicalTime const & value) const;
+         rti1516e::LogicalTime const & value) const override;
 
       virtual bool operator>= (
-         rti1516e::LogicalTime const & value) const;
+         rti1516e::LogicalTime const & value) const override;
 
       virtual bool operator<= (
-         rti1516e::LogicalTime const & value) const;
+         rti1516e::LogicalTime const & value) const override;
 
       // Generates an encoded value that can be used to send
       // LogicalTimes to other federates in updates or interactions
-      virtual rti1516e::VariableLengthData encode() const;
+      virtual rti1516e::VariableLengthData encode() const override;
 
       // Alternate encode for directly filling a buffer
       virtual size_t encode (
          void* buffer,
-         size_t bufferSize) const;
+         size_t bufferSize) const override;
 
       // The length of the encoded data
-      virtual size_t encodedLength () const;
+      virtual size_t encodedLength () const override;
 
       // Decode VariableLengthData into self
       virtual void decode (
-         rti1516e::VariableLengthData const & VariableLengthData);
+         rti1516e::VariableLengthData const & VariableLengthData) override;
 
       // Alternate decode that reads directly from a buffer
       virtual void decode (
          void* buffer,
-         size_t bufferSize);
+         size_t bufferSize) override;
 
       // Diagnostic string representation of time
-      virtual std::wstring toString () const;
+      virtual std::wstring toString () const override;
 
       // Return the name of the Implementation, as needed by
       // createFederationExecution.
-      virtual std::wstring implementationName() const;
+      virtual std::wstring implementationName() const override;
 
    public:
       //-----------------------------------------------------------------

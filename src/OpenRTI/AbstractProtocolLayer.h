@@ -27,19 +27,19 @@ namespace OpenRTI {
 
 class OPENRTI_API AbstractProtocolLayer : public Referenced {
 public:
-  AbstractProtocolLayer();
-  virtual ~AbstractProtocolLayer();
+  AbstractProtocolLayer() noexcept;
+  virtual ~AbstractProtocolLayer()  noexcept;
 
   // Is called from the parent protocol layer when there is data to read
   virtual void read(AbstractProtocolSocket&) = 0;
-  // True if the protocol is ready to recieive
+  // True if the protocol is ready to receive
   virtual bool getEnableRead() const = 0;
   // Is called from the parent protocol layer when there is space to write something
   virtual void write(AbstractProtocolSocket&) = 0;
   // True if there is something to send
   virtual bool getEnableWrite() const = 0;
 
-  // Is called from the parent protocol layer when an unrecoverable error happenes.
+  // Is called from the parent protocol layer when an unrecoverable error happens.
   // FIXME rethink
   virtual void error(const Exception& e) = 0;
 

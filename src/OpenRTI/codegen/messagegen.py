@@ -470,10 +470,10 @@ class StructField(object):
         upperName = self.getUpperName()
         typeName = self.getTypeName()
         memberName = self.getMemberName()
-        sourceStream.writeline('void set{upperName}(const {typeName}& value)'.format(upperName = upperName, typeName = typeName))
+        sourceStream.writeline('void set{upperName}(const {typeName}& value) noexcept'.format(upperName = upperName, typeName = typeName))
         sourceStream.writeline('{{ {prefix}{memberName} = value; }}'.format(memberName = memberName, prefix = valuePrefix))
         sourceStream.writelineNoIndent('#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference')
-        sourceStream.writeline('void set{upperName}({typeName}&& value)'.format(upperName = upperName, typeName = typeName))
+        sourceStream.writeline('void set{upperName}({typeName}&& value) noexcept'.format(upperName = upperName, typeName = typeName))
         sourceStream.writeline('{{ {prefix}{memberName} = std::move(value); }}'.format(memberName = memberName, prefix = valuePrefix))
         sourceStream.writelineNoIndent('#endif')
 
@@ -481,14 +481,14 @@ class StructField(object):
         upperName = self.getUpperName()
         typeName = self.getTypeName()
         memberName = self.getMemberName()
-        sourceStream.writeline('{typeName}& get{upperName}()'.format(upperName = upperName, typeName = typeName))
+        sourceStream.writeline('{typeName}& get{upperName}() noexcept'.format(upperName = upperName, typeName = typeName))
         sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
 
     def writeConstGetter(self, sourceStream, valuePrefix):
         upperName = self.getUpperName()
         typeName = self.getTypeName()
         memberName = self.getMemberName()
-        sourceStream.writeline('const {typeName}& get{upperName}() const'.format(upperName = upperName, typeName = typeName))
+        sourceStream.writeline('const {typeName}& get{upperName}() const noexcept'.format(upperName = upperName, typeName = typeName))
         sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
 
     def writeMemberInstance(self, sourceStream):
@@ -539,7 +539,7 @@ class StructDataType(DataType):
         if self.getParentTypeName() is None:
             sourceStream.writeline('class OPENRTI_API {name} {{'.format(name = self.getName()))
         else:
-            sourceStream.writeline('class OPENRTI_API {name} : public {parentTypeName} {{'.format(name = self.getName(), parentTypeName = self.getParentTypeName()))
+            sourceStream.writeline('class OPENRTI_API {name} final : public {parentTypeName} {{'.format(name = self.getName(), parentTypeName = self.getParentTypeName()))
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
 
@@ -602,7 +602,7 @@ class StructDataType(DataType):
         sourceStream.popIndent()
         sourceStream.writeline('}')
 
-        sourceStream.writeline('bool operator==(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator==(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         if self.__cow:
             sourceStream.writeline('  if (_impl.get() == rhs._impl.get())')
@@ -612,7 +612,7 @@ class StructDataType(DataType):
             sourceStream.writeline('  if (get{upperName}() != rhs.get{upperName}()) return false;'.format(upperName = upperName))
         sourceStream.writeline('  return true;')
         sourceStream.writeline('}')
-        sourceStream.writeline('bool operator<(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator<(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         if self.__cow:
             sourceStream.writeline('  if (_impl.get() == rhs._impl.get())')
@@ -623,13 +623,13 @@ class StructDataType(DataType):
             sourceStream.writeline('  if (rhs.get{upperName}() < get{upperName}()) return false;'.format(upperName = upperName))
         sourceStream.writeline('  return false;')
         sourceStream.writeline('}')
-        sourceStream.writeline('bool operator!=(const {name}& rhs) const'.format(name = self.getName()))
-        sourceStream.writeline('{ return !operator==(rhs); }')
-        sourceStream.writeline('bool operator>(const {name}& rhs) const'.format(name = self.getName()))
+        #sourceStream.writeline('bool operator!=(const {name}& rhs) const noexcept'.format(name = self.getName()))
+        #sourceStream.writeline('{ return !operator==(rhs); }')
+        sourceStream.writeline('bool operator>(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return rhs.operator<(*this); }')
-        sourceStream.writeline('bool operator>=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator>=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator<(rhs); }')
-        sourceStream.writeline('bool operator<=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator<=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator>(rhs); }')
 
         sourceStream.popIndent()
@@ -637,14 +637,14 @@ class StructDataType(DataType):
         sourceStream.pushIndent()
 
         if self.__cow:
-            sourceStream.writeline('struct OPENRTI_API Implementation : public Referenced {')
+            sourceStream.writeline('struct OPENRTI_API Implementation final : public Referenced {')
             sourceStream.pushIndent()
 
             fieldCount = len(self.getFieldList())
             if fieldCount == 0:
-                sourceStream.writeline('Implementation()'.format(name = self.getName()))
+                sourceStream.writeline('Implementation() noexcept'.format(name = self.getName()))
             else:
-                sourceStream.writeline('Implementation() :'.format(name = self.getName()))
+                sourceStream.writeline('Implementation() noexcept :'.format(name = self.getName()))
             sourceStream.pushIndent()
             index = 0
             for field in self.getFieldList():
@@ -672,7 +672,7 @@ class StructDataType(DataType):
             sourceStream.writeline('Implementation& getImpl()')
             sourceStream.writeline('{')
             sourceStream.writeline('  if (1 < Referenced::count(_impl.get()))')
-            sourceStream.writeline('    _impl = new Implementation(*_impl);')
+            sourceStream.writeline('    _impl = MakeShared<Implementation>(*_impl);')
             sourceStream.writeline('  return *_impl;')
             sourceStream.writeline('}')
             sourceStream.writeline()
@@ -753,37 +753,37 @@ class MessageDataType(StructDataType):
         if self.getParentTypeName() is None:
             sourceStream.writeline('class OPENRTI_API {name} {{'.format(name = self.getName()))
         else:
-            sourceStream.writeline('class OPENRTI_API {name} : public {parentTypeName} {{'.format(name = self.getName(), parentTypeName = self.getParentTypeName()))
+            sourceStream.writeline('class OPENRTI_API {name} final : public {parentTypeName} {{'.format(name = self.getName(), parentTypeName = self.getParentTypeName()))
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
-        sourceStream.writeline('{name}();'.format(name = self.getName()))
-        sourceStream.writeline('virtual ~{name}();'.format(name = self.getName()))
+        sourceStream.writeline('{name}() noexcept;'.format(name = self.getName()))
+        sourceStream.writeline('virtual ~{name}() noexcept;'.format(name = self.getName()))
 
         sourceStream.writeline()
-        sourceStream.writeline('virtual const char* getTypeName() const;')
-        sourceStream.writeline('virtual void out(std::ostream& os) const;')
-        sourceStream.writeline('virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;')
+        sourceStream.writeline('virtual const char* getTypeName() const override;')
+        sourceStream.writeline('virtual void out(std::ostream& os) const override;')
+        sourceStream.writeline('virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;')
         sourceStream.writeline()
 
-        sourceStream.writeline('virtual bool operator==(const AbstractMessage& rhs) const;')
-        sourceStream.writeline('bool operator==(const {name}& rhs) const;'.format(name = self.getName()))
-        sourceStream.writeline('bool operator<(const {name}& rhs) const;'.format(name = self.getName()))
-        sourceStream.writeline('bool operator!=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator==(const AbstractMessage& rhs) const noexcept override;')
+        sourceStream.writeline('bool operator==(const {name}& rhs) const noexcept;'.format(name = self.getName()))
+        sourceStream.writeline('bool operator<(const {name}& rhs) const noexcept;'.format(name = self.getName()))
+        sourceStream.writeline('bool operator!=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator==(rhs); }')
-        sourceStream.writeline('bool operator>(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator>(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return rhs.operator<(*this); }')
-        sourceStream.writeline('bool operator>=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator>=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator<(rhs); }')
-        sourceStream.writeline('bool operator<=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator<=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator>(rhs); }')
         sourceStream.writeline()
 
         if self.getReliableExpression():
-            sourceStream.writeline('virtual bool getReliable() const;')
+            sourceStream.writeline('bool getReliable() const noexcept override;')
             sourceStream.writeline()
 
         if self.getObjectInstanceExpression():
-            sourceStream.writeline('virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;')
+            sourceStream.writeline('virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;')
             sourceStream.writeline()
 
         for field in self.getFieldList():
@@ -806,9 +806,9 @@ class MessageDataType(StructDataType):
     def writeImplementation(self, sourceStream):
         fieldCount = len(self.getFieldList())
         if fieldCount == 0:
-            sourceStream.writeline('{name}::{name}()'.format(name = self.getName()))
+            sourceStream.writeline('{name}::{name}() noexcept'.format(name = self.getName()))
         else:
-            sourceStream.writeline('{name}::{name}() :'.format(name = self.getName()))
+            sourceStream.writeline('{name}::{name}() noexcept :'.format(name = self.getName()))
         sourceStream.pushIndent()
         index = 0
         for field in self.getFieldList():
@@ -821,7 +821,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('{')
         sourceStream.writeline('}')
         sourceStream.writeline()
-        sourceStream.writeline('{name}::~{name}()'.format(name = self.getName()))
+        sourceStream.writeline('{name}::~{name}() noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('}')
         sourceStream.writeline()
@@ -846,7 +846,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline()
 
         sourceStream.writeline('bool')
-        sourceStream.writeline('{name}::operator==(const AbstractMessage& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('{name}::operator==(const AbstractMessage& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  const {name}* message = dynamic_cast<const {name}*>(&rhs);'.format(name = self.getName()))
         sourceStream.writeline('  if (!message)')
@@ -855,7 +855,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
         sourceStream.writeline('bool')
-        sourceStream.writeline('{name}::operator==(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('{name}::operator==(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         for field in self.getFieldList():
             upperName = field.getUpperName()
@@ -864,7 +864,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
         sourceStream.writeline('bool')
-        sourceStream.writeline('{name}::operator<(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('{name}::operator<(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         for field in self.getFieldList():
             upperName = field.getUpperName()
@@ -876,7 +876,7 @@ class MessageDataType(StructDataType):
         if self.getReliableExpression():
             sourceStream.writeline()
             sourceStream.writeline('bool')
-            sourceStream.writeline('{name}::getReliable() const'.format(name = self.getName()))
+            sourceStream.writeline('{name}::getReliable() const noexcept'.format(name = self.getName()))
             sourceStream.writeline('{')
             sourceStream.writeline('  return {expression};'.format(expression = self.getReliableExpression()))
             sourceStream.writeline('}')
@@ -884,7 +884,7 @@ class MessageDataType(StructDataType):
         if self.getObjectInstanceExpression():
             sourceStream.writeline()
             sourceStream.writeline('ObjectInstanceHandle')
-            sourceStream.writeline('{name}::getObjectInstanceHandleForMessage() const'.format(name = self.getName()))
+            sourceStream.writeline('{name}::getObjectInstanceHandleForMessage() const noexcept'.format(name = self.getName()))
             sourceStream.writeline('{')
             sourceStream.writeline('  return {expression};'.format(expression = self.getObjectInstanceExpression()))
             sourceStream.writeline('}')
@@ -1281,17 +1281,17 @@ class MessageEncoding(object):
         sourceStream.writeline('class OPENRTI_LOCAL ' + encodingName + 'MessageEncoding : public AbstractMessageEncoding {')
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
-        sourceStream.writeline(encodingName + 'MessageEncoding();')
-        sourceStream.writeline('virtual ~' + encodingName + 'MessageEncoding();')
+        sourceStream.writeline(encodingName + 'MessageEncoding() noexcept;')
+        sourceStream.writeline('virtual ~' + encodingName + 'MessageEncoding() noexcept;')
         sourceStream.writeline()
 
-        sourceStream.writeline('virtual const char* getName() const;')
+        sourceStream.writeline('const char* getName() const override;')
         sourceStream.writeline()
 
-        sourceStream.writeline('virtual void readPacket(const Buffer& buffer);')
+        sourceStream.writeline('void readPacket(const Buffer& buffer) override;')
         sourceStream.writeline('void decodeBody(const VariableLengthData& variableLengthData);')
         sourceStream.writeline('void decodePayload(const Buffer::const_iterator& i);')
-        sourceStream.writeline('virtual void writeMessage(const AbstractMessage& message);')
+        sourceStream.writeline('void writeMessage(const AbstractMessage& message) override;')
         sourceStream.writeline()
 
         sourceStream.popIndent()
@@ -1432,11 +1432,11 @@ class MessageEncoding(object):
         sourceStream.writeline()
 
 
-        sourceStream.writeline(encodingName + 'MessageEncoding::' + encodingName + 'MessageEncoding()')
+        sourceStream.writeline(encodingName + 'MessageEncoding::' + encodingName + 'MessageEncoding() noexcept')
         sourceStream.writeline('{')
         sourceStream.writeline('}')
         sourceStream.writeline()
-        sourceStream.writeline(encodingName + 'MessageEncoding::~' + encodingName + 'MessageEncoding()')
+        sourceStream.writeline(encodingName + 'MessageEncoding::~' + encodingName + 'MessageEncoding() noexcept')
         sourceStream.writeline('{')
         sourceStream.writeline('}')
         sourceStream.writeline()
@@ -1490,7 +1490,7 @@ class MessageEncoding(object):
                 continue
             sourceStream.writeline('case {opcode}:'.format(opcode = opcode))
             sourceStream.pushIndent()
-            sourceStream.writeline('_message = new {messageName};'.format(messageName = messageName))
+            sourceStream.writeline('_message = MakeShared<{messageName}>();'.format(messageName = messageName))
             sourceStream.writeline('decodeStream.read{messageName}(static_cast<{messageName}&>(*_message));'.format(messageName = messageName))
             sourceStream.writeline('break;')
             sourceStream.popIndent()
@@ -1701,7 +1701,7 @@ class TypeMap(object):
         sourceStream.writeline('class OPENRTI_LOCAL AbstractMessageDispatcher {')
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
-        sourceStream.writeline('virtual ~AbstractMessageDispatcher() {}')
+        sourceStream.writeline('virtual ~AbstractMessageDispatcher() noexcept {}')
         sourceStream.writeline()
 
         for t in self.__typeList:
@@ -1718,13 +1718,13 @@ class TypeMap(object):
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
         sourceStream.writeline('FunctorMessageDispatcher(T& t) : _t(t) {}')
-        sourceStream.writeline('virtual ~FunctorMessageDispatcher() {}')
+        sourceStream.writeline('virtual ~FunctorMessageDispatcher() noexcept {}')
         sourceStream.writeline()
 
         for t in self.__typeList:
             if not t.isMessage():
                 continue
-            sourceStream.writeline('virtual void accept(const {name}& message) const {{ _t(message); }}'.format(name = t.getName()))
+            sourceStream.writeline('virtual void accept(const {name}& message) const override {{ _t(message); }}'.format(name = t.getName()))
 
         sourceStream.popIndent()
         sourceStream.writeline('private:')
@@ -1739,13 +1739,13 @@ class TypeMap(object):
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
         sourceStream.writeline('ConstFunctorMessageDispatcher(const T& t) : _t(t) {}')
-        sourceStream.writeline('virtual ~ConstFunctorMessageDispatcher() {}')
+        sourceStream.writeline('virtual ~ConstFunctorMessageDispatcher() noexcept {}')
         sourceStream.writeline()
 
         for t in self.__typeList:
             if not t.isMessage():
                 continue
-            sourceStream.writeline('virtual void accept(const {name}& message) const {{ _t(message); }}'.format(name = t.getName()))
+            sourceStream.writeline('virtual void accept(const {name}& message) const override {{ _t(message); }}'.format(name = t.getName()))
 
         sourceStream.popIndent()
         sourceStream.writeline('private:')
@@ -1811,8 +1811,11 @@ elif outputMode == 'MessageEncodingImplementation':
     typeMap.writeEncodingImplementation(SourceStream(SourceStream(sys.stdout)), messageEncoding)
 else:
     # This is the shortcut for 'just do all output into the current directory'
+    print('write ' + 'Message.h')
     typeMap.writeDeclaration(SourceStream(open('Message.h', 'w+')))
+    print('write ' + 'Message.cpp')
     typeMap.writeImplementation(SourceStream(open('Message.cpp', 'w+')))
+    print('write ' + 'AbstractMessageDispatcher.h')
     typeMap.writeDispatcher(SourceStream(open('AbstractMessageDispatcher.h', 'w+')))
 
     messageEncoding = TightBE1MessageEncoding()

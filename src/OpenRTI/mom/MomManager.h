@@ -45,9 +45,11 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
     //----------------------------------------------------------
     //                      CONSTRUCTORS
     //----------------------------------------------------------
-
+    MomManager() noexcept = delete;
     MomManager(MomServer* rtiAmb, FederateHandle ownerFederateHandle);
-    ~MomManager();
+    ~MomManager() noexcept;
+    MomManager& operator=(const MomManager&) = delete;
+    MomManager& operator=(MomManager&&) = delete;
     //----------------------------------------------------------
     //                    INSTANCE METHODS
     //----------------------------------------------------------
@@ -117,7 +119,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
       {
         if (mRoot != nullptr)
         {
-          if (mRoot->type == MomType::Attribute)
+          if (mRoot->getType() == MomType::Attribute)
           {
             if (name == mRoot->getName())
             {
@@ -127,37 +129,37 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
           else
           {
             auto* currentNode = mRoot;
-            while (currentNode != nullptr && currentNode->type == MomType::Object)
+            while (currentNode != nullptr && currentNode->getType() == MomType::Object)
             {
               for (auto* childNode : currentNode->children)
               {
-                if (childNode->type == MomType::Attribute && childNode->getName() == name)
+                if (childNode->getType() == MomType::Attribute && childNode->getName() == name)
                 {
                   return AttributesAccessor(childNode);
                 }
               }
-              currentNode = currentNode->parent;
+              currentNode = currentNode->getParent();
             }
           }
         }
         return AttributesAccessor();
       }
-      operator AttributeHandle() const { return (mRoot != nullptr && mRoot->type == MomType::Attribute) ? mRoot->attributeHandle : AttributeHandle(); }
+      operator AttributeHandle() const { return (mRoot != nullptr && mRoot->getType() == MomType::Attribute) ? mRoot->attributeHandle : AttributeHandle(); }
       operator AttributeHandleSet() const
       {
         AttributeHandleSet result;
         MomTreeNode* currentNode = mRoot;
-        while (currentNode != nullptr && currentNode->type == MomType::Object)
+        while (currentNode != nullptr && currentNode->getType() == MomType::Object)
         {
           for (MomTreeNode* child : currentNode->children)
           {
-            if (child->type == MomType::Attribute)
+            if (child->getType() == MomType::Attribute)
             {
               assert(child->attributeHandle.valid());
               result.insert(child->attributeHandle);
             }
           }
-          currentNode = currentNode->parent;
+          currentNode = currentNode->getParent();
         }
         return result;
       }
@@ -200,7 +202,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
       {
         if (mRoot != nullptr)
         {
-          if (mRoot->type == MomType::Object && mRoot->parent == nullptr)
+          if (mRoot->getType() == MomType::Object && mRoot->getParent() == nullptr)
           {
             if (name == mRoot->getName())
             {
@@ -209,7 +211,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
           }
           for (auto* childNode : mRoot->children)
           {
-            if (childNode->type == MomType::Object && childNode->getName() == name)
+            if (childNode->getType() == MomType::Object && childNode->getName() == name)
             {
               return ObjectClassAccessor(childNode);
             }
@@ -254,7 +256,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
       {
         if (mRoot != nullptr)
         {
-          if (mRoot->type == MomType::Parameter)
+          if (mRoot->getType() == MomType::Parameter)
           {
             if (name == mRoot->getName())
             {
@@ -264,16 +266,16 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
           else
           {
             auto* currentNode = mRoot;
-            while (currentNode != nullptr && currentNode->type == MomType::Interaction)
+            while (currentNode != nullptr && currentNode->getType() == MomType::Interaction)
             {
               for (auto* childNode : currentNode->children)
               {
-                if (childNode->type == MomType::Parameter && childNode->getName() == name)
+                if (childNode->getType() == MomType::Parameter && childNode->getName() == name)
                 {
                   return ParametersAccessor(childNode);
                 }
               }
-              currentNode = currentNode->parent;
+              currentNode = currentNode->getParent();
             }
           }
         }
@@ -284,17 +286,17 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
       {
         ParameterHandleSet result;
         MomTreeNode* currentNode = mRoot;
-        while (currentNode != nullptr && currentNode->type == MomType::Interaction)
+        while (currentNode != nullptr && currentNode->getType() == MomType::Interaction)
         {
           for (MomTreeNode* child : currentNode->children)
           {
-            if (child->type == MomType::Parameter)
+            if (child->getType() == MomType::Parameter)
             {
               assert(child->parameterHandle.valid());
               result.insert(child->parameterHandle);
             }
           }
-          currentNode = currentNode->parent;
+          currentNode = currentNode->getParent();
         }
         return result;
       }
@@ -337,7 +339,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
       {
         if (mRoot != nullptr)
         {
-          if (mRoot->type == MomType::Interaction && mRoot->parent == nullptr)
+          if (mRoot->getType() == MomType::Interaction && mRoot->getParent() == nullptr)
           {
             if (name == mRoot->getName())
             {
@@ -461,7 +463,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
        */
       MomTreeNodeBuilder&  end()
       {
-        this->mContextStack.pop_front();
+        mContextStack.pop_front();
         return *this;
       }
 
@@ -470,7 +472,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
        */
       MomTreeNode* getContext()
       {
-        return this->mContextStack.front();
+        return mContextStack.front();
       }
     };
 
@@ -484,26 +486,26 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
 
     struct MomTreeNode
     {
-      MomTreeNode* parent;
+      MomTreeNode* mParent;
       std::list<MomTreeNode*> children;
       std::string mName;
       ObjectClassHandle objectClassHandle;
       AttributeHandle attributeHandle;
       InteractionClassHandle interactionClassHandle;
       ParameterHandle parameterHandle;
-      MomType type;
-      std::string datatype; // For attributes and parameters, only for 1516+ (all mom types are strings in 1.3)
+      MomType mType;
+      std::string mDatatype; // For attributes and parameters, only for 1516+ (all mom types are strings in 1.3)
 
 
       MomTreeNode(std::string name,
                   MomType type,
                   ObjectClassHandle handle)
       {
-        this->mName = name;
-        this->parent = nullptr;
-        this->objectClassHandle = handle;
-        this->type = type;
-        this->datatype = "HLAasciiString";
+        mName = name;
+        mParent = nullptr;
+        objectClassHandle = handle;
+        mType = type;
+        mDatatype = "HLAasciiString";
       }
 
       MomTreeNode(std::string name,
@@ -511,22 +513,22 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
                   AttributeHandle handle,
                   std::string datatype)
       {
-        this->mName = name;
-        this->parent = nullptr;
-        this->attributeHandle = handle;
-        this->type = type;
-        this->datatype = "HLAasciiString";
+        mName = name;
+        mParent = nullptr;
+        attributeHandle = handle;
+        mType = type;
+        datatype = "HLAasciiString";
       }
 
       MomTreeNode(std::string name,
                   MomType type,
                   InteractionClassHandle handle)
       {
-        this->mName = name;
-        this->parent = nullptr;
-        this->interactionClassHandle = handle;
-        this->type = type;
-        this->datatype = datatype;
+        mName = name;
+        mParent = nullptr;
+        interactionClassHandle = handle;
+        mType = type;
+        mDatatype = mDatatype;
       }
 
       MomTreeNode(std::string name,
@@ -534,32 +536,32 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
                   ParameterHandle handle,
                   std::string datatype)
       {
-        this->mName = name;
-        this->parent = nullptr;
-        this->parameterHandle = handle;
-        this->type = type;
-        this->datatype = datatype;
+        mName = name;
+        mParent = nullptr;
+        parameterHandle = handle;
+        mType = type;
+        datatype = datatype;
       }
 
-      ~MomTreeNode();
+      ~MomTreeNode() noexcept;
       MomTreeNode* getParent()
       {
-        return this->parent;
+        return mParent;
       }
 
-      MomType getType() const
+      MomType getType() const noexcept
       {
-        return this->type;
+        return mType;
       }
 
       //std::list<MomTreeNode*>& getChildren()
       //{
-      //  return this->children;
+      //  return children;
       //}
 
-      const std::list<MomTreeNode*>& getChildren() const
+      const std::list<MomTreeNode*>& getChildren() const noexcept
       {
-        return this->children;
+        return children;
       }
 
       /**
@@ -572,7 +574,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
        */
       const std::string getName() const
       {
-        return this->mName;
+        return mName;
       }
 
       /**
@@ -583,11 +585,11 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
        *
        * @see #getName()
        */
-      std::string getQualifiedName() const;
+      const std::string getQualifiedName() const;
 
       const std::string& getDatatype() const
       {
-        return this->datatype;
+        return mDatatype;
       }
 
       void addChild(MomTreeNode* node);

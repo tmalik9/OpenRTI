@@ -433,26 +433,26 @@ public:
       : _lowerBound(lowerBound)
       , _upperBound(upperBound)
     { }
-  void setLowerBound(const Unsigned& value)
+  void setLowerBound(const Unsigned& value) noexcept
   { _lowerBound = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLowerBound(Unsigned&& value)
+  void setLowerBound(Unsigned&& value) noexcept
   { _lowerBound = std::move(value); }
 #endif
-  Unsigned& getLowerBound()
+  Unsigned& getLowerBound() noexcept
   { return _lowerBound; }
-  const Unsigned& getLowerBound() const
+  const Unsigned& getLowerBound() const noexcept
   { return _lowerBound; }
 
-  void setUpperBound(const Unsigned& value)
+  void setUpperBound(const Unsigned& value) noexcept
   { _upperBound = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpperBound(Unsigned&& value)
+  void setUpperBound(Unsigned&& value) noexcept
   { _upperBound = std::move(value); }
 #endif
-  Unsigned& getUpperBound()
+  Unsigned& getUpperBound() noexcept
   { return _upperBound; }
-  const Unsigned& getUpperBound() const
+  const Unsigned& getUpperBound() const noexcept
   { return _upperBound; }
 
   RangeBoundsValue& swap(RangeBoundsValue& rhs)
@@ -461,13 +461,13 @@ public:
     std::swap(_upperBound, rhs._upperBound);
     return *this;
   }
-  bool operator==(const RangeBoundsValue& rhs) const
+  bool operator==(const RangeBoundsValue& rhs) const noexcept
   {
     if (getLowerBound() != rhs.getLowerBound()) return false;
     if (getUpperBound() != rhs.getUpperBound()) return false;
     return true;
   }
-  bool operator<(const RangeBoundsValue& rhs) const
+  bool operator<(const RangeBoundsValue& rhs) const noexcept
   {
     if (getLowerBound() < rhs.getLowerBound()) return true;
     if (rhs.getLowerBound() < getLowerBound()) return false;
@@ -475,13 +475,11 @@ public:
     if (rhs.getUpperBound() < getUpperBound()) return false;
     return false;
   }
-  bool operator!=(const RangeBoundsValue& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const RangeBoundsValue& rhs) const
+  bool operator>(const RangeBoundsValue& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RangeBoundsValue& rhs) const
+  bool operator>=(const RangeBoundsValue& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RangeBoundsValue& rhs) const
+  bool operator<=(const RangeBoundsValue& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   Unsigned _lowerBound;
@@ -519,26 +517,26 @@ public:
       : _attributeHandle(attributeHandle)
       , _ownerFederate(ownerFederate)
     { }
-  void setAttributeHandle(const AttributeHandle& value)
+  void setAttributeHandle(const AttributeHandle& value) noexcept
   { _attributeHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandle(AttributeHandle&& value)
+  void setAttributeHandle(AttributeHandle&& value) noexcept
   { _attributeHandle = std::move(value); }
 #endif
-  AttributeHandle& getAttributeHandle()
+  AttributeHandle& getAttributeHandle() noexcept
   { return _attributeHandle; }
-  const AttributeHandle& getAttributeHandle() const
+  const AttributeHandle& getAttributeHandle() const noexcept
   { return _attributeHandle; }
 
-  void setOwnerFederate(const FederateHandle& value)
+  void setOwnerFederate(const FederateHandle& value) noexcept
   { _ownerFederate = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOwnerFederate(FederateHandle&& value)
+  void setOwnerFederate(FederateHandle&& value) noexcept
   { _ownerFederate = std::move(value); }
 #endif
-  FederateHandle& getOwnerFederate()
+  FederateHandle& getOwnerFederate() noexcept
   { return _ownerFederate; }
-  const FederateHandle& getOwnerFederate() const
+  const FederateHandle& getOwnerFederate() const noexcept
   { return _ownerFederate; }
 
   AttributeState& swap(AttributeState& rhs)
@@ -547,13 +545,13 @@ public:
     std::swap(_ownerFederate, rhs._ownerFederate);
     return *this;
   }
-  bool operator==(const AttributeState& rhs) const
+  bool operator==(const AttributeState& rhs) const noexcept
   {
     if (getAttributeHandle() != rhs.getAttributeHandle()) return false;
     if (getOwnerFederate() != rhs.getOwnerFederate()) return false;
     return true;
   }
-  bool operator<(const AttributeState& rhs) const
+  bool operator<(const AttributeState& rhs) const noexcept
   {
     if (getAttributeHandle() < rhs.getAttributeHandle()) return true;
     if (rhs.getAttributeHandle() < getAttributeHandle()) return false;
@@ -561,13 +559,11 @@ public:
     if (rhs.getOwnerFederate() < getOwnerFederate()) return false;
     return false;
   }
-  bool operator!=(const AttributeState& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const AttributeState& rhs) const
+  bool operator>(const AttributeState& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AttributeState& rhs) const
+  bool operator>=(const AttributeState& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AttributeState& rhs) const
+  bool operator<=(const AttributeState& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   AttributeHandle _attributeHandle;
@@ -585,26 +581,26 @@ public:
       : _parameterHandle(parameterHandle)
       , _value(value)
     { }
-  void setParameterHandle(const ParameterHandle& value)
+  void setParameterHandle(const ParameterHandle& value) noexcept
   { _parameterHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterHandle(ParameterHandle&& value)
+  void setParameterHandle(ParameterHandle&& value) noexcept
   { _parameterHandle = std::move(value); }
 #endif
-  ParameterHandle& getParameterHandle()
+  ParameterHandle& getParameterHandle() noexcept
   { return _parameterHandle; }
-  const ParameterHandle& getParameterHandle() const
+  const ParameterHandle& getParameterHandle() const noexcept
   { return _parameterHandle; }
 
-  void setValue(const VariableLengthData& value)
+  void setValue(const VariableLengthData& value) noexcept
   { _value = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setValue(VariableLengthData&& value)
+  void setValue(VariableLengthData&& value) noexcept
   { _value = std::move(value); }
 #endif
-  VariableLengthData& getValue()
+  VariableLengthData& getValue() noexcept
   { return _value; }
-  const VariableLengthData& getValue() const
+  const VariableLengthData& getValue() const noexcept
   { return _value; }
 
   ParameterValue& swap(ParameterValue& rhs)
@@ -613,13 +609,13 @@ public:
     _value.swap(rhs._value);
     return *this;
   }
-  bool operator==(const ParameterValue& rhs) const
+  bool operator==(const ParameterValue& rhs) const noexcept
   {
     if (getParameterHandle() != rhs.getParameterHandle()) return false;
     if (getValue() != rhs.getValue()) return false;
     return true;
   }
-  bool operator<(const ParameterValue& rhs) const
+  bool operator<(const ParameterValue& rhs) const noexcept
   {
     if (getParameterHandle() < rhs.getParameterHandle()) return true;
     if (rhs.getParameterHandle() < getParameterHandle()) return false;
@@ -627,13 +623,11 @@ public:
     if (rhs.getValue() < getValue()) return false;
     return false;
   }
-  bool operator!=(const ParameterValue& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const ParameterValue& rhs) const
+  bool operator>(const ParameterValue& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ParameterValue& rhs) const
+  bool operator>=(const ParameterValue& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ParameterValue& rhs) const
+  bool operator<=(const ParameterValue& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   ParameterHandle _parameterHandle;
@@ -651,26 +645,26 @@ public:
       : _attributeHandle(attributeHandle)
       , _value(value)
     { }
-  void setAttributeHandle(const AttributeHandle& value)
+  void setAttributeHandle(const AttributeHandle& value) noexcept
   { _attributeHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandle(AttributeHandle&& value)
+  void setAttributeHandle(AttributeHandle&& value) noexcept
   { _attributeHandle = std::move(value); }
 #endif
-  AttributeHandle& getAttributeHandle()
+  AttributeHandle& getAttributeHandle() noexcept
   { return _attributeHandle; }
-  const AttributeHandle& getAttributeHandle() const
+  const AttributeHandle& getAttributeHandle() const noexcept
   { return _attributeHandle; }
 
-  void setValue(const VariableLengthData& value)
+  void setValue(const VariableLengthData& value) noexcept
   { _value = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setValue(VariableLengthData&& value)
+  void setValue(VariableLengthData&& value) noexcept
   { _value = std::move(value); }
 #endif
-  VariableLengthData& getValue()
+  VariableLengthData& getValue() noexcept
   { return _value; }
-  const VariableLengthData& getValue() const
+  const VariableLengthData& getValue() const noexcept
   { return _value; }
 
   AttributeValue& swap(AttributeValue& rhs)
@@ -679,13 +673,13 @@ public:
     _value.swap(rhs._value);
     return *this;
   }
-  bool operator==(const AttributeValue& rhs) const
+  bool operator==(const AttributeValue& rhs) const noexcept
   {
     if (getAttributeHandle() != rhs.getAttributeHandle()) return false;
     if (getValue() != rhs.getValue()) return false;
     return true;
   }
-  bool operator<(const AttributeValue& rhs) const
+  bool operator<(const AttributeValue& rhs) const noexcept
   {
     if (getAttributeHandle() < rhs.getAttributeHandle()) return true;
     if (rhs.getAttributeHandle() < getAttributeHandle()) return false;
@@ -693,13 +687,11 @@ public:
     if (rhs.getValue() < getValue()) return false;
     return false;
   }
-  bool operator!=(const AttributeValue& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const AttributeValue& rhs) const
+  bool operator>(const AttributeValue& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AttributeValue& rhs) const
+  bool operator>=(const AttributeValue& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AttributeValue& rhs) const
+  bool operator<=(const AttributeValue& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   AttributeHandle _attributeHandle;
@@ -725,26 +717,26 @@ public:
       : _federationExecutionName(federationExecutionName)
       , _logicalTimeFactoryName(logicalTimeFactoryName)
     { }
-  void setFederationExecutionName(const String& value)
+  void setFederationExecutionName(const String& value) noexcept
   { _federationExecutionName = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecutionName(String&& value)
+  void setFederationExecutionName(String&& value) noexcept
   { _federationExecutionName = std::move(value); }
 #endif
-  String& getFederationExecutionName()
+  String& getFederationExecutionName() noexcept
   { return _federationExecutionName; }
-  const String& getFederationExecutionName() const
+  const String& getFederationExecutionName() const noexcept
   { return _federationExecutionName; }
 
-  void setLogicalTimeFactoryName(const String& value)
+  void setLogicalTimeFactoryName(const String& value) noexcept
   { _logicalTimeFactoryName = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLogicalTimeFactoryName(String&& value)
+  void setLogicalTimeFactoryName(String&& value) noexcept
   { _logicalTimeFactoryName = std::move(value); }
 #endif
-  String& getLogicalTimeFactoryName()
+  String& getLogicalTimeFactoryName() noexcept
   { return _logicalTimeFactoryName; }
-  const String& getLogicalTimeFactoryName() const
+  const String& getLogicalTimeFactoryName() const noexcept
   { return _logicalTimeFactoryName; }
 
   FederationExecutionInformation& swap(FederationExecutionInformation& rhs)
@@ -753,13 +745,13 @@ public:
     _logicalTimeFactoryName.swap(rhs._logicalTimeFactoryName);
     return *this;
   }
-  bool operator==(const FederationExecutionInformation& rhs) const
+  bool operator==(const FederationExecutionInformation& rhs) const noexcept
   {
     if (getFederationExecutionName() != rhs.getFederationExecutionName()) return false;
     if (getLogicalTimeFactoryName() != rhs.getLogicalTimeFactoryName()) return false;
     return true;
   }
-  bool operator<(const FederationExecutionInformation& rhs) const
+  bool operator<(const FederationExecutionInformation& rhs) const noexcept
   {
     if (getFederationExecutionName() < rhs.getFederationExecutionName()) return true;
     if (rhs.getFederationExecutionName() < getFederationExecutionName()) return false;
@@ -767,13 +759,11 @@ public:
     if (rhs.getLogicalTimeFactoryName() < getLogicalTimeFactoryName()) return false;
     return false;
   }
-  bool operator!=(const FederationExecutionInformation& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FederationExecutionInformation& rhs) const
+  bool operator>(const FederationExecutionInformation& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FederationExecutionInformation& rhs) const
+  bool operator>=(const FederationExecutionInformation& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FederationExecutionInformation& rhs) const
+  bool operator<=(const FederationExecutionInformation& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   String _federationExecutionName;
@@ -793,26 +783,26 @@ public:
   FOMStringSimpleDataType() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setRepresentation(const String& value)
+  void setRepresentation(const String& value) noexcept
   { getImpl()._representation = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRepresentation(String&& value)
+  void setRepresentation(String&& value) noexcept
   { getImpl()._representation = std::move(value); }
 #endif
-  String& getRepresentation()
+  String& getRepresentation() noexcept
   { return getImpl()._representation; }
-  const String& getRepresentation() const
+  const String& getRepresentation() const noexcept
   { return getConstImpl()._representation; }
 
   FOMStringSimpleDataType& swap(FOMStringSimpleDataType& rhs)
@@ -820,7 +810,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringSimpleDataType& rhs) const
+  bool operator==(const FOMStringSimpleDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -828,7 +818,7 @@ public:
     if (getRepresentation() != rhs.getRepresentation()) return false;
     return true;
   }
-  bool operator<(const FOMStringSimpleDataType& rhs) const
+  bool operator<(const FOMStringSimpleDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -838,17 +828,15 @@ public:
     if (rhs.getRepresentation() < getRepresentation()) return false;
     return false;
   }
-  bool operator!=(const FOMStringSimpleDataType& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringSimpleDataType& rhs) const
+  bool operator>(const FOMStringSimpleDataType& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringSimpleDataType& rhs) const
+  bool operator>=(const FOMStringSimpleDataType& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringSimpleDataType& rhs) const
+  bool operator<=(const FOMStringSimpleDataType& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _representation()
     { }
@@ -864,7 +852,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -878,26 +866,26 @@ public:
   FOMStringEnumerator() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setValue(const Unsigned& value)
+  void setValue(const Unsigned& value) noexcept
   { getImpl()._value = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setValue(Unsigned&& value)
+  void setValue(Unsigned&& value) noexcept
   { getImpl()._value = std::move(value); }
 #endif
-  Unsigned& getValue()
+  Unsigned& getValue() noexcept
   { return getImpl()._value; }
-  const Unsigned& getValue() const
+  const Unsigned& getValue() const noexcept
   { return getConstImpl()._value; }
 
   FOMStringEnumerator& swap(FOMStringEnumerator& rhs)
@@ -905,7 +893,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringEnumerator& rhs) const
+  bool operator==(const FOMStringEnumerator& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -913,7 +901,7 @@ public:
     if (getValue() != rhs.getValue()) return false;
     return true;
   }
-  bool operator<(const FOMStringEnumerator& rhs) const
+  bool operator<(const FOMStringEnumerator& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -923,17 +911,15 @@ public:
     if (rhs.getValue() < getValue()) return false;
     return false;
   }
-  bool operator!=(const FOMStringEnumerator& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringEnumerator& rhs) const
+  bool operator>(const FOMStringEnumerator& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringEnumerator& rhs) const
+  bool operator>=(const FOMStringEnumerator& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringEnumerator& rhs) const
+  bool operator<=(const FOMStringEnumerator& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _value()
     { }
@@ -949,7 +935,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -963,37 +949,37 @@ public:
   FOMStringEnumeratedDataType() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setRepresentation(const String& value)
+  void setRepresentation(const String& value) noexcept
   { getImpl()._representation = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRepresentation(String&& value)
+  void setRepresentation(String&& value) noexcept
   { getImpl()._representation = std::move(value); }
 #endif
-  String& getRepresentation()
+  String& getRepresentation() noexcept
   { return getImpl()._representation; }
-  const String& getRepresentation() const
+  const String& getRepresentation() const noexcept
   { return getConstImpl()._representation; }
 
-  void setEnumerators(const FOMStringEnumeratorList& value)
+  void setEnumerators(const FOMStringEnumeratorList& value) noexcept
   { getImpl()._enumerators = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEnumerators(FOMStringEnumeratorList&& value)
+  void setEnumerators(FOMStringEnumeratorList&& value) noexcept
   { getImpl()._enumerators = std::move(value); }
 #endif
-  FOMStringEnumeratorList& getEnumerators()
+  FOMStringEnumeratorList& getEnumerators() noexcept
   { return getImpl()._enumerators; }
-  const FOMStringEnumeratorList& getEnumerators() const
+  const FOMStringEnumeratorList& getEnumerators() const noexcept
   { return getConstImpl()._enumerators; }
 
   FOMStringEnumeratedDataType& swap(FOMStringEnumeratedDataType& rhs)
@@ -1001,7 +987,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringEnumeratedDataType& rhs) const
+  bool operator==(const FOMStringEnumeratedDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1010,7 +996,7 @@ public:
     if (getEnumerators() != rhs.getEnumerators()) return false;
     return true;
   }
-  bool operator<(const FOMStringEnumeratedDataType& rhs) const
+  bool operator<(const FOMStringEnumeratedDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1022,17 +1008,15 @@ public:
     if (rhs.getEnumerators() < getEnumerators()) return false;
     return false;
   }
-  bool operator!=(const FOMStringEnumeratedDataType& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringEnumeratedDataType& rhs) const
+  bool operator>(const FOMStringEnumeratedDataType& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringEnumeratedDataType& rhs) const
+  bool operator>=(const FOMStringEnumeratedDataType& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringEnumeratedDataType& rhs) const
+  bool operator<=(const FOMStringEnumeratedDataType& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _representation(),
       _enumerators()
@@ -1050,7 +1034,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1064,48 +1048,48 @@ public:
   FOMStringArrayDataType() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const String& value)
+  void setDataType(const String& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(String&& value)
+  void setDataType(String&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  String& getDataType()
+  String& getDataType() noexcept
   { return getImpl()._dataType; }
-  const String& getDataType() const
+  const String& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
-  void setCardinality(const String& value)
+  void setCardinality(const String& value) noexcept
   { getImpl()._cardinality = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCardinality(String&& value)
+  void setCardinality(String&& value) noexcept
   { getImpl()._cardinality = std::move(value); }
 #endif
-  String& getCardinality()
+  String& getCardinality() noexcept
   { return getImpl()._cardinality; }
-  const String& getCardinality() const
+  const String& getCardinality() const noexcept
   { return getConstImpl()._cardinality; }
 
-  void setEncoding(const String& value)
+  void setEncoding(const String& value) noexcept
   { getImpl()._encoding = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEncoding(String&& value)
+  void setEncoding(String&& value) noexcept
   { getImpl()._encoding = std::move(value); }
 #endif
-  String& getEncoding()
+  String& getEncoding() noexcept
   { return getImpl()._encoding; }
-  const String& getEncoding() const
+  const String& getEncoding() const noexcept
   { return getConstImpl()._encoding; }
 
   FOMStringArrayDataType& swap(FOMStringArrayDataType& rhs)
@@ -1113,7 +1097,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringArrayDataType& rhs) const
+  bool operator==(const FOMStringArrayDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1123,7 +1107,7 @@ public:
     if (getEncoding() != rhs.getEncoding()) return false;
     return true;
   }
-  bool operator<(const FOMStringArrayDataType& rhs) const
+  bool operator<(const FOMStringArrayDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1137,17 +1121,15 @@ public:
     if (rhs.getEncoding() < getEncoding()) return false;
     return false;
   }
-  bool operator!=(const FOMStringArrayDataType& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringArrayDataType& rhs) const
+  bool operator>(const FOMStringArrayDataType& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringArrayDataType& rhs) const
+  bool operator>=(const FOMStringArrayDataType& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringArrayDataType& rhs) const
+  bool operator<=(const FOMStringArrayDataType& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dataType(),
       _cardinality(),
@@ -1167,7 +1149,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1181,26 +1163,26 @@ public:
   FOMStringFixedRecordField() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const Unsigned& value)
+  void setDataType(const Unsigned& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(Unsigned&& value)
+  void setDataType(Unsigned&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  Unsigned& getDataType()
+  Unsigned& getDataType() noexcept
   { return getImpl()._dataType; }
-  const Unsigned& getDataType() const
+  const Unsigned& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
   FOMStringFixedRecordField& swap(FOMStringFixedRecordField& rhs)
@@ -1208,7 +1190,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringFixedRecordField& rhs) const
+  bool operator==(const FOMStringFixedRecordField& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1216,7 +1198,7 @@ public:
     if (getDataType() != rhs.getDataType()) return false;
     return true;
   }
-  bool operator<(const FOMStringFixedRecordField& rhs) const
+  bool operator<(const FOMStringFixedRecordField& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1226,17 +1208,15 @@ public:
     if (rhs.getDataType() < getDataType()) return false;
     return false;
   }
-  bool operator!=(const FOMStringFixedRecordField& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringFixedRecordField& rhs) const
+  bool operator>(const FOMStringFixedRecordField& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringFixedRecordField& rhs) const
+  bool operator>=(const FOMStringFixedRecordField& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringFixedRecordField& rhs) const
+  bool operator<=(const FOMStringFixedRecordField& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dataType()
     { }
@@ -1252,7 +1232,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1266,37 +1246,37 @@ public:
   FOMStringFixedRecordDataType() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setEncoding(const String& value)
+  void setEncoding(const String& value) noexcept
   { getImpl()._encoding = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEncoding(String&& value)
+  void setEncoding(String&& value) noexcept
   { getImpl()._encoding = std::move(value); }
 #endif
-  String& getEncoding()
+  String& getEncoding() noexcept
   { return getImpl()._encoding; }
-  const String& getEncoding() const
+  const String& getEncoding() const noexcept
   { return getConstImpl()._encoding; }
 
-  void setFields(const FOMStringFixedRecordFieldList& value)
+  void setFields(const FOMStringFixedRecordFieldList& value) noexcept
   { getImpl()._fields = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFields(FOMStringFixedRecordFieldList&& value)
+  void setFields(FOMStringFixedRecordFieldList&& value) noexcept
   { getImpl()._fields = std::move(value); }
 #endif
-  FOMStringFixedRecordFieldList& getFields()
+  FOMStringFixedRecordFieldList& getFields() noexcept
   { return getImpl()._fields; }
-  const FOMStringFixedRecordFieldList& getFields() const
+  const FOMStringFixedRecordFieldList& getFields() const noexcept
   { return getConstImpl()._fields; }
 
   FOMStringFixedRecordDataType& swap(FOMStringFixedRecordDataType& rhs)
@@ -1304,7 +1284,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringFixedRecordDataType& rhs) const
+  bool operator==(const FOMStringFixedRecordDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1313,7 +1293,7 @@ public:
     if (getFields() != rhs.getFields()) return false;
     return true;
   }
-  bool operator<(const FOMStringFixedRecordDataType& rhs) const
+  bool operator<(const FOMStringFixedRecordDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1325,17 +1305,15 @@ public:
     if (rhs.getFields() < getFields()) return false;
     return false;
   }
-  bool operator!=(const FOMStringFixedRecordDataType& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringFixedRecordDataType& rhs) const
+  bool operator>(const FOMStringFixedRecordDataType& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringFixedRecordDataType& rhs) const
+  bool operator>=(const FOMStringFixedRecordDataType& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringFixedRecordDataType& rhs) const
+  bool operator<=(const FOMStringFixedRecordDataType& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _encoding(),
       _fields()
@@ -1353,7 +1331,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1367,37 +1345,37 @@ public:
   FOMStringVariantRecordAlternative() : 
     _impl(new Implementation())
   { }
-  void setEnumerator(const String& value)
+  void setEnumerator(const String& value) noexcept
   { getImpl()._enumerator = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEnumerator(String&& value)
+  void setEnumerator(String&& value) noexcept
   { getImpl()._enumerator = std::move(value); }
 #endif
-  String& getEnumerator()
+  String& getEnumerator() noexcept
   { return getImpl()._enumerator; }
-  const String& getEnumerator() const
+  const String& getEnumerator() const noexcept
   { return getConstImpl()._enumerator; }
 
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const Unsigned& value)
+  void setDataType(const Unsigned& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(Unsigned&& value)
+  void setDataType(Unsigned&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  Unsigned& getDataType()
+  Unsigned& getDataType() noexcept
   { return getImpl()._dataType; }
-  const Unsigned& getDataType() const
+  const Unsigned& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
   FOMStringVariantRecordAlternative& swap(FOMStringVariantRecordAlternative& rhs)
@@ -1405,7 +1383,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringVariantRecordAlternative& rhs) const
+  bool operator==(const FOMStringVariantRecordAlternative& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1414,7 +1392,7 @@ public:
     if (getDataType() != rhs.getDataType()) return false;
     return true;
   }
-  bool operator<(const FOMStringVariantRecordAlternative& rhs) const
+  bool operator<(const FOMStringVariantRecordAlternative& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1426,17 +1404,15 @@ public:
     if (rhs.getDataType() < getDataType()) return false;
     return false;
   }
-  bool operator!=(const FOMStringVariantRecordAlternative& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringVariantRecordAlternative& rhs) const
+  bool operator>(const FOMStringVariantRecordAlternative& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringVariantRecordAlternative& rhs) const
+  bool operator>=(const FOMStringVariantRecordAlternative& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringVariantRecordAlternative& rhs) const
+  bool operator<=(const FOMStringVariantRecordAlternative& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _enumerator(),
       _name(),
       _dataType()
@@ -1454,7 +1430,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1468,59 +1444,59 @@ public:
   FOMStringVariantRecordDataType() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDiscriminant(const String& value)
+  void setDiscriminant(const String& value) noexcept
   { getImpl()._discriminant = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDiscriminant(String&& value)
+  void setDiscriminant(String&& value) noexcept
   { getImpl()._discriminant = std::move(value); }
 #endif
-  String& getDiscriminant()
+  String& getDiscriminant() noexcept
   { return getImpl()._discriminant; }
-  const String& getDiscriminant() const
+  const String& getDiscriminant() const noexcept
   { return getConstImpl()._discriminant; }
 
-  void setDataType(const String& value)
+  void setDataType(const String& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(String&& value)
+  void setDataType(String&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  String& getDataType()
+  String& getDataType() noexcept
   { return getImpl()._dataType; }
-  const String& getDataType() const
+  const String& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
-  void setAlternatives(const FOMStringVariantRecordAlternativeList& value)
+  void setAlternatives(const FOMStringVariantRecordAlternativeList& value) noexcept
   { getImpl()._alternatives = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAlternatives(FOMStringVariantRecordAlternativeList&& value)
+  void setAlternatives(FOMStringVariantRecordAlternativeList&& value) noexcept
   { getImpl()._alternatives = std::move(value); }
 #endif
-  FOMStringVariantRecordAlternativeList& getAlternatives()
+  FOMStringVariantRecordAlternativeList& getAlternatives() noexcept
   { return getImpl()._alternatives; }
-  const FOMStringVariantRecordAlternativeList& getAlternatives() const
+  const FOMStringVariantRecordAlternativeList& getAlternatives() const noexcept
   { return getConstImpl()._alternatives; }
 
-  void setEncoding(const String& value)
+  void setEncoding(const String& value) noexcept
   { getImpl()._encoding = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEncoding(String&& value)
+  void setEncoding(String&& value) noexcept
   { getImpl()._encoding = std::move(value); }
 #endif
-  String& getEncoding()
+  String& getEncoding() noexcept
   { return getImpl()._encoding; }
-  const String& getEncoding() const
+  const String& getEncoding() const noexcept
   { return getConstImpl()._encoding; }
 
   FOMStringVariantRecordDataType& swap(FOMStringVariantRecordDataType& rhs)
@@ -1528,7 +1504,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringVariantRecordDataType& rhs) const
+  bool operator==(const FOMStringVariantRecordDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1539,7 +1515,7 @@ public:
     if (getEncoding() != rhs.getEncoding()) return false;
     return true;
   }
-  bool operator<(const FOMStringVariantRecordDataType& rhs) const
+  bool operator<(const FOMStringVariantRecordDataType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1555,17 +1531,15 @@ public:
     if (rhs.getEncoding() < getEncoding()) return false;
     return false;
   }
-  bool operator!=(const FOMStringVariantRecordDataType& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringVariantRecordDataType& rhs) const
+  bool operator>(const FOMStringVariantRecordDataType& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringVariantRecordDataType& rhs) const
+  bool operator>=(const FOMStringVariantRecordDataType& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringVariantRecordDataType& rhs) const
+  bool operator<=(const FOMStringVariantRecordDataType& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _discriminant(),
       _dataType(),
@@ -1587,7 +1561,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1601,15 +1575,15 @@ public:
   FOMStringTransportationType() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
   FOMStringTransportationType& swap(FOMStringTransportationType& rhs)
@@ -1617,14 +1591,14 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringTransportationType& rhs) const
+  bool operator==(const FOMStringTransportationType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
     return true;
   }
-  bool operator<(const FOMStringTransportationType& rhs) const
+  bool operator<(const FOMStringTransportationType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1632,17 +1606,15 @@ public:
     if (rhs.getName() < getName()) return false;
     return false;
   }
-  bool operator!=(const FOMStringTransportationType& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringTransportationType& rhs) const
+  bool operator>(const FOMStringTransportationType& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringTransportationType& rhs) const
+  bool operator>=(const FOMStringTransportationType& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringTransportationType& rhs) const
+  bool operator<=(const FOMStringTransportationType& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name()
     { }
     String _name;
@@ -1656,7 +1628,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1670,26 +1642,26 @@ public:
   FOMStringDimension() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setUpperBound(const Unsigned& value)
+  void setUpperBound(const Unsigned& value) noexcept
   { getImpl()._upperBound = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpperBound(Unsigned&& value)
+  void setUpperBound(Unsigned&& value) noexcept
   { getImpl()._upperBound = std::move(value); }
 #endif
-  Unsigned& getUpperBound()
+  Unsigned& getUpperBound() noexcept
   { return getImpl()._upperBound; }
-  const Unsigned& getUpperBound() const
+  const Unsigned& getUpperBound() const noexcept
   { return getConstImpl()._upperBound; }
 
   FOMStringDimension& swap(FOMStringDimension& rhs)
@@ -1697,7 +1669,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringDimension& rhs) const
+  bool operator==(const FOMStringDimension& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1705,7 +1677,7 @@ public:
     if (getUpperBound() != rhs.getUpperBound()) return false;
     return true;
   }
-  bool operator<(const FOMStringDimension& rhs) const
+  bool operator<(const FOMStringDimension& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1715,17 +1687,15 @@ public:
     if (rhs.getUpperBound() < getUpperBound()) return false;
     return false;
   }
-  bool operator!=(const FOMStringDimension& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringDimension& rhs) const
+  bool operator>(const FOMStringDimension& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringDimension& rhs) const
+  bool operator>=(const FOMStringDimension& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringDimension& rhs) const
+  bool operator<=(const FOMStringDimension& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _upperBound()
     { }
@@ -1741,7 +1711,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1755,26 +1725,26 @@ public:
   FOMStringRoutingSpace() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDimensionSet(const StringSet& value)
+  void setDimensionSet(const StringSet& value) noexcept
   { getImpl()._dimensionSet = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionSet(StringSet&& value)
+  void setDimensionSet(StringSet&& value) noexcept
   { getImpl()._dimensionSet = std::move(value); }
 #endif
-  StringSet& getDimensionSet()
+  StringSet& getDimensionSet() noexcept
   { return getImpl()._dimensionSet; }
-  const StringSet& getDimensionSet() const
+  const StringSet& getDimensionSet() const noexcept
   { return getConstImpl()._dimensionSet; }
 
   FOMStringRoutingSpace& swap(FOMStringRoutingSpace& rhs)
@@ -1782,7 +1752,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringRoutingSpace& rhs) const
+  bool operator==(const FOMStringRoutingSpace& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1790,7 +1760,7 @@ public:
     if (getDimensionSet() != rhs.getDimensionSet()) return false;
     return true;
   }
-  bool operator<(const FOMStringRoutingSpace& rhs) const
+  bool operator<(const FOMStringRoutingSpace& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1800,17 +1770,15 @@ public:
     if (rhs.getDimensionSet() < getDimensionSet()) return false;
     return false;
   }
-  bool operator!=(const FOMStringRoutingSpace& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringRoutingSpace& rhs) const
+  bool operator>(const FOMStringRoutingSpace& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringRoutingSpace& rhs) const
+  bool operator>=(const FOMStringRoutingSpace& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringRoutingSpace& rhs) const
+  bool operator<=(const FOMStringRoutingSpace& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dimensionSet()
     { }
@@ -1826,7 +1794,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1840,26 +1808,26 @@ public:
   FOMStringParameter() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const String& value)
+  void setDataType(const String& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(String&& value)
+  void setDataType(String&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  String& getDataType()
+  String& getDataType() noexcept
   { return getImpl()._dataType; }
-  const String& getDataType() const
+  const String& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
   FOMStringParameter& swap(FOMStringParameter& rhs)
@@ -1867,7 +1835,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringParameter& rhs) const
+  bool operator==(const FOMStringParameter& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1875,7 +1843,7 @@ public:
     if (getDataType() != rhs.getDataType()) return false;
     return true;
   }
-  bool operator<(const FOMStringParameter& rhs) const
+  bool operator<(const FOMStringParameter& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1885,17 +1853,15 @@ public:
     if (rhs.getDataType() < getDataType()) return false;
     return false;
   }
-  bool operator!=(const FOMStringParameter& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringParameter& rhs) const
+  bool operator>(const FOMStringParameter& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringParameter& rhs) const
+  bool operator>=(const FOMStringParameter& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringParameter& rhs) const
+  bool operator<=(const FOMStringParameter& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dataType()
     { }
@@ -1911,7 +1877,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1925,70 +1891,70 @@ public:
   FOMStringInteractionClass() : 
     _impl(new Implementation())
   { }
-  void setName(const StringVector& value)
+  void setName(const StringVector& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(StringVector&& value)
+  void setName(StringVector&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  StringVector& getName()
+  StringVector& getName() noexcept
   { return getImpl()._name; }
-  const StringVector& getName() const
+  const StringVector& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setOrderType(const String& value)
+  void setOrderType(const String& value) noexcept
   { getImpl()._orderType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(String&& value)
+  void setOrderType(String&& value) noexcept
   { getImpl()._orderType = std::move(value); }
 #endif
-  String& getOrderType()
+  String& getOrderType() noexcept
   { return getImpl()._orderType; }
-  const String& getOrderType() const
+  const String& getOrderType() const noexcept
   { return getConstImpl()._orderType; }
 
-  void setTransportationType(const String& value)
+  void setTransportationType(const String& value) noexcept
   { getImpl()._transportationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(String&& value)
+  void setTransportationType(String&& value) noexcept
   { getImpl()._transportationType = std::move(value); }
 #endif
-  String& getTransportationType()
+  String& getTransportationType() noexcept
   { return getImpl()._transportationType; }
-  const String& getTransportationType() const
+  const String& getTransportationType() const noexcept
   { return getConstImpl()._transportationType; }
 
-  void setRoutingSpace(const String& value)
+  void setRoutingSpace(const String& value) noexcept
   { getImpl()._routingSpace = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRoutingSpace(String&& value)
+  void setRoutingSpace(String&& value) noexcept
   { getImpl()._routingSpace = std::move(value); }
 #endif
-  String& getRoutingSpace()
+  String& getRoutingSpace() noexcept
   { return getImpl()._routingSpace; }
-  const String& getRoutingSpace() const
+  const String& getRoutingSpace() const noexcept
   { return getConstImpl()._routingSpace; }
 
-  void setDimensionSet(const StringSet& value)
+  void setDimensionSet(const StringSet& value) noexcept
   { getImpl()._dimensionSet = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionSet(StringSet&& value)
+  void setDimensionSet(StringSet&& value) noexcept
   { getImpl()._dimensionSet = std::move(value); }
 #endif
-  StringSet& getDimensionSet()
+  StringSet& getDimensionSet() noexcept
   { return getImpl()._dimensionSet; }
-  const StringSet& getDimensionSet() const
+  const StringSet& getDimensionSet() const noexcept
   { return getConstImpl()._dimensionSet; }
 
-  void setParameterList(const FOMStringParameterList& value)
+  void setParameterList(const FOMStringParameterList& value) noexcept
   { getImpl()._parameterList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterList(FOMStringParameterList&& value)
+  void setParameterList(FOMStringParameterList&& value) noexcept
   { getImpl()._parameterList = std::move(value); }
 #endif
-  FOMStringParameterList& getParameterList()
+  FOMStringParameterList& getParameterList() noexcept
   { return getImpl()._parameterList; }
-  const FOMStringParameterList& getParameterList() const
+  const FOMStringParameterList& getParameterList() const noexcept
   { return getConstImpl()._parameterList; }
 
   FOMStringInteractionClass& swap(FOMStringInteractionClass& rhs)
@@ -1996,7 +1962,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringInteractionClass& rhs) const
+  bool operator==(const FOMStringInteractionClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2008,7 +1974,7 @@ public:
     if (getParameterList() != rhs.getParameterList()) return false;
     return true;
   }
-  bool operator<(const FOMStringInteractionClass& rhs) const
+  bool operator<(const FOMStringInteractionClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2026,17 +1992,15 @@ public:
     if (rhs.getParameterList() < getParameterList()) return false;
     return false;
   }
-  bool operator!=(const FOMStringInteractionClass& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringInteractionClass& rhs) const
+  bool operator>(const FOMStringInteractionClass& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringInteractionClass& rhs) const
+  bool operator>=(const FOMStringInteractionClass& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringInteractionClass& rhs) const
+  bool operator<=(const FOMStringInteractionClass& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _orderType(),
       _transportationType(),
@@ -2060,7 +2024,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2074,70 +2038,70 @@ public:
   FOMStringAttribute() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const String& value)
+  void setDataType(const String& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(String&& value)
+  void setDataType(String&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  String& getDataType()
+  String& getDataType() noexcept
   { return getImpl()._dataType; }
-  const String& getDataType() const
+  const String& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
-  void setOrderType(const String& value)
+  void setOrderType(const String& value) noexcept
   { getImpl()._orderType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(String&& value)
+  void setOrderType(String&& value) noexcept
   { getImpl()._orderType = std::move(value); }
 #endif
-  String& getOrderType()
+  String& getOrderType() noexcept
   { return getImpl()._orderType; }
-  const String& getOrderType() const
+  const String& getOrderType() const noexcept
   { return getConstImpl()._orderType; }
 
-  void setTransportationType(const String& value)
+  void setTransportationType(const String& value) noexcept
   { getImpl()._transportationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(String&& value)
+  void setTransportationType(String&& value) noexcept
   { getImpl()._transportationType = std::move(value); }
 #endif
-  String& getTransportationType()
+  String& getTransportationType() noexcept
   { return getImpl()._transportationType; }
-  const String& getTransportationType() const
+  const String& getTransportationType() const noexcept
   { return getConstImpl()._transportationType; }
 
-  void setRoutingSpace(const String& value)
+  void setRoutingSpace(const String& value) noexcept
   { getImpl()._routingSpace = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRoutingSpace(String&& value)
+  void setRoutingSpace(String&& value) noexcept
   { getImpl()._routingSpace = std::move(value); }
 #endif
-  String& getRoutingSpace()
+  String& getRoutingSpace() noexcept
   { return getImpl()._routingSpace; }
-  const String& getRoutingSpace() const
+  const String& getRoutingSpace() const noexcept
   { return getConstImpl()._routingSpace; }
 
-  void setDimensionSet(const StringSet& value)
+  void setDimensionSet(const StringSet& value) noexcept
   { getImpl()._dimensionSet = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionSet(StringSet&& value)
+  void setDimensionSet(StringSet&& value) noexcept
   { getImpl()._dimensionSet = std::move(value); }
 #endif
-  StringSet& getDimensionSet()
+  StringSet& getDimensionSet() noexcept
   { return getImpl()._dimensionSet; }
-  const StringSet& getDimensionSet() const
+  const StringSet& getDimensionSet() const noexcept
   { return getConstImpl()._dimensionSet; }
 
   FOMStringAttribute& swap(FOMStringAttribute& rhs)
@@ -2145,7 +2109,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringAttribute& rhs) const
+  bool operator==(const FOMStringAttribute& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2157,7 +2121,7 @@ public:
     if (getDimensionSet() != rhs.getDimensionSet()) return false;
     return true;
   }
-  bool operator<(const FOMStringAttribute& rhs) const
+  bool operator<(const FOMStringAttribute& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2175,17 +2139,15 @@ public:
     if (rhs.getDimensionSet() < getDimensionSet()) return false;
     return false;
   }
-  bool operator!=(const FOMStringAttribute& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringAttribute& rhs) const
+  bool operator>(const FOMStringAttribute& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringAttribute& rhs) const
+  bool operator>=(const FOMStringAttribute& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringAttribute& rhs) const
+  bool operator<=(const FOMStringAttribute& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dataType(),
       _orderType(),
@@ -2209,7 +2171,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2223,26 +2185,26 @@ public:
   FOMStringObjectClass() : 
     _impl(new Implementation())
   { }
-  void setName(const StringVector& value)
+  void setName(const StringVector& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(StringVector&& value)
+  void setName(StringVector&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  StringVector& getName()
+  StringVector& getName() noexcept
   { return getImpl()._name; }
-  const StringVector& getName() const
+  const StringVector& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setAttributeList(const FOMStringAttributeList& value)
+  void setAttributeList(const FOMStringAttributeList& value) noexcept
   { getImpl()._attributeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeList(FOMStringAttributeList&& value)
+  void setAttributeList(FOMStringAttributeList&& value) noexcept
   { getImpl()._attributeList = std::move(value); }
 #endif
-  FOMStringAttributeList& getAttributeList()
+  FOMStringAttributeList& getAttributeList() noexcept
   { return getImpl()._attributeList; }
-  const FOMStringAttributeList& getAttributeList() const
+  const FOMStringAttributeList& getAttributeList() const noexcept
   { return getConstImpl()._attributeList; }
 
   FOMStringObjectClass& swap(FOMStringObjectClass& rhs)
@@ -2250,7 +2212,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringObjectClass& rhs) const
+  bool operator==(const FOMStringObjectClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2258,7 +2220,7 @@ public:
     if (getAttributeList() != rhs.getAttributeList()) return false;
     return true;
   }
-  bool operator<(const FOMStringObjectClass& rhs) const
+  bool operator<(const FOMStringObjectClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2268,17 +2230,15 @@ public:
     if (rhs.getAttributeList() < getAttributeList()) return false;
     return false;
   }
-  bool operator!=(const FOMStringObjectClass& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringObjectClass& rhs) const
+  bool operator>(const FOMStringObjectClass& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringObjectClass& rhs) const
+  bool operator>=(const FOMStringObjectClass& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringObjectClass& rhs) const
+  bool operator<=(const FOMStringObjectClass& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _attributeList()
     { }
@@ -2294,7 +2254,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2308,26 +2268,26 @@ public:
   FOMStringUpdateRate() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setRate(const Double& value)
+  void setRate(const Double& value) noexcept
   { getImpl()._rate = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRate(Double&& value)
+  void setRate(Double&& value) noexcept
   { getImpl()._rate = std::move(value); }
 #endif
-  Double& getRate()
+  Double& getRate() noexcept
   { return getImpl()._rate; }
-  const Double& getRate() const
+  const Double& getRate() const noexcept
   { return getConstImpl()._rate; }
 
   FOMStringUpdateRate& swap(FOMStringUpdateRate& rhs)
@@ -2335,7 +2295,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringUpdateRate& rhs) const
+  bool operator==(const FOMStringUpdateRate& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2343,7 +2303,7 @@ public:
     if (getRate() != rhs.getRate()) return false;
     return true;
   }
-  bool operator<(const FOMStringUpdateRate& rhs) const
+  bool operator<(const FOMStringUpdateRate& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2353,17 +2313,15 @@ public:
     if (rhs.getRate() < getRate()) return false;
     return false;
   }
-  bool operator!=(const FOMStringUpdateRate& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringUpdateRate& rhs) const
+  bool operator>(const FOMStringUpdateRate& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringUpdateRate& rhs) const
+  bool operator>=(const FOMStringUpdateRate& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringUpdateRate& rhs) const
+  bool operator<=(const FOMStringUpdateRate& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _rate()
     { }
@@ -2379,7 +2337,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2393,26 +2351,26 @@ public:
   FOMStringSwitch() : 
     _impl(new Implementation())
   { }
-  void setSwitchesType(const SwitchesType& value)
+  void setSwitchesType(const SwitchesType& value) noexcept
   { getImpl()._switchesType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSwitchesType(SwitchesType&& value)
+  void setSwitchesType(SwitchesType&& value) noexcept
   { getImpl()._switchesType = std::move(value); }
 #endif
-  SwitchesType& getSwitchesType()
+  SwitchesType& getSwitchesType() noexcept
   { return getImpl()._switchesType; }
-  const SwitchesType& getSwitchesType() const
+  const SwitchesType& getSwitchesType() const noexcept
   { return getConstImpl()._switchesType; }
 
-  void setEnabled(const Bool& value)
+  void setEnabled(const Bool& value) noexcept
   { getImpl()._enabled = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEnabled(Bool&& value)
+  void setEnabled(Bool&& value) noexcept
   { getImpl()._enabled = std::move(value); }
 #endif
-  Bool& getEnabled()
+  Bool& getEnabled() noexcept
   { return getImpl()._enabled; }
-  const Bool& getEnabled() const
+  const Bool& getEnabled() const noexcept
   { return getConstImpl()._enabled; }
 
   FOMStringSwitch& swap(FOMStringSwitch& rhs)
@@ -2420,7 +2378,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringSwitch& rhs) const
+  bool operator==(const FOMStringSwitch& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2428,7 +2386,7 @@ public:
     if (getEnabled() != rhs.getEnabled()) return false;
     return true;
   }
-  bool operator<(const FOMStringSwitch& rhs) const
+  bool operator<(const FOMStringSwitch& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2438,17 +2396,15 @@ public:
     if (rhs.getEnabled() < getEnabled()) return false;
     return false;
   }
-  bool operator!=(const FOMStringSwitch& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringSwitch& rhs) const
+  bool operator>(const FOMStringSwitch& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringSwitch& rhs) const
+  bool operator>=(const FOMStringSwitch& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringSwitch& rhs) const
+  bool operator<=(const FOMStringSwitch& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _switchesType(),
       _enabled()
     { }
@@ -2464,7 +2420,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2478,169 +2434,169 @@ public:
   FOMStringModule() : 
     _impl(new Implementation())
   { }
-  void setDesignator(const String& value)
+  void setDesignator(const String& value) noexcept
   { getImpl()._designator = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDesignator(String&& value)
+  void setDesignator(String&& value) noexcept
   { getImpl()._designator = std::move(value); }
 #endif
-  String& getDesignator()
+  String& getDesignator() noexcept
   { return getImpl()._designator; }
-  const String& getDesignator() const
+  const String& getDesignator() const noexcept
   { return getConstImpl()._designator; }
 
-  void setTransportationTypeList(const FOMStringTransportationTypeList& value)
+  void setTransportationTypeList(const FOMStringTransportationTypeList& value) noexcept
   { getImpl()._transportationTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationTypeList(FOMStringTransportationTypeList&& value)
+  void setTransportationTypeList(FOMStringTransportationTypeList&& value) noexcept
   { getImpl()._transportationTypeList = std::move(value); }
 #endif
-  FOMStringTransportationTypeList& getTransportationTypeList()
+  FOMStringTransportationTypeList& getTransportationTypeList() noexcept
   { return getImpl()._transportationTypeList; }
-  const FOMStringTransportationTypeList& getTransportationTypeList() const
+  const FOMStringTransportationTypeList& getTransportationTypeList() const noexcept
   { return getConstImpl()._transportationTypeList; }
 
-  void setDimensionList(const FOMStringDimensionList& value)
+  void setDimensionList(const FOMStringDimensionList& value) noexcept
   { getImpl()._dimensionList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionList(FOMStringDimensionList&& value)
+  void setDimensionList(FOMStringDimensionList&& value) noexcept
   { getImpl()._dimensionList = std::move(value); }
 #endif
-  FOMStringDimensionList& getDimensionList()
+  FOMStringDimensionList& getDimensionList() noexcept
   { return getImpl()._dimensionList; }
-  const FOMStringDimensionList& getDimensionList() const
+  const FOMStringDimensionList& getDimensionList() const noexcept
   { return getConstImpl()._dimensionList; }
 
-  void setRoutingSpaceList(const FOMStringRoutingSpaceList& value)
+  void setRoutingSpaceList(const FOMStringRoutingSpaceList& value) noexcept
   { getImpl()._routingSpaceList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRoutingSpaceList(FOMStringRoutingSpaceList&& value)
+  void setRoutingSpaceList(FOMStringRoutingSpaceList&& value) noexcept
   { getImpl()._routingSpaceList = std::move(value); }
 #endif
-  FOMStringRoutingSpaceList& getRoutingSpaceList()
+  FOMStringRoutingSpaceList& getRoutingSpaceList() noexcept
   { return getImpl()._routingSpaceList; }
-  const FOMStringRoutingSpaceList& getRoutingSpaceList() const
+  const FOMStringRoutingSpaceList& getRoutingSpaceList() const noexcept
   { return getConstImpl()._routingSpaceList; }
 
-  void setInteractionClassList(const FOMStringInteractionClassList& value)
+  void setInteractionClassList(const FOMStringInteractionClassList& value) noexcept
   { getImpl()._interactionClassList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassList(FOMStringInteractionClassList&& value)
+  void setInteractionClassList(FOMStringInteractionClassList&& value) noexcept
   { getImpl()._interactionClassList = std::move(value); }
 #endif
-  FOMStringInteractionClassList& getInteractionClassList()
+  FOMStringInteractionClassList& getInteractionClassList() noexcept
   { return getImpl()._interactionClassList; }
-  const FOMStringInteractionClassList& getInteractionClassList() const
+  const FOMStringInteractionClassList& getInteractionClassList() const noexcept
   { return getConstImpl()._interactionClassList; }
 
-  void setObjectClassList(const FOMStringObjectClassList& value)
+  void setObjectClassList(const FOMStringObjectClassList& value) noexcept
   { getImpl()._objectClassList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassList(FOMStringObjectClassList&& value)
+  void setObjectClassList(FOMStringObjectClassList&& value) noexcept
   { getImpl()._objectClassList = std::move(value); }
 #endif
-  FOMStringObjectClassList& getObjectClassList()
+  FOMStringObjectClassList& getObjectClassList() noexcept
   { return getImpl()._objectClassList; }
-  const FOMStringObjectClassList& getObjectClassList() const
+  const FOMStringObjectClassList& getObjectClassList() const noexcept
   { return getConstImpl()._objectClassList; }
 
-  void setUpdateRateList(const FOMStringUpdateRateList& value)
+  void setUpdateRateList(const FOMStringUpdateRateList& value) noexcept
   { getImpl()._updateRateList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpdateRateList(FOMStringUpdateRateList&& value)
+  void setUpdateRateList(FOMStringUpdateRateList&& value) noexcept
   { getImpl()._updateRateList = std::move(value); }
 #endif
-  FOMStringUpdateRateList& getUpdateRateList()
+  FOMStringUpdateRateList& getUpdateRateList() noexcept
   { return getImpl()._updateRateList; }
-  const FOMStringUpdateRateList& getUpdateRateList() const
+  const FOMStringUpdateRateList& getUpdateRateList() const noexcept
   { return getConstImpl()._updateRateList; }
 
-  void setSwitchList(const FOMStringSwitchList& value)
+  void setSwitchList(const FOMStringSwitchList& value) noexcept
   { getImpl()._switchList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSwitchList(FOMStringSwitchList&& value)
+  void setSwitchList(FOMStringSwitchList&& value) noexcept
   { getImpl()._switchList = std::move(value); }
 #endif
-  FOMStringSwitchList& getSwitchList()
+  FOMStringSwitchList& getSwitchList() noexcept
   { return getImpl()._switchList; }
-  const FOMStringSwitchList& getSwitchList() const
+  const FOMStringSwitchList& getSwitchList() const noexcept
   { return getConstImpl()._switchList; }
 
-  void setSimpleDataTypeList(const FOMStringSimpleDataTypeList& value)
+  void setSimpleDataTypeList(const FOMStringSimpleDataTypeList& value) noexcept
   { getImpl()._simpleDataTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSimpleDataTypeList(FOMStringSimpleDataTypeList&& value)
+  void setSimpleDataTypeList(FOMStringSimpleDataTypeList&& value) noexcept
   { getImpl()._simpleDataTypeList = std::move(value); }
 #endif
-  FOMStringSimpleDataTypeList& getSimpleDataTypeList()
+  FOMStringSimpleDataTypeList& getSimpleDataTypeList() noexcept
   { return getImpl()._simpleDataTypeList; }
-  const FOMStringSimpleDataTypeList& getSimpleDataTypeList() const
+  const FOMStringSimpleDataTypeList& getSimpleDataTypeList() const noexcept
   { return getConstImpl()._simpleDataTypeList; }
 
-  void setEnumeratedDataTypeList(const FOMStringEnumeratedDataTypeList& value)
+  void setEnumeratedDataTypeList(const FOMStringEnumeratedDataTypeList& value) noexcept
   { getImpl()._enumeratedDataTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEnumeratedDataTypeList(FOMStringEnumeratedDataTypeList&& value)
+  void setEnumeratedDataTypeList(FOMStringEnumeratedDataTypeList&& value) noexcept
   { getImpl()._enumeratedDataTypeList = std::move(value); }
 #endif
-  FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList()
+  FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() noexcept
   { return getImpl()._enumeratedDataTypeList; }
-  const FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() const
+  const FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() const noexcept
   { return getConstImpl()._enumeratedDataTypeList; }
 
-  void setArrayDataTypeList(const FOMStringArrayDataTypeList& value)
+  void setArrayDataTypeList(const FOMStringArrayDataTypeList& value) noexcept
   { getImpl()._arrayDataTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArrayDataTypeList(FOMStringArrayDataTypeList&& value)
+  void setArrayDataTypeList(FOMStringArrayDataTypeList&& value) noexcept
   { getImpl()._arrayDataTypeList = std::move(value); }
 #endif
-  FOMStringArrayDataTypeList& getArrayDataTypeList()
+  FOMStringArrayDataTypeList& getArrayDataTypeList() noexcept
   { return getImpl()._arrayDataTypeList; }
-  const FOMStringArrayDataTypeList& getArrayDataTypeList() const
+  const FOMStringArrayDataTypeList& getArrayDataTypeList() const noexcept
   { return getConstImpl()._arrayDataTypeList; }
 
-  void setFixedRecordDataTypeList(const FOMStringFixedRecordDataTypeList& value)
+  void setFixedRecordDataTypeList(const FOMStringFixedRecordDataTypeList& value) noexcept
   { getImpl()._fixedRecordDataTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFixedRecordDataTypeList(FOMStringFixedRecordDataTypeList&& value)
+  void setFixedRecordDataTypeList(FOMStringFixedRecordDataTypeList&& value) noexcept
   { getImpl()._fixedRecordDataTypeList = std::move(value); }
 #endif
-  FOMStringFixedRecordDataTypeList& getFixedRecordDataTypeList()
+  FOMStringFixedRecordDataTypeList& getFixedRecordDataTypeList() noexcept
   { return getImpl()._fixedRecordDataTypeList; }
-  const FOMStringFixedRecordDataTypeList& getFixedRecordDataTypeList() const
+  const FOMStringFixedRecordDataTypeList& getFixedRecordDataTypeList() const noexcept
   { return getConstImpl()._fixedRecordDataTypeList; }
 
-  void setVariantRecordDataTypeList(const FOMStringVariantRecordDataTypeList& value)
+  void setVariantRecordDataTypeList(const FOMStringVariantRecordDataTypeList& value) noexcept
   { getImpl()._variantRecordDataTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setVariantRecordDataTypeList(FOMStringVariantRecordDataTypeList&& value)
+  void setVariantRecordDataTypeList(FOMStringVariantRecordDataTypeList&& value) noexcept
   { getImpl()._variantRecordDataTypeList = std::move(value); }
 #endif
-  FOMStringVariantRecordDataTypeList& getVariantRecordDataTypeList()
+  FOMStringVariantRecordDataTypeList& getVariantRecordDataTypeList() noexcept
   { return getImpl()._variantRecordDataTypeList; }
-  const FOMStringVariantRecordDataTypeList& getVariantRecordDataTypeList() const
+  const FOMStringVariantRecordDataTypeList& getVariantRecordDataTypeList() const noexcept
   { return getConstImpl()._variantRecordDataTypeList; }
 
-  void setArtificialInteractionRoot(const Bool& value)
+  void setArtificialInteractionRoot(const Bool& value) noexcept
   { getImpl()._artificialInteractionRoot = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialInteractionRoot(Bool&& value)
+  void setArtificialInteractionRoot(Bool&& value) noexcept
   { getImpl()._artificialInteractionRoot = std::move(value); }
 #endif
-  Bool& getArtificialInteractionRoot()
+  Bool& getArtificialInteractionRoot() noexcept
   { return getImpl()._artificialInteractionRoot; }
-  const Bool& getArtificialInteractionRoot() const
+  const Bool& getArtificialInteractionRoot() const noexcept
   { return getConstImpl()._artificialInteractionRoot; }
 
-  void setArtificialObjectRoot(const Bool& value)
+  void setArtificialObjectRoot(const Bool& value) noexcept
   { getImpl()._artificialObjectRoot = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialObjectRoot(Bool&& value)
+  void setArtificialObjectRoot(Bool&& value) noexcept
   { getImpl()._artificialObjectRoot = std::move(value); }
 #endif
-  Bool& getArtificialObjectRoot()
+  Bool& getArtificialObjectRoot() noexcept
   { return getImpl()._artificialObjectRoot; }
-  const Bool& getArtificialObjectRoot() const
+  const Bool& getArtificialObjectRoot() const noexcept
   { return getConstImpl()._artificialObjectRoot; }
 
   FOMStringModule& swap(FOMStringModule& rhs)
@@ -2648,7 +2604,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringModule& rhs) const
+  bool operator==(const FOMStringModule& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2669,7 +2625,7 @@ public:
     if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
     return true;
   }
-  bool operator<(const FOMStringModule& rhs) const
+  bool operator<(const FOMStringModule& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2705,17 +2661,15 @@ public:
     if (rhs.getArtificialObjectRoot() < getArtificialObjectRoot()) return false;
     return false;
   }
-  bool operator!=(const FOMStringModule& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringModule& rhs) const
+  bool operator>(const FOMStringModule& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringModule& rhs) const
+  bool operator>=(const FOMStringModule& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringModule& rhs) const
+  bool operator<=(const FOMStringModule& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _designator(),
       _transportationTypeList(),
       _dimensionList(),
@@ -2757,7 +2711,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2771,26 +2725,26 @@ public:
   FOMTransportationType() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { getImpl()._transportationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { getImpl()._transportationType = std::move(value); }
 #endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return getImpl()._transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return getConstImpl()._transportationType; }
 
   FOMTransportationType& swap(FOMTransportationType& rhs)
@@ -2798,7 +2752,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMTransportationType& rhs) const
+  bool operator==(const FOMTransportationType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2806,7 +2760,7 @@ public:
     if (getTransportationType() != rhs.getTransportationType()) return false;
     return true;
   }
-  bool operator<(const FOMTransportationType& rhs) const
+  bool operator<(const FOMTransportationType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2816,17 +2770,15 @@ public:
     if (rhs.getTransportationType() < getTransportationType()) return false;
     return false;
   }
-  bool operator!=(const FOMTransportationType& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMTransportationType& rhs) const
+  bool operator>(const FOMTransportationType& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMTransportationType& rhs) const
+  bool operator>=(const FOMTransportationType& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMTransportationType& rhs) const
+  bool operator<=(const FOMTransportationType& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _transportationType()
     { }
@@ -2842,7 +2794,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2856,37 +2808,37 @@ public:
   FOMDimension() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDimensionHandle(const DimensionHandle& value)
+  void setDimensionHandle(const DimensionHandle& value) noexcept
   { getImpl()._dimensionHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionHandle(DimensionHandle&& value)
+  void setDimensionHandle(DimensionHandle&& value) noexcept
   { getImpl()._dimensionHandle = std::move(value); }
 #endif
-  DimensionHandle& getDimensionHandle()
+  DimensionHandle& getDimensionHandle() noexcept
   { return getImpl()._dimensionHandle; }
-  const DimensionHandle& getDimensionHandle() const
+  const DimensionHandle& getDimensionHandle() const noexcept
   { return getConstImpl()._dimensionHandle; }
 
-  void setUpperBound(const Unsigned& value)
+  void setUpperBound(const Unsigned& value) noexcept
   { getImpl()._upperBound = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpperBound(Unsigned&& value)
+  void setUpperBound(Unsigned&& value) noexcept
   { getImpl()._upperBound = std::move(value); }
 #endif
-  Unsigned& getUpperBound()
+  Unsigned& getUpperBound() noexcept
   { return getImpl()._upperBound; }
-  const Unsigned& getUpperBound() const
+  const Unsigned& getUpperBound() const noexcept
   { return getConstImpl()._upperBound; }
 
   FOMDimension& swap(FOMDimension& rhs)
@@ -2894,7 +2846,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMDimension& rhs) const
+  bool operator==(const FOMDimension& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2903,7 +2855,7 @@ public:
     if (getUpperBound() != rhs.getUpperBound()) return false;
     return true;
   }
-  bool operator<(const FOMDimension& rhs) const
+  bool operator<(const FOMDimension& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2915,17 +2867,15 @@ public:
     if (rhs.getUpperBound() < getUpperBound()) return false;
     return false;
   }
-  bool operator!=(const FOMDimension& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMDimension& rhs) const
+  bool operator>(const FOMDimension& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMDimension& rhs) const
+  bool operator>=(const FOMDimension& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMDimension& rhs) const
+  bool operator<=(const FOMDimension& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dimensionHandle(),
       _upperBound()
@@ -2943,7 +2893,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2957,37 +2907,37 @@ public:
   FOMRoutingSpace() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setSpaceHandle(const SpaceHandle& value)
+  void setSpaceHandle(const SpaceHandle& value) noexcept
   { getImpl()._spaceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSpaceHandle(SpaceHandle&& value)
+  void setSpaceHandle(SpaceHandle&& value) noexcept
   { getImpl()._spaceHandle = std::move(value); }
 #endif
-  SpaceHandle& getSpaceHandle()
+  SpaceHandle& getSpaceHandle() noexcept
   { return getImpl()._spaceHandle; }
-  const SpaceHandle& getSpaceHandle() const
+  const SpaceHandle& getSpaceHandle() const noexcept
   { return getConstImpl()._spaceHandle; }
 
-  void setDimensionHandleSet(const DimensionHandleSet& value)
+  void setDimensionHandleSet(const DimensionHandleSet& value) noexcept
   { getImpl()._dimensionHandleSet = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionHandleSet(DimensionHandleSet&& value)
+  void setDimensionHandleSet(DimensionHandleSet&& value) noexcept
   { getImpl()._dimensionHandleSet = std::move(value); }
 #endif
-  DimensionHandleSet& getDimensionHandleSet()
+  DimensionHandleSet& getDimensionHandleSet() noexcept
   { return getImpl()._dimensionHandleSet; }
-  const DimensionHandleSet& getDimensionHandleSet() const
+  const DimensionHandleSet& getDimensionHandleSet() const noexcept
   { return getConstImpl()._dimensionHandleSet; }
 
   FOMRoutingSpace& swap(FOMRoutingSpace& rhs)
@@ -2995,7 +2945,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMRoutingSpace& rhs) const
+  bool operator==(const FOMRoutingSpace& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -3004,7 +2954,7 @@ public:
     if (getDimensionHandleSet() != rhs.getDimensionHandleSet()) return false;
     return true;
   }
-  bool operator<(const FOMRoutingSpace& rhs) const
+  bool operator<(const FOMRoutingSpace& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -3016,17 +2966,15 @@ public:
     if (rhs.getDimensionHandleSet() < getDimensionHandleSet()) return false;
     return false;
   }
-  bool operator!=(const FOMRoutingSpace& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMRoutingSpace& rhs) const
+  bool operator>(const FOMRoutingSpace& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMRoutingSpace& rhs) const
+  bool operator>=(const FOMRoutingSpace& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMRoutingSpace& rhs) const
+  bool operator<=(const FOMRoutingSpace& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _spaceHandle(),
       _dimensionHandleSet()
@@ -3044,7 +2992,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -3058,37 +3006,37 @@ public:
   FOMParameter() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const String& value)
+  void setDataType(const String& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(String&& value)
+  void setDataType(String&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  String& getDataType()
+  String& getDataType() noexcept
   { return getImpl()._dataType; }
-  const String& getDataType() const
+  const String& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
-  void setParameterHandle(const ParameterHandle& value)
+  void setParameterHandle(const ParameterHandle& value) noexcept
   { getImpl()._parameterHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterHandle(ParameterHandle&& value)
+  void setParameterHandle(ParameterHandle&& value) noexcept
   { getImpl()._parameterHandle = std::move(value); }
 #endif
-  ParameterHandle& getParameterHandle()
+  ParameterHandle& getParameterHandle() noexcept
   { return getImpl()._parameterHandle; }
-  const ParameterHandle& getParameterHandle() const
+  const ParameterHandle& getParameterHandle() const noexcept
   { return getConstImpl()._parameterHandle; }
 
   FOMParameter& swap(FOMParameter& rhs)
@@ -3096,7 +3044,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMParameter& rhs) const
+  bool operator==(const FOMParameter& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -3105,7 +3053,7 @@ public:
     if (getParameterHandle() != rhs.getParameterHandle()) return false;
     return true;
   }
-  bool operator<(const FOMParameter& rhs) const
+  bool operator<(const FOMParameter& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -3117,17 +3065,15 @@ public:
     if (rhs.getParameterHandle() < getParameterHandle()) return false;
     return false;
   }
-  bool operator!=(const FOMParameter& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMParameter& rhs) const
+  bool operator>(const FOMParameter& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMParameter& rhs) const
+  bool operator>=(const FOMParameter& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMParameter& rhs) const
+  bool operator<=(const FOMParameter& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dataType(),
       _parameterHandle()
@@ -3145,7 +3091,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -3159,81 +3105,81 @@ public:
   FOMInteractionClass() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { getImpl()._interactionClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { getImpl()._interactionClassHandle = std::move(value); }
 #endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return getImpl()._interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return getConstImpl()._interactionClassHandle; }
 
-  void setParentInteractionClassHandle(const InteractionClassHandle& value)
+  void setParentInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { getImpl()._parentInteractionClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParentInteractionClassHandle(InteractionClassHandle&& value)
+  void setParentInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { getImpl()._parentInteractionClassHandle = std::move(value); }
 #endif
-  InteractionClassHandle& getParentInteractionClassHandle()
+  InteractionClassHandle& getParentInteractionClassHandle() noexcept
   { return getImpl()._parentInteractionClassHandle; }
-  const InteractionClassHandle& getParentInteractionClassHandle() const
+  const InteractionClassHandle& getParentInteractionClassHandle() const noexcept
   { return getConstImpl()._parentInteractionClassHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { getImpl()._orderType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { getImpl()._orderType = std::move(value); }
 #endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return getImpl()._orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return getConstImpl()._orderType; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { getImpl()._transportationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { getImpl()._transportationType = std::move(value); }
 #endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return getImpl()._transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return getConstImpl()._transportationType; }
 
-  void setDimensionHandleSet(const DimensionHandleSet& value)
+  void setDimensionHandleSet(const DimensionHandleSet& value) noexcept
   { getImpl()._dimensionHandleSet = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionHandleSet(DimensionHandleSet&& value)
+  void setDimensionHandleSet(DimensionHandleSet&& value) noexcept
   { getImpl()._dimensionHandleSet = std::move(value); }
 #endif
-  DimensionHandleSet& getDimensionHandleSet()
+  DimensionHandleSet& getDimensionHandleSet() noexcept
   { return getImpl()._dimensionHandleSet; }
-  const DimensionHandleSet& getDimensionHandleSet() const
+  const DimensionHandleSet& getDimensionHandleSet() const noexcept
   { return getConstImpl()._dimensionHandleSet; }
 
-  void setParameterList(const FOMParameterList& value)
+  void setParameterList(const FOMParameterList& value) noexcept
   { getImpl()._parameterList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterList(FOMParameterList&& value)
+  void setParameterList(FOMParameterList&& value) noexcept
   { getImpl()._parameterList = std::move(value); }
 #endif
-  FOMParameterList& getParameterList()
+  FOMParameterList& getParameterList() noexcept
   { return getImpl()._parameterList; }
-  const FOMParameterList& getParameterList() const
+  const FOMParameterList& getParameterList() const noexcept
   { return getConstImpl()._parameterList; }
 
   FOMInteractionClass& swap(FOMInteractionClass& rhs)
@@ -3241,7 +3187,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMInteractionClass& rhs) const
+  bool operator==(const FOMInteractionClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -3254,7 +3200,7 @@ public:
     if (getParameterList() != rhs.getParameterList()) return false;
     return true;
   }
-  bool operator<(const FOMInteractionClass& rhs) const
+  bool operator<(const FOMInteractionClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -3274,17 +3220,15 @@ public:
     if (rhs.getParameterList() < getParameterList()) return false;
     return false;
   }
-  bool operator!=(const FOMInteractionClass& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMInteractionClass& rhs) const
+  bool operator>(const FOMInteractionClass& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMInteractionClass& rhs) const
+  bool operator>=(const FOMInteractionClass& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMInteractionClass& rhs) const
+  bool operator<=(const FOMInteractionClass& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _interactionClassHandle(),
       _parentInteractionClassHandle(),
@@ -3310,7 +3254,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -3324,70 +3268,70 @@ public:
   FOMAttribute() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const String& value)
+  void setDataType(const String& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(String&& value)
+  void setDataType(String&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  String& getDataType()
+  String& getDataType() noexcept
   { return getImpl()._dataType; }
-  const String& getDataType() const
+  const String& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
-  void setAttributeHandle(const AttributeHandle& value)
+  void setAttributeHandle(const AttributeHandle& value) noexcept
   { getImpl()._attributeHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandle(AttributeHandle&& value)
+  void setAttributeHandle(AttributeHandle&& value) noexcept
   { getImpl()._attributeHandle = std::move(value); }
 #endif
-  AttributeHandle& getAttributeHandle()
+  AttributeHandle& getAttributeHandle() noexcept
   { return getImpl()._attributeHandle; }
-  const AttributeHandle& getAttributeHandle() const
+  const AttributeHandle& getAttributeHandle() const noexcept
   { return getConstImpl()._attributeHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { getImpl()._orderType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { getImpl()._orderType = std::move(value); }
 #endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return getImpl()._orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return getConstImpl()._orderType; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { getImpl()._transportationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { getImpl()._transportationType = std::move(value); }
 #endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return getImpl()._transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return getConstImpl()._transportationType; }
 
-  void setDimensionHandleSet(const DimensionHandleSet& value)
+  void setDimensionHandleSet(const DimensionHandleSet& value) noexcept
   { getImpl()._dimensionHandleSet = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionHandleSet(DimensionHandleSet&& value)
+  void setDimensionHandleSet(DimensionHandleSet&& value) noexcept
   { getImpl()._dimensionHandleSet = std::move(value); }
 #endif
-  DimensionHandleSet& getDimensionHandleSet()
+  DimensionHandleSet& getDimensionHandleSet() noexcept
   { return getImpl()._dimensionHandleSet; }
-  const DimensionHandleSet& getDimensionHandleSet() const
+  const DimensionHandleSet& getDimensionHandleSet() const noexcept
   { return getConstImpl()._dimensionHandleSet; }
 
   FOMAttribute& swap(FOMAttribute& rhs)
@@ -3395,7 +3339,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMAttribute& rhs) const
+  bool operator==(const FOMAttribute& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -3407,7 +3351,7 @@ public:
     if (getDimensionHandleSet() != rhs.getDimensionHandleSet()) return false;
     return true;
   }
-  bool operator<(const FOMAttribute& rhs) const
+  bool operator<(const FOMAttribute& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -3425,17 +3369,15 @@ public:
     if (rhs.getDimensionHandleSet() < getDimensionHandleSet()) return false;
     return false;
   }
-  bool operator!=(const FOMAttribute& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMAttribute& rhs) const
+  bool operator>(const FOMAttribute& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMAttribute& rhs) const
+  bool operator>=(const FOMAttribute& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMAttribute& rhs) const
+  bool operator<=(const FOMAttribute& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dataType(),
       _attributeHandle(),
@@ -3459,7 +3401,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -3473,48 +3415,48 @@ public:
   FOMObjectClass() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { getImpl()._objectClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { getImpl()._objectClassHandle = std::move(value); }
 #endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return getImpl()._objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return getConstImpl()._objectClassHandle; }
 
-  void setParentObjectClassHandle(const ObjectClassHandle& value)
+  void setParentObjectClassHandle(const ObjectClassHandle& value) noexcept
   { getImpl()._parentObjectClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParentObjectClassHandle(ObjectClassHandle&& value)
+  void setParentObjectClassHandle(ObjectClassHandle&& value) noexcept
   { getImpl()._parentObjectClassHandle = std::move(value); }
 #endif
-  ObjectClassHandle& getParentObjectClassHandle()
+  ObjectClassHandle& getParentObjectClassHandle() noexcept
   { return getImpl()._parentObjectClassHandle; }
-  const ObjectClassHandle& getParentObjectClassHandle() const
+  const ObjectClassHandle& getParentObjectClassHandle() const noexcept
   { return getConstImpl()._parentObjectClassHandle; }
 
-  void setAttributeList(const FOMAttributeList& value)
+  void setAttributeList(const FOMAttributeList& value) noexcept
   { getImpl()._attributeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeList(FOMAttributeList&& value)
+  void setAttributeList(FOMAttributeList&& value) noexcept
   { getImpl()._attributeList = std::move(value); }
 #endif
-  FOMAttributeList& getAttributeList()
+  FOMAttributeList& getAttributeList() noexcept
   { return getImpl()._attributeList; }
-  const FOMAttributeList& getAttributeList() const
+  const FOMAttributeList& getAttributeList() const noexcept
   { return getConstImpl()._attributeList; }
 
   FOMObjectClass& swap(FOMObjectClass& rhs)
@@ -3522,7 +3464,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMObjectClass& rhs) const
+  bool operator==(const FOMObjectClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -3532,7 +3474,7 @@ public:
     if (getAttributeList() != rhs.getAttributeList()) return false;
     return true;
   }
-  bool operator<(const FOMObjectClass& rhs) const
+  bool operator<(const FOMObjectClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -3546,17 +3488,15 @@ public:
     if (rhs.getAttributeList() < getAttributeList()) return false;
     return false;
   }
-  bool operator!=(const FOMObjectClass& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMObjectClass& rhs) const
+  bool operator>(const FOMObjectClass& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMObjectClass& rhs) const
+  bool operator>=(const FOMObjectClass& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMObjectClass& rhs) const
+  bool operator<=(const FOMObjectClass& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _objectClassHandle(),
       _parentObjectClassHandle(),
@@ -3576,7 +3516,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -3590,37 +3530,37 @@ public:
   FOMUpdateRate() : 
     _impl(new Implementation())
   { }
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setUpdateRateHandle(const UpdateRateHandle& value)
+  void setUpdateRateHandle(const UpdateRateHandle& value) noexcept
   { getImpl()._updateRateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpdateRateHandle(UpdateRateHandle&& value)
+  void setUpdateRateHandle(UpdateRateHandle&& value) noexcept
   { getImpl()._updateRateHandle = std::move(value); }
 #endif
-  UpdateRateHandle& getUpdateRateHandle()
+  UpdateRateHandle& getUpdateRateHandle() noexcept
   { return getImpl()._updateRateHandle; }
-  const UpdateRateHandle& getUpdateRateHandle() const
+  const UpdateRateHandle& getUpdateRateHandle() const noexcept
   { return getConstImpl()._updateRateHandle; }
 
-  void setRate(const Double& value)
+  void setRate(const Double& value) noexcept
   { getImpl()._rate = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRate(Double&& value)
+  void setRate(Double&& value) noexcept
   { getImpl()._rate = std::move(value); }
 #endif
-  Double& getRate()
+  Double& getRate() noexcept
   { return getImpl()._rate; }
-  const Double& getRate() const
+  const Double& getRate() const noexcept
   { return getConstImpl()._rate; }
 
   FOMUpdateRate& swap(FOMUpdateRate& rhs)
@@ -3628,7 +3568,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMUpdateRate& rhs) const
+  bool operator==(const FOMUpdateRate& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -3637,7 +3577,7 @@ public:
     if (getRate() != rhs.getRate()) return false;
     return true;
   }
-  bool operator<(const FOMUpdateRate& rhs) const
+  bool operator<(const FOMUpdateRate& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -3649,17 +3589,15 @@ public:
     if (rhs.getRate() < getRate()) return false;
     return false;
   }
-  bool operator!=(const FOMUpdateRate& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMUpdateRate& rhs) const
+  bool operator>(const FOMUpdateRate& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMUpdateRate& rhs) const
+  bool operator>=(const FOMUpdateRate& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMUpdateRate& rhs) const
+  bool operator<=(const FOMUpdateRate& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _updateRateHandle(),
       _rate()
@@ -3677,7 +3615,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -3691,26 +3629,26 @@ public:
   FOMSwitch() : 
     _impl(new Implementation())
   { }
-  void setSwitchesType(const SwitchesType& value)
+  void setSwitchesType(const SwitchesType& value) noexcept
   { getImpl()._switchesType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSwitchesType(SwitchesType&& value)
+  void setSwitchesType(SwitchesType&& value) noexcept
   { getImpl()._switchesType = std::move(value); }
 #endif
-  SwitchesType& getSwitchesType()
+  SwitchesType& getSwitchesType() noexcept
   { return getImpl()._switchesType; }
-  const SwitchesType& getSwitchesType() const
+  const SwitchesType& getSwitchesType() const noexcept
   { return getConstImpl()._switchesType; }
 
-  void setEnabled(const Bool& value)
+  void setEnabled(const Bool& value) noexcept
   { getImpl()._enabled = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEnabled(Bool&& value)
+  void setEnabled(Bool&& value) noexcept
   { getImpl()._enabled = std::move(value); }
 #endif
-  Bool& getEnabled()
+  Bool& getEnabled() noexcept
   { return getImpl()._enabled; }
-  const Bool& getEnabled() const
+  const Bool& getEnabled() const noexcept
   { return getConstImpl()._enabled; }
 
   FOMSwitch& swap(FOMSwitch& rhs)
@@ -3718,7 +3656,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMSwitch& rhs) const
+  bool operator==(const FOMSwitch& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -3726,7 +3664,7 @@ public:
     if (getEnabled() != rhs.getEnabled()) return false;
     return true;
   }
-  bool operator<(const FOMSwitch& rhs) const
+  bool operator<(const FOMSwitch& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -3736,17 +3674,15 @@ public:
     if (rhs.getEnabled() < getEnabled()) return false;
     return false;
   }
-  bool operator!=(const FOMSwitch& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMSwitch& rhs) const
+  bool operator>(const FOMSwitch& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMSwitch& rhs) const
+  bool operator>=(const FOMSwitch& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMSwitch& rhs) const
+  bool operator<=(const FOMSwitch& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _switchesType(),
       _enabled()
     { }
@@ -3762,7 +3698,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -3776,125 +3712,125 @@ public:
   FOMModule() : 
     _impl(new Implementation())
   { }
-  void setModuleHandle(const ModuleHandle& value)
+  void setModuleHandle(const ModuleHandle& value) noexcept
   { getImpl()._moduleHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setModuleHandle(ModuleHandle&& value)
+  void setModuleHandle(ModuleHandle&& value) noexcept
   { getImpl()._moduleHandle = std::move(value); }
 #endif
-  ModuleHandle& getModuleHandle()
+  ModuleHandle& getModuleHandle() noexcept
   { return getImpl()._moduleHandle; }
-  const ModuleHandle& getModuleHandle() const
+  const ModuleHandle& getModuleHandle() const noexcept
   { return getConstImpl()._moduleHandle; }
 
-  void setTransportationTypeList(const FOMTransportationTypeList& value)
+  void setTransportationTypeList(const FOMTransportationTypeList& value) noexcept
   { getImpl()._transportationTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationTypeList(FOMTransportationTypeList&& value)
+  void setTransportationTypeList(FOMTransportationTypeList&& value) noexcept
   { getImpl()._transportationTypeList = std::move(value); }
 #endif
-  FOMTransportationTypeList& getTransportationTypeList()
+  FOMTransportationTypeList& getTransportationTypeList() noexcept
   { return getImpl()._transportationTypeList; }
-  const FOMTransportationTypeList& getTransportationTypeList() const
+  const FOMTransportationTypeList& getTransportationTypeList() const noexcept
   { return getConstImpl()._transportationTypeList; }
 
-  void setDimensionList(const FOMDimensionList& value)
+  void setDimensionList(const FOMDimensionList& value) noexcept
   { getImpl()._dimensionList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionList(FOMDimensionList&& value)
+  void setDimensionList(FOMDimensionList&& value) noexcept
   { getImpl()._dimensionList = std::move(value); }
 #endif
-  FOMDimensionList& getDimensionList()
+  FOMDimensionList& getDimensionList() noexcept
   { return getImpl()._dimensionList; }
-  const FOMDimensionList& getDimensionList() const
+  const FOMDimensionList& getDimensionList() const noexcept
   { return getConstImpl()._dimensionList; }
 
-  void setRoutingSpaceList(const FOMRoutingSpaceList& value)
+  void setRoutingSpaceList(const FOMRoutingSpaceList& value) noexcept
   { getImpl()._routingSpaceList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRoutingSpaceList(FOMRoutingSpaceList&& value)
+  void setRoutingSpaceList(FOMRoutingSpaceList&& value) noexcept
   { getImpl()._routingSpaceList = std::move(value); }
 #endif
-  FOMRoutingSpaceList& getRoutingSpaceList()
+  FOMRoutingSpaceList& getRoutingSpaceList() noexcept
   { return getImpl()._routingSpaceList; }
-  const FOMRoutingSpaceList& getRoutingSpaceList() const
+  const FOMRoutingSpaceList& getRoutingSpaceList() const noexcept
   { return getConstImpl()._routingSpaceList; }
 
-  void setInteractionClassList(const FOMInteractionClassList& value)
+  void setInteractionClassList(const FOMInteractionClassList& value) noexcept
   { getImpl()._interactionClassList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassList(FOMInteractionClassList&& value)
+  void setInteractionClassList(FOMInteractionClassList&& value) noexcept
   { getImpl()._interactionClassList = std::move(value); }
 #endif
-  FOMInteractionClassList& getInteractionClassList()
+  FOMInteractionClassList& getInteractionClassList() noexcept
   { return getImpl()._interactionClassList; }
-  const FOMInteractionClassList& getInteractionClassList() const
+  const FOMInteractionClassList& getInteractionClassList() const noexcept
   { return getConstImpl()._interactionClassList; }
 
-  void setObjectClassList(const FOMObjectClassList& value)
+  void setObjectClassList(const FOMObjectClassList& value) noexcept
   { getImpl()._objectClassList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassList(FOMObjectClassList&& value)
+  void setObjectClassList(FOMObjectClassList&& value) noexcept
   { getImpl()._objectClassList = std::move(value); }
 #endif
-  FOMObjectClassList& getObjectClassList()
+  FOMObjectClassList& getObjectClassList() noexcept
   { return getImpl()._objectClassList; }
-  const FOMObjectClassList& getObjectClassList() const
+  const FOMObjectClassList& getObjectClassList() const noexcept
   { return getConstImpl()._objectClassList; }
 
-  void setUpdateRateList(const FOMUpdateRateList& value)
+  void setUpdateRateList(const FOMUpdateRateList& value) noexcept
   { getImpl()._updateRateList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpdateRateList(FOMUpdateRateList&& value)
+  void setUpdateRateList(FOMUpdateRateList&& value) noexcept
   { getImpl()._updateRateList = std::move(value); }
 #endif
-  FOMUpdateRateList& getUpdateRateList()
+  FOMUpdateRateList& getUpdateRateList() noexcept
   { return getImpl()._updateRateList; }
-  const FOMUpdateRateList& getUpdateRateList() const
+  const FOMUpdateRateList& getUpdateRateList() const noexcept
   { return getConstImpl()._updateRateList; }
 
-  void setSwitchList(const FOMSwitchList& value)
+  void setSwitchList(const FOMSwitchList& value) noexcept
   { getImpl()._switchList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSwitchList(FOMSwitchList&& value)
+  void setSwitchList(FOMSwitchList&& value) noexcept
   { getImpl()._switchList = std::move(value); }
 #endif
-  FOMSwitchList& getSwitchList()
+  FOMSwitchList& getSwitchList() noexcept
   { return getImpl()._switchList; }
-  const FOMSwitchList& getSwitchList() const
+  const FOMSwitchList& getSwitchList() const noexcept
   { return getConstImpl()._switchList; }
 
-  void setArtificialInteractionRoot(const Bool& value)
+  void setArtificialInteractionRoot(const Bool& value) noexcept
   { getImpl()._artificialInteractionRoot = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialInteractionRoot(Bool&& value)
+  void setArtificialInteractionRoot(Bool&& value) noexcept
   { getImpl()._artificialInteractionRoot = std::move(value); }
 #endif
-  Bool& getArtificialInteractionRoot()
+  Bool& getArtificialInteractionRoot() noexcept
   { return getImpl()._artificialInteractionRoot; }
-  const Bool& getArtificialInteractionRoot() const
+  const Bool& getArtificialInteractionRoot() const noexcept
   { return getConstImpl()._artificialInteractionRoot; }
 
-  void setArtificialObjectRoot(const Bool& value)
+  void setArtificialObjectRoot(const Bool& value) noexcept
   { getImpl()._artificialObjectRoot = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialObjectRoot(Bool&& value)
+  void setArtificialObjectRoot(Bool&& value) noexcept
   { getImpl()._artificialObjectRoot = std::move(value); }
 #endif
-  Bool& getArtificialObjectRoot()
+  Bool& getArtificialObjectRoot() noexcept
   { return getImpl()._artificialObjectRoot; }
-  const Bool& getArtificialObjectRoot() const
+  const Bool& getArtificialObjectRoot() const noexcept
   { return getConstImpl()._artificialObjectRoot; }
 
-  void setDesignator(const String& value)
+  void setDesignator(const String& value) noexcept
   { getImpl()._designator = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDesignator(String&& value)
+  void setDesignator(String&& value) noexcept
   { getImpl()._designator = std::move(value); }
 #endif
-  String& getDesignator()
+  String& getDesignator() noexcept
   { return getImpl()._designator; }
-  const String& getDesignator() const
+  const String& getDesignator() const noexcept
   { return getConstImpl()._designator; }
 
   FOMModule& swap(FOMModule& rhs)
@@ -3902,7 +3838,7 @@ public:
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMModule& rhs) const
+  bool operator==(const FOMModule& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -3919,7 +3855,7 @@ public:
     if (getDesignator() != rhs.getDesignator()) return false;
     return true;
   }
-  bool operator<(const FOMModule& rhs) const
+  bool operator<(const FOMModule& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -3947,17 +3883,15 @@ public:
     if (rhs.getDesignator() < getDesignator()) return false;
     return false;
   }
-  bool operator!=(const FOMModule& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMModule& rhs) const
+  bool operator>(const FOMModule& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMModule& rhs) const
+  bool operator>=(const FOMModule& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMModule& rhs) const
+  bool operator<=(const FOMModule& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _moduleHandle(),
       _transportationTypeList(),
       _dimensionList(),
@@ -3991,7 +3925,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -4000,94 +3934,94 @@ private:
 
 typedef std::vector<FOMModule> FOMModuleList;
 
-class OPENRTI_API ConnectionLostMessage : public AbstractMessage {
+class OPENRTI_API ConnectionLostMessage final : public AbstractMessage {
 public:
-  ConnectionLostMessage();
-  virtual ~ConnectionLostMessage();
+  ConnectionLostMessage() noexcept;
+  virtual ~ConnectionLostMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ConnectionLostMessage& rhs) const;
-  bool operator<(const ConnectionLostMessage& rhs) const;
-  bool operator!=(const ConnectionLostMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ConnectionLostMessage& rhs) const noexcept;
+  bool operator<(const ConnectionLostMessage& rhs) const noexcept;
+  bool operator!=(const ConnectionLostMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ConnectionLostMessage& rhs) const
+  bool operator>(const ConnectionLostMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ConnectionLostMessage& rhs) const
+  bool operator>=(const ConnectionLostMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ConnectionLostMessage& rhs) const
+  bool operator<=(const ConnectionLostMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFaultDescription(const String& value)
+  void setFaultDescription(const String& value) noexcept
   { _faultDescription = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFaultDescription(String&& value)
+  void setFaultDescription(String&& value) noexcept
   { _faultDescription = std::move(value); }
 #endif
-  String& getFaultDescription()
+  String& getFaultDescription() noexcept
   { return _faultDescription; }
-  const String& getFaultDescription() const
+  const String& getFaultDescription() const noexcept
   { return _faultDescription; }
 
 private:
   String _faultDescription;
 };
 
-class OPENRTI_API CreateFederationExecutionRequestMessage : public AbstractMessage {
+class OPENRTI_API CreateFederationExecutionRequestMessage final : public AbstractMessage {
 public:
-  CreateFederationExecutionRequestMessage();
-  virtual ~CreateFederationExecutionRequestMessage();
+  CreateFederationExecutionRequestMessage() noexcept;
+  virtual ~CreateFederationExecutionRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CreateFederationExecutionRequestMessage& rhs) const;
-  bool operator<(const CreateFederationExecutionRequestMessage& rhs) const;
-  bool operator!=(const CreateFederationExecutionRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CreateFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator<(const CreateFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator!=(const CreateFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CreateFederationExecutionRequestMessage& rhs) const
+  bool operator>(const CreateFederationExecutionRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CreateFederationExecutionRequestMessage& rhs) const
+  bool operator>=(const CreateFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CreateFederationExecutionRequestMessage& rhs) const
+  bool operator<=(const CreateFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationExecution(const String& value)
+  void setFederationExecution(const String& value) noexcept
   { _federationExecution = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecution(String&& value)
+  void setFederationExecution(String&& value) noexcept
   { _federationExecution = std::move(value); }
 #endif
-  String& getFederationExecution()
+  String& getFederationExecution() noexcept
   { return _federationExecution; }
-  const String& getFederationExecution() const
+  const String& getFederationExecution() const noexcept
   { return _federationExecution; }
 
-  void setLogicalTimeFactoryName(const String& value)
+  void setLogicalTimeFactoryName(const String& value) noexcept
   { _logicalTimeFactoryName = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLogicalTimeFactoryName(String&& value)
+  void setLogicalTimeFactoryName(String&& value) noexcept
   { _logicalTimeFactoryName = std::move(value); }
 #endif
-  String& getLogicalTimeFactoryName()
+  String& getLogicalTimeFactoryName() noexcept
   { return _logicalTimeFactoryName; }
-  const String& getLogicalTimeFactoryName() const
+  const String& getLogicalTimeFactoryName() const noexcept
   { return _logicalTimeFactoryName; }
 
-  void setFOMStringModuleList(const FOMStringModuleList& value)
+  void setFOMStringModuleList(const FOMStringModuleList& value) noexcept
   { _fOMStringModuleList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFOMStringModuleList(FOMStringModuleList&& value)
+  void setFOMStringModuleList(FOMStringModuleList&& value) noexcept
   { _fOMStringModuleList = std::move(value); }
 #endif
-  FOMStringModuleList& getFOMStringModuleList()
+  FOMStringModuleList& getFOMStringModuleList() noexcept
   { return _fOMStringModuleList; }
-  const FOMStringModuleList& getFOMStringModuleList() const
+  const FOMStringModuleList& getFOMStringModuleList() const noexcept
   { return _fOMStringModuleList; }
 
 private:
@@ -4096,47 +4030,47 @@ private:
   FOMStringModuleList _fOMStringModuleList;
 };
 
-class OPENRTI_API CreateFederationExecutionResponseMessage : public AbstractMessage {
+class OPENRTI_API CreateFederationExecutionResponseMessage final : public AbstractMessage {
 public:
-  CreateFederationExecutionResponseMessage();
-  virtual ~CreateFederationExecutionResponseMessage();
+  CreateFederationExecutionResponseMessage() noexcept;
+  virtual ~CreateFederationExecutionResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CreateFederationExecutionResponseMessage& rhs) const;
-  bool operator<(const CreateFederationExecutionResponseMessage& rhs) const;
-  bool operator!=(const CreateFederationExecutionResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CreateFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator<(const CreateFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator!=(const CreateFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CreateFederationExecutionResponseMessage& rhs) const
+  bool operator>(const CreateFederationExecutionResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CreateFederationExecutionResponseMessage& rhs) const
+  bool operator>=(const CreateFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CreateFederationExecutionResponseMessage& rhs) const
+  bool operator<=(const CreateFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setCreateFederationExecutionResponseType(const CreateFederationExecutionResponseType& value)
+  void setCreateFederationExecutionResponseType(const CreateFederationExecutionResponseType& value) noexcept
   { _createFederationExecutionResponseType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCreateFederationExecutionResponseType(CreateFederationExecutionResponseType&& value)
+  void setCreateFederationExecutionResponseType(CreateFederationExecutionResponseType&& value) noexcept
   { _createFederationExecutionResponseType = std::move(value); }
 #endif
-  CreateFederationExecutionResponseType& getCreateFederationExecutionResponseType()
+  CreateFederationExecutionResponseType& getCreateFederationExecutionResponseType() noexcept
   { return _createFederationExecutionResponseType; }
-  const CreateFederationExecutionResponseType& getCreateFederationExecutionResponseType() const
+  const CreateFederationExecutionResponseType& getCreateFederationExecutionResponseType() const noexcept
   { return _createFederationExecutionResponseType; }
 
-  void setExceptionString(const String& value)
+  void setExceptionString(const String& value) noexcept
   { _exceptionString = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setExceptionString(String&& value)
+  void setExceptionString(String&& value) noexcept
   { _exceptionString = std::move(value); }
 #endif
-  String& getExceptionString()
+  String& getExceptionString() noexcept
   { return _exceptionString; }
-  const String& getExceptionString() const
+  const String& getExceptionString() const noexcept
   { return _exceptionString; }
 
 private:
@@ -4144,201 +4078,201 @@ private:
   String _exceptionString;
 };
 
-class OPENRTI_API DestroyFederationExecutionRequestMessage : public AbstractMessage {
+class OPENRTI_API DestroyFederationExecutionRequestMessage final : public AbstractMessage {
 public:
-  DestroyFederationExecutionRequestMessage();
-  virtual ~DestroyFederationExecutionRequestMessage();
+  DestroyFederationExecutionRequestMessage() noexcept;
+  virtual ~DestroyFederationExecutionRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const DestroyFederationExecutionRequestMessage& rhs) const;
-  bool operator<(const DestroyFederationExecutionRequestMessage& rhs) const;
-  bool operator!=(const DestroyFederationExecutionRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DestroyFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator<(const DestroyFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator!=(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const DestroyFederationExecutionRequestMessage& rhs) const
+  bool operator>(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const DestroyFederationExecutionRequestMessage& rhs) const
+  bool operator>=(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const DestroyFederationExecutionRequestMessage& rhs) const
+  bool operator<=(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationExecution(const String& value)
+  void setFederationExecution(const String& value) noexcept
   { _federationExecution = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecution(String&& value)
+  void setFederationExecution(String&& value) noexcept
   { _federationExecution = std::move(value); }
 #endif
-  String& getFederationExecution()
+  String& getFederationExecution() noexcept
   { return _federationExecution; }
-  const String& getFederationExecution() const
+  const String& getFederationExecution() const noexcept
   { return _federationExecution; }
 
 private:
   String _federationExecution;
 };
 
-class OPENRTI_API DestroyFederationExecutionResponseMessage : public AbstractMessage {
+class OPENRTI_API DestroyFederationExecutionResponseMessage final : public AbstractMessage {
 public:
-  DestroyFederationExecutionResponseMessage();
-  virtual ~DestroyFederationExecutionResponseMessage();
+  DestroyFederationExecutionResponseMessage() noexcept;
+  virtual ~DestroyFederationExecutionResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const DestroyFederationExecutionResponseMessage& rhs) const;
-  bool operator<(const DestroyFederationExecutionResponseMessage& rhs) const;
-  bool operator!=(const DestroyFederationExecutionResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DestroyFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator<(const DestroyFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator!=(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const DestroyFederationExecutionResponseMessage& rhs) const
+  bool operator>(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const DestroyFederationExecutionResponseMessage& rhs) const
+  bool operator>=(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const DestroyFederationExecutionResponseMessage& rhs) const
+  bool operator<=(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setDestroyFederationExecutionResponseType(const DestroyFederationExecutionResponseType& value)
+  void setDestroyFederationExecutionResponseType(const DestroyFederationExecutionResponseType& value) noexcept
   { _destroyFederationExecutionResponseType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDestroyFederationExecutionResponseType(DestroyFederationExecutionResponseType&& value)
+  void setDestroyFederationExecutionResponseType(DestroyFederationExecutionResponseType&& value) noexcept
   { _destroyFederationExecutionResponseType = std::move(value); }
 #endif
-  DestroyFederationExecutionResponseType& getDestroyFederationExecutionResponseType()
+  DestroyFederationExecutionResponseType& getDestroyFederationExecutionResponseType() noexcept
   { return _destroyFederationExecutionResponseType; }
-  const DestroyFederationExecutionResponseType& getDestroyFederationExecutionResponseType() const
+  const DestroyFederationExecutionResponseType& getDestroyFederationExecutionResponseType() const noexcept
   { return _destroyFederationExecutionResponseType; }
 
 private:
   DestroyFederationExecutionResponseType _destroyFederationExecutionResponseType;
 };
 
-class OPENRTI_API EnumerateFederationExecutionsRequestMessage : public AbstractMessage {
+class OPENRTI_API EnumerateFederationExecutionsRequestMessage final : public AbstractMessage {
 public:
-  EnumerateFederationExecutionsRequestMessage();
-  virtual ~EnumerateFederationExecutionsRequestMessage();
+  EnumerateFederationExecutionsRequestMessage() noexcept;
+  virtual ~EnumerateFederationExecutionsRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EnumerateFederationExecutionsRequestMessage& rhs) const;
-  bool operator<(const EnumerateFederationExecutionsRequestMessage& rhs) const;
-  bool operator!=(const EnumerateFederationExecutionsRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept;
+  bool operator<(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept;
+  bool operator!=(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EnumerateFederationExecutionsRequestMessage& rhs) const
+  bool operator>(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EnumerateFederationExecutionsRequestMessage& rhs) const
+  bool operator>=(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EnumerateFederationExecutionsRequestMessage& rhs) const
+  bool operator<=(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
 private:
 };
 
-class OPENRTI_API EnumerateFederationExecutionsResponseMessage : public AbstractMessage {
+class OPENRTI_API EnumerateFederationExecutionsResponseMessage final : public AbstractMessage {
 public:
-  EnumerateFederationExecutionsResponseMessage();
-  virtual ~EnumerateFederationExecutionsResponseMessage();
+  EnumerateFederationExecutionsResponseMessage() noexcept;
+  virtual ~EnumerateFederationExecutionsResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EnumerateFederationExecutionsResponseMessage& rhs) const;
-  bool operator<(const EnumerateFederationExecutionsResponseMessage& rhs) const;
-  bool operator!=(const EnumerateFederationExecutionsResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept;
+  bool operator<(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept;
+  bool operator!=(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EnumerateFederationExecutionsResponseMessage& rhs) const
+  bool operator>(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EnumerateFederationExecutionsResponseMessage& rhs) const
+  bool operator>=(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EnumerateFederationExecutionsResponseMessage& rhs) const
+  bool operator<=(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationExecutionInformationVector(const FederationExecutionInformationVector& value)
+  void setFederationExecutionInformationVector(const FederationExecutionInformationVector& value) noexcept
   { _federationExecutionInformationVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecutionInformationVector(FederationExecutionInformationVector&& value)
+  void setFederationExecutionInformationVector(FederationExecutionInformationVector&& value) noexcept
   { _federationExecutionInformationVector = std::move(value); }
 #endif
-  FederationExecutionInformationVector& getFederationExecutionInformationVector()
+  FederationExecutionInformationVector& getFederationExecutionInformationVector() noexcept
   { return _federationExecutionInformationVector; }
-  const FederationExecutionInformationVector& getFederationExecutionInformationVector() const
+  const FederationExecutionInformationVector& getFederationExecutionInformationVector() const noexcept
   { return _federationExecutionInformationVector; }
 
 private:
   FederationExecutionInformationVector _federationExecutionInformationVector;
 };
 
-class OPENRTI_API InsertFederationExecutionMessage : public AbstractMessage {
+class OPENRTI_API InsertFederationExecutionMessage final : public AbstractMessage {
 public:
-  InsertFederationExecutionMessage();
-  virtual ~InsertFederationExecutionMessage();
+  InsertFederationExecutionMessage() noexcept;
+  virtual ~InsertFederationExecutionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InsertFederationExecutionMessage& rhs) const;
-  bool operator<(const InsertFederationExecutionMessage& rhs) const;
-  bool operator!=(const InsertFederationExecutionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertFederationExecutionMessage& rhs) const noexcept;
+  bool operator<(const InsertFederationExecutionMessage& rhs) const noexcept;
+  bool operator!=(const InsertFederationExecutionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InsertFederationExecutionMessage& rhs) const
+  bool operator>(const InsertFederationExecutionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InsertFederationExecutionMessage& rhs) const
+  bool operator>=(const InsertFederationExecutionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InsertFederationExecutionMessage& rhs) const
+  bool operator<=(const InsertFederationExecutionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederationName(const String& value)
+  void setFederationName(const String& value) noexcept
   { _federationName = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationName(String&& value)
+  void setFederationName(String&& value) noexcept
   { _federationName = std::move(value); }
 #endif
-  String& getFederationName()
+  String& getFederationName() noexcept
   { return _federationName; }
-  const String& getFederationName() const
+  const String& getFederationName() const noexcept
   { return _federationName; }
 
-  void setLogicalTimeFactoryName(const String& value)
+  void setLogicalTimeFactoryName(const String& value) noexcept
   { _logicalTimeFactoryName = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLogicalTimeFactoryName(String&& value)
+  void setLogicalTimeFactoryName(String&& value) noexcept
   { _logicalTimeFactoryName = std::move(value); }
 #endif
-  String& getLogicalTimeFactoryName()
+  String& getLogicalTimeFactoryName() noexcept
   { return _logicalTimeFactoryName; }
-  const String& getLogicalTimeFactoryName() const
+  const String& getLogicalTimeFactoryName() const noexcept
   { return _logicalTimeFactoryName; }
 
-  void setConfigurationParameterMap(const ConfigurationParameterMap& value)
+  void setConfigurationParameterMap(const ConfigurationParameterMap& value) noexcept
   { _configurationParameterMap = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setConfigurationParameterMap(ConfigurationParameterMap&& value)
+  void setConfigurationParameterMap(ConfigurationParameterMap&& value) noexcept
   { _configurationParameterMap = std::move(value); }
 #endif
-  ConfigurationParameterMap& getConfigurationParameterMap()
+  ConfigurationParameterMap& getConfigurationParameterMap() noexcept
   { return _configurationParameterMap; }
-  const ConfigurationParameterMap& getConfigurationParameterMap() const
+  const ConfigurationParameterMap& getConfigurationParameterMap() const noexcept
   { return _configurationParameterMap; }
 
 private:
@@ -4348,155 +4282,155 @@ private:
   ConfigurationParameterMap _configurationParameterMap;
 };
 
-class OPENRTI_API ShutdownFederationExecutionMessage : public AbstractMessage {
+class OPENRTI_API ShutdownFederationExecutionMessage final : public AbstractMessage {
 public:
-  ShutdownFederationExecutionMessage();
-  virtual ~ShutdownFederationExecutionMessage();
+  ShutdownFederationExecutionMessage() noexcept;
+  virtual ~ShutdownFederationExecutionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ShutdownFederationExecutionMessage& rhs) const;
-  bool operator<(const ShutdownFederationExecutionMessage& rhs) const;
-  bool operator!=(const ShutdownFederationExecutionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ShutdownFederationExecutionMessage& rhs) const noexcept;
+  bool operator<(const ShutdownFederationExecutionMessage& rhs) const noexcept;
+  bool operator!=(const ShutdownFederationExecutionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ShutdownFederationExecutionMessage& rhs) const
+  bool operator>(const ShutdownFederationExecutionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ShutdownFederationExecutionMessage& rhs) const
+  bool operator>=(const ShutdownFederationExecutionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ShutdownFederationExecutionMessage& rhs) const
+  bool operator<=(const ShutdownFederationExecutionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
 private:
   FederationHandle _federationHandle;
 };
 
-class OPENRTI_API EraseFederationExecutionMessage : public AbstractMessage {
+class OPENRTI_API EraseFederationExecutionMessage final : public AbstractMessage {
 public:
-  EraseFederationExecutionMessage();
-  virtual ~EraseFederationExecutionMessage();
+  EraseFederationExecutionMessage() noexcept;
+  virtual ~EraseFederationExecutionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EraseFederationExecutionMessage& rhs) const;
-  bool operator<(const EraseFederationExecutionMessage& rhs) const;
-  bool operator!=(const EraseFederationExecutionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EraseFederationExecutionMessage& rhs) const noexcept;
+  bool operator<(const EraseFederationExecutionMessage& rhs) const noexcept;
+  bool operator!=(const EraseFederationExecutionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EraseFederationExecutionMessage& rhs) const
+  bool operator>(const EraseFederationExecutionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EraseFederationExecutionMessage& rhs) const
+  bool operator>=(const EraseFederationExecutionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EraseFederationExecutionMessage& rhs) const
+  bool operator<=(const EraseFederationExecutionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
 private:
   FederationHandle _federationHandle;
 };
 
-class OPENRTI_API ReleaseFederationHandleMessage : public AbstractMessage {
+class OPENRTI_API ReleaseFederationHandleMessage final : public AbstractMessage {
 public:
-  ReleaseFederationHandleMessage();
-  virtual ~ReleaseFederationHandleMessage();
+  ReleaseFederationHandleMessage() noexcept;
+  virtual ~ReleaseFederationHandleMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReleaseFederationHandleMessage& rhs) const;
-  bool operator<(const ReleaseFederationHandleMessage& rhs) const;
-  bool operator!=(const ReleaseFederationHandleMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReleaseFederationHandleMessage& rhs) const noexcept;
+  bool operator<(const ReleaseFederationHandleMessage& rhs) const noexcept;
+  bool operator!=(const ReleaseFederationHandleMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReleaseFederationHandleMessage& rhs) const
+  bool operator>(const ReleaseFederationHandleMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReleaseFederationHandleMessage& rhs) const
+  bool operator>=(const ReleaseFederationHandleMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReleaseFederationHandleMessage& rhs) const
+  bool operator<=(const ReleaseFederationHandleMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
 private:
   FederationHandle _federationHandle;
 };
 
-class OPENRTI_API InsertModulesMessage : public AbstractMessage {
+class OPENRTI_API InsertModulesMessage final : public AbstractMessage {
 public:
-  InsertModulesMessage();
-  virtual ~InsertModulesMessage();
+  InsertModulesMessage() noexcept;
+  virtual ~InsertModulesMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InsertModulesMessage& rhs) const;
-  bool operator<(const InsertModulesMessage& rhs) const;
-  bool operator!=(const InsertModulesMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertModulesMessage& rhs) const noexcept;
+  bool operator<(const InsertModulesMessage& rhs) const noexcept;
+  bool operator!=(const InsertModulesMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InsertModulesMessage& rhs) const
+  bool operator>(const InsertModulesMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InsertModulesMessage& rhs) const
+  bool operator>=(const InsertModulesMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InsertModulesMessage& rhs) const
+  bool operator<=(const InsertModulesMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFOMModuleList(const FOMModuleList& value)
+  void setFOMModuleList(const FOMModuleList& value) noexcept
   { _fOMModuleList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFOMModuleList(FOMModuleList&& value)
+  void setFOMModuleList(FOMModuleList&& value) noexcept
   { _fOMModuleList = std::move(value); }
 #endif
-  FOMModuleList& getFOMModuleList()
+  FOMModuleList& getFOMModuleList() noexcept
   { return _fOMModuleList; }
-  const FOMModuleList& getFOMModuleList() const
+  const FOMModuleList& getFOMModuleList() const noexcept
   { return _fOMModuleList; }
 
 private:
@@ -4504,91 +4438,91 @@ private:
   FOMModuleList _fOMModuleList;
 };
 
-class OPENRTI_API JoinFederationExecutionRequestMessage : public AbstractMessage {
+class OPENRTI_API JoinFederationExecutionRequestMessage final : public AbstractMessage {
 public:
-  JoinFederationExecutionRequestMessage();
-  virtual ~JoinFederationExecutionRequestMessage();
+  JoinFederationExecutionRequestMessage() noexcept;
+  virtual ~JoinFederationExecutionRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const JoinFederationExecutionRequestMessage& rhs) const;
-  bool operator<(const JoinFederationExecutionRequestMessage& rhs) const;
-  bool operator!=(const JoinFederationExecutionRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const JoinFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator<(const JoinFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator!=(const JoinFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const JoinFederationExecutionRequestMessage& rhs) const
+  bool operator>(const JoinFederationExecutionRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const JoinFederationExecutionRequestMessage& rhs) const
+  bool operator>=(const JoinFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const JoinFederationExecutionRequestMessage& rhs) const
+  bool operator<=(const JoinFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationExecution(const String& value)
+  void setFederationExecution(const String& value) noexcept
   { _federationExecution = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecution(String&& value)
+  void setFederationExecution(String&& value) noexcept
   { _federationExecution = std::move(value); }
 #endif
-  String& getFederationExecution()
+  String& getFederationExecution() noexcept
   { return _federationExecution; }
-  const String& getFederationExecution() const
+  const String& getFederationExecution() const noexcept
   { return _federationExecution; }
 
-  void setFederateType(const String& value)
+  void setFederateType(const String& value) noexcept
   { _federateType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateType(String&& value)
+  void setFederateType(String&& value) noexcept
   { _federateType = std::move(value); }
 #endif
-  String& getFederateType()
+  String& getFederateType() noexcept
   { return _federateType; }
-  const String& getFederateType() const
+  const String& getFederateType() const noexcept
   { return _federateType; }
 
-  void setFederateName(const String& value)
+  void setFederateName(const String& value) noexcept
   { _federateName = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateName(String&& value)
+  void setFederateName(String&& value) noexcept
   { _federateName = std::move(value); }
 #endif
-  String& getFederateName()
+  String& getFederateName() noexcept
   { return _federateName; }
-  const String& getFederateName() const
+  const String& getFederateName() const noexcept
   { return _federateName; }
 
-  void setFOMStringModuleList(const FOMStringModuleList& value)
+  void setFOMStringModuleList(const FOMStringModuleList& value) noexcept
   { _fOMStringModuleList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFOMStringModuleList(FOMStringModuleList&& value)
+  void setFOMStringModuleList(FOMStringModuleList&& value) noexcept
   { _fOMStringModuleList = std::move(value); }
 #endif
-  FOMStringModuleList& getFOMStringModuleList()
+  FOMStringModuleList& getFOMStringModuleList() noexcept
   { return _fOMStringModuleList; }
-  const FOMStringModuleList& getFOMStringModuleList() const
+  const FOMStringModuleList& getFOMStringModuleList() const noexcept
   { return _fOMStringModuleList; }
 
-  void setConfigurationParameterMap(const ConfigurationParameterMap& value)
+  void setConfigurationParameterMap(const ConfigurationParameterMap& value) noexcept
   { _configurationParameterMap = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setConfigurationParameterMap(ConfigurationParameterMap&& value)
+  void setConfigurationParameterMap(ConfigurationParameterMap&& value) noexcept
   { _configurationParameterMap = std::move(value); }
 #endif
-  ConfigurationParameterMap& getConfigurationParameterMap()
+  ConfigurationParameterMap& getConfigurationParameterMap() noexcept
   { return _configurationParameterMap; }
-  const ConfigurationParameterMap& getConfigurationParameterMap() const
+  const ConfigurationParameterMap& getConfigurationParameterMap() const noexcept
   { return _configurationParameterMap; }
 
-  void setIsInternal(const Bool& value)
+  void setIsInternal(const Bool& value) noexcept
   { _isInternal = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setIsInternal(Bool&& value)
+  void setIsInternal(Bool&& value) noexcept
   { _isInternal = std::move(value); }
 #endif
-  Bool& getIsInternal()
+  Bool& getIsInternal() noexcept
   { return _isInternal; }
-  const Bool& getIsInternal() const
+  const Bool& getIsInternal() const noexcept
   { return _isInternal; }
 
 private:
@@ -4600,91 +4534,91 @@ private:
   Bool _isInternal;
 };
 
-class OPENRTI_API JoinFederationExecutionResponseMessage : public AbstractMessage {
+class OPENRTI_API JoinFederationExecutionResponseMessage final : public AbstractMessage {
 public:
-  JoinFederationExecutionResponseMessage();
-  virtual ~JoinFederationExecutionResponseMessage();
+  JoinFederationExecutionResponseMessage() noexcept;
+  virtual ~JoinFederationExecutionResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const JoinFederationExecutionResponseMessage& rhs) const;
-  bool operator<(const JoinFederationExecutionResponseMessage& rhs) const;
-  bool operator!=(const JoinFederationExecutionResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const JoinFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator<(const JoinFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator!=(const JoinFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const JoinFederationExecutionResponseMessage& rhs) const
+  bool operator>(const JoinFederationExecutionResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const JoinFederationExecutionResponseMessage& rhs) const
+  bool operator>=(const JoinFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const JoinFederationExecutionResponseMessage& rhs) const
+  bool operator<=(const JoinFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setJoinFederationExecutionResponseType(const JoinFederationExecutionResponseType& value)
+  void setJoinFederationExecutionResponseType(const JoinFederationExecutionResponseType& value) noexcept
   { _joinFederationExecutionResponseType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setJoinFederationExecutionResponseType(JoinFederationExecutionResponseType&& value)
+  void setJoinFederationExecutionResponseType(JoinFederationExecutionResponseType&& value) noexcept
   { _joinFederationExecutionResponseType = std::move(value); }
 #endif
-  JoinFederationExecutionResponseType& getJoinFederationExecutionResponseType()
+  JoinFederationExecutionResponseType& getJoinFederationExecutionResponseType() noexcept
   { return _joinFederationExecutionResponseType; }
-  const JoinFederationExecutionResponseType& getJoinFederationExecutionResponseType() const
+  const JoinFederationExecutionResponseType& getJoinFederationExecutionResponseType() const noexcept
   { return _joinFederationExecutionResponseType; }
 
-  void setExceptionString(const String& value)
+  void setExceptionString(const String& value) noexcept
   { _exceptionString = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setExceptionString(String&& value)
+  void setExceptionString(String&& value) noexcept
   { _exceptionString = std::move(value); }
 #endif
-  String& getExceptionString()
+  String& getExceptionString() noexcept
   { return _exceptionString; }
-  const String& getExceptionString() const
+  const String& getExceptionString() const noexcept
   { return _exceptionString; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setFederateType(const String& value)
+  void setFederateType(const String& value) noexcept
   { _federateType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateType(String&& value)
+  void setFederateType(String&& value) noexcept
   { _federateType = std::move(value); }
 #endif
-  String& getFederateType()
+  String& getFederateType() noexcept
   { return _federateType; }
-  const String& getFederateType() const
+  const String& getFederateType() const noexcept
   { return _federateType; }
 
-  void setFederateName(const String& value)
+  void setFederateName(const String& value) noexcept
   { _federateName = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateName(String&& value)
+  void setFederateName(String&& value) noexcept
   { _federateName = std::move(value); }
 #endif
-  String& getFederateName()
+  String& getFederateName() noexcept
   { return _federateName; }
-  const String& getFederateName() const
+  const String& getFederateName() const noexcept
   { return _federateName; }
 
 private:
@@ -4696,58 +4630,58 @@ private:
   String _federateName;
 };
 
-class OPENRTI_API ResignFederationExecutionLeafRequestMessage : public AbstractMessage {
+class OPENRTI_API ResignFederationExecutionLeafRequestMessage final : public AbstractMessage {
 public:
-  ResignFederationExecutionLeafRequestMessage();
-  virtual ~ResignFederationExecutionLeafRequestMessage();
+  ResignFederationExecutionLeafRequestMessage() noexcept;
+  virtual ~ResignFederationExecutionLeafRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ResignFederationExecutionLeafRequestMessage& rhs) const;
-  bool operator<(const ResignFederationExecutionLeafRequestMessage& rhs) const;
-  bool operator!=(const ResignFederationExecutionLeafRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept;
+  bool operator<(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept;
+  bool operator!=(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ResignFederationExecutionLeafRequestMessage& rhs) const
+  bool operator>(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ResignFederationExecutionLeafRequestMessage& rhs) const
+  bool operator>=(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ResignFederationExecutionLeafRequestMessage& rhs) const
+  bool operator<=(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setResignAction(const ResignAction& value)
+  void setResignAction(const ResignAction& value) noexcept
   { _resignAction = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setResignAction(ResignAction&& value)
+  void setResignAction(ResignAction&& value) noexcept
   { _resignAction = std::move(value); }
 #endif
-  ResignAction& getResignAction()
+  ResignAction& getResignAction() noexcept
   { return _resignAction; }
-  const ResignAction& getResignAction() const
+  const ResignAction& getResignAction() const noexcept
   { return _resignAction; }
 
 private:
@@ -4756,47 +4690,47 @@ private:
   ResignAction _resignAction;
 };
 
-class OPENRTI_API ResignFederationExecutionRequestMessage : public AbstractMessage {
+class OPENRTI_API ResignFederationExecutionRequestMessage final : public AbstractMessage {
 public:
-  ResignFederationExecutionRequestMessage();
-  virtual ~ResignFederationExecutionRequestMessage();
+  ResignFederationExecutionRequestMessage() noexcept;
+  virtual ~ResignFederationExecutionRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ResignFederationExecutionRequestMessage& rhs) const;
-  bool operator<(const ResignFederationExecutionRequestMessage& rhs) const;
-  bool operator!=(const ResignFederationExecutionRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ResignFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator<(const ResignFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator!=(const ResignFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ResignFederationExecutionRequestMessage& rhs) const
+  bool operator>(const ResignFederationExecutionRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ResignFederationExecutionRequestMessage& rhs) const
+  bool operator>=(const ResignFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ResignFederationExecutionRequestMessage& rhs) const
+  bool operator<=(const ResignFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
 private:
@@ -4804,80 +4738,80 @@ private:
   FederateHandle _federateHandle;
 };
 
-class OPENRTI_API JoinFederateNotifyMessage : public AbstractMessage {
+class OPENRTI_API JoinFederateNotifyMessage final : public AbstractMessage {
 public:
-  JoinFederateNotifyMessage();
-  virtual ~JoinFederateNotifyMessage();
+  JoinFederateNotifyMessage() noexcept;
+  virtual ~JoinFederateNotifyMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const JoinFederateNotifyMessage& rhs) const;
-  bool operator<(const JoinFederateNotifyMessage& rhs) const;
-  bool operator!=(const JoinFederateNotifyMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const JoinFederateNotifyMessage& rhs) const noexcept;
+  bool operator<(const JoinFederateNotifyMessage& rhs) const noexcept;
+  bool operator!=(const JoinFederateNotifyMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const JoinFederateNotifyMessage& rhs) const
+  bool operator>(const JoinFederateNotifyMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const JoinFederateNotifyMessage& rhs) const
+  bool operator>=(const JoinFederateNotifyMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const JoinFederateNotifyMessage& rhs) const
+  bool operator<=(const JoinFederateNotifyMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setFederateType(const String& value)
+  void setFederateType(const String& value) noexcept
   { _federateType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateType(String&& value)
+  void setFederateType(String&& value) noexcept
   { _federateType = std::move(value); }
 #endif
-  String& getFederateType()
+  String& getFederateType() noexcept
   { return _federateType; }
-  const String& getFederateType() const
+  const String& getFederateType() const noexcept
   { return _federateType; }
 
-  void setFederateName(const String& value)
+  void setFederateName(const String& value) noexcept
   { _federateName = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateName(String&& value)
+  void setFederateName(String&& value) noexcept
   { _federateName = std::move(value); }
 #endif
-  String& getFederateName()
+  String& getFederateName() noexcept
   { return _federateName; }
-  const String& getFederateName() const
+  const String& getFederateName() const noexcept
   { return _federateName; }
 
-  void setIsInternal(const Bool& value)
+  void setIsInternal(const Bool& value) noexcept
   { _isInternal = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setIsInternal(Bool&& value)
+  void setIsInternal(Bool&& value) noexcept
   { _isInternal = std::move(value); }
 #endif
-  Bool& getIsInternal()
+  Bool& getIsInternal() noexcept
   { return _isInternal; }
-  const Bool& getIsInternal() const
+  const Bool& getIsInternal() const noexcept
   { return _isInternal; }
 
 private:
@@ -4888,47 +4822,47 @@ private:
   Bool _isInternal;
 };
 
-class OPENRTI_API ResignFederateNotifyMessage : public AbstractMessage {
+class OPENRTI_API ResignFederateNotifyMessage final : public AbstractMessage {
 public:
-  ResignFederateNotifyMessage();
-  virtual ~ResignFederateNotifyMessage();
+  ResignFederateNotifyMessage() noexcept;
+  virtual ~ResignFederateNotifyMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ResignFederateNotifyMessage& rhs) const;
-  bool operator<(const ResignFederateNotifyMessage& rhs) const;
-  bool operator!=(const ResignFederateNotifyMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ResignFederateNotifyMessage& rhs) const noexcept;
+  bool operator<(const ResignFederateNotifyMessage& rhs) const noexcept;
+  bool operator!=(const ResignFederateNotifyMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ResignFederateNotifyMessage& rhs) const
+  bool operator>(const ResignFederateNotifyMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ResignFederateNotifyMessage& rhs) const
+  bool operator>=(const ResignFederateNotifyMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ResignFederateNotifyMessage& rhs) const
+  bool operator<=(const ResignFederateNotifyMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
 private:
@@ -4936,58 +4870,58 @@ private:
   FederateHandle _federateHandle;
 };
 
-class OPENRTI_API ChangeAutomaticResignDirectiveMessage : public AbstractMessage {
+class OPENRTI_API ChangeAutomaticResignDirectiveMessage final : public AbstractMessage {
 public:
-  ChangeAutomaticResignDirectiveMessage();
-  virtual ~ChangeAutomaticResignDirectiveMessage();
+  ChangeAutomaticResignDirectiveMessage() noexcept;
+  virtual ~ChangeAutomaticResignDirectiveMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeAutomaticResignDirectiveMessage& rhs) const;
-  bool operator<(const ChangeAutomaticResignDirectiveMessage& rhs) const;
-  bool operator!=(const ChangeAutomaticResignDirectiveMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept;
+  bool operator<(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept;
+  bool operator!=(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeAutomaticResignDirectiveMessage& rhs) const
+  bool operator>(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeAutomaticResignDirectiveMessage& rhs) const
+  bool operator>=(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeAutomaticResignDirectiveMessage& rhs) const
+  bool operator<=(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setResignAction(const ResignAction& value)
+  void setResignAction(const ResignAction& value) noexcept
   { _resignAction = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setResignAction(ResignAction&& value)
+  void setResignAction(ResignAction&& value) noexcept
   { _resignAction = std::move(value); }
 #endif
-  ResignAction& getResignAction()
+  ResignAction& getResignAction() noexcept
   { return _resignAction; }
-  const ResignAction& getResignAction() const
+  const ResignAction& getResignAction() const noexcept
   { return _resignAction; }
 
 private:
@@ -4996,80 +4930,80 @@ private:
   ResignAction _resignAction;
 };
 
-class OPENRTI_API RegisterFederationSynchronizationPointMessage : public AbstractMessage {
+class OPENRTI_API RegisterFederationSynchronizationPointMessage final : public AbstractMessage {
 public:
-  RegisterFederationSynchronizationPointMessage();
-  virtual ~RegisterFederationSynchronizationPointMessage();
+  RegisterFederationSynchronizationPointMessage() noexcept;
+  virtual ~RegisterFederationSynchronizationPointMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RegisterFederationSynchronizationPointMessage& rhs) const;
-  bool operator<(const RegisterFederationSynchronizationPointMessage& rhs) const;
-  bool operator!=(const RegisterFederationSynchronizationPointMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept;
+  bool operator<(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept;
+  bool operator!=(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RegisterFederationSynchronizationPointMessage& rhs) const
+  bool operator>(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RegisterFederationSynchronizationPointMessage& rhs) const
+  bool operator>=(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RegisterFederationSynchronizationPointMessage& rhs) const
+  bool operator<=(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
 #endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setFederateHandleVector(const FederateHandleVector& value)
+  void setFederateHandleVector(const FederateHandleVector& value) noexcept
   { _federateHandleVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandleVector(FederateHandleVector&& value)
+  void setFederateHandleVector(FederateHandleVector&& value) noexcept
   { _federateHandleVector = std::move(value); }
 #endif
-  FederateHandleVector& getFederateHandleVector()
+  FederateHandleVector& getFederateHandleVector() noexcept
   { return _federateHandleVector; }
-  const FederateHandleVector& getFederateHandleVector() const
+  const FederateHandleVector& getFederateHandleVector() const noexcept
   { return _federateHandleVector; }
 
 private:
@@ -5080,69 +5014,69 @@ private:
   FederateHandleVector _federateHandleVector;
 };
 
-class OPENRTI_API RegisterFederationSynchronizationPointResponseMessage : public AbstractMessage {
+class OPENRTI_API RegisterFederationSynchronizationPointResponseMessage final : public AbstractMessage {
 public:
-  RegisterFederationSynchronizationPointResponseMessage();
-  virtual ~RegisterFederationSynchronizationPointResponseMessage();
+  RegisterFederationSynchronizationPointResponseMessage() noexcept;
+  virtual ~RegisterFederationSynchronizationPointResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RegisterFederationSynchronizationPointResponseMessage& rhs) const;
-  bool operator<(const RegisterFederationSynchronizationPointResponseMessage& rhs) const;
-  bool operator!=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept;
+  bool operator<(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept;
+  bool operator!=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+  bool operator>(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+  bool operator>=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+  bool operator<=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
 #endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setRegisterFederationSynchronizationPointResponseType(const RegisterFederationSynchronizationPointResponseType& value)
+  void setRegisterFederationSynchronizationPointResponseType(const RegisterFederationSynchronizationPointResponseType& value) noexcept
   { _registerFederationSynchronizationPointResponseType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRegisterFederationSynchronizationPointResponseType(RegisterFederationSynchronizationPointResponseType&& value)
+  void setRegisterFederationSynchronizationPointResponseType(RegisterFederationSynchronizationPointResponseType&& value) noexcept
   { _registerFederationSynchronizationPointResponseType = std::move(value); }
 #endif
-  RegisterFederationSynchronizationPointResponseType& getRegisterFederationSynchronizationPointResponseType()
+  RegisterFederationSynchronizationPointResponseType& getRegisterFederationSynchronizationPointResponseType() noexcept
   { return _registerFederationSynchronizationPointResponseType; }
-  const RegisterFederationSynchronizationPointResponseType& getRegisterFederationSynchronizationPointResponseType() const
+  const RegisterFederationSynchronizationPointResponseType& getRegisterFederationSynchronizationPointResponseType() const noexcept
   { return _registerFederationSynchronizationPointResponseType; }
 
 private:
@@ -5152,80 +5086,80 @@ private:
   RegisterFederationSynchronizationPointResponseType _registerFederationSynchronizationPointResponseType;
 };
 
-class OPENRTI_API AnnounceSynchronizationPointMessage : public AbstractMessage {
+class OPENRTI_API AnnounceSynchronizationPointMessage final : public AbstractMessage {
 public:
-  AnnounceSynchronizationPointMessage();
-  virtual ~AnnounceSynchronizationPointMessage();
+  AnnounceSynchronizationPointMessage() noexcept;
+  virtual ~AnnounceSynchronizationPointMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const AnnounceSynchronizationPointMessage& rhs) const;
-  bool operator<(const AnnounceSynchronizationPointMessage& rhs) const;
-  bool operator!=(const AnnounceSynchronizationPointMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const AnnounceSynchronizationPointMessage& rhs) const noexcept;
+  bool operator<(const AnnounceSynchronizationPointMessage& rhs) const noexcept;
+  bool operator!=(const AnnounceSynchronizationPointMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const AnnounceSynchronizationPointMessage& rhs) const
+  bool operator>(const AnnounceSynchronizationPointMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AnnounceSynchronizationPointMessage& rhs) const
+  bool operator>=(const AnnounceSynchronizationPointMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AnnounceSynchronizationPointMessage& rhs) const
+  bool operator<=(const AnnounceSynchronizationPointMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
 #endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setAddJoiningFederates(const Bool& value)
+  void setAddJoiningFederates(const Bool& value) noexcept
   { _addJoiningFederates = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAddJoiningFederates(Bool&& value)
+  void setAddJoiningFederates(Bool&& value) noexcept
   { _addJoiningFederates = std::move(value); }
 #endif
-  Bool& getAddJoiningFederates()
+  Bool& getAddJoiningFederates() noexcept
   { return _addJoiningFederates; }
-  const Bool& getAddJoiningFederates() const
+  const Bool& getAddJoiningFederates() const noexcept
   { return _addJoiningFederates; }
 
-  void setFederateHandleVector(const FederateHandleVector& value)
+  void setFederateHandleVector(const FederateHandleVector& value) noexcept
   { _federateHandleVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandleVector(FederateHandleVector&& value)
+  void setFederateHandleVector(FederateHandleVector&& value) noexcept
   { _federateHandleVector = std::move(value); }
 #endif
-  FederateHandleVector& getFederateHandleVector()
+  FederateHandleVector& getFederateHandleVector() noexcept
   { return _federateHandleVector; }
-  const FederateHandleVector& getFederateHandleVector() const
+  const FederateHandleVector& getFederateHandleVector() const noexcept
   { return _federateHandleVector; }
 
 private:
@@ -5236,58 +5170,58 @@ private:
   FederateHandleVector _federateHandleVector;
 };
 
-class OPENRTI_API SynchronizationPointAchievedMessage : public AbstractMessage {
+class OPENRTI_API SynchronizationPointAchievedMessage final : public AbstractMessage {
 public:
-  SynchronizationPointAchievedMessage();
-  virtual ~SynchronizationPointAchievedMessage();
+  SynchronizationPointAchievedMessage() noexcept;
+  virtual ~SynchronizationPointAchievedMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const SynchronizationPointAchievedMessage& rhs) const;
-  bool operator<(const SynchronizationPointAchievedMessage& rhs) const;
-  bool operator!=(const SynchronizationPointAchievedMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const SynchronizationPointAchievedMessage& rhs) const noexcept;
+  bool operator<(const SynchronizationPointAchievedMessage& rhs) const noexcept;
+  bool operator!=(const SynchronizationPointAchievedMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const SynchronizationPointAchievedMessage& rhs) const
+  bool operator>(const SynchronizationPointAchievedMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const SynchronizationPointAchievedMessage& rhs) const
+  bool operator>=(const SynchronizationPointAchievedMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const SynchronizationPointAchievedMessage& rhs) const
+  bool operator<=(const SynchronizationPointAchievedMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
 #endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value)
+  void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value) noexcept
   { _federateHandleBoolPairVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value)
+  void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value) noexcept
   { _federateHandleBoolPairVector = std::move(value); }
 #endif
-  FederateHandleBoolPairVector& getFederateHandleBoolPairVector()
+  FederateHandleBoolPairVector& getFederateHandleBoolPairVector() noexcept
   { return _federateHandleBoolPairVector; }
-  const FederateHandleBoolPairVector& getFederateHandleBoolPairVector() const
+  const FederateHandleBoolPairVector& getFederateHandleBoolPairVector() const noexcept
   { return _federateHandleBoolPairVector; }
 
 private:
@@ -5296,58 +5230,58 @@ private:
   FederateHandleBoolPairVector _federateHandleBoolPairVector;
 };
 
-class OPENRTI_API FederationSynchronizedMessage : public AbstractMessage {
+class OPENRTI_API FederationSynchronizedMessage final : public AbstractMessage {
 public:
-  FederationSynchronizedMessage();
-  virtual ~FederationSynchronizedMessage();
+  FederationSynchronizedMessage() noexcept;
+  virtual ~FederationSynchronizedMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const FederationSynchronizedMessage& rhs) const;
-  bool operator<(const FederationSynchronizedMessage& rhs) const;
-  bool operator!=(const FederationSynchronizedMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const FederationSynchronizedMessage& rhs) const noexcept;
+  bool operator<(const FederationSynchronizedMessage& rhs) const noexcept;
+  bool operator!=(const FederationSynchronizedMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const FederationSynchronizedMessage& rhs) const
+  bool operator>(const FederationSynchronizedMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FederationSynchronizedMessage& rhs) const
+  bool operator>=(const FederationSynchronizedMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FederationSynchronizedMessage& rhs) const
+  bool operator<=(const FederationSynchronizedMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
 #endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value)
+  void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value) noexcept
   { _federateHandleBoolPairVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value)
+  void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value) noexcept
   { _federateHandleBoolPairVector = std::move(value); }
 #endif
-  FederateHandleBoolPairVector& getFederateHandleBoolPairVector()
+  FederateHandleBoolPairVector& getFederateHandleBoolPairVector() noexcept
   { return _federateHandleBoolPairVector; }
-  const FederateHandleBoolPairVector& getFederateHandleBoolPairVector() const
+  const FederateHandleBoolPairVector& getFederateHandleBoolPairVector() const noexcept
   { return _federateHandleBoolPairVector; }
 
 private:
@@ -5356,69 +5290,69 @@ private:
   FederateHandleBoolPairVector _federateHandleBoolPairVector;
 };
 
-class OPENRTI_API EnableTimeRegulationRequestMessage : public AbstractMessage {
+class OPENRTI_API EnableTimeRegulationRequestMessage final : public AbstractMessage {
 public:
-  EnableTimeRegulationRequestMessage();
-  virtual ~EnableTimeRegulationRequestMessage();
+  EnableTimeRegulationRequestMessage() noexcept;
+  virtual ~EnableTimeRegulationRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EnableTimeRegulationRequestMessage& rhs) const;
-  bool operator<(const EnableTimeRegulationRequestMessage& rhs) const;
-  bool operator!=(const EnableTimeRegulationRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnableTimeRegulationRequestMessage& rhs) const noexcept;
+  bool operator<(const EnableTimeRegulationRequestMessage& rhs) const noexcept;
+  bool operator!=(const EnableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EnableTimeRegulationRequestMessage& rhs) const
+  bool operator>(const EnableTimeRegulationRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EnableTimeRegulationRequestMessage& rhs) const
+  bool operator>=(const EnableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EnableTimeRegulationRequestMessage& rhs) const
+  bool operator<=(const EnableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
 #endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setCommitId(const Unsigned& value)
+  void setCommitId(const Unsigned& value) noexcept
   { _commitId = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCommitId(Unsigned&& value)
+  void setCommitId(Unsigned&& value) noexcept
   { _commitId = std::move(value); }
 #endif
-  Unsigned& getCommitId()
+  Unsigned& getCommitId() noexcept
   { return _commitId; }
-  const Unsigned& getCommitId() const
+  const Unsigned& getCommitId() const noexcept
   { return _commitId; }
 
 private:
@@ -5428,80 +5362,80 @@ private:
   Unsigned _commitId;
 };
 
-class OPENRTI_API EnableTimeRegulationResponseMessage : public AbstractMessage {
+class OPENRTI_API EnableTimeRegulationResponseMessage final : public AbstractMessage {
 public:
-  EnableTimeRegulationResponseMessage();
-  virtual ~EnableTimeRegulationResponseMessage();
+  EnableTimeRegulationResponseMessage() noexcept;
+  virtual ~EnableTimeRegulationResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EnableTimeRegulationResponseMessage& rhs) const;
-  bool operator<(const EnableTimeRegulationResponseMessage& rhs) const;
-  bool operator!=(const EnableTimeRegulationResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnableTimeRegulationResponseMessage& rhs) const noexcept;
+  bool operator<(const EnableTimeRegulationResponseMessage& rhs) const noexcept;
+  bool operator!=(const EnableTimeRegulationResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EnableTimeRegulationResponseMessage& rhs) const
+  bool operator>(const EnableTimeRegulationResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EnableTimeRegulationResponseMessage& rhs) const
+  bool operator>=(const EnableTimeRegulationResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EnableTimeRegulationResponseMessage& rhs) const
+  bool operator<=(const EnableTimeRegulationResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setRespondingFederateHandle(const FederateHandle& value)
+  void setRespondingFederateHandle(const FederateHandle& value) noexcept
   { _respondingFederateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRespondingFederateHandle(FederateHandle&& value)
+  void setRespondingFederateHandle(FederateHandle&& value) noexcept
   { _respondingFederateHandle = std::move(value); }
 #endif
-  FederateHandle& getRespondingFederateHandle()
+  FederateHandle& getRespondingFederateHandle() noexcept
   { return _respondingFederateHandle; }
-  const FederateHandle& getRespondingFederateHandle() const
+  const FederateHandle& getRespondingFederateHandle() const noexcept
   { return _respondingFederateHandle; }
 
-  void setTimeStampValid(const Bool& value)
+  void setTimeStampValid(const Bool& value) noexcept
   { _timeStampValid = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStampValid(Bool&& value)
+  void setTimeStampValid(Bool&& value) noexcept
   { _timeStampValid = std::move(value); }
 #endif
-  Bool& getTimeStampValid()
+  Bool& getTimeStampValid() noexcept
   { return _timeStampValid; }
-  const Bool& getTimeStampValid() const
+  const Bool& getTimeStampValid() const noexcept
   { return _timeStampValid; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
 #endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
 private:
@@ -5512,47 +5446,47 @@ private:
   VariableLengthData _timeStamp;
 };
 
-class OPENRTI_API DisableTimeRegulationRequestMessage : public AbstractMessage {
+class OPENRTI_API DisableTimeRegulationRequestMessage final : public AbstractMessage {
 public:
-  DisableTimeRegulationRequestMessage();
-  virtual ~DisableTimeRegulationRequestMessage();
+  DisableTimeRegulationRequestMessage() noexcept;
+  virtual ~DisableTimeRegulationRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const DisableTimeRegulationRequestMessage& rhs) const;
-  bool operator<(const DisableTimeRegulationRequestMessage& rhs) const;
-  bool operator!=(const DisableTimeRegulationRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DisableTimeRegulationRequestMessage& rhs) const noexcept;
+  bool operator<(const DisableTimeRegulationRequestMessage& rhs) const noexcept;
+  bool operator!=(const DisableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const DisableTimeRegulationRequestMessage& rhs) const
+  bool operator>(const DisableTimeRegulationRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const DisableTimeRegulationRequestMessage& rhs) const
+  bool operator>=(const DisableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const DisableTimeRegulationRequestMessage& rhs) const
+  bool operator<=(const DisableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
 private:
@@ -5560,47 +5494,47 @@ private:
   FederateHandle _federateHandle;
 };
 
-class OPENRTI_API EnableTimeConstrainedNotifyMessage : public AbstractMessage {
+class OPENRTI_API EnableTimeConstrainedNotifyMessage final : public AbstractMessage {
 public:
-  EnableTimeConstrainedNotifyMessage();
-  virtual ~EnableTimeConstrainedNotifyMessage();
+  EnableTimeConstrainedNotifyMessage() noexcept;
+  virtual ~EnableTimeConstrainedNotifyMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EnableTimeConstrainedNotifyMessage& rhs) const;
-  bool operator<(const EnableTimeConstrainedNotifyMessage& rhs) const;
-  bool operator!=(const EnableTimeConstrainedNotifyMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept;
+  bool operator<(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept;
+  bool operator!=(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EnableTimeConstrainedNotifyMessage& rhs) const
+  bool operator>(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EnableTimeConstrainedNotifyMessage& rhs) const
+  bool operator>=(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EnableTimeConstrainedNotifyMessage& rhs) const
+  bool operator<=(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
 private:
@@ -5608,47 +5542,47 @@ private:
   FederateHandle _federateHandle;
 };
 
-class OPENRTI_API DisableTimeConstrainedNotifyMessage : public AbstractMessage {
+class OPENRTI_API DisableTimeConstrainedNotifyMessage final : public AbstractMessage {
 public:
-  DisableTimeConstrainedNotifyMessage();
-  virtual ~DisableTimeConstrainedNotifyMessage();
+  DisableTimeConstrainedNotifyMessage() noexcept;
+  virtual ~DisableTimeConstrainedNotifyMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const DisableTimeConstrainedNotifyMessage& rhs) const;
-  bool operator<(const DisableTimeConstrainedNotifyMessage& rhs) const;
-  bool operator!=(const DisableTimeConstrainedNotifyMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept;
+  bool operator<(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept;
+  bool operator!=(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const DisableTimeConstrainedNotifyMessage& rhs) const
+  bool operator>(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const DisableTimeConstrainedNotifyMessage& rhs) const
+  bool operator>=(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const DisableTimeConstrainedNotifyMessage& rhs) const
+  bool operator<=(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
 private:
@@ -5656,80 +5590,80 @@ private:
   FederateHandle _federateHandle;
 };
 
-class OPENRTI_API CommitLowerBoundTimeStampMessage : public AbstractMessage {
+class OPENRTI_API CommitLowerBoundTimeStampMessage final : public AbstractMessage {
 public:
-  CommitLowerBoundTimeStampMessage();
-  virtual ~CommitLowerBoundTimeStampMessage();
+  CommitLowerBoundTimeStampMessage() noexcept;
+  virtual ~CommitLowerBoundTimeStampMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CommitLowerBoundTimeStampMessage& rhs) const;
-  bool operator<(const CommitLowerBoundTimeStampMessage& rhs) const;
-  bool operator!=(const CommitLowerBoundTimeStampMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CommitLowerBoundTimeStampMessage& rhs) const noexcept;
+  bool operator<(const CommitLowerBoundTimeStampMessage& rhs) const noexcept;
+  bool operator!=(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CommitLowerBoundTimeStampMessage& rhs) const
+  bool operator>(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CommitLowerBoundTimeStampMessage& rhs) const
+  bool operator>=(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CommitLowerBoundTimeStampMessage& rhs) const
+  bool operator<=(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
 #endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setCommitType(const LowerBoundTimeStampCommitType& value)
+  void setCommitType(const LowerBoundTimeStampCommitType& value) noexcept
   { _commitType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCommitType(LowerBoundTimeStampCommitType&& value)
+  void setCommitType(LowerBoundTimeStampCommitType&& value) noexcept
   { _commitType = std::move(value); }
 #endif
-  LowerBoundTimeStampCommitType& getCommitType()
+  LowerBoundTimeStampCommitType& getCommitType() noexcept
   { return _commitType; }
-  const LowerBoundTimeStampCommitType& getCommitType() const
+  const LowerBoundTimeStampCommitType& getCommitType() const noexcept
   { return _commitType; }
 
-  void setCommitId(const Unsigned& value)
+  void setCommitId(const Unsigned& value) noexcept
   { _commitId = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCommitId(Unsigned&& value)
+  void setCommitId(Unsigned&& value) noexcept
   { _commitId = std::move(value); }
 #endif
-  Unsigned& getCommitId()
+  Unsigned& getCommitId() noexcept
   { return _commitId; }
-  const Unsigned& getCommitId() const
+  const Unsigned& getCommitId() const noexcept
   { return _commitId; }
 
 private:
@@ -5740,69 +5674,69 @@ private:
   Unsigned _commitId;
 };
 
-class OPENRTI_API CommitLowerBoundTimeStampResponseMessage : public AbstractMessage {
+class OPENRTI_API CommitLowerBoundTimeStampResponseMessage final : public AbstractMessage {
 public:
-  CommitLowerBoundTimeStampResponseMessage();
-  virtual ~CommitLowerBoundTimeStampResponseMessage();
+  CommitLowerBoundTimeStampResponseMessage() noexcept;
+  virtual ~CommitLowerBoundTimeStampResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CommitLowerBoundTimeStampResponseMessage& rhs) const;
-  bool operator<(const CommitLowerBoundTimeStampResponseMessage& rhs) const;
-  bool operator!=(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept;
+  bool operator<(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept;
+  bool operator!=(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+  bool operator>(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+  bool operator>=(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+  bool operator<=(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setSendingFederateHandle(const FederateHandle& value)
+  void setSendingFederateHandle(const FederateHandle& value) noexcept
   { _sendingFederateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSendingFederateHandle(FederateHandle&& value)
+  void setSendingFederateHandle(FederateHandle&& value) noexcept
   { _sendingFederateHandle = std::move(value); }
 #endif
-  FederateHandle& getSendingFederateHandle()
+  FederateHandle& getSendingFederateHandle() noexcept
   { return _sendingFederateHandle; }
-  const FederateHandle& getSendingFederateHandle() const
+  const FederateHandle& getSendingFederateHandle() const noexcept
   { return _sendingFederateHandle; }
 
-  void setCommitId(const Unsigned& value)
+  void setCommitId(const Unsigned& value) noexcept
   { _commitId = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCommitId(Unsigned&& value)
+  void setCommitId(Unsigned&& value) noexcept
   { _commitId = std::move(value); }
 #endif
-  Unsigned& getCommitId()
+  Unsigned& getCommitId() noexcept
   { return _commitId; }
-  const Unsigned& getCommitId() const
+  const Unsigned& getCommitId() const noexcept
   { return _commitId; }
 
 private:
@@ -5812,58 +5746,58 @@ private:
   Unsigned _commitId;
 };
 
-class OPENRTI_API LockedByNextMessageRequestMessage : public AbstractMessage {
+class OPENRTI_API LockedByNextMessageRequestMessage final : public AbstractMessage {
 public:
-  LockedByNextMessageRequestMessage();
-  virtual ~LockedByNextMessageRequestMessage();
+  LockedByNextMessageRequestMessage() noexcept;
+  virtual ~LockedByNextMessageRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const LockedByNextMessageRequestMessage& rhs) const;
-  bool operator<(const LockedByNextMessageRequestMessage& rhs) const;
-  bool operator!=(const LockedByNextMessageRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const LockedByNextMessageRequestMessage& rhs) const noexcept;
+  bool operator<(const LockedByNextMessageRequestMessage& rhs) const noexcept;
+  bool operator!=(const LockedByNextMessageRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const LockedByNextMessageRequestMessage& rhs) const
+  bool operator>(const LockedByNextMessageRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const LockedByNextMessageRequestMessage& rhs) const
+  bool operator>=(const LockedByNextMessageRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const LockedByNextMessageRequestMessage& rhs) const
+  bool operator<=(const LockedByNextMessageRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setSendingFederateHandle(const FederateHandle& value)
+  void setSendingFederateHandle(const FederateHandle& value) noexcept
   { _sendingFederateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSendingFederateHandle(FederateHandle&& value)
+  void setSendingFederateHandle(FederateHandle&& value) noexcept
   { _sendingFederateHandle = std::move(value); }
 #endif
-  FederateHandle& getSendingFederateHandle()
+  FederateHandle& getSendingFederateHandle() noexcept
   { return _sendingFederateHandle; }
-  const FederateHandle& getSendingFederateHandle() const
+  const FederateHandle& getSendingFederateHandle() const noexcept
   { return _sendingFederateHandle; }
 
-  void setLockedByNextMessage(const Bool& value)
+  void setLockedByNextMessage(const Bool& value) noexcept
   { _lockedByNextMessage = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLockedByNextMessage(Bool&& value)
+  void setLockedByNextMessage(Bool&& value) noexcept
   { _lockedByNextMessage = std::move(value); }
 #endif
-  Bool& getLockedByNextMessage()
+  Bool& getLockedByNextMessage() noexcept
   { return _lockedByNextMessage; }
-  const Bool& getLockedByNextMessage() const
+  const Bool& getLockedByNextMessage() const noexcept
   { return _lockedByNextMessage; }
 
 private:
@@ -5872,119 +5806,119 @@ private:
   Bool _lockedByNextMessage;
 };
 
-class OPENRTI_API TimeConstrainedEnabledMessage : public AbstractMessage {
+class OPENRTI_API TimeConstrainedEnabledMessage final : public AbstractMessage {
 public:
-  TimeConstrainedEnabledMessage();
-  virtual ~TimeConstrainedEnabledMessage();
+  TimeConstrainedEnabledMessage() noexcept;
+  virtual ~TimeConstrainedEnabledMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeConstrainedEnabledMessage& rhs) const;
-  bool operator<(const TimeConstrainedEnabledMessage& rhs) const;
-  bool operator!=(const TimeConstrainedEnabledMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeConstrainedEnabledMessage& rhs) const noexcept;
+  bool operator<(const TimeConstrainedEnabledMessage& rhs) const noexcept;
+  bool operator!=(const TimeConstrainedEnabledMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeConstrainedEnabledMessage& rhs) const
+  bool operator>(const TimeConstrainedEnabledMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeConstrainedEnabledMessage& rhs) const
+  bool operator>=(const TimeConstrainedEnabledMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeConstrainedEnabledMessage& rhs) const
+  bool operator<=(const TimeConstrainedEnabledMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
 private:
 };
 
-class OPENRTI_API TimeRegulationEnabledMessage : public AbstractMessage {
+class OPENRTI_API TimeRegulationEnabledMessage final : public AbstractMessage {
 public:
-  TimeRegulationEnabledMessage();
-  virtual ~TimeRegulationEnabledMessage();
+  TimeRegulationEnabledMessage() noexcept;
+  virtual ~TimeRegulationEnabledMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeRegulationEnabledMessage& rhs) const;
-  bool operator<(const TimeRegulationEnabledMessage& rhs) const;
-  bool operator!=(const TimeRegulationEnabledMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeRegulationEnabledMessage& rhs) const noexcept;
+  bool operator<(const TimeRegulationEnabledMessage& rhs) const noexcept;
+  bool operator!=(const TimeRegulationEnabledMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeRegulationEnabledMessage& rhs) const
+  bool operator>(const TimeRegulationEnabledMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeRegulationEnabledMessage& rhs) const
+  bool operator>=(const TimeRegulationEnabledMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeRegulationEnabledMessage& rhs) const
+  bool operator<=(const TimeRegulationEnabledMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
 private:
 };
 
-class OPENRTI_API TimeAdvanceGrantedMessage : public AbstractMessage {
+class OPENRTI_API TimeAdvanceGrantedMessage final : public AbstractMessage {
 public:
-  TimeAdvanceGrantedMessage();
-  virtual ~TimeAdvanceGrantedMessage();
+  TimeAdvanceGrantedMessage() noexcept;
+  virtual ~TimeAdvanceGrantedMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeAdvanceGrantedMessage& rhs) const;
-  bool operator<(const TimeAdvanceGrantedMessage& rhs) const;
-  bool operator!=(const TimeAdvanceGrantedMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeAdvanceGrantedMessage& rhs) const noexcept;
+  bool operator<(const TimeAdvanceGrantedMessage& rhs) const noexcept;
+  bool operator!=(const TimeAdvanceGrantedMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeAdvanceGrantedMessage& rhs) const
+  bool operator>(const TimeAdvanceGrantedMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeAdvanceGrantedMessage& rhs) const
+  bool operator>=(const TimeAdvanceGrantedMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeAdvanceGrantedMessage& rhs) const
+  bool operator<=(const TimeAdvanceGrantedMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
 private:
 };
 
-class OPENRTI_API InsertRegionMessage : public AbstractMessage {
+class OPENRTI_API InsertRegionMessage final : public AbstractMessage {
 public:
-  InsertRegionMessage();
-  virtual ~InsertRegionMessage();
+  InsertRegionMessage() noexcept;
+  virtual ~InsertRegionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InsertRegionMessage& rhs) const;
-  bool operator<(const InsertRegionMessage& rhs) const;
-  bool operator!=(const InsertRegionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertRegionMessage& rhs) const noexcept;
+  bool operator<(const InsertRegionMessage& rhs) const noexcept;
+  bool operator!=(const InsertRegionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InsertRegionMessage& rhs) const
+  bool operator>(const InsertRegionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InsertRegionMessage& rhs) const
+  bool operator>=(const InsertRegionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InsertRegionMessage& rhs) const
+  bool operator<=(const InsertRegionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setRegionHandleDimensionHandleSetPairVector(const RegionHandleDimensionHandleSetPairVector& value)
+  void setRegionHandleDimensionHandleSetPairVector(const RegionHandleDimensionHandleSetPairVector& value) noexcept
   { _regionHandleDimensionHandleSetPairVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRegionHandleDimensionHandleSetPairVector(RegionHandleDimensionHandleSetPairVector&& value)
+  void setRegionHandleDimensionHandleSetPairVector(RegionHandleDimensionHandleSetPairVector&& value) noexcept
   { _regionHandleDimensionHandleSetPairVector = std::move(value); }
 #endif
-  RegionHandleDimensionHandleSetPairVector& getRegionHandleDimensionHandleSetPairVector()
+  RegionHandleDimensionHandleSetPairVector& getRegionHandleDimensionHandleSetPairVector() noexcept
   { return _regionHandleDimensionHandleSetPairVector; }
-  const RegionHandleDimensionHandleSetPairVector& getRegionHandleDimensionHandleSetPairVector() const
+  const RegionHandleDimensionHandleSetPairVector& getRegionHandleDimensionHandleSetPairVector() const noexcept
   { return _regionHandleDimensionHandleSetPairVector; }
 
 private:
@@ -5992,47 +5926,47 @@ private:
   RegionHandleDimensionHandleSetPairVector _regionHandleDimensionHandleSetPairVector;
 };
 
-class OPENRTI_API CommitRegionMessage : public AbstractMessage {
+class OPENRTI_API CommitRegionMessage final : public AbstractMessage {
 public:
-  CommitRegionMessage();
-  virtual ~CommitRegionMessage();
+  CommitRegionMessage() noexcept;
+  virtual ~CommitRegionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CommitRegionMessage& rhs) const;
-  bool operator<(const CommitRegionMessage& rhs) const;
-  bool operator!=(const CommitRegionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CommitRegionMessage& rhs) const noexcept;
+  bool operator<(const CommitRegionMessage& rhs) const noexcept;
+  bool operator!=(const CommitRegionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CommitRegionMessage& rhs) const
+  bool operator>(const CommitRegionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CommitRegionMessage& rhs) const
+  bool operator>=(const CommitRegionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CommitRegionMessage& rhs) const
+  bool operator<=(const CommitRegionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setRegionHandleRegionValuePairVector(const RegionHandleRegionValuePairVector& value)
+  void setRegionHandleRegionValuePairVector(const RegionHandleRegionValuePairVector& value) noexcept
   { _regionHandleRegionValuePairVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRegionHandleRegionValuePairVector(RegionHandleRegionValuePairVector&& value)
+  void setRegionHandleRegionValuePairVector(RegionHandleRegionValuePairVector&& value) noexcept
   { _regionHandleRegionValuePairVector = std::move(value); }
 #endif
-  RegionHandleRegionValuePairVector& getRegionHandleRegionValuePairVector()
+  RegionHandleRegionValuePairVector& getRegionHandleRegionValuePairVector() noexcept
   { return _regionHandleRegionValuePairVector; }
-  const RegionHandleRegionValuePairVector& getRegionHandleRegionValuePairVector() const
+  const RegionHandleRegionValuePairVector& getRegionHandleRegionValuePairVector() const noexcept
   { return _regionHandleRegionValuePairVector; }
 
 private:
@@ -6040,47 +5974,47 @@ private:
   RegionHandleRegionValuePairVector _regionHandleRegionValuePairVector;
 };
 
-class OPENRTI_API EraseRegionMessage : public AbstractMessage {
+class OPENRTI_API EraseRegionMessage final : public AbstractMessage {
 public:
-  EraseRegionMessage();
-  virtual ~EraseRegionMessage();
+  EraseRegionMessage() noexcept;
+  virtual ~EraseRegionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EraseRegionMessage& rhs) const;
-  bool operator<(const EraseRegionMessage& rhs) const;
-  bool operator!=(const EraseRegionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EraseRegionMessage& rhs) const noexcept;
+  bool operator<(const EraseRegionMessage& rhs) const noexcept;
+  bool operator!=(const EraseRegionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EraseRegionMessage& rhs) const
+  bool operator>(const EraseRegionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EraseRegionMessage& rhs) const
+  bool operator>=(const EraseRegionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EraseRegionMessage& rhs) const
+  bool operator<=(const EraseRegionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setRegionHandleVector(const RegionHandleVector& value)
+  void setRegionHandleVector(const RegionHandleVector& value) noexcept
   { _regionHandleVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRegionHandleVector(RegionHandleVector&& value)
+  void setRegionHandleVector(RegionHandleVector&& value) noexcept
   { _regionHandleVector = std::move(value); }
 #endif
-  RegionHandleVector& getRegionHandleVector()
+  RegionHandleVector& getRegionHandleVector() noexcept
   { return _regionHandleVector; }
-  const RegionHandleVector& getRegionHandleVector() const
+  const RegionHandleVector& getRegionHandleVector() const noexcept
   { return _regionHandleVector; }
 
 private:
@@ -6088,58 +6022,58 @@ private:
   RegionHandleVector _regionHandleVector;
 };
 
-class OPENRTI_API ChangeInteractionClassPublicationMessage : public AbstractMessage {
+class OPENRTI_API ChangeInteractionClassPublicationMessage final : public AbstractMessage {
 public:
-  ChangeInteractionClassPublicationMessage();
-  virtual ~ChangeInteractionClassPublicationMessage();
+  ChangeInteractionClassPublicationMessage() noexcept;
+  virtual ~ChangeInteractionClassPublicationMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeInteractionClassPublicationMessage& rhs) const;
-  bool operator<(const ChangeInteractionClassPublicationMessage& rhs) const;
-  bool operator!=(const ChangeInteractionClassPublicationMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeInteractionClassPublicationMessage& rhs) const noexcept;
+  bool operator<(const ChangeInteractionClassPublicationMessage& rhs) const noexcept;
+  bool operator!=(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeInteractionClassPublicationMessage& rhs) const
+  bool operator>(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeInteractionClassPublicationMessage& rhs) const
+  bool operator>=(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeInteractionClassPublicationMessage& rhs) const
+  bool operator<=(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setPublicationType(const PublicationType& value)
+  void setPublicationType(const PublicationType& value) noexcept
   { _publicationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setPublicationType(PublicationType&& value)
+  void setPublicationType(PublicationType&& value) noexcept
   { _publicationType = std::move(value); }
 #endif
-  PublicationType& getPublicationType()
+  PublicationType& getPublicationType() noexcept
   { return _publicationType; }
-  const PublicationType& getPublicationType() const
+  const PublicationType& getPublicationType() const noexcept
   { return _publicationType; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
 #endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
 private:
@@ -6148,69 +6082,69 @@ private:
   InteractionClassHandle _interactionClassHandle;
 };
 
-class OPENRTI_API ChangeObjectClassPublicationMessage : public AbstractMessage {
+class OPENRTI_API ChangeObjectClassPublicationMessage final : public AbstractMessage {
 public:
-  ChangeObjectClassPublicationMessage();
-  virtual ~ChangeObjectClassPublicationMessage();
+  ChangeObjectClassPublicationMessage() noexcept;
+  virtual ~ChangeObjectClassPublicationMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeObjectClassPublicationMessage& rhs) const;
-  bool operator<(const ChangeObjectClassPublicationMessage& rhs) const;
-  bool operator!=(const ChangeObjectClassPublicationMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeObjectClassPublicationMessage& rhs) const noexcept;
+  bool operator<(const ChangeObjectClassPublicationMessage& rhs) const noexcept;
+  bool operator!=(const ChangeObjectClassPublicationMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeObjectClassPublicationMessage& rhs) const
+  bool operator>(const ChangeObjectClassPublicationMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeObjectClassPublicationMessage& rhs) const
+  bool operator>=(const ChangeObjectClassPublicationMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeObjectClassPublicationMessage& rhs) const
+  bool operator<=(const ChangeObjectClassPublicationMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setPublicationType(const PublicationType& value)
+  void setPublicationType(const PublicationType& value) noexcept
   { _publicationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setPublicationType(PublicationType&& value)
+  void setPublicationType(PublicationType&& value) noexcept
   { _publicationType = std::move(value); }
 #endif
-  PublicationType& getPublicationType()
+  PublicationType& getPublicationType() noexcept
   { return _publicationType; }
-  const PublicationType& getPublicationType() const
+  const PublicationType& getPublicationType() const noexcept
   { return _publicationType; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
 #endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
 #endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
 private:
@@ -6220,69 +6154,69 @@ private:
   AttributeHandleVector _attributeHandles;
 };
 
-class OPENRTI_API ChangeInteractionClassSubscriptionMessage : public AbstractMessage {
+class OPENRTI_API ChangeInteractionClassSubscriptionMessage final : public AbstractMessage {
 public:
-  ChangeInteractionClassSubscriptionMessage();
-  virtual ~ChangeInteractionClassSubscriptionMessage();
+  ChangeInteractionClassSubscriptionMessage() noexcept;
+  virtual ~ChangeInteractionClassSubscriptionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeInteractionClassSubscriptionMessage& rhs) const;
-  bool operator<(const ChangeInteractionClassSubscriptionMessage& rhs) const;
-  bool operator!=(const ChangeInteractionClassSubscriptionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept;
+  bool operator<(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept;
+  bool operator!=(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeInteractionClassSubscriptionMessage& rhs) const
+  bool operator>(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeInteractionClassSubscriptionMessage& rhs) const
+  bool operator>=(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeInteractionClassSubscriptionMessage& rhs) const
+  bool operator<=(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setSubscriptionType(const SubscriptionType& value)
+  void setSubscriptionType(const SubscriptionType& value) noexcept
   { _subscriptionType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSubscriptionType(SubscriptionType&& value)
+  void setSubscriptionType(SubscriptionType&& value) noexcept
   { _subscriptionType = std::move(value); }
 #endif
-  SubscriptionType& getSubscriptionType()
+  SubscriptionType& getSubscriptionType() noexcept
   { return _subscriptionType; }
-  const SubscriptionType& getSubscriptionType() const
+  const SubscriptionType& getSubscriptionType() const noexcept
   { return _subscriptionType; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
 #endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
-  void setParameterFilterValues(const ParameterValueVector& value)
+  void setParameterFilterValues(const ParameterValueVector& value) noexcept
   { _parameterFilterValues = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterFilterValues(ParameterValueVector&& value)
+  void setParameterFilterValues(ParameterValueVector&& value) noexcept
   { _parameterFilterValues = std::move(value); }
 #endif
-  ParameterValueVector& getParameterFilterValues()
+  ParameterValueVector& getParameterFilterValues() noexcept
   { return _parameterFilterValues; }
-  const ParameterValueVector& getParameterFilterValues() const
+  const ParameterValueVector& getParameterFilterValues() const noexcept
   { return _parameterFilterValues; }
 
 private:
@@ -6292,69 +6226,69 @@ private:
   ParameterValueVector _parameterFilterValues;
 };
 
-class OPENRTI_API ChangeObjectClassSubscriptionMessage : public AbstractMessage {
+class OPENRTI_API ChangeObjectClassSubscriptionMessage final : public AbstractMessage {
 public:
-  ChangeObjectClassSubscriptionMessage();
-  virtual ~ChangeObjectClassSubscriptionMessage();
+  ChangeObjectClassSubscriptionMessage() noexcept;
+  virtual ~ChangeObjectClassSubscriptionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeObjectClassSubscriptionMessage& rhs) const;
-  bool operator<(const ChangeObjectClassSubscriptionMessage& rhs) const;
-  bool operator!=(const ChangeObjectClassSubscriptionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept;
+  bool operator<(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept;
+  bool operator!=(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeObjectClassSubscriptionMessage& rhs) const
+  bool operator>(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeObjectClassSubscriptionMessage& rhs) const
+  bool operator>=(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeObjectClassSubscriptionMessage& rhs) const
+  bool operator<=(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setSubscriptionType(const SubscriptionType& value)
+  void setSubscriptionType(const SubscriptionType& value) noexcept
   { _subscriptionType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSubscriptionType(SubscriptionType&& value)
+  void setSubscriptionType(SubscriptionType&& value) noexcept
   { _subscriptionType = std::move(value); }
 #endif
-  SubscriptionType& getSubscriptionType()
+  SubscriptionType& getSubscriptionType() noexcept
   { return _subscriptionType; }
-  const SubscriptionType& getSubscriptionType() const
+  const SubscriptionType& getSubscriptionType() const noexcept
   { return _subscriptionType; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
 #endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
 #endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
 private:
@@ -6364,69 +6298,69 @@ private:
   AttributeHandleVector _attributeHandles;
 };
 
-class OPENRTI_API ChangeObjectInstanceSubscriptionMessage : public AbstractMessage {
+class OPENRTI_API ChangeObjectInstanceSubscriptionMessage final : public AbstractMessage {
 public:
-  ChangeObjectInstanceSubscriptionMessage();
-  virtual ~ChangeObjectInstanceSubscriptionMessage();
+  ChangeObjectInstanceSubscriptionMessage() noexcept;
+  virtual ~ChangeObjectInstanceSubscriptionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeObjectInstanceSubscriptionMessage& rhs) const;
-  bool operator<(const ChangeObjectInstanceSubscriptionMessage& rhs) const;
-  bool operator!=(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept;
+  bool operator<(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept;
+  bool operator!=(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  bool operator>(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  bool operator>=(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  bool operator<=(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setSubscriptionType(const SubscriptionType& value)
+  void setSubscriptionType(const SubscriptionType& value) noexcept
   { _subscriptionType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSubscriptionType(SubscriptionType&& value)
+  void setSubscriptionType(SubscriptionType&& value) noexcept
   { _subscriptionType = std::move(value); }
 #endif
-  SubscriptionType& getSubscriptionType()
+  SubscriptionType& getSubscriptionType() noexcept
   { return _subscriptionType; }
-  const SubscriptionType& getSubscriptionType() const
+  const SubscriptionType& getSubscriptionType() const noexcept
   { return _subscriptionType; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
 #endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
 private:
@@ -6436,47 +6370,47 @@ private:
   ObjectInstanceHandle _objectInstanceHandle;
 };
 
-class OPENRTI_API RegistrationForObjectClassMessage : public AbstractMessage {
+class OPENRTI_API RegistrationForObjectClassMessage final : public AbstractMessage {
 public:
-  RegistrationForObjectClassMessage();
-  virtual ~RegistrationForObjectClassMessage();
+  RegistrationForObjectClassMessage() noexcept;
+  virtual ~RegistrationForObjectClassMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RegistrationForObjectClassMessage& rhs) const;
-  bool operator<(const RegistrationForObjectClassMessage& rhs) const;
-  bool operator!=(const RegistrationForObjectClassMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RegistrationForObjectClassMessage& rhs) const noexcept;
+  bool operator<(const RegistrationForObjectClassMessage& rhs) const noexcept;
+  bool operator!=(const RegistrationForObjectClassMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RegistrationForObjectClassMessage& rhs) const
+  bool operator>(const RegistrationForObjectClassMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RegistrationForObjectClassMessage& rhs) const
+  bool operator>=(const RegistrationForObjectClassMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RegistrationForObjectClassMessage& rhs) const
+  bool operator<=(const RegistrationForObjectClassMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
 #endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setStart(const Bool& value)
+  void setStart(const Bool& value) noexcept
   { _start = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setStart(Bool&& value)
+  void setStart(Bool&& value) noexcept
   { _start = std::move(value); }
 #endif
-  Bool& getStart()
+  Bool& getStart() noexcept
   { return _start; }
-  const Bool& getStart() const
+  const Bool& getStart() const noexcept
   { return _start; }
 
 private:
@@ -6484,60 +6418,60 @@ private:
   Bool _start;
 };
 
-class OPENRTI_API AttributesInScopeMessage : public AbstractMessage {
+class OPENRTI_API AttributesInScopeMessage final : public AbstractMessage {
 public:
-  AttributesInScopeMessage();
-  virtual ~AttributesInScopeMessage();
+  AttributesInScopeMessage() noexcept;
+  virtual ~AttributesInScopeMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const AttributesInScopeMessage& rhs) const;
-  bool operator<(const AttributesInScopeMessage& rhs) const;
-  bool operator!=(const AttributesInScopeMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const AttributesInScopeMessage& rhs) const noexcept;
+  bool operator<(const AttributesInScopeMessage& rhs) const noexcept;
+  bool operator!=(const AttributesInScopeMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const AttributesInScopeMessage& rhs) const
+  bool operator>(const AttributesInScopeMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AttributesInScopeMessage& rhs) const
+  bool operator>=(const AttributesInScopeMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AttributesInScopeMessage& rhs) const
+  bool operator<=(const AttributesInScopeMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
 #endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
-  void setInScope(const Bool& value)
+  void setInScope(const Bool& value) noexcept
   { _inScope = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInScope(Bool&& value)
+  void setInScope(Bool&& value) noexcept
   { _inScope = std::move(value); }
 #endif
-  Bool& getInScope()
+  Bool& getInScope() noexcept
   { return _inScope; }
-  const Bool& getInScope() const
+  const Bool& getInScope() const noexcept
   { return _inScope; }
 
 private:
@@ -6546,71 +6480,71 @@ private:
   Bool _inScope;
 };
 
-class OPENRTI_API TurnUpdatesOnForInstanceMessage : public AbstractMessage {
+class OPENRTI_API TurnUpdatesOnForInstanceMessage final : public AbstractMessage {
 public:
-  TurnUpdatesOnForInstanceMessage();
-  virtual ~TurnUpdatesOnForInstanceMessage();
+  TurnUpdatesOnForInstanceMessage() noexcept;
+  virtual ~TurnUpdatesOnForInstanceMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TurnUpdatesOnForInstanceMessage& rhs) const;
-  bool operator<(const TurnUpdatesOnForInstanceMessage& rhs) const;
-  bool operator!=(const TurnUpdatesOnForInstanceMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept;
+  bool operator<(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept;
+  bool operator!=(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TurnUpdatesOnForInstanceMessage& rhs) const
+  bool operator>(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TurnUpdatesOnForInstanceMessage& rhs) const
+  bool operator>=(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TurnUpdatesOnForInstanceMessage& rhs) const
+  bool operator<=(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
 #endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
-  void setUpdateRate(const String& value)
+  void setUpdateRate(const String& value) noexcept
   { _updateRate = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpdateRate(String&& value)
+  void setUpdateRate(String&& value) noexcept
   { _updateRate = std::move(value); }
 #endif
-  String& getUpdateRate()
+  String& getUpdateRate() noexcept
   { return _updateRate; }
-  const String& getUpdateRate() const
+  const String& getUpdateRate() const noexcept
   { return _updateRate; }
 
-  void setOn(const Bool& value)
+  void setOn(const Bool& value) noexcept
   { _on = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOn(Bool&& value)
+  void setOn(Bool&& value) noexcept
   { _on = std::move(value); }
 #endif
-  Bool& getOn()
+  Bool& getOn() noexcept
   { return _on; }
-  const Bool& getOn() const
+  const Bool& getOn() const noexcept
   { return _on; }
 
 private:
@@ -6620,47 +6554,47 @@ private:
   Bool _on;
 };
 
-class OPENRTI_API TurnInteractionsOnMessage : public AbstractMessage {
+class OPENRTI_API TurnInteractionsOnMessage final : public AbstractMessage {
 public:
-  TurnInteractionsOnMessage();
-  virtual ~TurnInteractionsOnMessage();
+  TurnInteractionsOnMessage() noexcept;
+  virtual ~TurnInteractionsOnMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TurnInteractionsOnMessage& rhs) const;
-  bool operator<(const TurnInteractionsOnMessage& rhs) const;
-  bool operator!=(const TurnInteractionsOnMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TurnInteractionsOnMessage& rhs) const noexcept;
+  bool operator<(const TurnInteractionsOnMessage& rhs) const noexcept;
+  bool operator!=(const TurnInteractionsOnMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TurnInteractionsOnMessage& rhs) const
+  bool operator>(const TurnInteractionsOnMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TurnInteractionsOnMessage& rhs) const
+  bool operator>=(const TurnInteractionsOnMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TurnInteractionsOnMessage& rhs) const
+  bool operator<=(const TurnInteractionsOnMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
 #endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
-  void setOn(const Bool& value)
+  void setOn(const Bool& value) noexcept
   { _on = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOn(Bool&& value)
+  void setOn(Bool&& value) noexcept
   { _on = std::move(value); }
 #endif
-  Bool& getOn()
+  Bool& getOn() noexcept
   { return _on; }
-  const Bool& getOn() const
+  const Bool& getOn() const noexcept
   { return _on; }
 
 private:
@@ -6668,93 +6602,93 @@ private:
   Bool _on;
 };
 
-class OPENRTI_API InteractionMessage : public AbstractMessage {
+class OPENRTI_API InteractionMessage final : public AbstractMessage {
 public:
-  InteractionMessage();
-  virtual ~InteractionMessage();
+  InteractionMessage() noexcept;
+  virtual ~InteractionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InteractionMessage& rhs) const;
-  bool operator<(const InteractionMessage& rhs) const;
-  bool operator!=(const InteractionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InteractionMessage& rhs) const noexcept;
+  bool operator<(const InteractionMessage& rhs) const noexcept;
+  bool operator!=(const InteractionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InteractionMessage& rhs) const
+  bool operator>(const InteractionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InteractionMessage& rhs) const
+  bool operator>=(const InteractionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InteractionMessage& rhs) const
+  bool operator<=(const InteractionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual bool getReliable() const;
+  bool getReliable() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
 #endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { _transportationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { _transportationType = std::move(value); }
 #endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return _transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return _transportationType; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setParameterValues(const ParameterValueVector& value)
+  void setParameterValues(const ParameterValueVector& value) noexcept
   { _parameterValues = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterValues(ParameterValueVector&& value)
+  void setParameterValues(ParameterValueVector&& value) noexcept
   { _parameterValues = std::move(value); }
 #endif
-  ParameterValueVector& getParameterValues()
+  ParameterValueVector& getParameterValues() noexcept
   { return _parameterValues; }
-  const ParameterValueVector& getParameterValues() const
+  const ParameterValueVector& getParameterValues() const noexcept
   { return _parameterValues; }
 
 private:
@@ -6766,126 +6700,126 @@ private:
   ParameterValueVector _parameterValues;
 };
 
-class OPENRTI_API TimeStampedInteractionMessage : public AbstractMessage {
+class OPENRTI_API TimeStampedInteractionMessage final : public AbstractMessage {
 public:
-  TimeStampedInteractionMessage();
-  virtual ~TimeStampedInteractionMessage();
+  TimeStampedInteractionMessage() noexcept;
+  virtual ~TimeStampedInteractionMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeStampedInteractionMessage& rhs) const;
-  bool operator<(const TimeStampedInteractionMessage& rhs) const;
-  bool operator!=(const TimeStampedInteractionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeStampedInteractionMessage& rhs) const noexcept;
+  bool operator<(const TimeStampedInteractionMessage& rhs) const noexcept;
+  bool operator!=(const TimeStampedInteractionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeStampedInteractionMessage& rhs) const
+  bool operator>(const TimeStampedInteractionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeStampedInteractionMessage& rhs) const
+  bool operator>=(const TimeStampedInteractionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeStampedInteractionMessage& rhs) const
+  bool operator<=(const TimeStampedInteractionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual bool getReliable() const;
+  bool getReliable() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
 #endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { _orderType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { _orderType = std::move(value); }
 #endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return _orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return _orderType; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { _transportationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { _transportationType = std::move(value); }
 #endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return _transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return _transportationType; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
 #endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setMessageRetractionHandle(const MessageRetractionHandle& value)
+  void setMessageRetractionHandle(const MessageRetractionHandle& value) noexcept
   { _messageRetractionHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setMessageRetractionHandle(MessageRetractionHandle&& value)
+  void setMessageRetractionHandle(MessageRetractionHandle&& value) noexcept
   { _messageRetractionHandle = std::move(value); }
 #endif
-  MessageRetractionHandle& getMessageRetractionHandle()
+  MessageRetractionHandle& getMessageRetractionHandle() noexcept
   { return _messageRetractionHandle; }
-  const MessageRetractionHandle& getMessageRetractionHandle() const
+  const MessageRetractionHandle& getMessageRetractionHandle() const noexcept
   { return _messageRetractionHandle; }
 
-  void setParameterValues(const ParameterValueVector& value)
+  void setParameterValues(const ParameterValueVector& value) noexcept
   { _parameterValues = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterValues(ParameterValueVector&& value)
+  void setParameterValues(ParameterValueVector&& value) noexcept
   { _parameterValues = std::move(value); }
 #endif
-  ParameterValueVector& getParameterValues()
+  ParameterValueVector& getParameterValues() noexcept
   { return _parameterValues; }
-  const ParameterValueVector& getParameterValues() const
+  const ParameterValueVector& getParameterValues() const noexcept
   { return _parameterValues; }
 
 private:
@@ -6900,58 +6834,58 @@ private:
   ParameterValueVector _parameterValues;
 };
 
-class OPENRTI_API ObjectInstanceHandlesRequestMessage : public AbstractMessage {
+class OPENRTI_API ObjectInstanceHandlesRequestMessage final : public AbstractMessage {
 public:
-  ObjectInstanceHandlesRequestMessage();
-  virtual ~ObjectInstanceHandlesRequestMessage();
+  ObjectInstanceHandlesRequestMessage() noexcept;
+  virtual ~ObjectInstanceHandlesRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ObjectInstanceHandlesRequestMessage& rhs) const;
-  bool operator<(const ObjectInstanceHandlesRequestMessage& rhs) const;
-  bool operator!=(const ObjectInstanceHandlesRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept;
+  bool operator<(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept;
+  bool operator!=(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ObjectInstanceHandlesRequestMessage& rhs) const
+  bool operator>(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ObjectInstanceHandlesRequestMessage& rhs) const
+  bool operator>=(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ObjectInstanceHandlesRequestMessage& rhs) const
+  bool operator<=(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setCount(const Unsigned& value)
+  void setCount(const Unsigned& value) noexcept
   { _count = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCount(Unsigned&& value)
+  void setCount(Unsigned&& value) noexcept
   { _count = std::move(value); }
 #endif
-  Unsigned& getCount()
+  Unsigned& getCount() noexcept
   { return _count; }
-  const Unsigned& getCount() const
+  const Unsigned& getCount() const noexcept
   { return _count; }
 
 private:
@@ -6960,58 +6894,58 @@ private:
   Unsigned _count;
 };
 
-class OPENRTI_API ObjectInstanceHandlesResponseMessage : public AbstractMessage {
+class OPENRTI_API ObjectInstanceHandlesResponseMessage final : public AbstractMessage {
 public:
-  ObjectInstanceHandlesResponseMessage();
-  virtual ~ObjectInstanceHandlesResponseMessage();
+  ObjectInstanceHandlesResponseMessage() noexcept;
+  virtual ~ObjectInstanceHandlesResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ObjectInstanceHandlesResponseMessage& rhs) const;
-  bool operator<(const ObjectInstanceHandlesResponseMessage& rhs) const;
-  bool operator!=(const ObjectInstanceHandlesResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept;
+  bool operator<(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept;
+  bool operator!=(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ObjectInstanceHandlesResponseMessage& rhs) const
+  bool operator>(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ObjectInstanceHandlesResponseMessage& rhs) const
+  bool operator>=(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ObjectInstanceHandlesResponseMessage& rhs) const
+  bool operator<=(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value)
+  void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value) noexcept
   { _objectInstanceHandleNamePairVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value)
+  void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value) noexcept
   { _objectInstanceHandleNamePairVector = std::move(value); }
 #endif
-  ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector()
+  ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() noexcept
   { return _objectInstanceHandleNamePairVector; }
-  const ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() const
+  const ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() const noexcept
   { return _objectInstanceHandleNamePairVector; }
 
 private:
@@ -7020,47 +6954,47 @@ private:
   ObjectInstanceHandleNamePairVector _objectInstanceHandleNamePairVector;
 };
 
-class OPENRTI_API ReleaseMultipleObjectInstanceNameHandlePairsMessage : public AbstractMessage {
+class OPENRTI_API ReleaseMultipleObjectInstanceNameHandlePairsMessage final : public AbstractMessage {
 public:
-  ReleaseMultipleObjectInstanceNameHandlePairsMessage();
-  virtual ~ReleaseMultipleObjectInstanceNameHandlePairsMessage();
+  ReleaseMultipleObjectInstanceNameHandlePairsMessage() noexcept;
+  virtual ~ReleaseMultipleObjectInstanceNameHandlePairsMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const;
-  bool operator<(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const;
-  bool operator!=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept;
+  bool operator<(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept;
+  bool operator!=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+  bool operator>(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+  bool operator>=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+  bool operator<=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectInstanceHandleVector(const ObjectInstanceHandleVector& value)
+  void setObjectInstanceHandleVector(const ObjectInstanceHandleVector& value) noexcept
   { _objectInstanceHandleVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandleVector(ObjectInstanceHandleVector&& value)
+  void setObjectInstanceHandleVector(ObjectInstanceHandleVector&& value) noexcept
   { _objectInstanceHandleVector = std::move(value); }
 #endif
-  ObjectInstanceHandleVector& getObjectInstanceHandleVector()
+  ObjectInstanceHandleVector& getObjectInstanceHandleVector() noexcept
   { return _objectInstanceHandleVector; }
-  const ObjectInstanceHandleVector& getObjectInstanceHandleVector() const
+  const ObjectInstanceHandleVector& getObjectInstanceHandleVector() const noexcept
   { return _objectInstanceHandleVector; }
 
 private:
@@ -7068,69 +7002,69 @@ private:
   ObjectInstanceHandleVector _objectInstanceHandleVector;
 };
 
-class OPENRTI_API ReserveObjectInstanceNameRequestMessage : public AbstractMessage {
+class OPENRTI_API ReserveObjectInstanceNameRequestMessage final : public AbstractMessage {
 public:
-  ReserveObjectInstanceNameRequestMessage();
-  virtual ~ReserveObjectInstanceNameRequestMessage();
+  ReserveObjectInstanceNameRequestMessage() noexcept;
+  virtual ~ReserveObjectInstanceNameRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReserveObjectInstanceNameRequestMessage& rhs) const;
-  bool operator<(const ReserveObjectInstanceNameRequestMessage& rhs) const;
-  bool operator!=(const ReserveObjectInstanceNameRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept;
+  bool operator<(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept;
+  bool operator!=(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReserveObjectInstanceNameRequestMessage& rhs) const
+  bool operator>(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReserveObjectInstanceNameRequestMessage& rhs) const
+  bool operator>=(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReserveObjectInstanceNameRequestMessage& rhs) const
+  bool operator<=(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { _name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { _name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return _name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return _name; }
 
-  void setIsInternal(const Bool& value)
+  void setIsInternal(const Bool& value) noexcept
   { _isInternal = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setIsInternal(Bool&& value)
+  void setIsInternal(Bool&& value) noexcept
   { _isInternal = std::move(value); }
 #endif
-  Bool& getIsInternal()
+  Bool& getIsInternal() noexcept
   { return _isInternal; }
-  const Bool& getIsInternal() const
+  const Bool& getIsInternal() const noexcept
   { return _isInternal; }
 
 private:
@@ -7140,69 +7074,69 @@ private:
   Bool _isInternal;
 };
 
-class OPENRTI_API ReserveObjectInstanceNameResponseMessage : public AbstractMessage {
+class OPENRTI_API ReserveObjectInstanceNameResponseMessage final : public AbstractMessage {
 public:
-  ReserveObjectInstanceNameResponseMessage();
-  virtual ~ReserveObjectInstanceNameResponseMessage();
+  ReserveObjectInstanceNameResponseMessage() noexcept;
+  virtual ~ReserveObjectInstanceNameResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReserveObjectInstanceNameResponseMessage& rhs) const;
-  bool operator<(const ReserveObjectInstanceNameResponseMessage& rhs) const;
-  bool operator!=(const ReserveObjectInstanceNameResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept;
+  bool operator<(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept;
+  bool operator!=(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReserveObjectInstanceNameResponseMessage& rhs) const
+  bool operator>(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReserveObjectInstanceNameResponseMessage& rhs) const
+  bool operator>=(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReserveObjectInstanceNameResponseMessage& rhs) const
+  bool operator<=(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandleNamePair(const ObjectInstanceHandleNamePair& value)
+  void setObjectInstanceHandleNamePair(const ObjectInstanceHandleNamePair& value) noexcept
   { _objectInstanceHandleNamePair = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandleNamePair(ObjectInstanceHandleNamePair&& value)
+  void setObjectInstanceHandleNamePair(ObjectInstanceHandleNamePair&& value) noexcept
   { _objectInstanceHandleNamePair = std::move(value); }
 #endif
-  ObjectInstanceHandleNamePair& getObjectInstanceHandleNamePair()
+  ObjectInstanceHandleNamePair& getObjectInstanceHandleNamePair() noexcept
   { return _objectInstanceHandleNamePair; }
-  const ObjectInstanceHandleNamePair& getObjectInstanceHandleNamePair() const
+  const ObjectInstanceHandleNamePair& getObjectInstanceHandleNamePair() const noexcept
   { return _objectInstanceHandleNamePair; }
 
-  void setSuccess(const Bool& value)
+  void setSuccess(const Bool& value) noexcept
   { _success = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSuccess(Bool&& value)
+  void setSuccess(Bool&& value) noexcept
   { _success = std::move(value); }
 #endif
-  Bool& getSuccess()
+  Bool& getSuccess() noexcept
   { return _success; }
-  const Bool& getSuccess() const
+  const Bool& getSuccess() const noexcept
   { return _success; }
 
 private:
@@ -7212,58 +7146,58 @@ private:
   Bool _success;
 };
 
-class OPENRTI_API ReserveMultipleObjectInstanceNameRequestMessage : public AbstractMessage {
+class OPENRTI_API ReserveMultipleObjectInstanceNameRequestMessage final : public AbstractMessage {
 public:
-  ReserveMultipleObjectInstanceNameRequestMessage();
-  virtual ~ReserveMultipleObjectInstanceNameRequestMessage();
+  ReserveMultipleObjectInstanceNameRequestMessage() noexcept;
+  virtual ~ReserveMultipleObjectInstanceNameRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const;
-  bool operator<(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const;
-  bool operator!=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept;
+  bool operator<(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept;
+  bool operator!=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+  bool operator>(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+  bool operator>=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+  bool operator<=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setNameList(const StringVector& value)
+  void setNameList(const StringVector& value) noexcept
   { _nameList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setNameList(StringVector&& value)
+  void setNameList(StringVector&& value) noexcept
   { _nameList = std::move(value); }
 #endif
-  StringVector& getNameList()
+  StringVector& getNameList() noexcept
   { return _nameList; }
-  const StringVector& getNameList() const
+  const StringVector& getNameList() const noexcept
   { return _nameList; }
 
 private:
@@ -7272,69 +7206,69 @@ private:
   StringVector _nameList;
 };
 
-class OPENRTI_API ReserveMultipleObjectInstanceNameResponseMessage : public AbstractMessage {
+class OPENRTI_API ReserveMultipleObjectInstanceNameResponseMessage final : public AbstractMessage {
 public:
-  ReserveMultipleObjectInstanceNameResponseMessage();
-  virtual ~ReserveMultipleObjectInstanceNameResponseMessage();
+  ReserveMultipleObjectInstanceNameResponseMessage() noexcept;
+  virtual ~ReserveMultipleObjectInstanceNameResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const;
-  bool operator<(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const;
-  bool operator!=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept;
+  bool operator<(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept;
+  bool operator!=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+  bool operator>(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+  bool operator>=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+  bool operator<=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value)
+  void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value) noexcept
   { _objectInstanceHandleNamePairVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value)
+  void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value) noexcept
   { _objectInstanceHandleNamePairVector = std::move(value); }
 #endif
-  ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector()
+  ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() noexcept
   { return _objectInstanceHandleNamePairVector; }
-  const ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() const
+  const ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() const noexcept
   { return _objectInstanceHandleNamePairVector; }
 
-  void setSuccess(const Bool& value)
+  void setSuccess(const Bool& value) noexcept
   { _success = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSuccess(Bool&& value)
+  void setSuccess(Bool&& value) noexcept
   { _success = std::move(value); }
 #endif
-  Bool& getSuccess()
+  Bool& getSuccess() noexcept
   { return _success; }
-  const Bool& getSuccess() const
+  const Bool& getSuccess() const noexcept
   { return _success; }
 
 private:
@@ -7344,82 +7278,82 @@ private:
   Bool _success;
 };
 
-class OPENRTI_API InsertObjectInstanceMessage : public AbstractMessage {
+class OPENRTI_API InsertObjectInstanceMessage final : public AbstractMessage {
 public:
-  InsertObjectInstanceMessage();
-  virtual ~InsertObjectInstanceMessage();
+  InsertObjectInstanceMessage() noexcept;
+  virtual ~InsertObjectInstanceMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InsertObjectInstanceMessage& rhs) const;
-  bool operator<(const InsertObjectInstanceMessage& rhs) const;
-  bool operator!=(const InsertObjectInstanceMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertObjectInstanceMessage& rhs) const noexcept;
+  bool operator<(const InsertObjectInstanceMessage& rhs) const noexcept;
+  bool operator!=(const InsertObjectInstanceMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InsertObjectInstanceMessage& rhs) const
+  bool operator>(const InsertObjectInstanceMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InsertObjectInstanceMessage& rhs) const
+  bool operator>=(const InsertObjectInstanceMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InsertObjectInstanceMessage& rhs) const
+  bool operator<=(const InsertObjectInstanceMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
 #endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { _name = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { _name = std::move(value); }
 #endif
-  String& getName()
+  String& getName() noexcept
   { return _name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return _name; }
 
-  void setAttributeStateVector(const AttributeStateVector& value)
+  void setAttributeStateVector(const AttributeStateVector& value) noexcept
   { _attributeStateVector = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeStateVector(AttributeStateVector&& value)
+  void setAttributeStateVector(AttributeStateVector&& value) noexcept
   { _attributeStateVector = std::move(value); }
 #endif
-  AttributeStateVector& getAttributeStateVector()
+  AttributeStateVector& getAttributeStateVector() noexcept
   { return _attributeStateVector; }
-  const AttributeStateVector& getAttributeStateVector() const
+  const AttributeStateVector& getAttributeStateVector() const noexcept
   { return _attributeStateVector; }
 
 private:
@@ -7430,71 +7364,71 @@ private:
   AttributeStateVector _attributeStateVector;
 };
 
-class OPENRTI_API DeleteObjectInstanceMessage : public AbstractMessage {
+class OPENRTI_API DeleteObjectInstanceMessage final : public AbstractMessage {
 public:
-  DeleteObjectInstanceMessage();
-  virtual ~DeleteObjectInstanceMessage();
+  DeleteObjectInstanceMessage() noexcept;
+  virtual ~DeleteObjectInstanceMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const DeleteObjectInstanceMessage& rhs) const;
-  bool operator<(const DeleteObjectInstanceMessage& rhs) const;
-  bool operator!=(const DeleteObjectInstanceMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DeleteObjectInstanceMessage& rhs) const noexcept;
+  bool operator<(const DeleteObjectInstanceMessage& rhs) const noexcept;
+  bool operator!=(const DeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const DeleteObjectInstanceMessage& rhs) const
+  bool operator>(const DeleteObjectInstanceMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const DeleteObjectInstanceMessage& rhs) const
+  bool operator>=(const DeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const DeleteObjectInstanceMessage& rhs) const
+  bool operator<=(const DeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
 private:
@@ -7504,104 +7438,104 @@ private:
   VariableLengthData _tag;
 };
 
-class OPENRTI_API TimeStampedDeleteObjectInstanceMessage : public AbstractMessage {
+class OPENRTI_API TimeStampedDeleteObjectInstanceMessage final : public AbstractMessage {
 public:
-  TimeStampedDeleteObjectInstanceMessage();
-  virtual ~TimeStampedDeleteObjectInstanceMessage();
+  TimeStampedDeleteObjectInstanceMessage() noexcept;
+  virtual ~TimeStampedDeleteObjectInstanceMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeStampedDeleteObjectInstanceMessage& rhs) const;
-  bool operator<(const TimeStampedDeleteObjectInstanceMessage& rhs) const;
-  bool operator!=(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept;
+  bool operator<(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept;
+  bool operator!=(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+  bool operator>(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+  bool operator>=(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+  bool operator<=(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { _orderType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { _orderType = std::move(value); }
 #endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return _orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return _orderType; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
 #endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setMessageRetractionHandle(const MessageRetractionHandle& value)
+  void setMessageRetractionHandle(const MessageRetractionHandle& value) noexcept
   { _messageRetractionHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setMessageRetractionHandle(MessageRetractionHandle&& value)
+  void setMessageRetractionHandle(MessageRetractionHandle&& value) noexcept
   { _messageRetractionHandle = std::move(value); }
 #endif
-  MessageRetractionHandle& getMessageRetractionHandle()
+  MessageRetractionHandle& getMessageRetractionHandle() noexcept
   { return _messageRetractionHandle; }
-  const MessageRetractionHandle& getMessageRetractionHandle() const
+  const MessageRetractionHandle& getMessageRetractionHandle() const noexcept
   { return _messageRetractionHandle; }
 
 private:
@@ -7614,95 +7548,95 @@ private:
   MessageRetractionHandle _messageRetractionHandle;
 };
 
-class OPENRTI_API AttributeUpdateMessage : public AbstractMessage {
+class OPENRTI_API AttributeUpdateMessage final : public AbstractMessage {
 public:
-  AttributeUpdateMessage();
-  virtual ~AttributeUpdateMessage();
+  AttributeUpdateMessage() noexcept;
+  virtual ~AttributeUpdateMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const AttributeUpdateMessage& rhs) const;
-  bool operator<(const AttributeUpdateMessage& rhs) const;
-  bool operator!=(const AttributeUpdateMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const AttributeUpdateMessage& rhs) const noexcept;
+  bool operator<(const AttributeUpdateMessage& rhs) const noexcept;
+  bool operator!=(const AttributeUpdateMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const AttributeUpdateMessage& rhs) const
+  bool operator>(const AttributeUpdateMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AttributeUpdateMessage& rhs) const
+  bool operator>=(const AttributeUpdateMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AttributeUpdateMessage& rhs) const
+  bool operator<=(const AttributeUpdateMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual bool getReliable() const;
+  bool getReliable() const noexcept override;
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { _transportationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { _transportationType = std::move(value); }
 #endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return _transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return _transportationType; }
 
-  void setAttributeValues(const AttributeValueVector& value)
+  void setAttributeValues(const AttributeValueVector& value) noexcept
   { _attributeValues = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeValues(AttributeValueVector&& value)
+  void setAttributeValues(AttributeValueVector&& value) noexcept
   { _attributeValues = std::move(value); }
 #endif
-  AttributeValueVector& getAttributeValues()
+  AttributeValueVector& getAttributeValues() noexcept
   { return _attributeValues; }
-  const AttributeValueVector& getAttributeValues() const
+  const AttributeValueVector& getAttributeValues() const noexcept
   { return _attributeValues; }
 
 private:
@@ -7714,128 +7648,128 @@ private:
   AttributeValueVector _attributeValues;
 };
 
-class OPENRTI_API TimeStampedAttributeUpdateMessage : public AbstractMessage {
+class OPENRTI_API TimeStampedAttributeUpdateMessage final : public AbstractMessage {
 public:
-  TimeStampedAttributeUpdateMessage();
-  virtual ~TimeStampedAttributeUpdateMessage();
+  TimeStampedAttributeUpdateMessage() noexcept;
+  virtual ~TimeStampedAttributeUpdateMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeStampedAttributeUpdateMessage& rhs) const;
-  bool operator<(const TimeStampedAttributeUpdateMessage& rhs) const;
-  bool operator!=(const TimeStampedAttributeUpdateMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeStampedAttributeUpdateMessage& rhs) const noexcept;
+  bool operator<(const TimeStampedAttributeUpdateMessage& rhs) const noexcept;
+  bool operator!=(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeStampedAttributeUpdateMessage& rhs) const
+  bool operator>(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeStampedAttributeUpdateMessage& rhs) const
+  bool operator>=(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeStampedAttributeUpdateMessage& rhs) const
+  bool operator<=(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual bool getReliable() const;
+  bool getReliable() const noexcept override;
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
 #endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
 #endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setMessageRetractionHandle(const MessageRetractionHandle& value)
+  void setMessageRetractionHandle(const MessageRetractionHandle& value) noexcept
   { _messageRetractionHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setMessageRetractionHandle(MessageRetractionHandle&& value)
+  void setMessageRetractionHandle(MessageRetractionHandle&& value) noexcept
   { _messageRetractionHandle = std::move(value); }
 #endif
-  MessageRetractionHandle& getMessageRetractionHandle()
+  MessageRetractionHandle& getMessageRetractionHandle() noexcept
   { return _messageRetractionHandle; }
-  const MessageRetractionHandle& getMessageRetractionHandle() const
+  const MessageRetractionHandle& getMessageRetractionHandle() const noexcept
   { return _messageRetractionHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { _orderType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { _orderType = std::move(value); }
 #endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return _orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return _orderType; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { _transportationType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { _transportationType = std::move(value); }
 #endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return _transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return _transportationType; }
 
-  void setAttributeValues(const AttributeValueVector& value)
+  void setAttributeValues(const AttributeValueVector& value) noexcept
   { _attributeValues = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeValues(AttributeValueVector&& value)
+  void setAttributeValues(AttributeValueVector&& value) noexcept
   { _attributeValues = std::move(value); }
 #endif
-  AttributeValueVector& getAttributeValues()
+  AttributeValueVector& getAttributeValues() noexcept
   { return _attributeValues; }
-  const AttributeValueVector& getAttributeValues() const
+  const AttributeValueVector& getAttributeValues() const noexcept
   { return _attributeValues; }
 
 private:
@@ -7850,71 +7784,71 @@ private:
   AttributeValueVector _attributeValues;
 };
 
-class OPENRTI_API RequestAttributeUpdateMessage : public AbstractMessage {
+class OPENRTI_API RequestAttributeUpdateMessage final : public AbstractMessage {
 public:
-  RequestAttributeUpdateMessage();
-  virtual ~RequestAttributeUpdateMessage();
+  RequestAttributeUpdateMessage() noexcept;
+  virtual ~RequestAttributeUpdateMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RequestAttributeUpdateMessage& rhs) const;
-  bool operator<(const RequestAttributeUpdateMessage& rhs) const;
-  bool operator!=(const RequestAttributeUpdateMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RequestAttributeUpdateMessage& rhs) const noexcept;
+  bool operator<(const RequestAttributeUpdateMessage& rhs) const noexcept;
+  bool operator!=(const RequestAttributeUpdateMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RequestAttributeUpdateMessage& rhs) const
+  bool operator>(const RequestAttributeUpdateMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RequestAttributeUpdateMessage& rhs) const
+  bool operator>=(const RequestAttributeUpdateMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RequestAttributeUpdateMessage& rhs) const
+  bool operator<=(const RequestAttributeUpdateMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
 #endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
 private:
@@ -7924,69 +7858,69 @@ private:
   VariableLengthData _tag;
 };
 
-class OPENRTI_API RequestClassAttributeUpdateMessage : public AbstractMessage {
+class OPENRTI_API RequestClassAttributeUpdateMessage final : public AbstractMessage {
 public:
-  RequestClassAttributeUpdateMessage();
-  virtual ~RequestClassAttributeUpdateMessage();
+  RequestClassAttributeUpdateMessage() noexcept;
+  virtual ~RequestClassAttributeUpdateMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RequestClassAttributeUpdateMessage& rhs) const;
-  bool operator<(const RequestClassAttributeUpdateMessage& rhs) const;
-  bool operator!=(const RequestClassAttributeUpdateMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RequestClassAttributeUpdateMessage& rhs) const noexcept;
+  bool operator<(const RequestClassAttributeUpdateMessage& rhs) const noexcept;
+  bool operator!=(const RequestClassAttributeUpdateMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RequestClassAttributeUpdateMessage& rhs) const
+  bool operator>(const RequestClassAttributeUpdateMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RequestClassAttributeUpdateMessage& rhs) const
+  bool operator>=(const RequestClassAttributeUpdateMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RequestClassAttributeUpdateMessage& rhs) const
+  bool operator<=(const RequestClassAttributeUpdateMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
 #endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
 #endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
 #endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
 private:
@@ -7996,58 +7930,58 @@ private:
   VariableLengthData _tag;
 };
 
-class OPENRTI_API QueryAttributeOwnershipRequestMessage : public AbstractMessage {
+class OPENRTI_API QueryAttributeOwnershipRequestMessage final : public AbstractMessage {
 public:
-  QueryAttributeOwnershipRequestMessage();
-  virtual ~QueryAttributeOwnershipRequestMessage();
+  QueryAttributeOwnershipRequestMessage() noexcept;
+  virtual ~QueryAttributeOwnershipRequestMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const QueryAttributeOwnershipRequestMessage& rhs) const;
-  bool operator<(const QueryAttributeOwnershipRequestMessage& rhs) const;
-  bool operator!=(const QueryAttributeOwnershipRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept;
+  bool operator<(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept;
+  bool operator!=(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const QueryAttributeOwnershipRequestMessage& rhs) const
+  bool operator>(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const QueryAttributeOwnershipRequestMessage& rhs) const
+  bool operator>=(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const QueryAttributeOwnershipRequestMessage& rhs) const
+  bool operator<=(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setAttributeHandle(const AttributeHandle& value)
+  void setAttributeHandle(const AttributeHandle& value) noexcept
   { _attributeHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandle(AttributeHandle&& value)
+  void setAttributeHandle(AttributeHandle&& value) noexcept
   { _attributeHandle = std::move(value); }
 #endif
-  AttributeHandle& getAttributeHandle()
+  AttributeHandle& getAttributeHandle() noexcept
   { return _attributeHandle; }
-  const AttributeHandle& getAttributeHandle() const
+  const AttributeHandle& getAttributeHandle() const noexcept
   { return _attributeHandle; }
 
 private:
@@ -8056,69 +7990,69 @@ private:
   AttributeHandle _attributeHandle;
 };
 
-class OPENRTI_API QueryAttributeOwnershipResponseMessage : public AbstractMessage {
+class OPENRTI_API QueryAttributeOwnershipResponseMessage final : public AbstractMessage {
 public:
-  QueryAttributeOwnershipResponseMessage();
-  virtual ~QueryAttributeOwnershipResponseMessage();
+  QueryAttributeOwnershipResponseMessage() noexcept;
+  virtual ~QueryAttributeOwnershipResponseMessage() noexcept;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const QueryAttributeOwnershipResponseMessage& rhs) const;
-  bool operator<(const QueryAttributeOwnershipResponseMessage& rhs) const;
-  bool operator!=(const QueryAttributeOwnershipResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept;
+  bool operator<(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept;
+  bool operator!=(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const QueryAttributeOwnershipResponseMessage& rhs) const
+  bool operator>(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const QueryAttributeOwnershipResponseMessage& rhs) const
+  bool operator>=(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const QueryAttributeOwnershipResponseMessage& rhs) const
+  bool operator<=(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
 #endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
 #endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setAttributeHandle(const AttributeHandle& value)
+  void setAttributeHandle(const AttributeHandle& value) noexcept
   { _attributeHandle = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandle(AttributeHandle&& value)
+  void setAttributeHandle(AttributeHandle&& value) noexcept
   { _attributeHandle = std::move(value); }
 #endif
-  AttributeHandle& getAttributeHandle()
+  AttributeHandle& getAttributeHandle() noexcept
   { return _attributeHandle; }
-  const AttributeHandle& getAttributeHandle() const
+  const AttributeHandle& getAttributeHandle() const noexcept
   { return _attributeHandle; }
 
-  void setOwner(const FederateHandle& value)
+  void setOwner(const FederateHandle& value) noexcept
   { _owner = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOwner(FederateHandle&& value)
+  void setOwner(FederateHandle&& value) noexcept
   { _owner = std::move(value); }
 #endif
-  FederateHandle& getOwner()
+  FederateHandle& getOwner() noexcept
   { return _owner; }
-  const FederateHandle& getOwner() const
+  const FederateHandle& getOwner() const noexcept
   { return _owner; }
 
 private:
@@ -9140,7 +9074,7 @@ inline std::string to_string(const RegisterFederationSynchronizationPointRespons
   }
 }
 
-// <__main__.MapDataType object at 0x0000029906089D30>
+// <__main__.MapDataType object at 0x00000224EB25BDD8>
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const ConfigurationParameterMap& value)

@@ -577,7 +577,7 @@ public:
 // As a subclass of OpenRTI::Ambassador, this class also has access to the callback queues (inherited from InternalAmbassador).
 // The MomManager must live here, because this is the place to decide whether to route callbacks into the MomManager only
 // or into the FederateAmbassador also.
-class OPENRTI_LOCAL RTIambassadorImplementation::RTI1516EAmbassadorInterface : public OpenRTI::Ambassador<RTI1516ETraits> {
+class OPENRTI_LOCAL RTIambassadorImplementation::RTI1516EAmbassadorInterface final : public OpenRTI::Ambassador<RTI1516ETraits> {
 public:
   RTI1516EAmbassadorInterface()
     : Ambassador<RTI1516ETraits>()
@@ -605,7 +605,7 @@ public:
     return rti1516e::LogicalTimeFactoryFactory::makeLogicalTimeFactory(utf8ToUcs(federate->getLogicalTimeFactoryName()));
   }
 
-  virtual TimeManagement<RTI1516ETraits>* createTimeManagement(Federate& federate)
+  TimeManagement<RTI1516ETraits>* createTimeManagement(Federate& federate) override
   {
     std::string logicalTimeFactoryName = federate.getLogicalTimeFactoryName();
     std::unique_ptr<rti1516e::LogicalTimeFactory> logicalTimeFactory;
@@ -660,7 +660,7 @@ public:
     return new TemplateTimeManagement<RTI1516ETraits, RTI1516ELogicalTimeFactory>(RTI1516ELogicalTimeFactory(std::move(logicalTimeFactory)));
   }
 
-  virtual void connectionLost(const std::string& faultDescription)
+  void connectionLost(const std::string& faultDescription) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -674,7 +674,7 @@ public:
     }
   }
 
-  virtual void reportFederationExecutions(const OpenRTI::FederationExecutionInformationVector& federationExecutionInformationVector)
+  void reportFederationExecutions(const OpenRTI::FederationExecutionInformationVector& federationExecutionInformationVector) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -688,7 +688,7 @@ public:
     }
   }
 
-  virtual void synchronizationPointRegistrationResponse(const std::string& label, RegisterFederationSynchronizationPointResponseType reason)
+  void synchronizationPointRegistrationResponse(const std::string& label, RegisterFederationSynchronizationPointResponseType reason) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -712,7 +712,7 @@ public:
     }
   }
 
-  virtual void announceSynchronizationPoint(const std::string& label, const OpenRTI::VariableLengthData& tag)
+  void announceSynchronizationPoint(const std::string& label, const OpenRTI::VariableLengthData& tag) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -727,7 +727,7 @@ public:
     }
   }
 
-  virtual void federationSynchronized(const std::string& label, const OpenRTI::FederateHandleBoolPairVector& federateHandleBoolPairVector)
+  void federationSynchronized(const std::string& label, const OpenRTI::FederateHandleBoolPairVector& federateHandleBoolPairVector) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -743,10 +743,7 @@ public:
   }
 
   // // 4.12
-  // virtual void
-  // initiateFederateSave(std::string const& label)
-  //   throw (OpenRTI::UnableToPerformSave,
-  //          OpenRTI::FederateInternalError)
+  // void initiateFederateSave(std::string const& label) override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -759,12 +756,8 @@ public:
   //   }
   // }
 
-  // virtual void
-  // initiateFederateSave(const std::string& label,
-  //                      const LogicalTime& logicalTime)
-  //   throw (OpenRTI::UnableToPerformSave,
-  //          OpenRTI::InvalidLogicalTime,
-  //          OpenRTI::FederateInternalError)
+  // void initiateFederateSave(const std::string& label,
+  //                      const LogicalTime& logicalTime) override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -780,9 +773,7 @@ public:
   // }
 
   // // 4.15
-  // virtual void
-  // federationSaved()
-  //   throw (OpenRTI::FederateInternalError)
+  // void federationSaved() override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -793,9 +784,7 @@ public:
   //   }
   // }
 
-  // virtual void
-  // federationNotSaved(OpenRTI::SaveFailureReason reason)
-  //   throw (OpenRTI::FederateInternalError)
+  // void federationNotSaved(OpenRTI::SaveFailureReason reason) override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -830,9 +819,7 @@ public:
 
 
   // // 4.17
-  // virtual void
-  // federationSaveStatusResponse(OpenRTI::FederateHandleSaveStatusPairVector const& federateStatusVector)
-  //   throw (OpenRTI::FederateInternalError)
+  // void federationSaveStatusResponse(OpenRTI::FederateHandleSaveStatusPairVector const& federateStatusVector) override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -853,9 +840,7 @@ public:
   // }
 
   // // 4.19
-  // virtual void
-  // requestFederationRestoreSucceeded(std::string const& label)
-  //   throw (OpenRTI::FederateInternalError)
+  // void requestFederationRestoreSucceeded(std::string const& label) override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -866,9 +851,7 @@ public:
   //   }
   // }
 
-  // virtual void
-  // requestFederationRestoreFailed(std::string const& label)
-  //   throw (OpenRTI::FederateInternalError)
+  // void requestFederationRestoreFailed(std::string const& label) override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -881,9 +864,7 @@ public:
 
 
   // // 4.20
-  // virtual void
-  // federationRestoreBegun()
-  //   throw (OpenRTI::FederateInternalError)
+  // void federationRestoreBegun() override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -895,12 +876,8 @@ public:
   // }
 
   // // 4.21
-  // virtual void
-  // initiateFederateRestore(std::string const & label,
-  //                         FederateHandle handle)
-  //   throw (OpenRTI::SpecifiedSaveLabelDoesNotExist,
-  //          OpenRTI::CouldNotInitiateRestore,
-  //          OpenRTI::FederateInternalError)
+  // void initiateFederateRestore(std::string const & label,
+  //                         FederateHandle handle) override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -917,9 +894,7 @@ public:
   // }
 
   // // 4.23
-  // virtual
-  // void federationRestored()
-  //   throw (OpenRTI::FederateInternalError)
+  // void federationRestored() override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -930,9 +905,7 @@ public:
   //   }
   // }
 
-  // virtual void
-  // federationNotRestored(RestoreFailureReason reason)
-  //   throw (OpenRTI::FederateInternalError)
+  // void federationNotRestored(RestoreFailureReason reason) override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -963,9 +936,7 @@ public:
   // }
 
   // // 4.25
-  // virtual void
-  // federationRestoreStatusResponse(FederateHandleRestoreStatusPairVector const& theFederateStatusVector)
-  //   throw (OpenRTI::FederateInternalError)
+  // void federationRestoreStatusResponse(FederateHandleRestoreStatusPairVector const& theFederateStatusVector) override
   // {
   //   if (!_federateAmbassador)
   //     throw OpenRTI::FederateInternalError();
@@ -994,7 +965,7 @@ public:
   // Declaration Management Services //
   /////////////////////////////////////
 
-  virtual void registrationForObjectClass(OpenRTI::ObjectClassHandle objectClassHandle, bool start)
+  void registrationForObjectClass(OpenRTI::ObjectClassHandle objectClassHandle, bool start) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1011,7 +982,7 @@ public:
     }
   }
 
-  virtual void turnInteractionsOn(InteractionClassHandle interactionClassHandle, bool on)
+  void turnInteractionsOn(InteractionClassHandle interactionClassHandle, bool on) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1032,7 +1003,7 @@ public:
   // Object Management Services //
   ////////////////////////////////
 
-  virtual void objectInstanceNameReservationSucceeded(const std::string& objectInstanceName)
+  void objectInstanceNameReservationSucceeded(const std::string& objectInstanceName) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1045,7 +1016,8 @@ public:
       Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
     }
   }
-  virtual void objectInstanceNameReservationFailed(const std::string& objectInstanceName)
+
+  void objectInstanceNameReservationFailed(const std::string& objectInstanceName) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1059,7 +1031,7 @@ public:
     }
   }
 
-  virtual void multipleObjectInstanceNameReservationSucceeded(const std::vector<std::string>& objectInstanceNames)
+  void multipleObjectInstanceNameReservationSucceeded(const std::vector<std::string>& objectInstanceNames) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1072,7 +1044,7 @@ public:
       Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
     }
   }
-  virtual void multipleObjectInstanceNameReservationFailed(const std::vector<std::string>& objectInstanceNames)
+  void multipleObjectInstanceNameReservationFailed(const std::vector<std::string>& objectInstanceNames) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1087,11 +1059,10 @@ public:
   }
 
   // 6.5
-  virtual
-  void
-  discoverObjectInstance(ObjectInstanceHandle objectInstanceHandle,
-                         ObjectClassHandle objectClassHandle,
-                         std::string const& name)
+
+  void discoverObjectInstance(ObjectInstanceHandle objectInstanceHandle,
+                              ObjectClassHandle objectClassHandle,
+                              std::string const& name) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1107,10 +1078,10 @@ public:
     }
   }
 
-  virtual void reflectAttributeValues (const Federate::ObjectClass& objectClass,
-                                       ObjectInstanceHandle objectInstanceHandle,
-                                       const AttributeValueVector& attributeValueVector, const VariableLengthData& tag,
-                                       OrderType sentOrder, TransportationType transportationType, FederateHandle federateHandle)
+  void reflectAttributeValues(const Federate::ObjectClass& objectClass,
+                              ObjectInstanceHandle objectInstanceHandle,
+                              const AttributeValueVector& attributeValueVector, const VariableLengthData& tag,
+                              OrderType sentOrder, TransportationType transportationType, FederateHandle federateHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1131,10 +1102,10 @@ public:
       Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
     }
   }
-  virtual void reflectAttributeValues(const Federate::ObjectClass& objectClass, ObjectInstanceHandle objectInstanceHandle,
-                                      const AttributeValueVector& attributeValueVector, const VariableLengthData& tag,
-                                      OrderType sentOrder, TransportationType transportationType,
-                                      const NativeLogicalTime& logicalTime, OrderType receivedOrder, FederateHandle federateHandle)
+  void reflectAttributeValues(const Federate::ObjectClass& objectClass, ObjectInstanceHandle objectInstanceHandle,
+                              const AttributeValueVector& attributeValueVector, const VariableLengthData& tag,
+                              OrderType sentOrder, TransportationType transportationType,
+                              const NativeLogicalTime& logicalTime, OrderType receivedOrder, FederateHandle federateHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1157,11 +1128,11 @@ public:
       Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
     }
   }
-  virtual void reflectAttributeValues(const Federate::ObjectClass& objectClass, ObjectInstanceHandle objectInstanceHandle,
-                                      const AttributeValueVector& attributeValueVector, const VariableLengthData& tag,
-                                      OrderType sentOrder, TransportationType transportationType,
-                                      const NativeLogicalTime& logicalTime, OrderType receivedOrder, FederateHandle federateHandle,
-                                      MessageRetractionHandle messageRetractionHandle)
+  void reflectAttributeValues(const Federate::ObjectClass& objectClass, ObjectInstanceHandle objectInstanceHandle,
+                              const AttributeValueVector& attributeValueVector, const VariableLengthData& tag,
+                              OrderType sentOrder, TransportationType transportationType,
+                              const NativeLogicalTime& logicalTime, OrderType receivedOrder, FederateHandle federateHandle,
+                              MessageRetractionHandle messageRetractionHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1187,7 +1158,7 @@ public:
     }
   }
 
-  virtual void removeObjectInstance(ObjectInstanceHandle objectInstanceHandle, const VariableLengthData& tag, OrderType sentOrder, FederateHandle federateHandle)
+  void removeObjectInstance(ObjectInstanceHandle objectInstanceHandle, const VariableLengthData& tag, OrderType sentOrder, FederateHandle federateHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1204,8 +1175,9 @@ public:
       Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
     }
   }
-  virtual void removeObjectInstance(ObjectInstanceHandle objectInstanceHandle, const VariableLengthData& tag, OrderType sentOrder,
-                                    const NativeLogicalTime& logicalTime, OrderType receivedOrder, FederateHandle federateHandle)
+
+  void removeObjectInstance(ObjectInstanceHandle objectInstanceHandle, const VariableLengthData& tag, OrderType sentOrder,
+                            const NativeLogicalTime& logicalTime, OrderType receivedOrder, FederateHandle federateHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1223,9 +1195,10 @@ public:
       Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
     }
   }
-  virtual void removeObjectInstance(ObjectInstanceHandle objectInstanceHandle, const VariableLengthData& tag, OrderType sentOrder,
-                                    const NativeLogicalTime& logicalTime, OrderType receivedOrder, FederateHandle federateHandle,
-                                    MessageRetractionHandle messageRetractionHandle)
+
+  void removeObjectInstance(ObjectInstanceHandle objectInstanceHandle, const VariableLengthData& tag, OrderType sentOrder,
+                            const NativeLogicalTime& logicalTime, OrderType receivedOrder, FederateHandle federateHandle,
+                            MessageRetractionHandle messageRetractionHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1246,9 +1219,9 @@ public:
     }
   }
 
-  virtual void receiveInteraction(const Federate::InteractionClass& interactionClass, InteractionClassHandle interactionClassHandle,
-                                  const ParameterValueVector& parameterValueVector, const VariableLengthData& tag,
-                                  OrderType sentOrder, TransportationType transportationType, FederateHandle federateHandle)
+  void receiveInteraction(const Federate::InteractionClass& interactionClass, InteractionClassHandle interactionClassHandle,
+                          const ParameterValueVector& parameterValueVector, const VariableLengthData& tag,
+                          OrderType sentOrder, TransportationType transportationType, FederateHandle federateHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1269,10 +1242,11 @@ public:
       Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
     }
   }
-  virtual void receiveInteraction(const Federate::InteractionClass& interactionClass, InteractionClassHandle interactionClassHandle,
-                                  const ParameterValueVector& parameterValueVector, const VariableLengthData& tag,
-                                  OrderType sentOrder, TransportationType transportationType, const NativeLogicalTime& logicalTime,
-                                  OrderType receivedOrder, FederateHandle federateHandle)
+
+  void receiveInteraction(const Federate::InteractionClass& interactionClass, InteractionClassHandle interactionClassHandle,
+                          const ParameterValueVector& parameterValueVector, const VariableLengthData& tag,
+                          OrderType sentOrder, TransportationType transportationType, const NativeLogicalTime& logicalTime,
+                          OrderType receivedOrder, FederateHandle federateHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1295,10 +1269,11 @@ public:
       Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
     }
   }
-  virtual void receiveInteraction(const Federate::InteractionClass& interactionClass, InteractionClassHandle interactionClassHandle,
-                                  const ParameterValueVector& parameterValueVector, const VariableLengthData& tag,
-                                  OrderType sentOrder, TransportationType transportationType, const NativeLogicalTime& logicalTime,
-                                  OrderType receivedOrder, FederateHandle federateHandle, MessageRetractionHandle messageRetractionHandle)
+
+  void receiveInteraction(const Federate::InteractionClass& interactionClass, InteractionClassHandle interactionClassHandle,
+                          const ParameterValueVector& parameterValueVector, const VariableLengthData& tag,
+                          OrderType sentOrder, TransportationType transportationType, const NativeLogicalTime& logicalTime,
+                          OrderType receivedOrder, FederateHandle federateHandle, MessageRetractionHandle messageRetractionHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1324,9 +1299,7 @@ public:
   }
 
   // 6.15
-  virtual
-  void
-  attributesInScope(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector)
+  void attributesInScope(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1342,9 +1315,7 @@ public:
   }
 
   // 6.16
-  virtual
-  void
-  attributesOutOfScope(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector)
+  void attributesOutOfScope(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1360,10 +1331,8 @@ public:
   }
 
   // 6.18
-  virtual
-  void
-  provideAttributeValueUpdate(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector,
-                              const VariableLengthData& tag)
+  void provideAttributeValueUpdate(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector,
+                              const VariableLengthData& tag) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1380,9 +1349,7 @@ public:
   }
 
   // 6.19
-  virtual
-  void
-  turnUpdatesOnForObjectInstance(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector, const std::string& updateRate)
+  void turnUpdatesOnForObjectInstance(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector, const std::string& updateRate) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1403,9 +1370,7 @@ public:
   }
 
   // 6.20
-  virtual
-  void
-  turnUpdatesOffForObjectInstance(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector)
+  void turnUpdatesOffForObjectInstance(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1425,10 +1390,8 @@ public:
   ///////////////////////////////////
 
   // 7.4
-  virtual
-  void
-  requestAttributeOwnershipAssumption(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector,
-                                      const VariableLengthData& tag)
+  void requestAttributeOwnershipAssumption(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector,
+                                      const VariableLengthData& tag) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1445,9 +1408,7 @@ public:
   }
 
   // 7.5
-  virtual
-  void
-  requestDivestitureConfirmation(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector)
+  void requestDivestitureConfirmation(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1463,10 +1424,8 @@ public:
   }
 
   // 7.7
-  virtual
-  void
-  attributeOwnershipAcquisitionNotification(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector,
-                                            const VariableLengthData& tag)
+  void attributeOwnershipAcquisitionNotification(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector,
+                                            const VariableLengthData& tag) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1483,9 +1442,7 @@ public:
   }
 
   // 7.10
-  virtual
-  void
-  attributeOwnershipUnavailable(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector)
+  void attributeOwnershipUnavailable(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1501,10 +1458,8 @@ public:
   }
 
   // 7.11
-  virtual
-  void
-  requestAttributeOwnershipRelease(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector,
-                                   const VariableLengthData& tag)
+  void requestAttributeOwnershipRelease(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector,
+                                   const VariableLengthData& tag) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1521,9 +1476,7 @@ public:
   }
 
   // 7.15
-  virtual
-  void
-  confirmAttributeOwnershipAcquisitionCancellation(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector)
+  void confirmAttributeOwnershipAcquisitionCancellation(ObjectInstanceHandle objectInstanceHandle, const AttributeHandleVector& attributeHandleVector) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1539,11 +1492,10 @@ public:
   }
 
   // 7.17
-  virtual
-  void
+  void 
   informAttributeOwnership(ObjectInstanceHandle objectInstanceHandle,
                            AttributeHandle attributeHandle,
-                           FederateHandle federateHandle)
+                           FederateHandle federateHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1561,9 +1513,7 @@ public:
     }
   }
 
-  virtual
-  void
-  attributeIsNotOwned(ObjectInstanceHandle objectInstanceHandle, AttributeHandle attributeHandle)
+  void attributeIsNotOwned(ObjectInstanceHandle objectInstanceHandle, AttributeHandle attributeHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1578,9 +1528,7 @@ public:
     }
   }
 
-  virtual
-  void
-  attributeIsOwnedByRTI(ObjectInstanceHandle objectInstanceHandle, AttributeHandle attributeHandle)
+  void attributeIsOwnedByRTI(ObjectInstanceHandle objectInstanceHandle, AttributeHandle attributeHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1600,8 +1548,7 @@ public:
   //////////////////////////////
 
   // 8.3
-  virtual void
-  timeRegulationEnabled(const rti1516e::LogicalTime& logicalTime)
+  void timeRegulationEnabled(const rti1516e::LogicalTime& logicalTime) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1615,8 +1562,7 @@ public:
   }
 
   // 8.6
-  virtual void
-  timeConstrainedEnabled(const rti1516e::LogicalTime& logicalTime)
+  void timeConstrainedEnabled(const rti1516e::LogicalTime& logicalTime) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1630,8 +1576,7 @@ public:
   }
 
   // 8.13
-  virtual void
-  timeAdvanceGrant(const rti1516e::LogicalTime& logicalTime)
+  void timeAdvanceGrant(const rti1516e::LogicalTime& logicalTime) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
@@ -1645,9 +1590,7 @@ public:
   }
 
   // 8.22
-  virtual
-  void
-  requestRetraction(MessageRetractionHandle messageRetractionHandle)
+  void requestRetraction(MessageRetractionHandle messageRetractionHandle) override
   {
     if (!_federateAmbassador) {
       Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;

@@ -54,25 +54,25 @@ static bool enableFlagToBool(const char* enableValue)
   throw RTIinternalError("Invalid enable flag!");
 }
 
-ServerConfigContentHandler::ServerConfigContentHandler() :
+ServerConfigContentHandler::ServerConfigContentHandler() noexcept :
   _permitTimeRegulation(true),
   _enableZLibCompression(true),
   _enableNetworkStatistics(false)
 {
 }
 
-ServerConfigContentHandler::~ServerConfigContentHandler()
+ServerConfigContentHandler::~ServerConfigContentHandler() noexcept
 {
 }
 
 void
-ServerConfigContentHandler::startDocument(void)
+ServerConfigContentHandler::startDocument()
 {
   OpenRTIAssert(_modeStack.empty());
 }
 
 void
-ServerConfigContentHandler::endDocument(void)
+ServerConfigContentHandler::endDocument()
 {
   OpenRTIAssert(_modeStack.empty());
 }

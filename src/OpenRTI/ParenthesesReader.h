@@ -33,7 +33,8 @@ class OPENRTI_API ParenthesesReader {
 public:
   class OPENRTI_API ContentHandler {
   public:
-    virtual ~ContentHandler();
+    ContentHandler() = default;
+    virtual ~ContentHandler() noexcept = default;
 
     virtual void startDocument();
     virtual void endDocument();
@@ -44,7 +45,7 @@ public:
 
   class OPENRTI_API ErrorHandler {
   public:
-    virtual ~ErrorHandler(void);
+    virtual ~ErrorHandler();
 
     virtual void error(const ParenthesesReader& parenthesesReader, const char* msg);
   };

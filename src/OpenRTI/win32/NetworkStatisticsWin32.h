@@ -11,8 +11,8 @@ namespace OpenRTI
 class NetworkStatisticsWin32 : public NetworkStatistics
 {
   public:
-    NetworkStatisticsWin32();
-    ~NetworkStatisticsWin32();
+    NetworkStatisticsWin32() noexcept;
+    ~NetworkStatisticsWin32() noexcept;
 
 #ifdef ENABLE_NETWORKSTATISTICS
     void Start(bool startTimer) override;

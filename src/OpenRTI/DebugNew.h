@@ -36,7 +36,8 @@ inline X* placement_new(void* addr, Types&& ... args)
 #endif
 
 #if defined(_WIN32)
-
+#pragma warning(push)
+#pragma warning(disable : 26409)
 #if defined(_DEBUG) && defined (OPENRTI_USE_DEBUG_NEW)
 #if !defined ( _OPENRTI_DEBUG_NEW )
   #include <crtdbg.h>
@@ -61,6 +62,7 @@ inline X* placement_new(void* addr, Types&& ... args)
 #endif
 
 #endif // defined(_DEBUG)
+#pragma warning(pop)
 
 #else // !defined(_WIN32)
 #ifndef _OPENRTI_ALLOC_NEW_DEFINED

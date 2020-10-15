@@ -34,7 +34,7 @@ public:
   HLAinteger64Interval(Integer64);
   HLAinteger64Interval(const rti1516::LogicalTimeInterval&);
   HLAinteger64Interval(const HLAinteger64Interval&);
-  virtual ~HLAinteger64Interval() throw ();
+  virtual ~HLAinteger64Interval() noexcept;
 
   virtual void setZero();
   virtual bool isZero() const;

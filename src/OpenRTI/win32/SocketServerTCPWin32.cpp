@@ -92,7 +92,7 @@ SocketServerTCP::listen(int backlog)
     throw TransportError(errnoToUtf8(WSAGetLastError()));
 }
 
-SocketTCP*
+SharedPtr<SocketStream>
 SocketServerTCP::accept()
 {
   SOCKET fd = ::accept(_privateData->_socket, 0, 0);

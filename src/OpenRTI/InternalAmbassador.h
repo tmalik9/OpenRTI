@@ -34,7 +34,7 @@ class AbstractServer;
 class OPENRTI_API InternalAmbassador {
 public:
   InternalAmbassador();
-  virtual ~InternalAmbassador();
+  virtual ~InternalAmbassador() noexcept;
 
   /// Handle the connection to the ServerNodes.
   bool isConnected() const;

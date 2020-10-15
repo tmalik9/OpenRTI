@@ -38,12 +38,12 @@ struct OPENRTI_LOCAL RegionSet::Node : public Referenced /* FIXME Memory managem
 };
 
 struct OPENRTI_LOCAL RegionSet::Leaf : public RegionSet::Node {
-  virtual void accept(Visitor& visitor)
+  virtual void accept(Visitor& visitor) override
   { visitor.apply(*this); }
 };
 
 struct OPENRTI_LOCAL RegionSet::Branch : public RegionSet::Node {
-  virtual void accept(Visitor& visitor)
+  void accept(Visitor& visitor) override
   { visitor.apply(*this); }
   SharedPtr<Node> _left;
   SharedPtr<Node> _right;
@@ -55,13 +55,13 @@ struct OPENRTI_LOCAL RegionSet::LeafIntersectVisitor : public RegionSet::Visitor
     _leaf(leaf)
   {
   }
-  virtual void apply(Leaf& leaf)
+  void apply(Leaf& leaf) override
   {
     if (_foundIntersection)
       return;
     _foundIntersection = _leaf._region.intersects(leaf._region);
   }
-  virtual void apply(Branch& branch)
+  void apply(Branch& branch) override
   {
     if (_foundIntersection)
       return;
@@ -83,7 +83,7 @@ struct OPENRTI_LOCAL RegionSet::NodeIntersectVisitor : public RegionSet::Visitor
     _node(node)
   {
   }
-  virtual void apply(Leaf& leaf)
+  void apply(Leaf& leaf) override
   {
     if (_foundIntersection)
       return;
@@ -91,7 +91,7 @@ struct OPENRTI_LOCAL RegionSet::NodeIntersectVisitor : public RegionSet::Visitor
     _node.accept(visitor);
     _foundIntersection = visitor._foundIntersection;
   }
-  virtual void apply(Branch& branch)
+  void apply(Branch& branch) override
   {
     if (_foundIntersection)
       return;
@@ -181,7 +181,7 @@ RegionSet::erase(const FederateHandle& federateHandle)
 bool
 RegionSet::intersects(const RegionSet& regionSet) const
 {
-  // Puh, O(n^2) ... that bouding volume tree ... FIXME
+  // Puh, O(n^2) ... that bounding volume tree ... FIXME
   for (RegionHandleLeafMap::const_iterator i = _regionHandleLeafMap->begin(); i != _regionHandleLeafMap->end(); ++i) {
     for (RegionHandleLeafMap::const_iterator j = regionSet._regionHandleLeafMap->begin(); j != regionSet._regionHandleLeafMap->end(); ++j) {
       if (i->second->_region.intersects(j->second->_region))

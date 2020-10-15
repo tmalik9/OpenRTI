@@ -37,7 +37,7 @@ typedef std::list<SharedPtr<AbstractSocketEvent> > SocketEventList;
 class OPENRTI_API AbstractSocketEvent : public Referenced {
 public:
   AbstractSocketEvent();
-  virtual ~AbstractSocketEvent();
+  virtual ~AbstractSocketEvent() noexcept = default;
 
   // Is called from the parent protocol layer when there is data to read
   virtual void read(SocketEventDispatcher& dispatcher) = 0;

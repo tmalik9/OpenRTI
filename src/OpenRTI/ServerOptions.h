@@ -29,7 +29,7 @@ namespace OpenRTI {
 
 // Just a set of options that might be configurable at some time from outside.
 // May be add some callback mechanism here: depending on the subnet??
-class OPENRTI_API ServerOptions : public Referenced {
+class OPENRTI_API ServerOptions final : public Referenced {
 public:
   ServerOptions() :
     _preferCompression(true), // Default to compression for now FIXME

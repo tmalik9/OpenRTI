@@ -37,9 +37,9 @@ public:
   typedef typename Traits::NativeLogicalTime NativeLogicalTime;
   typedef typename Traits::NativeLogicalTimeInterval NativeLogicalTimeInterval;
 
-  TimeManagement()
+  TimeManagement() noexcept
   { }
-  virtual ~TimeManagement()
+  virtual ~TimeManagement() noexcept
   { }
 
   virtual bool isLogicalTimeInThePast(const NativeLogicalTime& logicalTime) = 0;

@@ -119,9 +119,9 @@ public:
 
   // lm 22.01.01: nur den Kanal alleine: v.a. für die vielen Stellen alten codes (COM!?)
   //              die eben nur mit dem Kanal hantieren...
-  VAppChannelNumber GetAppChannelNumber(void) const { return mAppChannelNumber;};
+  VAppChannelNumber GetAppChannelNumber() const { return mAppChannelNumber;};
   // lm 22.01.01: i.A. sollte auch der Bustyp interessant sein
-  VBusType          GetBusType(void) const { return mBusType;};
+  VBusType          GetBusType() const { return mBusType;};
 
   bool IsValid() const { return mAppChannelNumber != kChannelInvalid && mBusType != kBtInvalid; }
     

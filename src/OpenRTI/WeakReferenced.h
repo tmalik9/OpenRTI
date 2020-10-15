@@ -65,18 +65,19 @@ public:
   /// In this case the last bit is still set and the Object instance is
   /// never destroyed.
   ///
-  WeakReferenced(void) :
+  WeakReferenced() :
     mWeakData(new WeakData(this))
   {}
   WeakReferenced(const WeakReferenced& weakReferenced) :
     mWeakData(new WeakData(this))
   {}
-  ~WeakReferenced(void)
-  { mWeakData->clear(); }
+  ~WeakReferenced() noexcept 
+  {
+    mWeakData->clear();
+  }
 
   /// Do not copy the weak backward references ...
-  WeakReferenced& operator=(const WeakReferenced&)
-  { return *this; }
+  WeakReferenced& operator=(const WeakReferenced&) { return *this; }
 
   /// The usual operations on weak pointers.
   /// The interface should stay the same then what we have in Referenced.
@@ -92,7 +93,7 @@ public:
   { if (!ref) return ~0u; return ref->mWeakData->weakReferencedCount(); }
 
   template<typename T>
-  static void destruct(T* ref)
+  static void destruct(T* ref) noexcept
   { delete ref; }
 
 private:
@@ -102,7 +103,7 @@ private:
   class OPENRTI_API WeakData : public Referenced {
   public:
     WeakData(WeakReferenced* weakReferenced);
-    ~WeakData();
+    ~WeakData() noexcept;
 
     void weakReferencedGet()
     { mRefcount.incFetch(Atomic::MemoryOrderRelease); }
@@ -114,8 +115,7 @@ private:
     unsigned weakReferencedCount()
     { return mRefcount & (~lastbit()); }
 
-    void clear()
-    { mWeakReferenced = 0; }
+    void clear() noexcept { mWeakReferenced = 0; }
 
     WeakReferenced* getWeakReferenced();
 
@@ -123,7 +123,7 @@ private:
     { return ~((~unsigned(0)) >> 1); }
 
   private:
-    WeakData(void);
+    WeakData();
     WeakData(const WeakData&);
     WeakData& operator=(const WeakData&);
 

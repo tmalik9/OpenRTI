@@ -119,7 +119,7 @@ public:
     _InternalMessageDispatchFunctor functor(_momServer);
     message->dispatch(FunctorMessageDispatcher<MomServer::_InternalMessageDispatchFunctor>(functor));
   }
-  virtual void close() override
+  virtual void close() noexcept override
   {
     //DebugPrintf("%s\n");
   }

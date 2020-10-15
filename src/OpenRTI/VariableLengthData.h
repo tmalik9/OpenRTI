@@ -67,7 +67,7 @@ typedef std::vector<VariableLengthData> VariableLengthDataVector;
 
 class OPENRTI_API VariableLengthData {
 public:
-  VariableLengthData() :
+  VariableLengthData() noexcept :
     _data(0),
     _size(0),
     _offset(0)
@@ -103,7 +103,7 @@ public:
     _offset(value._offset)
   { }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  VariableLengthData(VariableLengthData&& value) :
+  VariableLengthData(VariableLengthData&& value) noexcept :
     _data(std::move(value._data)),
     _size(value._size),
     _offset(value._offset)
@@ -143,7 +143,7 @@ public:
   }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   VariableLengthData&
-  operator=(VariableLengthData&& value)
+  operator=(VariableLengthData&& value) noexcept
   {
     _data.swap(value._data);
     _size = value._size;
@@ -184,7 +184,7 @@ public:
   uint8_t* uint8Data(size_t offset)
   { return static_cast<uint8_t*>(data(offset)); }
 
-  size_t size() const
+  size_t size() const noexcept
   { return _size; }
 
   size_t capacity() const
@@ -194,7 +194,7 @@ public:
     return _data->capacity() - _offset;
   }
 
-  bool empty() const
+  bool empty() const noexcept
   { return 0 == _size; }
 
   void clear()
@@ -229,7 +229,7 @@ public:
   {
     OpenRTIAssert(_size <= cap);
     // Don't mess with too small allocations.
-    cap = std::max(size_t(512), cap);
+    cap = std::max(size_t{512}, cap);
     if (!_data.valid()) {
       _data = createOwnData(cap);
     } else if (capacity() < cap) {
@@ -944,7 +944,7 @@ public:
   }
 
 private:
-  class OPENRTI_API Data : public Referenced {
+  class OPENRTI_API Data final : public Referenced {
   public:
     Data(size_t size) :
       _capacity(size),

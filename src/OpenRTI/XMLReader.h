@@ -35,13 +35,13 @@ namespace XML {
 
 class OPENRTI_API XMLReader : public Referenced {
 public:
-  virtual ~XMLReader(void);
+  virtual ~XMLReader();
   virtual void parse(std::istream& stream, const std::string& encoding) = 0;
 
-  ContentHandler* getContentHandler(void) const;
+  ContentHandler* getContentHandler() const;
   void setContentHandler(ContentHandler* contentHandler);
 
-  ErrorHandler* getErrorHandler(void) const;
+  ErrorHandler* getErrorHandler() const;
   void setErrorHandler(ErrorHandler* errorHandler);
 
 protected:

@@ -52,7 +52,7 @@ public:
       }
     }
   }
-  virtual ~HLAvariableArrayImplementation()
+  ~HLAvariableArrayImplementation() noexcept
   {
     for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
       if (i->second) delete i->first;

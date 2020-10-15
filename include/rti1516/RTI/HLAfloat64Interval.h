@@ -31,7 +31,7 @@ public:
   HLAfloat64Interval(double);
   HLAfloat64Interval(const rti1516::LogicalTimeInterval&);
   HLAfloat64Interval(const HLAfloat64Interval&);
-  virtual ~HLAfloat64Interval() throw ();
+  virtual ~HLAfloat64Interval() noexcept;
 
   virtual void setZero();
   virtual bool isZero() const;

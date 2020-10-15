@@ -29,7 +29,12 @@ class Clock;
 
 class OPENRTI_API AbstractProtocol : public Referenced {
 public:
-  virtual ~AbstractProtocol()
+  AbstractProtocol() noexcept = default;
+  AbstractProtocol(const AbstractProtocol&) noexcept = default;
+  AbstractProtocol(AbstractProtocol&&) noexcept = default;
+  AbstractProtocol& operator=(const AbstractProtocol&) noexcept = default;
+  AbstractProtocol& operator=(AbstractProtocol&&) noexcept = default;
+  virtual ~AbstractProtocol() noexcept
   { }
 
   virtual SharedPtr<AbstractConnect> connect(const StringStringListMap& clientOptions, const Clock& abstime) const = 0;

@@ -34,7 +34,7 @@ public:
   HLAinteger64Time(Integer64 value);
   HLAinteger64Time(const rti1516::LogicalTime& logicalTime);
   HLAinteger64Time(const HLAinteger64Time& logicalTime);
-  virtual ~HLAinteger64Time() throw ();
+  virtual ~HLAinteger64Time() noexcept;
 
   virtual void setInitial();
   virtual bool isInitial() const;

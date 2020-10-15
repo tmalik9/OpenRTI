@@ -41,29 +41,29 @@ class ScopeLock;
 class OPENRTI_API Condition {
 public:
 #if 201103L <= __CPlusPlusStd
-  Condition(void)
+  Condition() noexcept
   { }
 #else
-  Condition(void);
+  Condition() noexcept;
 #endif
 #if 201103L <= __CPlusPlusStd
-  ~Condition(void)
+  ~Condition() noexcept
   { }
 #else
-  ~Condition(void);
+  ~Condition();
 #endif
 
 #if 201103L <= __CPlusPlusStd
-  void notify_one(void)
+  void notify_one() noexcept
   { _condition.notify_one(); }
 #else
-  void notify_one(void);
+  void notify_one();
 #endif
 #if 201103L <= __CPlusPlusStd
-  void notify_all(void)
+  void notify_all()
   { _condition.notify_all(); }
 #else
-  void notify_all(void);
+  void notify_all();
 #endif
 
 #if 201103L <= __CPlusPlusStd

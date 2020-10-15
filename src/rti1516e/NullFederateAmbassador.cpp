@@ -24,7 +24,18 @@
 namespace rti1516e
 {
 
-  void NullFederateAmbassador::connectionLost(std::wstring const & faultDescription)
+
+NullFederateAmbassador::NullFederateAmbassador()
+{
+
+}
+
+NullFederateAmbassador::~NullFederateAmbassador() noexcept
+{
+
+}
+
+void NullFederateAmbassador::connectionLost(std::wstring const & faultDescription)
   {
     DebugPrintf("%s\n", __FUNCSIG__);
   }
@@ -52,6 +63,30 @@ namespace rti1516e
   void NullFederateAmbassador::federationSynchronized(std::wstring const & label, FederateHandleSet const& failedToSyncSet)
   {
     DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+
+  void NullFederateAmbassador::initiateFederateSave(std::wstring const & label)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+
+  void NullFederateAmbassador::initiateFederateSave(std::wstring const & label, LogicalTime const & theTime)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+
+  void NullFederateAmbassador::federationSaved()
+  {
+
+  }
+
+
+  void NullFederateAmbassador::federationNotSaved(SaveFailureReason theSaveFailureReason)
+  {
+
   }
 
   void NullFederateAmbassador::startRegistrationForObjectClass(ObjectClassHandle theClass)
@@ -129,12 +164,23 @@ namespace rti1516e
     DebugPrintf("%s\n", __FUNCSIG__);
   }
 
+
+  void NullFederateAmbassador::receiveInteraction(InteractionClassHandle theInteraction, ParameterHandleValueMap const & theParameterValues, VariableLengthData const & theUserSuppliedTag, OrderType sentOrder, TransportationType theType, LogicalTime const & theTime, OrderType receivedOrder, MessageRetractionHandle theHandle, SupplementalReceiveInfo theReceiveInfo)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
   void NullFederateAmbassador::removeObjectInstance(ObjectInstanceHandle theObject, VariableLengthData const & theUserSuppliedTag, OrderType sentOrder, SupplementalRemoveInfo theRemoveInfo)
   {
     DebugPrintf("%s\n", __FUNCSIG__);
   }
 
   void NullFederateAmbassador::removeObjectInstance(ObjectInstanceHandle theObject, VariableLengthData const & theUserSuppliedTag, OrderType sentOrder, LogicalTime const & theTime, OrderType receivedOrder, SupplementalRemoveInfo theRemoveInfo)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+  void NullFederateAmbassador::removeObjectInstance(ObjectInstanceHandle theObject, VariableLengthData const & theUserSuppliedTag, OrderType sentOrder, LogicalTime const & theTime, OrderType receivedOrder, MessageRetractionHandle theHandle, SupplementalRemoveInfo theRemoveInfo)
   {
     DebugPrintf("%s\n", __FUNCSIG__);
   }
@@ -179,7 +225,19 @@ namespace rti1516e
     DebugPrintf("%s\n", __FUNCSIG__);
   }
 
+
+  void NullFederateAmbassador::confirmInteractionTransportationTypeChange(InteractionClassHandle theInteraction, TransportationType theTransportation)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
   void NullFederateAmbassador::reportInteractionTransportationType(FederateHandle federateHandle, InteractionClassHandle theInteraction, TransportationType theTransportation)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+
+  void NullFederateAmbassador::informAttributeOwnership(ObjectInstanceHandle theObject, AttributeHandle theAttribute, FederateHandle theOwner)
   {
     DebugPrintf("%s\n", __FUNCSIG__);
   }
@@ -213,4 +271,25 @@ namespace rti1516e
   {
     DebugPrintf("%s\n", __FUNCSIG__);
   }
+
+  void NullFederateAmbassador::requestDivestitureConfirmation(ObjectInstanceHandle theObject, AttributeHandleSet const & releasedAttributes)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+  void NullFederateAmbassador::requestAttributeOwnershipAssumption(ObjectInstanceHandle theObject, AttributeHandleSet const & offeredAttributes, VariableLengthData const & theUserSuppliedTag)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+  void NullFederateAmbassador::confirmAttributeOwnershipAcquisitionCancellation(ObjectInstanceHandle theObject, AttributeHandleSet const & theAttributes)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+  void NullFederateAmbassador::requestAttributeOwnershipRelease(ObjectInstanceHandle theObject, AttributeHandleSet const & candidateAttributes, VariableLengthData const & theUserSuppliedTag)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
 }
