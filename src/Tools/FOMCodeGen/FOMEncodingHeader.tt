@@ -57,7 +57,7 @@ class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1
 	    m<#=field.Name#>.set(value, size);
     }
 <# } #>
-    <#=field.DataType.CPPType#> Get<#=field.Name#>() override
+    <#=field.DataType.CPPType#> Get<#=field.Name#>() const override
     {
 <# if (field.DataType is FOMParser.EnumeratedDataType) { #>
 	    return static_cast<<#=field.DataType.CPPType#>>(m<#=field.Name#>.get());

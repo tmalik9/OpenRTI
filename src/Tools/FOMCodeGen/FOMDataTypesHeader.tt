@@ -35,7 +35,7 @@ typedef <#=simpleDataType.Representation.CPPType#> <#=simpleDataType.Name#>;
 class <#=fixedRecordDataType.Name#><#=fixedRecordDataType.BaseClass != null ? " : public " + fixedRecordDataType.BaseClass.Name : ""#>
 {
   public:
-    virtual ~<#=fixedRecordDataType.Name#>() {}
+    virtual ~<#=fixedRecordDataType.Name#>() noexcept {}
 <# foreach (var field in fixedRecordDataType.Fields) { #>
     virtual void Set<#=field.Name#>(<#=field.DataType.CPPType#> value) = 0;
 <# if (field.DataType is FOMParser.ArrayDataType) {
@@ -43,7 +43,7 @@ class <#=fixedRecordDataType.Name#><#=fixedRecordDataType.BaseClass != null ? " 
 #>
     virtual void Set<#=field.Name#>(const <#=arrayDataType.DataType.CPPType#>* value, size_t size) = 0;
 <# } #>
-    virtual <#=field.DataType.CPPType#> Get<#=field.Name#>() = 0;
+    virtual <#=field.DataType.CPPType#> Get<#=field.Name#>() const = 0;
 <# } // foreach fixedRecordDataType.Fields #>
 
 }; // class <#=dataType.Name#>
