@@ -132,6 +132,53 @@ protected:
 
 namespace OpenRTI {
 
+std::ostream& operator<<(std::ostream& out, const ParameterValueVector& parameters)
+{
+  out << "(";
+  bool first = true;
+  uint32_t parameterIndex = 0;
+  for (size_t expectedParameterHandle = 1; expectedParameterHandle <= 3; expectedParameterHandle++)
+  {
+    if (!first)
+    {
+      out << ",";
+    }
+    first = false;
+    if (parameterIndex < parameters.size())
+    {
+      auto parameter = parameters[parameterIndex];
+      uint32_t parameterHandle = parameter.getParameterHandle().getHandle();
+      if (parameterHandle == expectedParameterHandle)
+      {
+        if (parameter.getValue().size() == 0)
+        {
+          out << "*";
+        }
+        else if (parameter.getValue().size() == 4)
+        {
+          uint32_t value = *static_cast<const uint32_t*>(parameter.getValue().data());
+          out << value;
+        }
+        else
+        {
+          out << "??? " << parameter.getValue().size();
+        }
+        parameterIndex++;
+      }
+      else
+      {
+        out << "*";
+      }
+    }
+    else
+    {
+      out << "*";
+    }
+  }
+  out << ")";
+  return out;
+}
+
 struct ParameterTest1
 {
   ParameterTest1() 
@@ -194,6 +241,7 @@ struct ParameterTest1
     parameters.push_back(paramValue3);
     return parameters;
   }
+
   ParameterValueVector BuildParameterValues12(uint32_t v1, uint32_t v2)
   {
     ParameterValueVector parameters;
@@ -283,6 +331,26 @@ struct ParameterTest1
     return parameters;
   }
   
+  void TestMatch(const std::string& message, ServerModel::InteractionClass& ic, ConnectHandle connect, const ParameterValueVector& parameters, bool expected)
+  {
+    bool result = _interactionClass.isMatching(connect, parameters);
+    std::cout << "matches " << parameters << message << " => " << result;
+    std::cout <<  (result == expected ? " OK" : " FAILED") << std::endl;
+  }
+
+  void AddFilter(ConnectHandle connect, const ParameterValueVector& parameters)
+  {
+    std::cout << "add " << parameters << ":" << std::endl;
+    bool updateResult = _interactionClass.updateParameterFilterValues(connect, parameters);
+    std::cout << "result=" << updateResult << std::endl;
+  }
+
+  void RemoveFilter(ConnectHandle connect, const ParameterValueVector& parameters)
+  {
+    std::cout << "remove " << parameters << ":" << std::endl;
+    bool updateResult = _interactionClass.updateParameterFilterValues(connect, parameters, true);
+    std::cout << "result=" << updateResult << std::endl;
+  }
 
   bool exec()
   {
@@ -318,53 +386,130 @@ struct ParameterTest1
     paramDef5.setParameterHandle(paramHandle5);
     paramDef5.setName("Channel");
     _interactionClass.insert(paramDef5);
-
     ParameterValueVector parameters1 = BuildParameterValues123(1,2,3);
-    std::cout << "update(1,2,3) => " << _interactionClass.updateParameterFilterValues(connect, parameters1) << std::endl;
+    AddFilter(connect, parameters1);
     ParameterValueVector parameters2 = BuildParameterValues123(2,3,4);
-    std::cout << "update(2,3,4) => " << _interactionClass.updateParameterFilterValues(connect, parameters2) << std::endl;
+    AddFilter(connect, parameters2);
     ParameterValueVector parameters3 = BuildParameterValues12(2,3);
-    std::cout << "update(2,3,*) => " << _interactionClass.updateParameterFilterValues(connect, parameters3) << std::endl;
+    AddFilter(connect, parameters3);
     ParameterValueVector parameters4 = BuildParameterValues23(4,5);
-    std::cout << "update(*,4,5) => " << _interactionClass.updateParameterFilterValues(connect, parameters4) << std::endl;
+    AddFilter(connect, parameters4);
     ParameterValueVector parameters5 = BuildParameterValues123(0x88,0xCC,0xFF);
-    std::cout << "update(0x88,0xCC,0xFF) => " << _interactionClass.updateParameterFilterValues(connect, parameters5) << std::endl;
-    ParameterValueVector parameters6 = BuildParameterValuesChannel(VAppChannel(1, kBtCAN));
-    std::cout << "update(CAN1) => " << _interactionClass.updateParameterFilterValues(connect, parameters6) << std::endl;
-    ParameterValueVector parameters7 = BuildParameterValuesChannel(VAppChannel(2, kBtCAN));
-    std::cout << "update(CAN2) => " << _interactionClass.updateParameterFilterValues(connect, parameters7) << std::endl;
-    ParameterValueVector parameters8 = BuildParameterValuesChannel(VAppChannel(1, kBtEthernet));
-    std::cout << "update(Eth1) => " << _interactionClass.updateParameterFilterValues(connect, parameters8) << std::endl;
+    AddFilter(connect, parameters5);
+    //ParameterValueVector parameters6 = BuildParameterValuesChannel(VAppChannel(1, kBtCAN));
+    //std::cout << "update(CAN1) => " << _interactionClass.updateParameterFilterValues(connect, parameters6) << std::endl;
+    //ParameterValueVector parameters7 = BuildParameterValuesChannel(VAppChannel(2, kBtCAN));
+    //std::cout << "update(CAN2) => " << _interactionClass.updateParameterFilterValues(connect, parameters7) << std::endl;
+    //ParameterValueVector parameters8 = BuildParameterValuesChannel(VAppChannel(1, kBtEthernet));
+    //std::cout << "update(Eth1) => " << _interactionClass.updateParameterFilterValues(connect, parameters8) << std::endl;
 
+    std::cout << _interactionClass.DumpInteractionFilters() << std::endl;
 
 
     // match the tuples we just inserted
-    std::cout << "isMatching(1,2,3) (INIT) => " << _interactionClass.isMatching(connect, parameters1) << std::endl;
-    std::cout << "isMatching(2,3,4) (INIT) => " << _interactionClass.isMatching(connect, parameters2) << std::endl;
-    std::cout << "isMatching(2,3,*) (INIT) => " << _interactionClass.isMatching(connect, parameters3) << std::endl;
-    std::cout << "isMatching(*,4,5) (INIT) => " << _interactionClass.isMatching(connect, parameters4) << std::endl;
-    std::cout << "isMatching(0x88,0xCC,0xFF) (INIT) => " << _interactionClass.isMatching(connect, parameters5) << std::endl;
-    std::cout << "isMatching(CAN1) (INIT) => " << _interactionClass.isMatching(connect, parameters6) << std::endl;
-    std::cout << "isMatching(CAN2) (INIT) => " << _interactionClass.isMatching(connect, parameters7) << std::endl;
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters1, true);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters2, true);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters3, true);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters4, true);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters5, true);
+    //std::cout << "isMatching(CAN1) (INIT) => " << _interactionClass.isMatching(connect, parameters6) << std::endl;
+    //std::cout << "isMatching(CAN2) (INIT) => " << _interactionClass.isMatching(connect, parameters7) << std::endl;
 
     ParameterValueVector input1 = BuildParameterValues12(2,3);
-    std::cout << "isMatching(2,3,*) (YES) => " << _interactionClass.isMatching(connect, input1) << std::endl;
     ParameterValueVector input2 = BuildParameterValues23(2,3);
-    std::cout << "isMatching(*,2,3) (YES) => " << _interactionClass.isMatching(connect, input2) << std::endl;
     ParameterValueVector input3 = BuildParameterValues13(2,4);
-    std::cout << "isMatching(2,*,4) (YES) => " << _interactionClass.isMatching(connect, input3) << std::endl;
     ParameterValueVector input4 = BuildParameterValues123(1,4,5);
-    std::cout << "isMatching(1,4,5) (YES) => " << _interactionClass.isMatching(connect, input4) << std::endl;
-    ParameterValueVector parameters9 = BuildParameterValues23(2,3);
-    std::cout << "isMatching(*,2,3) (YES) => " << _interactionClass.isMatching(connect, parameters9) << std::endl;
-    ParameterValueVector parameters10 = BuildParameterValues123(3,2,1);
-    std::cout << "isMatching(3,2,1) (NO) => " << _interactionClass.isMatching(connect, parameters10) << std::endl;
-    ParameterValueVector parameters11 = BuildParameterValues2(2);
-    std::cout << "isMatching(*,2,*) (YES) => " << _interactionClass.isMatching(connect, parameters11) << std::endl;
-    ParameterValueVector parameters12 = BuildParameterValues2(1);
-    std::cout << "isMatching(*,1,*) (NO) => " << _interactionClass.isMatching(connect, parameters12) << std::endl;
-    ParameterValueVector parameters13;
-    std::cout << "isMatching(*,*,*) (YES) => " << _interactionClass.isMatching(connect, parameters13) << std::endl;
+    ParameterValueVector input5 = BuildParameterValues23(2,3);
+    ParameterValueVector input6 = BuildParameterValues123(3,2,1);
+    ParameterValueVector input7 = BuildParameterValues2(2);
+    ParameterValueVector input8 = BuildParameterValues2(1);
+    ParameterValueVector input9 = BuildParameterValues123(2,3,5);
+    ParameterValueVector wildcard; // empty
+
+    TestMatch("", _interactionClass, connect, input1, true);
+    TestMatch("", _interactionClass, connect, input2, true);
+    TestMatch("", _interactionClass, connect, input3, true);
+    TestMatch("", _interactionClass, connect, input4, true);
+    TestMatch("", _interactionClass, connect, input5, true);
+    TestMatch("", _interactionClass, connect, input6, false);
+    TestMatch("", _interactionClass, connect, input7, true);
+    TestMatch("", _interactionClass, connect, input8, false);
+    // (2,3,5)
+    TestMatch("", _interactionClass, connect, input9, true);
+    // (*,*,*)
+    TestMatch("", _interactionClass, connect, wildcard, true);
+
+    std::cout  << std::endl << "before remove:" << _interactionClass.DumpInteractionFilters() << std::endl;
+    std::cout << "remove " << parameters1 << " => " << _interactionClass.updateParameterFilterValues(connect, parameters1, true) << std::endl;
+    std::cout  << std::endl << "after remove: " << _interactionClass.DumpInteractionFilters() << std::endl;
+
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters1, false);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters2, true);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters3, true);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters4, true);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters5, true);
+
+    // (2,3,*)
+    TestMatch("", _interactionClass, connect, input1, true);
+    // (*,2,3)
+    TestMatch("", _interactionClass, connect, input2, false);
+    // (2,*,4)
+    TestMatch("", _interactionClass, connect, input3, true);
+    // (1,4,5)
+    TestMatch("", _interactionClass, connect, input4, true);
+    //  (*,2,3)
+    TestMatch("", _interactionClass, connect, input5, false);
+    // (3,2,1)
+    TestMatch("", _interactionClass, connect, input6, false);
+    // (*,2,*)
+    TestMatch("", _interactionClass, connect, input7, false);
+    // (*,1,*)
+    TestMatch("", _interactionClass, connect, input8, false);
+    // (2,3,5)
+    TestMatch("", _interactionClass, connect, input9, true);
+    // (*,*,*)
+    TestMatch("", _interactionClass, connect, wildcard, true);
+
+    std::cout  << std::endl << "before remove:" << _interactionClass.DumpInteractionFilters() << std::endl;
+    RemoveFilter(connect, parameters1);
+    std::cout  << std::endl << "after remove (failed): " << _interactionClass.DumpInteractionFilters() << std::endl;
+    RemoveFilter(connect, parameters2);
+    std::cout  << std::endl << "after remove: " << _interactionClass.DumpInteractionFilters() << std::endl;
+
+    std::cout  << std::endl << "before remove:" << _interactionClass.DumpInteractionFilters() << std::endl;
+    RemoveFilter(connect, parameters4);
+    std::cout  << std::endl << "after remove: " << _interactionClass.DumpInteractionFilters() << std::endl;
+
+    std::cout  << std::endl << "before remove:" << _interactionClass.DumpInteractionFilters() << std::endl;
+    RemoveFilter(connect, parameters3);
+    std::cout  << std::endl << "after remove: " << _interactionClass.DumpInteractionFilters() << std::endl;
+
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters1, false);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters2, false);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters3, false);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters4, false);
+    TestMatch(" (INIT) ", _interactionClass, connect, parameters5, true);
+
+    // (2,3,*)
+    TestMatch("", _interactionClass, connect, input1, false);
+    // (*,2,3)
+    TestMatch("", _interactionClass, connect, input2, false);
+    // (2,*,4)
+    TestMatch("", _interactionClass, connect, input3, false);
+    // (1,4,5)
+    TestMatch("", _interactionClass, connect, input4, false);
+    //  (*,2,3)
+    TestMatch("", _interactionClass, connect, input5, false);
+    // (3,2,1)
+    TestMatch("", _interactionClass, connect, input6, false);
+    // (*,2,*)
+    TestMatch("", _interactionClass, connect, input7, false);
+    // (*,1,*)
+    TestMatch("", _interactionClass, connect, input8, false);
+    // (2,3,5)
+    TestMatch("", _interactionClass, connect, input9, false);
+    // (*,*,*)
+    TestMatch("", _interactionClass, connect, wildcard, true);
     return true;
   }
   ServerModel::Node _node;

@@ -1024,16 +1024,42 @@ public:
     // Change publication type for this connect ...
     ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
     ParameterValueVector parameterFilterValues = message->getParameterFilterValues();
-    propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, message->getSubscriptionType());
-    if (message->getSubscriptionType() == SubscriptionType::Unsubscribed)
+    bool filterChanged = false;
+    auto subscriptionType = message->getSubscriptionType();
+    // update federate metrics and interaction filters
+    if (subscriptionType == SubscriptionType::Unsubscribed)
     {
       interactionClassUnsubscribed(connectHandle, interactionClass);
+      if (!parameterFilterValues.empty())
+      {
+        // unsubscribe with filter: remove the parameter filter tuple
+        filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues, true);
+        if (interactionClass->hasFilterSubscriptions(connectHandle))
+        {
+          // no filters left: remove the subscription
+          interactionClass->setSubscriptionType(connectHandle, subscriptionType);
+        }
+      }
+      else
+      {
+        // unsubscribe completely: clear this connect's parameter filters
+        filterChanged = interactionClass->clearParameterFilters(connectHandle);
+        propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, subscriptionType);
+      }
     }
     else
     {
-      interactionClassSubscribed(connectHandle, interactionClass, message->getSubscriptionType() == SubscribedActive);
+      interactionClassSubscribed(connectHandle, interactionClass, subscriptionType == SubscribedActive);
+      // This can be somewhat finicky: if  parameterFilterValues is empty, this actually means to remove all filters 
+      // and subscribe without filter instead. But probably we don't want to clear out filters we once established,
+      // so we just add a match-all wildcard filter.
+      // Otoh if the interaction class was subscribed before without filters, and this call adds the first filter, 
+      // the subscription type will change with respect to subsequent unsubscribe calls:
+      // subscribe => subscribeWithFilter => unsubsribeFilter: the interaction class is now unsubscribed.
+      // Think about this again.
+      filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues, false);
+      propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, subscriptionType);
     }
-    bool filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues);
 
     // Update the receiving connect handle set
     interactionClass->updateCumulativeSubscription(connectHandle);

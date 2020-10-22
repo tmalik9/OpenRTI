@@ -955,14 +955,15 @@ public:
     } else {
       subscriptionType = SubscribedPassive;
     }
-    if (!interactionClass->setSubscriptionType(subscriptionType))
-      return;
-
-    SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
-    request->setFederationHandle(getFederationHandle());
-    request->setInteractionClassHandle(interactionClassHandle);
-    request->setSubscriptionType(subscriptionType);
-    send(request);
+    bool subscriptionChanged = interactionClass->setSubscriptionType(subscriptionType, ParameterValueVector());
+    if (subscriptionChanged)
+    {
+      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+      request->setFederationHandle(getFederationHandle());
+      request->setInteractionClassHandle(interactionClassHandle);
+      request->setSubscriptionType(subscriptionType);
+      send(request);
+    }
   }
 
   void subscribeInteractionClassWithFilter(InteractionClassHandle interactionClassHandle,
@@ -991,16 +992,18 @@ public:
       subscriptionType = SubscribedPassive;
     }
 
-    /*bool setResult =*/ interactionClass->setSubscriptionType(subscriptionType);
+    bool subscriptionChanged = interactionClass->setSubscriptionType(subscriptionType, filterValues);
+    if (subscriptionChanged)
+    {
+      // maybe we want to store parameter filters in the federate's InteractionClass as well.
+      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+      request->setFederationHandle(getFederationHandle());
+      request->setInteractionClassHandle(interactionClassHandle);
+      request->setSubscriptionType(subscriptionType);
+      request->getParameterFilterValues().swap(filterValues);
 
-    // maybe we want to store parameter filters in the federate's InteractionClass as well.
-    SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
-    request->setFederationHandle(getFederationHandle());
-    request->setInteractionClassHandle(interactionClassHandle);
-    request->setSubscriptionType(subscriptionType);
-    request->getParameterFilterValues().swap(filterValues);
-
-    send(request);
+      send(request);
+    }
   }
 
   void unsubscribeInteractionClass(InteractionClassHandle interactionClassHandle)
@@ -1019,15 +1022,46 @@ public:
     if (!interactionClass)
       throw InteractionClassNotDefined(interactionClassHandle.toString());
 
-    if (!interactionClass->setSubscriptionType(Unsubscribed))
-      return;
+    bool subscriptionChanged = interactionClass->setSubscriptionType(Unsubscribed, ParameterValueVector());
+    if (subscriptionChanged)
+    {
+      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+      request->setFederationHandle(getFederationHandle());
+      request->setInteractionClassHandle(interactionClassHandle);
+      request->setSubscriptionType(Unsubscribed);
 
-    SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
-    request->setFederationHandle(getFederationHandle());
-    request->setInteractionClassHandle(interactionClassHandle);
-    request->setSubscriptionType(Unsubscribed);
+      send(request);
+    }
+  }
 
-    send(request);
+  void unsubscribeInteractionClassWithFilter(InteractionClassHandle interactionClassHandle,
+                                             std::vector<ParameterValue>& filterValues)
+    // throw (InteractionClassNotDefined,
+    //        FederateNotExecutionMember,
+    //        SaveInProgress,
+    //        RestoreInProgress,
+    //        NotConnected,
+    //        RTIinternalError)
+  {
+    if (!isConnected())
+      throw NotConnected();
+    if (!_federate.valid())
+      throw FederateNotExecutionMember();
+    Federate::InteractionClass* interactionClass = _federate->getInteractionClass(interactionClassHandle);
+    if (!interactionClass)
+      throw InteractionClassNotDefined(interactionClassHandle.toString());
+
+    bool subscriptionChanged = interactionClass->setSubscriptionType(Unsubscribed, filterValues);
+    if (subscriptionChanged)
+    {
+      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+      request->setFederationHandle(getFederationHandle());
+      request->setInteractionClassHandle(interactionClassHandle);
+      request->setSubscriptionType(Unsubscribed);
+      request->getParameterFilterValues().swap(filterValues);
+
+      send(request);
+    }
   }
 
   void reserveObjectInstanceName(const std::string& objectInstanceName)

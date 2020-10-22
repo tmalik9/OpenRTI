@@ -27,6 +27,7 @@
 #include "Message.h"
 #include "Referenced.h"
 #include "Region.h"
+#include "VariableLengthDataTuple.h"
 
 namespace OpenRTI {
 
@@ -258,10 +259,17 @@ public:
     void insertChildInteractionClass(InteractionClass& interactionClass);
     void setDeliverToSelf(bool enable) { _deliverToSelf = enable; }
     bool getDeliverToSelf() const { return _deliverToSelf; }
+    bool setSubscriptionType(SubscriptionType subscriptionType, const ParameterValueVector& filterValues);
     void getFOMInteractionClass(FOMInteractionClass& fomInteractionClass);
   private:
     InteractionClass(const InteractionClass&);
     InteractionClass& operator=(const InteractionClass&);
+
+    bool updateParameterFilterValues(const ParameterValueVector& parameterFilterValues, bool remove = false);
+    ParameterValueVector getParameterFilterPrototype() const;
+    void NormalizeFilterValues(const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVectorReturn, VariableLengthDataTuple& filterValueVectorReturn) const;
+    bool AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters);
+    bool RemoveParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters);
 
     std::string _fqName;
     InteractionClassHandle _parentInteractionClassHandle;
@@ -272,6 +280,11 @@ public:
 
     ChildInteractionClassList _childInteractionClassList;
     bool _deliverToSelf;
+    // Parameter filters by this interaction class.
+    // Contrary to the one found in ServerModel, the prototype contains references to the parameters (instead of handles)
+    // and only contains data for this distinct federate
+    ParameterHandleVector _parameterFilterKeyPrototype;
+    VariableLengthDataTupleSet _parameterFilterValues;
   };
   typedef std::vector<SharedPtr<InteractionClass> > InteractionClassVector;
 

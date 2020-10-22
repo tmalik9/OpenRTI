@@ -203,6 +203,106 @@ Federate::InteractionClass::insertChildInteractionClass(InteractionClass& intera
 }
 
 
+bool Federate::InteractionClass::setSubscriptionType(SubscriptionType subscriptionType, const ParameterValueVector& filterValues)
+{
+  if (!filterValues.empty())
+  {
+    bool filterChanged = updateParameterFilterValues(filterValues, subscriptionType == SubscriptionType::Unsubscribed);
+    PublishSubscribe::setSubscriptionType(subscriptionType);
+    return filterChanged;
+  }
+  else
+  {
+    return PublishSubscribe::setSubscriptionType(subscriptionType);
+  }
+}
+
+void Federate::InteractionClass::NormalizeFilterValues(const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVector, VariableLengthDataTuple& filterValueTuple) const
+{
+  filterKeyVector = ParameterHandleVector(_parameterFilterKeyPrototype);
+  filterValueTuple = VariableLengthDataTuple(filterKeyVector.size());
+  int valueIndex = 0;
+  for (auto& filterKey : filterKeyVector)
+  {
+    auto where = std::find_if(parameterFilters.begin(), parameterFilters.end(),
+      [filterKey](ParameterValue parameterValue) { return parameterValue.getParameterHandle() == filterKey; });
+    if (where == parameterFilters.end())
+    {
+      filterKey = ParameterHandle();
+      filterValueTuple[valueIndex] = VariableLengthData();
+    }
+    else
+    {
+      filterValueTuple[valueIndex] = where->getValue();
+    }
+    valueIndex++;
+  }
+}
+
+bool Federate::InteractionClass::AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters)
+{
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple; // (filterKeyVector.size());
+  // update the _parameterFilterKeyPrototype, if necessary (new parameter handle specified in filter for the first time)
+  for (auto& item : parameterFilters)
+  {
+    if (std::find(_parameterFilterKeyPrototype.begin(), _parameterFilterKeyPrototype.end(), item.getParameterHandle()) == _parameterFilterKeyPrototype.end())
+    {
+      _parameterFilterKeyPrototype.push_back(item.getParameterHandle());
+    }
+  }
+  // bring the parameterFilters into a form matching _parameterFilterKeyPrototype. 
+  NormalizeFilterValues(parameterFilters, filterKeyVector, filterValueTuple);
+  if (!filterValueTuples.Contains(filterValueTuple))
+  {
+    filterValueTuples.Insert(filterValueTuple);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool Federate::InteractionClass::RemoveParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters)
+{
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple; // (filterKeyVector.size());
+  // update the _parameterFilterKeyPrototype, if necessary (new parameter handle specified in filter for the first time)
+  for (auto& item : parameterFilters)
+  {
+    if (std::find(_parameterFilterKeyPrototype.begin(), _parameterFilterKeyPrototype.end(), item.getParameterHandle()) == _parameterFilterKeyPrototype.end())
+    {
+      _parameterFilterKeyPrototype.push_back(item.getParameterHandle());
+    }
+  }
+  // bring the parameterFilters into a form matching _parameterFilterKeyPrototype. 
+  NormalizeFilterValues(parameterFilters, filterKeyVector, filterValueTuple);
+  if (filterValueTuples.Contains(filterValueTuple))
+  {
+    filterValueTuples.Erase(filterValueTuple);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool Federate::InteractionClass::updateParameterFilterValues(const ParameterValueVector& parameterFilters, bool remove)
+{
+  bool result = false;
+  if (remove)
+  {
+    result = RemoveParameterFilterValues(_parameterFilterValues, parameterFilters);
+  }
+  else
+  {
+    result = AddParameterFilterValues(_parameterFilterValues, parameterFilters);
+  }
+  return result;
+}
+
 void Federate::InteractionClass::getFOMInteractionClass(FOMInteractionClass& fomInteractionClass)
 {
   fomInteractionClass.setName(getName());

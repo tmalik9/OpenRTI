@@ -625,6 +625,8 @@ public:
   void subscribeInteractionClassWithFilter(rti1516e::InteractionClassHandle rti1516InteractionClassHandle,
                                            rti1516e::ParameterHandleValueMap filterValues, 
                                            bool active) override;
+  void unsubscribeInteractionClassWithFilter(rti1516e::InteractionClassHandle rti1516InteractionClassHandle,
+                                             rti1516e::ParameterHandleValueMap filterValues) override;
 
   void setInteractionClassDeliverToSelf(rti1516e::InteractionClassHandle interactionClassHandle, bool enable) override;
   void setObjectClassDeliverToSelf(rti1516e::ObjectClassHandle objectClassHandle, bool enable) override;
