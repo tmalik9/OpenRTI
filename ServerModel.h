@@ -1174,10 +1174,15 @@ public:
   }
 
   // returns true if the filter changes for given connect
-  bool updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues);
+  bool updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues, bool remove=false);
+  bool clearParameterFilters(const ConnectHandle& connectHandle);
   bool hasFilterSubscriptions() const;
+  bool hasFilterSubscriptions(const ConnectHandle& connectHandle) const;
   bool isMatching(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues) const;
   std::list<ParameterValueVector> getParameterFilters(const ConnectHandle& connectHandle);
+
+  std::string DumpInteractionFilters();
+
   void writeCurrentFDD(std::ostream& out, unsigned int level) const;
   const ParameterFilterMapByConnect& getParameterFiltersByConnect() const { return _parameterFiltersByConnect; }
 private:
@@ -1185,8 +1190,9 @@ private:
   InteractionClass& operator=(const InteractionClass&) = delete;
 
   ParameterValueVector getParameterFilterPrototype() const;
-  void NormalizeFilterValues(const VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVectorReturn, VariableLengthDataTuple& filterValueVectorReturn) const;
+  void NormalizeFilterValues(const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVectorReturn, VariableLengthDataTuple& filterValueVectorReturn) const;
   bool AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters);
+  bool RemoveParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters);
 
   Federation& _federation;
 

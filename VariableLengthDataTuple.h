@@ -113,11 +113,14 @@ class VariableLengthDataTupleSet
     bool FindNormalized(const VariableLengthDataTuple& newTuple) const;
     // Returns true if the tuple set already contains a tuple equal to newTuple. Just a linear search for the tuple will be done.
     bool Contains(const VariableLengthDataTuple& newTuple) const;
+    bool Erase(const VariableLengthDataTuple& ref);
     friend std::ostream& operator<<(std::ostream& out, const VariableLengthDataTupleSet& tupleSet);
     friend std::ostream& operator<<(std::ostream& out, const VariableLengthDataTupleSet::IndexSet& indexSet);
   private:
-    // updates the index set relating to the given column ( = positionInTuple) with the new index (row) of the given value
-    void UpdateIndexSet(const VariableLengthData& value, VariableLengthDataTuple::size_type positionInTuple, VariableLengthDataTupleSet::ImplType::size_type newIndex);
+    // updates the index set relating to the given column ( = columnIndex) with the new index (row) of the given value
+    void AddColumnValueToIndexSets(const VariableLengthData& value, VariableLengthDataTupleSet::ImplType::size_type rowIndex, VariableLengthDataTuple::size_type columnIndex);
+    void RemoveRowFromIndexSets(VariableLengthDataTupleSet::ImplType::size_type rowIndex, VariableLengthDataTuple::size_type columnIndex);
+    bool FindMatchingTuples(const VariableLengthDataTuple& newTuple, VariableLengthDataTupleSet::IndexSet &matchingRows) const;
     IndexType mTupleSize = 0;
     ImplType mImpl;
     ValueToIndexSets mIndexSets;

@@ -740,7 +740,7 @@ InteractionClass::insert(ParameterDefinition& parameterDefinition)
 
 // Normalize the given parameterFilters to match the this->_parameterFilterKeyPrototype. For unspecified values wildcards (empty VLD) will be inserted.
 // The result is split up to filterKeyVector (the parameter handles) and filterValueTuple.
-void InteractionClass::NormalizeFilterValues(const VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVector, VariableLengthDataTuple& filterValueTuple) const
+void InteractionClass::NormalizeFilterValues(const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVector, VariableLengthDataTuple& filterValueTuple) const
 {
   filterKeyVector = ParameterHandleVector(_parameterFilterKeyPrototype);
   filterValueTuple = VariableLengthDataTuple(filterKeyVector.size());
@@ -776,7 +776,7 @@ bool InteractionClass::AddParameterFilterValues(VariableLengthDataTupleSet& filt
     }
   }
   // bring the parameterFilters into a form matching _parameterFilterKeyPrototype. 
-  NormalizeFilterValues(filterValueTuples, parameterFilters, filterKeyVector, filterValueTuple);
+  NormalizeFilterValues(parameterFilters, filterKeyVector, filterValueTuple);
   if (!filterValueTuples.Contains(filterValueTuple))
   {
     filterValueTuples.Insert(filterValueTuple);
@@ -788,7 +788,33 @@ bool InteractionClass::AddParameterFilterValues(VariableLengthDataTupleSet& filt
   }
 }
 
-bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilters)
+// Add the specified parameterFilters to the given VariableLengthDataTupleSet
+bool InteractionClass::RemoveParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters)
+{
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple; // (filterKeyVector.size());
+  // update the _parameterFilterKeyPrototype, if necessary (new parameter handle specified in filter for the first time)
+  for (auto& item : parameterFilters)
+  {
+    if (std::find(_parameterFilterKeyPrototype.begin(), _parameterFilterKeyPrototype.end(), item.getParameterHandle()) == _parameterFilterKeyPrototype.end())
+    {
+      _parameterFilterKeyPrototype.push_back(item.getParameterHandle());
+    }
+  }
+  // bring the parameterFilters into a form matching _parameterFilterKeyPrototype. 
+  NormalizeFilterValues(parameterFilters, filterKeyVector, filterValueTuple);
+  if (filterValueTuples.Contains(filterValueTuple))
+  {
+    filterValueTuples.Erase(filterValueTuple);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilters, bool remove)
 {
   bool result = false;
   if (!connectHandle.valid())
@@ -799,16 +825,9 @@ bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectH
     return false;
   }
   auto where = _parameterFiltersByConnect.find(connectHandle);
-  if (parameterFilters.empty() /* && where != _parameterFiltersByFederate.end() */)
+  if (where == _parameterFiltersByConnect.end() && !remove)
   {
-    // given list is empty and any filter value list exists: request to remove filter
-    //_parameterFiltersByFederate.erase(where);
-    //DebugPrintf("%s(%s): empty filter list, connect=%s\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
-    return false;
-  }
-  else if (where == _parameterFiltersByConnect.end())
-  {
-    // connect handle not yet in filter: add
+    // connect handle not yet in filter (and we're about to add filter): add new filter tuple set
     VariableLengthDataTupleSet newFilterValueTupleSet;
     // convert vector <ParameterHandle, Value> to map<ParameterHandle : list of Values>
     AddParameterFilterValues(newFilterValueTupleSet, parameterFilters);
@@ -822,16 +841,60 @@ bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectH
     // filter already exists for given connect ...
     auto& existingFilterValues = where->second;
     // merge given filters into existing parameter filter map
-    result = AddParameterFilterValues(existingFilterValues, parameterFilters);
+    if (remove)
+    {
+      result = RemoveParameterFilterValues(existingFilterValues, parameterFilters);
+      if (parameterFilters.empty())
+      {
+        _parameterFiltersByConnect.erase(connectHandle);
+      }
+    }
+    else
+    {
+      result = AddParameterFilterValues(existingFilterValues, parameterFilters);
+    }
   }
-  //Dump(__FUNCTION__, _parameterFiltersByConnect);
   return result;
 }
 
+bool InteractionClass::clearParameterFilters(const ConnectHandle& connectHandle)
+{
+  if (!connectHandle.valid())
+  {
+    // given list is empty and any filter value list exists: request to remove filter
+    //_parameterFiltersByFederate.erase(where);
+    DebugPrintf("%s(%s): invalid connect handle\n", __FUNCTION__, getFQName().c_str());
+    return false;
+  }
+  auto where = _parameterFiltersByConnect.find(connectHandle);
+  if (where != _parameterFiltersByConnect.end())
+  {
+    _parameterFiltersByConnect.erase(where);
+    return true;
+  }
+  return false;
+}
 
 bool InteractionClass::hasFilterSubscriptions() const
 {
   return !_parameterFiltersByConnect.empty();
+}
+
+bool InteractionClass::hasFilterSubscriptions(const ConnectHandle& connectHandle) const
+{
+  if (!connectHandle.valid())
+  {
+    // given list is empty and any filter value list exists: request to remove filter
+    //_parameterFiltersByFederate.erase(where);
+    DebugPrintf("%s(%s): invalid connect handle\n", __FUNCTION__, getFQName().c_str());
+    return false;
+  }
+  auto where = _parameterFiltersByConnect.find(connectHandle);
+  if (where != _parameterFiltersByConnect.end())
+  {
+    return true;
+  }
+  return false;
 }
 
 template<typename TInputIter>
@@ -875,7 +938,7 @@ bool InteractionClass::isMatching(const ConnectHandle& connectHandle, const Para
   ParameterHandleVector filterKeyVector;
   VariableLengthDataTuple filterValueTuple;
 
-  NormalizeFilterValues(parameterFilterMap, parameterValues, filterKeyVector, filterValueTuple);
+  NormalizeFilterValues(parameterValues, filterKeyVector, filterValueTuple);
   return parameterFilterMap.FindNormalized(filterValueTuple);
 }
 
@@ -914,6 +977,16 @@ std::list<ParameterValueVector> InteractionClass::getParameterFilters(const Conn
   return result;
 }
 
+std::string InteractionClass::DumpInteractionFilters()
+{
+  std::ostringstream out;
+  for (auto& parameterFiltersByConnectEntry : _parameterFiltersByConnect)
+  {
+    out << parameterFiltersByConnectEntry.first << " : " << std::endl;
+    out << parameterFiltersByConnectEntry.second << std::endl;
+  }
+  return out.str();
+}
 
 void InteractionClass::writeCurrentFDD(std::ostream& out, unsigned int level) const
 {
@@ -3009,21 +3082,25 @@ Federation::insertObjectInstance(const ObjectInstanceHandle& objectInstanceHandl
 
 void Federation::initializeMom(AbstractServer* server, FederateHandle federateHandle)
 {
+#ifndef STANDALONE_TEST
   // be careful: we always get called twice: once for the RTI federate, a second time for the application federate
   if (_momServer == nullptr)
   {
     bool isRoot = !federateHandle.valid();
     _momServer = new MomServer(this, server, isRoot, federateHandle);
   }
+#endif
 }
 
 
 void Federation::resignMomServer()
 {
+#ifndef STANDALONE_TEST
   if (_momServer != nullptr)
   {
     _momServer->resignFederationExecution();
   }
+#endif
 }
 
 SharedPtr<MomServer> Federation::getMomServer() const
@@ -3033,6 +3110,7 @@ SharedPtr<MomServer> Federation::getMomServer() const
 
 std::shared_ptr<AbstractFederateMetrics> Federation::getFederateMetrics(const ConnectHandle& connectHandle)
 {
+#ifndef STANDALONE_TEST
   if (_momServer != nullptr)
   {
     for (auto iter = _federateHandleFederateMap.begin(); iter != _federateHandleFederateMap.end(); iter++)
@@ -3043,6 +3121,7 @@ std::shared_ptr<AbstractFederateMetrics> Federation::getFederateMetrics(const Co
       }
     }
   }
+#endif
   return std::shared_ptr<AbstractFederateMetrics>();
 }
 

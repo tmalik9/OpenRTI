@@ -807,16 +807,18 @@ void MomServer::subscribeInteractionClassWithFilter(
     subscriptionType = SubscribedPassive;
   }
 
-  /*bool setResult =*/ interactionClass->setSubscriptionType(subscriptionType);
+  bool subscribeResult = interactionClass->setSubscriptionType(subscriptionType, filterParameterValueVector);
+  if (subscribeResult)
+  {
+    // maybe we want to store parameter filters in the federate's InteractionClass as well.
+    SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+    request->setFederationHandle(getFederationHandle());
+    request->setInteractionClassHandle(interactionClassHandle);
+    request->setSubscriptionType(subscriptionType);
+    request->getParameterFilterValues().swap(filterParameterValueVector);
 
-  // maybe we want to store parameter filters in the federate's InteractionClass as well.
-  SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
-  request->setFederationHandle(getFederationHandle());
-  request->setInteractionClassHandle(interactionClassHandle);
-  request->setSubscriptionType(subscriptionType);
-  request->getParameterFilterValues().swap(filterParameterValueVector);
-
-  sendRequest(request);
+    sendRequest(request);
+  }
 }
 
 void MomServer::subscribeInteractionClass(InteractionClassHandle interactionClassHandle, bool active)
@@ -838,7 +840,7 @@ void MomServer::subscribeInteractionClass(InteractionClassHandle interactionClas
   {
     subscriptionType = SubscribedPassive;
   }
-  if (!interactionClass->setSubscriptionType(subscriptionType))
+  if (!interactionClass->setSubscriptionType(subscriptionType, ParameterValueVector()))
     return;
 
   SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
@@ -858,7 +860,7 @@ void MomServer::unsubscribeInteractionClass(InteractionClassHandle interactionCl
   if (!interactionClass)
     throw InteractionClassNotDefined(interactionClassHandle.toString());
 
-  if (!interactionClass->setSubscriptionType(Unsubscribed))
+  if (!interactionClass->setSubscriptionType(Unsubscribed, ParameterValueVector()))
     return;
 
   SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
