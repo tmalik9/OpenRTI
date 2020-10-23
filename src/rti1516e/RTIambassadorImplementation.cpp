@@ -2472,7 +2472,7 @@ RTIambassadorImplementation::subscribeInteractionClass(rti1516e::InteractionClas
 
 
 void RTIambassadorImplementation::subscribeInteractionClassWithFilter(rti1516e::InteractionClassHandle rti1516InteractionClassHandle,
-                                                                      rti1516e::ParameterHandleValueMap filterValues,
+                                                                      const rti1516e::ParameterHandleValueMap& filterValues,
                                                                       bool active)
 {
   try {
@@ -2523,7 +2523,7 @@ RTIambassadorImplementation::unsubscribeInteractionClass(rti1516e::InteractionCl
 
 void
 RTIambassadorImplementation::unsubscribeInteractionClassWithFilter(rti1516e::InteractionClassHandle rti1516InteractionClassHandle,
-                                                                   rti1516e::ParameterHandleValueMap filterValues)
+                                                                   const rti1516e::ParameterHandleValueMap& filterValues)
 {
   try {
     OpenRTI::_I1516EInteractionClassHandle interactionClassHandle(rti1516InteractionClassHandle);

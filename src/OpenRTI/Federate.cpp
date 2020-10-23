@@ -208,7 +208,19 @@ bool Federate::InteractionClass::setSubscriptionType(SubscriptionType subscripti
   if (!filterValues.empty())
   {
     bool filterChanged = updateParameterFilterValues(filterValues, subscriptionType == SubscriptionType::Unsubscribed);
-    PublishSubscribe::setSubscriptionType(subscriptionType);
+    if (subscriptionType == SubscriptionType::Unsubscribed)
+    {
+      if (!HasParameterFilters())
+      {
+        // we just emptied the parameter filter set - really unsubscribe
+        PublishSubscribe::setSubscriptionType(SubscriptionType::Unsubscribed);
+      }
+      // otherwise leave the subscription type intact
+    }
+    else
+    {
+      PublishSubscribe::setSubscriptionType(subscriptionType);
+    }
     return filterChanged;
   }
   else
@@ -287,6 +299,12 @@ bool Federate::InteractionClass::RemoveParameterFilterValues(VariableLengthDataT
   {
     return false;
   }
+}
+
+
+bool Federate::InteractionClass::HasParameterFilters() const
+{
+  return !_parameterFilterValues.empty();
 }
 
 bool Federate::InteractionClass::updateParameterFilterValues(const ParameterValueVector& parameterFilters, bool remove)

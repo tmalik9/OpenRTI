@@ -270,7 +270,7 @@ public:
     void NormalizeFilterValues(const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVectorReturn, VariableLengthDataTuple& filterValueVectorReturn) const;
     bool AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters);
     bool RemoveParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters);
-
+    bool HasParameterFilters() const;
     std::string _fqName;
     InteractionClassHandle _parentInteractionClassHandle;
 

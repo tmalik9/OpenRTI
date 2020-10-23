@@ -4018,7 +4018,6 @@ public:
       interactionClass = _federate->getInteractionClass(interactionClassHandle);
       if (!interactionClass)
       {
-        DebugPrintf("%s(TimeStampedInteractionMessage): %s: not subscribed?\n", __FUNCTION__, _federate->getInteractionClass(interactionClassHandle)->getFQName().c_str());
         return;
       }
     }

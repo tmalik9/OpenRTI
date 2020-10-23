@@ -741,8 +741,8 @@ namespace rti1516e
       virtual void setNotificationHandle(RTInotificationHandle* h) = 0;
       
       virtual void unsubscribeObjectInstance(ObjectInstanceHandle theClass) = 0;
-      virtual void subscribeInteractionClassWithFilter(InteractionClassHandle theClass, ParameterHandleValueMap filterValues, bool active = true) = 0;
-      virtual void unsubscribeInteractionClassWithFilter(InteractionClassHandle theClass, ParameterHandleValueMap filterValues) = 0;
+      virtual void subscribeInteractionClassWithFilter(InteractionClassHandle theClass, const ParameterHandleValueMap& filterValues, bool active = true) = 0;
+      virtual void unsubscribeInteractionClassWithFilter(InteractionClassHandle theClass, const ParameterHandleValueMap& filterValues) = 0;
 
       virtual void setInteractionClassDeliverToSelf(InteractionClassHandle interactionClassHandle, bool enable) = 0;
       virtual void setObjectClassDeliverToSelf(ObjectClassHandle objectClassHandle, bool enable) = 0;

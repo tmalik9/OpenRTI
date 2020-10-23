@@ -1034,17 +1034,21 @@ public:
       {
         // unsubscribe with filter: remove the parameter filter tuple
         filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues, true);
-        if (interactionClass->hasFilterSubscriptions(connectHandle))
+        if (!interactionClass->hasFilterSubscriptions(connectHandle))
         {
           // no filters left: remove the subscription
-          interactionClass->setSubscriptionType(connectHandle, subscriptionType);
+          propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, SubscriptionType::Unsubscribed);
+        }
+        else
+        {
+          propagationConnectPair.first = ServerModel::PropagateBroadcast;
         }
       }
       else
       {
         // unsubscribe completely: clear this connect's parameter filters
         filterChanged = interactionClass->clearParameterFilters(connectHandle);
-        propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, subscriptionType);
+        propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, SubscriptionType::Unsubscribed);
       }
     }
     else
