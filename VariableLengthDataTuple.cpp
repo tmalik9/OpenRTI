@@ -110,17 +110,7 @@ void VariableLengthDataTupleSet::RemoveRowFromIndexSets(VariableLengthDataTupleS
 void VariableLengthDataTupleSet::Insert(const VariableLengthDataTuple& newTuple)
 {
   //std::cout << "Insert " << newTuple << std::endl;
-  if (mTupleSize < newTuple.size())
-  {
-    //std::cout << "resizing tuples from " << mTupleSize << " to " << newTuple.size() << std::endl;
-    mTupleSize = newTuple.size();
-    for (auto& tuple : mImpl)
-    {
-      tuple.resize(mTupleSize);
-    }
-    mIndexSets.resize(mTupleSize);
-    mWildcardIndexSets.resize(mTupleSize);
-  }
+  SetTupleSize(newTuple.size());
   mImpl.push_back(newTuple);
   IndexType newRowIndex = mImpl.size() - 1;
   for (VariableLengthDataTuple::size_type columnIndex = 0; columnIndex < newTuple.size(); columnIndex++)
@@ -129,6 +119,31 @@ void VariableLengthDataTupleSet::Insert(const VariableLengthDataTuple& newTuple)
   }
   //std::cout << *this;
   //std::cout << "Done Insert " << newTuple << std::endl;
+}
+
+
+void VariableLengthDataTupleSet::SetTupleSize(size_t newTupleSize)
+{
+  if (mTupleSize < newTupleSize)
+  {
+    IndexType oldTupleSize = mTupleSize;
+    //std::cout << "resizing tuples from " << mTupleSize << " to " << newTuple.size() << std::endl;
+    mTupleSize = newTupleSize;
+    for (auto& tuple : mImpl)
+    {
+      tuple.resize(mTupleSize);
+    }
+    mIndexSets.resize(mTupleSize);
+    mWildcardIndexSets.resize(mTupleSize);
+    // insert all existing rows as wildcards for the newly added columns - they shall match anything future wise
+    for (IndexType column = oldTupleSize; column < mTupleSize; column++)
+    {
+      for (IndexType row = 0; row < mImpl.size(); row++)
+      {
+        mWildcardIndexSets[column].insert(row);
+      }
+    }
+  }
 }
 
 bool VariableLengthDataTupleSet::FindMatchingTuples(const VariableLengthDataTuple& normalizedValueTuple, VariableLengthDataTupleSet::IndexSet &matchingRows) const

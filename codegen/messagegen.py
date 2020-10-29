@@ -70,13 +70,27 @@ class SourceStream(object):
 
 ###############################################################################
 class DataType(object):
-    def __init__(self, name, hasSwap):
+    def __init__(self, typeMap, name, hasSwap, parentObject=None):
         self.__name = name
         self.__hasSwap = hasSwap
         self._hasPayload = None
+        self.__parentObject = parentObject
+        self.__typeMap = typeMap;
 
     def getName(self):
         return self.__name
+
+    def getType(self, name):
+      return self.__typeMap.getType(name)
+
+    def getParentObject(self):
+        return self.__parentObject
+
+    def getParentObjectType(self):
+        return "ServerModel::" + self.__parentObject
+
+    def getParentObjectParameter(self):
+        return self.__parentObject[0].lower() + self.__parentObject[1:]
 
     def isMessage(self):
         return False
@@ -105,17 +119,26 @@ class DataType(object):
     def writeStreamOut(self, sourceStream):
         pass
 
+    def writeStreamOutDecl(self, sourceStream):
+        pass
+
+    def writePrettyPrint(self, sourceStream):
+        pass
+
+    def writePrettyPrintDecl(self, sourceStream):
+        pass
+
     def writeToString(self, sourceStream):
         pass
 
 ###############################################################################
 class CDataType(DataType):
-    def __init__(self, name, encoding, ctype):
+    def __init__(self, typeMap, name, encoding, ctype, parentObject="Federation"):
         if ctype == 'VariableLengthData' or ctype == 'std::string':
             hasSwap = True
         else:
             hasSwap = False
-        DataType.__init__(self, name, hasSwap)
+        DataType.__init__(self, typeMap, name, hasSwap, parentObject)
         self.__encoding = encoding
         self.__ctype = ctype
 
@@ -142,7 +165,6 @@ class CDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeC' + component)(self, sourceStream)
 
-
 ###############################################################################
 class EnumLabel(object):
     def __init__(self, name, value):
@@ -156,8 +178,8 @@ class EnumLabel(object):
         return self.__value
 
 class EnumDataType(DataType):
-    def __init__(self, name):
-        DataType.__init__(self, name, False)
+    def __init__(self, typeMap, name):
+        DataType.__init__(self, typeMap, name, False)
         self.__enumList = []
 
     def addEnum(self, name, value):
@@ -189,16 +211,36 @@ class EnumDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeEnum' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         sourceStream.writeline('// EnumDataType ' + self.getName())
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  switch (value) {')
         for enum in self.__enumList:
             sourceStream.writeline('  case {enum}: os << "{enum}"; break;'.format(enum = enum.getName()))
         sourceStream.writeline('  }')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writePrettyPrint(self, sourceStream):
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, ServerModel::Federation* )'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << value;')
         sourceStream.writeline('  return os;')
         sourceStream.writeline('}')
         sourceStream.writeline()
@@ -215,8 +257,8 @@ class EnumDataType(DataType):
 
 ###############################################################################
 class VectorDataType(DataType):
-    def __init__(self, name, scalarTypeName):
-        DataType.__init__(self, name, True)
+    def __init__(self, typeMap, name, scalarTypeName, parentObject):
+        DataType.__init__(self, typeMap, name, True, parentObject)
         self.__scalarTypeName = scalarTypeName
 
     def getScalarTypeName(self):
@@ -238,13 +280,24 @@ class VectorDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeVector' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
         sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = name))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{ ";')
         sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
@@ -259,11 +312,44 @@ class VectorDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writePrettyPrint(self, sourceStream):
+        name = self.getName();
+        sourceStream.writeline('std::ostream&')
+        parentObject=self.getParentObject()
+        if parentObject is None:
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value)'.format(name = name))
+        else:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter})'.format(
+              name = name, parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
+        sourceStream.writeline('  if (i != value.end()) {')
+        if parentObject is None:
+            sourceStream.writeline('    os << *i;')
+        else:
+            sourceStream.writeline('    prettyprint(os, *i, {parentObjectParameter});'.format(parentObjectParameter=parentObjectParameter))
+
+        sourceStream.writeline('    while (++i != value.end()) {')
+        if parentObject is None:
+            sourceStream.writeline('      os << ", " << *i;')
+        else:
+            sourceStream.writeline('      os << ", "; prettyprint(os, *i, {parentObjectParameter});'.format(parentObjectParameter=parentObjectParameter))
+        sourceStream.writeline('    }')
+        sourceStream.writeline('  }')
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
 
 ###############################################################################
 class SetDataType(DataType):
-    def __init__(self, name, scalarTypeName):
-        DataType.__init__(self, name, True)
+    def __init__(self, typeMap, name, scalarTypeName):
+        DataType.__init__(self, typeMap, name, True)
         self.__scalarTypeName = scalarTypeName
 
     def getScalarTypeName(self):
@@ -285,13 +371,24 @@ class SetDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeSet' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
         sourceStream.writeline('// SetDataType ' + self.getName())
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = name))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{ ";')
         sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
@@ -306,11 +403,29 @@ class SetDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writePrettyPrint(self, sourceStream):
+        name = self.getName();
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, ServerModel::Federation* federation)'.format(name = name))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
+        sourceStream.writeline('  if (i != value.end()) {')
+        sourceStream.writeline('    prettyprint(os, *i, federation);')
+        sourceStream.writeline('    while (++i != value.end()) {')
+        sourceStream.writeline('      os << ", "; prettyprint(os, *i, federation);')
+        sourceStream.writeline('    }')
+        sourceStream.writeline('  }')
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
 
 ###############################################################################
 class MapDataType(DataType):
-    def __init__(self, name, keyTypeName, valueTypeName):
-        DataType.__init__(self, name, True)
+    def __init__(self, typeMap, name, keyTypeName, valueTypeName):
+        DataType.__init__(self, typeMap, name, True)
         self.__keyTypeName = keyTypeName
         self.__valueTypeName = valueTypeName
         self.__keyHasPayload = None
@@ -349,13 +464,24 @@ class MapDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeMap' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
         sourceStream.writeline('// ' + str(self))
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = name))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{ ";')
         sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
@@ -370,11 +496,29 @@ class MapDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writePrettyPrint(self, sourceStream):
+        name = self.getName();
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, ServerModel::Federation* federation)'.format(name = name))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
+        sourceStream.writeline('  if (i != value.end()) {')
+        sourceStream.writeline('    prettyprint(os, i->first, federation); os << ": "; prettyprint(os, i->second, federation);')
+        sourceStream.writeline('    while (++i != value.end()) {')
+        sourceStream.writeline('      prettyprint(os, i->first, federation); os << ": "; prettyprint(os, i->second, federation);')
+        sourceStream.writeline('    }')
+        sourceStream.writeline('  }')
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
 
 ###############################################################################
 class PairDataType(DataType):
-    def __init__(self, name, firstTypeName, secondTypeName):
-        DataType.__init__(self, name, False)
+    def __init__(self, typeMap, name, firstTypeName, secondTypeName):
+        DataType.__init__(self, typeMap, name, False)
         self.__firstTypeName = firstTypeName
         self.__secondTypeName = secondTypeName
         self.__firstHasPayload = None
@@ -414,15 +558,38 @@ class PairDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writePair' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         sourceStream.writeline('// PairDataType ' + self.getName())
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{ ";')
         sourceStream.writeline('  os << "first: " << value.first << ", ";')
         sourceStream.writeline('  os << "second: " << value.second;')
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writePrettyPrint(self, sourceStream):
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, ServerModel::Federation* federation)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  os << "first: "; prettyprint(os, value.first, federation); os << ", ";')
+        sourceStream.writeline('  os << "second: "; prettyprint(os, value.second, federation); os << ", ";')
         sourceStream.writeline('  os << " }";')
         sourceStream.writeline('  return os;')
         sourceStream.writeline('}')
@@ -505,8 +672,8 @@ class StructField(object):
 
 ###############################################################################
 class StructDataType(DataType):
-    def __init__(self, name, parentTypeName = None):
-        DataType.__init__(self, name, True)
+    def __init__(self, typeMap, name, parentObject = None, parentTypeName = None):
+        DataType.__init__(self, typeMap, name, True, parentObject)
         self.__parentTypeName = parentTypeName
         self.__fieldList = []
         self.__cow = False
@@ -685,11 +852,22 @@ class StructDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeStruct' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{ ";')
         count = 0
@@ -712,6 +890,62 @@ class StructDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writePrettyPrint(self, sourceStream):
+        parentObject=self.getParentObject()
+        if not parentObject is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            fieldParents = set()
+            for field in self.__fieldList:
+                fieldType=self.getType(field.getTypeName())
+                if not fieldType.getParentObject() is None and fieldType.getParentObject() != self.getParentObject():
+                    fieldValue=""
+                    fieldParentObject=fieldType.getParentObject()
+                    fieldParentObjectType=fieldType.getParentObjectType()
+                    fieldParentObjectParameter=fieldType.getParentObjectParameter()
+                    s = "{fieldParentObjectType}* {fieldParentObjectParameter} = {parentObjectParameter}->get{fieldParentObject}(value.get{fieldParentObject}Handle());".format(
+                        fieldParentObject=fieldParentObject,
+                        fieldParentObjectType=fieldParentObjectType, 
+                        fieldParentObjectParameter=fieldParentObjectParameter,
+                        parentObjectParameter=parentObjectParameter,
+                        fieldValue=fieldValue)
+                    fieldParents.add(s)
+        sourceStream.writeline('std::ostream&')
+        if not parentObject is None:
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter})'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value)'.format(name = self.getName()))
+
+        sourceStream.writeline('{')
+        if not parentObject is None:
+            for fieldParent in fieldParents:
+                sourceStream.writeline("  " + fieldParent)
+        sourceStream.writeline('  os << "{name} {{ ";'.format(name = self.getName()))
+        count = 0
+        for field in self.__fieldList:
+            count = count + 1
+            lowerName = field.getLowerName()
+            upperName = field.getUpperName()
+            if not field.hideOnPrint():
+                fieldType=self.getType(field.getTypeName())
+                if not parentObject is None and not fieldType.getParentObject() is None:
+                    fieldParentObjectType=fieldType.getParentObjectType()
+                    fieldParentObjectParameter=fieldType.getParentObjectParameter()
+                    sourceStream.writeline('  os << "{lowerName}: "; prettyprint(os, value.get{upperName}(), {fieldParentObjectParameter});'.format(
+                        lowerName = lowerName, upperName = upperName, fieldParentObjectParameter=fieldParentObjectParameter) + "//" + fieldType.getName() + " parent=" + fieldType.getParentObject())
+                else:
+                    sourceStream.writeline('  os << "{lowerName}: "<< value.get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
+                if count != len(self.__fieldList):
+                    sourceStream.writeline('  os << ", ";')
+            else:
+                sourceStream.writeline('  // ' + type(field).__name__ + " " + field.getLowerName() + " (hidden)")
+            
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
     def writeToString(self, sourceStream):
         sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
         sourceStream.writeline('inline std::string to_string(const {name}& value)'.format(name = self.getName()))
@@ -726,8 +960,8 @@ class StructDataType(DataType):
 
 ###############################################################################
 class MessageDataType(StructDataType):
-    def __init__(self, name, parentTypeName = None):
-        StructDataType.__init__(self, name, parentTypeName)
+    def __init__(self, typeMap, name, parentTypeName = None):
+        StructDataType.__init__(self, typeMap, name, 'Federation', parentTypeName)
         self.__reliableExpression = None
         self.__objectInstanceExpression = None
          
@@ -762,6 +996,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline()
         sourceStream.writeline('virtual const char* getTypeName() const override;')
         sourceStream.writeline('virtual void out(std::ostream& os) const override;')
+        sourceStream.writeline('virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;')
         sourceStream.writeline('virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;')
         sourceStream.writeline()
 
@@ -834,7 +1069,33 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('void')
         sourceStream.writeline('{name}::out(std::ostream& os) const'.format(name = self.getName()))
         sourceStream.writeline('{')
-        sourceStream.writeline('  os << "{name} " << *this;'.format(name = self.getName()))
+        sourceStream.writeline('  os << "{ ";')
+        count = 0
+        fields = self.getFieldList()
+        for field in fields:
+            count = count + 1
+            lowerName = field.getLowerName()
+            upperName = field.getUpperName()
+            if not field.hideOnPrint():
+                sourceStream.writeline('  os << "{lowerName}: " << get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
+                if count != len(fields):
+                    sourceStream.writeline('  os << ", ";')
+            else:
+                sourceStream.writeline('  // ' + type(field).__name__ + " " + field.getLowerName() + " (hidden)")
+                sourceStream.writeline('  //os << "{lowerName}: " << get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
+                if count != len(fields):
+                    sourceStream.writeline('  //os << ", ";')
+            
+        sourceStream.writeline('  os << " }";')
+        # sourceStream.writeline('  os << "{name} " << *this;'.format(name = self.getName()))
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+        parentDecl=self.getParentTypeName()
+        sourceStream.writeline('void')
+        sourceStream.writeline('{name}::out(std::ostream& os, ServerModel::Federation* federation) const'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  prettyprint(os, *this, federation);')
+        # sourceStream.writeline('  os << "{name} " << *this;'.format(name = self.getName()))
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -1568,7 +1829,7 @@ class TypeMap(object):
         self.__typeMap = {}
         for node in root.getchildren():
             if node.tag == 'message':
-                message = MessageDataType(node.get('type') + 'Message', 'AbstractMessage')
+                message = MessageDataType(self, node.get('type') + 'Message', 'AbstractMessage')
                 for field in node.getchildren():
                     if field.tag == 'field':
                         hide = field.get('hide')
@@ -1588,33 +1849,35 @@ class TypeMap(object):
             elif node.tag == 'type':
                 typeName = node.get('type')
                 if typeName == 'enum':
-                    enum = EnumDataType(node.get('name'))
+                    enum = EnumDataType(self, node.get('name'))
                     for enumerant in node.getchildren():
                         if enumerant.tag == 'enumerant':
                             enum.addEnum(enumerant.get('name'), enumerant.get('value'))
                     self.addType(enum)
 
                 elif typeName == 'vector':
-                    self.addType(VectorDataType(node.get('name'), node.get('scalar')))
+                    scalarTypeName = node.get('scalar')
+                    scalarType = self.__typeMap[scalarTypeName]
+                    self.addType(VectorDataType(self, node.get('name'), scalarTypeName, scalarType.getParentObject()))
 
                 elif typeName == 'set':
-                    self.addType(SetDataType(node.get('name'), node.get('scalar')))
+                    self.addType(SetDataType(self, node.get('name'), node.get('scalar')))
 
                 elif typeName == 'map':
-                    self.addType(MapDataType(node.get('name'), node.get('key'), node.get('value')))
+                    self.addType(MapDataType(self, node.get('name'), node.get('key'), node.get('value')))
 
                 elif typeName == 'pair':
-                    self.addType(PairDataType(node.get('name'), node.get('first'), node.get('second')))
+                    self.addType(PairDataType(self, node.get('name'), node.get('first'), node.get('second')))
 
                 elif typeName == 'struct':
-                    struct = StructDataType(node.get('name'))
+                    struct = StructDataType(self, node.get('name'), node.get('parent'))
                     struct.setCopyOnWrite(node.get('copyOnWrite') == 'true')
                     for field in node.getchildren():
                         if field.tag == 'field':
                             struct.addField(field.get('name'), field.get('type'))
                     self.addType(struct)
                 else:
-                    dataType = CDataType(node.get('name'), node.get('encoding'), node.get('ctype'))
+                    dataType = CDataType(self, node.get('name'), node.get('encoding'), node.get('ctype'), node.get('parent'))
                     self.addType(dataType)
             #node = node.next
 
@@ -1657,7 +1920,9 @@ class TypeMap(object):
             t.writeDeclaration(sourceStream)
         sourceStream.writeline()
         for t in self.__typeList:
-            t.writeStreamOut(sourceStream)
+            t.writePrettyPrintDecl(sourceStream)
+        for t in self.__typeList:
+            t.writeStreamOutDecl(sourceStream)
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeToString(sourceStream)
@@ -1674,11 +1939,15 @@ class TypeMap(object):
         sourceStream.writeline('#include "AbstractMessage.h"')
         sourceStream.writeline('#include "AbstractMessageDispatcher.h"')
         sourceStream.writeline('#include "StringUtils.h"')
+        sourceStream.writeline('#include "ServerModel.h"')
         sourceStream.writeline()
         sourceStream.writeline('namespace OpenRTI {')
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeImplementation(sourceStream)
+        for t in self.__typeList:
+            t.writeStreamOut(sourceStream)
+            t.writePrettyPrint(sourceStream)
         sourceStream.writeline('} // namespace OpenRTI')
 
     def writeDispatcher(self, sourceStream):

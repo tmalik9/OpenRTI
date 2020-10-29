@@ -2101,8 +2101,6 @@ public:
       throw InTimeAdvancingState();
     if (!_timeManagement->isPositiveLogicalTimeInterval(lookahead))
       throw InvalidLookahead(_timeManagement->logicalTimeIntervalToString(lookahead));
-    if (!_federate->getPermitTimeRegulation())
-      throw RTIinternalError("Enable time regulation not permitted due to server policy!");
     _timeManagement->enableTimeRegulation(*this, lookahead);
   }
 
@@ -2133,8 +2131,6 @@ public:
       throw InvalidLogicalTime(_timeManagement->logicalTimeToString(logicalTime));
     if (!_timeManagement->isPositiveLogicalTimeInterval(lookahead))
       throw InvalidLookahead(_timeManagement->logicalTimeIntervalToString(lookahead));
-    if (!_federate->getPermitTimeRegulation())
-      throw RTIinternalError("Enable time regulation not permitted due to server policy!");
     _timeManagement->enableTimeRegulation(*this, logicalTime, lookahead);
   }
 
@@ -4168,12 +4164,6 @@ public:
     _federate = new Federate;
     _federate->setFederationHandle(message.getFederationHandle());
     _federate->setLogicalTimeFactoryName(message.getLogicalTimeFactoryName());
-
-    ConfigurationParameterMap::const_iterator i;
-    // time regulation is by default permitted, but may be denied due to parent server policy
-    i = message.getConfigurationParameterMap().find("permitTimeRegulation");
-    if (i != message.getConfigurationParameterMap().end() && !i->second.empty() && i->second.front() != "true")
-      _federate->setPermitTimeRegulation(false);
 
     _timeManagement = createTimeManagement(*_federate);
     _timeManagement->setNotificationHandle(_getNotificationHandle());

@@ -109,10 +109,10 @@
   <type name="AttributeHandle" ctype="AttributeHandle" encoding="UInt32"/>
   <type name="DimensionHandle" ctype="DimensionHandle" encoding="UInt32"/>
   <type name="UpdateRateHandle" ctype="UpdateRateHandle" encoding="UInt32"/>
-  <type name="ObjectClassHandle" ctype="ObjectClassHandle" encoding="UInt32"/>
-  <type name="ObjectInstanceHandle" ctype="ObjectInstanceHandle" encoding="UInt32"/>
-  <type name="InteractionClassHandle" ctype="InteractionClassHandle" encoding="UInt32"/>
-  <type name="ParameterHandle" ctype="ParameterHandle" encoding="UInt32"/>
+  <type name="ObjectClassHandle" ctype="ObjectClassHandle" encoding="UInt32" parent="Federation"/>
+  <type name="ObjectInstanceHandle" ctype="ObjectInstanceHandle" encoding="UInt32" parent="Federation"/>
+  <type name="InteractionClassHandle" ctype="InteractionClassHandle" encoding="UInt32" parent="Federation"/>
+  <type name="ParameterHandle" ctype="ParameterHandle" encoding="UInt32" parent="InteractionClass"/>
   <type name="FederateHandle" ctype="FederateHandle" encoding="UInt32"/>
   <type name="SpaceHandle" ctype="SpaceHandle" encoding="UInt32"/>
   <type name="TransportationHandle" ctype="TransportationHandle" encoding="UInt8"/>
@@ -165,11 +165,11 @@
   </type>
   <type name="AttributeStateVector" type="vector" scalar="AttributeState" hide="True"/>
 
-  <type name="ParameterValue" type="struct">
+  <type name="ParameterValue" type="struct" parent="InteractionClass">
     <field name="ParameterHandle" type="ParameterHandle"/>
     <field name="Value" type="VariableLengthData"/>
   </type>
-  <type name="ParameterValueVector" type="vector" scalar="ParameterValue"/>
+  <type name="ParameterValueVector" type="vector" scalar="ParameterValue" parent="InteractionClass"/>
 
   <type name="AttributeValue" type="struct">
     <field name="AttributeHandle" type="AttributeHandle"/>
@@ -784,23 +784,23 @@
 
   <!-- Interaction message -->
   <message type="Interaction">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
     <field name="InteractionClassHandle" type="InteractionClassHandle"/>
-    <field name="TransportationType" type="TransportationType"/>
-    <field name="Tag" type="VariableLengthData"/>
+    <field name="TransportationType" type="TransportationType" hide="True"/>
+    <field name="Tag" type="VariableLengthData" hide="True"/>
     <field name="ParameterValues" type="ParameterValueVector"/>
     <reliable expression="getTransportationType() == RELIABLE"/>
   </message>
   <message type="TimeStampedInteraction">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
     <field name="InteractionClassHandle" type="InteractionClassHandle"/>
     <field name="OrderType" type="OrderType"/>
-    <field name="TransportationType" type="TransportationType"/>
-    <field name="Tag" type="VariableLengthData"/>
+    <field name="TransportationType" type="TransportationType" hide="True"/>
+    <field name="Tag" type="VariableLengthData" hide="True"/>
     <field name="TimeStamp" type="VariableLengthData"/>
-    <field name="MessageRetractionHandle" type="MessageRetractionHandle"/>
+    <field name="MessageRetractionHandle" type="MessageRetractionHandle" hide="True"/>
     <field name="ParameterValues" type="ParameterValueVector"/>
     <reliable expression="getTransportationType() == RELIABLE"/>
   </message>

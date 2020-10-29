@@ -146,11 +146,6 @@ InternalAmbassador::acceptInternalMessage(const ConnectionLostMessage& message)
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& message)
-{
-}
-
-void
 InternalAmbassador::acceptInternalMessage(const EnumerateFederationExecutionsResponseMessage& message)
 {
   queueCallback(message);
@@ -253,6 +248,18 @@ InternalAmbassador::acceptInternalMessage(const DisableTimeRegulationRequestMess
   if (InternalTimeManagement* timeManagement = getTimeManagement())
     timeManagement->acceptInternalMessage(*this, message);
 }
+
+// bkd: Bookkeeping timeConstrained federates 
+void
+InternalAmbassador::acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& message)
+{
+}
+
+void
+InternalAmbassador::acceptInternalMessage(const DisableTimeConstrainedNotifyMessage& message)
+{
+}
+// bkd ----
 
 void
 InternalAmbassador::acceptInternalMessage(const CommitLowerBoundTimeStampMessage& message)

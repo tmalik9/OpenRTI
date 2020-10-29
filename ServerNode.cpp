@@ -46,24 +46,11 @@ inline std::string to_string(const ConnectHandleSet& connectHandleSet)
 class OPENRTI_LOCAL FederationServer final : public ServerModel::Federation {
 public:
   FederationServer(ServerModel::Node& serverNode) :
-    ServerModel::Federation(serverNode),
-    _parentPermitTimeRegulation(true)
+    ServerModel::Federation(serverNode)
   { }
   virtual ~FederationServer()
   {
-    DebugPrintf("%s: name=%s\n", __FUNCTION__, getName().c_str());
-  }
-
-  void setParentConfigurationParameterMap(const ConfigurationParameterMap& configurationParameterMap)
-  {
-    ConfigurationParameterMap::const_iterator i;
-    // time regulation is by default permitted, but may be denied due to parent server policy
-    i = configurationParameterMap.find("permitTimeRegulation");
-    if (i != configurationParameterMap.end() && !i->second.empty()) {
-      _parentPermitTimeRegulation = (i->second.front() == "true");
-    } else {
-      _parentPermitTimeRegulation = true;
-    }
+    //DebugPrintf("bkd: %s: name=%s\n", __FUNCTION__, getName().c_str());
   }
 
   void accept(const ConnectHandle& connectHandle, const InsertModulesMessage* message)
@@ -206,6 +193,17 @@ public:
       request->setFederateHandle(federateHandle);
       broadcast(connectHandle, request);
     }
+
+    // bkd: Bookkeeping timeConstrained federates
+    if (federate->getIsTimeConstrained()) {
+      //DebugPrintf("bkd: accept ResignFederationExecutionRequestMessage from federateHandle = %s: eraseTimeConstrained and broadcast DisableTimeConstrainedNotifyMessage \n", federate->getFederateHandle().toString().c_str());
+      eraseTimeConstrained(*federate);
+      SharedPtr<DisableTimeConstrainedNotifyMessage> request = new DisableTimeConstrainedNotifyMessage;
+      request->setFederationHandle(getFederationHandle());
+      request->setFederateHandle(federateHandle);
+      broadcast(connectHandle, request);
+    }
+    /// --- bkd
 
     for (ServerModel::SynchronizationFederate::FirstList::iterator k = federate->getSynchronizationFederateList().begin();
          k != federate->getSynchronizationFederateList().end();) {
@@ -649,11 +647,6 @@ public:
     OpenRTIAssert(federationConnect);
     // OpenRTIAssert(federationConnect->getConnectHandle() == connectHandle);
 
-    // A correctly programmed ambassador already denies the enable request.
-    // So this is an error terminating the connection if somebody asks for that if it should not do so.
-    if (!federationConnect->getPermitTimeRegulation())
-      throw MessageError("EnableTimeRegulationRequestMessage from unauthorized connect!");
-
     if (isRootServer() || federationConnect->getIsParentConnect()) {
       // Note that this message really loops back to the requester.
       // The requester needs to know which federates he needs to wait for.
@@ -698,8 +691,41 @@ public:
     ServerModel::Federate* federate = getFederate(message->getFederateHandle());
     if (!federate)
       throw MessageError("EnableTimeConstrainedNotifyMessage from unknown Federate!");
-    federate->setIsTimeConstrained(true);
+    //federate->setIsTimeConstrained(true);
+#pragma message (__FILE__LINE__ "2020-10-27, Mth: REVIEW")
+    // bkd: Bookkeeping of timeConstrained federates
+    ServerModel::FederationConnect* federationConnect = getFederationConnect(connectHandle);
+    OpenRTIAssert(federationConnect);
+    if (isRootServer() || federationConnect->getIsParentConnect()) {
+
+      if (federate->getIsTimeConstrained())
+        throw MessageError("EnableTimeConstrainedRequestMessage for already time constrained federate!");
+
+      //DebugPrintf("bkd: rootServer insertTimeConstrained federateHandle = %s\n", federate->getFederateHandle().toString().c_str());
+
+      insertTimeConstrained(*federate);
+      broadcastToChildren(message);
+    }
+    else {
+      sendToParent(message);
+    }
+    // ---bkd
+
+   // broadcast(connectHandle, message);
+  }
+
+  void accept(const ConnectHandle& connectHandle, const DisableTimeConstrainedNotifyMessage* message)
+  {
+    ServerModel::Federate* federate = getFederate(message->getFederateHandle());
+    //DebugPrintf("bkd: accept DisableTimeConstrainedNotifyMessage from federateHandle = %s: broadcast and erase; \n", federate->getFederateHandle().toString().c_str());
+    if (!federate)
+      throw MessageError("DisableTimeConstrainedNotifyMessage from unknown Federate!");
+    if (!federate->getIsTimeConstrained())
+      throw MessageError("DisableTimeConstrainedNotifyMessage for non time constrained Federate!");
+    // Don't bail out on anything. If the federate dies in between, we might need to clean up somehow
     broadcast(connectHandle, message);
+
+    eraseTimeConstrained(*federate);
   }
   
   void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampMessage* message)
@@ -729,28 +755,52 @@ public:
       break;
     }
 
-    // send to all time constrainted connects except to where it originates
+    // send to all time constrained connects except to where it originates
     // Hmm, send to all federates. The problem is that non time constrained federates
     // must be able to query the GALT for itself, which is only possible if they know the time advances
     // of each regulating federate, thus just broadcast
-    broadcast(connectHandle, message);
+
+#pragma message (__FILE__LINE__ "2020-10-27, Mth: REVIEW")
+    if (getTimeConstrainedFederationConnectList().empty())
+    {
+      //DebugPrintf("bkd: accept CommitLowerBoundTimeStampMessage: TimeConstrainedConnectList empty -> broadcast\n");
+      broadcast(connectHandle, message);
+    }
+    else
+    {
+      //DebugPrintf("bkd: accept CommitLowerBoundTimeStampMessage\n");
+
+      // bkd: Only time constrained federates are interested in this message.
+      for (ServerModel::FederationConnect::TimeConstrainedList::iterator i = getTimeConstrainedFederationConnectList().begin();
+        i != getTimeConstrainedFederationConnectList().end(); ++i) {
+        if (connectHandle == i->getConnectHandle())
+          continue;
+        //DebugPrintf("bkd:    send further from connectHandles: %s to %s \n", connectHandle.toString().c_str(), i->getConnectHandle().toString().c_str());
+        i->send(message);
+      }
+    }
+
   }
   void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampResponseMessage* message)
   {
+    //DebugPrintf("bkd: accept CommitLowerBoundTimeStampResponseMessage\n");
     send(message->getFederateHandle(), message);
   }
   void accept(const ConnectHandle& connectHandle, const LockedByNextMessageRequestMessage* message)
   {
+    //DebugPrintf("bkd: accept LockedByNextMessageRequestMessage\n");
+
     // Only time regulating federates are interrested in this message.
     // May be we should at one point track and store this connect handle set.
-    for (ServerModel::FederationConnect::SecondList::iterator i = getTimeRegulatingFederationConnectList().begin();
+    for (ServerModel::FederationConnect::TimeRegulatingList::iterator i = getTimeRegulatingFederationConnectList().begin();
          i != getTimeRegulatingFederationConnectList().end(); ++i) {
       if (connectHandle == i->getConnectHandle())
         continue;
+      //DebugPrintf("bkd:    send further from connectHandles: %s to %s \n", connectHandle.toString().c_str(), i->getConnectHandle().toString().c_str());
+
       i->send(message);
     }
   }
-
 
   // Regions
   void accept(const ConnectHandle& connectHandle, const InsertRegionMessage* message)
@@ -1633,7 +1683,7 @@ public:
       {
         connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
         connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
-        //DebugPrintf("%s(TimeStampedAttributeUpdateMessage): instance=%s subscription(receivingConnect=%s) = %s, connectHandle=%s\n", __FUNCTION__,
+        ////DebugPrintf("bkd: %s(TimeStampedAttributeUpdateMessage): instance=%s subscription(receivingConnect=%s) = %s, connectHandle=%s\n", __FUNCTION__,
         //            objectInstance->getName().c_str(), 
         //            receivingConnect.toString().c_str(),
         //            to_string(objectInstance->getSubscriptionType(receivingConnect)).c_str(),
@@ -1677,11 +1727,17 @@ public:
       while (currentInteractionClass) {
         if (currentInteractionClass->getSubscriptionType(subscriberConnectHandle) != Unsubscribed) {
           if (currentInteractionClass == interactionClass) {
+            // interaction class specified in message
             if (interactionClass->isMatching(subscriberConnectHandle, message->getParameterValues())) {
+              //DebugPrintf("%s: send %s to %s\n", __FUNCTION__, message->toString(this).c_str(), subscriberConnectHandle.toString().c_str());
               send(subscriberConnectHandle, message);
               // check if the message goes to a locally connected federate, if so, increment the receive count.
               interactionReceived(subscriberConnectHandle, currentInteractionClass);
             }
+            //else
+            //{
+            //  DebugPrintf("%s: subscriber %s ignores %s\n", __FUNCTION__, subscriberConnectHandle.toString().c_str(), message->toString(this).c_str());
+            //}
           } else {
             SharedPtr<InteractionMessage> message2 = new InteractionMessage;
             message2->setFederationHandle(message->getFederationHandle());
@@ -1722,9 +1778,15 @@ public:
           if (currentInteractionClass == interactionClass) {
             // interaction class specified in message
             if (interactionClass->isMatching(subscriberConnectHandle, message->getParameterValues())) {
+              //DebugPrintf("%s: send %s to %s\n", __FUNCTION__, message->toString(this).c_str(), subscriberConnectHandle.toString().c_str());
               send(subscriberConnectHandle, message);
+              // check if the message goes to a locally connected federate, if so, increment the receive count.
               interactionReceived(subscriberConnectHandle, currentInteractionClass);
             }
+            //else
+            //{
+            //  DebugPrintf("%s: subscriber %s ignores %s\n", __FUNCTION__, subscriberConnectHandle.toString().c_str(), message->toString(this).c_str());
+            //}
           } else {
             // parent interaction class
             SharedPtr<TimeStampedInteractionMessage> message2 = new TimeStampedInteractionMessage;
@@ -1850,15 +1912,10 @@ public:
 
     OpenRTIAssert(!federationConnect->getIsParentConnect());
 
-    bool permitTimeRegulation = _parentPermitTimeRegulation && getServerNode().getServerOptions().getPermitTimeRegulation();
-    federationConnect->setPermitTimeRegulation(permitTimeRegulation);
-
     SharedPtr<InsertFederationExecutionMessage> message = new InsertFederationExecutionMessage;
     message->setFederationHandle(getFederationHandle());
     message->setFederationName(getName());
     message->setLogicalTimeFactoryName(getLogicalTimeFactoryName());
-    if (!federationConnect->getPermitTimeRegulation())
-      message->getConfigurationParameterMap()["permitTimeRegulation"].push_back("false");
     // FIXME add the server options
     federationConnect->send(message);
 
@@ -1881,18 +1938,22 @@ public:
       notify->setIsInternal(federate.getIsInternal());
       federationConnect->send(notify);
 
-      if (federate.getIsTimeConstrained())
-      {
-        SharedPtr<EnableTimeConstrainedNotifyMessage> tcNotify = new EnableTimeConstrainedNotifyMessage;
-        tcNotify->setFederationHandle(getFederationHandle());
-        tcNotify->setFederateHandle(federate.getFederateHandle());
-        federationConnect->send(tcNotify);
+    }
+
+    for (ServerModel::FederationConnect::TimeConstrainedList::iterator i = getTimeConstrainedFederationConnectList().begin();
+      i != getTimeConstrainedFederationConnectList().end(); ++i) {
+      for (ServerModel::Federate::TimeConstrainedList::iterator j = i->getTimeConstrainedFederateList().begin();
+        j != i->getTimeConstrainedFederateList().end(); ++j) {
+        SharedPtr<EnableTimeConstrainedNotifyMessage> enable = new EnableTimeConstrainedNotifyMessage;
+        enable->setFederationHandle(getFederationHandle());
+        enable->setFederateHandle(j->getFederateHandle());
+        federationConnect->send(enable);
       }
     }
 
-    for (ServerModel::FederationConnect::SecondList::iterator i = getTimeRegulatingFederationConnectList().begin();
+    for (ServerModel::FederationConnect::TimeRegulatingList::iterator i = getTimeRegulatingFederationConnectList().begin();
          i != getTimeRegulatingFederationConnectList().end(); ++i) {
-      for (ServerModel::Federate::SecondList::iterator j = i->getTimeRegulatingFederateList().begin();
+      for (ServerModel::Federate::TimeRegulatingList::iterator j = i->getTimeRegulatingFederateList().begin();
            j != i->getTimeRegulatingFederateList().end(); ++j) {
         SharedPtr<EnableTimeRegulationRequestMessage> enable = new EnableTimeRegulationRequestMessage;
         enable->setFederationHandle(getFederationHandle());
@@ -2052,6 +2113,14 @@ public:
           request->setFederateHandle(federate->getFederateHandle());
           broadcast(connectHandle, request);
         }
+        
+        if (federate->getIsTimeConstrained()) {
+          eraseTimeConstrained(*federate);
+          SharedPtr<DisableTimeConstrainedNotifyMessage> request = new DisableTimeConstrainedNotifyMessage;
+          request->setFederationHandle(getFederationHandle());
+          request->setFederateHandle(federate->getFederateHandle());
+          broadcast(connectHandle, request);
+        }
 
         for (ServerModel::SynchronizationFederate::FirstList::iterator k = federate->getSynchronizationFederateList().begin();
              k != federate->getSynchronizationFederateList().end();) {
@@ -2132,6 +2201,9 @@ public:
     if (federate.getIsTimeRegulating())
       eraseTimeRegulating(federate);
 
+    if (federate.getIsTimeConstrained())
+      eraseTimeConstrained(federate);
+
     // Remove from connects
     ServerModel::FederationConnect* federationConnect = federate.getFederationConnect();
     if (federationConnect)
@@ -2179,9 +2251,7 @@ public:
     for (ConnectHandleSet::const_iterator i = connectHandleSet.begin(); i != connectHandleSet.end(); ++i)
       send(*i, message);
   }
-
-  /// The parents policy if we are allowed to get time regulating
-  bool _parentPermitTimeRegulation;
+  
 };
 
 class OPENRTI_LOCAL ServerMessageDispatcher : public ServerModel::Node {
@@ -2421,7 +2491,6 @@ public:
     }
 
     federationServer = insertFederation(message->getFederationName(), federationHandle);
-    federationServer->setParentConfigurationParameterMap(message->getConfigurationParameterMap());
     federationServer->setLogicalTimeFactoryName(message->getLogicalTimeFactoryName());
     // FIXME add the server options
   }
@@ -2698,6 +2767,8 @@ public:
   { acceptFederationMessage(connectHandle, message); }
   void accept(const ConnectHandle& connectHandle, const EnableTimeConstrainedNotifyMessage* message)
   { acceptFederationMessage(connectHandle, message); }
+  void accept(const ConnectHandle& connectHandle, const DisableTimeConstrainedNotifyMessage* message)
+  { acceptFederationMessage(connectHandle, message);  }
   void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampMessage* message)
   { acceptFederationMessage(connectHandle, message); }
   void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampResponseMessage* message)

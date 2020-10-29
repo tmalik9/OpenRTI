@@ -55,7 +55,6 @@ static bool enableFlagToBool(const char* enableValue)
 }
 
 ServerConfigContentHandler::ServerConfigContentHandler() noexcept :
-  _permitTimeRegulation(true),
   _enableZLibCompression(true),
   _enableNetworkStatistics(false)
 {
@@ -148,16 +147,6 @@ ServerConfigContentHandler::startElement(const char* uri, const char* name,
     _modeStack.push_back(ParentServerMode);
     _parentServerUrl = trim(atts->getValue("url"));
   }
-  else if (strcmp(name, "permitTimeRegulation") == 0)
-  {
-    if (getCurrentMode() != OpenRTIServerConfigMode && getCurrentMode() != ListenMode)
-    {
-      throw RTIinternalError("permitTimeRegulation tag not inside of OpenRTIServerConfig or listen tag!");
-    }
-    _modeStack.push_back(PermitTimeRegulationMode);
-    bool enable = enableFlagToBool(atts->getValue("enable"));
-    _permitTimeRegulation = enable;
-  }
   else if (strcmp(name, "enableZLibCompression") == 0)
   {
     if (getCurrentMode() != OpenRTIServerConfigMode)
@@ -235,7 +224,7 @@ ServerConfigContentHandler::startElement(const char* uri, const char* name,
   {
     if (getCurrentMode() != OpenRTIServerConfigMode && getCurrentMode() != ListenMode)
     {
-      throw RTIinternalError("permitTimeRegulation tag not inside of OpenRTIServerConfig or listen tag!");
+      throw RTIinternalError("NetworkStatistics tag not inside of OpenRTIServerConfig or listen tag!");
     }
     _modeStack.push_back(NetworkStatisticsMode);
     bool enable = enableFlagToBool(atts->getValue("enable"));

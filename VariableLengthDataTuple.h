@@ -109,6 +109,7 @@ class VariableLengthDataTupleSet
 
     // Insert a value tuple. A match for existing tuples is not done here!
     void Insert(const VariableLengthDataTuple& newTuple);
+    void SetTupleSize(size_t newTupleSize);
     // Returns true if newTuple matches any existing tuple, including wildcard match
     bool FindNormalized(const VariableLengthDataTuple& newTuple) const;
     // Returns true if the tuple set already contains a tuple equal to newTuple. Just a linear search for the tuple will be done.

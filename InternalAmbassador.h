@@ -109,6 +109,7 @@ public:
   void acceptInternalMessage(const RequestClassAttributeUpdateMessage& message);
   void acceptInternalMessage(const QueryAttributeOwnershipRequestMessage& message);
   void acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& message);
+  void acceptInternalMessage(const DisableTimeConstrainedNotifyMessage& message);
 
 
   std::pair<CreateFederationExecutionResponseType, std::string>

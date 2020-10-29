@@ -84,10 +84,6 @@ public:
   { return _interactionRelevanceAdvisorySwitchEnabled; }
   void setInteractionRelevanceAdvisorySwitchEnabled(bool interactionRelevanceAdvisorySwitchEnabled);
 
-  bool getPermitTimeRegulation() const noexcept
-  { return _permitTimeRegulation; }
-  void setPermitTimeRegulation(bool permitTimeRegulation);
-
   void applySwitch(const FOMSwitch& switchValue);
 
   /// rti1516e update rates.
@@ -547,8 +543,6 @@ private:
   bool _attributeRelevanceAdvisorySwitchEnabled;
   bool _attributeScopeAdvisorySwitchEnabled;
   bool _interactionRelevanceAdvisorySwitchEnabled;
-
-  bool _permitTimeRegulation;
 
   typedef std::map<std::string, double> NameUpdateRateMap;
   NameUpdateRateMap _nameUpdateRateMap;

@@ -27,6 +27,7 @@
 #include "AbstractMessage.h"
 #include "AbstractMessageDispatcher.h"
 #include "StringUtils.h"
+#include "ServerModel.h"
 
 namespace OpenRTI {
 
@@ -48,7 +49,15 @@ ConnectionLostMessage::getTypeName() const
 void
 ConnectionLostMessage::out(std::ostream& os) const
 {
-  os << "ConnectionLostMessage " << *this;
+  os << "{ ";
+  os << "faultDescription: " << getFaultDescription();
+  os << " }";
+}
+
+void
+ConnectionLostMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -101,7 +110,19 @@ CreateFederationExecutionRequestMessage::getTypeName() const
 void
 CreateFederationExecutionRequestMessage::out(std::ostream& os) const
 {
-  os << "CreateFederationExecutionRequestMessage " << *this;
+  os << "{ ";
+  os << "federationExecution: " << getFederationExecution();
+  os << ", ";
+  os << "logicalTimeFactoryName: " << getLogicalTimeFactoryName();
+  os << ", ";
+  os << "fOMStringModuleList: " << getFOMStringModuleList();
+  os << " }";
+}
+
+void
+CreateFederationExecutionRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -159,7 +180,17 @@ CreateFederationExecutionResponseMessage::getTypeName() const
 void
 CreateFederationExecutionResponseMessage::out(std::ostream& os) const
 {
-  os << "CreateFederationExecutionResponseMessage " << *this;
+  os << "{ ";
+  os << "createFederationExecutionResponseType: " << getCreateFederationExecutionResponseType();
+  os << ", ";
+  os << "exceptionString: " << getExceptionString();
+  os << " }";
+}
+
+void
+CreateFederationExecutionResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -213,7 +244,15 @@ DestroyFederationExecutionRequestMessage::getTypeName() const
 void
 DestroyFederationExecutionRequestMessage::out(std::ostream& os) const
 {
-  os << "DestroyFederationExecutionRequestMessage " << *this;
+  os << "{ ";
+  os << "federationExecution: " << getFederationExecution();
+  os << " }";
+}
+
+void
+DestroyFederationExecutionRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -264,7 +303,15 @@ DestroyFederationExecutionResponseMessage::getTypeName() const
 void
 DestroyFederationExecutionResponseMessage::out(std::ostream& os) const
 {
-  os << "DestroyFederationExecutionResponseMessage " << *this;
+  os << "{ ";
+  os << "destroyFederationExecutionResponseType: " << getDestroyFederationExecutionResponseType();
+  os << " }";
+}
+
+void
+DestroyFederationExecutionResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -314,7 +361,14 @@ EnumerateFederationExecutionsRequestMessage::getTypeName() const
 void
 EnumerateFederationExecutionsRequestMessage::out(std::ostream& os) const
 {
-  os << "EnumerateFederationExecutionsRequestMessage " << *this;
+  os << "{ ";
+  os << " }";
+}
+
+void
+EnumerateFederationExecutionsRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -362,7 +416,15 @@ EnumerateFederationExecutionsResponseMessage::getTypeName() const
 void
 EnumerateFederationExecutionsResponseMessage::out(std::ostream& os) const
 {
-  os << "EnumerateFederationExecutionsResponseMessage " << *this;
+  os << "{ ";
+  os << "federationExecutionInformationVector: " << getFederationExecutionInformationVector();
+  os << " }";
+}
+
+void
+EnumerateFederationExecutionsResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -416,7 +478,22 @@ InsertFederationExecutionMessage::getTypeName() const
 void
 InsertFederationExecutionMessage::out(std::ostream& os) const
 {
-  os << "InsertFederationExecutionMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federationName: " << getFederationName();
+  os << ", ";
+  os << "logicalTimeFactoryName: " << getLogicalTimeFactoryName();
+  os << ", ";
+  os << "configurationParameterMap: " << getConfigurationParameterMap();
+  os << " }";
+}
+
+void
+InsertFederationExecutionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -476,7 +553,15 @@ ShutdownFederationExecutionMessage::getTypeName() const
 void
 ShutdownFederationExecutionMessage::out(std::ostream& os) const
 {
-  os << "ShutdownFederationExecutionMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << " }";
+}
+
+void
+ShutdownFederationExecutionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -527,7 +612,15 @@ EraseFederationExecutionMessage::getTypeName() const
 void
 EraseFederationExecutionMessage::out(std::ostream& os) const
 {
-  os << "EraseFederationExecutionMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << " }";
+}
+
+void
+EraseFederationExecutionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -578,7 +671,15 @@ ReleaseFederationHandleMessage::getTypeName() const
 void
 ReleaseFederationHandleMessage::out(std::ostream& os) const
 {
-  os << "ReleaseFederationHandleMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << " }";
+}
+
+void
+ReleaseFederationHandleMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -630,7 +731,19 @@ InsertModulesMessage::getTypeName() const
 void
 InsertModulesMessage::out(std::ostream& os) const
 {
-  os << "InsertModulesMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  // StructField fOMModuleList (hidden)
+  //os << "fOMModuleList: " << getFOMModuleList();
+  os << " }";
+}
+
+void
+InsertModulesMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -689,7 +802,25 @@ JoinFederationExecutionRequestMessage::getTypeName() const
 void
 JoinFederationExecutionRequestMessage::out(std::ostream& os) const
 {
-  os << "JoinFederationExecutionRequestMessage " << *this;
+  os << "{ ";
+  os << "federationExecution: " << getFederationExecution();
+  os << ", ";
+  os << "federateType: " << getFederateType();
+  os << ", ";
+  os << "federateName: " << getFederateName();
+  os << ", ";
+  os << "fOMStringModuleList: " << getFOMStringModuleList();
+  os << ", ";
+  os << "configurationParameterMap: " << getConfigurationParameterMap();
+  os << ", ";
+  os << "isInternal: " << getIsInternal();
+  os << " }";
+}
+
+void
+JoinFederationExecutionRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -760,7 +891,25 @@ JoinFederationExecutionResponseMessage::getTypeName() const
 void
 JoinFederationExecutionResponseMessage::out(std::ostream& os) const
 {
-  os << "JoinFederationExecutionResponseMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "joinFederationExecutionResponseType: " << getJoinFederationExecutionResponseType();
+  os << ", ";
+  os << "exceptionString: " << getExceptionString();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "federateType: " << getFederateType();
+  os << ", ";
+  os << "federateName: " << getFederateName();
+  os << " }";
+}
+
+void
+JoinFederationExecutionResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -828,7 +977,19 @@ ResignFederationExecutionLeafRequestMessage::getTypeName() const
 void
 ResignFederationExecutionLeafRequestMessage::out(std::ostream& os) const
 {
-  os << "ResignFederationExecutionLeafRequestMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "resignAction: " << getResignAction();
+  os << " }";
+}
+
+void
+ResignFederationExecutionLeafRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -886,7 +1047,17 @@ ResignFederationExecutionRequestMessage::getTypeName() const
 void
 ResignFederationExecutionRequestMessage::out(std::ostream& os) const
 {
-  os << "ResignFederationExecutionRequestMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << " }";
+}
+
+void
+ResignFederationExecutionRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -944,7 +1115,23 @@ JoinFederateNotifyMessage::getTypeName() const
 void
 JoinFederateNotifyMessage::out(std::ostream& os) const
 {
-  os << "JoinFederateNotifyMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "federateType: " << getFederateType();
+  os << ", ";
+  os << "federateName: " << getFederateName();
+  os << ", ";
+  os << "isInternal: " << getIsInternal();
+  os << " }";
+}
+
+void
+JoinFederateNotifyMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1008,7 +1195,17 @@ ResignFederateNotifyMessage::getTypeName() const
 void
 ResignFederateNotifyMessage::out(std::ostream& os) const
 {
-  os << "ResignFederateNotifyMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << " }";
+}
+
+void
+ResignFederateNotifyMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1064,7 +1261,19 @@ ChangeAutomaticResignDirectiveMessage::getTypeName() const
 void
 ChangeAutomaticResignDirectiveMessage::out(std::ostream& os) const
 {
-  os << "ChangeAutomaticResignDirectiveMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "resignAction: " << getResignAction();
+  os << " }";
+}
+
+void
+ChangeAutomaticResignDirectiveMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1125,7 +1334,24 @@ RegisterFederationSynchronizationPointMessage::getTypeName() const
 void
 RegisterFederationSynchronizationPointMessage::out(std::ostream& os) const
 {
-  os << "RegisterFederationSynchronizationPointMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "label: " << getLabel();
+  os << ", ";
+  os << "tag: " << getTag();
+  os << ", ";
+  os << "federateHandleVector: " << getFederateHandleVector();
+  os << " }";
+}
+
+void
+RegisterFederationSynchronizationPointMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1191,7 +1417,22 @@ RegisterFederationSynchronizationPointResponseMessage::getTypeName() const
 void
 RegisterFederationSynchronizationPointResponseMessage::out(std::ostream& os) const
 {
-  os << "RegisterFederationSynchronizationPointResponseMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "label: " << getLabel();
+  os << ", ";
+  os << "registerFederationSynchronizationPointResponseType: " << getRegisterFederationSynchronizationPointResponseType();
+  os << " }";
+}
+
+void
+RegisterFederationSynchronizationPointResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1255,7 +1496,24 @@ AnnounceSynchronizationPointMessage::getTypeName() const
 void
 AnnounceSynchronizationPointMessage::out(std::ostream& os) const
 {
-  os << "AnnounceSynchronizationPointMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "label: " << getLabel();
+  os << ", ";
+  os << "tag: " << getTag();
+  os << ", ";
+  os << "addJoiningFederates: " << getAddJoiningFederates();
+  os << ", ";
+  os << "federateHandleVector: " << getFederateHandleVector();
+  os << " }";
+}
+
+void
+AnnounceSynchronizationPointMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1320,7 +1578,20 @@ SynchronizationPointAchievedMessage::getTypeName() const
 void
 SynchronizationPointAchievedMessage::out(std::ostream& os) const
 {
-  os << "SynchronizationPointAchievedMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "label: " << getLabel();
+  os << ", ";
+  os << "federateHandleBoolPairVector: " << getFederateHandleBoolPairVector();
+  os << " }";
+}
+
+void
+SynchronizationPointAchievedMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1379,7 +1650,20 @@ FederationSynchronizedMessage::getTypeName() const
 void
 FederationSynchronizedMessage::out(std::ostream& os) const
 {
-  os << "FederationSynchronizedMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "label: " << getLabel();
+  os << ", ";
+  os << "federateHandleBoolPairVector: " << getFederateHandleBoolPairVector();
+  os << " }";
+}
+
+void
+FederationSynchronizedMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1439,7 +1723,22 @@ EnableTimeRegulationRequestMessage::getTypeName() const
 void
 EnableTimeRegulationRequestMessage::out(std::ostream& os) const
 {
-  os << "EnableTimeRegulationRequestMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "timeStamp: " << getTimeStamp();
+  os << ", ";
+  os << "commitId: " << getCommitId();
+  os << " }";
+}
+
+void
+EnableTimeRegulationRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1503,7 +1802,24 @@ EnableTimeRegulationResponseMessage::getTypeName() const
 void
 EnableTimeRegulationResponseMessage::out(std::ostream& os) const
 {
-  os << "EnableTimeRegulationResponseMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "respondingFederateHandle: " << getRespondingFederateHandle();
+  os << ", ";
+  os << "timeStampValid: " << getTimeStampValid();
+  os << ", ";
+  os << "timeStamp: " << getTimeStamp();
+  os << " }";
+}
+
+void
+EnableTimeRegulationResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1567,7 +1883,17 @@ DisableTimeRegulationRequestMessage::getTypeName() const
 void
 DisableTimeRegulationRequestMessage::out(std::ostream& os) const
 {
-  os << "DisableTimeRegulationRequestMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << " }";
+}
+
+void
+DisableTimeRegulationRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1622,7 +1948,18 @@ EnableTimeConstrainedNotifyMessage::getTypeName() const
 void
 EnableTimeConstrainedNotifyMessage::out(std::ostream& os) const
 {
-  os << "EnableTimeConstrainedNotifyMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << " }";
+}
+
+void
+EnableTimeConstrainedNotifyMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1677,7 +2014,18 @@ DisableTimeConstrainedNotifyMessage::getTypeName() const
 void
 DisableTimeConstrainedNotifyMessage::out(std::ostream& os) const
 {
-  os << "DisableTimeConstrainedNotifyMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << " }";
+}
+
+void
+DisableTimeConstrainedNotifyMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1735,7 +2083,24 @@ CommitLowerBoundTimeStampMessage::getTypeName() const
 void
 CommitLowerBoundTimeStampMessage::out(std::ostream& os) const
 {
-  os << "CommitLowerBoundTimeStampMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  // StructField federateHandle (hidden)
+  //os << "federateHandle: " << getFederateHandle();
+  //os << ", ";
+  os << "timeStamp: " << getTimeStamp();
+  os << ", ";
+  os << "commitType: " << getCommitType();
+  os << ", ";
+  os << "commitId: " << getCommitId();
+  os << " }";
+}
+
+void
+CommitLowerBoundTimeStampMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1801,7 +2166,22 @@ CommitLowerBoundTimeStampResponseMessage::getTypeName() const
 void
 CommitLowerBoundTimeStampResponseMessage::out(std::ostream& os) const
 {
-  os << "CommitLowerBoundTimeStampResponseMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "sendingFederateHandle: " << getSendingFederateHandle();
+  os << ", ";
+  os << "commitId: " << getCommitId();
+  os << " }";
+}
+
+void
+CommitLowerBoundTimeStampResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1863,7 +2243,20 @@ LockedByNextMessageRequestMessage::getTypeName() const
 void
 LockedByNextMessageRequestMessage::out(std::ostream& os) const
 {
-  os << "LockedByNextMessageRequestMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "sendingFederateHandle: " << getSendingFederateHandle();
+  os << ", ";
+  os << "lockedByNextMessage: " << getLockedByNextMessage();
+  os << " }";
+}
+
+void
+LockedByNextMessageRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1919,7 +2312,14 @@ TimeConstrainedEnabledMessage::getTypeName() const
 void
 TimeConstrainedEnabledMessage::out(std::ostream& os) const
 {
-  os << "TimeConstrainedEnabledMessage " << *this;
+  os << "{ ";
+  os << " }";
+}
+
+void
+TimeConstrainedEnabledMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -1966,7 +2366,14 @@ TimeRegulationEnabledMessage::getTypeName() const
 void
 TimeRegulationEnabledMessage::out(std::ostream& os) const
 {
-  os << "TimeRegulationEnabledMessage " << *this;
+  os << "{ ";
+  os << " }";
+}
+
+void
+TimeRegulationEnabledMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2013,7 +2420,14 @@ TimeAdvanceGrantedMessage::getTypeName() const
 void
 TimeAdvanceGrantedMessage::out(std::ostream& os) const
 {
-  os << "TimeAdvanceGrantedMessage " << *this;
+  os << "{ ";
+  os << " }";
+}
+
+void
+TimeAdvanceGrantedMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2062,7 +2476,17 @@ InsertRegionMessage::getTypeName() const
 void
 InsertRegionMessage::out(std::ostream& os) const
 {
-  os << "InsertRegionMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "regionHandleDimensionHandleSetPairVector: " << getRegionHandleDimensionHandleSetPairVector();
+  os << " }";
+}
+
+void
+InsertRegionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2117,7 +2541,17 @@ CommitRegionMessage::getTypeName() const
 void
 CommitRegionMessage::out(std::ostream& os) const
 {
-  os << "CommitRegionMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "regionHandleRegionValuePairVector: " << getRegionHandleRegionValuePairVector();
+  os << " }";
+}
+
+void
+CommitRegionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2172,7 +2606,17 @@ EraseRegionMessage::getTypeName() const
 void
 EraseRegionMessage::out(std::ostream& os) const
 {
-  os << "EraseRegionMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "regionHandleVector: " << getRegionHandleVector();
+  os << " }";
+}
+
+void
+EraseRegionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2228,7 +2672,20 @@ ChangeInteractionClassPublicationMessage::getTypeName() const
 void
 ChangeInteractionClassPublicationMessage::out(std::ostream& os) const
 {
-  os << "ChangeInteractionClassPublicationMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "publicationType: " << getPublicationType();
+  os << ", ";
+  os << "interactionClassHandle: " << getInteractionClassHandle();
+  os << " }";
+}
+
+void
+ChangeInteractionClassPublicationMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2288,7 +2745,22 @@ ChangeObjectClassPublicationMessage::getTypeName() const
 void
 ChangeObjectClassPublicationMessage::out(std::ostream& os) const
 {
-  os << "ChangeObjectClassPublicationMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "publicationType: " << getPublicationType();
+  os << ", ";
+  os << "objectClassHandle: " << getObjectClassHandle();
+  os << ", ";
+  os << "attributeHandles: " << getAttributeHandles();
+  os << " }";
+}
+
+void
+ChangeObjectClassPublicationMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2351,7 +2823,22 @@ ChangeInteractionClassSubscriptionMessage::getTypeName() const
 void
 ChangeInteractionClassSubscriptionMessage::out(std::ostream& os) const
 {
-  os << "ChangeInteractionClassSubscriptionMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "subscriptionType: " << getSubscriptionType();
+  os << ", ";
+  os << "interactionClassHandle: " << getInteractionClassHandle();
+  os << ", ";
+  os << "parameterFilterValues: " << getParameterFilterValues();
+  os << " }";
+}
+
+void
+ChangeInteractionClassSubscriptionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2414,7 +2901,22 @@ ChangeObjectClassSubscriptionMessage::getTypeName() const
 void
 ChangeObjectClassSubscriptionMessage::out(std::ostream& os) const
 {
-  os << "ChangeObjectClassSubscriptionMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "subscriptionType: " << getSubscriptionType();
+  os << ", ";
+  os << "objectClassHandle: " << getObjectClassHandle();
+  os << ", ";
+  os << "attributeHandles: " << getAttributeHandles();
+  os << " }";
+}
+
+void
+ChangeObjectClassSubscriptionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2477,7 +2979,22 @@ ChangeObjectInstanceSubscriptionMessage::getTypeName() const
 void
 ChangeObjectInstanceSubscriptionMessage::out(std::ostream& os) const
 {
-  os << "ChangeObjectInstanceSubscriptionMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "subscriptionType: " << getSubscriptionType();
+  os << ", ";
+  os << "objectClassHandle: " << getObjectClassHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << " }";
+}
+
+void
+ChangeObjectInstanceSubscriptionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2538,7 +3055,17 @@ RegistrationForObjectClassMessage::getTypeName() const
 void
 RegistrationForObjectClassMessage::out(std::ostream& os) const
 {
-  os << "RegistrationForObjectClassMessage " << *this;
+  os << "{ ";
+  os << "objectClassHandle: " << getObjectClassHandle();
+  os << ", ";
+  os << "start: " << getStart();
+  os << " }";
+}
+
+void
+RegistrationForObjectClassMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2594,7 +3121,19 @@ AttributesInScopeMessage::getTypeName() const
 void
 AttributesInScopeMessage::out(std::ostream& os) const
 {
-  os << "AttributesInScopeMessage " << *this;
+  os << "{ ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandles: " << getAttributeHandles();
+  os << ", ";
+  os << "inScope: " << getInScope();
+  os << " }";
+}
+
+void
+AttributesInScopeMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2660,7 +3199,21 @@ TurnUpdatesOnForInstanceMessage::getTypeName() const
 void
 TurnUpdatesOnForInstanceMessage::out(std::ostream& os) const
 {
-  os << "TurnUpdatesOnForInstanceMessage " << *this;
+  os << "{ ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandles: " << getAttributeHandles();
+  os << ", ";
+  os << "updateRate: " << getUpdateRate();
+  os << ", ";
+  os << "on: " << getOn();
+  os << " }";
+}
+
+void
+TurnUpdatesOnForInstanceMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2727,7 +3280,17 @@ TurnInteractionsOnMessage::getTypeName() const
 void
 TurnInteractionsOnMessage::out(std::ostream& os) const
 {
-  os << "TurnInteractionsOnMessage " << *this;
+  os << "{ ";
+  os << "interactionClassHandle: " << getInteractionClassHandle();
+  os << ", ";
+  os << "on: " << getOn();
+  os << " }";
+}
+
+void
+TurnInteractionsOnMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2786,7 +3349,28 @@ InteractionMessage::getTypeName() const
 void
 InteractionMessage::out(std::ostream& os) const
 {
-  os << "InteractionMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "interactionClassHandle: " << getInteractionClassHandle();
+  os << ", ";
+  // StructField transportationType (hidden)
+  //os << "transportationType: " << getTransportationType();
+  //os << ", ";
+  // StructField tag (hidden)
+  //os << "tag: " << getTag();
+  //os << ", ";
+  os << "parameterValues: " << getParameterValues();
+  os << " }";
+}
+
+void
+InteractionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2866,7 +3450,35 @@ TimeStampedInteractionMessage::getTypeName() const
 void
 TimeStampedInteractionMessage::out(std::ostream& os) const
 {
-  os << "TimeStampedInteractionMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "interactionClassHandle: " << getInteractionClassHandle();
+  os << ", ";
+  os << "orderType: " << getOrderType();
+  os << ", ";
+  // StructField transportationType (hidden)
+  //os << "transportationType: " << getTransportationType();
+  //os << ", ";
+  // StructField tag (hidden)
+  //os << "tag: " << getTag();
+  //os << ", ";
+  os << "timeStamp: " << getTimeStamp();
+  os << ", ";
+  // StructField messageRetractionHandle (hidden)
+  //os << "messageRetractionHandle: " << getMessageRetractionHandle();
+  //os << ", ";
+  os << "parameterValues: " << getParameterValues();
+  os << " }";
+}
+
+void
+TimeStampedInteractionMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -2949,7 +3561,19 @@ ObjectInstanceHandlesRequestMessage::getTypeName() const
 void
 ObjectInstanceHandlesRequestMessage::out(std::ostream& os) const
 {
-  os << "ObjectInstanceHandlesRequestMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "count: " << getCount();
+  os << " }";
+}
+
+void
+ObjectInstanceHandlesRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3008,7 +3632,21 @@ ObjectInstanceHandlesResponseMessage::getTypeName() const
 void
 ObjectInstanceHandlesResponseMessage::out(std::ostream& os) const
 {
-  os << "ObjectInstanceHandlesResponseMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  // StructField objectInstanceHandleNamePairVector (hidden)
+  //os << "objectInstanceHandleNamePairVector: " << getObjectInstanceHandleNamePairVector();
+  os << " }";
+}
+
+void
+ObjectInstanceHandlesResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3066,7 +3704,17 @@ ReleaseMultipleObjectInstanceNameHandlePairsMessage::getTypeName() const
 void
 ReleaseMultipleObjectInstanceNameHandlePairsMessage::out(std::ostream& os) const
 {
-  os << "ReleaseMultipleObjectInstanceNameHandlePairsMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandleVector: " << getObjectInstanceHandleVector();
+  os << " }";
+}
+
+void
+ReleaseMultipleObjectInstanceNameHandlePairsMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3123,7 +3771,21 @@ ReserveObjectInstanceNameRequestMessage::getTypeName() const
 void
 ReserveObjectInstanceNameRequestMessage::out(std::ostream& os) const
 {
-  os << "ReserveObjectInstanceNameRequestMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "name: " << getName();
+  os << ", ";
+  os << "isInternal: " << getIsInternal();
+  os << " }";
+}
+
+void
+ReserveObjectInstanceNameRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3186,7 +3848,21 @@ ReserveObjectInstanceNameResponseMessage::getTypeName() const
 void
 ReserveObjectInstanceNameResponseMessage::out(std::ostream& os) const
 {
-  os << "ReserveObjectInstanceNameResponseMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandleNamePair: " << getObjectInstanceHandleNamePair();
+  os << ", ";
+  os << "success: " << getSuccess();
+  os << " }";
+}
+
+void
+ReserveObjectInstanceNameResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3248,7 +3924,19 @@ ReserveMultipleObjectInstanceNameRequestMessage::getTypeName() const
 void
 ReserveMultipleObjectInstanceNameRequestMessage::out(std::ostream& os) const
 {
-  os << "ReserveMultipleObjectInstanceNameRequestMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "nameList: " << getNameList();
+  os << " }";
+}
+
+void
+ReserveMultipleObjectInstanceNameRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3308,7 +3996,22 @@ ReserveMultipleObjectInstanceNameResponseMessage::getTypeName() const
 void
 ReserveMultipleObjectInstanceNameResponseMessage::out(std::ostream& os) const
 {
-  os << "ReserveMultipleObjectInstanceNameResponseMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  // StructField objectInstanceHandleNamePairVector (hidden)
+  //os << "objectInstanceHandleNamePairVector: " << getObjectInstanceHandleNamePairVector();
+  //os << ", ";
+  os << "success: " << getSuccess();
+  os << " }";
+}
+
+void
+ReserveMultipleObjectInstanceNameResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3372,7 +4075,24 @@ InsertObjectInstanceMessage::getTypeName() const
 void
 InsertObjectInstanceMessage::out(std::ostream& os) const
 {
-  os << "InsertObjectInstanceMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "objectClassHandle: " << getObjectClassHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  os << "name: " << getName();
+  os << ", ";
+  // StructField attributeStateVector (hidden)
+  //os << "attributeStateVector: " << getAttributeStateVector();
+  os << " }";
+}
+
+void
+InsertObjectInstanceMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3444,7 +4164,21 @@ DeleteObjectInstanceMessage::getTypeName() const
 void
 DeleteObjectInstanceMessage::out(std::ostream& os) const
 {
-  os << "DeleteObjectInstanceMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  os << "tag: " << getTag();
+  os << " }";
+}
+
+void
+DeleteObjectInstanceMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3516,7 +4250,27 @@ TimeStampedDeleteObjectInstanceMessage::getTypeName() const
 void
 TimeStampedDeleteObjectInstanceMessage::out(std::ostream& os) const
 {
-  os << "TimeStampedDeleteObjectInstanceMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  os << "orderType: " << getOrderType();
+  os << ", ";
+  os << "tag: " << getTag();
+  os << ", ";
+  os << "timeStamp: " << getTimeStamp();
+  os << ", ";
+  os << "messageRetractionHandle: " << getMessageRetractionHandle();
+  os << " }";
+}
+
+void
+TimeStampedDeleteObjectInstanceMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3596,7 +4350,29 @@ AttributeUpdateMessage::getTypeName() const
 void
 AttributeUpdateMessage::out(std::ostream& os) const
 {
-  os << "AttributeUpdateMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  // StructField tag (hidden)
+  //os << "tag: " << getTag();
+  //os << ", ";
+  // StructField transportationType (hidden)
+  //os << "transportationType: " << getTransportationType();
+  //os << ", ";
+  // StructField attributeValues (hidden)
+  //os << "attributeValues: " << getAttributeValues();
+  os << " }";
+}
+
+void
+AttributeUpdateMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3682,7 +4458,31 @@ TimeStampedAttributeUpdateMessage::getTypeName() const
 void
 TimeStampedAttributeUpdateMessage::out(std::ostream& os) const
 {
-  os << "TimeStampedAttributeUpdateMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  os << "tag: " << getTag();
+  os << ", ";
+  os << "timeStamp: " << getTimeStamp();
+  os << ", ";
+  os << "messageRetractionHandle: " << getMessageRetractionHandle();
+  os << ", ";
+  os << "orderType: " << getOrderType();
+  os << ", ";
+  os << "transportationType: " << getTransportationType();
+  os << ", ";
+  os << "attributeValues: " << getAttributeValues();
+  os << " }";
+}
+
+void
+TimeStampedAttributeUpdateMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3772,7 +4572,23 @@ RequestAttributeUpdateMessage::getTypeName() const
 void
 RequestAttributeUpdateMessage::out(std::ostream& os) const
 {
-  os << "RequestAttributeUpdateMessage " << *this;
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  // StructField attributeHandles (hidden)
+  //os << "attributeHandles: " << getAttributeHandles();
+  //os << ", ";
+  os << "tag: " << getTag();
+  os << " }";
+}
+
+void
+RequestAttributeUpdateMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3841,7 +4657,21 @@ RequestClassAttributeUpdateMessage::getTypeName() const
 void
 RequestClassAttributeUpdateMessage::out(std::ostream& os) const
 {
-  os << "RequestClassAttributeUpdateMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "objectClassHandle: " << getObjectClassHandle();
+  os << ", ";
+  os << "attributeHandles: " << getAttributeHandles();
+  os << ", ";
+  os << "tag: " << getTag();
+  os << " }";
+}
+
+void
+RequestClassAttributeUpdateMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3903,7 +4733,19 @@ QueryAttributeOwnershipRequestMessage::getTypeName() const
 void
 QueryAttributeOwnershipRequestMessage::out(std::ostream& os) const
 {
-  os << "QueryAttributeOwnershipRequestMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandle: " << getAttributeHandle();
+  os << " }";
+}
+
+void
+QueryAttributeOwnershipRequestMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -3963,7 +4805,21 @@ QueryAttributeOwnershipResponseMessage::getTypeName() const
 void
 QueryAttributeOwnershipResponseMessage::out(std::ostream& os) const
 {
-  os << "QueryAttributeOwnershipResponseMessage " << *this;
+  os << "{ ";
+  os << "federationHandle: " << getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandle: " << getAttributeHandle();
+  os << ", ";
+  os << "owner: " << getOwner();
+  os << " }";
+}
+
+void
+QueryAttributeOwnershipResponseMessage::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
 }
 
 void
@@ -4003,6 +4859,5170 @@ QueryAttributeOwnershipResponseMessage::operator<(const QueryAttributeOwnershipR
   if (getOwner() < rhs.getOwner()) return true;
   if (rhs.getOwner() < getOwner()) return false;
   return false;
+}
+
+// EnumDataType CallbackModel
+std::ostream&
+operator<<(std::ostream& os, const CallbackModel& value)
+{
+  switch (value) {
+  case HLA_IMMEDIATE: os << "HLA_IMMEDIATE"; break;
+  case HLA_EVOKED: os << "HLA_EVOKED"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const CallbackModel& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const CallbackModel& value)
+{
+  switch (value) {
+  case HLA_IMMEDIATE: return "HLA_IMMEDIATE";
+  case HLA_EVOKED: return "HLA_EVOKED";
+  default: return "<Invalid CallbackModel>";
+  }
+}
+
+// EnumDataType OrderType
+std::ostream&
+operator<<(std::ostream& os, const OrderType& value)
+{
+  switch (value) {
+  case RECEIVE: os << "RECEIVE"; break;
+  case TIMESTAMP: os << "TIMESTAMP"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const OrderType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const OrderType& value)
+{
+  switch (value) {
+  case RECEIVE: return "RECEIVE";
+  case TIMESTAMP: return "TIMESTAMP";
+  default: return "<Invalid OrderType>";
+  }
+}
+
+// EnumDataType TransportationType
+std::ostream&
+operator<<(std::ostream& os, const TransportationType& value)
+{
+  switch (value) {
+  case RELIABLE: os << "RELIABLE"; break;
+  case BEST_EFFORT: os << "BEST_EFFORT"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const TransportationType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const TransportationType& value)
+{
+  switch (value) {
+  case RELIABLE: return "RELIABLE";
+  case BEST_EFFORT: return "BEST_EFFORT";
+  default: return "<Invalid TransportationType>";
+  }
+}
+
+// EnumDataType SubscriptionType
+std::ostream&
+operator<<(std::ostream& os, const SubscriptionType& value)
+{
+  switch (value) {
+  case Unsubscribed: os << "Unsubscribed"; break;
+  case SubscribedPassive: os << "SubscribedPassive"; break;
+  case SubscribedActive: os << "SubscribedActive"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const SubscriptionType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const SubscriptionType& value)
+{
+  switch (value) {
+  case Unsubscribed: return "Unsubscribed";
+  case SubscribedPassive: return "SubscribedPassive";
+  case SubscribedActive: return "SubscribedActive";
+  default: return "<Invalid SubscriptionType>";
+  }
+}
+
+// EnumDataType PublicationType
+std::ostream&
+operator<<(std::ostream& os, const PublicationType& value)
+{
+  switch (value) {
+  case Unpublished: os << "Unpublished"; break;
+  case Published: os << "Published"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const PublicationType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const PublicationType& value)
+{
+  switch (value) {
+  case Unpublished: return "Unpublished";
+  case Published: return "Published";
+  default: return "<Invalid PublicationType>";
+  }
+}
+
+// EnumDataType ResignAction
+std::ostream&
+operator<<(std::ostream& os, const ResignAction& value)
+{
+  switch (value) {
+  case UNCONDITIONALLY_DIVEST_ATTRIBUTES: os << "UNCONDITIONALLY_DIVEST_ATTRIBUTES"; break;
+  case DELETE_OBJECTS: os << "DELETE_OBJECTS"; break;
+  case CANCEL_PENDING_OWNERSHIP_ACQUISITIONS: os << "CANCEL_PENDING_OWNERSHIP_ACQUISITIONS"; break;
+  case DELETE_OBJECTS_THEN_DIVEST: os << "DELETE_OBJECTS_THEN_DIVEST"; break;
+  case CANCEL_THEN_DELETE_THEN_DIVEST: os << "CANCEL_THEN_DELETE_THEN_DIVEST"; break;
+  case NO_ACTION: os << "NO_ACTION"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ResignAction& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const ResignAction& value)
+{
+  switch (value) {
+  case UNCONDITIONALLY_DIVEST_ATTRIBUTES: return "UNCONDITIONALLY_DIVEST_ATTRIBUTES";
+  case DELETE_OBJECTS: return "DELETE_OBJECTS";
+  case CANCEL_PENDING_OWNERSHIP_ACQUISITIONS: return "CANCEL_PENDING_OWNERSHIP_ACQUISITIONS";
+  case DELETE_OBJECTS_THEN_DIVEST: return "DELETE_OBJECTS_THEN_DIVEST";
+  case CANCEL_THEN_DELETE_THEN_DIVEST: return "CANCEL_THEN_DELETE_THEN_DIVEST";
+  case NO_ACTION: return "NO_ACTION";
+  default: return "<Invalid ResignAction>";
+  }
+}
+
+// EnumDataType RestoreFailureReason
+std::ostream&
+operator<<(std::ostream& os, const RestoreFailureReason& value)
+{
+  switch (value) {
+  case RTI_UNABLE_TO_RESTORE: os << "RTI_UNABLE_TO_RESTORE"; break;
+  case FEDERATE_REPORTED_FAILURE_DURING_RESTORE: os << "FEDERATE_REPORTED_FAILURE_DURING_RESTORE"; break;
+  case FEDERATE_RESIGNED_DURING_RESTORE: os << "FEDERATE_RESIGNED_DURING_RESTORE"; break;
+  case RTI_DETECTED_FAILURE_DURING_RESTORE: os << "RTI_DETECTED_FAILURE_DURING_RESTORE"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RestoreFailureReason& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const RestoreFailureReason& value)
+{
+  switch (value) {
+  case RTI_UNABLE_TO_RESTORE: return "RTI_UNABLE_TO_RESTORE";
+  case FEDERATE_REPORTED_FAILURE_DURING_RESTORE: return "FEDERATE_REPORTED_FAILURE_DURING_RESTORE";
+  case FEDERATE_RESIGNED_DURING_RESTORE: return "FEDERATE_RESIGNED_DURING_RESTORE";
+  case RTI_DETECTED_FAILURE_DURING_RESTORE: return "RTI_DETECTED_FAILURE_DURING_RESTORE";
+  default: return "<Invalid RestoreFailureReason>";
+  }
+}
+
+// EnumDataType RestoreStatus
+std::ostream&
+operator<<(std::ostream& os, const RestoreStatus& value)
+{
+  switch (value) {
+  case NO_RESTORE_IN_PROGRESS: os << "NO_RESTORE_IN_PROGRESS"; break;
+  case FEDERATE_RESTORE_REQUEST_PENDING: os << "FEDERATE_RESTORE_REQUEST_PENDING"; break;
+  case FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN: os << "FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN"; break;
+  case FEDERATE_PREPARED_TO_RESTORE: os << "FEDERATE_PREPARED_TO_RESTORE"; break;
+  case FEDERATE_RESTORING: os << "FEDERATE_RESTORING"; break;
+  case FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE: os << "FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RestoreStatus& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const RestoreStatus& value)
+{
+  switch (value) {
+  case NO_RESTORE_IN_PROGRESS: return "NO_RESTORE_IN_PROGRESS";
+  case FEDERATE_RESTORE_REQUEST_PENDING: return "FEDERATE_RESTORE_REQUEST_PENDING";
+  case FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN: return "FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN";
+  case FEDERATE_PREPARED_TO_RESTORE: return "FEDERATE_PREPARED_TO_RESTORE";
+  case FEDERATE_RESTORING: return "FEDERATE_RESTORING";
+  case FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE";
+  default: return "<Invalid RestoreStatus>";
+  }
+}
+
+// EnumDataType SaveFailureReason
+std::ostream&
+operator<<(std::ostream& os, const SaveFailureReason& value)
+{
+  switch (value) {
+  case RTI_UNABLE_TO_SAVE: os << "RTI_UNABLE_TO_SAVE"; break;
+  case FEDERATE_REPORTED_FAILURE_DURING_SAVE: os << "FEDERATE_REPORTED_FAILURE_DURING_SAVE"; break;
+  case FEDERATE_RESIGNED_DURING_SAVE: os << "FEDERATE_RESIGNED_DURING_SAVE"; break;
+  case RTI_DETECTED_FAILURE_DURING_SAVE: os << "RTI_DETECTED_FAILURE_DURING_SAVE"; break;
+  case SAVE_TIME_CANNOT_BE_HONORED: os << "SAVE_TIME_CANNOT_BE_HONORED"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const SaveFailureReason& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const SaveFailureReason& value)
+{
+  switch (value) {
+  case RTI_UNABLE_TO_SAVE: return "RTI_UNABLE_TO_SAVE";
+  case FEDERATE_REPORTED_FAILURE_DURING_SAVE: return "FEDERATE_REPORTED_FAILURE_DURING_SAVE";
+  case FEDERATE_RESIGNED_DURING_SAVE: return "FEDERATE_RESIGNED_DURING_SAVE";
+  case RTI_DETECTED_FAILURE_DURING_SAVE: return "RTI_DETECTED_FAILURE_DURING_SAVE";
+  case SAVE_TIME_CANNOT_BE_HONORED: return "SAVE_TIME_CANNOT_BE_HONORED";
+  default: return "<Invalid SaveFailureReason>";
+  }
+}
+
+// EnumDataType SaveStatus
+std::ostream&
+operator<<(std::ostream& os, const SaveStatus& value)
+{
+  switch (value) {
+  case NO_SAVE_IN_PROGRESS: os << "NO_SAVE_IN_PROGRESS"; break;
+  case FEDERATE_INSTRUCTED_TO_SAVE: os << "FEDERATE_INSTRUCTED_TO_SAVE"; break;
+  case FEDERATE_SAVING: os << "FEDERATE_SAVING"; break;
+  case FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE: os << "FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const SaveStatus& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const SaveStatus& value)
+{
+  switch (value) {
+  case NO_SAVE_IN_PROGRESS: return "NO_SAVE_IN_PROGRESS";
+  case FEDERATE_INSTRUCTED_TO_SAVE: return "FEDERATE_INSTRUCTED_TO_SAVE";
+  case FEDERATE_SAVING: return "FEDERATE_SAVING";
+  case FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE";
+  default: return "<Invalid SaveStatus>";
+  }
+}
+
+// EnumDataType ServiceGroupIndicator
+std::ostream&
+operator<<(std::ostream& os, const ServiceGroupIndicator& value)
+{
+  switch (value) {
+  case FEDERATION_MANAGEMENT: os << "FEDERATION_MANAGEMENT"; break;
+  case DECLARATION_MANAGEMENT: os << "DECLARATION_MANAGEMENT"; break;
+  case OBJECT_MANAGEMENT: os << "OBJECT_MANAGEMENT"; break;
+  case OWNERSHIP_MANAGEMENT: os << "OWNERSHIP_MANAGEMENT"; break;
+  case TIME_MANAGEMENT: os << "TIME_MANAGEMENT"; break;
+  case DATA_DISTRIBUTION_MANAGEMENT: os << "DATA_DISTRIBUTION_MANAGEMENT"; break;
+  case SUPPORT_SERVICES: os << "SUPPORT_SERVICES"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ServiceGroupIndicator& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const ServiceGroupIndicator& value)
+{
+  switch (value) {
+  case FEDERATION_MANAGEMENT: return "FEDERATION_MANAGEMENT";
+  case DECLARATION_MANAGEMENT: return "DECLARATION_MANAGEMENT";
+  case OBJECT_MANAGEMENT: return "OBJECT_MANAGEMENT";
+  case OWNERSHIP_MANAGEMENT: return "OWNERSHIP_MANAGEMENT";
+  case TIME_MANAGEMENT: return "TIME_MANAGEMENT";
+  case DATA_DISTRIBUTION_MANAGEMENT: return "DATA_DISTRIBUTION_MANAGEMENT";
+  case SUPPORT_SERVICES: return "SUPPORT_SERVICES";
+  default: return "<Invalid ServiceGroupIndicator>";
+  }
+}
+
+// EnumDataType LowerBoundTimeStampCommitType
+std::ostream&
+operator<<(std::ostream& os, const LowerBoundTimeStampCommitType& value)
+{
+  switch (value) {
+  case TimeAdvanceCommit: os << "TimeAdvanceCommit"; break;
+  case NextMessageCommit: os << "NextMessageCommit"; break;
+  case TimeAdvanceAndNextMessageCommit: os << "TimeAdvanceAndNextMessageCommit"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const LowerBoundTimeStampCommitType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const LowerBoundTimeStampCommitType& value)
+{
+  switch (value) {
+  case TimeAdvanceCommit: return "TimeAdvanceCommit";
+  case NextMessageCommit: return "NextMessageCommit";
+  case TimeAdvanceAndNextMessageCommit: return "TimeAdvanceAndNextMessageCommit";
+  default: return "<Invalid LowerBoundTimeStampCommitType>";
+  }
+}
+
+// EnumDataType SwitchesType
+std::ostream&
+operator<<(std::ostream& os, const SwitchesType& value)
+{
+  switch (value) {
+  case InteractionRelevanceAdvisorySwitchesType: os << "InteractionRelevanceAdvisorySwitchesType"; break;
+  case ObjectClassRelevanceAdvisorySwitchesType: os << "ObjectClassRelevanceAdvisorySwitchesType"; break;
+  case AttributeRelevanceAdvisorySwitchesType: os << "AttributeRelevanceAdvisorySwitchesType"; break;
+  case AttributeScopeAdvisorySwitchesType: os << "AttributeScopeAdvisorySwitchesType"; break;
+  case AutoProvideSwitchesType: os << "AutoProvideSwitchesType"; break;
+  case ConveyRegionDesignatorSetsSwitchesType: os << "ConveyRegionDesignatorSetsSwitchesType"; break;
+  case ServiceReportingSwitchesType: os << "ServiceReportingSwitchesType"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const SwitchesType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const SwitchesType& value)
+{
+  switch (value) {
+  case InteractionRelevanceAdvisorySwitchesType: return "InteractionRelevanceAdvisorySwitchesType";
+  case ObjectClassRelevanceAdvisorySwitchesType: return "ObjectClassRelevanceAdvisorySwitchesType";
+  case AttributeRelevanceAdvisorySwitchesType: return "AttributeRelevanceAdvisorySwitchesType";
+  case AttributeScopeAdvisorySwitchesType: return "AttributeScopeAdvisorySwitchesType";
+  case AutoProvideSwitchesType: return "AutoProvideSwitchesType";
+  case ConveyRegionDesignatorSetsSwitchesType: return "ConveyRegionDesignatorSetsSwitchesType";
+  case ServiceReportingSwitchesType: return "ServiceReportingSwitchesType";
+  default: return "<Invalid SwitchesType>";
+  }
+}
+
+// VectorDataType AttributeHandleVector
+std::ostream&
+operator<<(std::ostream& os, const AttributeHandleVector& value)
+{
+  os << "{ ";
+  AttributeHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const AttributeHandleVector& value)
+{
+  os << "{ ";
+  AttributeHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// VectorDataType FederateHandleVector
+std::ostream&
+operator<<(std::ostream& os, const FederateHandleVector& value)
+{
+  os << "{ ";
+  FederateHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederateHandleVector& value)
+{
+  os << "{ ";
+  FederateHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// VectorDataType ParameterHandleVector
+std::ostream&
+operator<<(std::ostream& os, const ParameterHandleVector& value)
+{
+  os << "{ ";
+  ParameterHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ParameterHandleVector& value, ServerModel::InteractionClass* interactionClass)
+{
+  os << "{ ";
+  ParameterHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    prettyprint(os, *i, interactionClass);
+    while (++i != value.end()) {
+      os << ", "; prettyprint(os, *i, interactionClass);
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// VectorDataType DimensionHandleVector
+std::ostream&
+operator<<(std::ostream& os, const DimensionHandleVector& value)
+{
+  os << "{ ";
+  DimensionHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const DimensionHandleVector& value)
+{
+  os << "{ ";
+  DimensionHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// SetDataType DimensionHandleSet
+std::ostream&
+operator<<(std::ostream& os, const DimensionHandleSet& value)
+{
+  os << "{ ";
+  DimensionHandleSet::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const DimensionHandleSet& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  DimensionHandleSet::const_iterator i = value.begin();
+  if (i != value.end()) {
+    prettyprint(os, *i, federation);
+    while (++i != value.end()) {
+      os << ", "; prettyprint(os, *i, federation);
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// VectorDataType ObjectInstanceHandleVector
+std::ostream&
+operator<<(std::ostream& os, const ObjectInstanceHandleVector& value)
+{
+  os << "{ ";
+  ObjectInstanceHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ObjectInstanceHandleVector& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  ObjectInstanceHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    prettyprint(os, *i, federation);
+    while (++i != value.end()) {
+      os << ", "; prettyprint(os, *i, federation);
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// VectorDataType RegionHandleVector
+std::ostream&
+operator<<(std::ostream& os, const RegionHandleVector& value)
+{
+  os << "{ ";
+  RegionHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegionHandleVector& value)
+{
+  os << "{ ";
+  RegionHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// VectorDataType ModuleHandleVector
+std::ostream&
+operator<<(std::ostream& os, const ModuleHandleVector& value)
+{
+  os << "{ ";
+  ModuleHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ModuleHandleVector& value)
+{
+  os << "{ ";
+  ModuleHandleVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// VectorDataType StringVector
+std::ostream&
+operator<<(std::ostream& os, const StringVector& value)
+{
+  os << "{ ";
+  StringVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const StringVector& value)
+{
+  os << "{ ";
+  StringVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// SetDataType StringSet
+std::ostream&
+operator<<(std::ostream& os, const StringSet& value)
+{
+  os << "{ ";
+  StringSet::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const StringSet& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  StringSet::const_iterator i = value.begin();
+  if (i != value.end()) {
+    prettyprint(os, *i, federation);
+    while (++i != value.end()) {
+      os << ", "; prettyprint(os, *i, federation);
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// PairDataType FederateHandleBoolPair
+std::ostream&
+operator<<(std::ostream& os, const FederateHandleBoolPair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederateHandleBoolPair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// VectorDataType FederateHandleBoolPairVector
+std::ostream&
+operator<<(std::ostream& os, const FederateHandleBoolPairVector& value)
+{
+  os << "{ ";
+  FederateHandleBoolPairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederateHandleBoolPairVector& value)
+{
+  os << "{ ";
+  FederateHandleBoolPairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType RangeBoundsValue
+std::ostream&
+operator<<(std::ostream& os, const RangeBoundsValue& value)
+{
+  os << "{ ";
+  os << "lowerBound: " << value.getLowerBound();
+  os << ", ";
+  os << "upperBound: " << value.getUpperBound();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RangeBoundsValue& value)
+{
+  os << "RangeBoundsValue { ";
+  os << "lowerBound: "<< value.getLowerBound();
+  os << ", ";
+  os << "upperBound: "<< value.getUpperBound();
+  os << " }";
+  return os;
+}
+
+// PairDataType DimensionHandleRangeBoundsValuePair
+std::ostream&
+operator<<(std::ostream& os, const DimensionHandleRangeBoundsValuePair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const DimensionHandleRangeBoundsValuePair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// VectorDataType RegionValue
+std::ostream&
+operator<<(std::ostream& os, const RegionValue& value)
+{
+  os << "{ ";
+  RegionValue::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegionValue& value)
+{
+  os << "{ ";
+  RegionValue::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// VectorDataType RegionValueList
+std::ostream&
+operator<<(std::ostream& os, const RegionValueList& value)
+{
+  os << "{ ";
+  RegionValueList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegionValueList& value)
+{
+  os << "{ ";
+  RegionValueList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// PairDataType RegionHandleDimensionHandleSetPair
+std::ostream&
+operator<<(std::ostream& os, const RegionHandleDimensionHandleSetPair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegionHandleDimensionHandleSetPair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// VectorDataType RegionHandleDimensionHandleSetPairVector
+std::ostream&
+operator<<(std::ostream& os, const RegionHandleDimensionHandleSetPairVector& value)
+{
+  os << "{ ";
+  RegionHandleDimensionHandleSetPairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegionHandleDimensionHandleSetPairVector& value)
+{
+  os << "{ ";
+  RegionHandleDimensionHandleSetPairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// PairDataType RegionHandleSpaceHandlePair
+std::ostream&
+operator<<(std::ostream& os, const RegionHandleSpaceHandlePair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegionHandleSpaceHandlePair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// VectorDataType RegionHandleSpaceHandlePairVector
+std::ostream&
+operator<<(std::ostream& os, const RegionHandleSpaceHandlePairVector& value)
+{
+  os << "{ ";
+  RegionHandleSpaceHandlePairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegionHandleSpaceHandlePairVector& value)
+{
+  os << "{ ";
+  RegionHandleSpaceHandlePairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// PairDataType RegionHandleRegionValuePair
+std::ostream&
+operator<<(std::ostream& os, const RegionHandleRegionValuePair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegionHandleRegionValuePair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// VectorDataType RegionHandleRegionValuePairVector
+std::ostream&
+operator<<(std::ostream& os, const RegionHandleRegionValuePairVector& value)
+{
+  os << "{ ";
+  RegionHandleRegionValuePairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegionHandleRegionValuePairVector& value)
+{
+  os << "{ ";
+  RegionHandleRegionValuePairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// PairDataType InteractionClassHandleRegionValueListPair
+std::ostream&
+operator<<(std::ostream& os, const InteractionClassHandleRegionValueListPair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const InteractionClassHandleRegionValueListPair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// PairDataType AttributeHandleRegionValueListPair
+std::ostream&
+operator<<(std::ostream& os, const AttributeHandleRegionValueListPair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const AttributeHandleRegionValueListPair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// StructDataType AttributeState
+std::ostream&
+operator<<(std::ostream& os, const AttributeState& value)
+{
+  os << "{ ";
+  os << "attributeHandle: " << value.getAttributeHandle();
+  os << ", ";
+  os << "ownerFederate: " << value.getOwnerFederate();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const AttributeState& value)
+{
+  os << "AttributeState { ";
+  os << "attributeHandle: "<< value.getAttributeHandle();
+  os << ", ";
+  os << "ownerFederate: "<< value.getOwnerFederate();
+  os << " }";
+  return os;
+}
+
+// VectorDataType AttributeStateVector
+std::ostream&
+operator<<(std::ostream& os, const AttributeStateVector& value)
+{
+  os << "{ ";
+  AttributeStateVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const AttributeStateVector& value)
+{
+  os << "{ ";
+  AttributeStateVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType ParameterValue
+std::ostream&
+operator<<(std::ostream& os, const ParameterValue& value)
+{
+  os << "{ ";
+  os << "parameterHandle: " << value.getParameterHandle();
+  os << ", ";
+  os << "value: " << value.getValue();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ParameterValue& value, ServerModel::InteractionClass* interactionClass)
+{
+  os << "ParameterValue { ";
+  os << "parameterHandle: "; prettyprint(os, value.getParameterHandle(), interactionClass);//ParameterHandle parent=InteractionClass
+  os << ", ";
+  os << "value: "<< value.getValue();
+  os << " }";
+  return os;
+}
+
+// VectorDataType ParameterValueVector
+std::ostream&
+operator<<(std::ostream& os, const ParameterValueVector& value)
+{
+  os << "{ ";
+  ParameterValueVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ParameterValueVector& value, ServerModel::InteractionClass* interactionClass)
+{
+  os << "{ ";
+  ParameterValueVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    prettyprint(os, *i, interactionClass);
+    while (++i != value.end()) {
+      os << ", "; prettyprint(os, *i, interactionClass);
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType AttributeValue
+std::ostream&
+operator<<(std::ostream& os, const AttributeValue& value)
+{
+  os << "{ ";
+  os << "attributeHandle: " << value.getAttributeHandle();
+  os << ", ";
+  os << "value: " << value.getValue();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const AttributeValue& value)
+{
+  os << "AttributeValue { ";
+  os << "attributeHandle: "<< value.getAttributeHandle();
+  os << ", ";
+  os << "value: "<< value.getValue();
+  os << " }";
+  return os;
+}
+
+// VectorDataType AttributeValueVector
+std::ostream&
+operator<<(std::ostream& os, const AttributeValueVector& value)
+{
+  os << "{ ";
+  AttributeValueVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const AttributeValueVector& value)
+{
+  os << "{ ";
+  AttributeValueVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// PairDataType FederateHandleSaveStatusPair
+std::ostream&
+operator<<(std::ostream& os, const FederateHandleSaveStatusPair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederateHandleSaveStatusPair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// VectorDataType FederateHandleSaveStatusPairVector
+std::ostream&
+operator<<(std::ostream& os, const FederateHandleSaveStatusPairVector& value)
+{
+  os << "{ ";
+  FederateHandleSaveStatusPairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederateHandleSaveStatusPairVector& value)
+{
+  os << "{ ";
+  FederateHandleSaveStatusPairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// PairDataType FederateHandleRestoreStatusPair
+std::ostream&
+operator<<(std::ostream& os, const FederateHandleRestoreStatusPair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederateHandleRestoreStatusPair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// VectorDataType FederateHandleRestoreStatusPairVector
+std::ostream&
+operator<<(std::ostream& os, const FederateHandleRestoreStatusPairVector& value)
+{
+  os << "{ ";
+  FederateHandleRestoreStatusPairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederateHandleRestoreStatusPairVector& value)
+{
+  os << "{ ";
+  FederateHandleRestoreStatusPairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FederationExecutionInformation
+std::ostream&
+operator<<(std::ostream& os, const FederationExecutionInformation& value)
+{
+  os << "{ ";
+  os << "federationExecutionName: " << value.getFederationExecutionName();
+  os << ", ";
+  os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederationExecutionInformation& value)
+{
+  os << "FederationExecutionInformation { ";
+  os << "federationExecutionName: "<< value.getFederationExecutionName();
+  os << ", ";
+  os << "logicalTimeFactoryName: "<< value.getLogicalTimeFactoryName();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FederationExecutionInformationVector
+std::ostream&
+operator<<(std::ostream& os, const FederationExecutionInformationVector& value)
+{
+  os << "{ ";
+  FederationExecutionInformationVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederationExecutionInformationVector& value)
+{
+  os << "{ ";
+  FederationExecutionInformationVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// PairDataType ObjectInstanceHandleNamePair
+std::ostream&
+operator<<(std::ostream& os, const ObjectInstanceHandleNamePair& value)
+{
+  os << "{ ";
+  os << "first: " << value.first << ", ";
+  os << "second: " << value.second;
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ObjectInstanceHandleNamePair& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  os << "first: "; prettyprint(os, value.first, federation); os << ", ";
+  os << "second: "; prettyprint(os, value.second, federation); os << ", ";
+  os << " }";
+  return os;
+}
+
+// VectorDataType ObjectInstanceHandleNamePairVector
+std::ostream&
+operator<<(std::ostream& os, const ObjectInstanceHandleNamePairVector& value)
+{
+  os << "{ ";
+  ObjectInstanceHandleNamePairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ObjectInstanceHandleNamePairVector& value)
+{
+  os << "{ ";
+  ObjectInstanceHandleNamePairVector::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// EnumDataType CreateFederationExecutionResponseType
+std::ostream&
+operator<<(std::ostream& os, const CreateFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case CreateFederationExecutionResponseSuccess: os << "CreateFederationExecutionResponseSuccess"; break;
+  case CreateFederationExecutionResponseFederationExecutionAlreadyExists: os << "CreateFederationExecutionResponseFederationExecutionAlreadyExists"; break;
+  case CreateFederationExecutionResponseCouldNotOpenFDD: os << "CreateFederationExecutionResponseCouldNotOpenFDD"; break;
+  case CreateFederationExecutionResponseErrorReadingFDD: os << "CreateFederationExecutionResponseErrorReadingFDD"; break;
+  case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: os << "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory"; break;
+  case CreateFederationExecutionResponseInconsistentFDD: os << "CreateFederationExecutionResponseInconsistentFDD"; break;
+  case CreateFederationExecutionResponseRTIinternalError: os << "CreateFederationExecutionResponseRTIinternalError"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const CreateFederationExecutionResponseType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const CreateFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case CreateFederationExecutionResponseSuccess: return "CreateFederationExecutionResponseSuccess";
+  case CreateFederationExecutionResponseFederationExecutionAlreadyExists: return "CreateFederationExecutionResponseFederationExecutionAlreadyExists";
+  case CreateFederationExecutionResponseCouldNotOpenFDD: return "CreateFederationExecutionResponseCouldNotOpenFDD";
+  case CreateFederationExecutionResponseErrorReadingFDD: return "CreateFederationExecutionResponseErrorReadingFDD";
+  case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: return "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory";
+  case CreateFederationExecutionResponseInconsistentFDD: return "CreateFederationExecutionResponseInconsistentFDD";
+  case CreateFederationExecutionResponseRTIinternalError: return "CreateFederationExecutionResponseRTIinternalError";
+  default: return "<Invalid CreateFederationExecutionResponseType>";
+  }
+}
+
+// EnumDataType DestroyFederationExecutionResponseType
+std::ostream&
+operator<<(std::ostream& os, const DestroyFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case DestroyFederationExecutionResponseSuccess: os << "DestroyFederationExecutionResponseSuccess"; break;
+  case DestroyFederationExecutionResponseFederatesCurrentlyJoined: os << "DestroyFederationExecutionResponseFederatesCurrentlyJoined"; break;
+  case DestroyFederationExecutionResponseFederationExecutionDoesNotExist: os << "DestroyFederationExecutionResponseFederationExecutionDoesNotExist"; break;
+  case DestroyFederationExecutionResponseRTIinternalError: os << "DestroyFederationExecutionResponseRTIinternalError"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const DestroyFederationExecutionResponseType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const DestroyFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case DestroyFederationExecutionResponseSuccess: return "DestroyFederationExecutionResponseSuccess";
+  case DestroyFederationExecutionResponseFederatesCurrentlyJoined: return "DestroyFederationExecutionResponseFederatesCurrentlyJoined";
+  case DestroyFederationExecutionResponseFederationExecutionDoesNotExist: return "DestroyFederationExecutionResponseFederationExecutionDoesNotExist";
+  case DestroyFederationExecutionResponseRTIinternalError: return "DestroyFederationExecutionResponseRTIinternalError";
+  default: return "<Invalid DestroyFederationExecutionResponseType>";
+  }
+}
+
+// EnumDataType JoinFederationExecutionResponseType
+std::ostream&
+operator<<(std::ostream& os, const JoinFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case JoinFederationExecutionResponseSuccess: os << "JoinFederationExecutionResponseSuccess"; break;
+  case JoinFederationExecutionResponseFederateNameAlreadyInUse: os << "JoinFederationExecutionResponseFederateNameAlreadyInUse"; break;
+  case JoinFederationExecutionResponseFederationExecutionDoesNotExist: os << "JoinFederationExecutionResponseFederationExecutionDoesNotExist"; break;
+  case JoinFederationExecutionResponseSaveInProgress: os << "JoinFederationExecutionResponseSaveInProgress"; break;
+  case JoinFederationExecutionResponseRestoreInProgress: os << "JoinFederationExecutionResponseRestoreInProgress"; break;
+  case JoinFederationExecutionResponseInconsistentFDD: os << "JoinFederationExecutionResponseInconsistentFDD"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const JoinFederationExecutionResponseType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const JoinFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case JoinFederationExecutionResponseSuccess: return "JoinFederationExecutionResponseSuccess";
+  case JoinFederationExecutionResponseFederateNameAlreadyInUse: return "JoinFederationExecutionResponseFederateNameAlreadyInUse";
+  case JoinFederationExecutionResponseFederationExecutionDoesNotExist: return "JoinFederationExecutionResponseFederationExecutionDoesNotExist";
+  case JoinFederationExecutionResponseSaveInProgress: return "JoinFederationExecutionResponseSaveInProgress";
+  case JoinFederationExecutionResponseRestoreInProgress: return "JoinFederationExecutionResponseRestoreInProgress";
+  case JoinFederationExecutionResponseInconsistentFDD: return "JoinFederationExecutionResponseInconsistentFDD";
+  default: return "<Invalid JoinFederationExecutionResponseType>";
+  }
+}
+
+// EnumDataType RegisterFederationSynchronizationPointResponseType
+std::ostream&
+operator<<(std::ostream& os, const RegisterFederationSynchronizationPointResponseType& value)
+{
+  switch (value) {
+  case RegisterFederationSynchronizationPointResponseSuccess: os << "RegisterFederationSynchronizationPointResponseSuccess"; break;
+  case RegisterFederationSynchronizationPointResponseLabelNotUnique: os << "RegisterFederationSynchronizationPointResponseLabelNotUnique"; break;
+  case RegisterFederationSynchronizationPointResponseMemberNotJoined: os << "RegisterFederationSynchronizationPointResponseMemberNotJoined"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointResponseType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const RegisterFederationSynchronizationPointResponseType& value)
+{
+  switch (value) {
+  case RegisterFederationSynchronizationPointResponseSuccess: return "RegisterFederationSynchronizationPointResponseSuccess";
+  case RegisterFederationSynchronizationPointResponseLabelNotUnique: return "RegisterFederationSynchronizationPointResponseLabelNotUnique";
+  case RegisterFederationSynchronizationPointResponseMemberNotJoined: return "RegisterFederationSynchronizationPointResponseMemberNotJoined";
+  default: return "<Invalid RegisterFederationSynchronizationPointResponseType>";
+  }
+}
+
+// <__main__.MapDataType object at 0x0000024E05F6E978>
+std::ostream&
+operator<<(std::ostream& os, const ConfigurationParameterMap& value)
+{
+  os << "{ ";
+  ConfigurationParameterMap::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << i->first << ": " << i->second;
+    while (++i != value.end()) {
+      os << ", " << i->first << ": " << i->second;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ConfigurationParameterMap& value, ServerModel::Federation* federation)
+{
+  os << "{ ";
+  ConfigurationParameterMap::const_iterator i = value.begin();
+  if (i != value.end()) {
+    prettyprint(os, i->first, federation); os << ": "; prettyprint(os, i->second, federation);
+    while (++i != value.end()) {
+      prettyprint(os, i->first, federation); os << ": "; prettyprint(os, i->second, federation);
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringSimpleDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMStringSimpleDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "representation: " << value.getRepresentation();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringSimpleDataType& value)
+{
+  os << "FOMStringSimpleDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "representation: "<< value.getRepresentation();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringSimpleDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringSimpleDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringSimpleDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringSimpleDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringSimpleDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringEnumerator
+std::ostream&
+operator<<(std::ostream& os, const FOMStringEnumerator& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "value: " << value.getValue();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringEnumerator& value)
+{
+  os << "FOMStringEnumerator { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "value: "<< value.getValue();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringEnumeratorList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringEnumeratorList& value)
+{
+  os << "{ ";
+  FOMStringEnumeratorList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringEnumeratorList& value)
+{
+  os << "{ ";
+  FOMStringEnumeratorList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringEnumeratedDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMStringEnumeratedDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "representation: " << value.getRepresentation();
+  os << ", ";
+  os << "enumerators: " << value.getEnumerators();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringEnumeratedDataType& value)
+{
+  os << "FOMStringEnumeratedDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "representation: "<< value.getRepresentation();
+  os << ", ";
+  os << "enumerators: "<< value.getEnumerators();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringEnumeratedDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringEnumeratedDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringEnumeratedDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringEnumeratedDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringEnumeratedDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringArrayDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMStringArrayDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "cardinality: " << value.getCardinality();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringArrayDataType& value)
+{
+  os << "FOMStringArrayDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "cardinality: "<< value.getCardinality();
+  os << ", ";
+  os << "encoding: "<< value.getEncoding();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringArrayDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringArrayDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringArrayDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringArrayDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringArrayDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringFixedRecordField
+std::ostream&
+operator<<(std::ostream& os, const FOMStringFixedRecordField& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringFixedRecordField& value)
+{
+  os << "FOMStringFixedRecordField { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringFixedRecordFieldList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringFixedRecordFieldList& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordFieldList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringFixedRecordFieldList& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordFieldList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringFixedRecordDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMStringFixedRecordDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << ", ";
+  os << "fields: " << value.getFields();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringFixedRecordDataType& value)
+{
+  os << "FOMStringFixedRecordDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "encoding: "<< value.getEncoding();
+  os << ", ";
+  os << "fields: "<< value.getFields();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringFixedRecordDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringFixedRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringFixedRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringVariantRecordAlternative
+std::ostream&
+operator<<(std::ostream& os, const FOMStringVariantRecordAlternative& value)
+{
+  os << "{ ";
+  os << "enumerator: " << value.getEnumerator();
+  os << ", ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative& value)
+{
+  os << "FOMStringVariantRecordAlternative { ";
+  os << "enumerator: "<< value.getEnumerator();
+  os << ", ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringVariantRecordAlternativeList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringVariantRecordAlternativeList& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordAlternativeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringVariantRecordAlternativeList& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordAlternativeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringVariantRecordDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMStringVariantRecordDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "discriminant: " << value.getDiscriminant();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "alternatives: " << value.getAlternatives();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringVariantRecordDataType& value)
+{
+  os << "FOMStringVariantRecordDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "discriminant: "<< value.getDiscriminant();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "alternatives: "<< value.getAlternatives();
+  os << ", ";
+  os << "encoding: "<< value.getEncoding();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringVariantRecordDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringVariantRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringVariantRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringTransportationType
+std::ostream&
+operator<<(std::ostream& os, const FOMStringTransportationType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringTransportationType& value)
+{
+  os << "FOMStringTransportationType { ";
+  os << "name: "<< value.getName();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringTransportationTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringTransportationTypeList& value)
+{
+  os << "{ ";
+  FOMStringTransportationTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringTransportationTypeList& value)
+{
+  os << "{ ";
+  FOMStringTransportationTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringDimension
+std::ostream&
+operator<<(std::ostream& os, const FOMStringDimension& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "upperBound: " << value.getUpperBound();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringDimension& value)
+{
+  os << "FOMStringDimension { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "upperBound: "<< value.getUpperBound();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringDimensionList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringDimensionList& value)
+{
+  os << "{ ";
+  FOMStringDimensionList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringDimensionList& value)
+{
+  os << "{ ";
+  FOMStringDimensionList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringRoutingSpace
+std::ostream&
+operator<<(std::ostream& os, const FOMStringRoutingSpace& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dimensionSet: " << value.getDimensionSet();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringRoutingSpace& value)
+{
+  os << "FOMStringRoutingSpace { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dimensionSet: "<< value.getDimensionSet();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringRoutingSpaceList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringRoutingSpaceList& value)
+{
+  os << "{ ";
+  FOMStringRoutingSpaceList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringRoutingSpaceList& value)
+{
+  os << "{ ";
+  FOMStringRoutingSpaceList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringParameter
+std::ostream&
+operator<<(std::ostream& os, const FOMStringParameter& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringParameter& value)
+{
+  os << "FOMStringParameter { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringParameterList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringParameterList& value)
+{
+  os << "{ ";
+  FOMStringParameterList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringParameterList& value)
+{
+  os << "{ ";
+  FOMStringParameterList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringInteractionClass
+std::ostream&
+operator<<(std::ostream& os, const FOMStringInteractionClass& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "orderType: " << value.getOrderType();
+  os << ", ";
+  os << "transportationType: " << value.getTransportationType();
+  os << ", ";
+  os << "routingSpace: " << value.getRoutingSpace();
+  os << ", ";
+  os << "dimensionSet: " << value.getDimensionSet();
+  os << ", ";
+  os << "parameterList: " << value.getParameterList();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringInteractionClass& value)
+{
+  os << "FOMStringInteractionClass { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "orderType: "<< value.getOrderType();
+  os << ", ";
+  os << "transportationType: "<< value.getTransportationType();
+  os << ", ";
+  os << "routingSpace: "<< value.getRoutingSpace();
+  os << ", ";
+  os << "dimensionSet: "<< value.getDimensionSet();
+  os << ", ";
+  os << "parameterList: "<< value.getParameterList();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringInteractionClassList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringInteractionClassList& value)
+{
+  os << "{ ";
+  FOMStringInteractionClassList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringInteractionClassList& value)
+{
+  os << "{ ";
+  FOMStringInteractionClassList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringAttribute
+std::ostream&
+operator<<(std::ostream& os, const FOMStringAttribute& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "orderType: " << value.getOrderType();
+  os << ", ";
+  os << "transportationType: " << value.getTransportationType();
+  os << ", ";
+  os << "routingSpace: " << value.getRoutingSpace();
+  os << ", ";
+  os << "dimensionSet: " << value.getDimensionSet();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringAttribute& value)
+{
+  os << "FOMStringAttribute { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "orderType: "<< value.getOrderType();
+  os << ", ";
+  os << "transportationType: "<< value.getTransportationType();
+  os << ", ";
+  os << "routingSpace: "<< value.getRoutingSpace();
+  os << ", ";
+  os << "dimensionSet: "<< value.getDimensionSet();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringAttributeList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringAttributeList& value)
+{
+  os << "{ ";
+  FOMStringAttributeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringAttributeList& value)
+{
+  os << "{ ";
+  FOMStringAttributeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringObjectClass
+std::ostream&
+operator<<(std::ostream& os, const FOMStringObjectClass& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "attributeList: " << value.getAttributeList();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringObjectClass& value)
+{
+  os << "FOMStringObjectClass { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "attributeList: "<< value.getAttributeList();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringObjectClassList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringObjectClassList& value)
+{
+  os << "{ ";
+  FOMStringObjectClassList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringObjectClassList& value)
+{
+  os << "{ ";
+  FOMStringObjectClassList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringUpdateRate
+std::ostream&
+operator<<(std::ostream& os, const FOMStringUpdateRate& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "rate: " << value.getRate();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringUpdateRate& value)
+{
+  os << "FOMStringUpdateRate { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "rate: "<< value.getRate();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringUpdateRateList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringUpdateRateList& value)
+{
+  os << "{ ";
+  FOMStringUpdateRateList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringUpdateRateList& value)
+{
+  os << "{ ";
+  FOMStringUpdateRateList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringSwitch
+std::ostream&
+operator<<(std::ostream& os, const FOMStringSwitch& value)
+{
+  os << "{ ";
+  os << "switchesType: " << value.getSwitchesType();
+  os << ", ";
+  os << "enabled: " << value.getEnabled();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringSwitch& value)
+{
+  os << "FOMStringSwitch { ";
+  os << "switchesType: "<< value.getSwitchesType();
+  os << ", ";
+  os << "enabled: "<< value.getEnabled();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringSwitchList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringSwitchList& value)
+{
+  os << "{ ";
+  FOMStringSwitchList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringSwitchList& value)
+{
+  os << "{ ";
+  FOMStringSwitchList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringModule
+std::ostream&
+operator<<(std::ostream& os, const FOMStringModule& value)
+{
+  os << "{ ";
+  os << "designator: " << value.getDesignator();
+  os << ", ";
+  os << "transportationTypeList: " << value.getTransportationTypeList();
+  os << ", ";
+  os << "dimensionList: " << value.getDimensionList();
+  os << ", ";
+  os << "routingSpaceList: " << value.getRoutingSpaceList();
+  os << ", ";
+  os << "interactionClassList: " << value.getInteractionClassList();
+  os << ", ";
+  os << "objectClassList: " << value.getObjectClassList();
+  os << ", ";
+  os << "updateRateList: " << value.getUpdateRateList();
+  os << ", ";
+  os << "switchList: " << value.getSwitchList();
+  os << ", ";
+  os << "simpleDataTypeList: " << value.getSimpleDataTypeList();
+  os << ", ";
+  os << "enumeratedDataTypeList: " << value.getEnumeratedDataTypeList();
+  os << ", ";
+  os << "arrayDataTypeList: " << value.getArrayDataTypeList();
+  os << ", ";
+  os << "fixedRecordDataTypeList: " << value.getFixedRecordDataTypeList();
+  os << ", ";
+  os << "variantRecordDataTypeList: " << value.getVariantRecordDataTypeList();
+  os << ", ";
+  os << "artificialInteractionRoot: " << value.getArtificialInteractionRoot();
+  os << ", ";
+  os << "artificialObjectRoot: " << value.getArtificialObjectRoot();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringModule& value)
+{
+  os << "FOMStringModule { ";
+  os << "designator: "<< value.getDesignator();
+  os << ", ";
+  os << "transportationTypeList: "<< value.getTransportationTypeList();
+  os << ", ";
+  os << "dimensionList: "<< value.getDimensionList();
+  os << ", ";
+  os << "routingSpaceList: "<< value.getRoutingSpaceList();
+  os << ", ";
+  os << "interactionClassList: "<< value.getInteractionClassList();
+  os << ", ";
+  os << "objectClassList: "<< value.getObjectClassList();
+  os << ", ";
+  os << "updateRateList: "<< value.getUpdateRateList();
+  os << ", ";
+  os << "switchList: "<< value.getSwitchList();
+  os << ", ";
+  os << "simpleDataTypeList: "<< value.getSimpleDataTypeList();
+  os << ", ";
+  os << "enumeratedDataTypeList: "<< value.getEnumeratedDataTypeList();
+  os << ", ";
+  os << "arrayDataTypeList: "<< value.getArrayDataTypeList();
+  os << ", ";
+  os << "fixedRecordDataTypeList: "<< value.getFixedRecordDataTypeList();
+  os << ", ";
+  os << "variantRecordDataTypeList: "<< value.getVariantRecordDataTypeList();
+  os << ", ";
+  os << "artificialInteractionRoot: "<< value.getArtificialInteractionRoot();
+  os << ", ";
+  os << "artificialObjectRoot: "<< value.getArtificialObjectRoot();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringModuleList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringModuleList& value)
+{
+  os << "{ ";
+  FOMStringModuleList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringModuleList& value)
+{
+  os << "{ ";
+  FOMStringModuleList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMTransportationType
+std::ostream&
+operator<<(std::ostream& os, const FOMTransportationType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "transportationType: " << value.getTransportationType();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMTransportationType& value)
+{
+  os << "FOMTransportationType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "transportationType: "<< value.getTransportationType();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMTransportationTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMTransportationTypeList& value)
+{
+  os << "{ ";
+  FOMTransportationTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMTransportationTypeList& value)
+{
+  os << "{ ";
+  FOMTransportationTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMDimension
+std::ostream&
+operator<<(std::ostream& os, const FOMDimension& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dimensionHandle: " << value.getDimensionHandle();
+  os << ", ";
+  os << "upperBound: " << value.getUpperBound();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMDimension& value)
+{
+  os << "FOMDimension { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dimensionHandle: "<< value.getDimensionHandle();
+  os << ", ";
+  os << "upperBound: "<< value.getUpperBound();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMDimensionList
+std::ostream&
+operator<<(std::ostream& os, const FOMDimensionList& value)
+{
+  os << "{ ";
+  FOMDimensionList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMDimensionList& value)
+{
+  os << "{ ";
+  FOMDimensionList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMRoutingSpace
+std::ostream&
+operator<<(std::ostream& os, const FOMRoutingSpace& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "spaceHandle: " << value.getSpaceHandle();
+  os << ", ";
+  os << "dimensionHandleSet: " << value.getDimensionHandleSet();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMRoutingSpace& value)
+{
+  os << "FOMRoutingSpace { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "spaceHandle: "<< value.getSpaceHandle();
+  os << ", ";
+  os << "dimensionHandleSet: "<< value.getDimensionHandleSet();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMRoutingSpaceList
+std::ostream&
+operator<<(std::ostream& os, const FOMRoutingSpaceList& value)
+{
+  os << "{ ";
+  FOMRoutingSpaceList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMRoutingSpaceList& value)
+{
+  os << "{ ";
+  FOMRoutingSpaceList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMParameter
+std::ostream&
+operator<<(std::ostream& os, const FOMParameter& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "parameterHandle: " << value.getParameterHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMParameter& value)
+{
+  os << "FOMParameter { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "parameterHandle: "<< value.getParameterHandle();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMParameterList
+std::ostream&
+operator<<(std::ostream& os, const FOMParameterList& value)
+{
+  os << "{ ";
+  FOMParameterList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMParameterList& value)
+{
+  os << "{ ";
+  FOMParameterList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMInteractionClass
+std::ostream&
+operator<<(std::ostream& os, const FOMInteractionClass& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "interactionClassHandle: " << value.getInteractionClassHandle();
+  os << ", ";
+  os << "parentInteractionClassHandle: " << value.getParentInteractionClassHandle();
+  os << ", ";
+  os << "orderType: " << value.getOrderType();
+  os << ", ";
+  os << "transportationType: " << value.getTransportationType();
+  os << ", ";
+  os << "dimensionHandleSet: " << value.getDimensionHandleSet();
+  os << ", ";
+  os << "parameterList: " << value.getParameterList();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMInteractionClass& value)
+{
+  os << "FOMInteractionClass { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "interactionClassHandle: "<< value.getInteractionClassHandle();
+  os << ", ";
+  os << "parentInteractionClassHandle: "<< value.getParentInteractionClassHandle();
+  os << ", ";
+  os << "orderType: "<< value.getOrderType();
+  os << ", ";
+  os << "transportationType: "<< value.getTransportationType();
+  os << ", ";
+  os << "dimensionHandleSet: "<< value.getDimensionHandleSet();
+  os << ", ";
+  os << "parameterList: "<< value.getParameterList();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMInteractionClassList
+std::ostream&
+operator<<(std::ostream& os, const FOMInteractionClassList& value)
+{
+  os << "{ ";
+  FOMInteractionClassList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMInteractionClassList& value)
+{
+  os << "{ ";
+  FOMInteractionClassList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMAttribute
+std::ostream&
+operator<<(std::ostream& os, const FOMAttribute& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "attributeHandle: " << value.getAttributeHandle();
+  os << ", ";
+  os << "orderType: " << value.getOrderType();
+  os << ", ";
+  os << "transportationType: " << value.getTransportationType();
+  os << ", ";
+  os << "dimensionHandleSet: " << value.getDimensionHandleSet();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMAttribute& value)
+{
+  os << "FOMAttribute { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "attributeHandle: "<< value.getAttributeHandle();
+  os << ", ";
+  os << "orderType: "<< value.getOrderType();
+  os << ", ";
+  os << "transportationType: "<< value.getTransportationType();
+  os << ", ";
+  os << "dimensionHandleSet: "<< value.getDimensionHandleSet();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMAttributeList
+std::ostream&
+operator<<(std::ostream& os, const FOMAttributeList& value)
+{
+  os << "{ ";
+  FOMAttributeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMAttributeList& value)
+{
+  os << "{ ";
+  FOMAttributeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMObjectClass
+std::ostream&
+operator<<(std::ostream& os, const FOMObjectClass& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "objectClassHandle: " << value.getObjectClassHandle();
+  os << ", ";
+  os << "parentObjectClassHandle: " << value.getParentObjectClassHandle();
+  os << ", ";
+  os << "attributeList: " << value.getAttributeList();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMObjectClass& value)
+{
+  os << "FOMObjectClass { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "objectClassHandle: "<< value.getObjectClassHandle();
+  os << ", ";
+  os << "parentObjectClassHandle: "<< value.getParentObjectClassHandle();
+  os << ", ";
+  os << "attributeList: "<< value.getAttributeList();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMObjectClassList
+std::ostream&
+operator<<(std::ostream& os, const FOMObjectClassList& value)
+{
+  os << "{ ";
+  FOMObjectClassList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMObjectClassList& value)
+{
+  os << "{ ";
+  FOMObjectClassList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMUpdateRate
+std::ostream&
+operator<<(std::ostream& os, const FOMUpdateRate& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "updateRateHandle: " << value.getUpdateRateHandle();
+  os << ", ";
+  os << "rate: " << value.getRate();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMUpdateRate& value)
+{
+  os << "FOMUpdateRate { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "updateRateHandle: "<< value.getUpdateRateHandle();
+  os << ", ";
+  os << "rate: "<< value.getRate();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMUpdateRateList
+std::ostream&
+operator<<(std::ostream& os, const FOMUpdateRateList& value)
+{
+  os << "{ ";
+  FOMUpdateRateList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMUpdateRateList& value)
+{
+  os << "{ ";
+  FOMUpdateRateList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMSwitch
+std::ostream&
+operator<<(std::ostream& os, const FOMSwitch& value)
+{
+  os << "{ ";
+  os << "switchesType: " << value.getSwitchesType();
+  os << ", ";
+  os << "enabled: " << value.getEnabled();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMSwitch& value)
+{
+  os << "FOMSwitch { ";
+  os << "switchesType: "<< value.getSwitchesType();
+  os << ", ";
+  os << "enabled: "<< value.getEnabled();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMSwitchList
+std::ostream&
+operator<<(std::ostream& os, const FOMSwitchList& value)
+{
+  os << "{ ";
+  FOMSwitchList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMSwitchList& value)
+{
+  os << "{ ";
+  FOMSwitchList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMModule
+std::ostream&
+operator<<(std::ostream& os, const FOMModule& value)
+{
+  os << "{ ";
+  os << "moduleHandle: " << value.getModuleHandle();
+  os << ", ";
+  os << "transportationTypeList: " << value.getTransportationTypeList();
+  os << ", ";
+  os << "dimensionList: " << value.getDimensionList();
+  os << ", ";
+  os << "routingSpaceList: " << value.getRoutingSpaceList();
+  os << ", ";
+  os << "interactionClassList: " << value.getInteractionClassList();
+  os << ", ";
+  os << "objectClassList: " << value.getObjectClassList();
+  os << ", ";
+  os << "updateRateList: " << value.getUpdateRateList();
+  os << ", ";
+  os << "switchList: " << value.getSwitchList();
+  os << ", ";
+  os << "artificialInteractionRoot: " << value.getArtificialInteractionRoot();
+  os << ", ";
+  os << "artificialObjectRoot: " << value.getArtificialObjectRoot();
+  os << ", ";
+  os << "designator: " << value.getDesignator();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMModule& value)
+{
+  os << "FOMModule { ";
+  os << "moduleHandle: "<< value.getModuleHandle();
+  os << ", ";
+  os << "transportationTypeList: "<< value.getTransportationTypeList();
+  os << ", ";
+  os << "dimensionList: "<< value.getDimensionList();
+  os << ", ";
+  os << "routingSpaceList: "<< value.getRoutingSpaceList();
+  os << ", ";
+  os << "interactionClassList: "<< value.getInteractionClassList();
+  os << ", ";
+  os << "objectClassList: "<< value.getObjectClassList();
+  os << ", ";
+  os << "updateRateList: "<< value.getUpdateRateList();
+  os << ", ";
+  os << "switchList: "<< value.getSwitchList();
+  os << ", ";
+  os << "artificialInteractionRoot: "<< value.getArtificialInteractionRoot();
+  os << ", ";
+  os << "artificialObjectRoot: "<< value.getArtificialObjectRoot();
+  os << ", ";
+  os << "designator: "<< value.getDesignator();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMModuleList
+std::ostream&
+operator<<(std::ostream& os, const FOMModuleList& value)
+{
+  os << "{ ";
+  FOMModuleList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMModuleList& value)
+{
+  os << "{ ";
+  FOMModuleList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// MessageDataType ConnectionLostMessage
+std::ostream&
+operator<<(std::ostream& os, const ConnectionLostMessage& value)
+{
+  os << "{ ";
+  os << "faultDescription: " << value.getFaultDescription();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ConnectionLostMessage& value, ServerModel::Federation* federation)
+{
+  os << "ConnectionLostMessage { ";
+  os << "faultDescription: "<< value.getFaultDescription();
+  os << " }";
+  return os;
+}
+
+// MessageDataType CreateFederationExecutionRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const CreateFederationExecutionRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationExecution: " << value.getFederationExecution();
+  os << ", ";
+  os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
+  os << ", ";
+  os << "fOMStringModuleList: " << value.getFOMStringModuleList();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const CreateFederationExecutionRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "CreateFederationExecutionRequestMessage { ";
+  os << "federationExecution: "<< value.getFederationExecution();
+  os << ", ";
+  os << "logicalTimeFactoryName: "<< value.getLogicalTimeFactoryName();
+  os << ", ";
+  os << "fOMStringModuleList: "<< value.getFOMStringModuleList();
+  os << " }";
+  return os;
+}
+
+// MessageDataType CreateFederationExecutionResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const CreateFederationExecutionResponseMessage& value)
+{
+  os << "{ ";
+  os << "createFederationExecutionResponseType: " << value.getCreateFederationExecutionResponseType();
+  os << ", ";
+  os << "exceptionString: " << value.getExceptionString();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const CreateFederationExecutionResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "CreateFederationExecutionResponseMessage { ";
+  os << "createFederationExecutionResponseType: "<< value.getCreateFederationExecutionResponseType();
+  os << ", ";
+  os << "exceptionString: "<< value.getExceptionString();
+  os << " }";
+  return os;
+}
+
+// MessageDataType DestroyFederationExecutionRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const DestroyFederationExecutionRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationExecution: " << value.getFederationExecution();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const DestroyFederationExecutionRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "DestroyFederationExecutionRequestMessage { ";
+  os << "federationExecution: "<< value.getFederationExecution();
+  os << " }";
+  return os;
+}
+
+// MessageDataType DestroyFederationExecutionResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const DestroyFederationExecutionResponseMessage& value)
+{
+  os << "{ ";
+  os << "destroyFederationExecutionResponseType: " << value.getDestroyFederationExecutionResponseType();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const DestroyFederationExecutionResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "DestroyFederationExecutionResponseMessage { ";
+  os << "destroyFederationExecutionResponseType: "<< value.getDestroyFederationExecutionResponseType();
+  os << " }";
+  return os;
+}
+
+// MessageDataType EnumerateFederationExecutionsRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const EnumerateFederationExecutionsRequestMessage& value)
+{
+  os << "{ ";
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const EnumerateFederationExecutionsRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "EnumerateFederationExecutionsRequestMessage { ";
+  os << " }";
+  return os;
+}
+
+// MessageDataType EnumerateFederationExecutionsResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const EnumerateFederationExecutionsResponseMessage& value)
+{
+  os << "{ ";
+  os << "federationExecutionInformationVector: " << value.getFederationExecutionInformationVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const EnumerateFederationExecutionsResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "EnumerateFederationExecutionsResponseMessage { ";
+  os << "federationExecutionInformationVector: "<< value.getFederationExecutionInformationVector();
+  os << " }";
+  return os;
+}
+
+// MessageDataType InsertFederationExecutionMessage
+std::ostream&
+operator<<(std::ostream& os, const InsertFederationExecutionMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federationName: " << value.getFederationName();
+  os << ", ";
+  os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
+  os << ", ";
+  os << "configurationParameterMap: " << value.getConfigurationParameterMap();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const InsertFederationExecutionMessage& value, ServerModel::Federation* federation)
+{
+  os << "InsertFederationExecutionMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federationName: "<< value.getFederationName();
+  os << ", ";
+  os << "logicalTimeFactoryName: "<< value.getLogicalTimeFactoryName();
+  os << ", ";
+  os << "configurationParameterMap: "<< value.getConfigurationParameterMap();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ShutdownFederationExecutionMessage
+std::ostream&
+operator<<(std::ostream& os, const ShutdownFederationExecutionMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ShutdownFederationExecutionMessage& value, ServerModel::Federation* federation)
+{
+  os << "ShutdownFederationExecutionMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType EraseFederationExecutionMessage
+std::ostream&
+operator<<(std::ostream& os, const EraseFederationExecutionMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const EraseFederationExecutionMessage& value, ServerModel::Federation* federation)
+{
+  os << "EraseFederationExecutionMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ReleaseFederationHandleMessage
+std::ostream&
+operator<<(std::ostream& os, const ReleaseFederationHandleMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ReleaseFederationHandleMessage& value, ServerModel::Federation* federation)
+{
+  os << "ReleaseFederationHandleMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType InsertModulesMessage
+std::ostream&
+operator<<(std::ostream& os, const InsertModulesMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  // StructField fOMModuleList (hidden)
+  //os << "fOMModuleList: " << value.getFOMModuleList();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const InsertModulesMessage& value, ServerModel::Federation* federation)
+{
+  os << "InsertModulesMessage { ";
+  // StructField federationHandle (hidden)
+  // StructField fOMModuleList (hidden)
+  os << " }";
+  return os;
+}
+
+// MessageDataType JoinFederationExecutionRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const JoinFederationExecutionRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationExecution: " << value.getFederationExecution();
+  os << ", ";
+  os << "federateType: " << value.getFederateType();
+  os << ", ";
+  os << "federateName: " << value.getFederateName();
+  os << ", ";
+  os << "fOMStringModuleList: " << value.getFOMStringModuleList();
+  os << ", ";
+  os << "configurationParameterMap: " << value.getConfigurationParameterMap();
+  os << ", ";
+  os << "isInternal: " << value.getIsInternal();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const JoinFederationExecutionRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "JoinFederationExecutionRequestMessage { ";
+  os << "federationExecution: "<< value.getFederationExecution();
+  os << ", ";
+  os << "federateType: "<< value.getFederateType();
+  os << ", ";
+  os << "federateName: "<< value.getFederateName();
+  os << ", ";
+  os << "fOMStringModuleList: "<< value.getFOMStringModuleList();
+  os << ", ";
+  os << "configurationParameterMap: "<< value.getConfigurationParameterMap();
+  os << ", ";
+  os << "isInternal: "<< value.getIsInternal();
+  os << " }";
+  return os;
+}
+
+// MessageDataType JoinFederationExecutionResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const JoinFederationExecutionResponseMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "joinFederationExecutionResponseType: " << value.getJoinFederationExecutionResponseType();
+  os << ", ";
+  os << "exceptionString: " << value.getExceptionString();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "federateType: " << value.getFederateType();
+  os << ", ";
+  os << "federateName: " << value.getFederateName();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const JoinFederationExecutionResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "JoinFederationExecutionResponseMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "joinFederationExecutionResponseType: "<< value.getJoinFederationExecutionResponseType();
+  os << ", ";
+  os << "exceptionString: "<< value.getExceptionString();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "federateType: "<< value.getFederateType();
+  os << ", ";
+  os << "federateName: "<< value.getFederateName();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ResignFederationExecutionLeafRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const ResignFederationExecutionLeafRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "resignAction: " << value.getResignAction();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ResignFederationExecutionLeafRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "ResignFederationExecutionLeafRequestMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "resignAction: "<< value.getResignAction();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ResignFederationExecutionRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const ResignFederationExecutionRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ResignFederationExecutionRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "ResignFederationExecutionRequestMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType JoinFederateNotifyMessage
+std::ostream&
+operator<<(std::ostream& os, const JoinFederateNotifyMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "federateType: " << value.getFederateType();
+  os << ", ";
+  os << "federateName: " << value.getFederateName();
+  os << ", ";
+  os << "isInternal: " << value.getIsInternal();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const JoinFederateNotifyMessage& value, ServerModel::Federation* federation)
+{
+  os << "JoinFederateNotifyMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "federateType: "<< value.getFederateType();
+  os << ", ";
+  os << "federateName: "<< value.getFederateName();
+  os << ", ";
+  os << "isInternal: "<< value.getIsInternal();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ResignFederateNotifyMessage
+std::ostream&
+operator<<(std::ostream& os, const ResignFederateNotifyMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ResignFederateNotifyMessage& value, ServerModel::Federation* federation)
+{
+  os << "ResignFederateNotifyMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ChangeAutomaticResignDirectiveMessage
+std::ostream&
+operator<<(std::ostream& os, const ChangeAutomaticResignDirectiveMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "resignAction: " << value.getResignAction();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ChangeAutomaticResignDirectiveMessage& value, ServerModel::Federation* federation)
+{
+  os << "ChangeAutomaticResignDirectiveMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "resignAction: "<< value.getResignAction();
+  os << " }";
+  return os;
+}
+
+// MessageDataType RegisterFederationSynchronizationPointMessage
+std::ostream&
+operator<<(std::ostream& os, const RegisterFederationSynchronizationPointMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "label: " << value.getLabel();
+  os << ", ";
+  os << "tag: " << value.getTag();
+  os << ", ";
+  os << "federateHandleVector: " << value.getFederateHandleVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointMessage& value, ServerModel::Federation* federation)
+{
+  os << "RegisterFederationSynchronizationPointMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "label: "<< value.getLabel();
+  os << ", ";
+  os << "tag: "<< value.getTag();
+  os << ", ";
+  os << "federateHandleVector: "<< value.getFederateHandleVector();
+  os << " }";
+  return os;
+}
+
+// MessageDataType RegisterFederationSynchronizationPointResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const RegisterFederationSynchronizationPointResponseMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "label: " << value.getLabel();
+  os << ", ";
+  os << "registerFederationSynchronizationPointResponseType: " << value.getRegisterFederationSynchronizationPointResponseType();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "RegisterFederationSynchronizationPointResponseMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "label: "<< value.getLabel();
+  os << ", ";
+  os << "registerFederationSynchronizationPointResponseType: "<< value.getRegisterFederationSynchronizationPointResponseType();
+  os << " }";
+  return os;
+}
+
+// MessageDataType AnnounceSynchronizationPointMessage
+std::ostream&
+operator<<(std::ostream& os, const AnnounceSynchronizationPointMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "label: " << value.getLabel();
+  os << ", ";
+  os << "tag: " << value.getTag();
+  os << ", ";
+  os << "addJoiningFederates: " << value.getAddJoiningFederates();
+  os << ", ";
+  os << "federateHandleVector: " << value.getFederateHandleVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const AnnounceSynchronizationPointMessage& value, ServerModel::Federation* federation)
+{
+  os << "AnnounceSynchronizationPointMessage { ";
+  // StructField federationHandle (hidden)
+  os << "label: "<< value.getLabel();
+  os << ", ";
+  os << "tag: "<< value.getTag();
+  os << ", ";
+  os << "addJoiningFederates: "<< value.getAddJoiningFederates();
+  os << ", ";
+  os << "federateHandleVector: "<< value.getFederateHandleVector();
+  os << " }";
+  return os;
+}
+
+// MessageDataType SynchronizationPointAchievedMessage
+std::ostream&
+operator<<(std::ostream& os, const SynchronizationPointAchievedMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "label: " << value.getLabel();
+  os << ", ";
+  os << "federateHandleBoolPairVector: " << value.getFederateHandleBoolPairVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const SynchronizationPointAchievedMessage& value, ServerModel::Federation* federation)
+{
+  os << "SynchronizationPointAchievedMessage { ";
+  // StructField federationHandle (hidden)
+  os << "label: "<< value.getLabel();
+  os << ", ";
+  os << "federateHandleBoolPairVector: "<< value.getFederateHandleBoolPairVector();
+  os << " }";
+  return os;
+}
+
+// MessageDataType FederationSynchronizedMessage
+std::ostream&
+operator<<(std::ostream& os, const FederationSynchronizedMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "label: " << value.getLabel();
+  os << ", ";
+  os << "federateHandleBoolPairVector: " << value.getFederateHandleBoolPairVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FederationSynchronizedMessage& value, ServerModel::Federation* federation)
+{
+  os << "FederationSynchronizedMessage { ";
+  // StructField federationHandle (hidden)
+  os << "label: "<< value.getLabel();
+  os << ", ";
+  os << "federateHandleBoolPairVector: "<< value.getFederateHandleBoolPairVector();
+  os << " }";
+  return os;
+}
+
+// MessageDataType EnableTimeRegulationRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const EnableTimeRegulationRequestMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "timeStamp: " << value.getTimeStamp();
+  os << ", ";
+  os << "commitId: " << value.getCommitId();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const EnableTimeRegulationRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "EnableTimeRegulationRequestMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "timeStamp: "<< value.getTimeStamp();
+  os << ", ";
+  os << "commitId: "<< value.getCommitId();
+  os << " }";
+  return os;
+}
+
+// MessageDataType EnableTimeRegulationResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const EnableTimeRegulationResponseMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "respondingFederateHandle: " << value.getRespondingFederateHandle();
+  os << ", ";
+  os << "timeStampValid: " << value.getTimeStampValid();
+  os << ", ";
+  os << "timeStamp: " << value.getTimeStamp();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const EnableTimeRegulationResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "EnableTimeRegulationResponseMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "respondingFederateHandle: "<< value.getRespondingFederateHandle();
+  os << ", ";
+  os << "timeStampValid: "<< value.getTimeStampValid();
+  os << ", ";
+  os << "timeStamp: "<< value.getTimeStamp();
+  os << " }";
+  return os;
+}
+
+// MessageDataType DisableTimeRegulationRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const DisableTimeRegulationRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const DisableTimeRegulationRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "DisableTimeRegulationRequestMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType EnableTimeConstrainedNotifyMessage
+std::ostream&
+operator<<(std::ostream& os, const EnableTimeConstrainedNotifyMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const EnableTimeConstrainedNotifyMessage& value, ServerModel::Federation* federation)
+{
+  os << "EnableTimeConstrainedNotifyMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType DisableTimeConstrainedNotifyMessage
+std::ostream&
+operator<<(std::ostream& os, const DisableTimeConstrainedNotifyMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const DisableTimeConstrainedNotifyMessage& value, ServerModel::Federation* federation)
+{
+  os << "DisableTimeConstrainedNotifyMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType CommitLowerBoundTimeStampMessage
+std::ostream&
+operator<<(std::ostream& os, const CommitLowerBoundTimeStampMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  // StructField federateHandle (hidden)
+  //os << "federateHandle: " << value.getFederateHandle();
+  //os << ", ";
+  os << "timeStamp: " << value.getTimeStamp();
+  os << ", ";
+  os << "commitType: " << value.getCommitType();
+  os << ", ";
+  os << "commitId: " << value.getCommitId();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const CommitLowerBoundTimeStampMessage& value, ServerModel::Federation* federation)
+{
+  os << "CommitLowerBoundTimeStampMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  // StructField federateHandle (hidden)
+  os << "timeStamp: "<< value.getTimeStamp();
+  os << ", ";
+  os << "commitType: "<< value.getCommitType();
+  os << ", ";
+  os << "commitId: "<< value.getCommitId();
+  os << " }";
+  return os;
+}
+
+// MessageDataType CommitLowerBoundTimeStampResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const CommitLowerBoundTimeStampResponseMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "sendingFederateHandle: " << value.getSendingFederateHandle();
+  os << ", ";
+  os << "commitId: " << value.getCommitId();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const CommitLowerBoundTimeStampResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "CommitLowerBoundTimeStampResponseMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "sendingFederateHandle: "<< value.getSendingFederateHandle();
+  os << ", ";
+  os << "commitId: "<< value.getCommitId();
+  os << " }";
+  return os;
+}
+
+// MessageDataType LockedByNextMessageRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const LockedByNextMessageRequestMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "sendingFederateHandle: " << value.getSendingFederateHandle();
+  os << ", ";
+  os << "lockedByNextMessage: " << value.getLockedByNextMessage();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const LockedByNextMessageRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "LockedByNextMessageRequestMessage { ";
+  // StructField federationHandle (hidden)
+  os << "sendingFederateHandle: "<< value.getSendingFederateHandle();
+  os << ", ";
+  os << "lockedByNextMessage: "<< value.getLockedByNextMessage();
+  os << " }";
+  return os;
+}
+
+// MessageDataType TimeConstrainedEnabledMessage
+std::ostream&
+operator<<(std::ostream& os, const TimeConstrainedEnabledMessage& value)
+{
+  os << "{ ";
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const TimeConstrainedEnabledMessage& value, ServerModel::Federation* federation)
+{
+  os << "TimeConstrainedEnabledMessage { ";
+  os << " }";
+  return os;
+}
+
+// MessageDataType TimeRegulationEnabledMessage
+std::ostream&
+operator<<(std::ostream& os, const TimeRegulationEnabledMessage& value)
+{
+  os << "{ ";
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const TimeRegulationEnabledMessage& value, ServerModel::Federation* federation)
+{
+  os << "TimeRegulationEnabledMessage { ";
+  os << " }";
+  return os;
+}
+
+// MessageDataType TimeAdvanceGrantedMessage
+std::ostream&
+operator<<(std::ostream& os, const TimeAdvanceGrantedMessage& value)
+{
+  os << "{ ";
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const TimeAdvanceGrantedMessage& value, ServerModel::Federation* federation)
+{
+  os << "TimeAdvanceGrantedMessage { ";
+  os << " }";
+  return os;
+}
+
+// MessageDataType InsertRegionMessage
+std::ostream&
+operator<<(std::ostream& os, const InsertRegionMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "regionHandleDimensionHandleSetPairVector: " << value.getRegionHandleDimensionHandleSetPairVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const InsertRegionMessage& value, ServerModel::Federation* federation)
+{
+  os << "InsertRegionMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "regionHandleDimensionHandleSetPairVector: "<< value.getRegionHandleDimensionHandleSetPairVector();
+  os << " }";
+  return os;
+}
+
+// MessageDataType CommitRegionMessage
+std::ostream&
+operator<<(std::ostream& os, const CommitRegionMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "regionHandleRegionValuePairVector: " << value.getRegionHandleRegionValuePairVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const CommitRegionMessage& value, ServerModel::Federation* federation)
+{
+  os << "CommitRegionMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "regionHandleRegionValuePairVector: "<< value.getRegionHandleRegionValuePairVector();
+  os << " }";
+  return os;
+}
+
+// MessageDataType EraseRegionMessage
+std::ostream&
+operator<<(std::ostream& os, const EraseRegionMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "regionHandleVector: " << value.getRegionHandleVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const EraseRegionMessage& value, ServerModel::Federation* federation)
+{
+  os << "EraseRegionMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "regionHandleVector: "<< value.getRegionHandleVector();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ChangeInteractionClassPublicationMessage
+std::ostream&
+operator<<(std::ostream& os, const ChangeInteractionClassPublicationMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "publicationType: " << value.getPublicationType();
+  os << ", ";
+  os << "interactionClassHandle: " << value.getInteractionClassHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ChangeInteractionClassPublicationMessage& value, ServerModel::Federation* federation)
+{
+  os << "ChangeInteractionClassPublicationMessage { ";
+  // StructField federationHandle (hidden)
+  os << "publicationType: "<< value.getPublicationType();
+  os << ", ";
+  os << "interactionClassHandle: "; prettyprint(os, value.getInteractionClassHandle(), federation);//InteractionClassHandle parent=Federation
+  os << " }";
+  return os;
+}
+
+// MessageDataType ChangeObjectClassPublicationMessage
+std::ostream&
+operator<<(std::ostream& os, const ChangeObjectClassPublicationMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "publicationType: " << value.getPublicationType();
+  os << ", ";
+  os << "objectClassHandle: " << value.getObjectClassHandle();
+  os << ", ";
+  os << "attributeHandles: " << value.getAttributeHandles();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ChangeObjectClassPublicationMessage& value, ServerModel::Federation* federation)
+{
+  os << "ChangeObjectClassPublicationMessage { ";
+  // StructField federationHandle (hidden)
+  os << "publicationType: "<< value.getPublicationType();
+  os << ", ";
+  os << "objectClassHandle: "; prettyprint(os, value.getObjectClassHandle(), federation);//ObjectClassHandle parent=Federation
+  os << ", ";
+  os << "attributeHandles: "<< value.getAttributeHandles();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ChangeInteractionClassSubscriptionMessage
+std::ostream&
+operator<<(std::ostream& os, const ChangeInteractionClassSubscriptionMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "subscriptionType: " << value.getSubscriptionType();
+  os << ", ";
+  os << "interactionClassHandle: " << value.getInteractionClassHandle();
+  os << ", ";
+  os << "parameterFilterValues: " << value.getParameterFilterValues();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ChangeInteractionClassSubscriptionMessage& value, ServerModel::Federation* federation)
+{
+  ServerModel::InteractionClass* interactionClass = federation->getInteractionClass(value.getInteractionClassHandle());
+  os << "ChangeInteractionClassSubscriptionMessage { ";
+  // StructField federationHandle (hidden)
+  os << "subscriptionType: "<< value.getSubscriptionType();
+  os << ", ";
+  os << "interactionClassHandle: "; prettyprint(os, value.getInteractionClassHandle(), federation);//InteractionClassHandle parent=Federation
+  os << ", ";
+  os << "parameterFilterValues: "; prettyprint(os, value.getParameterFilterValues(), interactionClass);//ParameterValueVector parent=InteractionClass
+  os << " }";
+  return os;
+}
+
+// MessageDataType ChangeObjectClassSubscriptionMessage
+std::ostream&
+operator<<(std::ostream& os, const ChangeObjectClassSubscriptionMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "subscriptionType: " << value.getSubscriptionType();
+  os << ", ";
+  os << "objectClassHandle: " << value.getObjectClassHandle();
+  os << ", ";
+  os << "attributeHandles: " << value.getAttributeHandles();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ChangeObjectClassSubscriptionMessage& value, ServerModel::Federation* federation)
+{
+  os << "ChangeObjectClassSubscriptionMessage { ";
+  // StructField federationHandle (hidden)
+  os << "subscriptionType: "<< value.getSubscriptionType();
+  os << ", ";
+  os << "objectClassHandle: "; prettyprint(os, value.getObjectClassHandle(), federation);//ObjectClassHandle parent=Federation
+  os << ", ";
+  os << "attributeHandles: "<< value.getAttributeHandles();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ChangeObjectInstanceSubscriptionMessage
+std::ostream&
+operator<<(std::ostream& os, const ChangeObjectInstanceSubscriptionMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "subscriptionType: " << value.getSubscriptionType();
+  os << ", ";
+  os << "objectClassHandle: " << value.getObjectClassHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ChangeObjectInstanceSubscriptionMessage& value, ServerModel::Federation* federation)
+{
+  os << "ChangeObjectInstanceSubscriptionMessage { ";
+  // StructField federationHandle (hidden)
+  os << "subscriptionType: "<< value.getSubscriptionType();
+  os << ", ";
+  os << "objectClassHandle: "; prettyprint(os, value.getObjectClassHandle(), federation);//ObjectClassHandle parent=Federation
+  os << ", ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << " }";
+  return os;
+}
+
+// MessageDataType RegistrationForObjectClassMessage
+std::ostream&
+operator<<(std::ostream& os, const RegistrationForObjectClassMessage& value)
+{
+  os << "{ ";
+  os << "objectClassHandle: " << value.getObjectClassHandle();
+  os << ", ";
+  os << "start: " << value.getStart();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RegistrationForObjectClassMessage& value, ServerModel::Federation* federation)
+{
+  os << "RegistrationForObjectClassMessage { ";
+  os << "objectClassHandle: "; prettyprint(os, value.getObjectClassHandle(), federation);//ObjectClassHandle parent=Federation
+  os << ", ";
+  os << "start: "<< value.getStart();
+  os << " }";
+  return os;
+}
+
+// MessageDataType AttributesInScopeMessage
+std::ostream&
+operator<<(std::ostream& os, const AttributesInScopeMessage& value)
+{
+  os << "{ ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandles: " << value.getAttributeHandles();
+  os << ", ";
+  os << "inScope: " << value.getInScope();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const AttributesInScopeMessage& value, ServerModel::Federation* federation)
+{
+  os << "AttributesInScopeMessage { ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  os << "attributeHandles: "<< value.getAttributeHandles();
+  os << ", ";
+  os << "inScope: "<< value.getInScope();
+  os << " }";
+  return os;
+}
+
+// MessageDataType TurnUpdatesOnForInstanceMessage
+std::ostream&
+operator<<(std::ostream& os, const TurnUpdatesOnForInstanceMessage& value)
+{
+  os << "{ ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandles: " << value.getAttributeHandles();
+  os << ", ";
+  os << "updateRate: " << value.getUpdateRate();
+  os << ", ";
+  os << "on: " << value.getOn();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const TurnUpdatesOnForInstanceMessage& value, ServerModel::Federation* federation)
+{
+  os << "TurnUpdatesOnForInstanceMessage { ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  os << "attributeHandles: "<< value.getAttributeHandles();
+  os << ", ";
+  os << "updateRate: "<< value.getUpdateRate();
+  os << ", ";
+  os << "on: "<< value.getOn();
+  os << " }";
+  return os;
+}
+
+// MessageDataType TurnInteractionsOnMessage
+std::ostream&
+operator<<(std::ostream& os, const TurnInteractionsOnMessage& value)
+{
+  os << "{ ";
+  os << "interactionClassHandle: " << value.getInteractionClassHandle();
+  os << ", ";
+  os << "on: " << value.getOn();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const TurnInteractionsOnMessage& value, ServerModel::Federation* federation)
+{
+  os << "TurnInteractionsOnMessage { ";
+  os << "interactionClassHandle: "; prettyprint(os, value.getInteractionClassHandle(), federation);//InteractionClassHandle parent=Federation
+  os << ", ";
+  os << "on: "<< value.getOn();
+  os << " }";
+  return os;
+}
+
+// MessageDataType InteractionMessage
+std::ostream&
+operator<<(std::ostream& os, const InteractionMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "interactionClassHandle: " << value.getInteractionClassHandle();
+  os << ", ";
+  // StructField transportationType (hidden)
+  //os << "transportationType: " << value.getTransportationType();
+  //os << ", ";
+  // StructField tag (hidden)
+  //os << "tag: " << value.getTag();
+  //os << ", ";
+  os << "parameterValues: " << value.getParameterValues();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const InteractionMessage& value, ServerModel::Federation* federation)
+{
+  ServerModel::InteractionClass* interactionClass = federation->getInteractionClass(value.getInteractionClassHandle());
+  os << "InteractionMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "interactionClassHandle: "; prettyprint(os, value.getInteractionClassHandle(), federation);//InteractionClassHandle parent=Federation
+  os << ", ";
+  // StructField transportationType (hidden)
+  // StructField tag (hidden)
+  os << "parameterValues: "; prettyprint(os, value.getParameterValues(), interactionClass);//ParameterValueVector parent=InteractionClass
+  os << " }";
+  return os;
+}
+
+// MessageDataType TimeStampedInteractionMessage
+std::ostream&
+operator<<(std::ostream& os, const TimeStampedInteractionMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "interactionClassHandle: " << value.getInteractionClassHandle();
+  os << ", ";
+  os << "orderType: " << value.getOrderType();
+  os << ", ";
+  // StructField transportationType (hidden)
+  //os << "transportationType: " << value.getTransportationType();
+  //os << ", ";
+  // StructField tag (hidden)
+  //os << "tag: " << value.getTag();
+  //os << ", ";
+  os << "timeStamp: " << value.getTimeStamp();
+  os << ", ";
+  // StructField messageRetractionHandle (hidden)
+  //os << "messageRetractionHandle: " << value.getMessageRetractionHandle();
+  //os << ", ";
+  os << "parameterValues: " << value.getParameterValues();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const TimeStampedInteractionMessage& value, ServerModel::Federation* federation)
+{
+  ServerModel::InteractionClass* interactionClass = federation->getInteractionClass(value.getInteractionClassHandle());
+  os << "TimeStampedInteractionMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "interactionClassHandle: "; prettyprint(os, value.getInteractionClassHandle(), federation);//InteractionClassHandle parent=Federation
+  os << ", ";
+  os << "orderType: "<< value.getOrderType();
+  os << ", ";
+  // StructField transportationType (hidden)
+  // StructField tag (hidden)
+  os << "timeStamp: "<< value.getTimeStamp();
+  os << ", ";
+  // StructField messageRetractionHandle (hidden)
+  os << "parameterValues: "; prettyprint(os, value.getParameterValues(), interactionClass);//ParameterValueVector parent=InteractionClass
+  os << " }";
+  return os;
+}
+
+// MessageDataType ObjectInstanceHandlesRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const ObjectInstanceHandlesRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "count: " << value.getCount();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ObjectInstanceHandlesRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "ObjectInstanceHandlesRequestMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "count: "<< value.getCount();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ObjectInstanceHandlesResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const ObjectInstanceHandlesResponseMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  // StructField objectInstanceHandleNamePairVector (hidden)
+  //os << "objectInstanceHandleNamePairVector: " << value.getObjectInstanceHandleNamePairVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ObjectInstanceHandlesResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "ObjectInstanceHandlesResponseMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  // StructField objectInstanceHandleNamePairVector (hidden)
+  os << " }";
+  return os;
+}
+
+// MessageDataType ReleaseMultipleObjectInstanceNameHandlePairsMessage
+std::ostream&
+operator<<(std::ostream& os, const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandleVector: " << value.getObjectInstanceHandleVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value, ServerModel::Federation* federation)
+{
+  os << "ReleaseMultipleObjectInstanceNameHandlePairsMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandleVector: "; prettyprint(os, value.getObjectInstanceHandleVector(), federation);//ObjectInstanceHandleVector parent=Federation
+  os << " }";
+  return os;
+}
+
+// MessageDataType ReserveObjectInstanceNameRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const ReserveObjectInstanceNameRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "isInternal: " << value.getIsInternal();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ReserveObjectInstanceNameRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "ReserveObjectInstanceNameRequestMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "isInternal: "<< value.getIsInternal();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ReserveObjectInstanceNameResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const ReserveObjectInstanceNameResponseMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandleNamePair: " << value.getObjectInstanceHandleNamePair();
+  os << ", ";
+  os << "success: " << value.getSuccess();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ReserveObjectInstanceNameResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "ReserveObjectInstanceNameResponseMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandleNamePair: "<< value.getObjectInstanceHandleNamePair();
+  os << ", ";
+  os << "success: "<< value.getSuccess();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ReserveMultipleObjectInstanceNameRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const ReserveMultipleObjectInstanceNameRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "nameList: " << value.getNameList();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ReserveMultipleObjectInstanceNameRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "ReserveMultipleObjectInstanceNameRequestMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "nameList: "<< value.getNameList();
+  os << " }";
+  return os;
+}
+
+// MessageDataType ReserveMultipleObjectInstanceNameResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const ReserveMultipleObjectInstanceNameResponseMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  // StructField objectInstanceHandleNamePairVector (hidden)
+  //os << "objectInstanceHandleNamePairVector: " << value.getObjectInstanceHandleNamePairVector();
+  //os << ", ";
+  os << "success: " << value.getSuccess();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ReserveMultipleObjectInstanceNameResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "ReserveMultipleObjectInstanceNameResponseMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  // StructField objectInstanceHandleNamePairVector (hidden)
+  os << "success: "<< value.getSuccess();
+  os << " }";
+  return os;
+}
+
+// MessageDataType InsertObjectInstanceMessage
+std::ostream&
+operator<<(std::ostream& os, const InsertObjectInstanceMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "objectClassHandle: " << value.getObjectClassHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "name: " << value.getName();
+  os << ", ";
+  // StructField attributeStateVector (hidden)
+  //os << "attributeStateVector: " << value.getAttributeStateVector();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const InsertObjectInstanceMessage& value, ServerModel::Federation* federation)
+{
+  os << "InsertObjectInstanceMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "objectClassHandle: "; prettyprint(os, value.getObjectClassHandle(), federation);//ObjectClassHandle parent=Federation
+  os << ", ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  // StructField attributeStateVector (hidden)
+  os << " }";
+  return os;
+}
+
+// MessageDataType DeleteObjectInstanceMessage
+std::ostream&
+operator<<(std::ostream& os, const DeleteObjectInstanceMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "tag: " << value.getTag();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const DeleteObjectInstanceMessage& value, ServerModel::Federation* federation)
+{
+  os << "DeleteObjectInstanceMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  os << "tag: "<< value.getTag();
+  os << " }";
+  return os;
+}
+
+// MessageDataType TimeStampedDeleteObjectInstanceMessage
+std::ostream&
+operator<<(std::ostream& os, const TimeStampedDeleteObjectInstanceMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "orderType: " << value.getOrderType();
+  os << ", ";
+  os << "tag: " << value.getTag();
+  os << ", ";
+  os << "timeStamp: " << value.getTimeStamp();
+  os << ", ";
+  os << "messageRetractionHandle: " << value.getMessageRetractionHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const TimeStampedDeleteObjectInstanceMessage& value, ServerModel::Federation* federation)
+{
+  os << "TimeStampedDeleteObjectInstanceMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  os << "orderType: "<< value.getOrderType();
+  os << ", ";
+  os << "tag: "<< value.getTag();
+  os << ", ";
+  os << "timeStamp: "<< value.getTimeStamp();
+  os << ", ";
+  os << "messageRetractionHandle: "<< value.getMessageRetractionHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType AttributeUpdateMessage
+std::ostream&
+operator<<(std::ostream& os, const AttributeUpdateMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  // StructField tag (hidden)
+  //os << "tag: " << value.getTag();
+  //os << ", ";
+  // StructField transportationType (hidden)
+  //os << "transportationType: " << value.getTransportationType();
+  //os << ", ";
+  // StructField attributeValues (hidden)
+  //os << "attributeValues: " << value.getAttributeValues();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const AttributeUpdateMessage& value, ServerModel::Federation* federation)
+{
+  os << "AttributeUpdateMessage { ";
+  // StructField federationHandle (hidden)
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  // StructField tag (hidden)
+  // StructField transportationType (hidden)
+  // StructField attributeValues (hidden)
+  os << " }";
+  return os;
+}
+
+// MessageDataType TimeStampedAttributeUpdateMessage
+std::ostream&
+operator<<(std::ostream& os, const TimeStampedAttributeUpdateMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: " << value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "tag: " << value.getTag();
+  os << ", ";
+  os << "timeStamp: " << value.getTimeStamp();
+  os << ", ";
+  os << "messageRetractionHandle: " << value.getMessageRetractionHandle();
+  os << ", ";
+  os << "orderType: " << value.getOrderType();
+  os << ", ";
+  os << "transportationType: " << value.getTransportationType();
+  os << ", ";
+  os << "attributeValues: " << value.getAttributeValues();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const TimeStampedAttributeUpdateMessage& value, ServerModel::Federation* federation)
+{
+  os << "TimeStampedAttributeUpdateMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "federateHandle: "<< value.getFederateHandle();
+  os << ", ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  os << "tag: "<< value.getTag();
+  os << ", ";
+  os << "timeStamp: "<< value.getTimeStamp();
+  os << ", ";
+  os << "messageRetractionHandle: "<< value.getMessageRetractionHandle();
+  os << ", ";
+  os << "orderType: "<< value.getOrderType();
+  os << ", ";
+  os << "transportationType: "<< value.getTransportationType();
+  os << ", ";
+  os << "attributeValues: "<< value.getAttributeValues();
+  os << " }";
+  return os;
+}
+
+// MessageDataType RequestAttributeUpdateMessage
+std::ostream&
+operator<<(std::ostream& os, const RequestAttributeUpdateMessage& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  // StructField attributeHandles (hidden)
+  //os << "attributeHandles: " << value.getAttributeHandles();
+  //os << ", ";
+  os << "tag: " << value.getTag();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RequestAttributeUpdateMessage& value, ServerModel::Federation* federation)
+{
+  os << "RequestAttributeUpdateMessage { ";
+  // StructField federationHandle (hidden)
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  // StructField attributeHandles (hidden)
+  os << "tag: "<< value.getTag();
+  os << " }";
+  return os;
+}
+
+// MessageDataType RequestClassAttributeUpdateMessage
+std::ostream&
+operator<<(std::ostream& os, const RequestClassAttributeUpdateMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "objectClassHandle: " << value.getObjectClassHandle();
+  os << ", ";
+  os << "attributeHandles: " << value.getAttributeHandles();
+  os << ", ";
+  os << "tag: " << value.getTag();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const RequestClassAttributeUpdateMessage& value, ServerModel::Federation* federation)
+{
+  os << "RequestClassAttributeUpdateMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "objectClassHandle: "; prettyprint(os, value.getObjectClassHandle(), federation);//ObjectClassHandle parent=Federation
+  os << ", ";
+  os << "attributeHandles: "<< value.getAttributeHandles();
+  os << ", ";
+  os << "tag: "<< value.getTag();
+  os << " }";
+  return os;
+}
+
+// MessageDataType QueryAttributeOwnershipRequestMessage
+std::ostream&
+operator<<(std::ostream& os, const QueryAttributeOwnershipRequestMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandle: " << value.getAttributeHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const QueryAttributeOwnershipRequestMessage& value, ServerModel::Federation* federation)
+{
+  os << "QueryAttributeOwnershipRequestMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  os << "attributeHandle: "<< value.getAttributeHandle();
+  os << " }";
+  return os;
+}
+
+// MessageDataType QueryAttributeOwnershipResponseMessage
+std::ostream&
+operator<<(std::ostream& os, const QueryAttributeOwnershipResponseMessage& value)
+{
+  os << "{ ";
+  os << "federationHandle: " << value.getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
+  os << ", ";
+  os << "attributeHandle: " << value.getAttributeHandle();
+  os << ", ";
+  os << "owner: " << value.getOwner();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const QueryAttributeOwnershipResponseMessage& value, ServerModel::Federation* federation)
+{
+  os << "QueryAttributeOwnershipResponseMessage { ";
+  os << "federationHandle: "<< value.getFederationHandle();
+  os << ", ";
+  os << "objectInstanceHandle: "; prettyprint(os, value.getObjectInstanceHandle(), federation);//ObjectInstanceHandle parent=Federation
+  os << ", ";
+  os << "attributeHandle: "<< value.getAttributeHandle();
+  os << ", ";
+  os << "owner: "<< value.getOwner();
+  os << " }";
+  return os;
 }
 
 } // namespace OpenRTI

@@ -675,12 +675,13 @@ class NodeConnect;
 class Federation;
 class FederationConnect;
 
-class OPENRTI_LOCAL Federate : public HandleStringEntity<Federate, FederateHandle>, public IntrusiveList<Federate, 0>::Hook, public IntrusiveList<Federate, 1>::Hook {
+class OPENRTI_LOCAL Federate : public HandleStringEntity<Federate, FederateHandle>, public IntrusiveList<Federate, 0>::Hook, public IntrusiveList<Federate, 1>::Hook, public IntrusiveList<Federate, 2>::Hook {
 public:
   typedef HandleStringEntity<Federate, FederateHandle>::HandleMap HandleMap;
   typedef HandleStringEntity<Federate, FederateHandle>::StringMap NameMap;
   typedef IntrusiveList<Federate, 0> FirstList; // Used to access federates from the FederationConnect
-  typedef IntrusiveList<Federate, 1> SecondList; // Used to access time regulating federates from the FederationConnect
+  typedef IntrusiveList<Federate, 1> TimeRegulatingList; // Used to access time regulating federates from the FederationConnect
+  typedef IntrusiveList<Federate, 2> TimeConstrainedList; // Used to access time constrained federates from the FederationConnect
 
   Federate(Federation& federation);
   ~Federate();
@@ -723,6 +724,7 @@ public:
   { return _regionHandleRegionMap; }
 
   bool getIsTimeRegulating() const;
+  bool getIsTimeConstrained() const;
 
   const VariableLengthData& getTimeAdvanceTimeStamp() const
   { return _timeAdvanceTimeStamp; }
@@ -749,8 +751,6 @@ public:
   bool getIsInternal() const { return _isInternal; }
   void send(const SharedPtr<const AbstractMessage>& message);
 
-  bool getIsTimeConstrained() const { return _isTimeConstrained; }
-  void setIsTimeConstrained(bool value) { _isTimeConstrained = value; }
 private:
   Federate(const Federate&) = delete;
   Federate& operator=(const Federate&) = delete;
@@ -768,7 +768,6 @@ private:
   VariableLengthData _nextMessageTimeStamp;
   Unsigned _commitId;
   bool _isInternal;
-  bool _isTimeConstrained;
 };
 
 ////////////////////////////////////////////////////////////
@@ -1134,6 +1133,7 @@ public:
   ParameterDefinition* getParameterDefinition(const ParameterHandle& parameterHandle);
   ParameterDefinition::HandleMap& getParameterHandleParameterMap()
   { return _parameterHandleParameterMap; }
+  ParameterDefinition* findParameterDefinition(const ParameterHandle& parameterHandle);
 
   void insertClassParameterFor(ParameterDefinition& parameterDefinition);
   ClassParameter* getClassParameter(const ParameterHandle& parameterHandle);
@@ -1606,11 +1606,13 @@ class Federation;
 class OPENRTI_LOCAL FederationConnect :
     public IntrusiveUnorderedMap<ConnectHandle, FederationConnect>::Hook,
     public IntrusiveList<FederationConnect, 0>::Hook,
-    public IntrusiveList<FederationConnect, 1>::Hook {
+    public IntrusiveList<FederationConnect, 1>::Hook,
+    public IntrusiveList<FederationConnect, 2>::Hook {
 public:
   typedef IntrusiveUnorderedMap<ConnectHandle, FederationConnect> HandleMap;
   typedef IntrusiveList<FederationConnect, 0> FirstList; /// Used to access FederationConnects from a NodeConnect
-  typedef IntrusiveList<FederationConnect, 1> SecondList; /// Used to access time regulating connects from the federation
+  typedef IntrusiveList<FederationConnect, 1> TimeRegulatingList; /// Used to access time regulating connects from the federation
+  typedef IntrusiveList<FederationConnect, 2> TimeConstrainedList; /// Used to access time constrained connects from the federation
 
   FederationConnect(Federation& federation, NodeConnect& nodeConnect);
   ~FederationConnect();
@@ -1636,10 +1638,6 @@ public:
   bool getActive() const;
   void setActive(bool active);
 
-  /// If the federates behind this connect are allowed to get time regulating
-  bool getPermitTimeRegulation() const;
-  void setPermitTimeRegulation(bool permitTimeRegulation);
-
   /// The federates hidden behind this connect
   Federate::FirstList& getFederateList()
   { return _federateList; }
@@ -1660,11 +1658,17 @@ public:
   }
 
   /// The time regulating federates hidden behind this connect
-  Federate::SecondList& getTimeRegulatingFederateList()
+  Federate::TimeRegulatingList& getTimeRegulatingFederateList()
   { return _timeRegulatingFederateList; }
   bool getIsTimeRegulating() const;
   void insertTimeRegulating(Federate& federate);
   void eraseTimeRegulating(Federate& federate);
+
+  Federate::TimeConstrainedList& getTimeConstrainedFederateList()
+  { return _timeConstrainedFederateList; }
+  bool getIsTimeConstrained() const;
+  void insertTimeConstrained(Federate& federate);
+  void eraseTimeConstrained(Federate& federate);
 
   /// Object instance handle name pairs referenced by this connect
   void insert(ObjectInstanceConnect& objectInstanceConnect)
@@ -1687,12 +1691,11 @@ private:
 
   bool _active;
 
-  bool _permitTimeRegulation;
-
   /// Federates behind this connect
   Federate::FirstList _federateList;
   /// Time regulating federates behind this connect
-  Federate::SecondList _timeRegulatingFederateList;
+  Federate::TimeRegulatingList _timeRegulatingFederateList;
+  Federate::TimeConstrainedList _timeConstrainedFederateList;
 
   // List of object instance handle/name references at this connect.
   ObjectInstanceConnect::FirstList _objectInstanceConnectList;
@@ -1835,8 +1838,13 @@ public:
 
   void insertTimeRegulating(Federate& federate);
   void eraseTimeRegulating(Federate& federate);
-  FederationConnect::SecondList& getTimeRegulatingFederationConnectList()
+  FederationConnect::TimeRegulatingList& getTimeRegulatingFederationConnectList()
   { return _timeRegulatingFederationConnectList; }
+
+  void insertTimeConstrained(Federate& federate);
+  void eraseTimeConstrained(Federate& federate);
+  FederationConnect::TimeConstrainedList& getTimeConstrainedFederationConnectList()
+  { return _timeConstrainedFederationConnectList; }
 
   /// FIXME simplify region communication, only commit and erase is needed.
   Region* getOrCreateRegion(const RegionHandle& regionHandle);
@@ -1932,7 +1940,8 @@ private:
   HandleAllocator<FederateHandle> _federateHandleAllocator;
 
   // Links the FederationConnects that have time regulating federates
-  FederationConnect::SecondList _timeRegulatingFederationConnectList;
+  FederationConnect::TimeRegulatingList _timeRegulatingFederationConnectList;
+  FederationConnect::TimeConstrainedList _timeConstrainedFederationConnectList;
 
   ObjectInstance::HandleMap _objectInstanceHandleObjectInstanceMap;
   ObjectInstance::NameMap _objectInstanceNameObjectInstanceMap;
