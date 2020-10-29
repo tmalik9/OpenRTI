@@ -120,7 +120,6 @@ NetworkServer::setUpFromConfig(std::istream& stream)
   if (contentHandler->isLogToConsoleSet()) LogStream::EnableLogToConsole(contentHandler->getLogToConsole());
 
   getServerNode().getServerOptions()._preferCompression = contentHandler->getEnableZLibCompression();
-  getServerNode().getServerOptions()._permitTimeRegulation = contentHandler->getPermitTimeRegulation();
 
   if (!contentHandler->getParentServerUrl().empty()) {
     URL url = URL::fromUrl(contentHandler->getParentServerUrl());

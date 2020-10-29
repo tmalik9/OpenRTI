@@ -341,7 +341,6 @@ Federate::Federate(Federation& federation)
   , _federationConnect(0)
   , _commitId()
   , _isInternal(false)
-  , _isTimeConstrained(false)
 {
 }
 
@@ -399,8 +398,13 @@ Federate::getRegion(const LocalRegionHandle& regionHandle)
 bool
 Federate::getIsTimeRegulating() const
 {
-  // OpenRTIAssert(!SecondList::Hook::is_linked() || _federationConnect->_permitTimeRegulation);
-  return SecondList::Hook::is_linked();
+  return TimeRegulatingList::Hook::is_linked();
+}
+
+bool
+Federate::getIsTimeConstrained() const
+{
+  return TimeConstrainedList::Hook::is_linked();
 }
 
 void
@@ -852,6 +856,13 @@ bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectH
     else
     {
       result = AddParameterFilterValues(existingFilterValues, parameterFilters);
+      for (auto& entry : _parameterFiltersByConnect)
+      {
+        if (entry.first != where->first)
+        {
+          entry.second.SetTupleSize(_parameterFilterKeyPrototype.size());
+        }
+      }
     }
   }
   return result;
@@ -1022,6 +1033,20 @@ InteractionClass::getParameterDefinition(const ParameterHandle& parameterHandle)
   if (i == _parameterHandleParameterMap.end())
     return 0;
   return i.get();
+}
+
+ParameterDefinition*
+InteractionClass::findParameterDefinition(const ParameterHandle& parameterHandle)
+{
+  ParameterDefinition* definition = nullptr;
+  InteractionClass* interactionClass = this;
+  definition = interactionClass->getParameterDefinition(parameterHandle);
+  while (definition == nullptr && interactionClass->getParentInteractionClass() != nullptr)
+  {
+    interactionClass = interactionClass->getParentInteractionClass();
+    definition = interactionClass->getParameterDefinition(parameterHandle);
+  }
+  return definition;
 }
 
 void
@@ -1619,8 +1644,7 @@ Module::insertAttributes(ObjectClass& objectClass)
 FederationConnect::FederationConnect(Federation& federation, NodeConnect& nodeConnect) :
   _federation(federation),
   _nodeConnect(nodeConnect),
-  _active(false),
-  _permitTimeRegulation(true)
+  _active(false)
 {
   HandleMap::Hook::setKey(nodeConnect.getConnectHandle());
 }
@@ -1630,6 +1654,7 @@ FederationConnect::~FederationConnect()
   /// FIXME
   _objectInstanceConnectList.clear();
   _timeRegulatingFederateList.unlink();
+  _timeConstrainedFederateList.unlink();
 }
 
 const FederationHandle&
@@ -1670,38 +1695,52 @@ FederationConnect::setActive(bool active)
 }
 
 bool
-FederationConnect::getPermitTimeRegulation() const
-{
-  if (_permitTimeRegulation)
-    return true;
-  return getIsParentConnect();
-}
-
-void
-FederationConnect::setPermitTimeRegulation(bool permitTimeRegulation)
-{
-  _permitTimeRegulation = permitTimeRegulation;
-}
-
-bool
 FederationConnect::getIsTimeRegulating() const
 {
-  OpenRTIAssert(_timeRegulatingFederateList.empty() != SecondList::Hook::is_linked());
-  OpenRTIAssert(!SecondList::Hook::is_linked() || _permitTimeRegulation);
-  return SecondList::Hook::is_linked();
+  OpenRTIAssert(_timeRegulatingFederateList.empty() != TimeRegulatingList::Hook::is_linked());
+  return TimeRegulatingList::Hook::is_linked();
 }
 
 void
 FederationConnect::insertTimeRegulating(Federate& federate)
 {
+  //DebugPrintf("bkd: FederationConnect::insertTimeRegulating federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
+
   _timeRegulatingFederateList.push_back(federate);
 }
 
 void
 FederationConnect::eraseTimeRegulating(Federate& federate)
 {
+  //DebugPrintf("bkd: FederationConnect::eraseTimeRegulating federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
+
   _timeRegulatingFederateList.unlink(federate);
 }
+
+// bkd: Bookkeeping timeConstrained federates
+bool
+FederationConnect::getIsTimeConstrained() const
+{
+  OpenRTIAssert(_timeConstrainedFederateList.empty() != TimeConstrainedList::Hook::is_linked());
+  return TimeConstrainedList::Hook::is_linked();
+}
+
+void
+FederationConnect::insertTimeConstrained(Federate& federate)
+{
+  //DebugPrintf("bkd: FederationConnect::insertTimeConstrained federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
+
+  _timeConstrainedFederateList.push_back(federate);
+}
+
+void
+FederationConnect::eraseTimeConstrained(Federate& federate)
+{
+  //DebugPrintf("bkd: FederationConnect::eraseTimeConstrained federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
+
+  _timeConstrainedFederateList.unlink(federate);
+}
+// --- bkd
 
 void
 FederationConnect::send(const SharedPtr<const AbstractMessage>& message)
@@ -1731,7 +1770,7 @@ Federation::Federation(Node& serverNode)
 
 Federation::~Federation()
 {
-  DebugPrintf("%s: name=%s\n", __FUNCTION__, getName().c_str());
+  //DebugPrintf("bkd: %s: name=%s\n", __FUNCTION__, getName().c_str());
   _momServer.clear();
   // In case of an exception tis can be non empty
   _objectInstanceHandleObjectInstanceMap.clear();
@@ -1744,6 +1783,7 @@ Federation::~Federation()
   OpenRTIAssert(_federateHandleFederateMap.empty());
 
   OpenRTIAssert(_timeRegulatingFederationConnectList.empty());
+  OpenRTIAssert(_timeConstrainedFederationConnectList.empty());
 
   // Throw away the base modules
   while (!_moduleHandleModuleMap.empty()) {
@@ -2983,6 +3023,8 @@ Federation::getFederate(const FederateHandle& federateHandle)
 void
 Federation::insertTimeRegulating(Federate& federate)
 {
+  //DebugPrintf("bkd: Federation::insertTimeRegulating federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
+
   OpenRTIAssert(!federate.getIsTimeRegulating());
   FederationConnect* federationConnect = federate.getFederationConnect();
   OpenRTIAssert(federationConnect);
@@ -2994,6 +3036,8 @@ Federation::insertTimeRegulating(Federate& federate)
 void
 Federation::eraseTimeRegulating(Federate& federate)
 {
+  //DebugPrintf("bkd: Federation::eraseTimeRegulating federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
+
   OpenRTIAssert(federate.getIsTimeRegulating());
   FederationConnect* federationConnect = federate.getFederationConnect();
   // We can only be time regulating if this exists and provides us with a link
@@ -3004,6 +3048,37 @@ Federation::eraseTimeRegulating(Federate& federate)
     return;
   _timeRegulatingFederationConnectList.unlink(*federationConnect);
 }
+
+//bkd: Bookkeeping timeConstrained federates
+void
+Federation::insertTimeConstrained(Federate& federate)
+{
+  //DebugPrintf("bkd: Federation::insertTimeConstrained federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
+
+  OpenRTIAssert(!federate.getIsTimeConstrained());
+  FederationConnect* federationConnect = federate.getFederationConnect();
+  OpenRTIAssert(federationConnect);
+  if (!federationConnect->getIsTimeConstrained())
+    _timeConstrainedFederationConnectList.push_back(*federationConnect);
+  federationConnect->insertTimeConstrained(federate);
+}
+
+void
+Federation::eraseTimeConstrained(Federate& federate)
+{
+  //DebugPrintf("bkd: Federation::eraseTimeConstrained federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
+
+  OpenRTIAssert(federate.getIsTimeConstrained());
+  FederationConnect* federationConnect = federate.getFederationConnect();
+  // We can only be time Constrained if this exists and provides us with a link
+  OpenRTIAssert(federationConnect);
+  OpenRTIAssert(federationConnect->getIsTimeConstrained());
+  federationConnect->eraseTimeConstrained(federate);
+  if (!federationConnect->getTimeConstrainedFederateList().empty())
+    return;
+  _timeConstrainedFederationConnectList.unlink(*federationConnect);
+}
+// --- bkd
 
 Region*
 Federation::getOrCreateRegion(const RegionHandle& regionHandle)

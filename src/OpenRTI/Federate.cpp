@@ -667,8 +667,7 @@ Federate::Federate() :
   _objectClassRelevanceAdvisorySwitchEnabled(false),
   _attributeRelevanceAdvisorySwitchEnabled(false),
   _attributeScopeAdvisorySwitchEnabled(false),
-  _interactionRelevanceAdvisorySwitchEnabled(false),
-  _permitTimeRegulation(true)
+  _interactionRelevanceAdvisorySwitchEnabled(false)
 {
 }
 
@@ -730,12 +729,6 @@ void
 Federate::setInteractionRelevanceAdvisorySwitchEnabled(bool interactionRelevanceAdvisorySwitchEnabled)
 {
   _interactionRelevanceAdvisorySwitchEnabled = interactionRelevanceAdvisorySwitchEnabled;
-}
-
-void
-Federate::setPermitTimeRegulation(bool permitTimeRegulation)
-{
-  _permitTimeRegulation = permitTimeRegulation;
 }
 
 void

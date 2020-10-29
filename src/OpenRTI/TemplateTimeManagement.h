@@ -227,6 +227,8 @@ public:
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnablePending());
     OpenRTIAssert(!InternalTimeManagement::getTimeAdvancePending());
 
+    //DebugPrintf("bkd: enableTimeConstrained federateHandle = %s\n", ambassador.getFederate()->getFederateHandle().toString().c_str());
+
     InternalTimeManagement::setTimeConstrainedMode(InternalTimeManagement::TimeConstrainedEnablePending);
 
     // 8.6 tells that after getting time constrained the federate can receive messages
@@ -255,6 +257,12 @@ public:
     OpenRTIAssert(!InternalTimeManagement::getTimeAdvancePending());
 
     InternalTimeManagement::setTimeConstrainedMode(InternalTimeManagement::TimeConstrainedDisabled);
+
+    SharedPtr<DisableTimeConstrainedNotifyMessage> disable;
+    disable = new DisableTimeConstrainedNotifyMessage;
+    disable->setFederationHandle(ambassador.getFederate()->getFederationHandle());
+    disable->setFederateHandle(ambassador.getFederate()->getFederateHandle());
+    ambassador.send(disable);
   }
 
   void timeAdvanceRequest(InternalAmbassador& ambassador, const NativeLogicalTime& nativeLogicalTime, InternalTimeManagement::TimeAdvanceMode timeAdvanceMode) override
@@ -457,7 +465,7 @@ public:
 
   // This message is sent from federates that wish to get time regulating.
   // The federate sends its current logical time in the request.
-  // If we are time constraind, we rely on the guarantee that we do not receive messages
+  // If we are time constrained, we rely on the guarantee that we do not receive messages
   // from the past. This means if the requesting federate would be able to send messages
   // from the past, we need to tell that federate that it has to adjust its logical time
   // to match already established logical time guarantees.
@@ -649,7 +657,7 @@ public:
     // Would happen if all other federates sent a CommitLowerBoundTimeStamp message, an s.o. sent a message older than this.
     // In case the (local) federate is queuing the message to itself, this is allowed, except the local federate already committed a time advance (checked below).
     if (!loopback && InternalTimeManagement::getTimeConstrainedEnabled() && canAdvanceTo(LogicalTimePair(logicalTime, 1))) {
-      DebugPrintf("TM::%s: illegal TSO message: T=%s GALT=%s\n", __func__,
+        DebugPrintf("TM::%s: illegal TSO message: T=%s GALT=%s\n", __func__,
         logicalTimeToString(logicalTime).c_str(),
         logicalTimeToString(_federateLowerBoundMap.getGALT()).c_str());
       //Log(Network, Warning) << "Dropping illegal time stamp order message!\n"
@@ -1228,7 +1236,7 @@ public:
       }
       if (havePendingMessages)
       {
-        //CondDebugPrintf("%s(TID=%d): signal _notificationHandle=%p\n", __FUNCTION__, GetCurrentThreadId(), _notificationHandle.get());
+        //CondDebugPrintf(": %s(TID=%d): signal _notificationHandle=%p\n", __FUNCTION__, GetCurrentThreadId(), _notificationHandle.get());
         _notificationHandle->Signal();
       }
     }

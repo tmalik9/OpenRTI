@@ -37,7 +37,13 @@ class ConstFunctorMessageDispatcher;
 
 template<typename T>
 class SharedPtr;
+namespace ServerModel {
+class Federation;
+class InteractionClass;
+class ObjectClass;
+}
 
+class ParameterValue;
 class OPENRTI_API AbstractMessage : public Referenced {
 public:
   AbstractMessage() noexcept = default;
@@ -47,8 +53,10 @@ public:
 
   virtual const char* getTypeName() const = 0;
   virtual void out(std::ostream& os) const = 0;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const = 0;
   virtual void dispatch(const AbstractMessageDispatcher&) const = 0;
   std::string toString() const;
+  std::string toString(ServerModel::Federation* federation) const;
   // For testing of the transport implementation
   virtual bool operator==(const AbstractMessage&) const noexcept = 0;
   bool operator!=(const AbstractMessage& message) const noexcept
@@ -75,6 +83,17 @@ public:
 inline std::ostream&
 operator<<(std::ostream& os, const AbstractMessage& message)
 { message.out(os); return os; }
+
+template<typename T, typename ParentObjectClass>
+std::ostream&
+prettyprint(std::ostream& os, const T& value, ParentObjectClass* parentObject)
+{
+  os << value;
+  return os;
+}
+
+std::ostream& prettyprint(std::ostream& os, const InteractionClassHandle& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ParameterHandle& value, ServerModel::InteractionClass* interactionClass);
 
 typedef std::list<SharedPtr<const AbstractMessage> > MessageList;
 

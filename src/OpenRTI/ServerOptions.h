@@ -32,8 +32,7 @@ namespace OpenRTI {
 class OPENRTI_API ServerOptions final : public Referenced {
 public:
   ServerOptions() :
-    _preferCompression(true), // Default to compression for now FIXME
-    _permitTimeRegulation(true)
+    _preferCompression(true) // Default to compression for now FIXME
   { }
 
   const std::string& getServerName() const
@@ -64,9 +63,6 @@ public:
   const std::string& getServerPath() const
   { return _serverPath; }
 
-  bool getPermitTimeRegulation(/*FIXME add something where we can distinguish which client connect*/) const
-  { return _permitTimeRegulation; }
-
 private:
   void _setServerPath(const StringList& serverPath)
   {
@@ -94,9 +90,6 @@ public:
   bool _preferCompression;
   // bool _preferTightEncoding;
   // bool _preferServerSideByteSwap;
-
-  /// See if this server permits us to have time regulating clients
-  bool _permitTimeRegulation;
 
   /// Connection options
   // bool _enableUDP;

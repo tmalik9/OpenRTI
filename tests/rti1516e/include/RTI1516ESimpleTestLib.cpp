@@ -208,7 +208,7 @@ void SimpleTestFederate::join(const std::string& address, const std::string& fed
     mFederateHandle = mRtiAmb->joinFederationExecution(to_wstring(federateName), L"ExampleFederate", mFederationName, fomModules);
   }
   std::wcout << L"Joined Federation as " << mRtiAmb->getFederateName(mFederateHandle) << std::endl;
-  waitForUser("Joined");
+  //waitForUser("Joined");
   /////////////////////////////
   // 6. enable time policies
   /////////////////////////////
@@ -254,6 +254,7 @@ void SimpleTestFederate::join(const std::string& address, const std::string& fed
     mRtiAmb->evokeCallback(12.0);
   }
 
+  waitForUser("INITIALIZED");
   mRtiAmb->synchronizationPointAchieved(INITIALIZED);
   std::wcout << L"Achieved sync point: " << INITIALIZED << L", waiting for federation..." << std::endl;
   while (_syncedInitialized == false)
@@ -465,12 +466,14 @@ void SimpleTestFederate::timeRegulationEnabled(LogicalTime const& theFederateTim
 {
   isRegulating = true;
   federateTime = convertTime(theFederateTime);
+  printf("timeRegulationEnabled(%.9f)\n", federateTime);
 }
 
 void SimpleTestFederate::timeConstrainedEnabled(LogicalTime const& theFederateTime)
 {
   isConstrained = true;
   federateTime = convertTime(theFederateTime);
+  printf("timeConstrainedEnabled(%.9f)\n", federateTime);
 }
 
 void SimpleTestFederate::timeAdvanceGrant(LogicalTime const& theTime)

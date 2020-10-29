@@ -45,10 +45,6 @@ public:
   const std::string& getParentServerUrl() const noexcept
   { return _parentServerUrl; }
 
-  /// The server global default for clients being allowed getting time regulating
-  bool getPermitTimeRegulation() const noexcept
-  { return _permitTimeRegulation; }
-
   /// The server global default for clients connects using zlib conpression
   bool getEnableZLibCompression() const noexcept
   { return _enableZLibCompression; }
@@ -92,7 +88,6 @@ private:
     OpenRTIServerConfigMode,
 
     ParentServerMode,
-    PermitTimeRegulationMode,
     EnableZLibCompressionMode,
     ListenMode,
     LogPriorityMode,
@@ -116,8 +111,7 @@ private:
   /// The parent server url from the config file
   std::string _parentServerUrl;
 
-  /// Server defaults for time regulation and protocol compression
-  bool _permitTimeRegulation = true;
+  /// Server defaults
   bool _enableZLibCompression = true;
   bool _enableNetworkStatistics = false;
   /// The config file configured listens
