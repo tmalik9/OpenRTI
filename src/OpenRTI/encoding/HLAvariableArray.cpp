@@ -207,7 +207,7 @@ HLAvariableArray::HLAvariableArray(HLAvariableArray&& rhs) :
 {
 }
 
-HLAvariableArray::~HLAvariableArray()
+HLAvariableArray::~HLAvariableArray() noexcept
 {
   delete _impl;
   _impl = 0;

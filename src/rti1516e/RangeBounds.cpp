@@ -38,7 +38,7 @@ RangeBounds::RangeBounds(unsigned long lowerBound,
 {
 }
 
-RangeBounds::~RangeBounds()
+RangeBounds::~RangeBounds() noexcept
 {
 }
 

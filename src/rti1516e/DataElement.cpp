@@ -27,7 +27,7 @@
 namespace rti1516e
 {
 
-DataElement::~DataElement()
+DataElement::~DataElement() noexcept
 {
 }
 

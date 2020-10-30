@@ -31,7 +31,7 @@ RTIambassador::RTIambassador()
 {
 }
 
-RTIambassador::~RTIambassador()
+RTIambassador::~RTIambassador() noexcept
 {
 }
 

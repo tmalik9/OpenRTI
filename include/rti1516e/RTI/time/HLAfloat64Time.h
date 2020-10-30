@@ -37,7 +37,7 @@ namespace rti1516e
          HLAfloat64Time const & value);
 
       // Destructor
-      virtual ~HLAfloat64Time ();
+      virtual ~HLAfloat64Time () noexcept;
 
       // Basic accessors/mutators
       virtual void setInitial () override;

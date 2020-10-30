@@ -36,7 +36,7 @@ namespace rti1516e
     HandleKind##Implementation::get(_impl);                             \
   }                                                                     \
                                                                         \
-  HandleKind::~HandleKind()                                             \
+  HandleKind::~HandleKind() noexcept                                    \
   {                                                                     \
     HandleKind##Implementation::putAndDelete(_impl);                    \
   }                                                                     \

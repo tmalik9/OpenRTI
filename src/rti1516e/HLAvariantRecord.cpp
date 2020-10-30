@@ -44,7 +44,7 @@ public:
     _octetBoundary(0)
   {
   }
-  ~HLAvariantRecordImplementation()
+  ~HLAvariantRecordImplementation() noexcept
   {
   }
 
@@ -147,7 +147,7 @@ HLAvariantRecord::HLAvariantRecord(HLAvariantRecord const & rhs) :
 {
 }
 
-HLAvariantRecord::~HLAvariantRecord()
+HLAvariantRecord::~HLAvariantRecord() noexcept
 {
   delete _impl;
   _impl = 0;

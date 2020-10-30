@@ -46,7 +46,7 @@ namespace rti1516e
    class RTI_EXPORT LogicalTimeFactory
    {
    public:
-      virtual ~LogicalTimeFactory () = 0;
+      virtual ~LogicalTimeFactory () noexcept = 0;
 
       // Return a LogicalTime with a value of "initial"
       virtual std::unique_ptr< LogicalTime > makeInitial() = 0;

@@ -35,7 +35,7 @@ SocketServerAcceptEvent::SocketServerAcceptEvent(const SharedPtr<SocketServer>& 
 {
 }
 
-SocketServerAcceptEvent::~SocketServerAcceptEvent()
+SocketServerAcceptEvent::~SocketServerAcceptEvent() noexcept
 {
 }
 

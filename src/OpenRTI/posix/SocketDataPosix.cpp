@@ -27,7 +27,7 @@ SocketData::SocketData(PrivateData* privateData) :
 {
 }
 
-SocketData::~SocketData()
+SocketData::~SocketData() noexcept
 {
 }
 

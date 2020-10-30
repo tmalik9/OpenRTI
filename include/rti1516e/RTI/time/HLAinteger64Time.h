@@ -34,7 +34,7 @@ class RTI_EXPORT HLAinteger64Time : public rti1516e::LogicalTime
     HLAinteger64Time(HLAinteger64Time const& value);
 
     // Destructor
-    virtual ~HLAinteger64Time();
+    virtual ~HLAinteger64Time() noexcept;
 
     // Basic accessors/mutators
     virtual void setInitial() override;

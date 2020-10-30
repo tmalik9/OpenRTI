@@ -31,7 +31,7 @@ HLAfloat64TimeFactory::HLAfloat64TimeFactory()
 {
 }
 
-HLAfloat64TimeFactory::~HLAfloat64TimeFactory()
+HLAfloat64TimeFactory::~HLAfloat64TimeFactory() noexcept
 {
 }
 

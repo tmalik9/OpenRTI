@@ -128,7 +128,7 @@ class OPENRTI_LOCAL HLAinteractionSubscription : public HLAfixedRecord
       HLAfixedRecord::appendElementPointer(&mClassHandle);
       HLAfixedRecord::appendElementPointer(&mActive);
     }
-    ~HLAinteractionSubscription()
+    ~HLAinteractionSubscription() noexcept
     {
     }
     std::unique_ptr<DataElement> clone() const override

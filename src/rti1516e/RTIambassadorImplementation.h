@@ -34,7 +34,7 @@ namespace OpenRTI {
 class OPENRTI_LOCAL RTIambassadorImplementation final : public rti1516e::RTIambassador {
 public:
   RTIambassadorImplementation();
-  virtual ~RTIambassadorImplementation();
+  virtual ~RTIambassadorImplementation() noexcept;
 
   void connect(rti1516e::FederateAmbassador & federateAmbassador, rti1516e::CallbackModel theCallbackModel,
           std::wstring const & localSettingsDesignator) override;

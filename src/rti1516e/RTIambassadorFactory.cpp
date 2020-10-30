@@ -26,11 +26,11 @@
 namespace rti1516e
 {
 
-RTIambassadorFactory::RTIambassadorFactory()
+RTIambassadorFactory::RTIambassadorFactory() noexcept
 {
 }
 
-RTIambassadorFactory::~RTIambassadorFactory()
+RTIambassadorFactory::~RTIambassadorFactory() noexcept
 {
 }
 

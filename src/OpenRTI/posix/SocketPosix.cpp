@@ -51,7 +51,7 @@ Socket::Socket(PrivateData* privateData) :
 {
 }
 
-Socket::~Socket()
+Socket::~Socket() noexcept
 {
   delete _privateData;
   _privateData = 0;

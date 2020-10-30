@@ -84,14 +84,6 @@ inline std::ostream&
 operator<<(std::ostream& os, const AbstractMessage& message)
 { message.out(os); return os; }
 
-template<typename T, typename ParentObjectClass>
-std::ostream&
-prettyprint(std::ostream& os, const T& value, ParentObjectClass* parentObject)
-{
-  os << value;
-  return os;
-}
-
 std::ostream& prettyprint(std::ostream& os, const InteractionClassHandle& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const ParameterHandle& value, ServerModel::InteractionClass* interactionClass);
 

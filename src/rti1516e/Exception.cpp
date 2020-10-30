@@ -46,7 +46,7 @@ Exception::operator=(Exception const & rhs)
   return *this;
 }
 
-Exception::~Exception()
+Exception::~Exception() noexcept
 {
 }
 

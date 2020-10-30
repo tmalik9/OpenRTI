@@ -70,7 +70,7 @@ HLAinteger64Time::HLAinteger64Time(const HLAinteger64Time& integer64Time) :
   HLAinteger64TimeImpl::assign(_impl, integer64Time._impl);
 }
 
-HLAinteger64Time::~HLAinteger64Time() 
+HLAinteger64Time::~HLAinteger64Time() noexcept
 {
   HLAinteger64TimeImpl::putAndDelete(_impl);
 }

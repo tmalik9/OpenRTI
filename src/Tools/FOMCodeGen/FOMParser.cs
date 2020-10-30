@@ -184,7 +184,7 @@ namespace FOMCodeGen
 
     public Dictionary<string, DataType> DataTypes { get; set; }
     public string Filename { get; set; }
-    public string Namespace { get; set; }
+    public string [] Namespace { get; set; }
     private Dictionary<string, string> mBasicDataRepresentations = new Dictionary<string, string>()
     {
       { "HLAASCIIchar", "char" },
@@ -207,7 +207,7 @@ namespace FOMCodeGen
       { "HLAunicodeChar", "wchar_t" },
       { "HLAunicodeString", "std::wstring" },
     };
-    public FOMParser(string filename)
+    public FOMParser(string filename, string enclosingNamespace)
     {
       DataTypes = new Dictionary<string, DataType>();
       foreach (var entry in mBasicDataRepresentations)
@@ -215,7 +215,7 @@ namespace FOMCodeGen
         DataTypes.Add(entry.Key, new BasicDataRepresentation(entry.Key, entry.Value));
       }
       Filename = filename;
-      Namespace = "N" + System.IO.Path.GetFileNameWithoutExtension(filename) + "Encoding";
+      Namespace = enclosingNamespace.Split('.');
       XmlDocument doc = new XmlDocument();
       doc.Load(filename);
       var simpleDataTypeNodes = doc.DocumentElement.SelectNodes("/objectModel/dataTypes/simpleDataTypes/simpleData");

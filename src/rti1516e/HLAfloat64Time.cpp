@@ -123,7 +123,7 @@ HLAfloat64Time::HLAfloat64Time(const HLAfloat64Time& float64Time) :
   HLAfloat64TimeImpl::assign(_impl, float64Time._impl);
 }
 
-HLAfloat64Time::~HLAfloat64Time() 
+HLAfloat64Time::~HLAfloat64Time() noexcept
 {
   HLAfloat64TimeImpl::putAndDelete(_impl);
 }

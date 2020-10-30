@@ -32,7 +32,7 @@ namespace OpenRTI {
 class OPENRTI_LOCAL RTI1516ELogicalTimeFactory::LogicalTimeFactoryImplementation : public Referenced {
 public:
   LogicalTimeFactoryImplementation(std::unique_ptr<rti1516e::LogicalTimeFactory> logicalTimeFactory);
-  ~LogicalTimeFactoryImplementation();
+  ~LogicalTimeFactoryImplementation() noexcept;
 
   std::string getName() const;
   LogicalTimeImplementation* initialLogicalTime() const;
@@ -214,7 +214,7 @@ RTI1516ELogicalTimeFactory::LogicalTimeFactoryImplementation::LogicalTimeFactory
   _epsilonTimeInterval = _logicalTimeFactory->makeEpsilon();
 }
 
-RTI1516ELogicalTimeFactory::LogicalTimeFactoryImplementation::~LogicalTimeFactoryImplementation()
+RTI1516ELogicalTimeFactory::LogicalTimeFactoryImplementation::~LogicalTimeFactoryImplementation() noexcept
 {
 }
 
@@ -279,7 +279,7 @@ RTI1516ELogicalTimeFactory::LogicalTimeInterval::LogicalTimeInterval(const RTI15
 {
 }
 
-RTI1516ELogicalTimeFactory::LogicalTimeInterval::~LogicalTimeInterval()
+RTI1516ELogicalTimeFactory::LogicalTimeInterval::~LogicalTimeInterval() noexcept
 {
 }
 
@@ -362,7 +362,7 @@ RTI1516ELogicalTimeFactory::LogicalTime::LogicalTime(const RTI1516ELogicalTimeFa
 {
 }
 
-RTI1516ELogicalTimeFactory::LogicalTime::~LogicalTime()
+RTI1516ELogicalTimeFactory::LogicalTime::~LogicalTime() noexcept
 {
 }
 
@@ -478,7 +478,7 @@ RTI1516ELogicalTimeFactory::RTI1516ELogicalTimeFactory(const RTI1516ELogicalTime
 {
 }
 
-RTI1516ELogicalTimeFactory::~RTI1516ELogicalTimeFactory()
+RTI1516ELogicalTimeFactory::~RTI1516ELogicalTimeFactory() noexcept
 {
 }
 

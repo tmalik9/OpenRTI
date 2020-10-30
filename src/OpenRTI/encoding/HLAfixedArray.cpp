@@ -52,7 +52,7 @@ public:
       _dataElementVector[i].first = rhs._dataElementVector[i].first->clone().release();
     }
   }
-  virtual ~HLAfixedArrayImplementation()
+  virtual ~HLAfixedArrayImplementation() noexcept
   {
     for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
       if (i->second) delete i->first;

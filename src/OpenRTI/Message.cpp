@@ -6436,7 +6436,7 @@ inline std::string to_string(const RegisterFederationSynchronizationPointRespons
   }
 }
 
-// <__main__.MapDataType object at 0x0000024E05F6E978>
+// <__main__.MapDataType object at 0x00000190DA96E978>
 std::ostream&
 operator<<(std::ostream& os, const ConfigurationParameterMap& value)
 {
@@ -10024,5 +10024,6 @@ prettyprint(std::ostream& os, const QueryAttributeOwnershipResponseMessage& valu
   os << " }";
   return os;
 }
+
 
 } // namespace OpenRTI

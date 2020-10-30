@@ -26,7 +26,7 @@ DefaultErrorHandler::DefaultErrorHandler()
 {
 }
 
-DefaultErrorHandler::~DefaultErrorHandler()
+DefaultErrorHandler::~DefaultErrorHandler() noexcept
 {
 }
 

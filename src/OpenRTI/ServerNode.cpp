@@ -691,9 +691,7 @@ public:
     ServerModel::Federate* federate = getFederate(message->getFederateHandle());
     if (!federate)
       throw MessageError("EnableTimeConstrainedNotifyMessage from unknown Federate!");
-    //federate->setIsTimeConstrained(true);
-#pragma message (__FILE__LINE__ "2020-10-27, Mth: REVIEW")
-    // bkd: Bookkeeping of timeConstrained federates
+    // 2020-10-27, Mth: REVIEW
     ServerModel::FederationConnect* federationConnect = getFederationConnect(connectHandle);
     OpenRTIAssert(federationConnect);
     if (isRootServer() || federationConnect->getIsParentConnect()) {
@@ -760,7 +758,7 @@ public:
     // must be able to query the GALT for itself, which is only possible if they know the time advances
     // of each regulating federate, thus just broadcast
 
-#pragma message (__FILE__LINE__ "2020-10-27, Mth: REVIEW")
+    // 2020-10-27, Mth: REVIEW
     if (getTimeConstrainedFederationConnectList().empty())
     {
       //DebugPrintf("bkd: accept CommitLowerBoundTimeStampMessage: TimeConstrainedConnectList empty -> broadcast\n");

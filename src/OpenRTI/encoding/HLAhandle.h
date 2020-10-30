@@ -53,7 +53,7 @@ public:
   HLAhandle(const AttributeHandle& handle);
   HLAhandle(const InteractionClassHandle& handle);
   HLAhandle(const ParameterHandle& handle);
-  ~HLAhandle();
+  ~HLAhandle() noexcept;
   FederateHandle getFederateHandle() const;
   ObjectClassHandle getObjectClassHandle() const;
   ObjectInstanceHandle getObjectInstanceHandle() const;

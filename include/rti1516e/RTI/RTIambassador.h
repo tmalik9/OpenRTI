@@ -46,7 +46,7 @@ namespace rti1516e
       RTIambassador ();
 
    public:
-      virtual ~RTIambassador ();
+      virtual ~RTIambassador () noexcept;
 
       // 4.2
       virtual void connect (

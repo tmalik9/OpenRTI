@@ -26,7 +26,7 @@
 namespace rti1516e
 {
 
-LogicalTimeInterval::~LogicalTimeInterval()
+LogicalTimeInterval::~LogicalTimeInterval() noexcept
 {
 }
 

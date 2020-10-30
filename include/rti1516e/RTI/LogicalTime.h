@@ -36,7 +36,7 @@ namespace rti1516e
    {
    public:
       // Destructor
-      virtual ~LogicalTime () = 0;
+      virtual ~LogicalTime () noexcept = 0;
 
       // Basic accessors/mutators
 

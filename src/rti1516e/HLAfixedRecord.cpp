@@ -47,7 +47,7 @@ public:
     for (auto& element : rhs._dataElementVector)
       _dataElementVector.push_back(std::make_pair(element.first->clone().release(), true));
   }
-  ~HLAfixedRecordImplementation()
+  ~HLAfixedRecordImplementation() noexcept
   {
     for (auto& it_dataElement_owner : _dataElementVector) {
       if (it_dataElement_owner.second) delete it_dataElement_owner.first;
@@ -181,7 +181,7 @@ HLAfixedRecord::HLAfixedRecord(HLAfixedRecord const & rhs) :
 {
 }
 
-HLAfixedRecord::~HLAfixedRecord()
+HLAfixedRecord::~HLAfixedRecord() noexcept
 {
   delete _impl;
   _impl = 0;

@@ -10,7 +10,12 @@
 
 #include <vector>
 
-namespace <#=FOM.Namespace#> {
+<#
+foreach (var namespacePart in FOM.Namespace)
+{
+#>
+namespace <#=namespacePart#> {
+<#  } #>
 
 <#
 foreach (var dataType in FOM.DataTypes.Values)
@@ -70,4 +75,10 @@ enum <#=dataType.Name#> : <#=enumeratedDataType.Representation.CPPType#>
   } // if (dataType is FOMParser.EnumeratedDataType)
 } // foreach (var dataType in FOM.DataTypes.Values)
 #>
-} // namespace <#=FOM.Namespace#>
+
+<#
+foreach (var namespacePart in FOM.Namespace)
+{
+#>
+} // namespace <#=namespacePart#>
+<#  } #>

@@ -63,7 +63,7 @@ namespace rti1516
     }                                                                   \
                                                                         \
     static void                                                         \
-    putAndDelete(HandleKind##Implementation* impl)                      \
+    putAndDelete(HandleKind##Implementation* impl) noexcept             \
     {                                                                   \
       if (!useImplementationClass())                                    \
         return;                                                         \

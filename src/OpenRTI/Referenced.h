@@ -33,7 +33,7 @@ public:
   /// Do not copy reference counts. Each new object has it's own counter
   Referenced(const Referenced&) noexcept : _refcount(0u)
   {}
-  Referenced(Referenced&&) noexcept = default;
+  Referenced(Referenced&&) = default;
   virtual ~Referenced() noexcept {}
   /// Do not copy reference counts. Each new object has it's own counter
   Referenced& operator=(const Referenced&) noexcept

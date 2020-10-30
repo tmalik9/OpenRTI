@@ -46,7 +46,7 @@ public:
   public:
     LogicalTimeInterval(LogicalTimeIntervalImplementation* implementation = 0);
     LogicalTimeInterval(const LogicalTimeInterval&);
-    ~LogicalTimeInterval();
+    ~LogicalTimeInterval() noexcept;
 
     LogicalTimeInterval& operator=(const LogicalTimeInterval&);
 
@@ -67,7 +67,7 @@ public:
   public:
     LogicalTime(LogicalTimeImplementation* implementation = 0);
     LogicalTime(const LogicalTime&);
-    ~LogicalTime();
+    ~LogicalTime() noexcept;
 
     LogicalTime& operator=(const LogicalTime&);
 
@@ -90,7 +90,7 @@ public:
 
   RTI1516ELogicalTimeFactory(std::unique_ptr<rti1516e::LogicalTimeFactory> logicalTimeFactory);
   RTI1516ELogicalTimeFactory(const RTI1516ELogicalTimeFactory&);
-  ~RTI1516ELogicalTimeFactory();
+  ~RTI1516ELogicalTimeFactory() noexcept;
 
   RTI1516ELogicalTimeFactory& operator=(const RTI1516ELogicalTimeFactory&);
 

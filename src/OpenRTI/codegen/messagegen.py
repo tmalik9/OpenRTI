@@ -1912,17 +1912,32 @@ class TypeMap(object):
         sourceStream.writeline('#endif')
         sourceStream.writeline()
         sourceStream.writeline('namespace OpenRTI {')
+
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeForwardDeclaration(sourceStream)
+
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeDeclaration(sourceStream)
+
         sourceStream.writeline()
         for t in self.__typeList:
-            t.writePrettyPrintDecl(sourceStream)
-        for t in self.__typeList:
             t.writeStreamOutDecl(sourceStream)
+
+        sourceStream.writeline()
+        sourceStream.writeline('template<typename T, typename ParentObjectClass>')
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const T& value, ParentObjectClass* parentObject)')
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << value;')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+        for t in self.__typeList:
+            t.writePrettyPrintDecl(sourceStream)
+
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeToString(sourceStream)
@@ -1948,6 +1963,7 @@ class TypeMap(object):
         for t in self.__typeList:
             t.writeStreamOut(sourceStream)
             t.writePrettyPrint(sourceStream)
+        sourceStream.writeline()
         sourceStream.writeline('} // namespace OpenRTI')
 
     def writeDispatcher(self, sourceStream):

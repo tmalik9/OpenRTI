@@ -25,7 +25,7 @@ MomManager::MomManager(MomServer* rtiAmb, FederateHandle ownerFederateHandle)
 {
 }
 
-MomManager::~MomManager()
+MomManager::~MomManager() noexcept
 {
   delete objects.mRoot;
   delete interactions.mRoot;

@@ -113,7 +113,7 @@ EncodableDataType::EncodableDataType(EncodableDataType const& rhs) :    \
 {                                                                       \
 }                                                                       \
                                                                         \
-EncodableDataType::~EncodableDataType()                                 \
+EncodableDataType::~EncodableDataType() noexcept                        \
 {                                                                       \
   delete _impl;                                                         \
 }                                                                       \

@@ -9,13 +9,20 @@
 #pragma once
 
 #include <vector>
+#include <cstring>
+
 #include "RTI/encoding/BasicDataElements.h"
 #include "RTI/encoding/HLAfixedRecord.h"
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
 #include "<#=DataTypesHeaderFilename#>"
 
-namespace <#=FOM.Namespace#> {
+<#
+foreach (var namespacePart in FOM.Namespace)
+{
+#>
+namespace <#=namespacePart#> {
+<#  } #>
 
 <#
 foreach (var dataType in FOM.DataTypes.Values)
@@ -204,4 +211,10 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
   } // if (dataType is FOMParser.ArrayDataType)
 } // foreach (var dataType in FOM.DataTypes.Values)
 #>
-} // namespace <#=FOM.Namespace#>
+<#
+foreach (var namespacePart in FOM.Namespace)
+{
+#>
+} // namespace <#=namespacePart#>
+<#  } #>
+

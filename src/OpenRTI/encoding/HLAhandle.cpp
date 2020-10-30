@@ -59,7 +59,7 @@ HLAhandle::HLAhandle(const ParameterHandle& handle)
 {
 }
 
-HLAhandle::~HLAhandle()
+HLAhandle::~HLAhandle() noexcept
 {
 
 }

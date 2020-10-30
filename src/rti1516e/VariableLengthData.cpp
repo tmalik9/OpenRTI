@@ -44,7 +44,7 @@ VariableLengthData::VariableLengthData(VariableLengthData const & rhs)
 {
 }
 
-VariableLengthData::~VariableLengthData()
+VariableLengthData::~VariableLengthData() noexcept
 {
   _impl.reset();
 }

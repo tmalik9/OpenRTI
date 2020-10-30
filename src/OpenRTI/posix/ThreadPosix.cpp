@@ -28,7 +28,7 @@ Thread::Thread(void) :
 {
 }
 
-Thread::~Thread(void)
+Thread::~Thread(void) noexcept
 {
   OpenRTIAssert(!Thread::count(this));
   delete _privateData;

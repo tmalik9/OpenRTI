@@ -41,7 +41,7 @@ InitialClientStreamProtocol::InitialClientStreamProtocol(AbstractServer& abstrac
   setConnectOptions(connectOptions);
 }
 
-InitialClientStreamProtocol::~InitialClientStreamProtocol()
+InitialClientStreamProtocol::~InitialClientStreamProtocol() noexcept
 {
 }
 

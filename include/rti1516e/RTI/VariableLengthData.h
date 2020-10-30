@@ -46,7 +46,7 @@ namespace rti1516e
       VariableLengthData (
          VariableLengthData const & rhs);
 
-      ~VariableLengthData ();
+      ~VariableLengthData () noexcept;
 
       // Caller is free to delete rhs after the call
       // This instance will revert to internal storage as a result of assignment.

@@ -45,7 +45,7 @@ namespace OpenRTI
       HLAvariableArray (HLAvariableArray&& rhs);
 
       // Destructor
-      virtual ~HLAvariableArray ();
+      virtual ~HLAvariableArray () noexcept;
 
       // Return a new copy of the DataElement
       virtual std::unique_ptr<DataElement> clone () const override;

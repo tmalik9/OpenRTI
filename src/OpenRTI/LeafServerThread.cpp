@@ -60,7 +60,7 @@ LeafServerThread::_Registry::_Registry()
 {
 }
 
-LeafServerThread::_Registry::~_Registry()
+LeafServerThread::_Registry::~_Registry() noexcept
 {
   ScopeLock scopeLock(_mutex);
   for (UrlServerMap::iterator i = _urlServerMap.begin(); i != _urlServerMap.end();) {
@@ -189,7 +189,7 @@ LeafServerThread::LeafServerThread(const SharedPtr<AbstractServer>& server) :
   OpenRTIAssert(_server.valid());
 }
 
-LeafServerThread::~LeafServerThread()
+LeafServerThread::~LeafServerThread() noexcept
 {
 }
 

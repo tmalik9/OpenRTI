@@ -31,7 +31,7 @@ HLAinteger64TimeFactory::HLAinteger64TimeFactory()
 {
 }
 
-HLAinteger64TimeFactory::~HLAinteger64TimeFactory()
+HLAinteger64TimeFactory::~HLAinteger64TimeFactory() noexcept
 {
 }
 

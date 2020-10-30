@@ -30,9 +30,9 @@ namespace rti1516e
    class RTI_EXPORT RTIambassadorFactory
    {
    public:
-      RTIambassadorFactory();
+      RTIambassadorFactory() noexcept;
 
-      virtual ~RTIambassadorFactory();
+      virtual ~RTIambassadorFactory() noexcept;
 
       // 10.35
       std::unique_ptr< RTIambassador > createRTIambassador ();

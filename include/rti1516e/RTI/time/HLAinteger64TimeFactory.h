@@ -33,7 +33,7 @@ namespace rti1516e
    public:
       HLAinteger64TimeFactory ();
 
-      virtual ~HLAinteger64TimeFactory ();
+      virtual ~HLAinteger64TimeFactory () noexcept;
 
       // Return a LogicalTime with a value of "initial"
       std::unique_ptr< LogicalTime > makeInitial() override;

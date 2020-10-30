@@ -165,8 +165,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wuninitialized>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-reorder>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unknown-pragmas>)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-inconsistent-missing-override>)
 endif()
 
 

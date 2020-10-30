@@ -35,16 +35,33 @@ namespace FOMCodeGen
             
             #line default
             #line hidden
-            this.Write(", do not edit\r\n\r\n#pragma once\r\n\r\n#include <vector>\r\n\r\nnamespace ");
+            this.Write(", do not edit\r\n\r\n#pragma once\r\n\r\n#include <vector>\r\n\r\n");
             
             #line 13 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.Namespace));
+
+foreach (var namespacePart in FOM.Namespace)
+{
+
             
             #line default
             #line hidden
-            this.Write(" {\r\n\r\n");
+            this.Write("namespace ");
             
-            #line 15 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 17 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
+            
+            #line default
+            #line hidden
+            this.Write(" {\r\n");
+            
+            #line 18 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+  } 
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 20 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
 foreach (var dataType in FOM.DataTypes.Values)
 {
@@ -57,13 +74,13 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line default
             #line hidden
             
-            #line 23 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 28 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Comment));
             
             #line default
             #line hidden
             
-            #line 23 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 28 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } 
             
@@ -71,21 +88,21 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("typedef ");
             
-            #line 25 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 30 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(simpleDataType.Representation.CPPType));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 25 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 30 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(simpleDataType.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n\r\n");
             
-            #line 27 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 32 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 } // if (dataType is FOMParser.SimpleDataType)
   else if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
   {
@@ -96,62 +113,62 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line default
             #line hidden
             
-            #line 33 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 38 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 34 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 39 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
   } 
             
             #line default
             #line hidden
             this.Write("class ");
             
-            #line 35 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 40 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Name));
             
             #line default
             #line hidden
             
-            #line 35 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 40 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.BaseClass != null ? " : public " + fixedRecordDataType.BaseClass.Name : ""));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n  public:\r\n    virtual ~");
             
-            #line 38 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 43 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Name));
             
             #line default
             #line hidden
             this.Write("() noexcept {}\r\n");
             
-            #line 39 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 44 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  foreach (var field in fixedRecordDataType.Fields) { 
             
             #line default
             #line hidden
             this.Write("    virtual void Set");
             
-            #line 40 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 45 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 40 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 45 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write(" value) = 0;\r\n");
             
-            #line 41 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 46 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  if (field.DataType is FOMParser.ArrayDataType) {
      var arrayDataType = field.DataType as FOMParser.ArrayDataType;
 
@@ -160,56 +177,56 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("    virtual void Set");
             
-            #line 44 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 49 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(const ");
             
-            #line 44 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 49 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("* value, size_t size) = 0;\r\n");
             
-            #line 45 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 50 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    virtual ");
             
-            #line 46 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 51 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write(" Get");
             
-            #line 46 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 51 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("() const = 0;\r\n");
             
-            #line 47 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 52 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  } // foreach fixedRecordDataType.Fields 
             
             #line default
             #line hidden
             this.Write("\r\n}; // class ");
             
-            #line 49 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 54 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 51 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 56 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
   } // if (dataType is FOMParser.FixedRecordDataType)
   else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
@@ -221,21 +238,21 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("enum ");
             
-            #line 57 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 62 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 57 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 62 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeratedDataType.Representation.CPPType));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n");
             
-            #line 59 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 64 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
@@ -245,21 +262,21 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("      ");
             
-            #line 63 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 68 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 63 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 68 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Value));
             
             #line default
             #line hidden
             this.Write(",\r\n");
             
-            #line 64 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 69 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -268,14 +285,14 @@ foreach (var dataType in FOM.DataTypes.Values)
             #line hidden
             this.Write("}; // enum ");
             
-            #line 67 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 72 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 69 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 74 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
   } // if (dataType is FOMParser.EnumeratedDataType)
 } // foreach (var dataType in FOM.DataTypes.Values)
@@ -283,14 +300,30 @@ foreach (var dataType in FOM.DataTypes.Values)
             
             #line default
             #line hidden
+            this.Write("\r\n");
+            
+            #line 79 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+
+foreach (var namespacePart in FOM.Namespace)
+{
+
+            
+            #line default
+            #line hidden
             this.Write("} // namespace ");
             
-            #line 73 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.Namespace));
+            #line 83 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
+            
+            #line 84 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+  } 
+            
+            #line default
+            #line hidden
             return this.GenerationEnvironment.ToString();
         }
     }

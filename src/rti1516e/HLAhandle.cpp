@@ -61,9 +61,8 @@ HLAhandle::HLAhandle(const ParameterHandle& handle) : mImpl(std::unique_ptr<HLAh
   set(handle);
 }
 
-HLAhandle::~HLAhandle()
+HLAhandle::~HLAhandle() noexcept
 {
-
 }
 
 FederateHandle HLAhandle::getFederateHandle() const

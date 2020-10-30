@@ -587,10 +587,10 @@ public:
 
   class OPENRTI_LOCAL CallbackScope {
   public:
-    CallbackScope(RTI1516EAmbassadorInterface& ambassadorInterface) :
+    CallbackScope(RTI1516EAmbassadorInterface& ambassadorInterface) noexcept :
       _ambassadorInterface(ambassadorInterface)
     { _ambassadorInterface._inCallback = true; }
-    ~CallbackScope()
+    ~CallbackScope() noexcept
     { _ambassadorInterface._inCallback = false; }
   private:
     RTI1516EAmbassadorInterface& _ambassadorInterface;
@@ -1613,7 +1613,7 @@ RTIambassadorImplementation::RTIambassadorImplementation()
 {
 }
 
-RTIambassadorImplementation::~RTIambassadorImplementation()
+RTIambassadorImplementation::~RTIambassadorImplementation() noexcept
 {
   delete _ambassadorInterface;
   _ambassadorInterface = 0;
