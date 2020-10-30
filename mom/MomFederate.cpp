@@ -113,7 +113,7 @@ MomFederate::MomFederate(std::shared_ptr<MomManager> mom, FederateHandle federat
 }
 
 
-MomFederate::~MomFederate()
+MomFederate::~MomFederate() noexcept
 {
   //DebugPrintf("%s: federateHandle=%s\n", __FUNCTION__, mInternalFederateHandle.toString().c_str());
 }

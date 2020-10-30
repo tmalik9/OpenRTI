@@ -16,7 +16,7 @@ MomFederateMetrics::MomFederateMetrics(MomManager* mom)
 }
 
 
-MomFederateMetrics::~MomFederateMetrics()
+MomFederateMetrics::~MomFederateMetrics() noexcept
 {}
 
 void MomFederateMetrics::reflectionReceived(ObjectClassHandle classId, ObjectInstanceHandle instanceId)

@@ -43,7 +43,7 @@ Exception::Exception(const char* type, const std::string& reason) :
   Log(Assert, Info) << "Fired exception: type = " << type << ", reason = " << _reason << std::endl;
 }
 
-Exception::~Exception()
+Exception::~Exception() noexcept
 {
 }
 
@@ -70,7 +70,7 @@ RTIinternalError::RTIinternalError(const std::string& reason) :
 {
 }
 
-RTIinternalError::~RTIinternalError()
+RTIinternalError::~RTIinternalError() noexcept
 {
 }
 

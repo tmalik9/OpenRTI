@@ -53,7 +53,7 @@ SocketServer::SocketServer(PrivateData* privateData) :
 {
 }
 
-SocketServer::~SocketServer()
+SocketServer::~SocketServer() noexcept
 {
 }
 

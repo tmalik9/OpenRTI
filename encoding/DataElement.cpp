@@ -28,7 +28,7 @@
 namespace OpenRTI
 {
 
-DataElement::~DataElement()
+DataElement::~DataElement() noexcept
 {
 }
 

@@ -53,7 +53,7 @@ public:
       DebugPrintf("%s failed\n", __FUNCTION__);
     }
   }
-  ~HLAfixedRecordImplementation()
+  ~HLAfixedRecordImplementation() noexcept
   {
     for (auto& it_dataElement_owner : _dataElementVector) {
       if (it_dataElement_owner.second) delete it_dataElement_owner.first;
@@ -187,7 +187,7 @@ HLAfixedRecord::HLAfixedRecord(HLAfixedRecord const & rhs) :
 {
 }
 
-HLAfixedRecord::~HLAfixedRecord()
+HLAfixedRecord::~HLAfixedRecord() noexcept
 {
   delete _impl;
   _impl = 0;

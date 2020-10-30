@@ -105,7 +105,7 @@ AbstractServer::_Connect::_Connect(const SharedPtr<AbstractMessageSender>& messa
 {
 }
 
-AbstractServer::_Connect::~_Connect()
+AbstractServer::_Connect::~_Connect() noexcept
 {
   if (_messageSender.valid())
     _messageSender->close();
@@ -358,7 +358,7 @@ AbstractServer::AbstractServer(const SharedPtr<AbstractServerNode>& serverNode) 
   serverNode->setServer(this);
 }
 
-AbstractServer::~AbstractServer()
+AbstractServer::~AbstractServer() noexcept
 {
 }
 

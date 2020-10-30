@@ -41,7 +41,7 @@ class AbstractServer;
 /// These suffer from the locking overhead but do not disturb implementation that do not need.
 class OPENRTI_API AbstractServerNode : public Referenced {
 public:
-  AbstractServerNode();
+  AbstractServerNode() noexcept;
   virtual ~AbstractServerNode() noexcept;
 
   /// Hmm, make that more callback based during connection setup, but for now ...
