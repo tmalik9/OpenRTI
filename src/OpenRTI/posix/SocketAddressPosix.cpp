@@ -40,6 +40,10 @@
 
 namespace OpenRTI {
 
+SocketAddress::SocketAddress() noexcept
+{
+}
+
 SocketAddress::SocketAddress(const SocketAddress& socketAddress) :
   _privateData(socketAddress._privateData)
 {

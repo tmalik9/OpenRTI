@@ -1,5 +1,6 @@
 # The rti1516e includes
 include_directories(${OPENRTI_CMAKEROOTDIR}/include/rti1516e)
+include_directories(${OPENRTI_CMAKEROOTDIR}/src/OpenRTI)
 
 add_library(rti1516e_py MODULE Module.cpp)
 set_property(TARGET rti1516e_py PROPERTY PREFIX "")

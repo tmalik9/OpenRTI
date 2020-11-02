@@ -83,25 +83,25 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)src\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;OPENRTI_DLL;STANDALONE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;STANDALONE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)src\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;OPENRTI_DLL;STANDALONE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;STANDALONE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)src\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;OPENRTI_DLL;STANDALONE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;STANDALONE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)src\OpenRTI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;OPENRTI_DLL;STANDALONE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;STANDALONE_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -112,7 +112,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\src\OpenRTI\AbstractMessage.cpp" />
     <ClCompile Include="..\..\..\src\OpenRTI\dprintf.cpp" />
+    <ClCompile Include="..\..\..\src\OpenRTI\Message.cpp" />
     <ClCompile Include="..\..\..\src\OpenRTI\ServerModel.cpp" />
     <ClCompile Include="..\..\..\src\OpenRTI\VariableLengthDataTuple.cpp" />
     <ClCompile Include="InteractionFilters.cpp" />

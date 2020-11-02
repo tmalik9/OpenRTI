@@ -22,7 +22,7 @@
 #include <map>
 #include <set>
 
-#include "../../src/OpenRTI/DebugNew.h"
+#include "DebugNew.h"
 #include "RTI/RTI1516.h"
 #include "RTI/FederateAmbassador.h"
 #include "RTI/time/HLAfloat64Time.h"
@@ -1523,7 +1523,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     PyGILState_STATE _gstate;
   };
 
-  virtual void connectionLost(std::wstring const & faultDescription) override
+  void connectionLost(std::wstring const & faultDescription) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1540,7 +1540,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void reportFederationExecutions(rti1516e::FederationExecutionInformationVector const &federationExecutionInformationVector) override
+  void reportFederationExecutions(rti1516e::FederationExecutionInformationVector const &federationExecutionInformationVector) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1557,7 +1557,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void synchronizationPointRegistrationSucceeded(std::wstring const & label) override
+  void synchronizationPointRegistrationSucceeded(std::wstring const & label) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1574,8 +1574,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void synchronizationPointRegistrationFailed(std::wstring const & label,
-                                                      rti1516e::SynchronizationPointFailureReason reason) override
+  void synchronizationPointRegistrationFailed(std::wstring const & label,
+                                              rti1516e::SynchronizationPointFailureReason reason) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1593,8 +1593,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void announceSynchronizationPoint(std::wstring const & label,
-                                            rti1516e::VariableLengthData const & theUserSuppliedTag) override
+  void announceSynchronizationPoint(std::wstring const & label,
+                                    rti1516e::VariableLengthData const & theUserSuppliedTag) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1612,7 +1612,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void federationSynchronized(std::wstring const & label, rti1516e::FederateHandleSet const& failedToSyncSet) override
+  void federationSynchronized(std::wstring const & label, rti1516e::FederateHandleSet const& failedToSyncSet) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1630,7 +1630,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void initiateFederateSave(std::wstring const & label) override
+  void initiateFederateSave(std::wstring const & label) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1647,7 +1647,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void initiateFederateSave(std::wstring const & label, rti1516e::LogicalTime const & theTime) override
+  void initiateFederateSave(std::wstring const & label, rti1516e::LogicalTime const & theTime) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1665,7 +1665,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void federationSaved() override
+  void federationSaved() override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1681,7 +1681,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void federationNotSaved(rti1516e::SaveFailureReason theSaveFailureReason) override
+  void federationNotSaved(rti1516e::SaveFailureReason theSaveFailureReason) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1698,7 +1698,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void federationSaveStatusResponse(rti1516e::FederateHandleSaveStatusPairVector const & theFederateStatusVector) override
+  void federationSaveStatusResponse(rti1516e::FederateHandleSaveStatusPairVector const & theFederateStatusVector) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1715,7 +1715,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void requestFederationRestoreSucceeded(std::wstring const & label) override
+  void requestFederationRestoreSucceeded(std::wstring const & label) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1732,7 +1732,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void requestFederationRestoreFailed(std::wstring const & label) override
+  void requestFederationRestoreFailed(std::wstring const & label) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1749,7 +1749,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void federationRestoreBegun() override
+  void federationRestoreBegun() override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1765,7 +1765,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void initiateFederateRestore(std::wstring const & label, std::wstring const & federateName, rti1516e::FederateHandle handle) override
+  void initiateFederateRestore(std::wstring const & label, std::wstring const & federateName, rti1516e::FederateHandle handle) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1784,7 +1784,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void federationRestored() override
+  void federationRestored() override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1800,7 +1800,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void federationNotRestored(rti1516e::RestoreFailureReason theRestoreFailureReason) override
+  void federationNotRestored(rti1516e::RestoreFailureReason theRestoreFailureReason) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1817,7 +1817,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void federationRestoreStatusResponse(rti1516e::FederateRestoreStatusVector const & theFederateStatusVector) override
+  void federationRestoreStatusResponse(rti1516e::FederateRestoreStatusVector const & theFederateStatusVector) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1834,7 +1834,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void startRegistrationForObjectClass(rti1516e::ObjectClassHandle theClass) override
+  void startRegistrationForObjectClass(rti1516e::ObjectClassHandle theClass) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1851,7 +1851,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void stopRegistrationForObjectClass(rti1516e::ObjectClassHandle theClass) override
+  void stopRegistrationForObjectClass(rti1516e::ObjectClassHandle theClass) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1868,7 +1868,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void turnInteractionsOn(rti1516e::InteractionClassHandle theHandle) override
+  void turnInteractionsOn(rti1516e::InteractionClassHandle theHandle) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1885,7 +1885,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void turnInteractionsOff(rti1516e::InteractionClassHandle theHandle) override
+  void turnInteractionsOff(rti1516e::InteractionClassHandle theHandle) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1902,7 +1902,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void objectInstanceNameReservationSucceeded(std::wstring const & theObjectInstanceName) override
+  void objectInstanceNameReservationSucceeded(std::wstring const & theObjectInstanceName) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1919,7 +1919,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void objectInstanceNameReservationFailed(std::wstring const & theObjectInstanceName) override
+  void objectInstanceNameReservationFailed(std::wstring const & theObjectInstanceName) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1936,7 +1936,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void multipleObjectInstanceNameReservationSucceeded(std::set<std::wstring> const & theObjectInstanceNames) override
+  void multipleObjectInstanceNameReservationSucceeded(std::set<std::wstring> const & theObjectInstanceNames) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1953,7 +1953,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void multipleObjectInstanceNameReservationFailed(std::set<std::wstring> const & theObjectInstanceNames) override
+  void multipleObjectInstanceNameReservationFailed(std::set<std::wstring> const & theObjectInstanceNames) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -1970,7 +1970,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject,
+  void discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject,
                                       rti1516e::ObjectClassHandle theObjectClass,
                                       std::wstring const & theObjectInstanceName) override
   {
@@ -1991,7 +1991,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::ObjectClassHandle theObjectClass,
+  void discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::ObjectClassHandle theObjectClass,
                                       std::wstring const & theObjectInstanceName, rti1516e::FederateHandle producingFederate) override
   {
     if (!ob_federateAmbassador)
@@ -2012,7 +2012,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues,
+  void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues,
                                       rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
                                       rti1516e::TransportationType theType, rti1516e::SupplementalReflectInfo theReflectInfo) override
   {
@@ -2042,7 +2042,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
 
   virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues,
                                       rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
-                                      rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::SupplementalReflectInfo theReflectInfo) override
+                                      rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder,
+                                      rti1516e::SupplementalReflectInfo theReflectInfo) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2068,7 +2069,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues,
+  void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues,
                                       rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
                                       rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime,
                                       rti1516e::OrderType receivedOrder, rti1516e::MessageRetractionHandle theHandle,
@@ -2098,7 +2099,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues,
+  void receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues,
                                   rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
                                   rti1516e::TransportationType theType, rti1516e::SupplementalReceiveInfo theReceiveInfo) override
   {
@@ -2126,7 +2127,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues,
+  void receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues,
                                   rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
                                   rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder,
                                   rti1516e::SupplementalReceiveInfo theReceiveInfo) override
@@ -2155,7 +2156,6 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual
   void
   receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues,
                      rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
@@ -2188,11 +2188,10 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
   }
 
   // 6.11
-  virtual
   void
   removeObjectInstance(rti1516e::ObjectInstanceHandle theObject,
                        rti1516e::VariableLengthData const & theUserSuppliedTag,
-                       rti1516e::OrderType sentOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo)
+                       rti1516e::OrderType sentOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2216,13 +2215,12 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual
   void
   removeObjectInstance(rti1516e::ObjectInstanceHandle theObject,
                        rti1516e::VariableLengthData const & theUserSuppliedTag,
                        rti1516e::OrderType sentOrder,
                        rti1516e::LogicalTime const & theTime,
-                       rti1516e::OrderType receivedOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo)
+                       rti1516e::OrderType receivedOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2253,7 +2251,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
                        rti1516e::OrderType sentOrder,
                        rti1516e::LogicalTime const & theTime,
                        rti1516e::OrderType receivedOrder,
-                       rti1516e::MessageRetractionHandle theHandle, rti1516e::SupplementalRemoveInfo theRemoveInfo)
+                       rti1516e::MessageRetractionHandle theHandle, rti1516e::SupplementalRemoveInfo theRemoveInfo) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2280,7 +2278,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
   // 6.15
   virtual
   void
-  attributesInScope(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes)
+  attributesInScope(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2301,7 +2299,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
   // 6.16
   virtual
   void
-  attributesOutOfScope(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes)
+  attributesOutOfScope(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2320,8 +2318,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
   }
 
   // 6.18
-  virtual void provideAttributeValueUpdate(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes,
-                                           rti1516e::VariableLengthData const & theUserSuppliedTag)
+  void provideAttributeValueUpdate(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes,
+                                           rti1516e::VariableLengthData const & theUserSuppliedTag) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2340,7 +2338,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes)
+  void turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2359,7 +2357,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes, std::wstring const & updateRateDesignator)
+  void turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes, std::wstring const & updateRateDesignator) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2378,7 +2376,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void turnUpdatesOffForObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes)
+  void turnUpdatesOffForObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2396,9 +2394,9 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void confirmAttributeTransportationTypeChange(rti1516e::ObjectInstanceHandle theObject,
+  void confirmAttributeTransportationTypeChange(rti1516e::ObjectInstanceHandle theObject,
                                                         rti1516e::AttributeHandleSet theAttributes,
-                                                        rti1516e::TransportationType theTransportation)
+                                                        rti1516e::TransportationType theTransportation) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2417,9 +2415,9 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void reportAttributeTransportationType(rti1516e::ObjectInstanceHandle theObject,
-                                                 rti1516e::AttributeHandle theAttribute,
-                                                 rti1516e::TransportationType theTransportation)
+  void reportAttributeTransportationType(rti1516e::ObjectInstanceHandle theObject,
+                                         rti1516e::AttributeHandle theAttribute,
+                                         rti1516e::TransportationType theTransportation) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2438,8 +2436,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void confirmInteractionTransportationTypeChange(rti1516e::InteractionClassHandle theInteraction,
-                                                          rti1516e::TransportationType theTransportation)
+  void confirmInteractionTransportationTypeChange(rti1516e::InteractionClassHandle theInteraction,
+                                                  rti1516e::TransportationType theTransportation) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2457,9 +2455,9 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void reportInteractionTransportationType(rti1516e::FederateHandle federateHandle,
-                                                   rti1516e::InteractionClassHandle theInteraction,
-                                                   rti1516e::TransportationType theTransportation)
+  void reportInteractionTransportationType(rti1516e::FederateHandle federateHandle,
+                                           rti1516e::InteractionClassHandle theInteraction,
+                                           rti1516e::TransportationType theTransportation) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2478,8 +2476,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void requestAttributeOwnershipAssumption(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & offeredAttributes,
-                                                   rti1516e::VariableLengthData const & theUserSuppliedTag)
+  void requestAttributeOwnershipAssumption(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & offeredAttributes,
+                                           rti1516e::VariableLengthData const & theUserSuppliedTag) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2498,7 +2496,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void requestDivestitureConfirmation(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & releasedAttributes)
+  void requestDivestitureConfirmation(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & releasedAttributes) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2516,8 +2514,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void attributeOwnershipAcquisitionNotification(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & securedAttributes,
-                                                         rti1516e::VariableLengthData const & theUserSuppliedTag)
+  void attributeOwnershipAcquisitionNotification(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & securedAttributes,
+                                                 rti1516e::VariableLengthData const & theUserSuppliedTag) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2536,7 +2534,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void attributeOwnershipUnavailable(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes)
+  void attributeOwnershipUnavailable(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & theAttributes) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2554,8 +2552,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void requestAttributeOwnershipRelease(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & candidateAttributes,
-                                                rti1516e::VariableLengthData const & theUserSuppliedTag)
+  void requestAttributeOwnershipRelease(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleSet const & candidateAttributes,
+                                                rti1516e::VariableLengthData const & theUserSuppliedTag) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2574,8 +2572,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void confirmAttributeOwnershipAcquisitionCancellation(rti1516e::ObjectInstanceHandle theObject,
-                                                                rti1516e::AttributeHandleSet const & theAttributes)
+  void confirmAttributeOwnershipAcquisitionCancellation(rti1516e::ObjectInstanceHandle theObject,
+                                                        rti1516e::AttributeHandleSet const & theAttributes) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2593,8 +2591,8 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void informAttributeOwnership(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandle theAttribute,
-                                        rti1516e::FederateHandle theOwner)
+  void informAttributeOwnership(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandle theAttribute,
+                                rti1516e::FederateHandle theOwner) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2613,7 +2611,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void attributeIsNotOwned(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandle theAttribute)
+  void attributeIsNotOwned(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandle theAttribute) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2631,7 +2629,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void attributeIsOwnedByRTI(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandle theAttribute)
+  void attributeIsOwnedByRTI(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandle theAttribute) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2649,7 +2647,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void timeRegulationEnabled(rti1516e::LogicalTime const & theFederateTime)
+  void timeRegulationEnabled(rti1516e::LogicalTime const & theFederateTime) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2667,7 +2665,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
   }
 
   // 8.6
-  virtual void timeConstrainedEnabled(rti1516e::LogicalTime const & theFederateTime)
+  void timeConstrainedEnabled(rti1516e::LogicalTime const & theFederateTime) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2684,7 +2682,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void timeAdvanceGrant(rti1516e::LogicalTime const & theTime)
+  void timeAdvanceGrant(rti1516e::LogicalTime const & theTime) override
   {
     if (!ob_federateAmbassador)
       return;
@@ -2701,7 +2699,7 @@ struct PyRTI1516EFederateAmbassador : public rti1516e::FederateAmbassador {
     }
   }
 
-  virtual void requestRetraction(rti1516e::MessageRetractionHandle theHandle)
+  void requestRetraction(rti1516e::MessageRetractionHandle theHandle) override
   {
     if (!ob_federateAmbassador)
       return;

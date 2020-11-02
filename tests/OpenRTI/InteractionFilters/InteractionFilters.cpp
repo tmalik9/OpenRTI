@@ -132,8 +132,9 @@ protected:
 
 namespace OpenRTI {
 
-std::ostream& operator<<(std::ostream& out, const ParameterValueVector& parameters)
+std::string to_string(const ParameterValueVector& parameters)
 {
+  std::ostringstream out;
   out << "(";
   bool first = true;
   uint32_t parameterIndex = 0;
@@ -176,7 +177,7 @@ std::ostream& operator<<(std::ostream& out, const ParameterValueVector& paramete
     }
   }
   out << ")";
-  return out;
+  return out.str();
 }
 
 struct ParameterTest1
@@ -334,20 +335,20 @@ struct ParameterTest1
   void TestMatch(const std::string& message, ServerModel::InteractionClass& ic, ConnectHandle connect, const ParameterValueVector& parameters, bool expected)
   {
     bool result = _interactionClass.isMatching(connect, parameters);
-    std::cout << "matches " << parameters << message << " => " << result;
+    std::cout << "matches " << to_string(parameters) << message << " => " << result;
     std::cout <<  (result == expected ? " OK" : " FAILED") << std::endl;
   }
 
   void AddFilter(ConnectHandle connect, const ParameterValueVector& parameters)
   {
-    std::cout << "add " << parameters << ":" << std::endl;
+    std::cout << "add " << to_string(parameters) << ":" << std::endl;
     bool updateResult = _interactionClass.updateParameterFilterValues(connect, parameters);
     std::cout << "result=" << updateResult << std::endl;
   }
 
   void RemoveFilter(ConnectHandle connect, const ParameterValueVector& parameters)
   {
-    std::cout << "remove " << parameters << ":" << std::endl;
+    std::cout << "remove " << to_string(parameters) << ":" << std::endl;
     bool updateResult = _interactionClass.updateParameterFilterValues(connect, parameters, true);
     std::cout << "result=" << updateResult << std::endl;
   }
@@ -440,7 +441,7 @@ struct ParameterTest1
     TestMatch("", _interactionClass, connect, wildcard, true);
 
     std::cout  << std::endl << "before remove:" << _interactionClass.DumpInteractionFilters() << std::endl;
-    std::cout << "remove " << parameters1 << " => " << _interactionClass.updateParameterFilterValues(connect, parameters1, true) << std::endl;
+    std::cout << "remove " << to_string(parameters1) << " => " << _interactionClass.updateParameterFilterValues(connect, parameters1, true) << std::endl;
     std::cout  << std::endl << "after remove: " << _interactionClass.DumpInteractionFilters() << std::endl;
 
     TestMatch(" (INIT) ", _interactionClass, connect, parameters1, false);
