@@ -100,7 +100,7 @@ public:
     }
     uint8_t buffer[8];
     size_t offset = 0;
-    offset = encodeIntoBE32Compressed(buffer, 8, offset, length);
+    offset = encodeIntoBE32Compressed(buffer, 8, offset, static_cast<uint32_t>(length));
     offset = encodeIntoBE32Compressed(buffer, 8, offset, _version);
     return offset + length;
   }
