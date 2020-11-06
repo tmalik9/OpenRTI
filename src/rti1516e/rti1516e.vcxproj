@@ -159,8 +159,7 @@
       <Name>OpenRTI</Name>
     </ProjectReference>
     <ProjectReference Include="fedtime1516eStub.vcxproj">
-      <Project>{F8E7565C-E670-3525-A6A8-27D4E9420652}</Project>
-      <Name>fedtime1516eStub</Name>
+      <Project>{f8e7565c-e670-3525-a6a8-27d4e9420652}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

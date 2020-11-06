@@ -28,6 +28,7 @@
 
 #include "Encoding.h"
 #include "Export.h"
+#include "dprintf.h"
 
 namespace rti1516e
 {
@@ -36,16 +37,23 @@ typedef std::vector<std::pair<DataElement*, bool>> DataElementVector;
 
 class OPENRTI_LOCAL HLAfixedRecordImplementation {
 public:
-  HLAfixedRecordImplementation() :
-    _octetBoundary(0)
+  HLAfixedRecordImplementation(uint32_t version)
+    : _version(version)
   {
   }
-  HLAfixedRecordImplementation(const HLAfixedRecordImplementation& rhs) :
-    _octetBoundary(0)
+  HLAfixedRecordImplementation(const HLAfixedRecordImplementation& rhs)
+    : _version(rhs._version)
   {
-    _dataElementVector.reserve(rhs._dataElementVector.size());
-    for (auto& element : rhs._dataElementVector)
-      _dataElementVector.push_back(std::make_pair(element.first->clone().release(), true));
+    try {
+      _dataElementVector.reserve(rhs._dataElementVector.size());
+      for (auto& element : rhs._dataElementVector)
+        _dataElementVector.push_back(std::make_pair(element.first->clone().release(), true));
+      _dataElementVersions = rhs._dataElementVersions;
+    }
+    catch (...)
+    {
+      DebugPrintf("%s failed\n", __FUNCTION__);
+    }
   }
   ~HLAfixedRecordImplementation() noexcept
   {
@@ -61,15 +69,24 @@ public:
     if (bufferSize < offset + getEncodedLength())
       throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
 #endif
+    uint32_t byteLength = static_cast<uint32_t>(getEncodedLength());
+    offset = encodeIntoBE32Compressed(buffer, bufferSize, offset, static_cast<uint32_t>(byteLength));
+    offset = encodeIntoBE32Compressed(buffer, bufferSize, offset, static_cast<uint32_t>(_version));
+
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
       offset = i->first->encodeInto(buffer, bufferSize, offset);
     }
     return offset;
   }
 
-  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t startIndex)
   {
-    for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
+    uint32_t byteLength;
+    size_t index = startIndex;
+    index = decodeFromBE32Compressed(buffer, bufferSize, startIndex, byteLength);
+    index = decodeFromBE32Compressed(buffer, bufferSize, index, _version);
+    size_t end = startIndex + byteLength;
+    for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end() && index < end; ++i) {
       index = i->first->decodeFrom(buffer, bufferSize, index);
     }
     return index;
@@ -77,11 +94,15 @@ public:
 
   size_t getEncodedLength() const
   {
-    size_t length = 0;
+    size_t length = 0; /*2 * sizeof(uint32_t)*/; // sizeof(version) + sizeof(byteLength)
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
       length += i->first->getEncodedLength();
     }
-    return length;
+    uint8_t buffer[8];
+    size_t offset = 0;
+    offset = encodeIntoBE32Compressed(buffer, 8, offset, length);
+    offset = encodeIntoBE32Compressed(buffer, 8, offset, _version);
+    return offset + length;
   }
 
   unsigned int getOctetBoundary()
@@ -113,19 +134,19 @@ public:
   size_t size() const
   { return _dataElementVector.size(); }
 
-  void appendElement(const DataElement& dataElement)
+  void appendElement(const DataElement& dataElement, uint32_t fieldVersion = 0)
   {
     _dataElementVector.push_back(std::make_pair(dataElement.clone().release(), true));
-    _octetBoundary = 0;
+    _dataElementVersions.push_back(fieldVersion);
   }
 
-  void appendElementPointer(DataElement* dataElement)
+  void appendElementPointer(DataElement* dataElement, uint32_t fieldVersion = 0)
   {
     if (!dataElement)
       throw EncoderException(L"HLAfixedRecord::appendElementPointer: Null pointer given!");
     _dataElementVector.push_back(std::make_pair(dataElement, false));
-    _octetBoundary = 0;
-  }
+    _dataElementVersions.push_back(fieldVersion);
+}
 
   void set(size_t index, const DataElement& dataElement)
   {
@@ -156,23 +177,21 @@ public:
   const DataElement& get(size_t index) const
   {
     if (_dataElementVector.size() <= index)
-      throw EncoderException(L"HLAfixedRecord::get(size_t): Index out of range!");
+      throw EncoderException(L"HLAfixedRecord::get(size_t): Index out of range: size=" + std::to_wstring(_dataElementVector.size()) + L" <= index=" + std::to_wstring(index));
+    if (_version < _dataElementVersions[index])
+      throw EncoderException(L"HLAfixedRecord::get(size_t): Field not available in given version: record version=" + std::to_wstring(_version) + L" < field version=" + std::to_wstring(_dataElementVersions[index]));
     return *(_dataElementVector[index].first);
   }
 
-  const DataElement& arrayget(size_t index) const
-  {
-    if (_dataElementVector.size() <= index)
-      throw EncoderException(L"HLAfixedRecord::operator[](size_t): Index out of range!");
-    return *(_dataElementVector[index].first);
-  }
+  uint32_t getVersion() const { return _version; }
 
   DataElementVector _dataElementVector;
-  unsigned _octetBoundary;
+  std::vector<uint32_t> _dataElementVersions;
+  uint32_t _version;
 };
 
-HLAfixedRecord::HLAfixedRecord() :
-  _impl(new HLAfixedRecordImplementation)
+HLAfixedRecord::HLAfixedRecord(uint32_t version)
+ : _impl(new HLAfixedRecordImplementation(version))
 {
 }
 
@@ -276,15 +295,15 @@ HLAfixedRecord::size() const
 }
 
 void
-HLAfixedRecord::appendElement(const DataElement& dataElement)
+HLAfixedRecord::appendElement(const DataElement& dataElement, uint32_t fieldVersion)
 {
-  _impl->appendElement(dataElement);
+  _impl->appendElement(dataElement, fieldVersion);
 }
 
 void
-HLAfixedRecord::appendElementPointer(DataElement* dataElement)
+HLAfixedRecord::appendElementPointer(DataElement* dataElement, uint32_t fieldVersion)
 {
-  _impl->appendElementPointer(dataElement);
+  _impl->appendElementPointer(dataElement, fieldVersion);
 }
 
 void
@@ -305,10 +324,15 @@ HLAfixedRecord::get(size_t index) const
   return _impl->get(index);
 }
 
+uint32_t HLAfixedRecord::getVersion() const
+{
+  return _impl->getVersion();
+}
+
 DataElement const&
 HLAfixedRecord::operator[](size_t index) const
 {
-  return _impl->arrayget(index);
+  return _impl->get(index);
 }
 
 }

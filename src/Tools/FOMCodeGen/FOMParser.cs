@@ -146,21 +146,26 @@ namespace FOMCodeGen
 
     public class FixedRecordField
     {
-      public FixedRecordField(string name, DataType dataType)
+      public FixedRecordField(string name, DataType dataType, uint version)
       {
         Name = name;
         DataType = dataType;
+        Version = version;
       }
       public string Name { get; set; }
       public DataType DataType { get; set; }
+      public uint Version { get; set; }
       public string Comment { get; set; }
     }
     public class FixedRecordDataType : DataType
     {
-      public FixedRecordDataType(string name) : base(name)
+      public FixedRecordDataType(string name, uint version) : base(name)
       {
         Fields = new List<FixedRecordField>();
+        Version = version;
+        HasChilds = false;
       }
+      public uint Version { get; set; }
       public List<FixedRecordField> Fields { get; set; }
       public List<FixedRecordField> AllFields
       {
@@ -180,6 +185,7 @@ namespace FOMCodeGen
         }
       }
       public FixedRecordDataType BaseClass { get; set; }
+      public bool HasChilds { get; set; }
     }
 
     public Dictionary<string, DataType> DataTypes { get; set; }
@@ -288,30 +294,70 @@ namespace FOMCodeGen
       foreach (XmlElement fixedRecordDataTypeNode in fixedRecordDataTypeNodes)
       {
         string name = fixedRecordDataTypeNode["name"].FirstChild.InnerText;
-        var fixedRecordDataType = new FixedRecordDataType(name);
-        DataTypes[name] = fixedRecordDataType;
+        FixedRecordDataType includedFixedRecordType = null;
         if (fixedRecordDataTypeNode["include"] != null)
         {
-          var includedFixedRecordType = DataTypes[fixedRecordDataTypeNode["include"].FirstChild.InnerText] as FixedRecordDataType;
-          fixedRecordDataType.BaseClass = includedFixedRecordType;
-          //foreach (var field in includedFixedRecordType.Fields)
-          //{
-          //  fixedRecordDataType.Fields.Add(field.Key, field.Value);
-          //}
+          includedFixedRecordType = DataTypes[fixedRecordDataTypeNode["include"].FirstChild.InnerText] as FixedRecordDataType;
+          includedFixedRecordType.HasChilds = true;
         }
+
+        uint recordVersion = 0;
+        if (fixedRecordDataTypeNode["version"] != null)
+        {
+          string versionString = fixedRecordDataTypeNode["version"].FirstChild.InnerText;
+          if (!uint.TryParse(versionString, out recordVersion))
+          {
+            throw new ApplicationException("record version must be an integer: \"" + versionString + "\"");
+          }
+        }
+        else if (includedFixedRecordType != null)
+        {
+          recordVersion = includedFixedRecordType.Version;
+        }
+        var fixedRecordDataType = new FixedRecordDataType(name, recordVersion);
+        DataTypes[name] = fixedRecordDataType;
+        fixedRecordDataType.BaseClass = includedFixedRecordType;
+
         foreach (XmlElement fieldNode in fixedRecordDataTypeNode.SelectNodes("field"))
         {
           string fieldName = fieldNode["name"].FirstChild.InnerText;
           string fieldDataType = fieldNode["dataType"].FirstChild.InnerText;
-          var field = new FixedRecordField(fieldName, DataTypes[fieldDataType]);
+          uint fieldVersion = recordVersion;
+          if (fieldNode["version"] != null)
+          {
+            string versionString = fieldNode["version"].FirstChild.InnerText;
+            if (!uint.TryParse(versionString, out fieldVersion))
+            {
+              throw new ApplicationException("field version must be an integer: \"" + versionString + "\"");
+            }
+          }
+          var field = new FixedRecordField(fieldName, DataTypes[fieldDataType], fieldVersion);
           if (fieldNode["semantics"] != null && fieldNode["semantics"].FirstChild != null)
           {
             field.Comment = fieldNode["semantics"].FirstChild.InnerText;
           }
           fixedRecordDataType.Fields.Add(field);
         }
+        FixedRecordField previousField = null;
+        foreach (var field in fixedRecordDataType.Fields)
+        {
+          if (field.Version > fixedRecordDataType.Version)
+          {
+            throw new ApplicationException(string.Format("fixed record \"{0}\" version {1}, field \"{2}\" version {3}: field version must be lower or equal to record version",
+              fixedRecordDataType.Name, fixedRecordDataType.Version, field.Name, field.Version));
+          }
+          if (previousField != null && previousField.Version > field.Version)
+          {
+            throw new ApplicationException(string.Format("fixed record \"{0}\", field \"{1}\" version {2}: field version must be greater or equal to previous field \"{3}\" version {4}",
+              fixedRecordDataType.Name, field.Name, field.Version, previousField.Name, previousField.Version));
+          }
+          previousField = field;
+        }
         fixedRecordDataType.Generate = (fixedRecordDataTypeNode["nocode"] == null);
-        if (fixedRecordDataTypeNode["semantics"] != null) fixedRecordDataType.Comment = fixedRecordDataTypeNode["semantics"].FirstChild.InnerText;
+        if (fixedRecordDataTypeNode["semantics"] != null)
+        {
+          fixedRecordDataType.Comment = fixedRecordDataTypeNode["semantics"].FirstChild.InnerText;
+        }
       }
     }
   }

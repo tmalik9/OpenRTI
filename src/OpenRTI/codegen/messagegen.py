@@ -167,9 +167,10 @@ class CDataType(DataType):
 
 ###############################################################################
 class EnumLabel(object):
-    def __init__(self, name, value):
+    def __init__(self, name, value, repr):
         self.__name = name
         self.__value = value
+        self.__repr = repr
 
     def getName(self):
         return self.__name
@@ -177,13 +178,19 @@ class EnumLabel(object):
     def getValue(self):
         return self.__value
 
+    def getRepr(self):
+        return self.__repr
+
 class EnumDataType(DataType):
     def __init__(self, typeMap, name):
         DataType.__init__(self, typeMap, name, False)
         self.__enumList = []
 
-    def addEnum(self, name, value):
-        self.__enumList.append(EnumLabel(name, value))
+    def addEnum(self, name, value, repr=None):
+        if repr is None:
+            self.__enumList.append(EnumLabel(name, value, name))
+        else:
+            self.__enumList.append(EnumLabel(name, value, repr))
 
     def getEnumList(self):
         return self.__enumList
@@ -230,7 +237,7 @@ class EnumDataType(DataType):
         sourceStream.writeline('{')
         sourceStream.writeline('  switch (value) {')
         for enum in self.__enumList:
-            sourceStream.writeline('  case {enum}: os << "{enum}"; break;'.format(enum = enum.getName()))
+            sourceStream.writeline('  case {enum}: os << "{repr}"; break;'.format(enum = enum.getName(), repr=enum.getRepr()))
         sourceStream.writeline('  }')
         sourceStream.writeline('  return os;')
         sourceStream.writeline('}')
@@ -248,7 +255,7 @@ class EnumDataType(DataType):
         sourceStream.writeline('{')
         sourceStream.writeline('  switch (value) {')
         for enum in self.__enumList:
-            sourceStream.writeline('  case {enum}: return "{enum}";'.format(enum = enum.getName()))
+            sourceStream.writeline('  case {enum}: return "{repr}";'.format(enum = enum.getName(), repr=enum.getRepr()))
         sourceStream.writeline('  default: return "<Invalid {name}>";'.format(name = self.getName()))
         sourceStream.writeline('  }')
         sourceStream.writeline('}')
@@ -598,12 +605,17 @@ class PairDataType(DataType):
 
 ###############################################################################
 class StructField(object):
-    def __init__(self, name, typeName, hideOnPrint=False):
+    def __init__(self, name, typeName, abstract=False, override=False, hideOnPrint=False):
+        if abstract and override:
+            raise Exception('abstract and override can\'t be used together, field {0}'.format(name))
         self.__name = name
         self.__typeName = typeName
         self.__hasSwap = False
+        self.__abstract = abstract
+        self.__override = override
         self._hasPayload = None
         self._hideOnPrint = hideOnPrint
+
 
     def getName(self):
         return self.__name
@@ -637,61 +649,179 @@ class StructField(object):
         upperName = self.getUpperName()
         typeName = self.getTypeName()
         memberName = self.getMemberName()
-        sourceStream.writeline('void set{upperName}(const {typeName}& value) noexcept'.format(upperName = upperName, typeName = typeName))
-        sourceStream.writeline('{{ {prefix}{memberName} = value; }}'.format(memberName = memberName, prefix = valuePrefix))
-        sourceStream.writelineNoIndent('#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference')
-        sourceStream.writeline('void set{upperName}({typeName}&& value) noexcept'.format(upperName = upperName, typeName = typeName))
-        sourceStream.writeline('{{ {prefix}{memberName} = std::move(value); }}'.format(memberName = memberName, prefix = valuePrefix))
-        sourceStream.writelineNoIndent('#endif')
+        if self.__abstract:
+            sourceStream.writeline('virtual void set{upperName}(const {typeName}& value) noexcept = 0;'.format(upperName = upperName, typeName = typeName))
+            sourceStream.writelineNoIndent('#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference')
+            sourceStream.writeline('virtual void set{upperName}({typeName}&& value) noexcept = 0;'.format(upperName = upperName, typeName = typeName))
+            sourceStream.writelineNoIndent('#endif')
+        else:
+            override=""
+            if self.__override:
+                override = " override"
+            sourceStream.writeline('void set{upperName}(const {typeName}& value) noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
+            sourceStream.writeline('{{ {prefix}{memberName} = value; }}'.format(memberName = memberName, prefix = valuePrefix))
+            sourceStream.writelineNoIndent('#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference')
+            sourceStream.writeline('void set{upperName}({typeName}&& value) noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
+            sourceStream.writeline('{{ {prefix}{memberName} = std::move(value); }}'.format(memberName = memberName, prefix = valuePrefix))
+            sourceStream.writelineNoIndent('#endif')
 
     def writeGetter(self, sourceStream, valuePrefix):
         upperName = self.getUpperName()
         typeName = self.getTypeName()
         memberName = self.getMemberName()
-        sourceStream.writeline('{typeName}& get{upperName}() noexcept'.format(upperName = upperName, typeName = typeName))
-        sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
+        if self.__abstract:
+            sourceStream.writeline('virtual {typeName}& get{upperName}() noexcept = 0;'.format(upperName = upperName, typeName = typeName))
+        else:
+            override=""
+            if self.__override:
+                override = " override"
+            sourceStream.writeline('{typeName}& get{upperName}() noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
+            sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
 
     def writeConstGetter(self, sourceStream, valuePrefix):
         upperName = self.getUpperName()
         typeName = self.getTypeName()
         memberName = self.getMemberName()
-        sourceStream.writeline('const {typeName}& get{upperName}() const noexcept'.format(upperName = upperName, typeName = typeName))
-        sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
+        if self.__abstract:
+            sourceStream.writeline('virtual const {typeName}& get{upperName}() const noexcept = 0;'.format(upperName = upperName, typeName = typeName))
+        else:
+            override=""
+            if self.__override:
+                override = " override"
+            sourceStream.writeline('const {typeName}& get{upperName}() const noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
+            sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
 
     def writeMemberInstance(self, sourceStream):
-        typeName = self.getTypeName()
-        memberName = self.getMemberName()
-        sourceStream.writeline('{typeName} {memberName};'.format(typeName = typeName, memberName = memberName))
+        if not self.__abstract:
+            typeName = self.getTypeName()
+            memberName = self.getMemberName()
+            sourceStream.writeline('{typeName} {memberName};'.format(typeName = typeName, memberName = memberName))
 
     def writeSwap(self, sourceStream, value):
+        if not self.__abstract:
+            memberName = self.getMemberName()
+            if self.__hasSwap:
+                sourceStream.writeline('{memberName}.swap({value}.{memberName});'.format(memberName = memberName, value = value))
+            else:
+                sourceStream.writeline('std::swap({memberName}, {value}.{memberName});'.format(memberName = memberName, value = value))
+
+class StructConstField(object):
+    def __init__(self, name, typeName, value=None, abstract=False, override=False, hideOnPrint=False):
+        self.__name = name
+        self.__typeName = typeName
+        self.__hasSwap = False
+        self.__value = value
+        self.__abstract = abstract
+        self.__override = override
+        self._hasPayload = None
+        self._hideOnPrint = hideOnPrint
+        if value is None and abstract is False:
+            raise Exception("value must be specified: field {0}".format(name))
+
+    def getName(self):
+        return self.__name
+
+    def getLowerName(self):
+        return self.__name[0].lower() + self.__name[1:len(self.__name)]
+
+    def getUpperName(self):
+        return self.__name[0].upper() + self.__name[1:len(self.__name)]
+
+    def getMemberName(self):
+        return '_' + self.getLowerName()
+
+    def getTypeName(self):
+        return self.__typeName
+
+    def resolveHasPayloadAndHasSwap(self, typeMap):
+        t = typeMap.getType(self.getTypeName())
+        t.resolveHasPayloadAndHasSwap(typeMap)
+        self._hasPayload = t.hasPayload()
+
+        self.__hasSwap = t.hasSwap()
+
+    def hasPayload(self):
+        return False
+
+    def hideOnPrint(self):
+        return self._hideOnPrint
+
+    def writeSetter(self, sourceStream, valuePrefix):
+        pass
+
+    def writeGetter(self, sourceStream, valuePrefix):
+        pass
+
+    def writeConstGetter(self, sourceStream, valuePrefix):
+        upperName = self.getUpperName()
+        typeName = self.getTypeName()
         memberName = self.getMemberName()
-        if self.__hasSwap:
-            sourceStream.writeline('{memberName}.swap({value}.{memberName});'.format(memberName = memberName, value = value))
+        if self.__abstract:
+            sourceStream.writeline('virtual const {typeName} get{upperName}() const noexcept = 0;'.format(upperName = upperName, typeName = typeName))
         else:
-            sourceStream.writeline('std::swap({memberName}, {value}.{memberName});'.format(memberName = memberName, value = value))
+            override=""
+            if self.__override:
+                override = " override"
+            sourceStream.writeline('const {typeName} get{upperName}() const noexcept{override} {{ return {value}; }}'.format(upperName = upperName, typeName = typeName, value = self.__value, override=override))
+
+    def writeMemberInstance(self, sourceStream):
+        pass
+
+    def writeSwap(self, sourceStream, value):
+        pass
 
 ###############################################################################
 class StructDataType(DataType):
-    def __init__(self, typeMap, name, parentObject = None, parentTypeName = None):
-        DataType.__init__(self, typeMap, name, True, parentObject)
+    def __init__(self, typeMap, name, abstract=None, parentObject = None, parentTypeName = None):
+        DataType.__init__(self, typeMap, name, hasSwap=True, parentObject=parentObject)
         self.__parentTypeName = parentTypeName
         self.__fieldList = []
         self.__cow = False
+        if abstract is not None and abstract.lower() == 'true':
+            self.__abstract = True
+        else:
+            self.__abstract = False
 
     def setCopyOnWrite(self, cow):
+        if self.__abstract and cow:
+            raise Exception('copyOnWrite and abstract can\'t be used together')
         self.__cow = cow
 
     def getCopyOnWrite(self):
         return self.__cow
 
-    def addField(self, name, typeName, hideOnPrint=False):
-        self.__fieldList.append(StructField(name, typeName, hideOnPrint))
+    def addField(self, name, typeName, const=None, value=None, hideOnPrint=False):
+        override = False
+        if not self.__abstract and self.getParentType():
+            parentType = self.getParentType()
+            fields = parentType.getFieldList()
+            for field in fields:
+                if field.getName() == name:
+                    override = True
+        if const is not None and const.lower() == 'true':
+            self.__fieldList.append(StructConstField(name, typeName, value, abstract=self.__abstract, override=override, hideOnPrint=hideOnPrint))
+        else:
+            self.__fieldList.append(StructField(name, typeName, abstract=self.__abstract, override=override, hideOnPrint=hideOnPrint))
 
     def getFieldList(self):
         return self.__fieldList
 
+    def getNonConstFieldList(self):
+        result = []
+        for field in self.__fieldList:
+            if type(field) is StructField:
+                result .append(field)
+        return result
+
     def getParentTypeName(self):
         return self.__parentTypeName
+
+    def getParentType(self):
+        if self.__parentTypeName:
+            return self.getType(self.__parentTypeName)
+
+    def isAbstract(self):
+        return self.__abstract
 
     def resolveHasPayloadAndHasSwap(self, typeMap):
         for field in self.__fieldList:
@@ -717,15 +847,16 @@ class StructDataType(DataType):
             valuePrefix = 'getImpl().'
             constValuePrefix = 'getConstImpl().'
         else:
-            fieldCount = len(self.getFieldList())
             # default constructor
             sourceStream.writeline('{name}()'.format(name = self.getName()) + ' { }')
 
-            if fieldCount > 0:
+            fields = self.getNonConstFieldList()
+            fieldCount = len(fields)
+            if not self.__abstract and fieldCount > 0:
                 sourceStream.writeline('{name}('.format(name = self.getName()))
                 sourceStream.pushIndent()
                 index = 0
-                for field in self.getFieldList():
+                for field in fields:
                     line = '{fieldTypeName} {paramName}'.format(paramName = field.getLowerName(), fieldTypeName=field.getTypeName())
                     index = index + 1
                     if index < fieldCount:
@@ -735,7 +866,7 @@ class StructDataType(DataType):
                     sourceStream.writeline(line)
                 index = 0
                 sourceStream.pushIndent()
-                for field in self.getFieldList():
+                for field in fields:
                     if (index == 0): 
                         line = ': '
                     else:
@@ -799,51 +930,54 @@ class StructDataType(DataType):
         sourceStream.writeline('bool operator<=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator>(rhs); }')
 
-        sourceStream.popIndent()
-        sourceStream.writeline('private:')
-        sourceStream.pushIndent()
-
-        if self.__cow:
-            sourceStream.writeline('struct OPENRTI_API Implementation final : public Referenced {')
-            sourceStream.pushIndent()
-
-            fieldCount = len(self.getFieldList())
-            if fieldCount == 0:
-                sourceStream.writeline('Implementation() noexcept'.format(name = self.getName()))
-            else:
-                sourceStream.writeline('Implementation() noexcept :'.format(name = self.getName()))
-            sourceStream.pushIndent()
-            index = 0
-            for field in self.getFieldList():
-                line = '{memberName}()'.format(memberName = field.getMemberName())
-                index = index + 1
-                if index < fieldCount:
-                    line += ','
-                sourceStream.writeline(line)
+        if not self.isAbstract():
             sourceStream.popIndent()
-            sourceStream.writeline('{ }')
+            sourceStream.writeline('private:')
+            sourceStream.pushIndent()
+
+            if self.__cow:
+                sourceStream.writeline('struct OPENRTI_API Implementation final : public Referenced {')
+                sourceStream.pushIndent()
+
+                nonConstFields = self.getNonConstFieldList()
+                fieldCount = len(nonConstFields)
+                if fieldCount == 0:
+                    sourceStream.writeline('Implementation() noexcept'.format(name = self.getName()))
+                else:
+                    sourceStream.writeline('Implementation() noexcept :'.format(name = self.getName()))
+                sourceStream.pushIndent()
+                index = 0
+                for field in nonConstFields:
+                    if type(field) is StructField:
+                        line = '{memberName}()'.format(memberName = field.getMemberName())
+                        index = index + 1
+                        if index < fieldCount:
+                            line += ','
+                        sourceStream.writeline(line)
+                sourceStream.popIndent()
+                sourceStream.writeline('{ }')
  
             
-        for field in self.__fieldList:
-            field.writeMemberInstance(sourceStream)
+            for field in self.__fieldList:
+                field.writeMemberInstance(sourceStream)
 
-        if self.__cow:
-            sourceStream.popIndent()
-            sourceStream.writeline('};')
-            sourceStream.writeline()
-            sourceStream.writeline('const Implementation& getConstImpl() const')
-            sourceStream.writeline('{')
-            sourceStream.writeline('  return *_impl;')
-            sourceStream.writeline('}')
-            sourceStream.writeline()
-            sourceStream.writeline('Implementation& getImpl()')
-            sourceStream.writeline('{')
-            sourceStream.writeline('  if (1 < Referenced::count(_impl.get()))')
-            sourceStream.writeline('    _impl = MakeShared<Implementation>(*_impl);')
-            sourceStream.writeline('  return *_impl;')
-            sourceStream.writeline('}')
-            sourceStream.writeline()
-            sourceStream.writeline('SharedPtr<Implementation> _impl;')
+            if self.__cow:
+                sourceStream.popIndent()
+                sourceStream.writeline('};')
+                sourceStream.writeline()
+                sourceStream.writeline('const Implementation& getConstImpl() const')
+                sourceStream.writeline('{')
+                sourceStream.writeline('  return *_impl;')
+                sourceStream.writeline('}')
+                sourceStream.writeline()
+                sourceStream.writeline('Implementation& getImpl()')
+                sourceStream.writeline('{')
+                sourceStream.writeline('  if (1 < Referenced::count(_impl.get()))')
+                sourceStream.writeline('    _impl = MakeShared<Implementation>(*_impl);')
+                sourceStream.writeline('  return *_impl;')
+                sourceStream.writeline('}')
+                sourceStream.writeline()
+                sourceStream.writeline('SharedPtr<Implementation> _impl;')
 
         sourceStream.popIndent()
         sourceStream.writeline('};')
@@ -958,10 +1092,42 @@ class StructDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writeEncoder(self, sourceStream):
+        if not self.isAbstract():
+            name = self.getName()
+            sourceStream.writeline('void write{name}(const {name}& value)'.format(name = name))
+            sourceStream.writeline('{')
+            for field in self.getFieldList():
+                fieldName = field.getName()
+                typeName = field.getTypeName()
+                if type(field) is StructField:
+                    sourceStream.writeline('  write{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
+                else:
+                    sourceStream.writeline('  write{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
+            sourceStream.writeline('}')
+            sourceStream.writeline()
+    
+    def writeDecoder(self, sourceStream):
+        if not self.isAbstract():
+            name = self.getName()
+            sourceStream.writeline('void read{name}({name}& value)'.format(name = name))
+            sourceStream.writeline('{')
+            for field in self.getFieldList():
+                fieldName = field.getName()
+                typeName = field.getTypeName()
+                if type(field) is StructField:
+                    sourceStream.writeline('  read{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
+                else:
+                    sourceStream.writeline('  {typeName} _dummy{typeName};'.format(typeName = typeName, fieldName = fieldName))
+                    sourceStream.writeline('  read{typeName}(_dummy{typeName});'.format(typeName = typeName, fieldName = fieldName))
+
+            sourceStream.writeline('}')
+            sourceStream.writeline()
+
 ###############################################################################
 class MessageDataType(StructDataType):
     def __init__(self, typeMap, name, parentTypeName = None):
-        StructDataType.__init__(self, typeMap, name, 'Federation', parentTypeName)
+        StructDataType.__init__(self, typeMap, name, parentObject='Federation', parentTypeName=parentTypeName)
         self.__reliableExpression = None
         self.__objectInstanceExpression = None
          
@@ -1491,26 +1657,10 @@ class MessageEncoding(object):
 
 
     def writeStructEncoder(self, dataType, sourceStream):
-        name = dataType.getName()
-        sourceStream.writeline('void write{name}(const {name}& value)'.format(name = name))
-        sourceStream.writeline('{')
-        for field in dataType.getFieldList():
-            fieldName = field.getName()
-            typeName = field.getTypeName()
-            sourceStream.writeline('  write{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
-        sourceStream.writeline('}')
-        sourceStream.writeline()
+        dataType.writeEncoder(sourceStream)
 
     def writeStructDecoder(self, dataType, sourceStream):
-        name = dataType.getName()
-        sourceStream.writeline('void read{name}({name}& value)'.format(name = name))
-        sourceStream.writeline('{')
-        for field in dataType.getFieldList():
-            fieldName = field.getName()
-            typeName = field.getTypeName()
-            sourceStream.writeline('  read{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
-        sourceStream.writeline('}')
-        sourceStream.writeline()
+        dataType.writeDecoder(sourceStream)
 
     def writeStructPayloadDecoder(self, dataType, sourceStream):
         if not dataType.hasPayload():
@@ -1829,7 +1979,7 @@ class TypeMap(object):
         self.__typeMap = {}
         for node in root.getchildren():
             if node.tag == 'message':
-                message = MessageDataType(self, node.get('type') + 'Message', 'AbstractMessage')
+                message = MessageDataType(self, node.get('type') + 'Message', parentTypeName='AbstractMessage')
                 for field in node.getchildren():
                     if field.tag == 'field':
                         hide = field.get('hide')
@@ -1838,7 +1988,7 @@ class TypeMap(object):
                                 hide = True
                             else:
                                 hide = False
-                        message.addField(field.get('name'), field.get('type'), hide)
+                        message.addField(field.get('name'), field.get('type'), hideOnPrint=hide)
                     elif field.tag == 'reliable':
                         message.setReliableExpression(field.get('expression'))
                     elif field.tag == 'objectInstance':
@@ -1852,7 +2002,7 @@ class TypeMap(object):
                     enum = EnumDataType(self, node.get('name'))
                     for enumerant in node.getchildren():
                         if enumerant.tag == 'enumerant':
-                            enum.addEnum(enumerant.get('name'), enumerant.get('value'))
+                            enum.addEnum(enumerant.get('name'), enumerant.get('value'), enumerant.get('repr'))
                     self.addType(enum)
 
                 elif typeName == 'vector':
@@ -1870,11 +2020,11 @@ class TypeMap(object):
                     self.addType(PairDataType(self, node.get('name'), node.get('first'), node.get('second')))
 
                 elif typeName == 'struct':
-                    struct = StructDataType(self, node.get('name'), node.get('parent'))
+                    struct = StructDataType(self, node.get('name'), abstract=node.get('abstract'), parentObject=node.get('parent'), parentTypeName=node.get('base'))
                     struct.setCopyOnWrite(node.get('copyOnWrite') == 'true')
                     for field in node.getchildren():
                         if field.tag == 'field':
-                            struct.addField(field.get('name'), field.get('type'))
+                            struct.addField(field.get('name'), field.get('type'), const=field.get('const'), value=field.get('value'))
                     self.addType(struct)
                 else:
                     dataType = CDataType(self, node.get('name'), node.get('encoding'), node.get('ctype'), node.get('parent'))
@@ -1892,7 +2042,9 @@ class TypeMap(object):
         return self.__typeList
 
     def getType(self, name):
-        return self.__typeMap[name]
+        if name in self.__typeMap:
+            return self.__typeMap[name]
+        return None
 
     def writeDeclaration(self, sourceStream):
         sourceStream.writeCopyright()

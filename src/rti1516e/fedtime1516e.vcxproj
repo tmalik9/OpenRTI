@@ -127,8 +127,7 @@
       <Name>OpenRTI</Name>
     </ProjectReference>
     <ProjectReference Include="rti1516e.vcxproj">
-      <Project>{DEE8A809-6531-30D3-9292-E70C38ED75FC}</Project>
-      <Name>rti1516e</Name>
+      <Project>{dee8a809-6531-30d3-9292-e70c38ed75fc}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

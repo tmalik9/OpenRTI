@@ -1,4 +1,4 @@
-/* -*-c++-*- OpenRTI - Copyright (C) 2009-2015 Mathias Froehlich
+/* -*-c++-*- OpenRTI - Copyright (C) 2009-2012 Mathias Froehlich
  *
  * This file is part of OpenRTI.
  *
@@ -17,23 +17,30 @@
  *
  */
 
-#ifndef OpenRTI_FDD1516EFileReader_h
-#define OpenRTI_FDD1516EFileReader_h
-
-#include <iosfwd>
+#include <cstdlib>
 #include <string>
-#include "Export.h"
-#include "Message.h"
+#include <memory>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include "RTI/RTIambassadorFactory.h"
+#include "RTI/RTIambassador.h"
 
-namespace OpenRTI {
+#include "Options.h"
+#include "StringUtils.h"
+#include "FDD1516EFileReader.h"
 
-class FOMStringModule;
 
-class OPENRTI_API FDD1516EFileReader {
-public:
-  static FOMStringModule read(std::istream& stream, const std::string& encoding);
-};
-
-} // namespace OpenRTI
-
-#endif
+int
+main(int argc, char* argv[])
+{
+  OpenRTI::FDD1516EFileReader reader;
+  std::ifstream file(argv[1]);
+  if (!file.is_open())
+  {
+    std::cerr << "could not open file " << argv[1] << std::endl;
+    return EXIT_FAILURE;
+  }
+  reader.read(file, std::string());
+  return EXIT_SUCCESS;
+}

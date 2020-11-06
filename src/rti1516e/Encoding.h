@@ -197,5 +197,60 @@ static inline size_t decodeFromLE16(const Octet* buffer, size_t bufferSize, size
   return offset + 2;
 }
 
+template<typename T>
+static inline size_t decodeCompressed(const Octet* buffer, size_t bufferSize, size_t offset, T& value)
+{
+  unsigned shift = 7;
+  if (bufferSize <= offset)
+  {
+    throw EncoderException(L"provided buffer too small");
+  }
+  const Octet* p = buffer + offset;
+  uint8_t byte = *p++; offset++;
+  value = (byte & 0x7f);
+  while (byte & 0x80)
+  {
+    if (bufferSize <= offset)
+    {
+      throw EncoderException(L"provided buffer too small");
+    }
+    byte = *p++; offset++;
+    value |= T(byte & 0x7f) << shift;
+    shift += 7;
+  }
+  return offset;
+}
+
+template<typename T>
+static inline size_t encodeCompressed(Octet* buffer, size_t bufferSize, size_t offset, T value)
+{
+  if (bufferSize <= offset)
+  {
+    throw EncoderException(L"provided buffer too small");
+  }
+  Octet* p = buffer + offset;
+  while (value & (~T(0x7f)))
+  {
+    if (bufferSize <= offset)
+    {
+      throw EncoderException(L"provided buffer too small");
+    }
+    uint8_t byte = (0x80 | (0x7f & static_cast<uint8_t>(value)));
+    *p++ = byte; offset++;
+    value >>= 7;
+  }
+  *p++ = static_cast<uint8_t>(value); offset++;
+  return offset;
+}
+
+static inline size_t decodeFromBE32Compressed(const Octet* buffer, size_t bufferSize, size_t offset, uint32_t& value)
+{
+  return decodeCompressed<uint32_t>(buffer, bufferSize, offset, value);
+}
+
+static inline size_t encodeIntoBE32Compressed(Octet* buffer, size_t bufferSize, size_t offset, uint32_t value)
+{
+  return encodeCompressed<uint32_t>(buffer, bufferSize, offset, value);
+}
 
 }

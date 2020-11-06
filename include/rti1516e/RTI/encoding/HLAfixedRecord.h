@@ -29,7 +29,7 @@ namespace rti1516e
    public:
 
       // Default Constructor
-      HLAfixedRecord ();
+      HLAfixedRecord (uint32_t version = 0);
 
       // Copy Constructor
       HLAfixedRecord (
@@ -86,11 +86,11 @@ namespace rti1516e
       virtual size_t size () const;
 
       // Append a copy of the dataElement instance to this fixed record.
-      virtual void appendElement (const DataElement& dataElement);
+      virtual void appendElement (const DataElement& dataElement, uint32_t fieldVersion = 0);
 
       // Append the dataElement instance to this fixed record.
       // Null pointer results in an exception.
-      virtual void appendElementPointer (DataElement* dataElement);
+      virtual void appendElementPointer (DataElement* dataElement, uint32_t fieldVersion = 0);
 
       // Sets the element at the given index to a copy of the given element instance
       // Element must match prototype of existing element at this index.
@@ -110,6 +110,8 @@ namespace rti1516e
       // Return a const reference to the element instance at the specified index.
       // Must use set to change element.
       DataElement const& operator [](size_t index) const;
+
+      uint32_t getVersion() const;
 
    private:
 

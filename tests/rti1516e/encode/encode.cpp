@@ -38,6 +38,7 @@
 
 #include "../../../src/rti1516e/HandleFactory.h"
 #include "../../../src/OpenRTI/DebugNew.h"
+#include "../../../src/rti1516e/Encoding.h"
 
 #include <RTI1516ETestLib.h>
 
@@ -51,7 +52,7 @@ typedef rti1516e::HLAinteger32BE HLAcount;
 class OPENRTI_LOCAL HLAinteractionCount : public rti1516e::HLAfixedRecord
 {
   public:
-    HLAinteractionCount()
+    HLAinteractionCount() : rti1516e::HLAfixedRecord(1)
     {
       HLAfixedRecord::appendElementPointer(&mClassHandle);
       HLAfixedRecord::appendElementPointer(&mCount);
@@ -111,7 +112,8 @@ class OPENRTI_LOCAL HLAinteractionSubscription : public rti1516e::HLAfixedRecord
 {
   public:
     HLAinteractionSubscription(rti1516e::InteractionClassHandle classHandle, bool active)
-      : mClassHandle(classHandle)
+      : rti1516e::HLAfixedRecord(1)
+      , mClassHandle(classHandle)
       , mActive(active)
     {
       HLAfixedRecord::appendElementPointer(&mClassHandle);
@@ -1883,9 +1885,253 @@ bool testDataPointerFixedRecordEncoding()
   return true;
 }
 
+bool testFixedRecordWithVersionsEncoding()
+{
+  if (gDebugPrint) std::cout << "==============================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing fixed record encodings with versions" << std::endl;
+  if (gDebugPrint) std::cout << "==============================================" << std::endl;
+  // first set up a fixed array, to be added to a fixed record
+  std::vector<uint8_t> data1{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+  std::vector<uint8_t> data2{0, 0, 0, 0, 0, 0, 0, 0};
+  rti1516e::HLAbyte byteEncoder1[8];
+  rti1516e::HLAbyte byteEncoder2[8];
+  rti1516e::HLAfixedArray arrayEncoder1(rti1516e::HLAbyte(), 8);
+  rti1516e::HLAfixedArray arrayEncoder2(rti1516e::HLAbyte(), 8);
+  for (int i=0;i<8;i++)
+  {
+    byteEncoder1[i].setDataPointer(&data1.data()[i]);
+    byteEncoder2[i].setDataPointer(&data2.data()[i]);
+    arrayEncoder1.setElementPointer(i, &byteEncoder1[i]);
+    arrayEncoder2.setElementPointer(i, &byteEncoder2[i]);
+  }
+  int i1 = 123;
+  rti1516e::HLAinteger32LE intEncoder;
+  intEncoder.setDataPointer(&i1);
+  char c1 = 123;
+  rti1516e::HLAASCIIchar charEncoder;
+  charEncoder.setDataPointer(&c1);
+  bool b1 = true;
+  rti1516e::HLAboolean boolEncoder;
+  boolEncoder.setDataPointer(&b1);
+
+  // now set up the fixed record encoder version 1 ...
+  rti1516e::HLAfixedRecord recordEncoderV1(1);
+  recordEncoderV1.appendElementPointer(&intEncoder, 1);
+  recordEncoderV1.appendElementPointer(&charEncoder, 1);
+  recordEncoderV1.appendElementPointer(&arrayEncoder1, 1);
+  rti1516e::VariableLengthData encodedDataV1 = recordEncoderV1.encode();
+  if (gDebugPrint) std::cout << "encodedDataV1=" << encodedDataV1 << std::endl;
+
+  // ... and the fixed record encoder version 2
+  rti1516e::HLAfixedRecord recordEncoderV2(2);
+  recordEncoderV2.appendElementPointer(&intEncoder, 1);
+  recordEncoderV2.appendElementPointer(&charEncoder, 1);
+  recordEncoderV2.appendElementPointer(&arrayEncoder1, 1);
+  recordEncoderV2.appendElementPointer(&boolEncoder, 2);
+  rti1516e::VariableLengthData encodedDataV2 = recordEncoderV2.encode();
+  if (gDebugPrint) std::cout << "encodedDataV2=" << encodedDataV2 << std::endl;
+
+  // now decode all from encodedDataV1:
+  // prepare recordDecoderV1
+  rti1516e::HLAfixedRecord recordDecoderV1(1);
+  recordDecoderV1.appendElement(rti1516e::HLAinteger32LE());
+  recordDecoderV1.appendElement(rti1516e::HLAASCIIchar());
+  // prepare array decoder
+  rti1516e::HLAfixedArray arrayDecoder1(rti1516e::HLAbyte(), 8);
+  std::vector<uint8_t> decodedArray1{0, 0, 0, 0, 0, 0, 0, 0};
+  rti1516e::HLAbyte byteDecoder1[8];
+  for (int i=0;i<8;i++)
+  {
+    byteDecoder1[i].setDataPointer(&decodedArray1.data()[i]);
+    arrayDecoder1.setElementPointer(i, &byteDecoder1[i]);
+  }
+  recordDecoderV1.appendElementPointer(&arrayDecoder1);
+  // decode with data from V1 encoder
+  {
+    recordDecoderV1.decode(encodedDataV1);
+    // fields should now equal given data
+    if (gDebugPrint) std::cout << "field1=" << static_cast<const rti1516e::HLAinteger32LE&>(recordDecoderV1.get(0)).get() << std::endl;
+    if (gDebugPrint) std::cout << "field2=" << static_cast<int>(static_cast<const rti1516e::HLAASCIIchar&>(recordDecoderV1.get(1)).get()) << std::endl;
+    if (gDebugPrint) std::cout << "field3=" << decodedArray1 << std::endl;
+    const rti1516e::HLAfixedArray& array1 = dynamic_cast<const rti1516e::HLAfixedArray&>(recordDecoderV1.get(2));
+    if (gDebugPrint) std::cout << "data from distinct HLAbytes:" << std::endl;
+    for (int i=0;i<8;i++)
+    {
+      const rti1516e::HLAbyte& byteDecoder = dynamic_cast<const rti1516e::HLAbyte&>(array1.get(i));
+      if (gDebugPrint) std::cout << " " << static_cast<int>(byteDecoder.get());
+    }
+    if (gDebugPrint) std::cout << std::endl;
+  }
+  // decode with data from V2 encoder
+  {
+    recordDecoderV1.decode(encodedDataV2);
+    // fields should now equal given data
+    if (gDebugPrint) std::cout << "field1=" << static_cast<const rti1516e::HLAinteger32LE&>(recordDecoderV1.get(0)).get() << std::endl;
+    if (gDebugPrint) std::cout << "field2=" << static_cast<int>(static_cast<const rti1516e::HLAASCIIchar&>(recordDecoderV1.get(1)).get()) << std::endl;
+    if (gDebugPrint) std::cout << "field3=" << decodedArray1 << std::endl;
+    const rti1516e::HLAfixedArray& array1 = dynamic_cast<const rti1516e::HLAfixedArray&>(recordDecoderV1.get(2));
+    if (gDebugPrint) std::cout << "data from distinct HLAbytes:" << std::endl;
+    for (int i=0;i<8;i++)
+    {
+      const rti1516e::HLAbyte& byteDecoder = dynamic_cast<const rti1516e::HLAbyte&>(array1.get(i));
+      if (gDebugPrint) std::cout << " " << static_cast<int>(byteDecoder.get());
+    }
+    if (gDebugPrint) std::cout << std::endl;
+  }
+
+  // prepare recordDecoderV2
+  rti1516e::HLAfixedRecord recordDecoderV2(2);
+  recordDecoderV2.appendElement(rti1516e::HLAinteger32LE(), 1);
+  recordDecoderV2.appendElement(rti1516e::HLAASCIIchar(), 1);
+  // prepare array decoder
+  rti1516e::HLAfixedArray arrayDecoder2(rti1516e::HLAbyte(), 8);
+  std::vector<uint8_t> decodedArray2{0, 0, 0, 0, 0, 0, 0, 0};
+  rti1516e::HLAbyte byteDecoder2[8];
+  for (int i=0;i<8;i++)
+  {
+    byteDecoder2[i].setDataPointer(&decodedArray2.data()[i]);
+    arrayDecoder2.setElementPointer(i, &byteDecoder2[i]);
+  }
+  recordDecoderV2.appendElementPointer(&arrayDecoder2, 1);
+  recordDecoderV2.appendElementPointer(&boolEncoder, 2);
+  {
+    // decode with data from V2 encoder (full match)
+    recordDecoderV2.decode(encodedDataV2);
+    // fields should now equal given data
+    if (gDebugPrint) std::cout << "record version=" << recordDecoderV2.getVersion() << std::endl;
+    if (gDebugPrint) std::cout << "field1=" << static_cast<const rti1516e::HLAinteger32LE&>(recordDecoderV2.get(0)).get() << std::endl;
+    if (gDebugPrint) std::cout << "field2=" << static_cast<int>(static_cast<const rti1516e::HLAASCIIchar&>(recordDecoderV2.get(1)).get()) << std::endl;
+    if (gDebugPrint) std::cout << "field3=" << decodedArray2 << std::endl;
+    const rti1516e::HLAfixedArray& array2 = dynamic_cast<const rti1516e::HLAfixedArray&>(recordDecoderV2.get(2));
+    if (gDebugPrint) std::cout << "data from distinct HLAbytes:" << std::endl;
+    for (int i = 0; i < 8; i++)
+    {
+      const rti1516e::HLAbyte& byteDecoder = dynamic_cast<const rti1516e::HLAbyte&>(array2.get(i));
+      if (gDebugPrint) std::cout << " " << static_cast<int>(byteDecoder.get());
+    }
+    if (gDebugPrint) std::cout << std::endl;
+    if (gDebugPrint) std::cout << "field4=" << static_cast<const rti1516e::HLAboolean&>(recordDecoderV2.get(3)).get() << std::endl;
+  }
+  {
+    // decode with data from V1 encoding (boolean field at end is missing)
+    recordDecoderV2.decode(encodedDataV1);
+    // fields should now equal given data
+    if (gDebugPrint) std::cout << "record version=" << recordDecoderV2.getVersion() << std::endl;
+    if (gDebugPrint) std::cout << "field1=" << static_cast<const rti1516e::HLAinteger32LE&>(recordDecoderV2.get(0)).get() << std::endl;
+    if (gDebugPrint) std::cout << "field2=" << static_cast<int>(static_cast<const rti1516e::HLAASCIIchar&>(recordDecoderV2.get(1)).get()) << std::endl;
+    if (gDebugPrint) std::cout << "field3=" << decodedArray2 << std::endl;
+    const rti1516e::HLAfixedArray& array2 = dynamic_cast<const rti1516e::HLAfixedArray&>(recordDecoderV2.get(2));
+    if (gDebugPrint) std::cout << "data from distinct HLAbytes:" << std::endl;
+    for (int i = 0; i < 8; i++)
+    {
+      const rti1516e::HLAbyte& byteDecoder = dynamic_cast<const rti1516e::HLAbyte&>(array2.get(i));
+      if (gDebugPrint) std::cout << " " << static_cast<int>(byteDecoder.get());
+    }
+    if (gDebugPrint) std::cout << std::endl;
+    try {
+      const rti1516e::HLAboolean& boolDecoder = static_cast<const rti1516e::HLAboolean&>(recordDecoderV2.get(3));
+      if (gDebugPrint) std::cout << "expected exception not thrown (value is " << boolDecoder.get() << ")" << std::endl;
+      return false;
+    }
+    catch (const rti1516e::EncoderException& e)
+    {
+      if (gDebugPrint) std::cout << "expected exception: " << e << std::endl;
+    }
+
+  }
+  std::cout << "fixed record encodings with versions OK" << std::endl;
+  return true;
+}
+
+bool testTightBEEncoding()
+{
+  std::vector<uint32_t> values{
+    0x0001, 0x0010, 0x0100, 0x1000,
+    0x7fff, 0x07ff, 0x007f, 0x0007,
+    0x8000, 0x0800, 0x0080, 0x0008,
+    0xffff, 0x0fff, 0x00ff, 0x000f,
+    0x5555, 0x0505, 0x5050, 0x1234
+  };
+  uint8_t buffer[128];
+  size_t bufferSize = sizeof(buffer);
+  size_t offset = 0;
+  for (size_t i=0;i<values.size();i++)
+  {
+    uint32_t value = values[i];
+    offset = rti1516e::encodeIntoBE32Compressed(buffer, bufferSize, offset, values[i]);
+    std::cout << std::dec << i << " value=" << std::hex << value << " => buffer=" << make_hex_string(buffer, buffer + offset, true, true) << std::endl;
+  }
+  offset = 0;
+  for (size_t i=0;i<values.size();i++)
+  {
+    uint32_t value = 0;
+    offset = rti1516e::decodeFromBE32Compressed(buffer, bufferSize, offset, value);
+    std::cout << std::dec << i << " value=" << std::hex << value << std::endl;
+    if (value != values[i])
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 int
 main(int argc, char* argv[])
 {
+  OpenRTI::RTI1516ESimpleAmbassador ambassador;
+  ambassador.setUseDataUrlObjectModels(false);
+
+  try
+  {
+    ambassador.connect(L"thread://");
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return EXIT_FAILURE;
+  }
+  std::wstring federationExecutionName = L"test";
+  // create, must work
+  try
+  {
+    ambassador.createFederationExecution(federationExecutionName, L"fdd-1.xml");
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  rti1516e::FederateHandle federateHandle;
+
+  // join must work
+  try
+  {
+    federateHandle = ambassador.joinFederationExecution(L"federate", federationExecutionName);
+  }
+  catch (const rti1516e::Exception& e)
+  {
+    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
+    return EXIT_FAILURE;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  if (!testTightBEEncoding())
+    return EXIT_FAILURE;
   if (!testDataElementEncoding(HLAASCIIcharDataType))
     return EXIT_FAILURE;
   if (!testDataElementEncoding(HLAunicodeCharDataType))
@@ -1973,7 +2219,8 @@ main(int argc, char* argv[])
   if (!testDataPointerFixedRecordEncoding())
     return EXIT_FAILURE;
 
-
+  if (!testFixedRecordWithVersionsEncoding())
+    return EXIT_FAILURE;
 
   if (!testFixedArrayOfFederateHandlesEncoding())
     return EXIT_FAILURE;
@@ -1998,132 +2245,6 @@ main(int argc, char* argv[])
 
   if (!testVariableArrayOfInteractionSubscriptionsEncoding())
     return EXIT_FAILURE;
-
-
-  OpenRTI::RTI1516ESimpleAmbassador ambassador;
-  ambassador.setUseDataUrlObjectModels(false);
-
-  try
-  {
-    ambassador.connect(L"thread://");
-  }
-  catch (const rti1516e::Exception& e)
-  {
-    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::wcout << L"Unknown Exception!" << std::endl;
-    return EXIT_FAILURE;
-  }
-  std::wstring federationExecutionName = L"test";
-  // create, must work
-  try
-  {
-    ambassador.createFederationExecution(federationExecutionName, L"fdd-1.xml");
-  }
-  catch (const rti1516e::Exception& e)
-  {
-    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::wcout << L"Unknown Exception!" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  rti1516e::FederateHandle federateHandle;
-
-  // join must work
-  try
-  {
-    federateHandle = ambassador.joinFederationExecution(L"federate", federationExecutionName);
-  }
-  catch (const rti1516e::Exception& e)
-  {
-    std::wcout << L"rti1516e::Exception: \"" << e.what() << L"\"" << std::endl;
-    return EXIT_FAILURE;
-  }
-  catch (...)
-  {
-    std::wcout << L"Unknown Exception!" << std::endl;
-    return EXIT_FAILURE;
-  }
-
-  if (!testDataElementEncoding(HLAASCIIcharDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAunicodeCharDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAbooleanDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAbyteDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAoctetDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAoctetPairBEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAoctetPairLEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAinteger16BEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAinteger16LEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAinteger32BEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAinteger32LEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAinteger64BEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAinteger64LEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAfloat32BEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAfloat32LEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAfloat64BEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAfloat64LEDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAASCIIstringDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAunicodeStringDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAfederateHandleDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAobjectClassHandleDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(HLAobjectInstanceHandleDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(Vec3fDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(Vec3dDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(VecfDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(VecdDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(GeodfDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(GeoddDataType))
-    return EXIT_FAILURE;
-
-  if (!testDataElementEncoding(StructAlignDataType))
-    return EXIT_FAILURE;
-  if (!testDataElementEncoding(StructAlign2DataType))
-    return EXIT_FAILURE;
-
-  if (!testDataPointerEncoding())
-    return EXIT_FAILURE;
-
-  if (!testDataPointerFixedArrayEncoding())
-    return EXIT_FAILURE;
-
-  if (!testDataPointerFixedRecordEncoding())
-    return EXIT_FAILURE;
-
-  // now run the tests
 
   if (!testFederateHandleEncodings(ambassador, federateHandle))
     return EXIT_FAILURE;

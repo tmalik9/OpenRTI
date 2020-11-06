@@ -272,27 +272,6 @@ public:
 };
 
 ///// FIXME above here should also move into a clean referencing scheme to the connects and what not.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ////////////////////////////////////////////////////////////
 
 template<typename T, typename H>
@@ -395,8 +374,8 @@ public:
   DimensionHandleSet _dimensionHandleSet;
 
 private:
-  Region(const Region&);
-  Region& operator=(const Region&);
+  Region(const Region&) = delete;
+  Region& operator=(const Region&) = delete;
 };
 
 ////////////////////////////////////////////////////////////
@@ -481,8 +460,8 @@ public:
   { return _federationConnect; }
 
 private:
-  ObjectInstanceConnect(const ObjectInstanceConnect&);
-  ObjectInstanceConnect& operator=(const ObjectInstanceConnect&);
+  ObjectInstanceConnect(const ObjectInstanceConnect&) = delete;
+  ObjectInstanceConnect& operator=(const ObjectInstanceConnect&) = delete;
 
   ObjectInstance& _objectInstance;
   FederationConnect& _federationConnect;
@@ -570,8 +549,8 @@ public:
   }
 
 private:
-  ObjectInstance(const ObjectInstance&);
-  ObjectInstance& operator=(const ObjectInstance&);
+  ObjectInstance(const ObjectInstance&) = delete;
+  ObjectInstance& operator=(const ObjectInstance&) = delete;
 
   Federation& _federation;
 
@@ -616,8 +595,8 @@ public:
   void setSuccessful(bool successful);
 
 private:
-  SynchronizationFederate(const SynchronizationFederate&);
-  SynchronizationFederate& operator=(const SynchronizationFederate&);
+  SynchronizationFederate(const SynchronizationFederate&) = delete;
+  SynchronizationFederate& operator=(const SynchronizationFederate&) = delete;
 
   Synchronization& _synchronization;
   Federate& _federate;
@@ -661,8 +640,8 @@ public:
   SynchronizationFederate::HandleMap _achievedFederateSyncronizationMap;
 
 private:
-  Synchronization(const Synchronization&);
-  Synchronization& operator=(const Synchronization&);
+  Synchronization(const Synchronization&) = delete;
+  Synchronization& operator=(const Synchronization&) = delete;
 
   VariableLengthData _tag;
 
@@ -790,8 +769,8 @@ public:
   { return _module; }
 
 private:
-  DimensionModule(const DimensionModule&);
-  DimensionModule& operator=(const DimensionModule&);
+  DimensionModule(const DimensionModule&) = delete;
+  DimensionModule& operator=(const DimensionModule&) = delete;
 
   Dimension& _dimension;
   Module& _module;
@@ -861,8 +840,8 @@ public:
   { _dimensionModuleList.push_back(dimensionModule); }
 
 private:
-  Dimension(const Dimension&);
-  Dimension& operator=(const Dimension&);
+  Dimension(const Dimension&) = delete;
+  Dimension& operator=(const Dimension&) = delete;
 
   Federation& _federation;
 
@@ -880,8 +859,8 @@ class UpdateRate;
 
 class OPENRTI_LOCAL UpdateRateModule : public ListPair<UpdateRateModule> {
 public:
-  UpdateRateModule(UpdateRate& updateRate, Module& module);
-  ~UpdateRateModule();
+  UpdateRateModule(UpdateRate& updateRate, Module& module) : _updateRate(updateRate), _module(module) { }
+  ~UpdateRateModule() {}
 
   const UpdateRate& getUpdateRate() const
   { return _updateRate; }
@@ -893,8 +872,8 @@ public:
   { return _module; }
 
 private:
-  UpdateRateModule(const UpdateRateModule&);
-  UpdateRateModule& operator=(const UpdateRateModule&);
+  UpdateRateModule(const UpdateRateModule&) = delete;
+  UpdateRateModule& operator=(const UpdateRateModule&) = delete;
 
   UpdateRate& _updateRate;
   Module& _module;
@@ -912,37 +891,582 @@ public:
   UpdateRate(Federation& federation);
   ~UpdateRate();
 
-  const Federation& getFederation() const
-  { return _federation; }
-  Federation& getFederation()
-  { return _federation; }
+  const Federation& getFederation() const { return _federation; }
+  Federation& getFederation() { return _federation; }
 
-  const std::string& getName() const
-  { return ModuleEntity<UpdateRate, UpdateRateHandle>::_getString(); }
-  void setName(const std::string& name);
+  const std::string& getName() const { return ModuleEntity<UpdateRate, UpdateRateHandle>::_getString(); }
 
-  const UpdateRateHandle& getUpdateRateHandle() const
-  { return ModuleEntity<UpdateRate, UpdateRateHandle>::_getHandle(); }
-  void setUpdateRateHandle(const UpdateRateHandle& updateRateHandle);
+  void setName(const std::string& name) { ModuleEntity<UpdateRate, UpdateRateHandle>::_setString(name); }
+
+  const UpdateRateHandle& getUpdateRateHandle() const { return ModuleEntity<UpdateRate, UpdateRateHandle>::_getHandle(); }
+  void setUpdateRateHandle(const UpdateRateHandle& updateRateHandle) { ModuleEntity<UpdateRate, UpdateRateHandle>::_setHandle(updateRateHandle); }
 
   const double& getRate() const
   { return _rate; }
   void setRate(const double& rate);
 
-  bool getIsReferencedByAnyModule() const;
+
+  bool getIsReferencedByAnyModule() const { return !_updateRateModuleList.empty(); }
 
   void insert(UpdateRateModule& updateRateModule)
   { _updateRateModuleList.push_back(updateRateModule); }
 
 private:
-  UpdateRate(const UpdateRate&);
-  UpdateRate& operator=(const UpdateRate&);
+  UpdateRate(const UpdateRate&) = delete;
+  UpdateRate& operator=(const UpdateRate&) = delete;
 
   Federation& _federation;
 
   double _rate;
 
   UpdateRateModule::SecondList _updateRateModuleList;
+};
+
+class BasicDataType;
+
+class OPENRTI_LOCAL BasicDataTypeModule : public ListPair<BasicDataTypeModule> {
+public:
+  BasicDataTypeModule(BasicDataType& simpleDataType, Module& module) : _basicDataType(simpleDataType), _module(module) {}
+  ~BasicDataTypeModule() {}
+
+  const BasicDataType& getBasicDataType() const
+  { return _basicDataType; }
+  BasicDataType& getBasicDataType()
+  { return _basicDataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  BasicDataTypeModule(const BasicDataTypeModule&) = delete;
+  BasicDataTypeModule& operator=(const BasicDataTypeModule&) = delete;
+
+  BasicDataType& _basicDataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL BasicDataType : public ModuleEntity<BasicDataType, BasicDataTypeHandle> {
+public:
+  typedef ModuleEntity<BasicDataType, BasicDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<BasicDataType, BasicDataTypeHandle>::StringMap NameMap;
+
+  BasicDataType(Federation& federation) : _federation(federation) { }
+  ~BasicDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<BasicDataType, BasicDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<BasicDataType, BasicDataTypeHandle>::_setString(name); }
+
+  const BasicDataTypeHandle& getHandle() const
+  { return ModuleEntity<BasicDataType,BasicDataTypeHandle>::_getHandle(); }
+  void setHandle(const BasicDataTypeHandle& simpleDataTypeHandle) { ModuleEntity<BasicDataType,BasicDataTypeHandle>::_setHandle(simpleDataTypeHandle); }
+
+  bool getIsReferencedByAnyModule() const { return !_basicDataTypeModuleList.empty(); }
+
+  void insert(BasicDataTypeModule& simpleDataTypeModule)
+  { _basicDataTypeModuleList.push_back(simpleDataTypeModule); }
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+  uint32_t getSize() const {
+    return _size;
+  }
+  void setSize(uint32_t val) {
+    _size = val;
+  }
+  OpenRTI::Endianness getEndian() const {
+    return _endian;
+  }
+  void setEndian(OpenRTI::Endianness val) {
+    _endian = val;
+  }
+private:
+  BasicDataType(const BasicDataType&) = delete;
+  BasicDataType& operator=(const BasicDataType&) = delete;
+
+  Federation& _federation;
+  uint32_t _size;
+  Endianness _endian;
+  BasicDataTypeModule::SecondList _basicDataTypeModuleList;
+};
+
+class SimpleDataType;
+
+class OPENRTI_LOCAL SimpleDataTypeModule : public ListPair<SimpleDataTypeModule> {
+public:
+  SimpleDataTypeModule(SimpleDataType& simpleDataType, Module& module) : _simpleDataType(simpleDataType), _module(module) {}
+  ~SimpleDataTypeModule() {}
+
+  const SimpleDataType& getSimpleDataType() const
+  { return _simpleDataType; }
+  SimpleDataType& getSimpleDataType()
+  { return _simpleDataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  SimpleDataTypeModule(const SimpleDataTypeModule&) = delete;
+  SimpleDataTypeModule& operator=(const SimpleDataTypeModule&) = delete;
+
+  SimpleDataType& _simpleDataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL SimpleDataType : public ModuleEntity<SimpleDataType, SimpleDataTypeHandle> {
+public:
+  typedef ModuleEntity<SimpleDataType, SimpleDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<SimpleDataType, SimpleDataTypeHandle>::StringMap NameMap;
+
+  SimpleDataType(Federation& federation) : _federation(federation) { }
+  ~SimpleDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<SimpleDataType, SimpleDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<SimpleDataType, SimpleDataTypeHandle>::_setString(name); }
+
+  const std::string& getRepresentation() const { return _representation; }
+  void setRepresentation(const std::string& s) { _representation = s; }
+
+  const SimpleDataTypeHandle& getHandle() const
+  { return ModuleEntity<SimpleDataType,SimpleDataTypeHandle>::_getHandle(); }
+  void setHandle(const SimpleDataTypeHandle& simpleDataTypeHandle) { ModuleEntity<SimpleDataType,SimpleDataTypeHandle>::_setHandle(simpleDataTypeHandle); }
+
+  bool getIsReferencedByAnyModule() const { return !_simpleDataTypeModuleList.empty(); }
+
+  void insert(SimpleDataTypeModule& simpleDataTypeModule)
+  { _simpleDataTypeModuleList.push_back(simpleDataTypeModule); }
+
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+private:
+  SimpleDataType(const SimpleDataType&) = delete;
+  SimpleDataType& operator=(const SimpleDataType&) = delete;
+
+  Federation& _federation;
+  std::string _representation;
+  SimpleDataTypeModule::SecondList _simpleDataTypeModuleList;
+};
+
+class EnumeratedDataType;
+
+class OPENRTI_LOCAL EnumeratedDataTypeModule : public ListPair<EnumeratedDataTypeModule> {
+public:
+  EnumeratedDataTypeModule(EnumeratedDataType& simpleDataType, Module& module) : _simpleDataType(simpleDataType), _module(module) {}
+  ~EnumeratedDataTypeModule() {}
+
+  const EnumeratedDataType& getEnumeratedDataType() const
+  { return _simpleDataType; }
+  EnumeratedDataType& getEnumeratedDataType()
+  { return _simpleDataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  EnumeratedDataTypeModule(const EnumeratedDataTypeModule&) = delete;
+  EnumeratedDataTypeModule& operator=(const EnumeratedDataTypeModule&) = delete;
+
+  EnumeratedDataType& _simpleDataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL Enumerator
+{
+public:
+  Enumerator(const std::string& name , uint32_t value) : _name(name), _value(value) {}
+
+  std::string getName() const {
+    return _name;
+  }
+  void setName(std::string val) {
+    _name = val;
+  }
+  uint32_t getValue() const {
+    return _value;
+  }
+  void setValue(uint32_t val) {
+    _value = val;
+  }
+  std::string _name;
+  uint32_t _value;
+};
+
+class OPENRTI_LOCAL EnumeratedDataType : public ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle> {
+public:
+  typedef ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle>::StringMap NameMap;
+
+  EnumeratedDataType(Federation& federation) : _federation(federation) { }
+  ~EnumeratedDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle>::_setString(name); }
+
+  const EnumeratedDataTypeHandle& getHandle() const
+  { return ModuleEntity<EnumeratedDataType,EnumeratedDataTypeHandle>::_getHandle(); }
+  void setHandle(const EnumeratedDataTypeHandle& simpleDataTypeHandle) { ModuleEntity<EnumeratedDataType,EnumeratedDataTypeHandle>::_setHandle(simpleDataTypeHandle); }
+
+  bool getIsReferencedByAnyModule() const { return !_simpleDataTypeModuleList.empty(); }
+
+  void insert(EnumeratedDataTypeModule& simpleDataTypeModule)
+  { _simpleDataTypeModuleList.push_back(simpleDataTypeModule); }
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+  void addEnumerator(const std::string name, uint32_t value)
+  {
+    _enumerators.push_back(Enumerator(name, value));
+  }
+  std::list<OpenRTI::ServerModel::Enumerator> getEnumerators() const {
+    return _enumerators;
+  }
+  void setEnumerators(std::list<OpenRTI::ServerModel::Enumerator> val) {
+    _enumerators = val;
+  }
+  std::string getRepresentation() const {
+    return _representation;
+  }
+  void setRepresentation(std::string val) {
+    _representation = val;
+  }
+private:
+  EnumeratedDataType(const EnumeratedDataType&) = delete;
+  EnumeratedDataType& operator=(const EnumeratedDataType&) = delete;
+
+  Federation& _federation;
+  std::list<Enumerator> _enumerators;
+  std::string _representation;
+
+  EnumeratedDataTypeModule::SecondList _simpleDataTypeModuleList;
+};
+
+class ArrayDataType;
+
+class OPENRTI_LOCAL ArrayDataTypeModule : public ListPair<ArrayDataTypeModule> {
+public:
+  ArrayDataTypeModule(ArrayDataType& simpleDataType, Module& module) : _dataType(simpleDataType), _module(module) {}
+  ~ArrayDataTypeModule() {}
+
+  const ArrayDataType& getArrayDataType() const
+  { return _dataType; }
+  ArrayDataType& getArrayDataType()
+  { return _dataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  ArrayDataTypeModule(const ArrayDataTypeModule&) = delete;
+  ArrayDataTypeModule& operator=(const ArrayDataTypeModule&) = delete;
+
+  ArrayDataType& _dataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL ArrayDataType : public ModuleEntity<ArrayDataType, ArrayDataTypeHandle> {
+public:
+  typedef ModuleEntity<ArrayDataType, ArrayDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<ArrayDataType, ArrayDataTypeHandle>::StringMap NameMap;
+
+  ArrayDataType(Federation& federation) : _federation(federation) { }
+  ~ArrayDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<ArrayDataType, ArrayDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<ArrayDataType, ArrayDataTypeHandle>::_setString(name); }
+
+  std::string getDataType() const noexcept { return _dataType; }
+  void setDataType(const std::string newValue) {
+    _dataType = newValue;
+  }
+
+  ArrayDataTypeEncoding getEncoding() const noexcept { return _encoding; }
+  void setEncoding(ArrayDataTypeEncoding newValue) noexcept {
+    _encoding = newValue;
+  }
+
+  std::string getCardinality() const {
+    return _cardinality;
+  }
+  void setCardinality(std::string val) {
+    _cardinality = val;
+  }
+
+  const ArrayDataTypeHandle& getHandle() const
+  { return ModuleEntity<ArrayDataType,ArrayDataTypeHandle>::_getHandle(); }
+  void setHandle(const ArrayDataTypeHandle& simpleDataTypeHandle) { ModuleEntity<ArrayDataType,ArrayDataTypeHandle>::_setHandle(simpleDataTypeHandle); }
+
+  bool getIsReferencedByAnyModule() const { return !_moduleList.empty(); }
+
+  void insert(ArrayDataTypeModule& dataTypeModule)
+  { _moduleList.push_back(dataTypeModule); }
+
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+private:
+  ArrayDataType(const ArrayDataType&) = delete;
+  ArrayDataType& operator=(const ArrayDataType&) = delete;
+
+  Federation& _federation;
+  std::string _dataType;
+  std::string _cardinality;
+  ArrayDataTypeEncoding _encoding;
+  ArrayDataTypeModule::SecondList _moduleList;
+};
+
+class FixedRecordDataType;
+
+class OPENRTI_LOCAL FixedRecordDataTypeModule : public ListPair<FixedRecordDataTypeModule> {
+public:
+  FixedRecordDataTypeModule(FixedRecordDataType& fixedRecordDataType, Module& module) : _dataType(fixedRecordDataType), _module(module) {}
+  ~FixedRecordDataTypeModule() {}
+
+  const FixedRecordDataType& getFixedRecordDataType() const
+  { return _dataType; }
+  FixedRecordDataType& getFixedRecordDataType()
+  { return _dataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  FixedRecordDataTypeModule(const FixedRecordDataTypeModule&) = delete;
+  FixedRecordDataTypeModule& operator=(const FixedRecordDataTypeModule&) = delete;
+
+  FixedRecordDataType& _dataType;
+  Module& _module;
+};
+
+class FixedRecordField
+{
+public:
+  FixedRecordField(const std::string name, const std::string& dataType, uint32_t version) : _name(name), _dataType(dataType), _version(version) {}
+  std::string getName() const {
+    return _name;
+  }
+  void setName(std::string val) {
+    _name = val;
+  }
+  std::string getDataType() const {
+    return _dataType;
+  }
+  void setDataType(std::string val) {
+    _dataType = val;
+  }
+  std::string _name;
+  std::string _dataType;
+  uint32_t _version;
+  uint32_t getVersion() const {
+    return _version;
+  }
+  void setVersion(uint32_t val) {
+    _version = val;
+  }
+};
+
+class OPENRTI_LOCAL FixedRecordDataType : public ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle> {
+public:
+  typedef ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle>::StringMap NameMap;
+
+  FixedRecordDataType(Federation& federation) : _federation(federation) { }
+  ~FixedRecordDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle>::_setString(name); }
+
+  const FixedRecordDataTypeHandle& getHandle() const
+  { return ModuleEntity<FixedRecordDataType,FixedRecordDataTypeHandle>::_getHandle(); }
+  void setHandle(const FixedRecordDataTypeHandle& handle) { ModuleEntity<FixedRecordDataType,FixedRecordDataTypeHandle>::_setHandle(handle); }
+
+  bool getIsReferencedByAnyModule() const { return !_fixedRecordDataTypeModuleList.empty(); }
+
+  void insert(FixedRecordDataTypeModule& module)
+  { _fixedRecordDataTypeModuleList.push_back(module); }
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+  void addField(const std::string name, const std::string& dataType, uint32_t version)
+  {
+    _fields.push_back(FixedRecordField(name, dataType, version));
+  }
+  std::list<OpenRTI::ServerModel::FixedRecordField> getFields() const {
+    return _fields;
+  }
+  void setFields(const std::list<OpenRTI::ServerModel::FixedRecordField>& val) {
+    _fields = val;
+  }
+  std::string getEncoding() const {
+    return _encoding;
+  }
+  void setEncoding(std::string val) {
+    _encoding = val;
+  }
+  std::string getInclude() const {
+    return _include;
+  }
+  void setInclude(std::string val) {
+    _include = val;
+  }
+  uint32_t getVersion() const {
+    return _version;
+  }
+  void setVersion(uint32_t val) {
+    _version = val;
+  }
+private:
+  FixedRecordDataType(const FixedRecordDataType&) = delete;
+  FixedRecordDataType& operator=(const FixedRecordDataType&) = delete;
+
+  Federation& _federation;
+
+  std::list<FixedRecordField> _fields;
+  std::string _encoding;
+  std::string _include;
+  uint32_t _version;
+  FixedRecordDataTypeModule::SecondList _fixedRecordDataTypeModuleList;
+};
+
+class VariantRecordDataType;
+
+class OPENRTI_LOCAL VariantRecordDataTypeModule : public ListPair<VariantRecordDataTypeModule> {
+public:
+  VariantRecordDataTypeModule(VariantRecordDataType& simpleDataType, Module& module) : _variantRecordDataType(simpleDataType), _module(module) {}
+  ~VariantRecordDataTypeModule() {}
+
+  const VariantRecordDataType& getVariantRecordDataType() const
+  { return _variantRecordDataType; }
+  VariantRecordDataType& getVariantRecordDataType()
+  { return _variantRecordDataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  VariantRecordDataTypeModule(const VariantRecordDataTypeModule&) = delete;
+  VariantRecordDataTypeModule& operator=(const VariantRecordDataTypeModule&) = delete;
+
+  VariantRecordDataType& _variantRecordDataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL VariantRecordAlternative
+{
+public:
+  VariantRecordAlternative(const std::string& name, const std::string& enumerator, const std::string& dataType)
+    : _name(name), _enumerator(enumerator), _dataType(dataType)
+  {
+  }
+  std::string getDataType() const {
+    return _dataType;
+  }
+  void setDataType(std::string val) {
+    _dataType = val;
+  }
+private:
+  std::string _enumerator;
+  std::string _name;
+  std::string _dataType;
+};
+
+class OPENRTI_LOCAL VariantRecordDataType : public ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle> {
+public:
+  typedef ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle>::StringMap NameMap;
+
+  VariantRecordDataType(Federation& federation) : _federation(federation) { }
+  ~VariantRecordDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle>::_setString(name); }
+
+  std::string getDataType() const {
+    return _dataType;
+  }
+  void setDataType(std::string val) {
+    _dataType = val;
+  }
+
+  const VariantRecordDataTypeHandle& getHandle() const { return ModuleEntity<VariantRecordDataType,VariantRecordDataTypeHandle>::_getHandle(); }
+  void setHandle(const VariantRecordDataTypeHandle& handle) {
+    ModuleEntity<VariantRecordDataType,VariantRecordDataTypeHandle>::_setHandle(handle);
+  }
+
+  bool getIsReferencedByAnyModule() const { return !_variantRecordDataTypeModuleList.empty(); }
+
+  void insert(VariantRecordDataTypeModule& module)
+  { _variantRecordDataTypeModuleList.push_back(module); }
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+  std::string getDiscriminant() const {
+    return _discriminant;
+  }
+  void setDiscriminant(std::string val) {
+    _discriminant = val;
+  }
+  std::string getEncoding() const {
+    return _encoding;
+  }
+  void setEncoding(std::string val) {
+    _encoding = val;
+  }
+  std::list<OpenRTI::ServerModel::VariantRecordAlternative> getAlternatives() const {
+    return _alternatives;
+  }
+  void setAlternatives(const std::list<OpenRTI::ServerModel::VariantRecordAlternative>& val) {
+    _alternatives = val;
+  }
+  void setAlternatives(std::list<OpenRTI::ServerModel::VariantRecordAlternative>&& val) {
+    _alternatives = std::move(val);
+  }
+private:
+  VariantRecordDataType(const VariantRecordDataType&) = delete;
+  VariantRecordDataType& operator=(const VariantRecordDataType&) = delete;
+
+  Federation& _federation;
+
+  std::string _discriminant;
+  std::string _dataType;
+  std::string _encoding;
+  std::list<VariantRecordAlternative> _alternatives;
+
+  VariantRecordDataTypeModule::SecondList _variantRecordDataTypeModuleList;
 };
 
 ////////////////////////////////////////////////////////////
@@ -1540,37 +2064,75 @@ public:
   // insert into this module
   DimensionModule* insert(Dimension& dimension);
   UpdateRateModule* insert(UpdateRate& updateRate);
+
+  BasicDataTypeModule* insert(BasicDataType& dataType);
+  SimpleDataTypeModule* insert(SimpleDataType& dataType);
+  ArrayDataTypeModule* insert(ArrayDataType& dataType);
+  FixedRecordDataTypeModule* insert(FixedRecordDataType& dataType);
+  VariantRecordDataTypeModule* insert(VariantRecordDataType& dataType);
+
   InteractionClassModule* insert(InteractionClass& interactionClass);
   ParameterDefinitionModule* insertParameters(InteractionClass& interactionClass);
+  EnumeratedDataTypeModule* insert(EnumeratedDataType& dataType);
   ObjectClassModule* insert(ObjectClass& objectClass);
   AttributeDefinitionModule* insertAttributes(ObjectClass& objectClass);
 
-  void insert(DimensionModule& dimensionModule)
+  void insertModule(DimensionModule& dimensionModule)
   { _dimensionModuleList.push_back(dimensionModule); }
   DimensionModule::FirstList& getDimensionModuleList()
   { return _dimensionModuleList; }
 
-  void insert(UpdateRateModule& updateRateModule)
+  void insertModule(UpdateRateModule& updateRateModule)
   { _updateRateModuleList.push_back(updateRateModule); }
   UpdateRateModule::FirstList& getUpdateRateModuleList()
   { return _updateRateModuleList; }
 
-  void insert(InteractionClassModule& interactionClassModule)
+  void insertModule(BasicDataTypeModule& module)
+  { _basicDataTypeModuleList.push_back(module); }
+  BasicDataTypeModule::FirstList& getBasicDataTypeModuleList()
+  { return _basicDataTypeModuleList; }
+
+  void insertModule(SimpleDataTypeModule& module)
+  { _simpleDataTypeModuleList.push_back(module); }
+  SimpleDataTypeModule::FirstList& getSimpleDataTypeModuleList()
+  { return _simpleDataTypeModuleList; }
+
+  void insertModule(EnumeratedDataTypeModule& module)
+  { _enumeratedDataTypeModuleList.push_back(module); }
+  EnumeratedDataTypeModule::FirstList& getEnumeratedDataTypeModuleList()
+  { return _enumeratedDataTypeModuleList; }
+
+  void insertModule(ArrayDataTypeModule& module)
+  { _arrayDataTypeModuleList.push_back(module); }
+  ArrayDataTypeModule::FirstList& getArrayDataTypeModuleList()
+  { return _arrayDataTypeModuleList; }
+
+  void insertModule(FixedRecordDataTypeModule& fixedRecordDataTypeModule)
+  { _fixedRecordDataTypeModuleList.push_back(fixedRecordDataTypeModule); }
+  FixedRecordDataTypeModule::FirstList& getFixedRecordDataTypeModuleList()
+  { return _fixedRecordDataTypeModuleList; }
+
+  void insertModule(VariantRecordDataTypeModule& module)
+  { _variantRecordDataTypeModuleList.push_back(module); }
+  VariantRecordDataTypeModule::FirstList& getVariantRecordDataTypeModuleList()
+  { return _variantRecordDataTypeModuleList; }
+
+  void insertModule(InteractionClassModule& interactionClassModule)
   { _interactionClassModuleList.push_back(interactionClassModule); }
   InteractionClassModule::FirstList& getInteractionClassModuleList()
   { return _interactionClassModuleList; }
 
-  void insert(ParameterDefinitionModule& parameterDefinitionModule)
+  void insertModule(ParameterDefinitionModule& parameterDefinitionModule)
   { _parameterDefinitionModuleList.push_back(parameterDefinitionModule); }
   ParameterDefinitionModule::FirstList& getParameterDefinitionModuleList()
   { return _parameterDefinitionModuleList; }
 
-  void insert(ObjectClassModule& objectClassModule)
+  void insertModule(ObjectClassModule& objectClassModule)
   { _objectClassModuleList.push_back(objectClassModule); }
   ObjectClassModule::FirstList& getObjectClassModuleList()
   { return _objectClassModuleList; }
 
-  void insert(AttributeDefinitionModule& attributeDefinitionModule)
+  void insertModule(AttributeDefinitionModule& attributeDefinitionModule)
   { _attributeDefinitionModuleList.push_back(attributeDefinitionModule); }
   AttributeDefinitionModule::FirstList& getAttributeDefinitionModuleList()
   { return _attributeDefinitionModuleList; }
@@ -1590,6 +2152,15 @@ private:
   DimensionModule::FirstList _dimensionModuleList;
   // All update rates that are referenced by this module
   UpdateRateModule::FirstList _updateRateModuleList;
+
+  // All data types that are referenced by this module
+  BasicDataTypeModule::FirstList _basicDataTypeModuleList;
+  SimpleDataTypeModule::FirstList _simpleDataTypeModuleList;
+  EnumeratedDataTypeModule::FirstList _enumeratedDataTypeModuleList;
+  ArrayDataTypeModule::FirstList _arrayDataTypeModuleList;
+  FixedRecordDataTypeModule::FirstList _fixedRecordDataTypeModuleList;
+  VariantRecordDataTypeModule::FirstList _variantRecordDataTypeModuleList;
+
   // All interaction classes that are referenced by this module
   InteractionClassModule::FirstList _interactionClassModuleList;
   ParameterDefinitionModule::FirstList _parameterDefinitionModuleList;
@@ -1765,6 +2336,13 @@ public:
   /// Access and modify object model modules
   void insert(Dimension& dimension);
   void insert(UpdateRate& updateRate);
+  void insert(BasicDataType& dataType);
+  void insert(SimpleDataType& dataType);
+  void insert(EnumeratedDataType& dataType);
+  void insert(ArrayDataType& dataType);
+  void insert(FixedRecordDataType& dataType);
+  void insert(VariantRecordDataType& dataType);
+
   void insert(InteractionClass& interactionClass);
   void insert(ObjectClass& objectClass);
   void insert(Module& module);
@@ -1773,13 +2351,15 @@ public:
   /// compatible with the existing one. Returns true if the entity was newly created.
   bool insertOrCheck(Module& module, const FOMStringDimension& stringDimension);
   bool insertOrCheck(Module& module, const FOMStringUpdateRate& stringUpdateRate);
+  bool insertOrCheck(Module& module, const FOMStringBasicDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringSimpleDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringEnumeratedDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringArrayDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringFixedRecordDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringVariantRecordDataType& stringDataType);
+
   bool insertOrCheck(Module& module, const FOMStringInteractionClass& stringInteractionClass);
   bool insertOrCheck(Module& module, const FOMStringObjectClass& stringObjectClass);
-  bool insertOrCheck(Module& module, const FOMStringSimpleDataType& dataType);
-  bool insertOrCheck(Module& module, const FOMStringEnumeratedDataType& dataType);
-  bool insertOrCheck(Module& module, const FOMStringArrayDataType& dataType);
-  bool insertOrCheck(Module& module, const FOMStringFixedRecordDataType& dataType);
-  bool insertOrCheck(Module& module, const FOMStringVariantRecordDataType& dataType);
 
   /// This is for inserting the initial object model
   ModuleHandle insert(const FOMStringModule& stringModule);
@@ -1790,6 +2370,12 @@ public:
   /// Throws a message error if an existing one does not match the provided.
   void insert(Module& module, const FOMDimension& fomDimension);
   void insert(Module& module, const FOMUpdateRate& fomUpdateRate);
+  void insert(Module& module, const FOMBasicDataType& fomDataType);
+  void insert(Module& module, const FOMSimpleDataType& fomDataType);
+  void insert(Module& module, const FOMEnumeratedDataType& fomDataType);
+  void insert(Module& module, const FOMArrayDataType& fomDataType);
+  void insert(Module& module, const FOMFixedRecordDataType& fomDataType);
+  void insert(Module& module, const FOMVariantRecordDataType& fomDataType);
   void insert(Module& module, const FOMInteractionClass& fomInteractionClass);
   void insert(Module& module, const FOMObjectClass& fomObjectClass);
   void insert(Module& module, const FOMTransportationType& fomObjectClass);
@@ -1922,6 +2508,30 @@ private:
   UpdateRate::NameMap _updateRateNameUpdateRateMap;
   UpdateRate::HandleMap _updateRateHandleUpdateRateMap;
   HandleAllocator<UpdateRateHandle> _updateRateHandleAllocator;
+
+  BasicDataType::NameMap               _basicDataTypeNameBasicDataTypeMap;
+  BasicDataType::HandleMap             _basicDataTypeHandleBasicDataTypeMap;
+  HandleAllocator<BasicDataTypeHandle> _basicDataTypeHandleAllocator;
+
+  SimpleDataType::NameMap               _simpleDataTypeNameSimpleDataTypeMap;
+  SimpleDataType::HandleMap             _simpleDataTypeHandleSimpleDataTypeMap;
+  HandleAllocator<SimpleDataTypeHandle> _simpleDataTypeHandleAllocator;
+
+  EnumeratedDataType::NameMap               _enumeratedDataTypeNameEnumeratedDataTypeMap;
+  EnumeratedDataType::HandleMap             _enumeratedDataTypeHandleEnumeratedDataTypeMap;
+  HandleAllocator<EnumeratedDataTypeHandle> _enumeratedDataTypeHandleAllocator;
+
+  ArrayDataType::NameMap               _arrayDataTypeNameArrayDataTypeMap;
+  ArrayDataType::HandleMap             _arrayDataTypeHandleArrayDataTypeMap;
+  HandleAllocator<ArrayDataTypeHandle> _arrayDataTypeHandleAllocator;
+
+  FixedRecordDataType::NameMap               _fixedRecordDataTypeNameFixedRecordDataTypeMap;
+  FixedRecordDataType::HandleMap             _fixedRecordDataTypeHandleFixedRecordDataTypeMap;
+  HandleAllocator<FixedRecordDataTypeHandle> _fixedRecordDataTypeHandleAllocator;
+
+  VariantRecordDataType::NameMap               _variantRecordDataTypeNameVariantRecordDataTypeMap;
+  VariantRecordDataType::HandleMap             _variantRecordDataTypeHandleVariantRecordDataTypeMap;
+  HandleAllocator<VariantRecordDataTypeHandle> _variantRecordDataTypeHandleAllocator;
 
   InteractionClass::NameMap _interactionClassNameInteractionClassMap;
   InteractionClass::HandleMap _interactionClassHandleInteractionClassMap;

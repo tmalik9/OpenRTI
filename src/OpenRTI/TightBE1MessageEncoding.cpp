@@ -317,6 +317,36 @@ public:
     }
   }
 
+  void writeArrayDataTypeEncoding(const ArrayDataTypeEncoding& value)
+  {
+    switch (value) {
+    case FixedArrayDataTypeEncoding:
+      writeUInt32Compressed(0);
+      break;
+    case VariableArrayDataTypeEncoding:
+      writeUInt32Compressed(1);
+      break;
+    default:
+      writeUInt32Compressed(2);
+      break;
+    }
+  }
+
+  void writeEndianness(const Endianness& value)
+  {
+    switch (value) {
+    case BigEndian:
+      writeUInt32Compressed(0);
+      break;
+    case LittleEndian:
+      writeUInt32Compressed(1);
+      break;
+    default:
+      writeUInt32Compressed(2);
+      break;
+    }
+  }
+
   void writeBool(const bool& value)
   {
     writeBoolCompressed(value);
@@ -361,6 +391,36 @@ public:
   }
 
   void writeUpdateRateHandle(const UpdateRateHandle& value)
+  {
+    writeUInt32Compressed(value);
+  }
+
+  void writeBasicDataTypeHandle(const BasicDataTypeHandle& value)
+  {
+    writeUInt32Compressed(value);
+  }
+
+  void writeSimpleDataTypeHandle(const SimpleDataTypeHandle& value)
+  {
+    writeUInt32Compressed(value);
+  }
+
+  void writeEnumeratedDataTypeHandle(const EnumeratedDataTypeHandle& value)
+  {
+    writeUInt32Compressed(value);
+  }
+
+  void writeArrayDataTypeHandle(const ArrayDataTypeHandle& value)
+  {
+    writeUInt32Compressed(value);
+  }
+
+  void writeFixedRecordDataTypeHandle(const FixedRecordDataTypeHandle& value)
+  {
+    writeUInt32Compressed(value);
+  }
+
+  void writeVariantRecordDataTypeHandle(const VariantRecordDataTypeHandle& value)
   {
     writeUInt32Compressed(value);
   }
@@ -801,6 +861,21 @@ public:
     }
   }
 
+  void writeFOMStringBasicDataType(const FOMStringBasicDataType& value)
+  {
+    writeString(value.getName());
+    writeUnsigned(value.getSize());
+    writeEndianness(value.getEndian());
+  }
+
+  void writeFOMStringBasicDataTypeList(const FOMStringBasicDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringBasicDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringBasicDataType(*i);
+    }
+  }
+
   void writeFOMStringSimpleDataType(const FOMStringSimpleDataType& value)
   {
     writeString(value.getName());
@@ -849,7 +924,7 @@ public:
     writeString(value.getName());
     writeString(value.getDataType());
     writeString(value.getCardinality());
-    writeString(value.getEncoding());
+    writeArrayDataTypeEncoding(value.getEncoding());
   }
 
   void writeFOMStringArrayDataTypeList(const FOMStringArrayDataTypeList& value)
@@ -863,7 +938,8 @@ public:
   void writeFOMStringFixedRecordField(const FOMStringFixedRecordField& value)
   {
     writeString(value.getName());
-    writeUnsigned(value.getDataType());
+    writeString(value.getDataType());
+    writeUnsigned(value.getVersion());
   }
 
   void writeFOMStringFixedRecordFieldList(const FOMStringFixedRecordFieldList& value)
@@ -878,6 +954,8 @@ public:
   {
     writeString(value.getName());
     writeString(value.getEncoding());
+    writeString(value.getInclude());
+    writeUnsigned(value.getVersion());
     writeFOMStringFixedRecordFieldList(value.getFields());
   }
 
@@ -893,7 +971,7 @@ public:
   {
     writeString(value.getEnumerator());
     writeString(value.getName());
-    writeUnsigned(value.getDataType());
+    writeString(value.getDataType());
   }
 
   void writeFOMStringVariantRecordAlternativeList(const FOMStringVariantRecordAlternativeList& value)
@@ -1064,6 +1142,7 @@ public:
     writeFOMStringObjectClassList(value.getObjectClassList());
     writeFOMStringUpdateRateList(value.getUpdateRateList());
     writeFOMStringSwitchList(value.getSwitchList());
+    writeFOMStringBasicDataTypeList(value.getBasicDataTypeList());
     writeFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
     writeFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
     writeFOMStringArrayDataTypeList(value.getArrayDataTypeList());
@@ -1222,6 +1301,150 @@ public:
     }
   }
 
+  void writeFOMBasicDataType(const FOMBasicDataType& value)
+  {
+    writeString(value.getName());
+    writeUnsigned(value.getSize());
+    writeEndianness(value.getEndian());
+    writeBasicDataTypeHandle(value.getHandle());
+  }
+
+  void writeFOMBasicDataTypeList(const FOMBasicDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMBasicDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMBasicDataType(*i);
+    }
+  }
+
+  void writeFOMSimpleDataType(const FOMSimpleDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getRepresentation());
+    writeSimpleDataTypeHandle(value.getHandle());
+  }
+
+  void writeFOMSimpleDataTypeList(const FOMSimpleDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMSimpleDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMSimpleDataType(*i);
+    }
+  }
+
+  void writeFOMEnumerator(const FOMEnumerator& value)
+  {
+    writeString(value.getName());
+    writeUnsigned(value.getValue());
+  }
+
+  void writeFOMEnumeratorList(const FOMEnumeratorList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMEnumeratorList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMEnumerator(*i);
+    }
+  }
+
+  void writeFOMEnumeratedDataType(const FOMEnumeratedDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getRepresentation());
+    writeFOMEnumeratorList(value.getEnumerators());
+    writeEnumeratedDataTypeHandle(value.getHandle());
+  }
+
+  void writeFOMEnumeratedDataTypeList(const FOMEnumeratedDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMEnumeratedDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMEnumeratedDataType(*i);
+    }
+  }
+
+  void writeFOMArrayDataType(const FOMArrayDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getDataType());
+    writeString(value.getCardinality());
+    writeArrayDataTypeEncoding(value.getEncoding());
+    writeArrayDataTypeHandle(value.getHandle());
+  }
+
+  void writeFOMArrayDataTypeList(const FOMArrayDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMArrayDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMArrayDataType(*i);
+    }
+  }
+
+  void writeFOMFixedRecordField(const FOMFixedRecordField& value)
+  {
+    writeString(value.getName());
+    writeString(value.getDataType());
+    writeUnsigned(value.getVersion());
+  }
+
+  void writeFOMFixedRecordFieldList(const FOMFixedRecordFieldList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMFixedRecordFieldList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMFixedRecordField(*i);
+    }
+  }
+
+  void writeFOMFixedRecordDataType(const FOMFixedRecordDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getEncoding());
+    writeString(value.getInclude());
+    writeUnsigned(value.getVersion());
+    writeFOMFixedRecordFieldList(value.getFields());
+    writeFixedRecordDataTypeHandle(value.getHandle());
+  }
+
+  void writeFOMFixedRecordDataTypeList(const FOMFixedRecordDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMFixedRecordDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMFixedRecordDataType(*i);
+    }
+  }
+
+  void writeFOMVariantRecordAlternative(const FOMVariantRecordAlternative& value)
+  {
+    writeString(value.getEnumerator());
+    writeString(value.getName());
+    writeString(value.getDataType());
+  }
+
+  void writeFOMVariantRecordAlternativeList(const FOMVariantRecordAlternativeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMVariantRecordAlternativeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMVariantRecordAlternative(*i);
+    }
+  }
+
+  void writeFOMVariantRecordDataType(const FOMVariantRecordDataType& value)
+  {
+    writeString(value.getName());
+    writeString(value.getDiscriminant());
+    writeString(value.getDataType());
+    writeFOMVariantRecordAlternativeList(value.getAlternatives());
+    writeString(value.getEncoding());
+    writeVariantRecordDataTypeHandle(value.getHandle());
+  }
+
+  void writeFOMVariantRecordDataTypeList(const FOMVariantRecordDataTypeList& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMVariantRecordDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMVariantRecordDataType(*i);
+    }
+  }
+
   void writeFOMModule(const FOMModule& value)
   {
     writeModuleHandle(value.getModuleHandle());
@@ -1232,6 +1455,12 @@ public:
     writeFOMObjectClassList(value.getObjectClassList());
     writeFOMUpdateRateList(value.getUpdateRateList());
     writeFOMSwitchList(value.getSwitchList());
+    writeFOMBasicDataTypeList(value.getBasicDataTypeList());
+    writeFOMSimpleDataTypeList(value.getSimpleDataTypeList());
+    writeFOMEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
+    writeFOMArrayDataTypeList(value.getArrayDataTypeList());
+    writeFOMFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
+    writeFOMVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
     writeBool(value.getArtificialInteractionRoot());
     writeBool(value.getArtificialObjectRoot());
     writeString(value.getDesignator());
@@ -2592,6 +2821,36 @@ public:
     }
   }
 
+  void readArrayDataTypeEncoding(ArrayDataTypeEncoding& value)
+  {
+    switch (readUInt32Compressed()) {
+    case 0:
+      value = FixedArrayDataTypeEncoding;
+      break;
+    case 1:
+      value = VariableArrayDataTypeEncoding;
+      break;
+    default:
+      value = VariableArrayDataTypeEncoding;
+      break;
+    }
+  }
+
+  void readEndianness(Endianness& value)
+  {
+    switch (readUInt32Compressed()) {
+    case 0:
+      value = BigEndian;
+      break;
+    case 1:
+      value = LittleEndian;
+      break;
+    default:
+      value = LittleEndian;
+      break;
+    }
+  }
+
   void readBool(bool& value)
   {
     value = readBoolCompressed();
@@ -2636,6 +2895,36 @@ public:
   }
 
   void readUpdateRateHandle(UpdateRateHandle& value)
+  {
+    value = readUInt32Compressed();
+  }
+
+  void readBasicDataTypeHandle(BasicDataTypeHandle& value)
+  {
+    value = readUInt32Compressed();
+  }
+
+  void readSimpleDataTypeHandle(SimpleDataTypeHandle& value)
+  {
+    value = readUInt32Compressed();
+  }
+
+  void readEnumeratedDataTypeHandle(EnumeratedDataTypeHandle& value)
+  {
+    value = readUInt32Compressed();
+  }
+
+  void readArrayDataTypeHandle(ArrayDataTypeHandle& value)
+  {
+    value = readUInt32Compressed();
+  }
+
+  void readFixedRecordDataTypeHandle(FixedRecordDataTypeHandle& value)
+  {
+    value = readUInt32Compressed();
+  }
+
+  void readVariantRecordDataTypeHandle(VariantRecordDataTypeHandle& value)
   {
     value = readUInt32Compressed();
   }
@@ -3082,6 +3371,21 @@ public:
     }
   }
 
+  void readFOMStringBasicDataType(FOMStringBasicDataType& value)
+  {
+    readString(value.getName());
+    readUnsigned(value.getSize());
+    readEndianness(value.getEndian());
+  }
+
+  void readFOMStringBasicDataTypeList(FOMStringBasicDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringBasicDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringBasicDataType(*i);
+    }
+  }
+
   void readFOMStringSimpleDataType(FOMStringSimpleDataType& value)
   {
     readString(value.getName());
@@ -3130,7 +3434,7 @@ public:
     readString(value.getName());
     readString(value.getDataType());
     readString(value.getCardinality());
-    readString(value.getEncoding());
+    readArrayDataTypeEncoding(value.getEncoding());
   }
 
   void readFOMStringArrayDataTypeList(FOMStringArrayDataTypeList& value)
@@ -3144,7 +3448,8 @@ public:
   void readFOMStringFixedRecordField(FOMStringFixedRecordField& value)
   {
     readString(value.getName());
-    readUnsigned(value.getDataType());
+    readString(value.getDataType());
+    readUnsigned(value.getVersion());
   }
 
   void readFOMStringFixedRecordFieldList(FOMStringFixedRecordFieldList& value)
@@ -3159,6 +3464,8 @@ public:
   {
     readString(value.getName());
     readString(value.getEncoding());
+    readString(value.getInclude());
+    readUnsigned(value.getVersion());
     readFOMStringFixedRecordFieldList(value.getFields());
   }
 
@@ -3174,7 +3481,7 @@ public:
   {
     readString(value.getEnumerator());
     readString(value.getName());
-    readUnsigned(value.getDataType());
+    readString(value.getDataType());
   }
 
   void readFOMStringVariantRecordAlternativeList(FOMStringVariantRecordAlternativeList& value)
@@ -3345,6 +3652,7 @@ public:
     readFOMStringObjectClassList(value.getObjectClassList());
     readFOMStringUpdateRateList(value.getUpdateRateList());
     readFOMStringSwitchList(value.getSwitchList());
+    readFOMStringBasicDataTypeList(value.getBasicDataTypeList());
     readFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
     readFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
     readFOMStringArrayDataTypeList(value.getArrayDataTypeList());
@@ -3503,6 +3811,150 @@ public:
     }
   }
 
+  void readFOMBasicDataType(FOMBasicDataType& value)
+  {
+    readString(value.getName());
+    readUnsigned(value.getSize());
+    readEndianness(value.getEndian());
+    readBasicDataTypeHandle(value.getHandle());
+  }
+
+  void readFOMBasicDataTypeList(FOMBasicDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMBasicDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMBasicDataType(*i);
+    }
+  }
+
+  void readFOMSimpleDataType(FOMSimpleDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getRepresentation());
+    readSimpleDataTypeHandle(value.getHandle());
+  }
+
+  void readFOMSimpleDataTypeList(FOMSimpleDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMSimpleDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMSimpleDataType(*i);
+    }
+  }
+
+  void readFOMEnumerator(FOMEnumerator& value)
+  {
+    readString(value.getName());
+    readUnsigned(value.getValue());
+  }
+
+  void readFOMEnumeratorList(FOMEnumeratorList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMEnumeratorList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMEnumerator(*i);
+    }
+  }
+
+  void readFOMEnumeratedDataType(FOMEnumeratedDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getRepresentation());
+    readFOMEnumeratorList(value.getEnumerators());
+    readEnumeratedDataTypeHandle(value.getHandle());
+  }
+
+  void readFOMEnumeratedDataTypeList(FOMEnumeratedDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMEnumeratedDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMEnumeratedDataType(*i);
+    }
+  }
+
+  void readFOMArrayDataType(FOMArrayDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getDataType());
+    readString(value.getCardinality());
+    readArrayDataTypeEncoding(value.getEncoding());
+    readArrayDataTypeHandle(value.getHandle());
+  }
+
+  void readFOMArrayDataTypeList(FOMArrayDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMArrayDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMArrayDataType(*i);
+    }
+  }
+
+  void readFOMFixedRecordField(FOMFixedRecordField& value)
+  {
+    readString(value.getName());
+    readString(value.getDataType());
+    readUnsigned(value.getVersion());
+  }
+
+  void readFOMFixedRecordFieldList(FOMFixedRecordFieldList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMFixedRecordFieldList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMFixedRecordField(*i);
+    }
+  }
+
+  void readFOMFixedRecordDataType(FOMFixedRecordDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getEncoding());
+    readString(value.getInclude());
+    readUnsigned(value.getVersion());
+    readFOMFixedRecordFieldList(value.getFields());
+    readFixedRecordDataTypeHandle(value.getHandle());
+  }
+
+  void readFOMFixedRecordDataTypeList(FOMFixedRecordDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMFixedRecordDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMFixedRecordDataType(*i);
+    }
+  }
+
+  void readFOMVariantRecordAlternative(FOMVariantRecordAlternative& value)
+  {
+    readString(value.getEnumerator());
+    readString(value.getName());
+    readString(value.getDataType());
+  }
+
+  void readFOMVariantRecordAlternativeList(FOMVariantRecordAlternativeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMVariantRecordAlternativeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMVariantRecordAlternative(*i);
+    }
+  }
+
+  void readFOMVariantRecordDataType(FOMVariantRecordDataType& value)
+  {
+    readString(value.getName());
+    readString(value.getDiscriminant());
+    readString(value.getDataType());
+    readFOMVariantRecordAlternativeList(value.getAlternatives());
+    readString(value.getEncoding());
+    readVariantRecordDataTypeHandle(value.getHandle());
+  }
+
+  void readFOMVariantRecordDataTypeList(FOMVariantRecordDataTypeList& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMVariantRecordDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMVariantRecordDataType(*i);
+    }
+  }
+
   void readFOMModule(FOMModule& value)
   {
     readModuleHandle(value.getModuleHandle());
@@ -3513,6 +3965,12 @@ public:
     readFOMObjectClassList(value.getObjectClassList());
     readFOMUpdateRateList(value.getUpdateRateList());
     readFOMSwitchList(value.getSwitchList());
+    readFOMBasicDataTypeList(value.getBasicDataTypeList());
+    readFOMSimpleDataTypeList(value.getSimpleDataTypeList());
+    readFOMEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
+    readFOMArrayDataTypeList(value.getArrayDataTypeList());
+    readFOMFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
+    readFOMVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
     readBool(value.getArtificialInteractionRoot());
     readBool(value.getArtificialObjectRoot());
     readString(value.getDesignator());
