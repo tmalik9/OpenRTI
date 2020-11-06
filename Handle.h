@@ -178,6 +178,15 @@ class Handle
     T _handle;
 };
 
+template<typename T> struct Hash<Handle<T>>
+{
+  std::size_t operator()(const Handle<T>& handle) const noexcept
+  {
+    return handle.getHash();
+  }
+};
+
+
 class ObjectClassHandle : public Handle<uint32_t>
 {
   public:
@@ -196,14 +205,6 @@ class ObjectClassHandle : public Handle<uint32_t>
       stream << "ObjectClassHandle" "(" << getHandle() << ")";
       return stream.str();
     }
-};
-
-template<> struct Hash<ObjectClassHandle>
-{
-  std::size_t operator()(const ObjectClassHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
 };
 
 template<typename char_type, typename traits_type> inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectClassHandle& handle)
@@ -227,14 +228,6 @@ class ObjectInstanceHandle : public Handle<uint32_t>
       stream << "ObjectInstanceHandle" "(" << getHandle() << ")";
       return stream.str();
     }
-};
-
-template<> struct Hash<ObjectInstanceHandle>
-{
-  std::size_t operator()(const ObjectInstanceHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
 };
 
 template<typename char_type, typename traits_type> 
@@ -263,14 +256,6 @@ class AttributeHandle : public Handle<uint32_t>
     }
 };
 
-template<> struct Hash<AttributeHandle>
-{
-  std::size_t operator()(const AttributeHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
-};
-
 template<typename char_type, typename traits_type> 
 inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeHandle& handle)
 {
@@ -294,14 +279,6 @@ class InteractionClassHandle : public Handle<uint32_t>
       stream << "InteractionClassHandle" "(" << getHandle() << ")";
       return stream.str();
     }
-};
-
-template<> struct Hash<InteractionClassHandle>
-{
-  std::size_t operator()(const InteractionClassHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
 };
 
 template<typename char_type, typename traits_type> 
@@ -328,14 +305,6 @@ class ParameterHandle : public Handle<uint32_t>
     }
 };
 
-template<> struct Hash<ParameterHandle>
-{
-  std::size_t operator()(const ParameterHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
-};
-
 template<typename char_type, typename traits_type> 
 inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterHandle& handle)
 {
@@ -358,14 +327,6 @@ class FederateHandle : public Handle<uint32_t>
       stream << "FederateHandle" "(" << getHandle() << ")";
       return stream.str();
     }
-};
-
-template<> struct Hash<FederateHandle>
-{
-  std::size_t operator()(const FederateHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
 };
 
 template<typename char_type, typename traits_type> 
@@ -393,14 +354,6 @@ class FederationHandle : public Handle<uint16_t>
     }
 };
 
-template<> struct Hash<FederationHandle>
-{
-  std::size_t operator()(const FederationHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
-};
-
 template<typename char_type, typename traits_type> 
 inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationHandle& handle)
 {
@@ -424,14 +377,6 @@ class ModuleHandle : public Handle<uint16_t>
       stream << "ModuleHandle" "(" << getHandle() << ")";
       return stream.str();
     }
-};
-
-template<> struct Hash<ModuleHandle>
-{
-  std::size_t operator()(const ModuleHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
 };
 
 template<typename char_type, typename traits_type> 
@@ -458,14 +403,6 @@ class ConnectHandle : public Handle<unsigned>
     }
 };
 
-template<> struct Hash<ConnectHandle>
-{
-  std::size_t operator()(const ConnectHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
-};
-
 template<typename char_type, typename traits_type> 
 inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const ConnectHandle& handle)
 {
@@ -488,14 +425,6 @@ class TransportationHandle : public Handle<uint8_t>
       stream << "TransportationHandle" "(" << getHandle() << ")";
       return stream.str();
     }
-};
-
-template<> struct Hash<TransportationHandle>
-{
-  std::size_t operator()(const TransportationHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
 };
 
 template<typename char_type, typename traits_type> 
@@ -522,14 +451,6 @@ class OrderingHandle : public Handle<uint8_t>
     }
 };
 
-template<> struct Hash<OrderingHandle>
-{
-  std::size_t operator()(const OrderingHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
-};
-
 template<typename char_type, typename traits_type> 
 inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const OrderingHandle& handle)
 {
@@ -552,14 +473,6 @@ class DimensionHandle : public Handle<uint32_t>
       stream << "DimensionHandle" "(" << getHandle() << ")";
       return stream.str();
     }
-};
-
-template<> struct Hash<DimensionHandle>
-{
-  std::size_t operator()(const DimensionHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
 };
 
 template<typename char_type, typename traits_type> 
@@ -585,14 +498,6 @@ class SpaceHandle : public Handle<uint32_t>
     }
 };
 
-template<> struct Hash<SpaceHandle>
-{
-  std::size_t operator()(const SpaceHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
-};
-
 template<typename char_type, typename traits_type> inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const SpaceHandle& handle)
 {
   os << "SpaceHandle" "(" << handle.getHandle() << ")";
@@ -616,17 +521,147 @@ class UpdateRateHandle : public Handle<uint32_t>
     }
 };
 
-template<> struct Hash<UpdateRateHandle>
-{
-  std::size_t operator()(const UpdateRateHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
-};
-
 template<typename char_type, typename traits_type> inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const UpdateRateHandle& handle)
 {
   os << "UpdateRateHandle" "(" << handle.getHandle() << ")";
+  return os;
+}
+
+class BasicDataTypeHandle : public Handle<uint32_t>
+{
+  public:
+    BasicDataTypeHandle() noexcept = default;
+    BasicDataTypeHandle(const BasicDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
+    BasicDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ~BasicDataTypeHandle() noexcept = default;
+    BasicDataTypeHandle& operator=(const BasicDataTypeHandle& handle) = default;
+    BasicDataTypeHandle& operator=(BasicDataTypeHandle&& handle) = default;
+    std::string toString() const
+    {
+      std::stringstream stream;
+      stream << "BasicDataTypeHandle" "(" << getHandle() << ")";
+      return stream.str();
+    }
+};
+
+template<typename char_type, typename traits_type> inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const BasicDataTypeHandle& handle)
+{
+  os << "BasicDataTypeHandle" "(" << handle.getHandle() << ")";
+  return os;
+}
+
+class SimpleDataTypeHandle : public Handle<uint32_t>
+{
+  public:
+    SimpleDataTypeHandle() noexcept = default;
+    SimpleDataTypeHandle(const SimpleDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
+    SimpleDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ~SimpleDataTypeHandle() noexcept = default;
+    SimpleDataTypeHandle& operator=(const SimpleDataTypeHandle& handle) = default;
+    SimpleDataTypeHandle& operator=(SimpleDataTypeHandle&& handle) = default;
+    std::string toString() const
+    {
+      std::stringstream stream;
+      stream << "SimpleDataTypeHandle" "(" << getHandle() << ")";
+      return stream.str();
+    }
+};
+
+template<typename char_type, typename traits_type> inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const SimpleDataTypeHandle& handle)
+{
+  os << "SimpleDataTypeHandle" "(" << handle.getHandle() << ")";
+  return os;
+}
+
+class EnumeratedDataTypeHandle : public Handle<uint32_t>
+{
+  public:
+    EnumeratedDataTypeHandle() noexcept = default;
+    EnumeratedDataTypeHandle(const EnumeratedDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
+    EnumeratedDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ~EnumeratedDataTypeHandle() noexcept = default;
+    EnumeratedDataTypeHandle& operator=(const EnumeratedDataTypeHandle& handle) = default;
+    EnumeratedDataTypeHandle& operator=(EnumeratedDataTypeHandle&& handle) = default;
+    std::string toString() const
+    {
+      std::stringstream stream;
+      stream << "EnumeratedDataTypeHandle" "(" << getHandle() << ")";
+      return stream.str();
+    }
+};
+
+template<typename char_type, typename traits_type> inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const EnumeratedDataTypeHandle& handle)
+{
+  os << "EnumeratedDataTypeHandle" "(" << handle.getHandle() << ")";
+  return os;
+}
+
+class ArrayDataTypeHandle : public Handle<uint32_t>
+{
+  public:
+    ArrayDataTypeHandle() noexcept = default;
+    ArrayDataTypeHandle(const ArrayDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ArrayDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ~ArrayDataTypeHandle() noexcept = default;
+    ArrayDataTypeHandle& operator=(const ArrayDataTypeHandle& handle) = default;
+    ArrayDataTypeHandle& operator=(ArrayDataTypeHandle&& handle) = default;
+    std::string toString() const
+    {
+      std::stringstream stream;
+      stream << "ArrayDataTypeHandle" "(" << getHandle() << ")";
+      return stream.str();
+    }
+};
+
+template<typename char_type, typename traits_type> inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const ArrayDataTypeHandle& handle)
+{
+  os << "ArrayDataTypeHandle" "(" << handle.getHandle() << ")";
+  return os;
+}
+
+class FixedRecordDataTypeHandle : public Handle<uint32_t>
+{
+  public:
+    FixedRecordDataTypeHandle() noexcept = default;
+    FixedRecordDataTypeHandle(const FixedRecordDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
+    FixedRecordDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ~FixedRecordDataTypeHandle() noexcept = default;
+    FixedRecordDataTypeHandle& operator=(const FixedRecordDataTypeHandle& handle) = default;
+    FixedRecordDataTypeHandle& operator=(FixedRecordDataTypeHandle&& handle) = default;
+    std::string toString() const
+    {
+      std::stringstream stream;
+      stream << "FixedRecordDataTypeHandle" "(" << getHandle() << ")";
+      return stream.str();
+    }
+};
+
+template<typename char_type, typename traits_type> inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const FixedRecordDataTypeHandle& handle)
+{
+  os << "FixedRecordDataTypeHandle" "(" << handle.getHandle() << ")";
+  return os;
+}
+
+class VariantRecordDataTypeHandle : public Handle<uint32_t>
+{
+  public:
+    VariantRecordDataTypeHandle() noexcept = default;
+    VariantRecordDataTypeHandle(const VariantRecordDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
+    VariantRecordDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ~VariantRecordDataTypeHandle() noexcept = default;
+    VariantRecordDataTypeHandle& operator=(const VariantRecordDataTypeHandle& handle) = default;
+    VariantRecordDataTypeHandle& operator=(VariantRecordDataTypeHandle&& handle) = default;
+    std::string toString() const
+    {
+      std::stringstream stream;
+      stream << "VariantRecordDataTypeHandle" "(" << getHandle() << ")";
+      return stream.str();
+    }
+};
+
+template<typename char_type, typename traits_type> inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const VariantRecordDataTypeHandle& handle)
+{
+  os << "VariantRecordDataTypeHandle" "(" << handle.getHandle() << ")";
   return os;
 }
 
@@ -664,16 +699,6 @@ class MessageRetractionHandle : public Handle<uint64_t>
     }
 };
 
-template<>
-struct Hash<MessageRetractionHandle>
-{
-  public:
-    std::size_t operator()(const MessageRetractionHandle& handle) const noexcept
-    {
-      return handle.getHash();
-    }
-};
-
 // The regions are private to the creator, so prefix the regions with the federate handle,
 // This way we can avoid tracking the region handles globally.
 class LocalRegionHandle : public Handle<uint32_t>
@@ -693,13 +718,7 @@ class LocalRegionHandle : public Handle<uint32_t>
       return stream.str();
     }
 };
-template<> struct Hash<LocalRegionHandle>
-{
-  std::size_t operator()(const LocalRegionHandle& handle) const noexcept
-  {
-    return handle.getHash();
-  }
-};
+
 template<typename char_type, typename traits_type> 
 inline std::basic_ostream<char_type, traits_type>& operator<<(std::basic_ostream<char_type, traits_type>& os, const LocalRegionHandle& handle)
 {
@@ -738,16 +757,6 @@ class RegionHandle : public Handle<uint64_t>
       std::stringstream stream;
       stream << "RegionHandle(" << getFederateHandle().getHandle() << "," << getLocalRegionHandle().getHandle() << ")";
       return stream.str();
-    }
-};
-
-template<>
-struct Hash<RegionHandle>
-{
-  public:
-    std::size_t operator()(const RegionHandle& handle) const noexcept
-    {
-      return handle.getHash();
     }
 };
 

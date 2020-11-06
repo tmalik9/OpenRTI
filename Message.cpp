@@ -5266,6 +5266,60 @@ inline std::string to_string(const SwitchesType& value)
   }
 }
 
+// EnumDataType ArrayDataTypeEncoding
+std::ostream&
+operator<<(std::ostream& os, const ArrayDataTypeEncoding& value)
+{
+  switch (value) {
+  case FixedArrayDataTypeEncoding: os << "HLAfixedArray"; break;
+  case VariableArrayDataTypeEncoding: os << "HLAvariableArray"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const ArrayDataTypeEncoding& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const ArrayDataTypeEncoding& value)
+{
+  switch (value) {
+  case FixedArrayDataTypeEncoding: return "HLAfixedArray";
+  case VariableArrayDataTypeEncoding: return "HLAvariableArray";
+  default: return "<Invalid ArrayDataTypeEncoding>";
+  }
+}
+
+// EnumDataType Endianness
+std::ostream&
+operator<<(std::ostream& os, const Endianness& value)
+{
+  switch (value) {
+  case BigEndian: os << "BIG"; break;
+  case LittleEndian: os << "LITTLE"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const Endianness& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
+inline std::string to_string(const Endianness& value)
+{
+  switch (value) {
+  case BigEndian: return "BIG";
+  case LittleEndian: return "LITTLE";
+  default: return "<Invalid Endianness>";
+  }
+}
+
 // VectorDataType AttributeHandleVector
 std::ostream&
 operator<<(std::ostream& os, const AttributeHandleVector& value)
@@ -6436,7 +6490,7 @@ inline std::string to_string(const RegisterFederationSynchronizationPointRespons
   }
 }
 
-// <__main__.MapDataType object at 0x00000190DA96E978>
+// <__main__.MapDataType object at 0x0000023A3B81FEF0>
 std::ostream&
 operator<<(std::ostream& os, const ConfigurationParameterMap& value)
 {
@@ -6461,6 +6515,64 @@ prettyprint(std::ostream& os, const ConfigurationParameterMap& value, ServerMode
     prettyprint(os, i->first, federation); os << ": "; prettyprint(os, i->second, federation);
     while (++i != value.end()) {
       prettyprint(os, i->first, federation); os << ": "; prettyprint(os, i->second, federation);
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringBasicDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMStringBasicDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "size: " << value.getSize();
+  os << ", ";
+  os << "endian: " << value.getEndian();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringBasicDataType& value)
+{
+  os << "FOMStringBasicDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "size: "<< value.getSize();
+  os << ", ";
+  os << "endian: "<< value.getEndian();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringBasicDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMStringBasicDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringBasicDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringBasicDataTypeList& value)
+{
+  os << "{ ";
+  FOMStringBasicDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
     }
   }
   os << " }";
@@ -6703,6 +6815,8 @@ operator<<(std::ostream& os, const FOMStringFixedRecordField& value)
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "version: " << value.getVersion();
   os << " }";
   return os;
 }
@@ -6714,6 +6828,8 @@ prettyprint(std::ostream& os, const FOMStringFixedRecordField& value)
   os << "name: "<< value.getName();
   os << ", ";
   os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "version: "<< value.getVersion();
   os << " }";
   return os;
 }
@@ -6758,6 +6874,10 @@ operator<<(std::ostream& os, const FOMStringFixedRecordDataType& value)
   os << ", ";
   os << "encoding: " << value.getEncoding();
   os << ", ";
+  os << "include: " << value.getInclude();
+  os << ", ";
+  os << "version: " << value.getVersion();
+  os << ", ";
   os << "fields: " << value.getFields();
   os << " }";
   return os;
@@ -6770,6 +6890,10 @@ prettyprint(std::ostream& os, const FOMStringFixedRecordDataType& value)
   os << "name: "<< value.getName();
   os << ", ";
   os << "encoding: "<< value.getEncoding();
+  os << ", ";
+  os << "include: "<< value.getInclude();
+  os << ", ";
+  os << "version: "<< value.getVersion();
   os << ", ";
   os << "fields: "<< value.getFields();
   os << " }";
@@ -7466,6 +7590,8 @@ operator<<(std::ostream& os, const FOMStringModule& value)
   os << ", ";
   os << "switchList: " << value.getSwitchList();
   os << ", ";
+  os << "basicDataTypeList: " << value.getBasicDataTypeList();
+  os << ", ";
   os << "simpleDataTypeList: " << value.getSimpleDataTypeList();
   os << ", ";
   os << "enumeratedDataTypeList: " << value.getEnumeratedDataTypeList();
@@ -7502,6 +7628,8 @@ prettyprint(std::ostream& os, const FOMStringModule& value)
   os << "updateRateList: "<< value.getUpdateRateList();
   os << ", ";
   os << "switchList: "<< value.getSwitchList();
+  os << ", ";
+  os << "basicDataTypeList: "<< value.getBasicDataTypeList();
   os << ", ";
   os << "simpleDataTypeList: "<< value.getSimpleDataTypeList();
   os << ", ";
@@ -8097,6 +8225,564 @@ prettyprint(std::ostream& os, const FOMSwitchList& value)
   return os;
 }
 
+// StructDataType FOMBasicDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMBasicDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "size: " << value.getSize();
+  os << ", ";
+  os << "endian: " << value.getEndian();
+  os << ", ";
+  os << "handle: " << value.getHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMBasicDataType& value)
+{
+  os << "FOMBasicDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "size: "<< value.getSize();
+  os << ", ";
+  os << "endian: "<< value.getEndian();
+  os << ", ";
+  os << "handle: "<< value.getHandle();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMBasicDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMBasicDataTypeList& value)
+{
+  os << "{ ";
+  FOMBasicDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMBasicDataTypeList& value)
+{
+  os << "{ ";
+  FOMBasicDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMSimpleDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMSimpleDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "representation: " << value.getRepresentation();
+  os << ", ";
+  os << "handle: " << value.getHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMSimpleDataType& value)
+{
+  os << "FOMSimpleDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "representation: "<< value.getRepresentation();
+  os << ", ";
+  os << "handle: "<< value.getHandle();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMSimpleDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMSimpleDataTypeList& value)
+{
+  os << "{ ";
+  FOMSimpleDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMSimpleDataTypeList& value)
+{
+  os << "{ ";
+  FOMSimpleDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMEnumerator
+std::ostream&
+operator<<(std::ostream& os, const FOMEnumerator& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "value: " << value.getValue();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMEnumerator& value)
+{
+  os << "FOMEnumerator { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "value: "<< value.getValue();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMEnumeratorList
+std::ostream&
+operator<<(std::ostream& os, const FOMEnumeratorList& value)
+{
+  os << "{ ";
+  FOMEnumeratorList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMEnumeratorList& value)
+{
+  os << "{ ";
+  FOMEnumeratorList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMEnumeratedDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMEnumeratedDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "representation: " << value.getRepresentation();
+  os << ", ";
+  os << "enumerators: " << value.getEnumerators();
+  os << ", ";
+  os << "handle: " << value.getHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMEnumeratedDataType& value)
+{
+  os << "FOMEnumeratedDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "representation: "<< value.getRepresentation();
+  os << ", ";
+  os << "enumerators: "<< value.getEnumerators();
+  os << ", ";
+  os << "handle: "<< value.getHandle();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMEnumeratedDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMEnumeratedDataTypeList& value)
+{
+  os << "{ ";
+  FOMEnumeratedDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMEnumeratedDataTypeList& value)
+{
+  os << "{ ";
+  FOMEnumeratedDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMArrayDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMArrayDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "cardinality: " << value.getCardinality();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << ", ";
+  os << "handle: " << value.getHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMArrayDataType& value)
+{
+  os << "FOMArrayDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "cardinality: "<< value.getCardinality();
+  os << ", ";
+  os << "encoding: "<< value.getEncoding();
+  os << ", ";
+  os << "handle: "<< value.getHandle();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMArrayDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMArrayDataTypeList& value)
+{
+  os << "{ ";
+  FOMArrayDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMArrayDataTypeList& value)
+{
+  os << "{ ";
+  FOMArrayDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMFixedRecordField
+std::ostream&
+operator<<(std::ostream& os, const FOMFixedRecordField& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "version: " << value.getVersion();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMFixedRecordField& value)
+{
+  os << "FOMFixedRecordField { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "version: "<< value.getVersion();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMFixedRecordFieldList
+std::ostream&
+operator<<(std::ostream& os, const FOMFixedRecordFieldList& value)
+{
+  os << "{ ";
+  FOMFixedRecordFieldList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMFixedRecordFieldList& value)
+{
+  os << "{ ";
+  FOMFixedRecordFieldList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMFixedRecordDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMFixedRecordDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << ", ";
+  os << "include: " << value.getInclude();
+  os << ", ";
+  os << "version: " << value.getVersion();
+  os << ", ";
+  os << "fields: " << value.getFields();
+  os << ", ";
+  os << "handle: " << value.getHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMFixedRecordDataType& value)
+{
+  os << "FOMFixedRecordDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "encoding: "<< value.getEncoding();
+  os << ", ";
+  os << "include: "<< value.getInclude();
+  os << ", ";
+  os << "version: "<< value.getVersion();
+  os << ", ";
+  os << "fields: "<< value.getFields();
+  os << ", ";
+  os << "handle: "<< value.getHandle();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMFixedRecordDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMFixedRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMFixedRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMFixedRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMFixedRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMVariantRecordAlternative
+std::ostream&
+operator<<(std::ostream& os, const FOMVariantRecordAlternative& value)
+{
+  os << "{ ";
+  os << "enumerator: " << value.getEnumerator();
+  os << ", ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMVariantRecordAlternative& value)
+{
+  os << "FOMVariantRecordAlternative { ";
+  os << "enumerator: "<< value.getEnumerator();
+  os << ", ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMVariantRecordAlternativeList
+std::ostream&
+operator<<(std::ostream& os, const FOMVariantRecordAlternativeList& value)
+{
+  os << "{ ";
+  FOMVariantRecordAlternativeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMVariantRecordAlternativeList& value)
+{
+  os << "{ ";
+  FOMVariantRecordAlternativeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMVariantRecordDataType
+std::ostream&
+operator<<(std::ostream& os, const FOMVariantRecordDataType& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "discriminant: " << value.getDiscriminant();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "alternatives: " << value.getAlternatives();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << ", ";
+  os << "handle: " << value.getHandle();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMVariantRecordDataType& value)
+{
+  os << "FOMVariantRecordDataType { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "discriminant: "<< value.getDiscriminant();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "alternatives: "<< value.getAlternatives();
+  os << ", ";
+  os << "encoding: "<< value.getEncoding();
+  os << ", ";
+  os << "handle: "<< value.getHandle();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMVariantRecordDataTypeList
+std::ostream&
+operator<<(std::ostream& os, const FOMVariantRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMVariantRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMVariantRecordDataTypeList& value)
+{
+  os << "{ ";
+  FOMVariantRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
 // StructDataType FOMModule
 std::ostream&
 operator<<(std::ostream& os, const FOMModule& value)
@@ -8117,6 +8803,18 @@ operator<<(std::ostream& os, const FOMModule& value)
   os << "updateRateList: " << value.getUpdateRateList();
   os << ", ";
   os << "switchList: " << value.getSwitchList();
+  os << ", ";
+  os << "basicDataTypeList: " << value.getBasicDataTypeList();
+  os << ", ";
+  os << "simpleDataTypeList: " << value.getSimpleDataTypeList();
+  os << ", ";
+  os << "enumeratedDataTypeList: " << value.getEnumeratedDataTypeList();
+  os << ", ";
+  os << "arrayDataTypeList: " << value.getArrayDataTypeList();
+  os << ", ";
+  os << "fixedRecordDataTypeList: " << value.getFixedRecordDataTypeList();
+  os << ", ";
+  os << "variantRecordDataTypeList: " << value.getVariantRecordDataTypeList();
   os << ", ";
   os << "artificialInteractionRoot: " << value.getArtificialInteractionRoot();
   os << ", ";
@@ -8146,6 +8844,18 @@ prettyprint(std::ostream& os, const FOMModule& value)
   os << "updateRateList: "<< value.getUpdateRateList();
   os << ", ";
   os << "switchList: "<< value.getSwitchList();
+  os << ", ";
+  os << "basicDataTypeList: "<< value.getBasicDataTypeList();
+  os << ", ";
+  os << "simpleDataTypeList: "<< value.getSimpleDataTypeList();
+  os << ", ";
+  os << "enumeratedDataTypeList: "<< value.getEnumeratedDataTypeList();
+  os << ", ";
+  os << "arrayDataTypeList: "<< value.getArrayDataTypeList();
+  os << ", ";
+  os << "fixedRecordDataTypeList: "<< value.getFixedRecordDataTypeList();
+  os << ", ";
+  os << "variantRecordDataTypeList: "<< value.getVariantRecordDataTypeList();
   os << ", ";
   os << "artificialInteractionRoot: "<< value.getArtificialInteractionRoot();
   os << ", ";

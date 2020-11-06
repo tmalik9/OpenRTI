@@ -129,6 +129,16 @@ enum SwitchesType {
   ServiceReportingSwitchesType
 };
 
+enum ArrayDataTypeEncoding {
+  FixedArrayDataTypeEncoding,
+  VariableArrayDataTypeEncoding
+};
+
+enum Endianness {
+  BigEndian,
+  LittleEndian
+};
+
 typedef bool Bool;
 
 typedef std::string String;
@@ -242,6 +252,9 @@ enum RegisterFederationSynchronizationPointResponseType {
 
 typedef std::map<String, StringVector> ConfigurationParameterMap;
 
+class FOMStringBasicDataType;
+typedef std::vector<FOMStringBasicDataType> FOMStringBasicDataTypeList;
+
 class FOMStringSimpleDataType;
 typedef std::vector<FOMStringSimpleDataType> FOMStringSimpleDataTypeList;
 
@@ -322,6 +335,33 @@ typedef std::vector<FOMUpdateRate> FOMUpdateRateList;
 
 class FOMSwitch;
 typedef std::vector<FOMSwitch> FOMSwitchList;
+
+class FOMBasicDataType;
+typedef std::vector<FOMBasicDataType> FOMBasicDataTypeList;
+
+class FOMSimpleDataType;
+typedef std::vector<FOMSimpleDataType> FOMSimpleDataTypeList;
+
+class FOMEnumerator;
+typedef std::vector<FOMEnumerator> FOMEnumeratorList;
+
+class FOMEnumeratedDataType;
+typedef std::vector<FOMEnumeratedDataType> FOMEnumeratedDataTypeList;
+
+class FOMArrayDataType;
+typedef std::vector<FOMArrayDataType> FOMArrayDataTypeList;
+
+class FOMFixedRecordField;
+typedef std::vector<FOMFixedRecordField> FOMFixedRecordFieldList;
+
+class FOMFixedRecordDataType;
+typedef std::vector<FOMFixedRecordDataType> FOMFixedRecordDataTypeList;
+
+class FOMVariantRecordAlternative;
+typedef std::vector<FOMVariantRecordAlternative> FOMVariantRecordAlternativeList;
+
+class FOMVariantRecordDataType;
+typedef std::vector<FOMVariantRecordDataType> FOMVariantRecordDataTypeList;
 
 class FOMModule;
 typedef std::vector<FOMModule> FOMModuleList;
@@ -778,6 +818,105 @@ typedef std::vector<ObjectInstanceHandleNamePair> ObjectInstanceHandleNamePairVe
 
 typedef std::map<String, StringVector> ConfigurationParameterMap;
 
+class OPENRTI_API FOMStringBasicDataType {
+public:
+  FOMStringBasicDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setSize(const Unsigned& value) noexcept
+  { getImpl()._size = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setSize(Unsigned&& value) noexcept
+  { getImpl()._size = std::move(value); }
+#endif
+  Unsigned& getSize() noexcept
+  { return getImpl()._size; }
+  const Unsigned& getSize() const noexcept
+  { return getConstImpl()._size; }
+
+  void setEndian(const Endianness& value) noexcept
+  { getImpl()._endian = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEndian(Endianness&& value) noexcept
+  { getImpl()._endian = std::move(value); }
+#endif
+  Endianness& getEndian() noexcept
+  { return getImpl()._endian; }
+  const Endianness& getEndian() const noexcept
+  { return getConstImpl()._endian; }
+
+  FOMStringBasicDataType& swap(FOMStringBasicDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringBasicDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getSize() != rhs.getSize()) return false;
+    if (getEndian() != rhs.getEndian()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringBasicDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getSize() < rhs.getSize()) return true;
+    if (rhs.getSize() < getSize()) return false;
+    if (getEndian() < rhs.getEndian()) return true;
+    if (rhs.getEndian() < getEndian()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringBasicDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringBasicDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringBasicDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _size(),
+      _endian()
+    { }
+    String _name;
+    Unsigned _size;
+    Endianness _endian;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringBasicDataType> FOMStringBasicDataTypeList;
+
 class OPENRTI_API FOMStringSimpleDataType {
 public:
   FOMStringSimpleDataType() : 
@@ -1081,15 +1220,15 @@ public:
   const String& getCardinality() const noexcept
   { return getConstImpl()._cardinality; }
 
-  void setEncoding(const String& value) noexcept
+  void setEncoding(const ArrayDataTypeEncoding& value) noexcept
   { getImpl()._encoding = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEncoding(String&& value) noexcept
+  void setEncoding(ArrayDataTypeEncoding&& value) noexcept
   { getImpl()._encoding = std::move(value); }
 #endif
-  String& getEncoding() noexcept
+  ArrayDataTypeEncoding& getEncoding() noexcept
   { return getImpl()._encoding; }
-  const String& getEncoding() const noexcept
+  const ArrayDataTypeEncoding& getEncoding() const noexcept
   { return getConstImpl()._encoding; }
 
   FOMStringArrayDataType& swap(FOMStringArrayDataType& rhs)
@@ -1138,7 +1277,7 @@ private:
     String _name;
     String _dataType;
     String _cardinality;
-    String _encoding;
+    ArrayDataTypeEncoding _encoding;
   };
 
   const Implementation& getConstImpl() const
@@ -1174,16 +1313,27 @@ public:
   const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const Unsigned& value) noexcept
+  void setDataType(const String& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(Unsigned&& value) noexcept
+  void setDataType(String&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  Unsigned& getDataType() noexcept
+  String& getDataType() noexcept
   { return getImpl()._dataType; }
-  const Unsigned& getDataType() const noexcept
+  const String& getDataType() const noexcept
   { return getConstImpl()._dataType; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+#endif
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
 
   FOMStringFixedRecordField& swap(FOMStringFixedRecordField& rhs)
   {
@@ -1196,6 +1346,7 @@ public:
       return true;
     if (getName() != rhs.getName()) return false;
     if (getDataType() != rhs.getDataType()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
     return true;
   }
   bool operator<(const FOMStringFixedRecordField& rhs) const noexcept
@@ -1206,6 +1357,8 @@ public:
     if (rhs.getName() < getName()) return false;
     if (getDataType() < rhs.getDataType()) return true;
     if (rhs.getDataType() < getDataType()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
     return false;
   }
   bool operator>(const FOMStringFixedRecordField& rhs) const noexcept
@@ -1218,10 +1371,12 @@ private:
   struct OPENRTI_API Implementation final : public Referenced {
     Implementation() noexcept :
       _name(),
-      _dataType()
+      _dataType(),
+      _version()
     { }
     String _name;
-    Unsigned _dataType;
+    String _dataType;
+    Unsigned _version;
   };
 
   const Implementation& getConstImpl() const
@@ -1268,6 +1423,28 @@ public:
   const String& getEncoding() const noexcept
   { return getConstImpl()._encoding; }
 
+  void setInclude(const String& value) noexcept
+  { getImpl()._include = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setInclude(String&& value) noexcept
+  { getImpl()._include = std::move(value); }
+#endif
+  String& getInclude() noexcept
+  { return getImpl()._include; }
+  const String& getInclude() const noexcept
+  { return getConstImpl()._include; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+#endif
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
+
   void setFields(const FOMStringFixedRecordFieldList& value) noexcept
   { getImpl()._fields = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -1290,6 +1467,8 @@ public:
       return true;
     if (getName() != rhs.getName()) return false;
     if (getEncoding() != rhs.getEncoding()) return false;
+    if (getInclude() != rhs.getInclude()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
     if (getFields() != rhs.getFields()) return false;
     return true;
   }
@@ -1301,6 +1480,10 @@ public:
     if (rhs.getName() < getName()) return false;
     if (getEncoding() < rhs.getEncoding()) return true;
     if (rhs.getEncoding() < getEncoding()) return false;
+    if (getInclude() < rhs.getInclude()) return true;
+    if (rhs.getInclude() < getInclude()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
     if (getFields() < rhs.getFields()) return true;
     if (rhs.getFields() < getFields()) return false;
     return false;
@@ -1316,10 +1499,14 @@ private:
     Implementation() noexcept :
       _name(),
       _encoding(),
+      _include(),
+      _version(),
       _fields()
     { }
     String _name;
     String _encoding;
+    String _include;
+    Unsigned _version;
     FOMStringFixedRecordFieldList _fields;
   };
 
@@ -1367,15 +1554,15 @@ public:
   const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const Unsigned& value) noexcept
+  void setDataType(const String& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(Unsigned&& value) noexcept
+  void setDataType(String&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  Unsigned& getDataType() noexcept
+  String& getDataType() noexcept
   { return getImpl()._dataType; }
-  const Unsigned& getDataType() const noexcept
+  const String& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
   FOMStringVariantRecordAlternative& swap(FOMStringVariantRecordAlternative& rhs)
@@ -1419,7 +1606,7 @@ private:
     { }
     String _enumerator;
     String _name;
-    Unsigned _dataType;
+    String _dataType;
   };
 
   const Implementation& getConstImpl() const
@@ -2522,6 +2709,17 @@ public:
   const FOMStringSwitchList& getSwitchList() const noexcept
   { return getConstImpl()._switchList; }
 
+  void setBasicDataTypeList(const FOMStringBasicDataTypeList& value) noexcept
+  { getImpl()._basicDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setBasicDataTypeList(FOMStringBasicDataTypeList&& value) noexcept
+  { getImpl()._basicDataTypeList = std::move(value); }
+#endif
+  FOMStringBasicDataTypeList& getBasicDataTypeList() noexcept
+  { return getImpl()._basicDataTypeList; }
+  const FOMStringBasicDataTypeList& getBasicDataTypeList() const noexcept
+  { return getConstImpl()._basicDataTypeList; }
+
   void setSimpleDataTypeList(const FOMStringSimpleDataTypeList& value) noexcept
   { getImpl()._simpleDataTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -2616,6 +2814,7 @@ public:
     if (getObjectClassList() != rhs.getObjectClassList()) return false;
     if (getUpdateRateList() != rhs.getUpdateRateList()) return false;
     if (getSwitchList() != rhs.getSwitchList()) return false;
+    if (getBasicDataTypeList() != rhs.getBasicDataTypeList()) return false;
     if (getSimpleDataTypeList() != rhs.getSimpleDataTypeList()) return false;
     if (getEnumeratedDataTypeList() != rhs.getEnumeratedDataTypeList()) return false;
     if (getArrayDataTypeList() != rhs.getArrayDataTypeList()) return false;
@@ -2645,6 +2844,8 @@ public:
     if (rhs.getUpdateRateList() < getUpdateRateList()) return false;
     if (getSwitchList() < rhs.getSwitchList()) return true;
     if (rhs.getSwitchList() < getSwitchList()) return false;
+    if (getBasicDataTypeList() < rhs.getBasicDataTypeList()) return true;
+    if (rhs.getBasicDataTypeList() < getBasicDataTypeList()) return false;
     if (getSimpleDataTypeList() < rhs.getSimpleDataTypeList()) return true;
     if (rhs.getSimpleDataTypeList() < getSimpleDataTypeList()) return false;
     if (getEnumeratedDataTypeList() < rhs.getEnumeratedDataTypeList()) return true;
@@ -2678,6 +2879,7 @@ private:
       _objectClassList(),
       _updateRateList(),
       _switchList(),
+      _basicDataTypeList(),
       _simpleDataTypeList(),
       _enumeratedDataTypeList(),
       _arrayDataTypeList(),
@@ -2694,6 +2896,7 @@ private:
     FOMStringObjectClassList _objectClassList;
     FOMStringUpdateRateList _updateRateList;
     FOMStringSwitchList _switchList;
+    FOMStringBasicDataTypeList _basicDataTypeList;
     FOMStringSimpleDataTypeList _simpleDataTypeList;
     FOMStringEnumeratedDataTypeList _enumeratedDataTypeList;
     FOMStringArrayDataTypeList _arrayDataTypeList;
@@ -3707,6 +3910,1041 @@ private:
 
 typedef std::vector<FOMSwitch> FOMSwitchList;
 
+class OPENRTI_API FOMBasicDataType {
+public:
+  FOMBasicDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setSize(const Unsigned& value) noexcept
+  { getImpl()._size = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setSize(Unsigned&& value) noexcept
+  { getImpl()._size = std::move(value); }
+#endif
+  Unsigned& getSize() noexcept
+  { return getImpl()._size; }
+  const Unsigned& getSize() const noexcept
+  { return getConstImpl()._size; }
+
+  void setEndian(const Endianness& value) noexcept
+  { getImpl()._endian = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEndian(Endianness&& value) noexcept
+  { getImpl()._endian = std::move(value); }
+#endif
+  Endianness& getEndian() noexcept
+  { return getImpl()._endian; }
+  const Endianness& getEndian() const noexcept
+  { return getConstImpl()._endian; }
+
+  void setHandle(const BasicDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setHandle(BasicDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+#endif
+  BasicDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const BasicDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMBasicDataType& swap(FOMBasicDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMBasicDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getSize() != rhs.getSize()) return false;
+    if (getEndian() != rhs.getEndian()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMBasicDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getSize() < rhs.getSize()) return true;
+    if (rhs.getSize() < getSize()) return false;
+    if (getEndian() < rhs.getEndian()) return true;
+    if (rhs.getEndian() < getEndian()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMBasicDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMBasicDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMBasicDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _size(),
+      _endian(),
+      _handle()
+    { }
+    String _name;
+    Unsigned _size;
+    Endianness _endian;
+    BasicDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMBasicDataType> FOMBasicDataTypeList;
+
+class OPENRTI_API FOMSimpleDataType {
+public:
+  FOMSimpleDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setRepresentation(const String& value) noexcept
+  { getImpl()._representation = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setRepresentation(String&& value) noexcept
+  { getImpl()._representation = std::move(value); }
+#endif
+  String& getRepresentation() noexcept
+  { return getImpl()._representation; }
+  const String& getRepresentation() const noexcept
+  { return getConstImpl()._representation; }
+
+  void setHandle(const SimpleDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setHandle(SimpleDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+#endif
+  SimpleDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const SimpleDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMSimpleDataType& swap(FOMSimpleDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMSimpleDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getRepresentation() != rhs.getRepresentation()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMSimpleDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getRepresentation() < rhs.getRepresentation()) return true;
+    if (rhs.getRepresentation() < getRepresentation()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMSimpleDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMSimpleDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMSimpleDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _representation(),
+      _handle()
+    { }
+    String _name;
+    String _representation;
+    SimpleDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMSimpleDataType> FOMSimpleDataTypeList;
+
+class OPENRTI_API FOMEnumerator {
+public:
+  FOMEnumerator() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setValue(const Unsigned& value) noexcept
+  { getImpl()._value = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setValue(Unsigned&& value) noexcept
+  { getImpl()._value = std::move(value); }
+#endif
+  Unsigned& getValue() noexcept
+  { return getImpl()._value; }
+  const Unsigned& getValue() const noexcept
+  { return getConstImpl()._value; }
+
+  FOMEnumerator& swap(FOMEnumerator& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMEnumerator& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getValue() != rhs.getValue()) return false;
+    return true;
+  }
+  bool operator<(const FOMEnumerator& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getValue() < rhs.getValue()) return true;
+    if (rhs.getValue() < getValue()) return false;
+    return false;
+  }
+  bool operator>(const FOMEnumerator& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMEnumerator& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMEnumerator& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _value()
+    { }
+    String _name;
+    Unsigned _value;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMEnumerator> FOMEnumeratorList;
+
+class OPENRTI_API FOMEnumeratedDataType {
+public:
+  FOMEnumeratedDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setRepresentation(const String& value) noexcept
+  { getImpl()._representation = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setRepresentation(String&& value) noexcept
+  { getImpl()._representation = std::move(value); }
+#endif
+  String& getRepresentation() noexcept
+  { return getImpl()._representation; }
+  const String& getRepresentation() const noexcept
+  { return getConstImpl()._representation; }
+
+  void setEnumerators(const FOMEnumeratorList& value) noexcept
+  { getImpl()._enumerators = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEnumerators(FOMEnumeratorList&& value) noexcept
+  { getImpl()._enumerators = std::move(value); }
+#endif
+  FOMEnumeratorList& getEnumerators() noexcept
+  { return getImpl()._enumerators; }
+  const FOMEnumeratorList& getEnumerators() const noexcept
+  { return getConstImpl()._enumerators; }
+
+  void setHandle(const EnumeratedDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setHandle(EnumeratedDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+#endif
+  EnumeratedDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const EnumeratedDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMEnumeratedDataType& swap(FOMEnumeratedDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMEnumeratedDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getRepresentation() != rhs.getRepresentation()) return false;
+    if (getEnumerators() != rhs.getEnumerators()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMEnumeratedDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getRepresentation() < rhs.getRepresentation()) return true;
+    if (rhs.getRepresentation() < getRepresentation()) return false;
+    if (getEnumerators() < rhs.getEnumerators()) return true;
+    if (rhs.getEnumerators() < getEnumerators()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMEnumeratedDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMEnumeratedDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMEnumeratedDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _representation(),
+      _enumerators(),
+      _handle()
+    { }
+    String _name;
+    String _representation;
+    FOMEnumeratorList _enumerators;
+    EnumeratedDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMEnumeratedDataType> FOMEnumeratedDataTypeList;
+
+class OPENRTI_API FOMArrayDataType {
+public:
+  FOMArrayDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setCardinality(const String& value) noexcept
+  { getImpl()._cardinality = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setCardinality(String&& value) noexcept
+  { getImpl()._cardinality = std::move(value); }
+#endif
+  String& getCardinality() noexcept
+  { return getImpl()._cardinality; }
+  const String& getCardinality() const noexcept
+  { return getConstImpl()._cardinality; }
+
+  void setEncoding(const ArrayDataTypeEncoding& value) noexcept
+  { getImpl()._encoding = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEncoding(ArrayDataTypeEncoding&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+#endif
+  ArrayDataTypeEncoding& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const ArrayDataTypeEncoding& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  void setHandle(const ArrayDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setHandle(ArrayDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+#endif
+  ArrayDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const ArrayDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMArrayDataType& swap(FOMArrayDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMArrayDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getCardinality() != rhs.getCardinality()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMArrayDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getCardinality() < rhs.getCardinality()) return true;
+    if (rhs.getCardinality() < getCardinality()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMArrayDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMArrayDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMArrayDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType(),
+      _cardinality(),
+      _encoding(),
+      _handle()
+    { }
+    String _name;
+    String _dataType;
+    String _cardinality;
+    ArrayDataTypeEncoding _encoding;
+    ArrayDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMArrayDataType> FOMArrayDataTypeList;
+
+class OPENRTI_API FOMFixedRecordField {
+public:
+  FOMFixedRecordField() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+#endif
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
+
+  FOMFixedRecordField& swap(FOMFixedRecordField& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMFixedRecordField& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
+    return true;
+  }
+  bool operator<(const FOMFixedRecordField& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
+    return false;
+  }
+  bool operator>(const FOMFixedRecordField& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMFixedRecordField& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMFixedRecordField& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType(),
+      _version()
+    { }
+    String _name;
+    String _dataType;
+    Unsigned _version;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMFixedRecordField> FOMFixedRecordFieldList;
+
+class OPENRTI_API FOMFixedRecordDataType {
+public:
+  FOMFixedRecordDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+#endif
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  void setInclude(const String& value) noexcept
+  { getImpl()._include = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setInclude(String&& value) noexcept
+  { getImpl()._include = std::move(value); }
+#endif
+  String& getInclude() noexcept
+  { return getImpl()._include; }
+  const String& getInclude() const noexcept
+  { return getConstImpl()._include; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+#endif
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
+
+  void setFields(const FOMFixedRecordFieldList& value) noexcept
+  { getImpl()._fields = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFields(FOMFixedRecordFieldList&& value) noexcept
+  { getImpl()._fields = std::move(value); }
+#endif
+  FOMFixedRecordFieldList& getFields() noexcept
+  { return getImpl()._fields; }
+  const FOMFixedRecordFieldList& getFields() const noexcept
+  { return getConstImpl()._fields; }
+
+  void setHandle(const FixedRecordDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setHandle(FixedRecordDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+#endif
+  FixedRecordDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const FixedRecordDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMFixedRecordDataType& swap(FOMFixedRecordDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMFixedRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getInclude() != rhs.getInclude()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
+    if (getFields() != rhs.getFields()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMFixedRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getInclude() < rhs.getInclude()) return true;
+    if (rhs.getInclude() < getInclude()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
+    if (getFields() < rhs.getFields()) return true;
+    if (rhs.getFields() < getFields()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMFixedRecordDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMFixedRecordDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMFixedRecordDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _encoding(),
+      _include(),
+      _version(),
+      _fields(),
+      _handle()
+    { }
+    String _name;
+    String _encoding;
+    String _include;
+    Unsigned _version;
+    FOMFixedRecordFieldList _fields;
+    FixedRecordDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMFixedRecordDataType> FOMFixedRecordDataTypeList;
+
+class OPENRTI_API FOMVariantRecordAlternative {
+public:
+  FOMVariantRecordAlternative() : 
+    _impl(new Implementation())
+  { }
+  void setEnumerator(const String& value) noexcept
+  { getImpl()._enumerator = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEnumerator(String&& value) noexcept
+  { getImpl()._enumerator = std::move(value); }
+#endif
+  String& getEnumerator() noexcept
+  { return getImpl()._enumerator; }
+  const String& getEnumerator() const noexcept
+  { return getConstImpl()._enumerator; }
+
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  FOMVariantRecordAlternative& swap(FOMVariantRecordAlternative& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMVariantRecordAlternative& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getEnumerator() != rhs.getEnumerator()) return false;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    return true;
+  }
+  bool operator<(const FOMVariantRecordAlternative& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getEnumerator() < rhs.getEnumerator()) return true;
+    if (rhs.getEnumerator() < getEnumerator()) return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    return false;
+  }
+  bool operator>(const FOMVariantRecordAlternative& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMVariantRecordAlternative& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMVariantRecordAlternative& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _enumerator(),
+      _name(),
+      _dataType()
+    { }
+    String _enumerator;
+    String _name;
+    String _dataType;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMVariantRecordAlternative> FOMVariantRecordAlternativeList;
+
+class OPENRTI_API FOMVariantRecordDataType {
+public:
+  FOMVariantRecordDataType() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDiscriminant(const String& value) noexcept
+  { getImpl()._discriminant = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDiscriminant(String&& value) noexcept
+  { getImpl()._discriminant = std::move(value); }
+#endif
+  String& getDiscriminant() noexcept
+  { return getImpl()._discriminant; }
+  const String& getDiscriminant() const noexcept
+  { return getConstImpl()._discriminant; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setAlternatives(const FOMVariantRecordAlternativeList& value) noexcept
+  { getImpl()._alternatives = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setAlternatives(FOMVariantRecordAlternativeList&& value) noexcept
+  { getImpl()._alternatives = std::move(value); }
+#endif
+  FOMVariantRecordAlternativeList& getAlternatives() noexcept
+  { return getImpl()._alternatives; }
+  const FOMVariantRecordAlternativeList& getAlternatives() const noexcept
+  { return getConstImpl()._alternatives; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+#endif
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  void setHandle(const VariantRecordDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setHandle(VariantRecordDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+#endif
+  VariantRecordDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const VariantRecordDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMVariantRecordDataType& swap(FOMVariantRecordDataType& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMVariantRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDiscriminant() != rhs.getDiscriminant()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getAlternatives() != rhs.getAlternatives()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMVariantRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDiscriminant() < rhs.getDiscriminant()) return true;
+    if (rhs.getDiscriminant() < getDiscriminant()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getAlternatives() < rhs.getAlternatives()) return true;
+    if (rhs.getAlternatives() < getAlternatives()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMVariantRecordDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMVariantRecordDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMVariantRecordDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _discriminant(),
+      _dataType(),
+      _alternatives(),
+      _encoding(),
+      _handle()
+    { }
+    String _name;
+    String _discriminant;
+    String _dataType;
+    FOMVariantRecordAlternativeList _alternatives;
+    String _encoding;
+    VariantRecordDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMVariantRecordDataType> FOMVariantRecordDataTypeList;
+
 class OPENRTI_API FOMModule {
 public:
   FOMModule() : 
@@ -3800,6 +5038,72 @@ public:
   const FOMSwitchList& getSwitchList() const noexcept
   { return getConstImpl()._switchList; }
 
+  void setBasicDataTypeList(const FOMBasicDataTypeList& value) noexcept
+  { getImpl()._basicDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setBasicDataTypeList(FOMBasicDataTypeList&& value) noexcept
+  { getImpl()._basicDataTypeList = std::move(value); }
+#endif
+  FOMBasicDataTypeList& getBasicDataTypeList() noexcept
+  { return getImpl()._basicDataTypeList; }
+  const FOMBasicDataTypeList& getBasicDataTypeList() const noexcept
+  { return getConstImpl()._basicDataTypeList; }
+
+  void setSimpleDataTypeList(const FOMSimpleDataTypeList& value) noexcept
+  { getImpl()._simpleDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setSimpleDataTypeList(FOMSimpleDataTypeList&& value) noexcept
+  { getImpl()._simpleDataTypeList = std::move(value); }
+#endif
+  FOMSimpleDataTypeList& getSimpleDataTypeList() noexcept
+  { return getImpl()._simpleDataTypeList; }
+  const FOMSimpleDataTypeList& getSimpleDataTypeList() const noexcept
+  { return getConstImpl()._simpleDataTypeList; }
+
+  void setEnumeratedDataTypeList(const FOMEnumeratedDataTypeList& value) noexcept
+  { getImpl()._enumeratedDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEnumeratedDataTypeList(FOMEnumeratedDataTypeList&& value) noexcept
+  { getImpl()._enumeratedDataTypeList = std::move(value); }
+#endif
+  FOMEnumeratedDataTypeList& getEnumeratedDataTypeList() noexcept
+  { return getImpl()._enumeratedDataTypeList; }
+  const FOMEnumeratedDataTypeList& getEnumeratedDataTypeList() const noexcept
+  { return getConstImpl()._enumeratedDataTypeList; }
+
+  void setArrayDataTypeList(const FOMArrayDataTypeList& value) noexcept
+  { getImpl()._arrayDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setArrayDataTypeList(FOMArrayDataTypeList&& value) noexcept
+  { getImpl()._arrayDataTypeList = std::move(value); }
+#endif
+  FOMArrayDataTypeList& getArrayDataTypeList() noexcept
+  { return getImpl()._arrayDataTypeList; }
+  const FOMArrayDataTypeList& getArrayDataTypeList() const noexcept
+  { return getConstImpl()._arrayDataTypeList; }
+
+  void setFixedRecordDataTypeList(const FOMFixedRecordDataTypeList& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFixedRecordDataTypeList(FOMFixedRecordDataTypeList&& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = std::move(value); }
+#endif
+  FOMFixedRecordDataTypeList& getFixedRecordDataTypeList() noexcept
+  { return getImpl()._fixedRecordDataTypeList; }
+  const FOMFixedRecordDataTypeList& getFixedRecordDataTypeList() const noexcept
+  { return getConstImpl()._fixedRecordDataTypeList; }
+
+  void setVariantRecordDataTypeList(const FOMVariantRecordDataTypeList& value) noexcept
+  { getImpl()._variantRecordDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setVariantRecordDataTypeList(FOMVariantRecordDataTypeList&& value) noexcept
+  { getImpl()._variantRecordDataTypeList = std::move(value); }
+#endif
+  FOMVariantRecordDataTypeList& getVariantRecordDataTypeList() noexcept
+  { return getImpl()._variantRecordDataTypeList; }
+  const FOMVariantRecordDataTypeList& getVariantRecordDataTypeList() const noexcept
+  { return getConstImpl()._variantRecordDataTypeList; }
+
   void setArtificialInteractionRoot(const Bool& value) noexcept
   { getImpl()._artificialInteractionRoot = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -3850,6 +5154,12 @@ public:
     if (getObjectClassList() != rhs.getObjectClassList()) return false;
     if (getUpdateRateList() != rhs.getUpdateRateList()) return false;
     if (getSwitchList() != rhs.getSwitchList()) return false;
+    if (getBasicDataTypeList() != rhs.getBasicDataTypeList()) return false;
+    if (getSimpleDataTypeList() != rhs.getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() != rhs.getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() != rhs.getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() != rhs.getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() != rhs.getVariantRecordDataTypeList()) return false;
     if (getArtificialInteractionRoot() != rhs.getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
     if (getDesignator() != rhs.getDesignator()) return false;
@@ -3875,6 +5185,18 @@ public:
     if (rhs.getUpdateRateList() < getUpdateRateList()) return false;
     if (getSwitchList() < rhs.getSwitchList()) return true;
     if (rhs.getSwitchList() < getSwitchList()) return false;
+    if (getBasicDataTypeList() < rhs.getBasicDataTypeList()) return true;
+    if (rhs.getBasicDataTypeList() < getBasicDataTypeList()) return false;
+    if (getSimpleDataTypeList() < rhs.getSimpleDataTypeList()) return true;
+    if (rhs.getSimpleDataTypeList() < getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() < rhs.getEnumeratedDataTypeList()) return true;
+    if (rhs.getEnumeratedDataTypeList() < getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() < rhs.getArrayDataTypeList()) return true;
+    if (rhs.getArrayDataTypeList() < getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() < rhs.getFixedRecordDataTypeList()) return true;
+    if (rhs.getFixedRecordDataTypeList() < getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() < rhs.getVariantRecordDataTypeList()) return true;
+    if (rhs.getVariantRecordDataTypeList() < getVariantRecordDataTypeList()) return false;
     if (getArtificialInteractionRoot() < rhs.getArtificialInteractionRoot()) return true;
     if (rhs.getArtificialInteractionRoot() < getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() < rhs.getArtificialObjectRoot()) return true;
@@ -3900,6 +5222,12 @@ private:
       _objectClassList(),
       _updateRateList(),
       _switchList(),
+      _basicDataTypeList(),
+      _simpleDataTypeList(),
+      _enumeratedDataTypeList(),
+      _arrayDataTypeList(),
+      _fixedRecordDataTypeList(),
+      _variantRecordDataTypeList(),
       _artificialInteractionRoot(),
       _artificialObjectRoot(),
       _designator()
@@ -3912,6 +5240,12 @@ private:
     FOMObjectClassList _objectClassList;
     FOMUpdateRateList _updateRateList;
     FOMSwitchList _switchList;
+    FOMBasicDataTypeList _basicDataTypeList;
+    FOMSimpleDataTypeList _simpleDataTypeList;
+    FOMEnumeratedDataTypeList _enumeratedDataTypeList;
+    FOMArrayDataTypeList _arrayDataTypeList;
+    FOMFixedRecordDataTypeList _fixedRecordDataTypeList;
+    FOMVariantRecordDataTypeList _variantRecordDataTypeList;
     Bool _artificialInteractionRoot;
     Bool _artificialObjectRoot;
     String _designator;
@@ -8141,6 +9475,8 @@ std::ostream& operator<<(std::ostream& os, const SaveStatus& value);
 std::ostream& operator<<(std::ostream& os, const ServiceGroupIndicator& value);
 std::ostream& operator<<(std::ostream& os, const LowerBoundTimeStampCommitType& value);
 std::ostream& operator<<(std::ostream& os, const SwitchesType& value);
+std::ostream& operator<<(std::ostream& os, const ArrayDataTypeEncoding& value);
+std::ostream& operator<<(std::ostream& os, const Endianness& value);
 std::ostream& operator<<(std::ostream& os, const AttributeHandleVector& value);
 std::ostream& operator<<(std::ostream& os, const FederateHandleVector& value);
 std::ostream& operator<<(std::ostream& os, const ParameterHandleVector& value);
@@ -8184,6 +9520,8 @@ std::ostream& operator<<(std::ostream& os, const DestroyFederationExecutionRespo
 std::ostream& operator<<(std::ostream& os, const JoinFederationExecutionResponseType& value);
 std::ostream& operator<<(std::ostream& os, const RegisterFederationSynchronizationPointResponseType& value);
 std::ostream& operator<<(std::ostream& os, const ConfigurationParameterMap& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringBasicDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringBasicDataTypeList& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringSimpleDataType& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringSimpleDataTypeList& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringEnumerator& value);
@@ -8238,6 +9576,24 @@ std::ostream& operator<<(std::ostream& os, const FOMUpdateRate& value);
 std::ostream& operator<<(std::ostream& os, const FOMUpdateRateList& value);
 std::ostream& operator<<(std::ostream& os, const FOMSwitch& value);
 std::ostream& operator<<(std::ostream& os, const FOMSwitchList& value);
+std::ostream& operator<<(std::ostream& os, const FOMBasicDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMBasicDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMSimpleDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMSimpleDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMEnumerator& value);
+std::ostream& operator<<(std::ostream& os, const FOMEnumeratorList& value);
+std::ostream& operator<<(std::ostream& os, const FOMEnumeratedDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMEnumeratedDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMArrayDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMArrayDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMFixedRecordField& value);
+std::ostream& operator<<(std::ostream& os, const FOMFixedRecordFieldList& value);
+std::ostream& operator<<(std::ostream& os, const FOMFixedRecordDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMFixedRecordDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMVariantRecordAlternative& value);
+std::ostream& operator<<(std::ostream& os, const FOMVariantRecordAlternativeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMVariantRecordDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMVariantRecordDataTypeList& value);
 std::ostream& operator<<(std::ostream& os, const FOMModule& value);
 std::ostream& operator<<(std::ostream& os, const FOMModuleList& value);
 std::ostream& operator<<(std::ostream& os, const ConnectionLostMessage& value);
@@ -8327,6 +9683,8 @@ std::ostream& prettyprint(std::ostream& os, const SaveStatus& value);
 std::ostream& prettyprint(std::ostream& os, const ServiceGroupIndicator& value);
 std::ostream& prettyprint(std::ostream& os, const LowerBoundTimeStampCommitType& value);
 std::ostream& prettyprint(std::ostream& os, const SwitchesType& value);
+std::ostream& prettyprint(std::ostream& os, const ArrayDataTypeEncoding& value);
+std::ostream& prettyprint(std::ostream& os, const Endianness& value);
 std::ostream& prettyprint(std::ostream& os, const AttributeHandleVector& value);
 std::ostream& prettyprint(std::ostream& os, const FederateHandleVector& value);
 std::ostream& prettyprint(std::ostream& os, const ParameterHandleVector& value, ServerModel::InteractionClass* interactionClass);
@@ -8370,6 +9728,8 @@ std::ostream& prettyprint(std::ostream& os, const DestroyFederationExecutionResp
 std::ostream& prettyprint(std::ostream& os, const JoinFederationExecutionResponseType& value);
 std::ostream& prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointResponseType& value);
 std::ostream& prettyprint(std::ostream& os, const ConfigurationParameterMap& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringBasicDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringBasicDataTypeList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringSimpleDataType& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringSimpleDataTypeList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringEnumerator& value);
@@ -8424,6 +9784,24 @@ std::ostream& prettyprint(std::ostream& os, const FOMUpdateRate& value);
 std::ostream& prettyprint(std::ostream& os, const FOMUpdateRateList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMSwitch& value);
 std::ostream& prettyprint(std::ostream& os, const FOMSwitchList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMBasicDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMBasicDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMSimpleDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMSimpleDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMEnumerator& value);
+std::ostream& prettyprint(std::ostream& os, const FOMEnumeratorList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMEnumeratedDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMEnumeratedDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMArrayDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMArrayDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMFixedRecordField& value);
+std::ostream& prettyprint(std::ostream& os, const FOMFixedRecordFieldList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMFixedRecordDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMFixedRecordDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordAlternative& value);
+std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordAlternativeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordDataTypeList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMModule& value);
 std::ostream& prettyprint(std::ostream& os, const FOMModuleList& value);
 std::ostream& prettyprint(std::ostream& os, const ConnectionLostMessage& value, ServerModel::Federation* federation);
@@ -8526,6 +9904,14 @@ inline std::string to_string(const AttributeValue& value)
 
 // StructDataType FederationExecutionInformation
 inline std::string to_string(const FederationExecutionInformation& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringBasicDataType
+inline std::string to_string(const FOMStringBasicDataType& value)
 {
     std::ostringstream out;
     out << value;
@@ -8742,6 +10128,78 @@ inline std::string to_string(const FOMUpdateRate& value)
 
 // StructDataType FOMSwitch
 inline std::string to_string(const FOMSwitch& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMBasicDataType
+inline std::string to_string(const FOMBasicDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMSimpleDataType
+inline std::string to_string(const FOMSimpleDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMEnumerator
+inline std::string to_string(const FOMEnumerator& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMEnumeratedDataType
+inline std::string to_string(const FOMEnumeratedDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMArrayDataType
+inline std::string to_string(const FOMArrayDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMFixedRecordField
+inline std::string to_string(const FOMFixedRecordField& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMFixedRecordDataType
+inline std::string to_string(const FOMFixedRecordDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMVariantRecordAlternative
+inline std::string to_string(const FOMVariantRecordAlternative& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMVariantRecordDataType
+inline std::string to_string(const FOMVariantRecordDataType& value)
 {
     std::ostringstream out;
     out << value;

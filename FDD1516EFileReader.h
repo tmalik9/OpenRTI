@@ -23,6 +23,7 @@
 #include <iosfwd>
 #include <string>
 #include "Export.h"
+#include "Message.h"
 
 namespace OpenRTI {
 

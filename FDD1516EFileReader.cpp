@@ -26,13 +26,183 @@
 #include "FOMStringModuleBuilder.h"
 #include "Message.h"
 #include "StringUtils.h"
+#include <functional>
+#include <iostream>
 
 namespace OpenRTI {
+
+struct XmlSchemaNodeBase : std::enable_shared_from_this<XmlSchemaNodeBase>
+{
+  XmlSchemaNodeBase(const std::string& name, bool recurse, bool ignoreChildren)
+    : _name(name), _recurse(recurse), _ignoreChildren(ignoreChildren)
+  {
+  }
+  XmlSchemaNodeBase(const XmlSchemaNodeBase& rhs) : _name(rhs._name), _recurse(rhs._recurse), _ignoreChildren(rhs._ignoreChildren)
+  {
+  }
+  virtual ~XmlSchemaNodeBase() {}
+  const std::string getName() const
+  {
+    return _name;
+  }
+  const std::list<std::shared_ptr<XmlSchemaNodeBase>>& getChildren() const noexcept
+  {
+    return _children;
+  }
+  void addChild(std::shared_ptr<XmlSchemaNodeBase> node)
+  {
+    if (node->_parent == nullptr)
+    {
+      node->_parent = shared_from_this();
+      _children.push_back(node);
+    }
+    else
+    {
+      throw RTIinternalError(node->getName() + " already has a parent");
+    }
+  }
+  // note: may return 'this' if _recurse is true and 'name' equals the name of this node
+  std::shared_ptr<XmlSchemaNodeBase> getChild(const std::string& name)
+  {
+    for (auto child : _children)
+    {
+      if (child->getName() == name)
+        return child;
+    }
+    if (_recurse && name == getName())
+    {
+      return shared_from_this();
+    }
+    return std::shared_ptr<XmlSchemaNodeBase>();
+  }
+  std::string getPath() const
+  {
+    if (_parent != nullptr)
+    {
+      return _parent->getPath() + "/" + _name;
+    }
+    else
+    {
+      return "/" + _name;
+    }
+  }
+
+  bool ignoreChildren() const { return _ignoreChildren; }
+  std::shared_ptr<XmlSchemaNodeBase> _parent;
+  std::string _name;
+  bool _recurse;
+  bool _ignoreChildren;
+  std::list<std::shared_ptr<XmlSchemaNodeBase>> _children;
+};
+
+struct XmlSchemaNode : public XmlSchemaNodeBase
+{
+  using NodeCallbackType = std::function<void()>;
+  XmlSchemaNode(const std::string& name, bool recurse, bool ignoreChildren, NodeCallbackType startCallback = nullptr, NodeCallbackType endCallback = nullptr)
+    : XmlSchemaNodeBase(name, recurse, ignoreChildren)
+    , _startCallback(startCallback)
+    , _endCallback(endCallback)
+  {
+  }
+  XmlSchemaNode(const XmlSchemaNode& rhs) 
+    : XmlSchemaNodeBase(rhs._name, rhs._recurse, rhs._ignoreChildren)
+    , _startCallback(rhs._startCallback)
+    , _endCallback(rhs._endCallback)
+  {
+  }
+  NodeCallbackType _startCallback;
+  NodeCallbackType _endCallback;
+};
+
+struct XmlSchemaLeafNode : public XmlSchemaNodeBase
+{
+  using LeafCallbackType = std::function<void(const std::string&)>;
+
+  XmlSchemaLeafNode(const std::string& name, LeafCallbackType callback = nullptr)
+    : XmlSchemaNodeBase(name, false, false)
+    , _callback(callback)
+  {
+  }
+  XmlSchemaLeafNode(const XmlSchemaLeafNode& rhs)
+    : XmlSchemaNodeBase(rhs._name, rhs._recurse, rhs._ignoreChildren)
+    , _callback(rhs._callback)
+  {
+  }
+  LeafCallbackType _callback;
+};
+
+struct XmlSchemaTreeBuilder
+{
+  XmlSchemaTreeBuilder& node(std::string name, XmlSchemaNode::NodeCallbackType startCallback = nullptr)
+  {
+    if (name[name.size()-1] == '*')
+    {
+      addAndPush(std::make_shared<XmlSchemaNode>(name.substr(0, name.size() - 1), true, false, startCallback));
+    }
+    else
+    {
+      addAndPush(std::make_shared<XmlSchemaNode>(name, false, false, startCallback));
+    }
+    return *this;
+  }
+  XmlSchemaTreeBuilder& ignore_node(std::string name)
+  {
+    addAndPush(std::make_shared<XmlSchemaNode>(name, false, true));
+    return *this;
+  }
+  XmlSchemaTreeBuilder& leaf(std::string name, XmlSchemaLeafNode::LeafCallbackType callback = nullptr)
+  {
+    add(std::make_shared<XmlSchemaLeafNode>(name, callback));
+    return *this;
+  }
+  void addAndPush(std::shared_ptr<XmlSchemaNodeBase> newNode)
+  {
+    if (!mContextStack.empty())
+    {
+      auto currentContext = mContextStack.front();
+      currentContext->addChild(newNode);
+    }
+    mContextStack.push_front(newNode);
+  }
+  void add(std::shared_ptr<XmlSchemaNodeBase> newNode)
+  {
+    if (!mContextStack.empty())
+    {
+      auto currentContext = mContextStack.front();
+      currentContext->addChild(newNode);
+    }
+    else
+    {
+      throw new RTIinternalError("no context to add to");
+    }
+  }
+  XmlSchemaTreeBuilder& end(XmlSchemaNode::NodeCallbackType endCallback = nullptr)
+  {
+    assert(mContextStack.size() >= 1);
+    auto currentContextNode = std::dynamic_pointer_cast<XmlSchemaNode>(mContextStack.front());
+    if (mContextStack.size() == 1)
+    {
+      _root = currentContextNode;
+      assert(_root != nullptr);
+    }
+    if (currentContextNode != nullptr)
+    {
+      currentContextNode->_endCallback = endCallback;
+    }
+    mContextStack.pop_front();
+    return *this;
+  }
+
+  std::list<std::shared_ptr<XmlSchemaNodeBase>> mContextStack;
+  std::shared_ptr<XmlSchemaNode> _root;
+};
 
 class OPENRTI_LOCAL FDD1516EContentHandler final : public XML::ContentHandler {
 public:
   FDD1516EContentHandler() noexcept;
   virtual ~FDD1516EContentHandler() noexcept;
+
+
 
   void startDocument() override;
   void endDocument() override;
@@ -42,158 +212,170 @@ public:
 
   void characters(const char* data, unsigned length) override;
 
-  // poor man's schema checking ...
-  enum Mode {
-    UnknownMode,
-
-    // Top level tag
-    ObjectModelMode,
-
-    // First level tags
-    ModelIdentificationMode,
-    ObjectsMode,
-    InteractionsMode,
-    DimensionsMode,
-    TimeMode,
-    TagsMode,
-    SynchronizationsMode,
-    TransportationsMode,
-    SwitchesMode,
-    UpdateRatesMode,
-    DataTypesMode,
-    NotesMode,
-
-    // Second level tags grouped by first level parent
-    // Skip ModelIdentification for now
-
-    // The second level and nested object class hierarchy
-    ObjectClassMode,
-
-    // Child elements of objectClass
-    ObjectClassNameMode,
-    ObjectClassSharingMode,
-    ObjectClassSemanticsMode,
-    ObjectClassAttributeMode,
-
-    // Child elements of attribute
-    ObjectClassAttributeNameMode,
-    ObjectClassAttributeDataTypeMode,
-    ObjectClassAttributeUpdateTypeMode,
-    ObjectClassAttributeUpdateConditionMode,
-    ObjectClassAttributeOwnershipMode,
-    ObjectClassAttributeSharingMode,
-    ObjectClassAttributeTransportationMode,
-    ObjectClassAttributeOrderMode,
-    ObjectClassAttributeSemanticsMode,
-    ObjectClassAttributeDimensionsMode,
-
-    // Child elements of attribute dimensions
-    ObjectClassAttributeDimensionsDimensionMode,
-
-
-    // The second level and nested interaction class hierarchy
-    InteractionClassMode,
-
-    // Child elements of interactionClass
-    InteractionClassNameMode,
-    InteractionClassSharingMode,
-    InteractionClassTransportationMode,
-    InteractionClassOrderMode,
-    InteractionClassSemanticsMode,
-    InteractionClassParameterMode,
-    InteractionClassDimensionsMode,
-
-    // Child elements of parameter
-    InteractionClassParameterNameMode,
-    InteractionClassParameterDataTypeMode,
-    InteractionClassParameterSemanticsMode,
-
-    // Child elements of interaction class dimensions
-    InteractionClassDimensionsDimensionMode,
-
-
-    // Dimensions
-    DimensionsDimensionMode,
-    DimensionsDimensionNameMode,
-    DimensionsDimensionDataTypeMode,
-    DimensionsDimensionUpperBoundMode,
-    DimensionsDimensionNormalizationMode,
-    DimensionsDimensionValueMode,
-
-    // TimeMode,
-    // TimeStampMode,
-    // LookaheadMode,
-
-    // TagsMode,
-    // UpdateReflectTagMode,
-    // SendReceiveTagMode,
-    // DeleteRemoveTagMode,
-    // DivestitureRequestTagMode,
-    // DivestitureCompletionTagMode,
-    // AcquisitionRequestTagMode,
-    // RequestUpdateTagMode,
-
-    // SynchronizationsMode,
-    // SynchronizationMode,
-
-    TransportationMode,
-    TransportationNameMode,
-    TransportationReliableMode,
-    TransportationSemanticsMode,
-
-    // SwitchesMode,
-
-    UpdateRateMode,
-    UpdateRateNameMode,
-    UpdateRateRateMode,
-
-     BasicDataRepresentationsMode,
-     BasicDataMode,
-
-     SimpleDataTypesMode,
-     SimpleDataMode,
-     SimpleDataNameMode,
-     SimpleDataRepresentationMode,
-     SimpleDataUnitsMode,
-     SimpleDataResolutionMode,
-     SimpleDataAccuracyMode,
-     SimpleDataSemanticsMode,
-
-      EnumeratedDataTypesMode,
-     EnumeratedDataMode,
-     EnumeratorMode,
-     ArrayDataTypesMode,
-     ArrayDataMode,
-     FixedRecordDataTypesMode,
-     FixedRecordDataMode,
-     FieldMode,
-     VariantRecordDataTypesMode,
-     VariantRecordDataMode,
-     AlternativeDataMode,
-
-    // NotesMode,
-    // NoteMode
-  };
-
-  Mode getCurrentMode()
-  {
-    if (_modeStack.empty())
-      return UnknownMode;
-    return _modeStack.back();
-  }
-
-  // Current modes in a stack
-  std::vector<Mode> _modeStack;
-
   // Character data content. Is only accumulated in the leaf elements.
   std::string _characterData;
 
   // Helper to build up the data
   FOMStringModuleBuilder _fomStringModuleBuilder;
+
+  std::shared_ptr<XmlSchemaNode> _rootNode;
+  std::list<std::shared_ptr<XmlSchemaNodeBase>> _contextStack;
 };
+
+template<typename T>
+inline T from_string(const std::string& str)
+{
+  std::istringstream ss(str);
+  T ret;
+  ss >> ret;
+  return ret;
+}
+
+template<>
+inline Endianness from_string<Endianness>(const std::string& str)
+{
+  if (caseInSensitiveStringEqual(str, "little"))
+    return Endianness::LittleEndian;
+  else
+    return Endianness::BigEndian;
+}
+
+template<>
+inline ArrayDataTypeEncoding from_string<ArrayDataTypeEncoding>(const std::string& str)
+{
+  if (caseInSensitiveStringEqual(str, "HLAfixedArray"))
+    return ArrayDataTypeEncoding::FixedArrayDataTypeEncoding;
+  else
+    return ArrayDataTypeEncoding::VariableArrayDataTypeEncoding;
+}
 
 FDD1516EContentHandler::FDD1516EContentHandler() noexcept
 {
+  XmlSchemaTreeBuilder b;
+  b.node("objectModel")
+    .ignore_node("modelIdentification")
+    .end() // modelIdentification
+    .node("objects")
+      .node("objectClass*", [this]() { _fomStringModuleBuilder.pushObjectClass(); })
+        .leaf("name", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentObjectClass().getName().push_back(name); })
+        .leaf("sharing")
+        .leaf("semantics")
+        .node("attribute", [this]() { _fomStringModuleBuilder.addAttribute(); })
+          .leaf("name", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentObjectClassAttribute().setName(name); })
+          .leaf("order", [this](const std::string& s) { _fomStringModuleBuilder.getCurrentObjectClassAttribute().setOrderType(s); })
+          .leaf("transportation", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentObjectClassAttribute().setTransportationType(name); })
+          .leaf("sharing")
+          .leaf("ownership")
+          .leaf("dataType", [this](const std::string& s) { _fomStringModuleBuilder.getCurrentObjectClassAttribute().setDataType(s); })
+          .leaf("updateType")
+          .leaf("updateCondition")
+          .leaf("semantics")
+          .node("dimensions")
+            .leaf("dimension", [this](const std::string& s) { _fomStringModuleBuilder.addAttributeDimension(s); })
+          .end()
+        .end() // attribute
+      .end([this]() { _fomStringModuleBuilder.popObjectClass(); }) // objectClass*
+    .end() // objects
+    .node("interactions")
+      .node("interactionClass*", [this]() { _fomStringModuleBuilder.pushInteractionClass(); })
+        .leaf("name", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentInteractionClass().getName().push_back(name); })
+        .leaf("order", [this](const std::string& s) { _fomStringModuleBuilder.getCurrentInteractionClass().setOrderType(s); })
+        .leaf("sharing")
+        .leaf("transportation", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentInteractionClass().setTransportationType(name); })
+        .leaf("semantics")
+        .node("dimensions")
+          .leaf("dimension", [this](const std::string& s) { _fomStringModuleBuilder.addInteractionDimension(s); })
+        .end()
+        .node("parameter", [this]() { _fomStringModuleBuilder.addParameter(); })
+          .leaf("name", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentInteractionClassParameter().setName(name); })
+          .leaf("dataType", [this](const std::string& s) { _fomStringModuleBuilder.getCurrentInteractionClassParameter().setDataType(s); })
+          .leaf("semantics")
+        .end([this]() {  }) // parameter
+      .end([this]() { _fomStringModuleBuilder.popInteractionClass(); }) // interactionClass
+    .end() // interactions
+    .node("dimensions")
+      .node("dimension", [this]() { _fomStringModuleBuilder.addDimension();})
+        .leaf("name", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentDimension().setName(name); })
+        .leaf("dataType")
+        .leaf("normalization")
+        .leaf("value")
+        .leaf("upperBound")
+      .end()
+    .end()
+    .node("transportations")
+      .node("transportation", [this]() { _fomStringModuleBuilder.addTransportationType();})
+        .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentTransportationType().setName(name); })
+        .leaf("reliable")
+        .leaf("semantics")
+      .end()
+    .end()
+    .node("dataTypes")
+      .node("basicDataRepresentations")
+        .node("basicData", [this]() { _fomStringModuleBuilder.addBasicDataType();})
+          .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentBasicDataType().setName(name); })
+          .leaf("size", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentBasicDataType().setSize(from_string<uint32_t>(s)); })
+          .leaf("interpretation")
+          .leaf("endian", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentBasicDataType().setEndian(from_string<Endianness>(s)); })
+          .leaf("encoding")
+          .leaf("nocode")
+        .end() // basicData
+      .end() // basicDataRepresentations
+      .node("simpleDataTypes")
+        .node("simpleData", [this]() { _fomStringModuleBuilder.addSimpleDataType();})
+          .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentSimpleDataType().setName(name); })
+          .leaf("representation", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentSimpleDataType().setRepresentation(s); })
+          .leaf("units")
+          .leaf("resolution")
+          .leaf("accuracy")
+          .leaf("semantics")
+          .leaf("nocode")
+        .end() // simpleData
+      .end() // simpleDataTypes
+      .node("enumeratedDataTypes")
+        .node("enumeratedData", [this]() { _fomStringModuleBuilder.addEnumeratedDataType();})
+          .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentEnumeratedDataType().setName(name); })
+          .leaf("representation", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentEnumeratedDataType().setRepresentation(s); })
+          .leaf("semantics")
+          .leaf("nocode")
+          .node("enumerator", [this]() { _fomStringModuleBuilder.getCurrentEnumeratedDataType().getEnumerators().push_back(FOMStringEnumerator()); })
+            .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentEnumeratedDataType().getEnumerators().back().setName(name); })
+            .leaf("value", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentEnumeratedDataType().getEnumerators().back().setValue(from_string<uint32_t>(s)); })
+          .end() // enumerator
+        .end() // enumeratedData
+      .end() // enumeratedDataTypes
+      .node("arrayDataTypes")
+        .node("arrayData", [this]() { _fomStringModuleBuilder.addArrayDataType();})
+          .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentArrayDataType().setName(name); })
+          .leaf("dataType", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentArrayDataType().setDataType(s); })
+          .leaf("cardinality", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentArrayDataType().setCardinality(s); })
+          .leaf("encoding", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentArrayDataType().setEncoding(from_string<ArrayDataTypeEncoding>(s)); })
+          .leaf("semantics")
+          .leaf("nocode")
+        .end() // arrayData
+      .end() // arrayDataTypes
+      .node("fixedRecordDataTypes")
+        .node("fixedRecordData", [this]() { _fomStringModuleBuilder.addFixedRecordDataType();})
+          .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().setName(name); })
+          .leaf("include", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().setInclude(s); })
+          .leaf("version", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().setVersion(from_string<uint32_t>(s)); })
+          .leaf("encoding", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().setEncoding(s); })
+          .leaf("semantics")
+          .leaf("nocode")
+          .node("field", [this]() {_fomStringModuleBuilder.getCurrentFixedRecordDataType().getFields().push_back(FOMStringFixedRecordField()); })
+            .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().getFields().back().setName(name); })
+            .leaf("dataType", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().getFields().back().setDataType(s); })
+            .leaf("version", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().getFields().back().setVersion(from_string<uint32_t>(s)); })
+            .leaf("semantics")
+          .end() // field
+        .end() // fixedRecordData
+      .end() // fixedRecordDataTypes
+      .ignore_node("variantRecordDataTypes")
+      .end() // fixedRecordData
+    .end() // dataTypes
+    .ignore_node("notes")
+    .end() // notes
+  .end(); // objectModel
+  _rootNode = b._root;
 }
 
 FDD1516EContentHandler::~FDD1516EContentHandler() noexcept
@@ -203,13 +385,11 @@ FDD1516EContentHandler::~FDD1516EContentHandler() noexcept
 void
 FDD1516EContentHandler::startDocument()
 {
-  OpenRTIAssert(_modeStack.empty());
 }
 
 void
 FDD1516EContentHandler::endDocument()
 {
-  OpenRTIAssert(_modeStack.empty());
   _fomStringModuleBuilder.validate();
 }
 
@@ -217,498 +397,86 @@ void
 FDD1516EContentHandler::startElement(const char* uri, const char* name,
                                      const char* qName, const XML::Attributes* atts)
 {
-  /// Tags that can happen at multiple places
-  if (strcmp(name, "name") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassMode:
-      _modeStack.push_back(ObjectClassNameMode);
-      break;
-    case ObjectClassAttributeMode:
-      _modeStack.push_back(ObjectClassAttributeNameMode);
-      break;
-    case InteractionClassMode:
-      _modeStack.push_back(InteractionClassNameMode);
-      break;
-    case InteractionClassParameterMode:
-      _modeStack.push_back(InteractionClassParameterNameMode);
-      break;
-    case DimensionsDimensionMode:
-      _modeStack.push_back(DimensionsDimensionNameMode);
-      break;
-    case TransportationMode:
-      _modeStack.push_back(TransportationNameMode);
-      break;
-    case UpdateRateMode:
-      _modeStack.push_back(UpdateRateNameMode);
-      break;
-    case SimpleDataMode:
-      _modeStack.push_back(UpdateRateNameMode);
-      break;
-    default:
-      // throw ErrorReadingFDD("unexpected name tag!");
-      _modeStack.push_back(UnknownMode);
-      break;
+  if (_contextStack.empty())
+  {
+    if (name == _rootNode->getName())
+    {
+      _contextStack.push_front(_rootNode);
+      return;
     }
-
-  } else if (strcmp(name, "sharing") == 0) {
-    switch (getCurrentMode()) {
-    case UnknownMode:
-      _modeStack.push_back(UnknownMode);
-      break;
-    case ObjectClassMode:
-      _modeStack.push_back(ObjectClassSharingMode);
-      break;
-    case ObjectClassAttributeMode:
-      _modeStack.push_back(ObjectClassAttributeSharingMode);
-      break;
-    case InteractionClassMode:
-      _modeStack.push_back(InteractionClassSharingMode);
-      break;
-    default:
-      // throw ErrorReadingFDD("unexpected sharing tag!");
-      _modeStack.push_back(UnknownMode);
-      break;
+    else
+    {
+      throw ErrorReadingFDD(std::string("unexpected tag ") + name + " at document root");
     }
-
-  } else if (strcmp(name, "semantics") == 0) {
-    switch (getCurrentMode()) {
-    case UnknownMode:
-      _modeStack.push_back(UnknownMode);
-      break;
-    case ObjectClassMode:
-      _modeStack.push_back(ObjectClassSemanticsMode);
-      break;
-    case ObjectClassAttributeMode:
-      _modeStack.push_back(ObjectClassAttributeSemanticsMode);
-      break;
-    case InteractionClassMode:
-      _modeStack.push_back(InteractionClassSemanticsMode);
-      break;
-    case InteractionClassParameterMode:
-      _modeStack.push_back(InteractionClassParameterSemanticsMode);
-      break;
-    case TransportationMode:
-      _modeStack.push_back(TransportationSemanticsMode);
-      break;
-    default:
-      // throw ErrorReadingFDD("unexpected semantics tag!");
-      _modeStack.push_back(UnknownMode);
-      break;
-    }
-
-  } else if (strcmp(name, "dataType") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassAttributeMode:
-      _modeStack.push_back(ObjectClassAttributeDataTypeMode);
-      break;
-    case InteractionClassParameterMode:
-      _modeStack.push_back(InteractionClassParameterDataTypeMode);
-      break;
-    case DimensionsDimensionMode:
-      _modeStack.push_back(DimensionsDimensionDataTypeMode);
-      break;
-    default:
-      // throw ErrorReadingFDD("unexpected dataType tag!");
-      _modeStack.push_back(UnknownMode);
-      break;
-    }
-
-  } else if (strcmp(name, "transportation") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassAttributeMode:
-      _modeStack.push_back(ObjectClassAttributeTransportationMode);
-      break;
-    case InteractionClassMode:
-      _modeStack.push_back(InteractionClassTransportationMode);
-      break;
-    case TransportationsMode:
-      _modeStack.push_back(TransportationMode);
-      _fomStringModuleBuilder.addTransportationType();
-      break;
-    default:
-      // throw ErrorReadingFDD("unexpected transportation tag!");
-      _modeStack.push_back(UnknownMode);
-      break;
-    }
-
-  } else if (strcmp(name, "order") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassAttributeMode:
-      _modeStack.push_back(ObjectClassAttributeOrderMode);
-      break;
-    case InteractionClassMode:
-      _modeStack.push_back(InteractionClassOrderMode);
-      break;
-    default:
-      // throw ErrorReadingFDD("unexpected order tag!");
-      _modeStack.push_back(UnknownMode);
-      break;
-    }
-
-  } else if (strcmp(name, "dimensions") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassAttributeMode:
-      _modeStack.push_back(ObjectClassAttributeDimensionsMode);
-      break;
-    case InteractionClassMode:
-      _modeStack.push_back(InteractionClassDimensionsMode);
-      break;
-    case ObjectModelMode:
-      _modeStack.push_back(DimensionsMode);
-      break;
-    default:
-      // throw ErrorReadingFDD("unexpected dimensions tag!");
-      _modeStack.push_back(UnknownMode);
-      break;
-    }
-
-  } else if (strcmp(name, "dimension") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassAttributeDimensionsMode:
-      _modeStack.push_back(ObjectClassAttributeDimensionsDimensionMode);
-      break;
-    case InteractionClassDimensionsMode:
-      _modeStack.push_back(InteractionClassDimensionsDimensionMode);
-      break;
-    case DimensionsMode:
-      _modeStack.push_back(DimensionsDimensionMode);
-      _fomStringModuleBuilder.addDimension();
-      break;
-    default:
-      // throw ErrorReadingFDD("unexpected dimension tag!");
-      _modeStack.push_back(UnknownMode);
-      break;
-    }
-
-
-    /// Top level tag
-  } else if (strcmp(name, "objectModel") == 0) {
-    _modeStack.push_back(ObjectModelMode);
-
-
-    /// First level tags
-  } else if (strcmp(name, "modelIdentification") == 0) {
-    _modeStack.push_back(ModelIdentificationMode);
-
-  } else if (strcmp(name, "objects") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("objects tag outside objectModel!");
-    _modeStack.push_back(ObjectsMode);
-
-  } else if (strcmp(name, "interactions") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("interactions tag outside objectModel!");
-    _modeStack.push_back(InteractionsMode);
-
-  } else if (strcmp(name, "time") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("time tag outside objectModel!");
-    _modeStack.push_back(TimeMode);
-
-  } else if (strcmp(name, "tags") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("tags tag outside objectModel!");
-    _modeStack.push_back(TagsMode);
-
-  } else if (strcmp(name, "synchronizations") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("synchronizations tag outside objectModel!");
-    _modeStack.push_back(SynchronizationsMode);
-
-  } else if (strcmp(name, "transportations") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("transportations tag outside objectModel!");
-    _modeStack.push_back(TransportationsMode);
-
-  } else if (strcmp(name, "switches") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("switches tag outside objectModel!");
-    _modeStack.push_back(SwitchesMode);
-
-  } else if (strcmp(name, "dataTypes") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("dataTypes tag outside objectModel!");
-    _modeStack.push_back(DataTypesMode);
-
-  } else if (strcmp(name, "notes") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("notes tag outside objectModel!");
-    _modeStack.push_back(NotesMode);
-
-
-    /// updateRates
-  } else if (strcmp(name, "updateRates") == 0) {
-    if (getCurrentMode() != ObjectModelMode)
-      throw ErrorReadingFDD("updateRates tag outside objectModel!");
-    _modeStack.push_back(UpdateRatesMode);
-
-  } else if (strcmp(name, "updateRate") == 0) {
-    if (getCurrentMode() != UpdateRatesMode)
-      throw ErrorReadingFDD("updateRates tag outside updateRates!");
-    _modeStack.push_back(UpdateRateMode);
-    _fomStringModuleBuilder.addUpdateRate();
-
-  } else if (strcmp(name, "rate") == 0) {
-    if (getCurrentMode() != UpdateRateMode)
-      throw ErrorReadingFDD("rate tag outside updateRate!");
-    _modeStack.push_back(UpdateRateRateMode);
-
-
-    /// objectClass hierarchies
-  } else if (strcmp(name, "objectClass") == 0) {
-    if (getCurrentMode() != ObjectsMode && getCurrentMode() != ObjectClassMode)
-      throw ErrorReadingFDD("objectClass tag outside objectClass or objects!");
-    _modeStack.push_back(ObjectClassMode);
-
-    _fomStringModuleBuilder.pushObjectClass();
-
-  } else if (strcmp(name, "attribute") == 0) {
-    if (getCurrentMode() != ObjectClassMode)
-      throw ErrorReadingFDD("attribute tag outside objectClass!");
-    _modeStack.push_back(ObjectClassAttributeMode);
-
-    _fomStringModuleBuilder.addAttribute();
-
-  } else if (strcmp(name, "updateType") == 0) {
-    if (getCurrentMode() != ObjectClassAttributeMode)
-      throw ErrorReadingFDD("updateType tag outside attribute!");
-    _modeStack.push_back(ObjectClassAttributeUpdateTypeMode);
-
-  } else if (strcmp(name, "updateCondition") == 0) {
-    if (getCurrentMode() != ObjectClassAttributeMode)
-      throw ErrorReadingFDD("updateCondition tag outside attribute!");
-    _modeStack.push_back(ObjectClassAttributeUpdateConditionMode);
-
-  } else if (strcmp(name, "ownership") == 0) {
-    if (getCurrentMode() != ObjectClassAttributeMode)
-      throw ErrorReadingFDD("ownership tag outside attribute!");
-    _modeStack.push_back(ObjectClassAttributeOwnershipMode);
-  } else if (strcmp(name, "basicDataRepresentations") == 0) {
-    if (getCurrentMode() != DataTypesMode)
-      throw ErrorReadingFDD("basicDataRepresentations tag outside dataTypes!");
-    _modeStack.push_back(BasicDataRepresentationsMode);
-  } else if (strcmp(name, "simpleDataTypes") == 0) {
-    if (getCurrentMode() != DataTypesMode)
-      throw ErrorReadingFDD("simpleDataTypes tag outside dataTypes!");
-    _modeStack.push_back(SimpleDataTypesMode);
-  } else if (strcmp(name, "enumeratedDataTypes") == 0) {
-    if (getCurrentMode() != DataTypesMode)
-      throw ErrorReadingFDD("enumeratedDataTypes tag outside dataTypes!");
-    _modeStack.push_back(EnumeratedDataTypesMode);
-  } else if (strcmp(name, "arrayDataTypes") == 0) {
-    if (getCurrentMode() != DataTypesMode)
-      throw ErrorReadingFDD("arrayDataTypes tag outside dataTypes!");
-    _modeStack.push_back(ArrayDataTypesMode);
-  } else if (strcmp(name, "fixedRecordDataTypes") == 0) {
-    if (getCurrentMode() != DataTypesMode)
-      throw ErrorReadingFDD("fixedRecordDataTypes tag outside dataTypes!");
-    _modeStack.push_back(FixedRecordDataTypesMode);
-  } else if (strcmp(name, "variantRecordDataTypes") == 0) {
-    if (getCurrentMode() != DataTypesMode)
-      throw ErrorReadingFDD("variantRecordDataTypes tag outside dataTypes!");
-    _modeStack.push_back(VariantRecordDataTypesMode);
-
-
-    /// interactionClass hierarchies
-  } else if (strcmp(name, "interactionClass") == 0) {
-    if (getCurrentMode() != InteractionsMode && getCurrentMode() != InteractionClassMode)
-      throw ErrorReadingFDD("interactionClass tag outside interactionClass or interactions!");
-    _modeStack.push_back(InteractionClassMode);
-
-    _fomStringModuleBuilder.pushInteractionClass();
-
-  } else if (strcmp(name, "parameter") == 0) {
-    if (getCurrentMode() != InteractionClassMode)
-      throw ErrorReadingFDD("parameter tag outside interactionClass!");
-    _modeStack.push_back(InteractionClassParameterMode);
-
-    _fomStringModuleBuilder.addParameter();
-
-
-    /// dimensions
-  } else if (strcmp(name, "upperBound") == 0) {
-    if (getCurrentMode() != DimensionsDimensionMode)
-      throw ErrorReadingFDD("upperBound tag outside dimension!");
-    _modeStack.push_back(DimensionsDimensionUpperBoundMode);
-
-  } else if (strcmp(name, "normalization") == 0) {
-    if (getCurrentMode() != DimensionsDimensionMode)
-      throw ErrorReadingFDD("normalization tag outside dimension!");
-    _modeStack.push_back(DimensionsDimensionNormalizationMode);
-
-  } else if (strcmp(name, "value") == 0) {
-    if (getCurrentMode() != DimensionsDimensionMode && getCurrentMode() != UnknownMode)
-      throw ErrorReadingFDD("value tag outside dimension!");
-    _modeStack.push_back(DimensionsDimensionValueMode);
-
-
-    /// Transportations
-  } else if (strcmp(name, "reliable") == 0) {
-    if (getCurrentMode() != TransportationMode)
-      throw ErrorReadingFDD("reliable tag outside transportation!");
-    _modeStack.push_back(TransportationReliableMode);
-
-  } else {
-    _modeStack.push_back(UnknownMode);
   }
+  std::shared_ptr<XmlSchemaNodeBase> currentContext = _contextStack.front();
+  if (currentContext->ignoreChildren())
+  {
+    return;
+  }
+  auto childNode = currentContext->getChild(name);
+  if (childNode == nullptr)
+  {
+    throw ErrorReadingFDD(std::string("unexpected tag ") + name + " at path " + currentContext->getPath());
+  }
+  _contextStack.push_front(childNode);
 
-  _characterData.clear();
+  auto childContextNode = std::dynamic_pointer_cast<XmlSchemaNode>(childNode);
+  if (childContextNode != nullptr)
+  {
+    if (childContextNode->_startCallback != nullptr)
+    {
+      childContextNode->_startCallback();
+    }
+  }
 }
 
 void
 FDD1516EContentHandler::endElement(const char* uri, const char* name, const char* qName)
 {
-  if (strcmp(name, "name") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassNameMode:
-      if (!_fomStringModuleBuilder.getCurrentObjectClass().getName().empty())
-        throw ErrorReadingFDD("Duplicate name tag for object class \"" + _characterData + "\"!");
-      _fomStringModuleBuilder.getCurrentObjectClass().getName().push_back(_characterData);
-      break;
-    case ObjectClassAttributeNameMode:
-      if (!_fomStringModuleBuilder.getCurrentObjectClassAttribute().getName().empty())
-        throw ErrorReadingFDD("Duplicate name tag for object class attribute \"" +
-                              _fomStringModuleBuilder.getCurrentObjectClassAttribute().getName() + "\"!");
-      _fomStringModuleBuilder.getCurrentObjectClassAttribute().setName(_characterData);
-      break;
-    case InteractionClassNameMode:
-      if (!_fomStringModuleBuilder.getCurrentInteractionClass().getName().empty())
-        throw ErrorReadingFDD("Duplicate name tag for interaction class \"" + _characterData + "\"!");
-      _fomStringModuleBuilder.getCurrentInteractionClass().getName().push_back(_characterData);
-      break;
-    case InteractionClassParameterNameMode:
-      if (!_fomStringModuleBuilder.getCurrentInteractionClassParameter().getName().empty())
-        throw ErrorReadingFDD("Duplicate name tag for interaction class parameter \"" +
-                              _fomStringModuleBuilder.getCurrentInteractionClassParameter().getName() + "\"!");
-      _fomStringModuleBuilder.getCurrentInteractionClassParameter().setName(_characterData);
-      break;
-    case DimensionsDimensionNameMode:
-      if (!_fomStringModuleBuilder.getCurrentDimension().getName().empty())
-        throw ErrorReadingFDD("Duplicate name tag for dimension \"" +
-                              _fomStringModuleBuilder.getCurrentDimension().getName() + "\"!");
-      _fomStringModuleBuilder.getCurrentDimension().setName(_characterData);
-      break;
-    case TransportationNameMode:
-      if (!_fomStringModuleBuilder.getCurrentTransportationType().getName().empty())
-        throw ErrorReadingFDD("Duplicate name tag for transportation \"" +
-                              _fomStringModuleBuilder.getCurrentTransportationType().getName() + "\"!");
-      _fomStringModuleBuilder.getCurrentTransportationType().setName(_characterData);
-      break;
-    case UpdateRateNameMode:
-      if (!_fomStringModuleBuilder.getCurrentUpdateRate().getName().empty())
-        throw ErrorReadingFDD("Duplicate name tag for updateRate \"" +
-                              _fomStringModuleBuilder.getCurrentUpdateRate().getName() + "\"!");
-      _fomStringModuleBuilder.getCurrentUpdateRate().setName(_characterData);
-      break;
-    default:
-      break;
+  auto currentContext = _contextStack.front();
+  std::string characters = _characterData;
+  _characterData.clear();
+
+  if (name != currentContext->getName())
+  {
+    if (currentContext->ignoreChildren())
+    {
+      return;
     }
-
-  } else if (strcmp(name, "transportation") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassAttributeTransportationMode:
-      _fomStringModuleBuilder.getCurrentObjectClassAttribute().setTransportationType(_characterData);
-      break;
-    case InteractionClassTransportationMode:
-      _fomStringModuleBuilder.getCurrentInteractionClass().setTransportationType(_characterData);
-      break;
-    case TransportationNameMode:
-      if (_fomStringModuleBuilder.getCurrentTransportationType().getName().empty())
-        throw ErrorReadingFDD("No name given for transportation!");
-      break;
-    default:
-      break;
-    }
-
-  } else if (strcmp(name, "rate") == 0) {
-    std::stringstream ss(_characterData);
-    double rate = 0;
-    ss >> rate;
-    _fomStringModuleBuilder.getCurrentUpdateRate().setRate(rate);
-
-  } else if (strcmp(name, "order") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassAttributeOrderMode:
-      _fomStringModuleBuilder.getCurrentObjectClassAttribute().setOrderType(_characterData);
-      break;
-    case InteractionClassOrderMode:
-      _fomStringModuleBuilder.getCurrentInteractionClass().setOrderType(_characterData);
-      break;
-    default:
-      break;
-    }
-
-  } else if (strcmp(name, "dimension") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassAttributeDimensionsDimensionMode:
-      _fomStringModuleBuilder.addAttributeDimension(_characterData);
-      break;
-    case InteractionClassDimensionsDimensionMode:
-      _fomStringModuleBuilder.addInteractionDimension(_characterData);
-      break;
-    case DimensionsDimensionNameMode:
-      if (_fomStringModuleBuilder.getCurrentDimension().getName().empty())
-        throw ErrorReadingFDD("No name given for dimension!");
-      break;
-    default:
-      break;
-    }
-
-  } else if (strcmp(name, "upperBound") == 0) {
-    std::stringstream ss(_characterData);
-    Unsigned upperBound = 0;
-    ss >> upperBound;
-    _fomStringModuleBuilder.getCurrentDimension().setUpperBound(upperBound);
-
-
-  } else if (strcmp(name, "objectClass") == 0) {
-    if (_fomStringModuleBuilder.getCurrentObjectClass().getName().size() != 1)
-      throw ErrorReadingFDD("No name given for object class!");
-    if (_fomStringModuleBuilder.getCurrentObjectClass().getName().front().empty())
-      throw ErrorReadingFDD("Empty name given for object class!");
-    _fomStringModuleBuilder.popObjectClass();
-
-  } else if (strcmp(name, "attribute") == 0) {
-    if (_fomStringModuleBuilder.getCurrentObjectClassAttribute().getName().empty())
-      throw ErrorReadingFDD("No or empty name given for object class attribute!");
-
-
-  } else if (strcmp(name, "interactionClass") == 0) {
-    if (_fomStringModuleBuilder.getCurrentInteractionClass().getName().size() != 1)
-      throw ErrorReadingFDD("No name given for interaction class!");
-    if (_fomStringModuleBuilder.getCurrentInteractionClass().getName().front().empty())
-      throw ErrorReadingFDD("Empty name given for interaction class!");
-    _fomStringModuleBuilder.popInteractionClass();
-
-  } else if (strcmp(name, "parameter") == 0) {
-    if (_fomStringModuleBuilder.getCurrentInteractionClassParameter().getName().empty())
-      throw ErrorReadingFDD("No or empty name given for interaction class parameter!");
-  } else if (strcmp(name, "dataType") == 0) {
-    switch (getCurrentMode()) {
-    case ObjectClassAttributeDataTypeMode:
-      if (!_fomStringModuleBuilder.getCurrentObjectClassAttribute().getDataType().empty())
-        throw ErrorReadingFDD("Duplicate name tag for object class attribute \"" +
-                              _fomStringModuleBuilder.getCurrentObjectClassAttribute().getDataType() + "\"!");
-      _fomStringModuleBuilder.getCurrentObjectClassAttribute().setDataType(_characterData);
-      break;
-    case InteractionClassParameterDataTypeMode:
-      if (!_fomStringModuleBuilder.getCurrentInteractionClassParameter().getDataType().empty())
-        throw ErrorReadingFDD("Duplicate dataType tag for interaction class parameter \"" +
-                              _fomStringModuleBuilder.getCurrentInteractionClassParameter().getDataType() + "\"!");
-      _fomStringModuleBuilder.getCurrentInteractionClassParameter().setDataType(_characterData);
-      break;
-    default:
-      break;
+    throw ErrorReadingFDD(std::string("unexpected end tag ") + name + " at path " + currentContext->getPath());
+  }
+  auto leafNode = std::dynamic_pointer_cast<XmlSchemaLeafNode>(currentContext);
+  if (leafNode != nullptr)
+  {
+    if (leafNode->_callback != nullptr)
+    {
+      leafNode->_callback(characters);
     }
   }
-  _modeStack.pop_back();
-  _characterData.clear();
+  else
+  {
+    auto currentContextNode = std::dynamic_pointer_cast<XmlSchemaNode>(currentContext);
+    if (currentContextNode != nullptr)
+    {
+      if (currentContextNode->_endCallback != nullptr)
+      {
+        currentContextNode->_endCallback();
+      }
+    }
+    else
+    {
+      throw ErrorReadingFDD(std::string("internal error, tag ") + name + " at path " + currentContext->getPath());
+    }
+  }
+  _contextStack.pop_front();
 }
 
 void
 FDD1516EContentHandler::characters(const char* data, unsigned length)
 {
-  _characterData.append(data, length);
+  //_characterData.append(data, length);
+  _characterData = std::string(data, length);
 }
 
 FOMStringModule

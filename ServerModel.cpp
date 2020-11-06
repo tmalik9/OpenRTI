@@ -492,17 +492,6 @@ Dimension::getIsReferencedByAnyModule() const
 
 ////////////////////////////////////////////////////////////
 
-UpdateRateModule::UpdateRateModule(UpdateRate& updateRate, Module& module) :
-  _updateRate(updateRate), _module(module)
-{
-}
-
-UpdateRateModule::~UpdateRateModule()
-{
-}
-
-////////////////////////////////////////////////////////////
-
 UpdateRate::UpdateRate(Federation& federation) :
   _federation(federation),
   _rate(0)
@@ -515,27 +504,9 @@ UpdateRate::~UpdateRate()
 }
 
 void
-UpdateRate::setName(const std::string& name)
-{
-  ModuleEntity<UpdateRate, UpdateRateHandle>::_setString(name);
-}
-
-void
-UpdateRate::setUpdateRateHandle(const UpdateRateHandle& updateRateHandle)
-{
-  ModuleEntity<UpdateRate, UpdateRateHandle>::_setHandle(updateRateHandle);
-}
-
-void
 UpdateRate::setRate(const double& rate)
 {
   _rate = rate;
-}
-
-bool
-UpdateRate::getIsReferencedByAnyModule() const
-{
-  return !_updateRateModuleList.empty();
 }
 
 ////////////////////////////////////////////////////////////
@@ -1454,6 +1425,12 @@ Module::~Module()
   OpenRTIAssert(_parameterDefinitionModuleList.empty());
   OpenRTIAssert(_objectClassModuleList.empty());
   OpenRTIAssert(_attributeDefinitionModuleList.empty());
+  OpenRTIAssert(_basicDataTypeModuleList.empty());
+  OpenRTIAssert(_simpleDataTypeModuleList.empty());
+  OpenRTIAssert(_enumeratedDataTypeModuleList.empty());
+  OpenRTIAssert(_arrayDataTypeModuleList.empty());
+  OpenRTIAssert(_fixedRecordDataTypeModuleList.empty());
+  OpenRTIAssert(_variantRecordDataTypeModuleList.empty());
 }
 
 void
@@ -1509,6 +1486,14 @@ Module::getModule(FOMModule& module)
     fomUpdateRate.setName(updateRate.getName());
     fomUpdateRate.setUpdateRateHandle(updateRate.getUpdateRateHandle());
     fomUpdateRate.setRate(updateRate.getRate());
+  }
+  module.getBasicDataTypeList().reserve(_basicDataTypeModuleList.size());
+  for (auto& basicDataTypeModule : _basicDataTypeModuleList) {
+    BasicDataType& basicDataType = basicDataTypeModule.getBasicDataType();
+    module.getBasicDataTypeList().push_back(FOMBasicDataType());
+    FOMBasicDataType& fomBasicDataType = module.getBasicDataTypeList().back();
+    fomBasicDataType.setName(basicDataType.getName());
+    fomBasicDataType.setHandle(basicDataType.getHandle());
   }
 
   {
@@ -1585,7 +1570,7 @@ Module::insert(Dimension& dimension)
   DimensionModule* dimensionModule;
   dimensionModule = new DimensionModule(dimension, *this);
   dimension.insert(*dimensionModule);
-  insert(*dimensionModule);
+  insertModule(*dimensionModule);
   return dimensionModule;
 }
 
@@ -1595,8 +1580,62 @@ Module::insert(UpdateRate& updateRate)
   UpdateRateModule* updateRateModule;
   updateRateModule = new UpdateRateModule(updateRate, *this);
   updateRate.insert(*updateRateModule);
-  insert(*updateRateModule);
+  insertModule(*updateRateModule);
   return updateRateModule;
+}
+
+BasicDataTypeModule*
+Module::insert(BasicDataType& dataType)
+{
+  BasicDataTypeModule* module = new BasicDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+SimpleDataTypeModule*
+Module::insert(SimpleDataType& dataType)
+{
+  SimpleDataTypeModule* module = new SimpleDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+EnumeratedDataTypeModule*
+Module::insert(EnumeratedDataType& dataType)
+{
+  EnumeratedDataTypeModule* module = new EnumeratedDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+ArrayDataTypeModule*
+Module::insert(ArrayDataType& dataType)
+{
+  ArrayDataTypeModule* module = new ArrayDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+FixedRecordDataTypeModule*
+Module::insert(FixedRecordDataType& dataType)
+{
+  FixedRecordDataTypeModule* module = new FixedRecordDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+VariantRecordDataTypeModule*
+Module::insert(VariantRecordDataType& dataType)
+{
+  VariantRecordDataTypeModule* module = new VariantRecordDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
 }
 
 InteractionClassModule*
@@ -1605,7 +1644,7 @@ Module::insert(InteractionClass& interactionClass)
   InteractionClassModule* interactionClassModule;
   interactionClassModule = new InteractionClassModule(interactionClass, *this);
   interactionClass.insert(*interactionClassModule);
-  insert(*interactionClassModule);
+  insertModule(*interactionClassModule);
   return interactionClassModule;
 }
 
@@ -1615,7 +1654,7 @@ Module::insertParameters(InteractionClass& interactionClass)
   ParameterDefinitionModule* parameterDefinitionModule;
   parameterDefinitionModule = new ParameterDefinitionModule(interactionClass, *this);
   interactionClass.insert(*parameterDefinitionModule);
-  insert(*parameterDefinitionModule);
+  insertModule(*parameterDefinitionModule);
   return parameterDefinitionModule;
 }
 
@@ -1625,7 +1664,7 @@ Module::insert(ObjectClass& objectClass)
   ObjectClassModule* objectClassModule;
   objectClassModule = new ObjectClassModule(objectClass, *this);
   objectClass.insert(*objectClassModule);
-  insert(*objectClassModule);
+  insertModule(*objectClassModule);
   return objectClassModule;
 }
 
@@ -1635,7 +1674,7 @@ Module::insertAttributes(ObjectClass& objectClass)
   AttributeDefinitionModule* attributeDefinitionModule;
   attributeDefinitionModule = new AttributeDefinitionModule(objectClass, *this);
   objectClass.insert(*attributeDefinitionModule);
-  insert(*attributeDefinitionModule);
+  insertModule(*attributeDefinitionModule);
   return attributeDefinitionModule;
 }
 
@@ -2001,6 +2040,48 @@ Federation::insert(UpdateRate& updateRate)
 }
 
 void
+Federation::insert(BasicDataType& dataType)
+{
+  _basicDataTypeNameBasicDataTypeMap.insert(dataType);
+  _basicDataTypeHandleBasicDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(SimpleDataType& dataType)
+{
+  _simpleDataTypeNameSimpleDataTypeMap.insert(dataType);
+  _simpleDataTypeHandleSimpleDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(EnumeratedDataType& dataType)
+{
+  _enumeratedDataTypeNameEnumeratedDataTypeMap.insert(dataType);
+  _enumeratedDataTypeHandleEnumeratedDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(ArrayDataType& dataType)
+{
+  _arrayDataTypeNameArrayDataTypeMap.insert(dataType);
+  _arrayDataTypeHandleArrayDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(FixedRecordDataType& dataType)
+{
+  _fixedRecordDataTypeNameFixedRecordDataTypeMap.insert(dataType);
+  _fixedRecordDataTypeHandleFixedRecordDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(VariantRecordDataType& dataType)
+{
+  _variantRecordDataTypeNameVariantRecordDataTypeMap.insert(dataType);
+  _variantRecordDataTypeHandleVariantRecordDataTypeMap.insert(dataType);
+}
+
+void
 Federation::insert(InteractionClass& interactionClass)
 {
   _interactionClassNameInteractionClassMap.insert(interactionClass);
@@ -2075,6 +2156,128 @@ Federation::insertOrCheck(Module& module, const FOMStringUpdateRate& stringUpdat
     updateRate->setRate(stringUpdateRate.getRate());
     insert(*updateRate);
     module.insert(*updateRate);
+    return true;
+  }
+}
+
+bool
+Federation::insertOrCheck(Module& module, const FOMStringBasicDataType& stringDataType)
+{
+  BasicDataType::NameMap::iterator i;
+  i = _basicDataTypeNameBasicDataTypeMap.find(stringDataType.getName());
+  if (i != _basicDataTypeNameBasicDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    BasicDataType* basicDataType = new BasicDataType(*this);
+    basicDataType->setName(stringDataType.getName());
+    basicDataType->setSize(stringDataType.getSize());
+    basicDataType->setEndian(stringDataType.getEndian());
+    basicDataType->setHandle(_basicDataTypeHandleAllocator.get());
+    insert(*basicDataType);
+    module.insert(*basicDataType);
+    return true;
+  }
+}
+
+bool
+Federation::insertOrCheck(Module& module, const FOMStringSimpleDataType& stringDataType)
+{
+  SimpleDataType::NameMap::iterator i;
+  i = _simpleDataTypeNameSimpleDataTypeMap.find(stringDataType.getName());
+  if (i != _simpleDataTypeNameSimpleDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    SimpleDataType* simpleDataType = new SimpleDataType(*this);
+    simpleDataType->setName(stringDataType.getName());
+    simpleDataType->setRepresentation(stringDataType.getRepresentation());
+    simpleDataType->setHandle(_simpleDataTypeHandleAllocator.get());
+    insert(*simpleDataType);
+    module.insert(*simpleDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringEnumeratedDataType& stringDataType)
+{
+  EnumeratedDataType::NameMap::iterator i;
+  i = _enumeratedDataTypeNameEnumeratedDataTypeMap.find(stringDataType.getName());
+  if (i != _enumeratedDataTypeNameEnumeratedDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    EnumeratedDataType* enumeratedDataType = new EnumeratedDataType(*this);
+    enumeratedDataType->setName(stringDataType.getName());
+    enumeratedDataType->setRepresentation(stringDataType.getRepresentation());
+    for (auto& enumerator : stringDataType.getEnumerators())
+    {
+      enumeratedDataType->addEnumerator(enumerator.getName(), enumerator.getValue());
+    }
+    enumeratedDataType->setHandle(_enumeratedDataTypeHandleAllocator.get());
+    insert(*enumeratedDataType);
+    module.insert(*enumeratedDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType& stringDataType)
+{
+  ArrayDataType::NameMap::iterator i;
+  i = _arrayDataTypeNameArrayDataTypeMap.find(stringDataType.getName());
+  if (i != _arrayDataTypeNameArrayDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    ArrayDataType* arrayDataType = new ArrayDataType(*this);
+    arrayDataType->setName(stringDataType.getName());
+    arrayDataType->setEncoding(stringDataType.getEncoding());
+    arrayDataType->setDataType(stringDataType.getDataType());
+    arrayDataType->setCardinality(stringDataType.getCardinality());
+    arrayDataType->setHandle(_arrayDataTypeHandleAllocator.get());
+    insert(*arrayDataType);
+    module.insert(*arrayDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringFixedRecordDataType& stringDataType)
+{
+  FixedRecordDataType::NameMap::iterator i;
+  i = _fixedRecordDataTypeNameFixedRecordDataTypeMap.find(stringDataType.getName());
+  if (i != _fixedRecordDataTypeNameFixedRecordDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    FixedRecordDataType* fixedRecordDataType = new FixedRecordDataType(*this);
+    fixedRecordDataType->setName(stringDataType.getName());
+    for (auto& field : stringDataType.getFields())
+    {
+      fixedRecordDataType->addField(field.getName(), field.getDataType(), field.getVersion());
+    }
+    fixedRecordDataType->setEncoding(stringDataType.getEncoding());
+    fixedRecordDataType->setInclude(stringDataType.getInclude());
+    fixedRecordDataType->setVersion(stringDataType.getVersion());
+    fixedRecordDataType->setHandle(_fixedRecordDataTypeHandleAllocator.get());
+    insert(*fixedRecordDataType);
+    module.insert(*fixedRecordDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringVariantRecordDataType& stringDataType)
+{
+  VariantRecordDataType::NameMap::iterator i;
+  i = _variantRecordDataTypeNameVariantRecordDataTypeMap.find(stringDataType.getName());
+  if (i != _variantRecordDataTypeNameVariantRecordDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    VariantRecordDataType* variantRecordDataType = new VariantRecordDataType(*this);
+    variantRecordDataType->setName(stringDataType.getName());
+    variantRecordDataType->setHandle(_variantRecordDataTypeHandleAllocator.get());
+    insert(*variantRecordDataType);
+    module.insert(*variantRecordDataType);
     return true;
   }
 }
@@ -2315,31 +2518,6 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
   }
 }
 
-bool Federation::insertOrCheck(Module& module, const FOMStringSimpleDataType& dataType)
-{
-  return false;
-}
-
-bool Federation::insertOrCheck(Module& module, const FOMStringEnumeratedDataType& dataType)
-{
-  return false;
-}
-
-bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType& dataType)
-{
-  return false;
-}
-
-bool Federation::insertOrCheck(Module& module, const FOMStringFixedRecordDataType& dataType)
-{
-  return false;
-}
-
-bool Federation::insertOrCheck(Module& module, const FOMStringVariantRecordDataType& dataType)
-{
-  return false;
-}
-
 ModuleHandle
 Federation::insert(const FOMStringModule& stringModule)
 {
@@ -2372,6 +2550,10 @@ Federation::insert(const FOMStringModule& stringModule)
         created = true;
     }
 
+    for (auto& basicDataType : stringModule.getBasicDataTypeList()) {
+      if (insertOrCheck(*module, basicDataType))
+        created = true;
+    }
     for (auto& simpleDataType : stringModule.getSimpleDataTypeList()) {
       if (insertOrCheck(*module, simpleDataType))
         created = true;
@@ -2475,6 +2657,120 @@ Federation::insert(Module& module, const FOMUpdateRate& fomUpdateRate)
     updateRate->setRate(fomUpdateRate.getRate());
     insert(*updateRate);
     module.insert(*updateRate);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMBasicDataType& fomBasicDataType)
+{
+  BasicDataType::HandleMap::iterator i = _basicDataTypeHandleBasicDataTypeMap.find(fomBasicDataType.getHandle());
+  if (i != _basicDataTypeHandleBasicDataTypeMap.end()) {
+    if (fomBasicDataType.getName() != i->getName())
+      throw MessageError("BasicDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _basicDataTypeHandleAllocator.take(fomBasicDataType.getHandle());
+    BasicDataType* basicDataType = new BasicDataType(*this);
+    basicDataType->setName(fomBasicDataType.getName());
+    basicDataType->setHandle(fomBasicDataType.getHandle());
+    insert(*basicDataType);
+    module.insert(*basicDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMSimpleDataType& fomSimpleDataType)
+{
+  SimpleDataType::HandleMap::iterator i = _simpleDataTypeHandleSimpleDataTypeMap.find(fomSimpleDataType.getHandle());
+  if (i != _simpleDataTypeHandleSimpleDataTypeMap.end()) {
+    if (fomSimpleDataType.getName() != i->getName())
+      throw MessageError("SimpleDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _simpleDataTypeHandleAllocator.take(fomSimpleDataType.getHandle());
+    SimpleDataType* simpleDataType = new SimpleDataType(*this);
+    simpleDataType->setName(fomSimpleDataType.getName());
+    simpleDataType->setHandle(fomSimpleDataType.getHandle());
+    insert(*simpleDataType);
+    module.insert(*simpleDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMEnumeratedDataType& fomEnumeratedDataType)
+{
+  EnumeratedDataType::HandleMap::iterator i = _enumeratedDataTypeHandleEnumeratedDataTypeMap.find(fomEnumeratedDataType.getHandle());
+  if (i != _enumeratedDataTypeHandleEnumeratedDataTypeMap.end()) {
+    if (fomEnumeratedDataType.getName() != i->getName())
+      throw MessageError("EnumeratedDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _enumeratedDataTypeHandleAllocator.take(fomEnumeratedDataType.getHandle());
+    EnumeratedDataType* enumeratedDataType = new EnumeratedDataType(*this);
+    enumeratedDataType->setName(fomEnumeratedDataType.getName());
+    enumeratedDataType->setHandle(fomEnumeratedDataType.getHandle());
+    insert(*enumeratedDataType);
+    module.insert(*enumeratedDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMArrayDataType& fomArrayDataType)
+{
+  ArrayDataType::HandleMap::iterator i = _arrayDataTypeHandleArrayDataTypeMap.find(fomArrayDataType.getHandle());
+  if (i != _arrayDataTypeHandleArrayDataTypeMap.end()) {
+    if (fomArrayDataType.getName() != i->getName())
+      throw MessageError("ArrayDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _arrayDataTypeHandleAllocator.take(fomArrayDataType.getHandle());
+    ArrayDataType* arrayDataType = new ArrayDataType(*this);
+    arrayDataType->setName(fomArrayDataType.getName());
+    arrayDataType->setHandle(fomArrayDataType.getHandle());
+    insert(*arrayDataType);
+    module.insert(*arrayDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMFixedRecordDataType& fomFixedRecordDataType)
+{
+  FixedRecordDataType::HandleMap::iterator i = _fixedRecordDataTypeHandleFixedRecordDataTypeMap.find(fomFixedRecordDataType.getHandle());
+  if (i != _fixedRecordDataTypeHandleFixedRecordDataTypeMap.end()) {
+    if (fomFixedRecordDataType.getName() != i->getName())
+      throw MessageError("FixedRecordDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _fixedRecordDataTypeHandleAllocator.take(fomFixedRecordDataType.getHandle());
+    FixedRecordDataType* fixedRecordDataType = new FixedRecordDataType(*this);
+    fixedRecordDataType->setName(fomFixedRecordDataType.getName());
+    fixedRecordDataType->setHandle(fomFixedRecordDataType.getHandle());
+    insert(*fixedRecordDataType);
+    module.insert(*fixedRecordDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMVariantRecordDataType& fomVariantRecordDataType)
+{
+  VariantRecordDataType::HandleMap::iterator i = _variantRecordDataTypeHandleVariantRecordDataTypeMap.find(fomVariantRecordDataType.getHandle());
+  if (i != _variantRecordDataTypeHandleVariantRecordDataTypeMap.end()) {
+    if (fomVariantRecordDataType.getName() != i->getName())
+      throw MessageError("VariantRecordDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _variantRecordDataTypeHandleAllocator.take(fomVariantRecordDataType.getHandle());
+    VariantRecordDataType* variantRecordDataType = new VariantRecordDataType(*this);
+    variantRecordDataType->setName(fomVariantRecordDataType.getName());
+    variantRecordDataType->setHandle(fomVariantRecordDataType.getHandle());
+    insert(*variantRecordDataType);
+    module.insert(*variantRecordDataType);
   }
 }
 
@@ -2687,6 +2983,24 @@ Federation::insert(const FOMModule& fomModule)
     for (auto& transportationType : fomModule.getTransportationTypeList()) {
       insert(*module, transportationType);
     }
+    for (auto& basicDataType : fomModule.getBasicDataTypeList()) {
+      insert(*module, basicDataType);
+    }
+    for (auto& simpleDataType : fomModule.getSimpleDataTypeList()) {
+      insert(*module, simpleDataType);
+    }
+    for (auto& enumeratedDataType : fomModule.getEnumeratedDataTypeList()) {
+      insert(*module, enumeratedDataType);
+    }
+    for (auto& arrayDataType : fomModule.getArrayDataTypeList()) {
+      insert(*module, arrayDataType);
+    }
+    for (auto& fixedRecordDataType : fomModule.getFixedRecordDataTypeList()) {
+      insert(*module, fixedRecordDataType);
+    }
+    for (auto& variantRecordDataType : fomModule.getVariantRecordDataTypeList()) {
+      insert(*module, variantRecordDataType);
+    }
   }
 }
 
@@ -2757,6 +3071,60 @@ Federation::erase(Module& module)
       continue;
     _dimensionHandleAllocator.put(dimension.getDimensionHandle());
     Dimension::HandleMap::erase(dimension);
+  }
+
+  while (!module.getBasicDataTypeModuleList().empty()) {
+    BasicDataType& dataType = module.getBasicDataTypeModuleList().back().getBasicDataType();
+    module.getBasicDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _basicDataTypeHandleAllocator.put(dataType.getHandle());
+    BasicDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getSimpleDataTypeModuleList().empty()) {
+    SimpleDataType& dataType = module.getSimpleDataTypeModuleList().back().getSimpleDataType();
+    module.getSimpleDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _simpleDataTypeHandleAllocator.put(dataType.getHandle());
+    SimpleDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getEnumeratedDataTypeModuleList().empty()) {
+    EnumeratedDataType& dataType = module.getEnumeratedDataTypeModuleList().back().getEnumeratedDataType();
+    module.getEnumeratedDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _enumeratedDataTypeHandleAllocator.put(dataType.getHandle());
+    EnumeratedDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getArrayDataTypeModuleList().empty()) {
+    ArrayDataType& dataType = module.getArrayDataTypeModuleList().back().getArrayDataType();
+    module.getArrayDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _arrayDataTypeHandleAllocator.put(dataType.getHandle());
+    ArrayDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getFixedRecordDataTypeModuleList().empty()) {
+    FixedRecordDataType& dataType = module.getFixedRecordDataTypeModuleList().back().getFixedRecordDataType();
+    module.getFixedRecordDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _fixedRecordDataTypeHandleAllocator.put(dataType.getHandle());
+    FixedRecordDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getVariantRecordDataTypeModuleList().empty()) {
+    VariantRecordDataType& dataType = module.getVariantRecordDataTypeModuleList().back().getVariantRecordDataType();
+    module.getVariantRecordDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _variantRecordDataTypeHandleAllocator.put(dataType.getHandle());
+    VariantRecordDataType::HandleMap::erase(dataType);
   }
 
   _moduleHandleAllocator.put(module.getModuleHandle());
@@ -2836,6 +3204,60 @@ void Federation::writeCurrentFDD(std::ostream& out) const
   out << indent << R"XML(</transportations>)XML" << std::endl;
 
   out << indent << R"XML(<dataTypes>)XML" << std::endl;
+  if (!_basicDataTypeNameBasicDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<basicDataTypes>)XML" << std::endl;
+    for (const ServerModel::BasicDataType& dataType : _basicDataTypeNameBasicDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</basicDataTypes>)XML" << std::endl;
+  }
+  if (!_simpleDataTypeNameSimpleDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<simpleDataTypes>)XML" << std::endl;
+    for (const ServerModel::SimpleDataType& dataType : _simpleDataTypeNameSimpleDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</simpleDataTypes>)XML" << std::endl;
+  }
+  if (!_enumeratedDataTypeNameEnumeratedDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<enumeratedDataTypes>)XML" << std::endl;
+    for (const ServerModel::EnumeratedDataType& dataType : _enumeratedDataTypeNameEnumeratedDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</enumeratedDataTypes>)XML" << std::endl;
+  }
+  if (!_arrayDataTypeNameArrayDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<arrayDataTypes>)XML" << std::endl;
+    for (const ServerModel::ArrayDataType& dataType : _arrayDataTypeNameArrayDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</arrayDataTypes>)XML" << std::endl;
+  }
+  if (!_fixedRecordDataTypeNameFixedRecordDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<fixedRecordDataTypes>)XML" << std::endl;
+    for (const ServerModel::FixedRecordDataType& dataType : _fixedRecordDataTypeNameFixedRecordDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</fixedRecordDataTypes>)XML" << std::endl;
+  }
+  if (!_variantRecordDataTypeNameVariantRecordDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<variantRecordDataTypes>)XML" << std::endl;
+    for (const ServerModel::VariantRecordDataType& dataType : _variantRecordDataTypeNameVariantRecordDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</variantRecordDataTypes>)XML" << std::endl;
+  }
   out << indent << R"XML(</dataTypes>)XML" << std::endl;
   out << R"XML(</objectModel>)XML" << std::endl;
 }
@@ -3554,6 +3976,95 @@ void
 Node::broadcastToChildren(const SharedPtr<const AbstractMessage>& message)
 {
   broadcast(_parentConnectHandle, message);
+}
+
+
+void BasicDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<basicData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<size>)XML" << getSize() << R"XML(</size>)XML" << std::endl;
+  out << indent1 << R"XML(<endian>)XML" << getEndian() << R"XML(</endian>)XML" << std::endl;
+  out << indent << R"XML(</basicData>)XML" << std::endl;
+}
+
+
+void SimpleDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<simpleData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<representation>)XML" << getRepresentation() << R"XML(</representation>)XML" << std::endl;
+  out << indent << R"XML(</simpleData>)XML" << std::endl;
+}
+
+
+void EnumeratedDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<enumeratedData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<representation>)XML" << getRepresentation() << R"XML(</representation>)XML" << std::endl;
+  std::string indent2((level + 2) * kIndentSpaces, ' ');
+  for (auto& enumerator : getEnumerators())
+  {
+    out << indent1 << R"XML(<enumerator>)XML" << std::endl;
+    out << indent2 << R"XML(<name>)XML" << enumerator.getName() << R"XML(</name>)XML" << std::endl;
+    out << indent2 << R"XML(<value>)XML" << enumerator.getValue() << R"XML(</value>)XML" << std::endl;
+    out << indent1 << R"XML(</enumerator>)XML" << std::endl;
+  }
+  out << indent << R"XML(</enumeratedData>)XML" << std::endl;
+}
+
+
+void ArrayDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<arrayData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<encoding>)XML" << getEncoding() << R"XML(</encoding>)XML" << std::endl;
+  out << indent1 << R"XML(<dataType>)XML" << getDataType() << R"XML(</dataType>)XML" << std::endl;
+  out << indent1 << R"XML(<cardinality>)XML" << getCardinality() << R"XML(</cardinality>)XML" << std::endl;
+  out << indent << R"XML(</arrayData>)XML" << std::endl;
+}
+
+
+void FixedRecordDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  std::string indent2((level + 2) * kIndentSpaces, ' ');
+  out << indent << R"XML(<fixedRecordData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<encoding>)XML" << getEncoding() << R"XML(</encoding>)XML" << std::endl;
+  out << indent1 << R"XML(<version>)XML" << getVersion() << R"XML(</version>)XML" << std::endl;
+  if (!getInclude().empty())
+  {
+    out << indent1 << R"XML(<include>)XML" << getInclude() << R"XML(</include>)XML" << std::endl;
+  }
+  for (auto& field : getFields())
+  {
+    out << indent1 << R"XML(<field>)XML" << std::endl;
+    out << indent2 << R"XML(<name>)XML" << field.getName() << R"XML(</name>)XML" << std::endl;
+    out << indent2 << R"XML(<dataType>)XML" << field.getDataType() << R"XML(</dataType>)XML" << std::endl;
+    out << indent2 << R"XML(<version>)XML" << field.getVersion() << R"XML(</version>)XML" << std::endl;
+    out << indent1 << R"XML(</field>)XML" << std::endl;
+  }
+  out << indent << R"XML(</fixedRecordData>)XML" << std::endl;
+}
+
+void VariantRecordDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<variantRecordData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent << R"XML(</variantRecordData>)XML" << std::endl;
 }
 
 } // namespace ServerModel
