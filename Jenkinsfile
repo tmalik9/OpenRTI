@@ -1,30 +1,42 @@
-def docker_images = ["pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4"]
+def docker_images = ["pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4",
+                     "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"]
 
 
 def get_linux_stages(img) {
   return {
     stage(img) {
       node('docker && linux') {
-        try {
-          stage("Checkout") {
-            checkout scm
-          }
-          docker.withRegistry('https://pnd-rtklinux-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
-            docker.image(img).inside {
-              stage('Build') {
-                sh "mkdir build"
-                dir('build') {
-                  sh '/build.sh Release 1234'
+        withEnv([
+          "CC=clang",
+          "CXX=clang++"
+          ]) {
+          try {
+            stage("Checkout") {
+              checkout scm
+            }
+            docker.withRegistry('https://pnd-rtklinux-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
+              docker.image(img).inside {
+                stage('Build') {
+                  sh "mkdir build"
+                  sh "chmod +x build.sh"
+                  dir('build') {
+                    def build_cmd = '../build.sh Release 1234'
+                    if (img.contains('centos')) {
+                      sh "scl enable llvm-toolset-6.0 '${build_cmd}'"
+                    } else {
+                      sh "${build_cmd}"
+                    }
+                  }
                 }
-              }
-              stage('Deploy') {
-                echo "TODO deploy"
+                stage('Deploy') {
+                  echo "TODO deploy"
+                }
               }
             }
           }
-        }
-        finally {
-          cleanWs()
+          finally {
+            cleanWs()
+          }
         }
       }
     }
