@@ -198,9 +198,9 @@ public:
   }
   void addArrayDataType()
   {
-    _module.getArrayDataTypeList().push_back(FOMStringArrayDataType());
+    _module.getArrayDataTypeList().push_back(FOMStringArrayDataType2());
   }
-  FOMStringArrayDataType& getCurrentArrayDataType()
+  FOMStringArrayDataType2& getCurrentArrayDataType()
   {
     if (_module.getArrayDataTypeList().empty())
       throw RTIinternalError("No current StringArrayDataType.");
@@ -208,9 +208,9 @@ public:
   }
   void addFixedRecordDataType()
   {
-    _module.getFixedRecordDataTypeList().push_back(FOMStringFixedRecordDataType());
+    _module.getFixedRecordDataTypeList().push_back(FOMStringFixedRecordDataType2());
   }
-  FOMStringFixedRecordDataType& getCurrentFixedRecordDataType()
+  FOMStringFixedRecordDataType2& getCurrentFixedRecordDataType()
   {
     if (_module.getFixedRecordDataTypeList().empty())
       throw RTIinternalError("No current FixedRecordDataType.");
@@ -218,9 +218,9 @@ public:
   }
   void addVariantRecordDataType()
   {
-    _module.getVariantRecordDataTypeList().push_back(FOMStringVariantRecordDataType());
+    _module.getVariantRecordDataTypeList().push_back(FOMStringVariantRecordDataType2());
   }
-  FOMStringVariantRecordDataType& getCurrentVariantRecordDataType()
+  FOMStringVariantRecordDataType2& getCurrentVariantRecordDataType()
   {
     if (_module.getVariantRecordDataTypeList().empty())
       throw RTIinternalError("No current VariantRecordDataType.");
@@ -383,7 +383,7 @@ public:
     }
   }
 
-  const FOMStringModule& getFOMStringModule() const
+  const FOMStringModule2& getFOMStringModule() const
   { return _module; }
 
 private:
@@ -397,7 +397,7 @@ private:
   typedef std::vector<size_t> InteractionClassIndexVector;
   InteractionClassIndexVector _parentInteractionClassIndexVector;
 
-  FOMStringModule _module;
+  FOMStringModule2 _module;
 };
 
 }

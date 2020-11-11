@@ -272,7 +272,7 @@ public:
 
   virtual void send(const SharedPtr<const AbstractMessage>& message) override;
   virtual void close() noexcept override;
-
+  AbstractServer* getServer() const override { return _serverLoop.get(); }
 private:
   SharedPtr<AbstractServer> _serverLoop;
   ConnectHandle _connectHandle;
@@ -314,6 +314,10 @@ public:
   virtual void send(const SharedPtr<const AbstractMessage>& message) override;
   virtual void close() noexcept override;
   //void setConnectHandle(ConnectHandle handle) { _connectHandle = handle; }
+  virtual AbstractServer* getServer() const override
+  {
+    return _serverNode->getServer();
+  }
 private:
   SharedPtr<AbstractServerNode> _serverNode;
   ConnectHandle _connectHandle;

@@ -352,7 +352,7 @@ FDD1516ContentHandler::endElement(const char* uri, const char* name, const char*
   _modeStack.pop_back();
 }
 
-FOMStringModule
+FOMStringModule2
 FDD1516FileReader::read(std::istream& stream, const std::string& encoding)
 {
   // Set up the fdd parser

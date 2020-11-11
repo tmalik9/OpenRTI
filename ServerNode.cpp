@@ -149,6 +149,96 @@ public:
       broadcastToChildren(announce);
     }
   }
+  void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionRequest2Message* message)
+  {
+    OpenRTIAssert(isRootServer());
+
+    if (!message->getFederateName().empty() && isFederateNameInUse(message->getFederateName())) {
+      SharedPtr<JoinFederationExecutionResponseMessage> response;
+      response = new JoinFederationExecutionResponseMessage;
+      response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseFederateNameAlreadyInUse);
+      response->setExceptionString(message->getFederateName());
+      getServerNode().send(connectHandle, response);
+      return;
+    }
+
+    // Try to extend the object model
+    if (!message->getFOMStringModuleList().empty()) {
+      ModuleHandleVector moduleHandleVector;
+      try {
+        insert(moduleHandleVector, message->getFOMStringModuleList());
+      } catch (OpenRTI::Exception& e) {
+        SharedPtr<JoinFederationExecutionResponseMessage> response;
+        response = new JoinFederationExecutionResponseMessage;
+        response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseInconsistentFDD);
+        response->setExceptionString(e.what());
+        getServerNode().send(connectHandle, response);
+        return;
+      }
+      
+      if (!moduleHandleVector.empty()) {
+        SharedPtr<InsertModulesMessage> insertModules;
+        insertModules = new InsertModulesMessage;
+        getModuleList(insertModules->getFOMModuleList(), moduleHandleVector);
+        insertModules->setFederationHandle(getFederationHandle());
+        broadcastToChildren(insertModules);
+      }
+    }
+
+    // ... insert a new federate ...
+    ServerModel::Federate* federate = new ServerModel::Federate(*this);
+    federate->setName(message->getFederateName());
+    federate->setFederateType(message->getFederateType());
+    federate->setIsInternal(message->getIsInternal());
+    insert(*federate);
+
+    // Survived so far, insert a new federation connect
+    ServerModel::NodeConnect* nodeConnect = getServerNode().getNodeConnect(connectHandle);
+    OpenRTIAssert(nodeConnect);
+    ServerModel::FederationConnect* federationConnect = getOrInsertConnect(*nodeConnect);
+    OpenRTIAssert(federationConnect);
+    federationConnect->insert(*federate);
+    pushFederation(connectHandle);
+
+    // Respond with Success
+    SharedPtr<JoinFederationExecutionResponseMessage> response;
+    response = new JoinFederationExecutionResponseMessage;
+    response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseSuccess);
+    response->setFederationHandle(getFederationHandle());
+    response->setFederateHandle(federate->getFederateHandle());
+    response->setFederateName(federate->getName());
+    response->setFederateType(federate->getFederateType());
+    send(connectHandle, response);
+
+    // send all children the notification about the new federate except the one that gets the join response
+    SharedPtr<JoinFederateNotifyMessage> notify = new JoinFederateNotifyMessage;
+    notify->setFederationHandle(getFederationHandle());
+    notify->setFederateHandle(federate->getFederateHandle());
+    notify->setFederateName(federate->getName());
+    notify->setFederateType(federate->getFederateType());
+    notify->setIsInternal(federate->getIsInternal());
+    broadcastToChildren(connectHandle, notify);
+
+    // For those sync request that are automatically extended to new federates, send the announcement
+    for (ServerModel::Synchronization::NameMap::iterator j = _synchronizationNameSynchronizationMap.begin();
+         j != _synchronizationNameSynchronizationMap.end(); ++j) {
+      // only those with an auto expanding federate set
+      if (!j->getAddJoiningFederates())
+        continue;
+      if (federate->getIsInternal())
+        continue;
+      j->insert(*federate);
+
+      SharedPtr<AnnounceSynchronizationPointMessage> announce;
+      announce = new AnnounceSynchronizationPointMessage;
+      announce->setFederationHandle(getFederationHandle());
+      announce->setLabel(j->getLabel());
+      announce->setTag(j->getTag());
+      announce->getFederateHandleVector().push_back(federate->getFederateHandle());
+      announce->setAddJoiningFederates(j->getAddJoiningFederates());
+      broadcastToChildren(announce);
+    }
+  }
   void accept(const ConnectHandle& connectHandle, const ConnectHandle& requestConnectHandle, const JoinFederationExecutionResponseMessage* message)
   {
     OpenRTIAssert(connectHandle.valid());
@@ -2376,7 +2466,75 @@ public:
       }
     }
   }
+  void acceptAsRoot(const ConnectHandle& connectHandle, const CreateFederationExecutionRequest2Message* message)
+  {
+    OpenRTIAssert(connectHandle.valid());
+    OpenRTIAssert(isRootServer());
+    // Check if it is already there?
+    if (getFederationExecutionAlreadyExists(message->getFederationExecution())) {
+      // Ok, have an active federation, create needs to fail
+      SharedPtr<CreateFederationExecutionResponseMessage> response;
+      response = new CreateFederationExecutionResponseMessage;
+      response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseFederationExecutionAlreadyExists);
+      send(connectHandle, response);
+    } else {
+      // Successful create
+      FederationServer* federationServer;
+      federationServer = new FederationServer(*this);
+      federationServer->setName(message->getFederationExecution());
+      federationServer->setLogicalTimeFactoryName(message->getLogicalTimeFactoryName());
+      try {
+        federationServer->insert(message->getFOMStringModuleList());
+
+        // register this one
+        insert(*federationServer);
+
+        Log(ServerFederation, Info) << getServerPath() << ": Create federation execution \""
+                                    << message->getFederationExecution() << "\"." << std::endl;
+
+
+        // ... and respond with Success
+        SharedPtr<CreateFederationExecutionResponseMessage> response;
+        response = new CreateFederationExecutionResponseMessage;
+        response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseSuccess);
+        send(connectHandle, response);
+        // initialize the Mom federation object
+        federationServer->initializeMom(_serverNode->getServer(), FederateHandle());
+
+      } catch (const InconsistentFDD& e) {
+        delete federationServer;
+
+        Log(ServerFederation, Info) << getServerPath() << ": Caught Exception creating federation execution \""
+                                    << e.getReason() << "\"." << std::endl;
+        SharedPtr<CreateFederationExecutionResponseMessage> response;
+        response = new CreateFederationExecutionResponseMessage;
+        response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseInconsistentFDD);
+        response->setExceptionString(e.getReason());
+        send(connectHandle, response);
+
+      } catch (const Exception& e) {
+        Log(ServerFederation, Info) << getServerPath() << ": Caught Exception creating federation execution \""
+                                    << e.getReason() << "\"." << std::endl;
+        SharedPtr<CreateFederationExecutionResponseMessage> response;
+        response = new CreateFederationExecutionResponseMessage;
+        response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseRTIinternalError);
+        response->setExceptionString(e.getReason());
+        send(connectHandle, response);
+
+      } catch (...) {
+        delete federationServer;
+
+        Log(ServerFederation, Info) << getServerPath() << ": Caught unknown Exception creating federation execution." << std::endl;
+        SharedPtr<CreateFederationExecutionResponseMessage> response;
+        response = new CreateFederationExecutionResponseMessage;
+        response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseRTIinternalError);
+        send(connectHandle, response);
+      }
+    }
+  }
   void accept(const ConnectHandle& connectHandle, const CreateFederationExecutionRequestMessage* message)
+  { forwardUpstreamMessage(connectHandle, message); }
+  void accept(const ConnectHandle& connectHandle, const CreateFederationExecutionRequest2Message* message)
   { forwardUpstreamMessage(connectHandle, message); }
   void accept(const ConnectHandle& connectHandle, const CreateFederationExecutionResponseMessage* message)
   { forwardDownstreamMessage(connectHandle, message); }
@@ -2639,6 +2797,33 @@ public:
     }
   }
   void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionRequestMessage* message)
+  { forwardUpstreamMessage(connectHandle, message); }
+  void acceptAsRoot(const ConnectHandle& connectHandle, const JoinFederationExecutionRequest2Message* message)
+  {
+    OpenRTIAssert(connectHandle.valid());
+    OpenRTIAssert(isRootServer());
+
+    // The ambassador already needs to care for that. So, if we get that here, drop the connection.
+    if (message->getFederateName().compare(0, 3, "HLA") == 0)
+      throw MessageError("Got JoinFederationExecutionRequestMessage with name starting with HLA.");
+
+    FederationServer* federationServer = getFederation(message->getFederationExecution());
+    if (!federationServer) {
+      // FederationExecutionDoesNotExist ...
+      Log(ServerFederate, Info) << getServerPath()
+                                << ": JoinFederationExecutionRequestMessage failed for unknown federation named \""
+                                << message->getFederationExecution() << "\"!" << std::endl;
+      SharedPtr<JoinFederationExecutionResponseMessage> response;
+      response = new JoinFederationExecutionResponseMessage;
+      response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseFederationExecutionDoesNotExist);
+      send(connectHandle, response);
+
+    } else {
+      // Process the join request - which still might fail
+      federationServer->accept(connectHandle, message);
+    }
+  }
+  void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionRequest2Message* message)
   { forwardUpstreamMessage(connectHandle, message); }
   void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionResponseMessage* message)
   {
@@ -2953,6 +3138,7 @@ private:
     ServerModel::NodeConnect* connect = getNodeConnect(getParentConnectHandle());
     OpenRTIAssert(connect);
 
+    DebugPrintf("%s: connect version=%d\n", __FUNCTION__, connect->getVersion());
     FederationServer* federationServer = new FederationServer(*this);
     federationServer->setName(name);
     federationServer->setFederationHandle(federationHandle);
@@ -3040,6 +3226,12 @@ void
 ServerNode::_dispatchMessage(const AbstractMessage* message, const ConnectHandle& connectHandle)
 {
   _serverMessageDispatcher->dispatch(*message, connectHandle);
+}
+
+
+OpenRTI::ServerModel::NodeConnect* ServerNode::getParentConnect() const
+{
+  return _serverMessageDispatcher->getNodeConnect(_serverMessageDispatcher->getParentConnectHandle());
 }
 
 } // namespace OpenRTI

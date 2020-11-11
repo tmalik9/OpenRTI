@@ -32,6 +32,7 @@
 #include "URL.h"
 #include "StringUtils.h"
 #include "TimeManagement.h"
+#include "TranslateTypes.h"
 
 namespace OpenRTI {
 
@@ -101,25 +102,35 @@ public:
   }
 
   void createFederationExecution(const std::string& federationExecutionName,
-                                 const FOMStringModuleList& fomModules,
+                                 const FOMStringModule2List& fomModules,
                                  const std::string& logicalTimeFactoryName)
   {
     if (!isConnected())
       throw NotConnected(std::string("Could not get connect RTI of federation execution \"") +
                          federationExecutionName + std::string("\"."));
+    if (getProtocolVersion() == 8)
+    {
+      // The create request message
+      SharedPtr<CreateFederationExecutionRequestMessage> request = new CreateFederationExecutionRequestMessage;
+      request->setFederationExecution(federationExecutionName);
+      request->setLogicalTimeFactoryName(logicalTimeFactoryName);
+      request->setFOMStringModuleList(TranslateTypes::translate(fomModules));
 
-    // The create request message
-    SharedPtr<CreateFederationExecutionRequestMessage> request = new CreateFederationExecutionRequestMessage;
-    request->setFederationExecution(federationExecutionName);
-    request->setLogicalTimeFactoryName(logicalTimeFactoryName);
-    request->setFOMStringModuleList(fomModules);
+      // Send this message and wait for the response
+      send(request);
+    }
+    else if (getProtocolVersion() == 9)
+    {
+      // The create request message
+      SharedPtr<CreateFederationExecutionRequest2Message> request = new CreateFederationExecutionRequest2Message;
+      request->setFederationExecution(federationExecutionName);
+      request->setLogicalTimeFactoryName(logicalTimeFactoryName);
+      request->setFOMStringModuleList(fomModules);
 
-    // The maximum abstime to try to connect
-
+      // Send this message and wait for the response
+      send(request);
+    }
     Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
-    // Send this message and wait for the response
-    send(request);
-
     std::pair<CreateFederationExecutionResponseType, std::string> responseTypeStringPair;
     responseTypeStringPair = dispatchWaitCreateFederationExecutionResponse(abstime);
     if (responseTypeStringPair.first == CreateFederationExecutionResponseFederationExecutionAlreadyExists)
@@ -175,7 +186,7 @@ public:
 
   FederateHandle joinFederationExecution(const std::string& federateName, const std::string& federateType,
                                          const std::string& federationExecutionName,
-                                         const FOMStringModuleList& fomModules)
+                                         const FOMStringModule2List& fomModules)
   {
     if (!isConnected())
       throw NotConnected(std::string("Could not get connect RTI of federation execution \"") +
@@ -186,16 +197,29 @@ public:
     // The maximum abstime to try to connect
     Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
 
-    // The destroy request message
-    SharedPtr<JoinFederationExecutionRequestMessage> request;
-    request = new JoinFederationExecutionRequestMessage;
-    request->setFederationExecution(federationExecutionName);
-    request->setFederateType(federateType);
-    request->setFederateName(federateName);
-    request->setFOMStringModuleList(fomModules);
+    // The join request message
+    if (getProtocolVersion() == 8)
+    {
+      SharedPtr<JoinFederationExecutionRequestMessage> request = MakeShared<JoinFederationExecutionRequestMessage>();
+      request->setFederationExecution(federationExecutionName);
+      request->setFederateType(federateType);
+      request->setFederateName(federateName);
+      request->setFOMStringModuleList(TranslateTypes::translate(fomModules));
 
-    // Send this message and wait for the response
-    send(request);
+      // Send this message and wait for the response
+      send(request);
+    }
+    else if (getProtocolVersion() == 9)
+    {
+      SharedPtr<JoinFederationExecutionRequest2Message> request = MakeShared<JoinFederationExecutionRequest2Message>();
+      request->setFederationExecution(federationExecutionName);
+      request->setFederateType(federateType);
+      request->setFederateName(federateName);
+      request->setFOMStringModuleList(fomModules);
+
+      // Send this message and wait for the response
+      send(request);
+    }
     std::pair<JoinFederationExecutionResponseType, std::string> response;
     response = dispatchWaitJoinFederationExecutionResponse(abstime, federateName);
     switch (response.first) {

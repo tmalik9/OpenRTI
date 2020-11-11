@@ -46,6 +46,7 @@
 #include "SocketTCP.h"
 #include "StringUtils.h"
 #include "LogStream.h"
+#include "ServerModel.h"
 
 namespace OpenRTI {
 
@@ -323,6 +324,17 @@ NetworkServer::exec()
   }
 
   return EXIT_SUCCESS;
+}
+
+
+uint32_t NetworkServer::getProtocolVersion() const
+{
+  const ServerNode* serverNode = dynamic_cast<const ServerNode*>(&getServerNode());
+  if (serverNode != nullptr)
+  {
+    return serverNode->getParentConnect()->getVersion();
+  }
+  return 0;
 }
 
 void

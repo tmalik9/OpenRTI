@@ -161,6 +161,77 @@ CreateFederationExecutionRequestMessage::operator<(const CreateFederationExecuti
   return false;
 }
 
+CreateFederationExecutionRequest2Message::CreateFederationExecutionRequest2Message() noexcept :
+  _federationExecution(),
+  _logicalTimeFactoryName(),
+  _fOMStringModuleList()
+{
+}
+
+CreateFederationExecutionRequest2Message::~CreateFederationExecutionRequest2Message() noexcept
+{
+}
+
+const char*
+CreateFederationExecutionRequest2Message::getTypeName() const
+{
+  return "CreateFederationExecutionRequest2Message";
+}
+
+void
+CreateFederationExecutionRequest2Message::out(std::ostream& os) const
+{
+  os << "{ ";
+  os << "federationExecution: " << getFederationExecution();
+  os << ", ";
+  os << "logicalTimeFactoryName: " << getLogicalTimeFactoryName();
+  os << ", ";
+  os << "fOMStringModuleList: " << getFOMStringModuleList();
+  os << " }";
+}
+
+void
+CreateFederationExecutionRequest2Message::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
+}
+
+void
+CreateFederationExecutionRequest2Message::dispatch(const AbstractMessageDispatcher& dispatcher) const
+{
+  dispatcher.accept(*this);
+}
+
+bool
+CreateFederationExecutionRequest2Message::operator==(const AbstractMessage& rhs) const noexcept
+{
+  const CreateFederationExecutionRequest2Message* message = dynamic_cast<const CreateFederationExecutionRequest2Message*>(&rhs);
+  if (!message)
+    return false;
+  return operator==(*message);
+}
+
+bool
+CreateFederationExecutionRequest2Message::operator==(const CreateFederationExecutionRequest2Message& rhs) const noexcept
+{
+  if (getFederationExecution() != rhs.getFederationExecution()) return false;
+  if (getLogicalTimeFactoryName() != rhs.getLogicalTimeFactoryName()) return false;
+  if (getFOMStringModuleList() != rhs.getFOMStringModuleList()) return false;
+  return true;
+}
+
+bool
+CreateFederationExecutionRequest2Message::operator<(const CreateFederationExecutionRequest2Message& rhs) const noexcept
+{
+  if (getFederationExecution() < rhs.getFederationExecution()) return true;
+  if (rhs.getFederationExecution() < getFederationExecution()) return false;
+  if (getLogicalTimeFactoryName() < rhs.getLogicalTimeFactoryName()) return true;
+  if (rhs.getLogicalTimeFactoryName() < getLogicalTimeFactoryName()) return false;
+  if (getFOMStringModuleList() < rhs.getFOMStringModuleList()) return true;
+  if (rhs.getFOMStringModuleList() < getFOMStringModuleList()) return false;
+  return false;
+}
+
 CreateFederationExecutionResponseMessage::CreateFederationExecutionResponseMessage() noexcept :
   _createFederationExecutionResponseType(),
   _exceptionString()
@@ -779,6 +850,73 @@ InsertModulesMessage::operator<(const InsertModulesMessage& rhs) const noexcept
   return false;
 }
 
+InsertModules2Message::InsertModules2Message() noexcept :
+  _federationHandle(),
+  _fOMModule2List()
+{
+}
+
+InsertModules2Message::~InsertModules2Message() noexcept
+{
+}
+
+const char*
+InsertModules2Message::getTypeName() const
+{
+  return "InsertModules2Message";
+}
+
+void
+InsertModules2Message::out(std::ostream& os) const
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << getFederationHandle();
+  //os << ", ";
+  // StructField fOMModule2List (hidden)
+  //os << "fOMModule2List: " << getFOMModule2List();
+  os << " }";
+}
+
+void
+InsertModules2Message::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
+}
+
+void
+InsertModules2Message::dispatch(const AbstractMessageDispatcher& dispatcher) const
+{
+  dispatcher.accept(*this);
+}
+
+bool
+InsertModules2Message::operator==(const AbstractMessage& rhs) const noexcept
+{
+  const InsertModules2Message* message = dynamic_cast<const InsertModules2Message*>(&rhs);
+  if (!message)
+    return false;
+  return operator==(*message);
+}
+
+bool
+InsertModules2Message::operator==(const InsertModules2Message& rhs) const noexcept
+{
+  if (getFederationHandle() != rhs.getFederationHandle()) return false;
+  if (getFOMModule2List() != rhs.getFOMModule2List()) return false;
+  return true;
+}
+
+bool
+InsertModules2Message::operator<(const InsertModules2Message& rhs) const noexcept
+{
+  if (getFederationHandle() < rhs.getFederationHandle()) return true;
+  if (rhs.getFederationHandle() < getFederationHandle()) return false;
+  if (getFOMModule2List() < rhs.getFOMModule2List()) return true;
+  if (rhs.getFOMModule2List() < getFOMModule2List()) return false;
+  return false;
+}
+
 JoinFederationExecutionRequestMessage::JoinFederationExecutionRequestMessage() noexcept :
   _federationExecution(),
   _federateType(),
@@ -852,6 +990,95 @@ JoinFederationExecutionRequestMessage::operator==(const JoinFederationExecutionR
 
 bool
 JoinFederationExecutionRequestMessage::operator<(const JoinFederationExecutionRequestMessage& rhs) const noexcept
+{
+  if (getFederationExecution() < rhs.getFederationExecution()) return true;
+  if (rhs.getFederationExecution() < getFederationExecution()) return false;
+  if (getFederateType() < rhs.getFederateType()) return true;
+  if (rhs.getFederateType() < getFederateType()) return false;
+  if (getFederateName() < rhs.getFederateName()) return true;
+  if (rhs.getFederateName() < getFederateName()) return false;
+  if (getFOMStringModuleList() < rhs.getFOMStringModuleList()) return true;
+  if (rhs.getFOMStringModuleList() < getFOMStringModuleList()) return false;
+  if (getConfigurationParameterMap() < rhs.getConfigurationParameterMap()) return true;
+  if (rhs.getConfigurationParameterMap() < getConfigurationParameterMap()) return false;
+  if (getIsInternal() < rhs.getIsInternal()) return true;
+  if (rhs.getIsInternal() < getIsInternal()) return false;
+  return false;
+}
+
+JoinFederationExecutionRequest2Message::JoinFederationExecutionRequest2Message() noexcept :
+  _federationExecution(),
+  _federateType(),
+  _federateName(),
+  _fOMStringModuleList(),
+  _configurationParameterMap(),
+  _isInternal()
+{
+}
+
+JoinFederationExecutionRequest2Message::~JoinFederationExecutionRequest2Message() noexcept
+{
+}
+
+const char*
+JoinFederationExecutionRequest2Message::getTypeName() const
+{
+  return "JoinFederationExecutionRequest2Message";
+}
+
+void
+JoinFederationExecutionRequest2Message::out(std::ostream& os) const
+{
+  os << "{ ";
+  os << "federationExecution: " << getFederationExecution();
+  os << ", ";
+  os << "federateType: " << getFederateType();
+  os << ", ";
+  os << "federateName: " << getFederateName();
+  os << ", ";
+  os << "fOMStringModuleList: " << getFOMStringModuleList();
+  os << ", ";
+  os << "configurationParameterMap: " << getConfigurationParameterMap();
+  os << ", ";
+  os << "isInternal: " << getIsInternal();
+  os << " }";
+}
+
+void
+JoinFederationExecutionRequest2Message::out(std::ostream& os, ServerModel::Federation* federation) const
+{
+  prettyprint(os, *this, federation);
+}
+
+void
+JoinFederationExecutionRequest2Message::dispatch(const AbstractMessageDispatcher& dispatcher) const
+{
+  dispatcher.accept(*this);
+}
+
+bool
+JoinFederationExecutionRequest2Message::operator==(const AbstractMessage& rhs) const noexcept
+{
+  const JoinFederationExecutionRequest2Message* message = dynamic_cast<const JoinFederationExecutionRequest2Message*>(&rhs);
+  if (!message)
+    return false;
+  return operator==(*message);
+}
+
+bool
+JoinFederationExecutionRequest2Message::operator==(const JoinFederationExecutionRequest2Message& rhs) const noexcept
+{
+  if (getFederationExecution() != rhs.getFederationExecution()) return false;
+  if (getFederateType() != rhs.getFederateType()) return false;
+  if (getFederateName() != rhs.getFederateName()) return false;
+  if (getFOMStringModuleList() != rhs.getFOMStringModuleList()) return false;
+  if (getConfigurationParameterMap() != rhs.getConfigurationParameterMap()) return false;
+  if (getIsInternal() != rhs.getIsInternal()) return false;
+  return true;
+}
+
+bool
+JoinFederationExecutionRequest2Message::operator<(const JoinFederationExecutionRequest2Message& rhs) const noexcept
 {
   if (getFederationExecution() < rhs.getFederationExecution()) return true;
   if (rhs.getFederationExecution() < getFederationExecution()) return false;
@@ -6490,7 +6717,7 @@ inline std::string to_string(const RegisterFederationSynchronizationPointRespons
   }
 }
 
-// <__main__.MapDataType object at 0x0000023A3B81FEF0>
+// <__main__.MapDataType object at 0x000001F4CDF6CB38>
 std::ostream&
 operator<<(std::ostream& os, const ConfigurationParameterMap& value)
 {
@@ -6807,6 +7034,68 @@ prettyprint(std::ostream& os, const FOMStringArrayDataTypeList& value)
   return os;
 }
 
+// StructDataType FOMStringArrayDataType2
+std::ostream&
+operator<<(std::ostream& os, const FOMStringArrayDataType2& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "cardinality: " << value.getCardinality();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringArrayDataType2& value)
+{
+  os << "FOMStringArrayDataType2 { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "cardinality: "<< value.getCardinality();
+  os << ", ";
+  os << "encoding: "<< value.getEncoding();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringArrayDataType2List
+std::ostream&
+operator<<(std::ostream& os, const FOMStringArrayDataType2List& value)
+{
+  os << "{ ";
+  FOMStringArrayDataType2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringArrayDataType2List& value)
+{
+  os << "{ ";
+  FOMStringArrayDataType2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
 // StructDataType FOMStringFixedRecordField
 std::ostream&
 operator<<(std::ostream& os, const FOMStringFixedRecordField& value)
@@ -6815,8 +7104,6 @@ operator<<(std::ostream& os, const FOMStringFixedRecordField& value)
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
-  os << ", ";
-  os << "version: " << value.getVersion();
   os << " }";
   return os;
 }
@@ -6828,8 +7115,6 @@ prettyprint(std::ostream& os, const FOMStringFixedRecordField& value)
   os << "name: "<< value.getName();
   os << ", ";
   os << "dataType: "<< value.getDataType();
-  os << ", ";
-  os << "version: "<< value.getVersion();
   os << " }";
   return os;
 }
@@ -6874,10 +7159,6 @@ operator<<(std::ostream& os, const FOMStringFixedRecordDataType& value)
   os << ", ";
   os << "encoding: " << value.getEncoding();
   os << ", ";
-  os << "include: " << value.getInclude();
-  os << ", ";
-  os << "version: " << value.getVersion();
-  os << ", ";
   os << "fields: " << value.getFields();
   os << " }";
   return os;
@@ -6890,10 +7171,6 @@ prettyprint(std::ostream& os, const FOMStringFixedRecordDataType& value)
   os << "name: "<< value.getName();
   os << ", ";
   os << "encoding: "<< value.getEncoding();
-  os << ", ";
-  os << "include: "<< value.getInclude();
-  os << ", ";
-  os << "version: "<< value.getVersion();
   os << ", ";
   os << "fields: "<< value.getFields();
   os << " }";
@@ -6921,6 +7198,130 @@ prettyprint(std::ostream& os, const FOMStringFixedRecordDataTypeList& value)
 {
   os << "{ ";
   FOMStringFixedRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringFixedRecordField2
+std::ostream&
+operator<<(std::ostream& os, const FOMStringFixedRecordField2& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "version: " << value.getVersion();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringFixedRecordField2& value)
+{
+  os << "FOMStringFixedRecordField2 { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "version: "<< value.getVersion();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringFixedRecordField2List
+std::ostream&
+operator<<(std::ostream& os, const FOMStringFixedRecordField2List& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordField2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringFixedRecordField2List& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordField2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringFixedRecordDataType2
+std::ostream&
+operator<<(std::ostream& os, const FOMStringFixedRecordDataType2& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << ", ";
+  os << "include: " << value.getInclude();
+  os << ", ";
+  os << "version: " << value.getVersion();
+  os << ", ";
+  os << "fields: " << value.getFields();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringFixedRecordDataType2& value)
+{
+  os << "FOMStringFixedRecordDataType2 { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "encoding: "<< value.getEncoding();
+  os << ", ";
+  os << "include: "<< value.getInclude();
+  os << ", ";
+  os << "version: "<< value.getVersion();
+  os << ", ";
+  os << "fields: "<< value.getFields();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringFixedRecordDataType2List
+std::ostream&
+operator<<(std::ostream& os, const FOMStringFixedRecordDataType2List& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordDataType2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringFixedRecordDataType2List& value)
+{
+  os << "{ ";
+  FOMStringFixedRecordDataType2List::const_iterator i = value.begin();
   if (i != value.end()) {
     os << *i;
     while (++i != value.end()) {
@@ -7045,6 +7446,130 @@ prettyprint(std::ostream& os, const FOMStringVariantRecordDataTypeList& value)
 {
   os << "{ ";
   FOMStringVariantRecordDataTypeList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringVariantRecordAlternative2
+std::ostream&
+operator<<(std::ostream& os, const FOMStringVariantRecordAlternative2& value)
+{
+  os << "{ ";
+  os << "enumerator: " << value.getEnumerator();
+  os << ", ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative2& value)
+{
+  os << "FOMStringVariantRecordAlternative2 { ";
+  os << "enumerator: "<< value.getEnumerator();
+  os << ", ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringVariantRecordAlternative2List
+std::ostream&
+operator<<(std::ostream& os, const FOMStringVariantRecordAlternative2List& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordAlternative2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative2List& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordAlternative2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringVariantRecordDataType2
+std::ostream&
+operator<<(std::ostream& os, const FOMStringVariantRecordDataType2& value)
+{
+  os << "{ ";
+  os << "name: " << value.getName();
+  os << ", ";
+  os << "discriminant: " << value.getDiscriminant();
+  os << ", ";
+  os << "dataType: " << value.getDataType();
+  os << ", ";
+  os << "alternatives: " << value.getAlternatives();
+  os << ", ";
+  os << "encoding: " << value.getEncoding();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringVariantRecordDataType2& value)
+{
+  os << "FOMStringVariantRecordDataType2 { ";
+  os << "name: "<< value.getName();
+  os << ", ";
+  os << "discriminant: "<< value.getDiscriminant();
+  os << ", ";
+  os << "dataType: "<< value.getDataType();
+  os << ", ";
+  os << "alternatives: "<< value.getAlternatives();
+  os << ", ";
+  os << "encoding: "<< value.getEncoding();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringVariantRecordDataType2List
+std::ostream&
+operator<<(std::ostream& os, const FOMStringVariantRecordDataType2List& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordDataType2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringVariantRecordDataType2List& value)
+{
+  os << "{ ";
+  FOMStringVariantRecordDataType2List::const_iterator i = value.begin();
   if (i != value.end()) {
     os << *i;
     while (++i != value.end()) {
@@ -7590,8 +8115,6 @@ operator<<(std::ostream& os, const FOMStringModule& value)
   os << ", ";
   os << "switchList: " << value.getSwitchList();
   os << ", ";
-  os << "basicDataTypeList: " << value.getBasicDataTypeList();
-  os << ", ";
   os << "simpleDataTypeList: " << value.getSimpleDataTypeList();
   os << ", ";
   os << "enumeratedDataTypeList: " << value.getEnumeratedDataTypeList();
@@ -7628,8 +8151,6 @@ prettyprint(std::ostream& os, const FOMStringModule& value)
   os << "updateRateList: "<< value.getUpdateRateList();
   os << ", ";
   os << "switchList: "<< value.getSwitchList();
-  os << ", ";
-  os << "basicDataTypeList: "<< value.getBasicDataTypeList();
   os << ", ";
   os << "simpleDataTypeList: "<< value.getSimpleDataTypeList();
   os << ", ";
@@ -7669,6 +8190,116 @@ prettyprint(std::ostream& os, const FOMStringModuleList& value)
 {
   os << "{ ";
   FOMStringModuleList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMStringModule2
+std::ostream&
+operator<<(std::ostream& os, const FOMStringModule2& value)
+{
+  os << "{ ";
+  os << "designator: " << value.getDesignator();
+  os << ", ";
+  os << "transportationTypeList: " << value.getTransportationTypeList();
+  os << ", ";
+  os << "dimensionList: " << value.getDimensionList();
+  os << ", ";
+  os << "routingSpaceList: " << value.getRoutingSpaceList();
+  os << ", ";
+  os << "interactionClassList: " << value.getInteractionClassList();
+  os << ", ";
+  os << "objectClassList: " << value.getObjectClassList();
+  os << ", ";
+  os << "updateRateList: " << value.getUpdateRateList();
+  os << ", ";
+  os << "switchList: " << value.getSwitchList();
+  os << ", ";
+  os << "basicDataTypeList: " << value.getBasicDataTypeList();
+  os << ", ";
+  os << "simpleDataTypeList: " << value.getSimpleDataTypeList();
+  os << ", ";
+  os << "enumeratedDataTypeList: " << value.getEnumeratedDataTypeList();
+  os << ", ";
+  os << "arrayDataTypeList: " << value.getArrayDataTypeList();
+  os << ", ";
+  os << "fixedRecordDataTypeList: " << value.getFixedRecordDataTypeList();
+  os << ", ";
+  os << "variantRecordDataTypeList: " << value.getVariantRecordDataTypeList();
+  os << ", ";
+  os << "artificialInteractionRoot: " << value.getArtificialInteractionRoot();
+  os << ", ";
+  os << "artificialObjectRoot: " << value.getArtificialObjectRoot();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringModule2& value)
+{
+  os << "FOMStringModule2 { ";
+  os << "designator: "<< value.getDesignator();
+  os << ", ";
+  os << "transportationTypeList: "<< value.getTransportationTypeList();
+  os << ", ";
+  os << "dimensionList: "<< value.getDimensionList();
+  os << ", ";
+  os << "routingSpaceList: "<< value.getRoutingSpaceList();
+  os << ", ";
+  os << "interactionClassList: "<< value.getInteractionClassList();
+  os << ", ";
+  os << "objectClassList: "<< value.getObjectClassList();
+  os << ", ";
+  os << "updateRateList: "<< value.getUpdateRateList();
+  os << ", ";
+  os << "switchList: "<< value.getSwitchList();
+  os << ", ";
+  os << "basicDataTypeList: "<< value.getBasicDataTypeList();
+  os << ", ";
+  os << "simpleDataTypeList: "<< value.getSimpleDataTypeList();
+  os << ", ";
+  os << "enumeratedDataTypeList: "<< value.getEnumeratedDataTypeList();
+  os << ", ";
+  os << "arrayDataTypeList: "<< value.getArrayDataTypeList();
+  os << ", ";
+  os << "fixedRecordDataTypeList: "<< value.getFixedRecordDataTypeList();
+  os << ", ";
+  os << "variantRecordDataTypeList: "<< value.getVariantRecordDataTypeList();
+  os << ", ";
+  os << "artificialInteractionRoot: "<< value.getArtificialInteractionRoot();
+  os << ", ";
+  os << "artificialObjectRoot: "<< value.getArtificialObjectRoot();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMStringModule2List
+std::ostream&
+operator<<(std::ostream& os, const FOMStringModule2List& value)
+{
+  os << "{ ";
+  FOMStringModule2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMStringModule2List& value)
+{
+  os << "{ ";
+  FOMStringModule2List::const_iterator i = value.begin();
   if (i != value.end()) {
     os << *i;
     while (++i != value.end()) {
@@ -8804,18 +9435,6 @@ operator<<(std::ostream& os, const FOMModule& value)
   os << ", ";
   os << "switchList: " << value.getSwitchList();
   os << ", ";
-  os << "basicDataTypeList: " << value.getBasicDataTypeList();
-  os << ", ";
-  os << "simpleDataTypeList: " << value.getSimpleDataTypeList();
-  os << ", ";
-  os << "enumeratedDataTypeList: " << value.getEnumeratedDataTypeList();
-  os << ", ";
-  os << "arrayDataTypeList: " << value.getArrayDataTypeList();
-  os << ", ";
-  os << "fixedRecordDataTypeList: " << value.getFixedRecordDataTypeList();
-  os << ", ";
-  os << "variantRecordDataTypeList: " << value.getVariantRecordDataTypeList();
-  os << ", ";
   os << "artificialInteractionRoot: " << value.getArtificialInteractionRoot();
   os << ", ";
   os << "artificialObjectRoot: " << value.getArtificialObjectRoot();
@@ -8844,18 +9463,6 @@ prettyprint(std::ostream& os, const FOMModule& value)
   os << "updateRateList: "<< value.getUpdateRateList();
   os << ", ";
   os << "switchList: "<< value.getSwitchList();
-  os << ", ";
-  os << "basicDataTypeList: "<< value.getBasicDataTypeList();
-  os << ", ";
-  os << "simpleDataTypeList: "<< value.getSimpleDataTypeList();
-  os << ", ";
-  os << "enumeratedDataTypeList: "<< value.getEnumeratedDataTypeList();
-  os << ", ";
-  os << "arrayDataTypeList: "<< value.getArrayDataTypeList();
-  os << ", ";
-  os << "fixedRecordDataTypeList: "<< value.getFixedRecordDataTypeList();
-  os << ", ";
-  os << "variantRecordDataTypeList: "<< value.getVariantRecordDataTypeList();
   os << ", ";
   os << "artificialInteractionRoot: "<< value.getArtificialInteractionRoot();
   os << ", ";
@@ -8887,6 +9494,76 @@ prettyprint(std::ostream& os, const FOMModuleList& value)
 {
   os << "{ ";
   FOMModuleList::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+// StructDataType FOMModule2
+std::ostream&
+operator<<(std::ostream& os, const FOMModule2& value)
+{
+  os << "{ ";
+  os << "basicDataTypeList: " << value.getBasicDataTypeList();
+  os << ", ";
+  os << "simpleDataTypeList: " << value.getSimpleDataTypeList();
+  os << ", ";
+  os << "enumeratedDataTypeList: " << value.getEnumeratedDataTypeList();
+  os << ", ";
+  os << "arrayDataTypeList: " << value.getArrayDataTypeList();
+  os << ", ";
+  os << "fixedRecordDataTypeList: " << value.getFixedRecordDataTypeList();
+  os << ", ";
+  os << "variantRecordDataTypeList: " << value.getVariantRecordDataTypeList();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMModule2& value)
+{
+  os << "FOMModule2 { ";
+  os << "basicDataTypeList: "<< value.getBasicDataTypeList();
+  os << ", ";
+  os << "simpleDataTypeList: "<< value.getSimpleDataTypeList();
+  os << ", ";
+  os << "enumeratedDataTypeList: "<< value.getEnumeratedDataTypeList();
+  os << ", ";
+  os << "arrayDataTypeList: "<< value.getArrayDataTypeList();
+  os << ", ";
+  os << "fixedRecordDataTypeList: "<< value.getFixedRecordDataTypeList();
+  os << ", ";
+  os << "variantRecordDataTypeList: "<< value.getVariantRecordDataTypeList();
+  os << " }";
+  return os;
+}
+
+// VectorDataType FOMModule2List
+std::ostream&
+operator<<(std::ostream& os, const FOMModule2List& value)
+{
+  os << "{ ";
+  FOMModule2List::const_iterator i = value.begin();
+  if (i != value.end()) {
+    os << *i;
+    while (++i != value.end()) {
+      os << ", " << *i;
+    }
+  }
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const FOMModule2List& value)
+{
+  os << "{ ";
+  FOMModule2List::const_iterator i = value.begin();
   if (i != value.end()) {
     os << *i;
     while (++i != value.end()) {
@@ -8934,6 +9611,33 @@ std::ostream&
 prettyprint(std::ostream& os, const CreateFederationExecutionRequestMessage& value, ServerModel::Federation* federation)
 {
   os << "CreateFederationExecutionRequestMessage { ";
+  os << "federationExecution: "<< value.getFederationExecution();
+  os << ", ";
+  os << "logicalTimeFactoryName: "<< value.getLogicalTimeFactoryName();
+  os << ", ";
+  os << "fOMStringModuleList: "<< value.getFOMStringModuleList();
+  os << " }";
+  return os;
+}
+
+// MessageDataType CreateFederationExecutionRequest2Message
+std::ostream&
+operator<<(std::ostream& os, const CreateFederationExecutionRequest2Message& value)
+{
+  os << "{ ";
+  os << "federationExecution: " << value.getFederationExecution();
+  os << ", ";
+  os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
+  os << ", ";
+  os << "fOMStringModuleList: " << value.getFOMStringModuleList();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const CreateFederationExecutionRequest2Message& value, ServerModel::Federation* federation)
+{
+  os << "CreateFederationExecutionRequest2Message { ";
   os << "federationExecution: "<< value.getFederationExecution();
   os << ", ";
   os << "logicalTimeFactoryName: "<< value.getLogicalTimeFactoryName();
@@ -9152,6 +9856,30 @@ prettyprint(std::ostream& os, const InsertModulesMessage& value, ServerModel::Fe
   return os;
 }
 
+// MessageDataType InsertModules2Message
+std::ostream&
+operator<<(std::ostream& os, const InsertModules2Message& value)
+{
+  os << "{ ";
+  // StructField federationHandle (hidden)
+  //os << "federationHandle: " << value.getFederationHandle();
+  //os << ", ";
+  // StructField fOMModule2List (hidden)
+  //os << "fOMModule2List: " << value.getFOMModule2List();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const InsertModules2Message& value, ServerModel::Federation* federation)
+{
+  os << "InsertModules2Message { ";
+  // StructField federationHandle (hidden)
+  // StructField fOMModule2List (hidden)
+  os << " }";
+  return os;
+}
+
 // MessageDataType JoinFederationExecutionRequestMessage
 std::ostream&
 operator<<(std::ostream& os, const JoinFederationExecutionRequestMessage& value)
@@ -9176,6 +9904,45 @@ std::ostream&
 prettyprint(std::ostream& os, const JoinFederationExecutionRequestMessage& value, ServerModel::Federation* federation)
 {
   os << "JoinFederationExecutionRequestMessage { ";
+  os << "federationExecution: "<< value.getFederationExecution();
+  os << ", ";
+  os << "federateType: "<< value.getFederateType();
+  os << ", ";
+  os << "federateName: "<< value.getFederateName();
+  os << ", ";
+  os << "fOMStringModuleList: "<< value.getFOMStringModuleList();
+  os << ", ";
+  os << "configurationParameterMap: "<< value.getConfigurationParameterMap();
+  os << ", ";
+  os << "isInternal: "<< value.getIsInternal();
+  os << " }";
+  return os;
+}
+
+// MessageDataType JoinFederationExecutionRequest2Message
+std::ostream&
+operator<<(std::ostream& os, const JoinFederationExecutionRequest2Message& value)
+{
+  os << "{ ";
+  os << "federationExecution: " << value.getFederationExecution();
+  os << ", ";
+  os << "federateType: " << value.getFederateType();
+  os << ", ";
+  os << "federateName: " << value.getFederateName();
+  os << ", ";
+  os << "fOMStringModuleList: " << value.getFOMStringModuleList();
+  os << ", ";
+  os << "configurationParameterMap: " << value.getConfigurationParameterMap();
+  os << ", ";
+  os << "isInternal: " << value.getIsInternal();
+  os << " }";
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const JoinFederationExecutionRequest2Message& value, ServerModel::Federation* federation)
+{
+  os << "JoinFederationExecutionRequest2Message { ";
   os << "federationExecution: "<< value.getFederationExecution();
   os << ", ";
   os << "federateType: "<< value.getFederateType();

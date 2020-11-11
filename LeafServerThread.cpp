@@ -118,7 +118,7 @@ LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& 
     _urlServerMap.erase(i);
     return SharedPtr<AbstractConnect>();
   }
-
+  server->getServerNode();
   i->second = new LeafServerThread(server);
   i->second->_iterator = i;
   i->second->start();
@@ -145,6 +145,7 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
     server->setServerName("Leaf server");
     Clock abstime = (timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
     server->connectParentServer(url, abstime);
+    DebugPrintf("parent protocol version=%d\n", server->getProtocolVersion());
 
     return server;
   } else if (url.getProtocol() == "thread") {
@@ -164,7 +165,6 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
         server->connectParentServer(URL::fromUrl(stringPair.second), abstime);
       }
     }
-
     return server;
   } else {
     return SharedPtr<AbstractServer>();

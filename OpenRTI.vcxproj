@@ -184,6 +184,7 @@
     <ClCompile Include="StringUtils.cpp" />
     <ClCompile Include="TightBE1MessageEncoding.cpp" />
     <ClCompile Include="ThreadServer.cpp" />
+    <ClCompile Include="TranslateTypes.cpp" />
     <ClCompile Include="URL.cpp" />
     <ClCompile Include="VariableLengthDataTuple.cpp" />
     <ClCompile Include="WeakReferenced.cpp" />
@@ -249,6 +250,7 @@
     <ClInclude Include="mom\MomManager.h" />
     <ClInclude Include="mom\MomTypes.h" />
     <ClInclude Include="OpenRTIVersion.h" />
+    <ClInclude Include="TranslateTypes.h" />
     <ClInclude Include="VariableLengthDataTuple.h" />
     <ClInclude Include="win32\PerformanceCounterStopWatch.h" />
     <ClInclude Include="xml\ascii.h" />

@@ -71,6 +71,7 @@ private:
       _messageQueue->close();
       _messageQueue = 0;
     }
+    AbstractServer* getServer() const override { return nullptr; }
   private:
     SharedPtr<AbstractMessageQueue> _messageQueue;
   };

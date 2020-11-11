@@ -1315,7 +1315,7 @@ public:
   { _fixedRecordDataTypeModuleList.push_back(module); }
   void writeCurrentFDD(std::ostream& out, unsigned int level) const;
 
-  void addField(const std::string name, const std::string& dataType, uint32_t version)
+  void addField(const std::string name, const std::string& dataType, uint32_t version=0)
   {
     _fields.push_back(FixedRecordField(name, dataType, version));
   }
@@ -2355,8 +2355,11 @@ public:
   bool insertOrCheck(Module& module, const FOMStringSimpleDataType& stringDataType);
   bool insertOrCheck(Module& module, const FOMStringEnumeratedDataType& stringDataType);
   bool insertOrCheck(Module& module, const FOMStringArrayDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringArrayDataType2& stringDataType);
   bool insertOrCheck(Module& module, const FOMStringFixedRecordDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringFixedRecordDataType2& stringDataType);
   bool insertOrCheck(Module& module, const FOMStringVariantRecordDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringVariantRecordDataType2& stringDataType);
 
   bool insertOrCheck(Module& module, const FOMStringInteractionClass& stringInteractionClass);
   bool insertOrCheck(Module& module, const FOMStringObjectClass& stringObjectClass);
@@ -2364,7 +2367,12 @@ public:
   /// This is for inserting the initial object model
   ModuleHandle insert(const FOMStringModule& stringModule);
   void insert(const FOMStringModuleList& stringModuleList);
+
+  ModuleHandle insert(const FOMStringModule2& stringModule);
+  void insert(const FOMStringModule2List& stringModuleList);
+
   void insert(ModuleHandleVector& moduleHandleVector, const FOMStringModuleList& stringModuleList);
+  void insert(ModuleHandleVector& moduleHandleVector, const FOMStringModule2List& stringModuleList);
 
   /// Either insert a new entity or creates a new one.
   /// Throws a message error if an existing one does not match the provided.
@@ -2382,6 +2390,8 @@ public:
 
   void insert(const FOMModule& fomModule);
   void insert(const FOMModuleList& fomModuleList);
+  void insert(const FOMModule2& fomModule);
+  void insert(const FOMModule2List& fomModuleList);
   void erase(const ModuleHandle& moduleHandle);
   void erase(Module& module);
 
@@ -2590,6 +2600,7 @@ public:
   const StringStringListMap& getOptions() const;
   void setOptions(const StringStringListMap& options);
 
+  uint32_t getVersion() const { return _version; }
   /// The federations using this connect
   FederationConnect::FirstList& getFederationConnectList()
   { return _federationConnectList; }
@@ -2608,7 +2619,7 @@ private:
   bool _isParentConnect;
 
   std::string _name;
-
+  uint32_t _version;
   SharedPtr<AbstractMessageSender> _messageSender;
 
   StringStringListMap _options;
@@ -2632,6 +2643,7 @@ public:
   const ConnectHandle& getParentConnectHandle() const
   { return _parentConnectHandle; }
 
+  const NodeConnect* getNodeConnect(const ConnectHandle& connectHandle) const;
   NodeConnect* getNodeConnect(const ConnectHandle& connectHandle);
   NodeConnect* insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options);
   NodeConnect* insertParentNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options);

@@ -22,6 +22,7 @@
 
 #include "ScopeLock.h"
 #include "ScopeUnlock.h"
+#include "MessageEncodingRegistry.h"
 
 namespace OpenRTI {
 
@@ -62,6 +63,12 @@ ThreadServer::exec()
   }
 
   return EXIT_SUCCESS;
+}
+
+
+uint32_t ThreadServer::getProtocolVersion() const
+{
+  return OPENRTI_ENCODING_VERSION;
 }
 
 void

@@ -31,6 +31,7 @@
 #include "dprintf.h"
 #include "AbstractServer.h"
 #include "ThreadLocal.h"
+#include "NetworkServer.h"
 
 namespace OpenRTI {
 
@@ -180,6 +181,15 @@ InternalAmbassador::acceptInternalMessage(const InsertModulesMessage& message)
   if (!federate)
     return;
   federate->insertFOMModuleList(message.getFOMModuleList());
+}
+
+void
+InternalAmbassador::acceptInternalMessage(const InsertModules2Message& message)
+{
+  Federate* federate = getFederate();
+  if (!federate)
+    return;
+  federate->insertFOMModule2List(message.getFOMModule2List());
 }
 
 void
@@ -735,6 +745,13 @@ InternalAmbassador::_callbackMessageAvailable()
   if (timeManagement && timeManagement->callbackMessageAvailable())
     return true;
   return false;
+}
+
+
+uint32_t InternalAmbassador::getProtocolVersion() const
+{
+  AbstractServer* server = _connect->getMessageSender()->getServer();
+  return server->getProtocolVersion();
 }
 
 void InternalAmbassador::_setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h)

@@ -1312,6 +1312,13 @@ Federate::insertFOMModuleList(const FOMModuleList& moduleList)
     insertFOMModule(fomModule);
 }
 
+void
+Federate::insertFOMModule2List(const FOMModule2List& moduleList)
+{
+  for (auto& fomModule : moduleList)
+    insertFOMModule(fomModule);
+}
+
 
 void Federate::getFOMModule(FOMModule& module)
 {

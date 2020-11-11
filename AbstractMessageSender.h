@@ -26,7 +26,7 @@
 namespace OpenRTI {
 
 class AbstractMessage;
-
+class AbstractServer;
 class OPENRTI_API AbstractMessageSender : public Referenced {
 public:
   AbstractMessageSender() noexcept;
@@ -35,6 +35,7 @@ public:
   virtual void send(const SharedPtr<const AbstractMessage>& message) = 0;
   virtual void close() noexcept = 0;
   // virtual bool isOpen() const = 0;
+  virtual AbstractServer* getServer() const = 0;
 };
 
 } // namespace OpenRTI

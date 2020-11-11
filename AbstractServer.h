@@ -44,6 +44,7 @@ public:
   AbstractServerNode& getServerNode();
 
   virtual int exec() = 0;
+  virtual uint32_t getProtocolVersion() const = 0;
 
   /// Supposed to be called from the current thread
   void setDone(bool done)

@@ -275,30 +275,50 @@
     <field name="Name" type="String"/>
     <field name="DataType" type="String"/>
     <field name="Cardinality" type="String"/>
-    <field name="Encoding" type="ArrayDataTypeEncoding"/>
+    <field name="Encoding" type="String"/>
   </type>
   <type name="FOMStringArrayDataTypeList" type="vector" scalar="FOMStringArrayDataType"/>
+  <type name="FOMStringArrayDataType2" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Cardinality" type="String"/>
+    <field name="Encoding" type="ArrayDataTypeEncoding"/>
+  </type>
+  <type name="FOMStringArrayDataType2List" type="vector" scalar="FOMStringArrayDataType2"/>
 
   <type name="FOMStringFixedRecordField" type="struct" copyOnWrite="true">
     <field name="Name" type="String"/>
-    <field name="DataType" type="String"/>
-    <field name="Version" type="Unsigned"/>
+    <field name="DataType" type="Unsigned"/>
   </type>
   <type name="FOMStringFixedRecordFieldList" type="vector" scalar="FOMStringFixedRecordField"/>
 
   <type name="FOMStringFixedRecordDataType" type="struct" copyOnWrite="true">
     <field name="Name" type="String"/>
     <field name="Encoding" type="String"/>
-    <field name="Include" type="String"/>
-    <field name="Version" type="Unsigned"/>
     <field name="Fields" type="FOMStringFixedRecordFieldList"/>
   </type>
   <type name="FOMStringFixedRecordDataTypeList" type="vector" scalar="FOMStringFixedRecordDataType"/>
 
+  <type name="FOMStringFixedRecordField2" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Version" type="Unsigned"/>
+  </type>
+  <type name="FOMStringFixedRecordField2List" type="vector" scalar="FOMStringFixedRecordField2"/>
+
+  <type name="FOMStringFixedRecordDataType2" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Encoding" type="String"/>
+    <field name="Include" type="String"/>
+    <field name="Version" type="Unsigned"/>
+    <field name="Fields" type="FOMStringFixedRecordField2List"/>
+  </type>
+  <type name="FOMStringFixedRecordDataType2List" type="vector" scalar="FOMStringFixedRecordDataType2"/>
+
   <type name="FOMStringVariantRecordAlternative" type="struct" copyOnWrite="true">
     <field name="Enumerator" type="String"/>
     <field name="Name" type="String"/>
-    <field name="DataType" type="String"/>
+    <field name="DataType" type="Unsigned"/>
   </type>
   <type name="FOMStringVariantRecordAlternativeList" type="vector" scalar="FOMStringVariantRecordAlternative"/>
 
@@ -311,6 +331,20 @@
   </type>
   <type name="FOMStringVariantRecordDataTypeList" type="vector" scalar="FOMStringVariantRecordDataType"/>
 
+  <type name="FOMStringVariantRecordAlternative2" type="struct" copyOnWrite="true">
+    <field name="Enumerator" type="String"/>
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+  </type>
+  <type name="FOMStringVariantRecordAlternative2List" type="vector" scalar="FOMStringVariantRecordAlternative2"/>
+  <type name="FOMStringVariantRecordDataType2" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Discriminant" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Alternatives" type="FOMStringVariantRecordAlternative2List"/>
+    <field name="Encoding" type="String"/>
+  </type>
+  <type name="FOMStringVariantRecordDataType2List" type="vector" scalar="FOMStringVariantRecordDataType2"/>
   <!-- Data Types to send an already parsed/read fom module to the root server for
        validation and handle allocation. -->
   <type name="FOMStringTransportationType" type="struct" copyOnWrite="true">
@@ -384,7 +418,6 @@
     <field name="ObjectClassList" type="FOMStringObjectClassList"/>
     <field name="UpdateRateList" type="FOMStringUpdateRateList"/>
     <field name="SwitchList" type="FOMStringSwitchList"/>
-    <field name="BasicDataTypeList" type="FOMStringBasicDataTypeList"/>
     <field name="SimpleDataTypeList" type="FOMStringSimpleDataTypeList"/>
     <field name="EnumeratedDataTypeList" type="FOMStringEnumeratedDataTypeList"/>
     <field name="ArrayDataTypeList" type="FOMStringArrayDataTypeList"/>
@@ -395,6 +428,26 @@
   </type>
   <type name="FOMStringModuleList" type="vector" scalar="FOMStringModule"/>
 
+  <type name="FOMStringModule2" type="struct" copyOnWrite="true">
+    <field name="Designator" type="String"/>
+    <!--<field name="Content" type="String"/>-->
+    <field name="TransportationTypeList" type="FOMStringTransportationTypeList"/>
+    <field name="DimensionList" type="FOMStringDimensionList"/>
+    <field name="RoutingSpaceList" type="FOMStringRoutingSpaceList"/>
+    <field name="InteractionClassList" type="FOMStringInteractionClassList"/>
+    <field name="ObjectClassList" type="FOMStringObjectClassList"/>
+    <field name="UpdateRateList" type="FOMStringUpdateRateList"/>
+    <field name="SwitchList" type="FOMStringSwitchList"/>
+    <field name="BasicDataTypeList" type="FOMStringBasicDataTypeList"/>
+    <field name="SimpleDataTypeList" type="FOMStringSimpleDataTypeList"/>
+    <field name="EnumeratedDataTypeList" type="FOMStringEnumeratedDataTypeList"/>
+    <field name="ArrayDataTypeList" type="FOMStringArrayDataType2List"/>
+    <field name="FixedRecordDataTypeList" type="FOMStringFixedRecordDataType2List"/>
+    <field name="VariantRecordDataTypeList" type="FOMStringVariantRecordDataType2List"/>
+    <field name="ArtificialInteractionRoot" type="Bool"/>
+    <field name="ArtificialObjectRoot" type="Bool"/>
+  </type>
+  <type name="FOMStringModule2List" type="vector" scalar="FOMStringModule2"/>
 
   <!-- Data types to send ready to use FOM modules. -->
   <type name="FOMTransportationType" type="struct" copyOnWrite="true">
@@ -547,12 +600,6 @@
     <field name="ObjectClassList" type="FOMObjectClassList"/>
     <field name="UpdateRateList" type="FOMUpdateRateList"/>
     <field name="SwitchList" type="FOMSwitchList"/>
-    <field name="BasicDataTypeList" type="FOMBasicDataTypeList"/>
-    <field name="SimpleDataTypeList" type="FOMSimpleDataTypeList"/>
-    <field name="EnumeratedDataTypeList" type="FOMEnumeratedDataTypeList"/>
-    <field name="ArrayDataTypeList" type="FOMArrayDataTypeList"/>
-    <field name="FixedRecordDataTypeList" type="FOMFixedRecordDataTypeList"/>
-    <field name="VariantRecordDataTypeList" type="FOMVariantRecordDataTypeList"/>
     <field name="ArtificialInteractionRoot" type="Bool"/>
     <field name="ArtificialObjectRoot" type="Bool"/>
     <!--<field name="Content" type="String"/>-->
@@ -560,6 +607,15 @@
   </type>
   <type name="FOMModuleList" type="vector" scalar="FOMModule"/>
 
+  <type name="FOMModule2" type="struct" base="FOMModule" copyOnWrite="true">
+    <field name="BasicDataTypeList" type="FOMBasicDataTypeList"/>
+    <field name="SimpleDataTypeList" type="FOMSimpleDataTypeList"/>
+    <field name="EnumeratedDataTypeList" type="FOMEnumeratedDataTypeList"/>
+    <field name="ArrayDataTypeList" type="FOMArrayDataTypeList"/>
+    <field name="FixedRecordDataTypeList" type="FOMFixedRecordDataTypeList"/>
+    <field name="VariantRecordDataTypeList" type="FOMVariantRecordDataTypeList"/>
+  </type>
+  <type name="FOMModule2List" type="vector" scalar="FOMModule2"/>
 
   <!-- The messages -->
 
@@ -574,6 +630,12 @@
     <field name="LogicalTimeFactoryName" type="String"/>
     <!-- The already parsed list of FOM modules. -->
     <field name="FOMStringModuleList" type="FOMStringModuleList"/>
+  </message>
+  <message type="CreateFederationExecutionRequest2">
+    <field name="FederationExecution" type="String"/>
+    <field name="LogicalTimeFactoryName" type="String"/>
+    <!-- The already parsed list of FOM modules. -->
+    <field name="FOMStringModuleList" type="FOMStringModule2List"/>
   </message>
   <message type="CreateFederationExecutionResponse">
     <field name="CreateFederationExecutionResponseType" type="CreateFederationExecutionResponseType"/>
@@ -630,6 +692,11 @@
     <field name="FOMModuleList" type="FOMModuleList" hide="True"/>
   </message>
 
+  <message type="InsertModules2">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="FOMModule2List" type="FOMModule2List" hide="True"/>
+  </message>
+
   <!-- Join federation execution -->
   <message type="JoinFederationExecutionRequest">
     <field name="FederationExecution" type="String"/>
@@ -642,7 +709,19 @@
     <!-- Maximum backward compatible string based key value map describing the federate capabilites. -->
     <field name="ConfigurationParameterMap" type="ConfigurationParameterMap"/>
     <field name="IsInternal" type="Bool"/>
+  </message>
 
+  <message type="JoinFederationExecutionRequest2">
+    <field name="FederationExecution" type="String"/>
+    <!-- The new federates type -->
+    <field name="FederateType" type="String"/>
+    <!-- The new federates unique name -->
+    <field name="FederateName" type="String"/>
+    <!-- The set of additional FOM modules -->
+    <field name="FOMStringModuleList" type="FOMStringModule2List"/>
+    <!-- Maximum backward compatible string based key value map describing the federate capabilites. -->
+    <field name="ConfigurationParameterMap" type="ConfigurationParameterMap"/>
+    <field name="IsInternal" type="Bool"/>
   </message>
   <message type="JoinFederationExecutionResponse">
     <!-- The federation handle to identify packets -->

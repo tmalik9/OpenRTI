@@ -172,7 +172,7 @@ public:
     _modeStack.pop_back();
   }
 
-  const FOMStringModule& getFOMStringModule() const
+  const FOMStringModule2& getFOMStringModule() const
   { return _fomStringModuleBuilder.getFOMStringModule(); }
 
   std::string normalizeTransportationType(const std::string& name)
@@ -274,7 +274,7 @@ public:
   }
 };
 
-FOMStringModule
+FOMStringModule2
 FEDFileReader::read(std::istream& stream)
 {
   FEDContentHandler contentHandler;
