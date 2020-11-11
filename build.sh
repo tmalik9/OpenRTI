@@ -3,6 +3,8 @@
 BUILD_CONFIG=$1
 OPENRTI_VERSION=$2
 
+set -eu
+
 source /etc/os-release
 DISTRO="$ID"
 DISTRO_VERSION="${VERSION_ID/./}"
