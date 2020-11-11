@@ -26,11 +26,11 @@
 
 namespace OpenRTI {
 
-class FOMStringModule;
+class FOMStringModule2;
 
 class OPENRTI_API FDD1516FileReader {
 public:
-  static FOMStringModule read(std::istream& stream, const std::string& encoding);
+  static FOMStringModule2 read(std::istream& stream, const std::string& encoding);
 };
 
 } // namespace OpenRTI

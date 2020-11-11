@@ -522,7 +522,9 @@ public:
   /// On initialization we need to process object model data.
   /// We need only write access to this.
   void insertFOMModule(const FOMModule& module);
+  void insertFOMModule2(const FOMModule2& module);
   void insertFOMModuleList(const FOMModuleList& moduleList);
+  void insertFOMModule2List(const FOMModule2List& moduleList);
   void getFOMModule(FOMModule& module);
 private:
   Federate(const Federate&);

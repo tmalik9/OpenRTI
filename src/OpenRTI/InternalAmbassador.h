@@ -71,6 +71,7 @@ public:
   void acceptInternalMessage(const EraseFederationExecutionMessage& message);
   void acceptInternalMessage(const ReleaseFederationHandleMessage& message);
   void acceptInternalMessage(const InsertModulesMessage& message);
+  void acceptInternalMessage(const InsertModules2Message& message);
   virtual void acceptInternalMessage(const JoinFederationExecutionResponseMessage& message) = 0;
   void acceptInternalMessage(const JoinFederateNotifyMessage& message);
   void acceptInternalMessage(const ResignFederateNotifyMessage& message);
@@ -168,6 +169,7 @@ public:
   bool _dispatchCallbackMessage(AbstractMessageDispatcher& messageDispatcher);
   bool _callbackMessageAvailable();
 
+  uint32_t getProtocolVersion() const;
 protected:
   void _setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h);
   std::shared_ptr<AbstractNotificationHandle> _getNotificationHandle()

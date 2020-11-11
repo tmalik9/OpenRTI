@@ -28,6 +28,7 @@
 #include "mom/MomServer.h"
 #include "mom/MomFederateMetrics.h"
 #include "mom/AbstractFederateMetrics.h"
+#include "MessageEncodingRegistry.h"
 
 namespace OpenRTI {
 namespace ServerModel {
@@ -1487,6 +1488,8 @@ Module::getModule(FOMModule& module)
     fomUpdateRate.setUpdateRateHandle(updateRate.getUpdateRateHandle());
     fomUpdateRate.setRate(updateRate.getRate());
   }
+
+  /*
   module.getBasicDataTypeList().reserve(_basicDataTypeModuleList.size());
   for (auto& basicDataTypeModule : _basicDataTypeModuleList) {
     BasicDataType& basicDataType = basicDataTypeModule.getBasicDataType();
@@ -1495,7 +1498,7 @@ Module::getModule(FOMModule& module)
     fomBasicDataType.setName(basicDataType.getName());
     fomBasicDataType.setHandle(basicDataType.getHandle());
   }
-
+  */
   {
     module.getInteractionClassList().reserve(_interactionClassModuleList.size());
     ParameterDefinitionModule::FirstList::iterator j = _parameterDefinitionModuleList.begin();
@@ -2221,7 +2224,35 @@ bool Federation::insertOrCheck(Module& module, const FOMStringEnumeratedDataType
   }
 }
 
+static inline ArrayDataTypeEncoding convert(const std::string& s)
+{
+  if (s == "HLAvariableArray") 
+    return VariableArrayDataTypeEncoding;
+  else
+    return FixedArrayDataTypeEncoding;
+}
+
 bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType& stringDataType)
+{
+  ArrayDataType::NameMap::iterator i;
+  i = _arrayDataTypeNameArrayDataTypeMap.find(stringDataType.getName());
+  if (i != _arrayDataTypeNameArrayDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    ArrayDataType* arrayDataType = new ArrayDataType(*this);
+    arrayDataType->setName(stringDataType.getName());
+    arrayDataType->setEncoding(convert(stringDataType.getEncoding()));
+    arrayDataType->setDataType(stringDataType.getDataType());
+    arrayDataType->setCardinality(stringDataType.getCardinality());
+    arrayDataType->setHandle(_arrayDataTypeHandleAllocator.get());
+    insert(*arrayDataType);
+    module.insert(*arrayDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType2& stringDataType)
 {
   ArrayDataType::NameMap::iterator i;
   i = _arrayDataTypeNameArrayDataTypeMap.find(stringDataType.getName());
@@ -2253,6 +2284,28 @@ bool Federation::insertOrCheck(Module& module, const FOMStringFixedRecordDataTyp
     fixedRecordDataType->setName(stringDataType.getName());
     for (auto& field : stringDataType.getFields())
     {
+      fixedRecordDataType->addField(field.getName(), 0);
+    }
+    fixedRecordDataType->setEncoding(stringDataType.getEncoding());
+    fixedRecordDataType->setHandle(_fixedRecordDataTypeHandleAllocator.get());
+    insert(*fixedRecordDataType);
+    module.insert(*fixedRecordDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringFixedRecordDataType2& stringDataType)
+{
+  FixedRecordDataType::NameMap::iterator i;
+  i = _fixedRecordDataTypeNameFixedRecordDataTypeMap.find(stringDataType.getName());
+  if (i != _fixedRecordDataTypeNameFixedRecordDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    FixedRecordDataType* fixedRecordDataType = new FixedRecordDataType(*this);
+    fixedRecordDataType->setName(stringDataType.getName());
+    for (auto& field : stringDataType.getFields())
+    {
       fixedRecordDataType->addField(field.getName(), field.getDataType(), field.getVersion());
     }
     fixedRecordDataType->setEncoding(stringDataType.getEncoding());
@@ -2266,6 +2319,23 @@ bool Federation::insertOrCheck(Module& module, const FOMStringFixedRecordDataTyp
 }
 
 bool Federation::insertOrCheck(Module& module, const FOMStringVariantRecordDataType& stringDataType)
+{
+  VariantRecordDataType::NameMap::iterator i;
+  i = _variantRecordDataTypeNameVariantRecordDataTypeMap.find(stringDataType.getName());
+  if (i != _variantRecordDataTypeNameVariantRecordDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    VariantRecordDataType* variantRecordDataType = new VariantRecordDataType(*this);
+    variantRecordDataType->setName(stringDataType.getName());
+    variantRecordDataType->setHandle(_variantRecordDataTypeHandleAllocator.get());
+    insert(*variantRecordDataType);
+    module.insert(*variantRecordDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringVariantRecordDataType2& stringDataType)
 {
   VariantRecordDataType::NameMap::iterator i;
   i = _variantRecordDataTypeNameVariantRecordDataTypeMap.find(stringDataType.getName());
@@ -2550,10 +2620,12 @@ Federation::insert(const FOMStringModule& stringModule)
         created = true;
     }
 
+    /*
     for (auto& basicDataType : stringModule.getBasicDataTypeList()) {
       if (insertOrCheck(*module, basicDataType))
         created = true;
     }
+    */
     for (auto& simpleDataType : stringModule.getSimpleDataTypeList()) {
       if (insertOrCheck(*module, simpleDataType))
         created = true;
@@ -2605,8 +2677,110 @@ Federation::insert(ModuleHandleVector& moduleHandleVector, const FOMStringModule
 {
   moduleHandleVector.reserve(stringModuleList.size());
   try {
-    for (FOMStringModuleList::const_iterator i = stringModuleList.begin(); i != stringModuleList.end(); ++i) {
-      ModuleHandle moduleHandle = insert(*i);
+    for (auto& module : stringModuleList) {
+      ModuleHandle moduleHandle = insert(module);
+      if (moduleHandle.valid())
+        moduleHandleVector.push_back(moduleHandle);
+    }
+  } catch (...) {
+    for (ModuleHandleVector::iterator i = moduleHandleVector.begin(); i != moduleHandleVector.end(); ++i)
+      erase(*i);
+    moduleHandleVector.clear();
+    throw;
+  }
+}
+
+ModuleHandle
+Federation::insert(const FOMStringModule2& stringModule)
+{
+  Module* module = new Module(*this, stringModule.getDesignator());
+  module->setModuleHandle(_moduleHandleAllocator.get());
+  module->setArtificialInteractionRoot(stringModule.getArtificialInteractionRoot());
+  module->setArtificialObjectRoot(stringModule.getArtificialObjectRoot());
+  insert(*module);
+
+  bool created = false;
+  try {
+
+    for (auto& stringDimension : stringModule.getDimensionList()) {
+      if (insertOrCheck(*module, stringDimension))
+        created = true;
+    }
+
+    for (auto& stringUpdateRate : stringModule.getUpdateRateList()) {
+      if (insertOrCheck(*module, stringUpdateRate))
+        created = true;
+    }
+
+    for (auto& stringInteractionClassList : stringModule.getInteractionClassList()) {
+      if (insertOrCheck(*module, stringInteractionClassList))
+        created = true;
+    }
+
+    for (auto& stringObjectClass : stringModule.getObjectClassList()) {
+      if (insertOrCheck(*module, stringObjectClass))
+        created = true;
+    }
+
+    /*
+    for (auto& basicDataType : stringModule.getBasicDataTypeList()) {
+      if (insertOrCheck(*module, basicDataType))
+        created = true;
+    }
+    */
+    for (auto& simpleDataType : stringModule.getSimpleDataTypeList()) {
+      if (insertOrCheck(*module, simpleDataType))
+        created = true;
+    }
+
+    for (auto& enumeratedDataType : stringModule.getEnumeratedDataTypeList()) {
+      if (insertOrCheck(*module, enumeratedDataType))
+        created = true;
+    }
+
+    for (auto& arrayDataType : stringModule.getArrayDataTypeList()) {
+      if (insertOrCheck(*module, arrayDataType))
+        created = true;
+    }
+
+    for (auto& fixedRecordDataType : stringModule.getFixedRecordDataTypeList()) {
+      if (insertOrCheck(*module, fixedRecordDataType))
+        created = true;
+    }
+
+    for (auto& variantRecordDataType : stringModule.getVariantRecordDataTypeList()) {
+      if (insertOrCheck(*module, variantRecordDataType))
+        created = true;
+    }
+
+    if (!created) {
+      erase(*module);
+      return ModuleHandle();
+    }
+
+    return module->getModuleHandle();
+  } catch (...) {
+    erase(*module);
+    throw;
+  }
+
+  //UNREACHABLE: return ModuleHandle();
+}
+
+void
+Federation::insert(const FOMStringModule2List& stringModuleList)
+{
+  ModuleHandleVector moduleHandleVector;
+  insert(moduleHandleVector, stringModuleList);
+}
+
+void
+Federation::insert(ModuleHandleVector& moduleHandleVector, const FOMStringModule2List& stringModuleList)
+{
+  moduleHandleVector.reserve(stringModuleList.size());
+  try {
+    for (auto& module : stringModuleList) {
+      ModuleHandle moduleHandle = insert(module);
       if (moduleHandle.valid())
         moduleHandleVector.push_back(moduleHandle);
     }
@@ -2983,6 +3157,39 @@ Federation::insert(const FOMModule& fomModule)
     for (auto& transportationType : fomModule.getTransportationTypeList()) {
       insert(*module, transportationType);
     }
+  }
+}
+
+void
+Federation::insert(const FOMModule2& fomModule)
+{
+  Module::HandleMap::iterator i = _moduleHandleModuleMap.find(fomModule.getModuleHandle());
+  if (i == _moduleHandleModuleMap.end()) {
+    _moduleHandleAllocator.take(fomModule.getModuleHandle());
+    Module* module = new Module(*this, fomModule.getDesignator());
+    module->setModuleHandle(fomModule.getModuleHandle());
+    module->setArtificialInteractionRoot(fomModule.getArtificialInteractionRoot());
+    module->setArtificialObjectRoot(fomModule.getArtificialObjectRoot());
+    insert(*module);
+
+    for (auto& dimension : fomModule.getDimensionList()) {
+      insert(*module, dimension);
+    }
+
+    for (auto& updateRate : fomModule.getUpdateRateList()) {
+      insert(*module, updateRate);
+    }
+
+    for (auto& interactionClass : fomModule.getInteractionClassList()) {
+      insert(*module, interactionClass);
+    }
+
+    for (auto& objectClass : fomModule.getObjectClassList()) {
+      insert(*module, objectClass);
+    }
+    for (auto& transportationType : fomModule.getTransportationTypeList()) {
+      insert(*module, transportationType);
+    }
     for (auto& basicDataType : fomModule.getBasicDataTypeList()) {
       insert(*module, basicDataType);
     }
@@ -3007,8 +3214,16 @@ Federation::insert(const FOMModule& fomModule)
 void
 Federation::insert(const FOMModuleList& fomModuleList)
 {
-  for (FOMModuleList::const_iterator i = fomModuleList.begin(); i != fomModuleList.end(); ++i) {
-    insert(*i);
+  for (auto& module : fomModuleList) {
+    insert(module);
+  }
+}
+
+void
+Federation::insert(const FOMModule2List& fomModuleList)
+{
+  for (auto& module : fomModuleList) {
+    insert(module);
   }
 }
 
@@ -3714,8 +3929,9 @@ void Federation::objectInstanceUpdateSent(const ConnectHandle& connectHandle, Ob
 
 ////////////////////////////////////////////////////////////
 
-NodeConnect::NodeConnect() :
-  _isParentConnect(false)
+NodeConnect::NodeConnect()
+  : _isParentConnect(false)
+  , _version(OPENRTI_ENCODING_VERSION)
 {
 }
 
@@ -3773,6 +3989,15 @@ NodeConnect::setOptions(const StringStringListMap& options)
     _name = i->second.front();
   else
     _name.clear();
+  i = options.find("version");
+  if (i != options.end() && !i->second.empty())
+  {
+    const char* s = i->second.front().c_str();
+    _version = strtoul(s, nullptr, 10);
+    DebugPrintf("%s: client version=%d\n", __FUNCTION__, _version);
+  }
+  else
+    _name.clear();
 }
 
 void
@@ -3827,7 +4052,16 @@ Node::isIdle() const
 NodeConnect*
 Node::getNodeConnect(const ConnectHandle& connectHandle)
 {
-  NodeConnect::HandleMap::iterator i = _connectHandleNodeConnectMap.find(connectHandle);
+  auto i = _connectHandleNodeConnectMap.find(connectHandle);
+  if (i == _connectHandleNodeConnectMap.end())
+    return 0;
+  return i.get();
+}
+
+const NodeConnect*
+Node::getNodeConnect(const ConnectHandle& connectHandle) const
+{
+  auto i = _connectHandleNodeConnectMap.find(connectHandle);
   if (i == _connectHandleNodeConnectMap.end())
     return 0;
   return i.get();

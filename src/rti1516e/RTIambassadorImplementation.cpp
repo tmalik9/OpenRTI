@@ -75,10 +75,10 @@ static std::list<std::string> findHLAstandardMIMFileCandidates()
   return candidates;
 }
 
-static void loadModuleFromStream(OpenRTI::FOMStringModuleList& fomModuleList, std::istream& stream, const std::string& designator, const std::string& encoding)
+static void loadModuleFromStream(OpenRTI::FOMStringModule2List& fomModuleList, std::istream& stream, const std::string& designator, const std::string& encoding)
 {
   try {
-    FOMStringModule module = OpenRTI::FDD1516EFileReader::read(stream, encoding);
+    FOMStringModule2 module = OpenRTI::FDD1516EFileReader::read(stream, encoding);
     module.setDesignator(designator);
     fomModuleList.push_back(std::move(module));
   } catch (const OpenRTI::Exception& e) {
@@ -88,7 +88,7 @@ static void loadModuleFromStream(OpenRTI::FOMStringModuleList& fomModuleList, st
   }
 }
 
-static void loadHLAstandardMIM(OpenRTI::FOMStringModuleList& fomModuleList)
+static void loadHLAstandardMIM(OpenRTI::FOMStringModule2List& fomModuleList)
 {
   std::list<std::string> fileCandidates = findHLAstandardMIMFileCandidates();
   for (auto designator : fileCandidates) {
@@ -106,7 +106,7 @@ static void loadHLAstandardMIM(OpenRTI::FOMStringModuleList& fomModuleList)
   }
 }
 
-static void loadModuleFromFile(OpenRTI::FOMStringModuleList& fomModuleList, const std::string& fileName)
+static void loadModuleFromFile(OpenRTI::FOMStringModule2List& fomModuleList, const std::string& fileName)
 {
   std::string designator = std::string("file:///") + fileName;
   std::ifstream stream(fileName.c_str());
@@ -117,7 +117,7 @@ static void loadModuleFromFile(OpenRTI::FOMStringModuleList& fomModuleList, cons
   }
 }
 
-static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, const std::wstring& fomModuleDesignator)
+static void loadModule(OpenRTI::FOMStringModule2List& fomModuleList, const std::wstring& fomModuleDesignator)
 {
   if (fomModuleDesignator.empty())
     throw rti1516e::CouldNotOpenFDD(L"Empty module.");
@@ -137,7 +137,7 @@ static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, const std::w
   }
 }
 
-static void loadModules(OpenRTI::FOMStringModuleList& fomModuleList, const std::vector<std::wstring>& fomModules)
+static void loadModules(OpenRTI::FOMStringModule2List& fomModuleList, const std::vector<std::wstring>& fomModules)
 {
   for (auto& fomModule : fomModules)
     loadModule(fomModuleList, fomModule);
@@ -1681,7 +1681,7 @@ RTIambassadorImplementation::createFederationExecution(std::wstring const & fede
                                                        std::wstring const & logicalTimeImplementationName)
 {
   // Make sure we can read the fdd file
-  OpenRTI::FOMStringModuleList fomModuleList;
+  OpenRTI::FOMStringModule2List fomModuleList;
 
   // Preload the HLAstandardMIM module
   loadHLAstandardMIM(fomModuleList);
@@ -1711,7 +1711,7 @@ RTIambassadorImplementation::createFederationExecution(std::wstring const & fede
                                                        std::vector<std::wstring> const & fomModules,
                                                        std::wstring const & logicalTimeImplementationName)
 {
-  OpenRTI::FOMStringModuleList fomModuleList;
+  OpenRTI::FOMStringModule2List fomModuleList;
 
   // Preload the HLAstandardMIM module
   loadHLAstandardMIM(fomModuleList);
@@ -1741,7 +1741,7 @@ RTIambassadorImplementation::createFederationExecutionWithMIM (std::wstring cons
                                                         std::wstring const & mimModule,
                                                         std::wstring const & logicalTimeImplementationName)
 {
-  OpenRTI::FOMStringModuleList fomModuleList;
+  OpenRTI::FOMStringModule2List fomModuleList;
 
   try {
     loadModule(fomModuleList, mimModule);
@@ -1812,7 +1812,7 @@ RTIambassadorImplementation::joinFederationExecution(std::wstring const & federa
                                                      std::wstring const & federationExecutionName,
                                                      std::vector<std::wstring> const & additionalFomModules)
 {
-  OpenRTI::FOMStringModuleList fomModuleList;
+  OpenRTI::FOMStringModule2List fomModuleList;
   // Load the ones given in the argument
   loadModules(fomModuleList, additionalFomModules);
 
@@ -1850,7 +1850,7 @@ RTIambassadorImplementation::joinFederationExecution(std::wstring const & federa
                                                      std::wstring const & federationExecutionName,
                                                      std::vector<std::wstring> const & additionalFomModules)
 {
-  OpenRTI::FOMStringModuleList fomModuleList;
+  OpenRTI::FOMStringModule2List fomModuleList;
   // Load the ones given in the argument
   loadModules(fomModuleList, additionalFomModules);
 

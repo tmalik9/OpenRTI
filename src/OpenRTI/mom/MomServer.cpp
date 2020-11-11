@@ -123,6 +123,7 @@ public:
   {
     //DebugPrintf("%s\n");
   }
+  AbstractServer* getServer() const override { return nullptr; }
 private:
   MomServer& _momServer;
 };

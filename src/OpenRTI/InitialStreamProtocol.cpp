@@ -210,6 +210,27 @@ InitialStreamProtocol::error(const Exception& e)
   Log(MessageCoding, Warning) << "Unhandled exception during initials OpenRTI connection negotiation!" << std::endl;
 }
 
+
+bool InitialStreamProtocol::getCompatibleVersion(std::string& resultingVersion, const StringList& versions)
+{
+  for (auto compatibleVersion : getCompatibleVersions())
+  {
+    if (std::find(versions.begin(), versions.end(), compatibleVersion) != versions.end())
+    {
+      resultingVersion = compatibleVersion;
+      return true;
+    }
+  }
+  return false;
+}
+
+
+OpenRTI::StringList InitialStreamProtocol::getCompatibleVersions()
+{
+  static StringList compatibleVersions{"9", "8"};
+  return compatibleVersions;
+}
+
 void
 InitialStreamProtocol::setFollowupProtocol(const SharedPtr<AbstractProtocolLayer>& followupProtocol)
 {

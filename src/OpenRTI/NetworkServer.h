@@ -52,7 +52,7 @@ public:
   void connectParentStreamServer(const SharedPtr<SocketStream>& socketStream, const Clock& abstime, bool compress);
 
   int exec() override;
-
+  uint32_t getProtocolVersion() const override;
 protected:
   void _sendDone(bool done) override;
 

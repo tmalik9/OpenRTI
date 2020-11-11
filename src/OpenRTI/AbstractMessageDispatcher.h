@@ -29,6 +29,7 @@ class AbstractMessage;
 
 class ConnectionLostMessage;
 class CreateFederationExecutionRequestMessage;
+class CreateFederationExecutionRequest2Message;
 class CreateFederationExecutionResponseMessage;
 class DestroyFederationExecutionRequestMessage;
 class DestroyFederationExecutionResponseMessage;
@@ -39,7 +40,9 @@ class ShutdownFederationExecutionMessage;
 class EraseFederationExecutionMessage;
 class ReleaseFederationHandleMessage;
 class InsertModulesMessage;
+class InsertModules2Message;
 class JoinFederationExecutionRequestMessage;
+class JoinFederationExecutionRequest2Message;
 class JoinFederationExecutionResponseMessage;
 class ResignFederationExecutionLeafRequestMessage;
 class ResignFederationExecutionRequestMessage;
@@ -99,6 +102,7 @@ public:
 
   virtual void accept(const ConnectionLostMessage&) const = 0;
   virtual void accept(const CreateFederationExecutionRequestMessage&) const = 0;
+  virtual void accept(const CreateFederationExecutionRequest2Message&) const = 0;
   virtual void accept(const CreateFederationExecutionResponseMessage&) const = 0;
   virtual void accept(const DestroyFederationExecutionRequestMessage&) const = 0;
   virtual void accept(const DestroyFederationExecutionResponseMessage&) const = 0;
@@ -109,7 +113,9 @@ public:
   virtual void accept(const EraseFederationExecutionMessage&) const = 0;
   virtual void accept(const ReleaseFederationHandleMessage&) const = 0;
   virtual void accept(const InsertModulesMessage&) const = 0;
+  virtual void accept(const InsertModules2Message&) const = 0;
   virtual void accept(const JoinFederationExecutionRequestMessage&) const = 0;
+  virtual void accept(const JoinFederationExecutionRequest2Message&) const = 0;
   virtual void accept(const JoinFederationExecutionResponseMessage&) const = 0;
   virtual void accept(const ResignFederationExecutionLeafRequestMessage&) const = 0;
   virtual void accept(const ResignFederationExecutionRequestMessage&) const = 0;
@@ -172,6 +178,7 @@ public:
 
   virtual void accept(const ConnectionLostMessage& message) const override { _t(message); }
   virtual void accept(const CreateFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const CreateFederationExecutionRequest2Message& message) const override { _t(message); }
   virtual void accept(const CreateFederationExecutionResponseMessage& message) const override { _t(message); }
   virtual void accept(const DestroyFederationExecutionRequestMessage& message) const override { _t(message); }
   virtual void accept(const DestroyFederationExecutionResponseMessage& message) const override { _t(message); }
@@ -182,7 +189,9 @@ public:
   virtual void accept(const EraseFederationExecutionMessage& message) const override { _t(message); }
   virtual void accept(const ReleaseFederationHandleMessage& message) const override { _t(message); }
   virtual void accept(const InsertModulesMessage& message) const override { _t(message); }
+  virtual void accept(const InsertModules2Message& message) const override { _t(message); }
   virtual void accept(const JoinFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const JoinFederationExecutionRequest2Message& message) const override { _t(message); }
   virtual void accept(const JoinFederationExecutionResponseMessage& message) const override { _t(message); }
   virtual void accept(const ResignFederationExecutionLeafRequestMessage& message) const override { _t(message); }
   virtual void accept(const ResignFederationExecutionRequestMessage& message) const override { _t(message); }
@@ -247,6 +256,7 @@ public:
 
   virtual void accept(const ConnectionLostMessage& message) const override { _t(message); }
   virtual void accept(const CreateFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const CreateFederationExecutionRequest2Message& message) const override { _t(message); }
   virtual void accept(const CreateFederationExecutionResponseMessage& message) const override { _t(message); }
   virtual void accept(const DestroyFederationExecutionRequestMessage& message) const override { _t(message); }
   virtual void accept(const DestroyFederationExecutionResponseMessage& message) const override { _t(message); }
@@ -257,7 +267,9 @@ public:
   virtual void accept(const EraseFederationExecutionMessage& message) const override { _t(message); }
   virtual void accept(const ReleaseFederationHandleMessage& message) const override { _t(message); }
   virtual void accept(const InsertModulesMessage& message) const override { _t(message); }
+  virtual void accept(const InsertModules2Message& message) const override { _t(message); }
   virtual void accept(const JoinFederationExecutionRequestMessage& message) const override { _t(message); }
+  virtual void accept(const JoinFederationExecutionRequest2Message& message) const override { _t(message); }
   virtual void accept(const JoinFederationExecutionResponseMessage& message) const override { _t(message); }
   virtual void accept(const ResignFederationExecutionLeafRequestMessage& message) const override { _t(message); }
   virtual void accept(const ResignFederationExecutionRequestMessage& message) const override { _t(message); }

@@ -46,6 +46,8 @@ public:
 
   void error(const Exception& e) override;
 
+  static bool getCompatibleVersion(std::string& resultingVersion, const StringList& versions);
+  static StringList getCompatibleVersions();
 protected:
   void setFollowupProtocol(const SharedPtr<AbstractProtocolLayer>& followupProtocol);
 

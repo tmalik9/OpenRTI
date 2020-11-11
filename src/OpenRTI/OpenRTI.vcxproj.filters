@@ -265,6 +265,9 @@
     <ClCompile Include="encoding\HLAopaqueData.cpp">
       <Filter>Source Files\encoding</Filter>
     </ClCompile>
+    <ClCompile Include="TranslateTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -741,6 +744,9 @@
       <Filter>Source Files\mom</Filter>
     </ClInclude>
     <ClInclude Include="DebugNew.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TranslateTypes.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

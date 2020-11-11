@@ -267,17 +267,32 @@ typedef std::vector<FOMStringEnumeratedDataType> FOMStringEnumeratedDataTypeList
 class FOMStringArrayDataType;
 typedef std::vector<FOMStringArrayDataType> FOMStringArrayDataTypeList;
 
+class FOMStringArrayDataType2;
+typedef std::vector<FOMStringArrayDataType2> FOMStringArrayDataType2List;
+
 class FOMStringFixedRecordField;
 typedef std::vector<FOMStringFixedRecordField> FOMStringFixedRecordFieldList;
 
 class FOMStringFixedRecordDataType;
 typedef std::vector<FOMStringFixedRecordDataType> FOMStringFixedRecordDataTypeList;
 
+class FOMStringFixedRecordField2;
+typedef std::vector<FOMStringFixedRecordField2> FOMStringFixedRecordField2List;
+
+class FOMStringFixedRecordDataType2;
+typedef std::vector<FOMStringFixedRecordDataType2> FOMStringFixedRecordDataType2List;
+
 class FOMStringVariantRecordAlternative;
 typedef std::vector<FOMStringVariantRecordAlternative> FOMStringVariantRecordAlternativeList;
 
 class FOMStringVariantRecordDataType;
 typedef std::vector<FOMStringVariantRecordDataType> FOMStringVariantRecordDataTypeList;
+
+class FOMStringVariantRecordAlternative2;
+typedef std::vector<FOMStringVariantRecordAlternative2> FOMStringVariantRecordAlternative2List;
+
+class FOMStringVariantRecordDataType2;
+typedef std::vector<FOMStringVariantRecordDataType2> FOMStringVariantRecordDataType2List;
 
 class FOMStringTransportationType;
 typedef std::vector<FOMStringTransportationType> FOMStringTransportationTypeList;
@@ -308,6 +323,9 @@ typedef std::vector<FOMStringSwitch> FOMStringSwitchList;
 
 class FOMStringModule;
 typedef std::vector<FOMStringModule> FOMStringModuleList;
+
+class FOMStringModule2;
+typedef std::vector<FOMStringModule2> FOMStringModule2List;
 
 class FOMTransportationType;
 typedef std::vector<FOMTransportationType> FOMTransportationTypeList;
@@ -366,8 +384,12 @@ typedef std::vector<FOMVariantRecordDataType> FOMVariantRecordDataTypeList;
 class FOMModule;
 typedef std::vector<FOMModule> FOMModuleList;
 
+class FOMModule2;
+typedef std::vector<FOMModule2> FOMModule2List;
+
 class ConnectionLostMessage;
 class CreateFederationExecutionRequestMessage;
+class CreateFederationExecutionRequest2Message;
 class CreateFederationExecutionResponseMessage;
 class DestroyFederationExecutionRequestMessage;
 class DestroyFederationExecutionResponseMessage;
@@ -378,7 +400,9 @@ class ShutdownFederationExecutionMessage;
 class EraseFederationExecutionMessage;
 class ReleaseFederationHandleMessage;
 class InsertModulesMessage;
+class InsertModules2Message;
 class JoinFederationExecutionRequestMessage;
+class JoinFederationExecutionRequest2Message;
 class JoinFederationExecutionResponseMessage;
 class ResignFederationExecutionLeafRequestMessage;
 class ResignFederationExecutionRequestMessage;
@@ -1220,15 +1244,15 @@ public:
   const String& getCardinality() const noexcept
   { return getConstImpl()._cardinality; }
 
-  void setEncoding(const ArrayDataTypeEncoding& value) noexcept
+  void setEncoding(const String& value) noexcept
   { getImpl()._encoding = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEncoding(ArrayDataTypeEncoding&& value) noexcept
+  void setEncoding(String&& value) noexcept
   { getImpl()._encoding = std::move(value); }
 #endif
-  ArrayDataTypeEncoding& getEncoding() noexcept
+  String& getEncoding() noexcept
   { return getImpl()._encoding; }
-  const ArrayDataTypeEncoding& getEncoding() const noexcept
+  const String& getEncoding() const noexcept
   { return getConstImpl()._encoding; }
 
   FOMStringArrayDataType& swap(FOMStringArrayDataType& rhs)
@@ -1277,7 +1301,7 @@ private:
     String _name;
     String _dataType;
     String _cardinality;
-    ArrayDataTypeEncoding _encoding;
+    String _encoding;
   };
 
   const Implementation& getConstImpl() const
@@ -1297,9 +1321,9 @@ private:
 
 typedef std::vector<FOMStringArrayDataType> FOMStringArrayDataTypeList;
 
-class OPENRTI_API FOMStringFixedRecordField {
+class OPENRTI_API FOMStringArrayDataType2 {
 public:
-  FOMStringFixedRecordField() : 
+  FOMStringArrayDataType2() : 
     _impl(new Implementation())
   { }
   void setName(const String& value) noexcept
@@ -1324,16 +1348,120 @@ public:
   const String& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
-  void setVersion(const Unsigned& value) noexcept
-  { getImpl()._version = value; }
+  void setCardinality(const String& value) noexcept
+  { getImpl()._cardinality = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setVersion(Unsigned&& value) noexcept
-  { getImpl()._version = std::move(value); }
+  void setCardinality(String&& value) noexcept
+  { getImpl()._cardinality = std::move(value); }
 #endif
-  Unsigned& getVersion() noexcept
-  { return getImpl()._version; }
-  const Unsigned& getVersion() const noexcept
-  { return getConstImpl()._version; }
+  String& getCardinality() noexcept
+  { return getImpl()._cardinality; }
+  const String& getCardinality() const noexcept
+  { return getConstImpl()._cardinality; }
+
+  void setEncoding(const ArrayDataTypeEncoding& value) noexcept
+  { getImpl()._encoding = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEncoding(ArrayDataTypeEncoding&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+#endif
+  ArrayDataTypeEncoding& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const ArrayDataTypeEncoding& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  FOMStringArrayDataType2& swap(FOMStringArrayDataType2& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringArrayDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getCardinality() != rhs.getCardinality()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringArrayDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getCardinality() < rhs.getCardinality()) return true;
+    if (rhs.getCardinality() < getCardinality()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringArrayDataType2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringArrayDataType2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringArrayDataType2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType(),
+      _cardinality(),
+      _encoding()
+    { }
+    String _name;
+    String _dataType;
+    String _cardinality;
+    ArrayDataTypeEncoding _encoding;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringArrayDataType2> FOMStringArrayDataType2List;
+
+class OPENRTI_API FOMStringFixedRecordField {
+public:
+  FOMStringFixedRecordField() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const Unsigned& value) noexcept
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(Unsigned&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+#endif
+  Unsigned& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const Unsigned& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
 
   FOMStringFixedRecordField& swap(FOMStringFixedRecordField& rhs)
   {
@@ -1346,7 +1474,6 @@ public:
       return true;
     if (getName() != rhs.getName()) return false;
     if (getDataType() != rhs.getDataType()) return false;
-    if (getVersion() != rhs.getVersion()) return false;
     return true;
   }
   bool operator<(const FOMStringFixedRecordField& rhs) const noexcept
@@ -1357,8 +1484,6 @@ public:
     if (rhs.getName() < getName()) return false;
     if (getDataType() < rhs.getDataType()) return true;
     if (rhs.getDataType() < getDataType()) return false;
-    if (getVersion() < rhs.getVersion()) return true;
-    if (rhs.getVersion() < getVersion()) return false;
     return false;
   }
   bool operator>(const FOMStringFixedRecordField& rhs) const noexcept
@@ -1371,12 +1496,10 @@ private:
   struct OPENRTI_API Implementation final : public Referenced {
     Implementation() noexcept :
       _name(),
-      _dataType(),
-      _version()
+      _dataType()
     { }
     String _name;
-    String _dataType;
-    Unsigned _version;
+    Unsigned _dataType;
   };
 
   const Implementation& getConstImpl() const
@@ -1423,28 +1546,6 @@ public:
   const String& getEncoding() const noexcept
   { return getConstImpl()._encoding; }
 
-  void setInclude(const String& value) noexcept
-  { getImpl()._include = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInclude(String&& value) noexcept
-  { getImpl()._include = std::move(value); }
-#endif
-  String& getInclude() noexcept
-  { return getImpl()._include; }
-  const String& getInclude() const noexcept
-  { return getConstImpl()._include; }
-
-  void setVersion(const Unsigned& value) noexcept
-  { getImpl()._version = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setVersion(Unsigned&& value) noexcept
-  { getImpl()._version = std::move(value); }
-#endif
-  Unsigned& getVersion() noexcept
-  { return getImpl()._version; }
-  const Unsigned& getVersion() const noexcept
-  { return getConstImpl()._version; }
-
   void setFields(const FOMStringFixedRecordFieldList& value) noexcept
   { getImpl()._fields = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -1467,8 +1568,6 @@ public:
       return true;
     if (getName() != rhs.getName()) return false;
     if (getEncoding() != rhs.getEncoding()) return false;
-    if (getInclude() != rhs.getInclude()) return false;
-    if (getVersion() != rhs.getVersion()) return false;
     if (getFields() != rhs.getFields()) return false;
     return true;
   }
@@ -1480,10 +1579,6 @@ public:
     if (rhs.getName() < getName()) return false;
     if (getEncoding() < rhs.getEncoding()) return true;
     if (rhs.getEncoding() < getEncoding()) return false;
-    if (getInclude() < rhs.getInclude()) return true;
-    if (rhs.getInclude() < getInclude()) return false;
-    if (getVersion() < rhs.getVersion()) return true;
-    if (rhs.getVersion() < getVersion()) return false;
     if (getFields() < rhs.getFields()) return true;
     if (rhs.getFields() < getFields()) return false;
     return false;
@@ -1499,14 +1594,10 @@ private:
     Implementation() noexcept :
       _name(),
       _encoding(),
-      _include(),
-      _version(),
       _fields()
     { }
     String _name;
     String _encoding;
-    String _include;
-    Unsigned _version;
     FOMStringFixedRecordFieldList _fields;
   };
 
@@ -1526,6 +1617,236 @@ private:
 };
 
 typedef std::vector<FOMStringFixedRecordDataType> FOMStringFixedRecordDataTypeList;
+
+class OPENRTI_API FOMStringFixedRecordField2 {
+public:
+  FOMStringFixedRecordField2() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+#endif
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
+
+  FOMStringFixedRecordField2& swap(FOMStringFixedRecordField2& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringFixedRecordField2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringFixedRecordField2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringFixedRecordField2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringFixedRecordField2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringFixedRecordField2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType(),
+      _version()
+    { }
+    String _name;
+    String _dataType;
+    Unsigned _version;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringFixedRecordField2> FOMStringFixedRecordField2List;
+
+class OPENRTI_API FOMStringFixedRecordDataType2 {
+public:
+  FOMStringFixedRecordDataType2() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+#endif
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  void setInclude(const String& value) noexcept
+  { getImpl()._include = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setInclude(String&& value) noexcept
+  { getImpl()._include = std::move(value); }
+#endif
+  String& getInclude() noexcept
+  { return getImpl()._include; }
+  const String& getInclude() const noexcept
+  { return getConstImpl()._include; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+#endif
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
+
+  void setFields(const FOMStringFixedRecordField2List& value) noexcept
+  { getImpl()._fields = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFields(FOMStringFixedRecordField2List&& value) noexcept
+  { getImpl()._fields = std::move(value); }
+#endif
+  FOMStringFixedRecordField2List& getFields() noexcept
+  { return getImpl()._fields; }
+  const FOMStringFixedRecordField2List& getFields() const noexcept
+  { return getConstImpl()._fields; }
+
+  FOMStringFixedRecordDataType2& swap(FOMStringFixedRecordDataType2& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getInclude() != rhs.getInclude()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
+    if (getFields() != rhs.getFields()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getInclude() < rhs.getInclude()) return true;
+    if (rhs.getInclude() < getInclude()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
+    if (getFields() < rhs.getFields()) return true;
+    if (rhs.getFields() < getFields()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _encoding(),
+      _include(),
+      _version(),
+      _fields()
+    { }
+    String _name;
+    String _encoding;
+    String _include;
+    Unsigned _version;
+    FOMStringFixedRecordField2List _fields;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringFixedRecordDataType2> FOMStringFixedRecordDataType2List;
 
 class OPENRTI_API FOMStringVariantRecordAlternative {
 public:
@@ -1554,15 +1875,15 @@ public:
   const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDataType(const String& value) noexcept
+  void setDataType(const Unsigned& value) noexcept
   { getImpl()._dataType = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDataType(String&& value) noexcept
+  void setDataType(Unsigned&& value) noexcept
   { getImpl()._dataType = std::move(value); }
 #endif
-  String& getDataType() noexcept
+  Unsigned& getDataType() noexcept
   { return getImpl()._dataType; }
-  const String& getDataType() const noexcept
+  const Unsigned& getDataType() const noexcept
   { return getConstImpl()._dataType; }
 
   FOMStringVariantRecordAlternative& swap(FOMStringVariantRecordAlternative& rhs)
@@ -1606,7 +1927,7 @@ private:
     { }
     String _enumerator;
     String _name;
-    String _dataType;
+    Unsigned _dataType;
   };
 
   const Implementation& getConstImpl() const
@@ -1756,6 +2077,236 @@ private:
 };
 
 typedef std::vector<FOMStringVariantRecordDataType> FOMStringVariantRecordDataTypeList;
+
+class OPENRTI_API FOMStringVariantRecordAlternative2 {
+public:
+  FOMStringVariantRecordAlternative2() : 
+    _impl(new Implementation())
+  { }
+  void setEnumerator(const String& value) noexcept
+  { getImpl()._enumerator = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEnumerator(String&& value) noexcept
+  { getImpl()._enumerator = std::move(value); }
+#endif
+  String& getEnumerator() noexcept
+  { return getImpl()._enumerator; }
+  const String& getEnumerator() const noexcept
+  { return getConstImpl()._enumerator; }
+
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  FOMStringVariantRecordAlternative2& swap(FOMStringVariantRecordAlternative2& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getEnumerator() != rhs.getEnumerator()) return false;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getEnumerator() < rhs.getEnumerator()) return true;
+    if (rhs.getEnumerator() < getEnumerator()) return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _enumerator(),
+      _name(),
+      _dataType()
+    { }
+    String _enumerator;
+    String _name;
+    String _dataType;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringVariantRecordAlternative2> FOMStringVariantRecordAlternative2List;
+
+class OPENRTI_API FOMStringVariantRecordDataType2 {
+public:
+  FOMStringVariantRecordDataType2() : 
+    _impl(new Implementation())
+  { }
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+#endif
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDiscriminant(const String& value) noexcept
+  { getImpl()._discriminant = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDiscriminant(String&& value) noexcept
+  { getImpl()._discriminant = std::move(value); }
+#endif
+  String& getDiscriminant() noexcept
+  { return getImpl()._discriminant; }
+  const String& getDiscriminant() const noexcept
+  { return getConstImpl()._discriminant; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+#endif
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setAlternatives(const FOMStringVariantRecordAlternative2List& value) noexcept
+  { getImpl()._alternatives = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setAlternatives(FOMStringVariantRecordAlternative2List&& value) noexcept
+  { getImpl()._alternatives = std::move(value); }
+#endif
+  FOMStringVariantRecordAlternative2List& getAlternatives() noexcept
+  { return getImpl()._alternatives; }
+  const FOMStringVariantRecordAlternative2List& getAlternatives() const noexcept
+  { return getConstImpl()._alternatives; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+#endif
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  FOMStringVariantRecordDataType2& swap(FOMStringVariantRecordDataType2& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDiscriminant() != rhs.getDiscriminant()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getAlternatives() != rhs.getAlternatives()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDiscriminant() < rhs.getDiscriminant()) return true;
+    if (rhs.getDiscriminant() < getDiscriminant()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getAlternatives() < rhs.getAlternatives()) return true;
+    if (rhs.getAlternatives() < getAlternatives()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _discriminant(),
+      _dataType(),
+      _alternatives(),
+      _encoding()
+    { }
+    String _name;
+    String _discriminant;
+    String _dataType;
+    FOMStringVariantRecordAlternative2List _alternatives;
+    String _encoding;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringVariantRecordDataType2> FOMStringVariantRecordDataType2List;
 
 class OPENRTI_API FOMStringTransportationType {
 public:
@@ -2709,17 +3260,6 @@ public:
   const FOMStringSwitchList& getSwitchList() const noexcept
   { return getConstImpl()._switchList; }
 
-  void setBasicDataTypeList(const FOMStringBasicDataTypeList& value) noexcept
-  { getImpl()._basicDataTypeList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setBasicDataTypeList(FOMStringBasicDataTypeList&& value) noexcept
-  { getImpl()._basicDataTypeList = std::move(value); }
-#endif
-  FOMStringBasicDataTypeList& getBasicDataTypeList() noexcept
-  { return getImpl()._basicDataTypeList; }
-  const FOMStringBasicDataTypeList& getBasicDataTypeList() const noexcept
-  { return getConstImpl()._basicDataTypeList; }
-
   void setSimpleDataTypeList(const FOMStringSimpleDataTypeList& value) noexcept
   { getImpl()._simpleDataTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -2814,7 +3354,6 @@ public:
     if (getObjectClassList() != rhs.getObjectClassList()) return false;
     if (getUpdateRateList() != rhs.getUpdateRateList()) return false;
     if (getSwitchList() != rhs.getSwitchList()) return false;
-    if (getBasicDataTypeList() != rhs.getBasicDataTypeList()) return false;
     if (getSimpleDataTypeList() != rhs.getSimpleDataTypeList()) return false;
     if (getEnumeratedDataTypeList() != rhs.getEnumeratedDataTypeList()) return false;
     if (getArrayDataTypeList() != rhs.getArrayDataTypeList()) return false;
@@ -2825,6 +3364,309 @@ public:
     return true;
   }
   bool operator<(const FOMStringModule& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getDesignator() < rhs.getDesignator()) return true;
+    if (rhs.getDesignator() < getDesignator()) return false;
+    if (getTransportationTypeList() < rhs.getTransportationTypeList()) return true;
+    if (rhs.getTransportationTypeList() < getTransportationTypeList()) return false;
+    if (getDimensionList() < rhs.getDimensionList()) return true;
+    if (rhs.getDimensionList() < getDimensionList()) return false;
+    if (getRoutingSpaceList() < rhs.getRoutingSpaceList()) return true;
+    if (rhs.getRoutingSpaceList() < getRoutingSpaceList()) return false;
+    if (getInteractionClassList() < rhs.getInteractionClassList()) return true;
+    if (rhs.getInteractionClassList() < getInteractionClassList()) return false;
+    if (getObjectClassList() < rhs.getObjectClassList()) return true;
+    if (rhs.getObjectClassList() < getObjectClassList()) return false;
+    if (getUpdateRateList() < rhs.getUpdateRateList()) return true;
+    if (rhs.getUpdateRateList() < getUpdateRateList()) return false;
+    if (getSwitchList() < rhs.getSwitchList()) return true;
+    if (rhs.getSwitchList() < getSwitchList()) return false;
+    if (getSimpleDataTypeList() < rhs.getSimpleDataTypeList()) return true;
+    if (rhs.getSimpleDataTypeList() < getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() < rhs.getEnumeratedDataTypeList()) return true;
+    if (rhs.getEnumeratedDataTypeList() < getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() < rhs.getArrayDataTypeList()) return true;
+    if (rhs.getArrayDataTypeList() < getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() < rhs.getFixedRecordDataTypeList()) return true;
+    if (rhs.getFixedRecordDataTypeList() < getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() < rhs.getVariantRecordDataTypeList()) return true;
+    if (rhs.getVariantRecordDataTypeList() < getVariantRecordDataTypeList()) return false;
+    if (getArtificialInteractionRoot() < rhs.getArtificialInteractionRoot()) return true;
+    if (rhs.getArtificialInteractionRoot() < getArtificialInteractionRoot()) return false;
+    if (getArtificialObjectRoot() < rhs.getArtificialObjectRoot()) return true;
+    if (rhs.getArtificialObjectRoot() < getArtificialObjectRoot()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringModule& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringModule& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringModule& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _designator(),
+      _transportationTypeList(),
+      _dimensionList(),
+      _routingSpaceList(),
+      _interactionClassList(),
+      _objectClassList(),
+      _updateRateList(),
+      _switchList(),
+      _simpleDataTypeList(),
+      _enumeratedDataTypeList(),
+      _arrayDataTypeList(),
+      _fixedRecordDataTypeList(),
+      _variantRecordDataTypeList(),
+      _artificialInteractionRoot(),
+      _artificialObjectRoot()
+    { }
+    String _designator;
+    FOMStringTransportationTypeList _transportationTypeList;
+    FOMStringDimensionList _dimensionList;
+    FOMStringRoutingSpaceList _routingSpaceList;
+    FOMStringInteractionClassList _interactionClassList;
+    FOMStringObjectClassList _objectClassList;
+    FOMStringUpdateRateList _updateRateList;
+    FOMStringSwitchList _switchList;
+    FOMStringSimpleDataTypeList _simpleDataTypeList;
+    FOMStringEnumeratedDataTypeList _enumeratedDataTypeList;
+    FOMStringArrayDataTypeList _arrayDataTypeList;
+    FOMStringFixedRecordDataTypeList _fixedRecordDataTypeList;
+    FOMStringVariantRecordDataTypeList _variantRecordDataTypeList;
+    Bool _artificialInteractionRoot;
+    Bool _artificialObjectRoot;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringModule> FOMStringModuleList;
+
+class OPENRTI_API FOMStringModule2 {
+public:
+  FOMStringModule2() : 
+    _impl(new Implementation())
+  { }
+  void setDesignator(const String& value) noexcept
+  { getImpl()._designator = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDesignator(String&& value) noexcept
+  { getImpl()._designator = std::move(value); }
+#endif
+  String& getDesignator() noexcept
+  { return getImpl()._designator; }
+  const String& getDesignator() const noexcept
+  { return getConstImpl()._designator; }
+
+  void setTransportationTypeList(const FOMStringTransportationTypeList& value) noexcept
+  { getImpl()._transportationTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setTransportationTypeList(FOMStringTransportationTypeList&& value) noexcept
+  { getImpl()._transportationTypeList = std::move(value); }
+#endif
+  FOMStringTransportationTypeList& getTransportationTypeList() noexcept
+  { return getImpl()._transportationTypeList; }
+  const FOMStringTransportationTypeList& getTransportationTypeList() const noexcept
+  { return getConstImpl()._transportationTypeList; }
+
+  void setDimensionList(const FOMStringDimensionList& value) noexcept
+  { getImpl()._dimensionList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDimensionList(FOMStringDimensionList&& value) noexcept
+  { getImpl()._dimensionList = std::move(value); }
+#endif
+  FOMStringDimensionList& getDimensionList() noexcept
+  { return getImpl()._dimensionList; }
+  const FOMStringDimensionList& getDimensionList() const noexcept
+  { return getConstImpl()._dimensionList; }
+
+  void setRoutingSpaceList(const FOMStringRoutingSpaceList& value) noexcept
+  { getImpl()._routingSpaceList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setRoutingSpaceList(FOMStringRoutingSpaceList&& value) noexcept
+  { getImpl()._routingSpaceList = std::move(value); }
+#endif
+  FOMStringRoutingSpaceList& getRoutingSpaceList() noexcept
+  { return getImpl()._routingSpaceList; }
+  const FOMStringRoutingSpaceList& getRoutingSpaceList() const noexcept
+  { return getConstImpl()._routingSpaceList; }
+
+  void setInteractionClassList(const FOMStringInteractionClassList& value) noexcept
+  { getImpl()._interactionClassList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setInteractionClassList(FOMStringInteractionClassList&& value) noexcept
+  { getImpl()._interactionClassList = std::move(value); }
+#endif
+  FOMStringInteractionClassList& getInteractionClassList() noexcept
+  { return getImpl()._interactionClassList; }
+  const FOMStringInteractionClassList& getInteractionClassList() const noexcept
+  { return getConstImpl()._interactionClassList; }
+
+  void setObjectClassList(const FOMStringObjectClassList& value) noexcept
+  { getImpl()._objectClassList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setObjectClassList(FOMStringObjectClassList&& value) noexcept
+  { getImpl()._objectClassList = std::move(value); }
+#endif
+  FOMStringObjectClassList& getObjectClassList() noexcept
+  { return getImpl()._objectClassList; }
+  const FOMStringObjectClassList& getObjectClassList() const noexcept
+  { return getConstImpl()._objectClassList; }
+
+  void setUpdateRateList(const FOMStringUpdateRateList& value) noexcept
+  { getImpl()._updateRateList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setUpdateRateList(FOMStringUpdateRateList&& value) noexcept
+  { getImpl()._updateRateList = std::move(value); }
+#endif
+  FOMStringUpdateRateList& getUpdateRateList() noexcept
+  { return getImpl()._updateRateList; }
+  const FOMStringUpdateRateList& getUpdateRateList() const noexcept
+  { return getConstImpl()._updateRateList; }
+
+  void setSwitchList(const FOMStringSwitchList& value) noexcept
+  { getImpl()._switchList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setSwitchList(FOMStringSwitchList&& value) noexcept
+  { getImpl()._switchList = std::move(value); }
+#endif
+  FOMStringSwitchList& getSwitchList() noexcept
+  { return getImpl()._switchList; }
+  const FOMStringSwitchList& getSwitchList() const noexcept
+  { return getConstImpl()._switchList; }
+
+  void setBasicDataTypeList(const FOMStringBasicDataTypeList& value) noexcept
+  { getImpl()._basicDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setBasicDataTypeList(FOMStringBasicDataTypeList&& value) noexcept
+  { getImpl()._basicDataTypeList = std::move(value); }
+#endif
+  FOMStringBasicDataTypeList& getBasicDataTypeList() noexcept
+  { return getImpl()._basicDataTypeList; }
+  const FOMStringBasicDataTypeList& getBasicDataTypeList() const noexcept
+  { return getConstImpl()._basicDataTypeList; }
+
+  void setSimpleDataTypeList(const FOMStringSimpleDataTypeList& value) noexcept
+  { getImpl()._simpleDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setSimpleDataTypeList(FOMStringSimpleDataTypeList&& value) noexcept
+  { getImpl()._simpleDataTypeList = std::move(value); }
+#endif
+  FOMStringSimpleDataTypeList& getSimpleDataTypeList() noexcept
+  { return getImpl()._simpleDataTypeList; }
+  const FOMStringSimpleDataTypeList& getSimpleDataTypeList() const noexcept
+  { return getConstImpl()._simpleDataTypeList; }
+
+  void setEnumeratedDataTypeList(const FOMStringEnumeratedDataTypeList& value) noexcept
+  { getImpl()._enumeratedDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setEnumeratedDataTypeList(FOMStringEnumeratedDataTypeList&& value) noexcept
+  { getImpl()._enumeratedDataTypeList = std::move(value); }
+#endif
+  FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() noexcept
+  { return getImpl()._enumeratedDataTypeList; }
+  const FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() const noexcept
+  { return getConstImpl()._enumeratedDataTypeList; }
+
+  void setArrayDataTypeList(const FOMStringArrayDataType2List& value) noexcept
+  { getImpl()._arrayDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setArrayDataTypeList(FOMStringArrayDataType2List&& value) noexcept
+  { getImpl()._arrayDataTypeList = std::move(value); }
+#endif
+  FOMStringArrayDataType2List& getArrayDataTypeList() noexcept
+  { return getImpl()._arrayDataTypeList; }
+  const FOMStringArrayDataType2List& getArrayDataTypeList() const noexcept
+  { return getConstImpl()._arrayDataTypeList; }
+
+  void setFixedRecordDataTypeList(const FOMStringFixedRecordDataType2List& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFixedRecordDataTypeList(FOMStringFixedRecordDataType2List&& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = std::move(value); }
+#endif
+  FOMStringFixedRecordDataType2List& getFixedRecordDataTypeList() noexcept
+  { return getImpl()._fixedRecordDataTypeList; }
+  const FOMStringFixedRecordDataType2List& getFixedRecordDataTypeList() const noexcept
+  { return getConstImpl()._fixedRecordDataTypeList; }
+
+  void setVariantRecordDataTypeList(const FOMStringVariantRecordDataType2List& value) noexcept
+  { getImpl()._variantRecordDataTypeList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setVariantRecordDataTypeList(FOMStringVariantRecordDataType2List&& value) noexcept
+  { getImpl()._variantRecordDataTypeList = std::move(value); }
+#endif
+  FOMStringVariantRecordDataType2List& getVariantRecordDataTypeList() noexcept
+  { return getImpl()._variantRecordDataTypeList; }
+  const FOMStringVariantRecordDataType2List& getVariantRecordDataTypeList() const noexcept
+  { return getConstImpl()._variantRecordDataTypeList; }
+
+  void setArtificialInteractionRoot(const Bool& value) noexcept
+  { getImpl()._artificialInteractionRoot = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setArtificialInteractionRoot(Bool&& value) noexcept
+  { getImpl()._artificialInteractionRoot = std::move(value); }
+#endif
+  Bool& getArtificialInteractionRoot() noexcept
+  { return getImpl()._artificialInteractionRoot; }
+  const Bool& getArtificialInteractionRoot() const noexcept
+  { return getConstImpl()._artificialInteractionRoot; }
+
+  void setArtificialObjectRoot(const Bool& value) noexcept
+  { getImpl()._artificialObjectRoot = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setArtificialObjectRoot(Bool&& value) noexcept
+  { getImpl()._artificialObjectRoot = std::move(value); }
+#endif
+  Bool& getArtificialObjectRoot() noexcept
+  { return getImpl()._artificialObjectRoot; }
+  const Bool& getArtificialObjectRoot() const noexcept
+  { return getConstImpl()._artificialObjectRoot; }
+
+  FOMStringModule2& swap(FOMStringModule2& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringModule2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getDesignator() != rhs.getDesignator()) return false;
+    if (getTransportationTypeList() != rhs.getTransportationTypeList()) return false;
+    if (getDimensionList() != rhs.getDimensionList()) return false;
+    if (getRoutingSpaceList() != rhs.getRoutingSpaceList()) return false;
+    if (getInteractionClassList() != rhs.getInteractionClassList()) return false;
+    if (getObjectClassList() != rhs.getObjectClassList()) return false;
+    if (getUpdateRateList() != rhs.getUpdateRateList()) return false;
+    if (getSwitchList() != rhs.getSwitchList()) return false;
+    if (getBasicDataTypeList() != rhs.getBasicDataTypeList()) return false;
+    if (getSimpleDataTypeList() != rhs.getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() != rhs.getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() != rhs.getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() != rhs.getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() != rhs.getVariantRecordDataTypeList()) return false;
+    if (getArtificialInteractionRoot() != rhs.getArtificialInteractionRoot()) return false;
+    if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringModule2& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2862,11 +3704,11 @@ public:
     if (rhs.getArtificialObjectRoot() < getArtificialObjectRoot()) return false;
     return false;
   }
-  bool operator>(const FOMStringModule& rhs) const noexcept
+  bool operator>(const FOMStringModule2& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringModule& rhs) const noexcept
+  bool operator>=(const FOMStringModule2& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringModule& rhs) const noexcept
+  bool operator<=(const FOMStringModule2& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   struct OPENRTI_API Implementation final : public Referenced {
@@ -2899,9 +3741,9 @@ private:
     FOMStringBasicDataTypeList _basicDataTypeList;
     FOMStringSimpleDataTypeList _simpleDataTypeList;
     FOMStringEnumeratedDataTypeList _enumeratedDataTypeList;
-    FOMStringArrayDataTypeList _arrayDataTypeList;
-    FOMStringFixedRecordDataTypeList _fixedRecordDataTypeList;
-    FOMStringVariantRecordDataTypeList _variantRecordDataTypeList;
+    FOMStringArrayDataType2List _arrayDataTypeList;
+    FOMStringFixedRecordDataType2List _fixedRecordDataTypeList;
+    FOMStringVariantRecordDataType2List _variantRecordDataTypeList;
     Bool _artificialInteractionRoot;
     Bool _artificialObjectRoot;
   };
@@ -2921,7 +3763,7 @@ private:
   SharedPtr<Implementation> _impl;
 };
 
-typedef std::vector<FOMStringModule> FOMStringModuleList;
+typedef std::vector<FOMStringModule2> FOMStringModule2List;
 
 class OPENRTI_API FOMTransportationType {
 public:
@@ -5038,6 +5880,145 @@ public:
   const FOMSwitchList& getSwitchList() const noexcept
   { return getConstImpl()._switchList; }
 
+  void setArtificialInteractionRoot(const Bool& value) noexcept
+  { getImpl()._artificialInteractionRoot = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setArtificialInteractionRoot(Bool&& value) noexcept
+  { getImpl()._artificialInteractionRoot = std::move(value); }
+#endif
+  Bool& getArtificialInteractionRoot() noexcept
+  { return getImpl()._artificialInteractionRoot; }
+  const Bool& getArtificialInteractionRoot() const noexcept
+  { return getConstImpl()._artificialInteractionRoot; }
+
+  void setArtificialObjectRoot(const Bool& value) noexcept
+  { getImpl()._artificialObjectRoot = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setArtificialObjectRoot(Bool&& value) noexcept
+  { getImpl()._artificialObjectRoot = std::move(value); }
+#endif
+  Bool& getArtificialObjectRoot() noexcept
+  { return getImpl()._artificialObjectRoot; }
+  const Bool& getArtificialObjectRoot() const noexcept
+  { return getConstImpl()._artificialObjectRoot; }
+
+  void setDesignator(const String& value) noexcept
+  { getImpl()._designator = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setDesignator(String&& value) noexcept
+  { getImpl()._designator = std::move(value); }
+#endif
+  String& getDesignator() noexcept
+  { return getImpl()._designator; }
+  const String& getDesignator() const noexcept
+  { return getConstImpl()._designator; }
+
+  FOMModule& swap(FOMModule& rhs)
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMModule& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getModuleHandle() != rhs.getModuleHandle()) return false;
+    if (getTransportationTypeList() != rhs.getTransportationTypeList()) return false;
+    if (getDimensionList() != rhs.getDimensionList()) return false;
+    if (getRoutingSpaceList() != rhs.getRoutingSpaceList()) return false;
+    if (getInteractionClassList() != rhs.getInteractionClassList()) return false;
+    if (getObjectClassList() != rhs.getObjectClassList()) return false;
+    if (getUpdateRateList() != rhs.getUpdateRateList()) return false;
+    if (getSwitchList() != rhs.getSwitchList()) return false;
+    if (getArtificialInteractionRoot() != rhs.getArtificialInteractionRoot()) return false;
+    if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
+    if (getDesignator() != rhs.getDesignator()) return false;
+    return true;
+  }
+  bool operator<(const FOMModule& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getModuleHandle() < rhs.getModuleHandle()) return true;
+    if (rhs.getModuleHandle() < getModuleHandle()) return false;
+    if (getTransportationTypeList() < rhs.getTransportationTypeList()) return true;
+    if (rhs.getTransportationTypeList() < getTransportationTypeList()) return false;
+    if (getDimensionList() < rhs.getDimensionList()) return true;
+    if (rhs.getDimensionList() < getDimensionList()) return false;
+    if (getRoutingSpaceList() < rhs.getRoutingSpaceList()) return true;
+    if (rhs.getRoutingSpaceList() < getRoutingSpaceList()) return false;
+    if (getInteractionClassList() < rhs.getInteractionClassList()) return true;
+    if (rhs.getInteractionClassList() < getInteractionClassList()) return false;
+    if (getObjectClassList() < rhs.getObjectClassList()) return true;
+    if (rhs.getObjectClassList() < getObjectClassList()) return false;
+    if (getUpdateRateList() < rhs.getUpdateRateList()) return true;
+    if (rhs.getUpdateRateList() < getUpdateRateList()) return false;
+    if (getSwitchList() < rhs.getSwitchList()) return true;
+    if (rhs.getSwitchList() < getSwitchList()) return false;
+    if (getArtificialInteractionRoot() < rhs.getArtificialInteractionRoot()) return true;
+    if (rhs.getArtificialInteractionRoot() < getArtificialInteractionRoot()) return false;
+    if (getArtificialObjectRoot() < rhs.getArtificialObjectRoot()) return true;
+    if (rhs.getArtificialObjectRoot() < getArtificialObjectRoot()) return false;
+    if (getDesignator() < rhs.getDesignator()) return true;
+    if (rhs.getDesignator() < getDesignator()) return false;
+    return false;
+  }
+  bool operator>(const FOMModule& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMModule& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMModule& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _moduleHandle(),
+      _transportationTypeList(),
+      _dimensionList(),
+      _routingSpaceList(),
+      _interactionClassList(),
+      _objectClassList(),
+      _updateRateList(),
+      _switchList(),
+      _artificialInteractionRoot(),
+      _artificialObjectRoot(),
+      _designator()
+    { }
+    ModuleHandle _moduleHandle;
+    FOMTransportationTypeList _transportationTypeList;
+    FOMDimensionList _dimensionList;
+    FOMRoutingSpaceList _routingSpaceList;
+    FOMInteractionClassList _interactionClassList;
+    FOMObjectClassList _objectClassList;
+    FOMUpdateRateList _updateRateList;
+    FOMSwitchList _switchList;
+    Bool _artificialInteractionRoot;
+    Bool _artificialObjectRoot;
+    String _designator;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMModule> FOMModuleList;
+
+class OPENRTI_API FOMModule2 : public FOMModule {
+public:
+  FOMModule2() : 
+    _impl(new Implementation())
+  { }
   void setBasicDataTypeList(const FOMBasicDataTypeList& value) noexcept
   { getImpl()._basicDataTypeList = value; }
 #if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
@@ -5104,87 +6085,27 @@ public:
   const FOMVariantRecordDataTypeList& getVariantRecordDataTypeList() const noexcept
   { return getConstImpl()._variantRecordDataTypeList; }
 
-  void setArtificialInteractionRoot(const Bool& value) noexcept
-  { getImpl()._artificialInteractionRoot = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialInteractionRoot(Bool&& value) noexcept
-  { getImpl()._artificialInteractionRoot = std::move(value); }
-#endif
-  Bool& getArtificialInteractionRoot() noexcept
-  { return getImpl()._artificialInteractionRoot; }
-  const Bool& getArtificialInteractionRoot() const noexcept
-  { return getConstImpl()._artificialInteractionRoot; }
-
-  void setArtificialObjectRoot(const Bool& value) noexcept
-  { getImpl()._artificialObjectRoot = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialObjectRoot(Bool&& value) noexcept
-  { getImpl()._artificialObjectRoot = std::move(value); }
-#endif
-  Bool& getArtificialObjectRoot() noexcept
-  { return getImpl()._artificialObjectRoot; }
-  const Bool& getArtificialObjectRoot() const noexcept
-  { return getConstImpl()._artificialObjectRoot; }
-
-  void setDesignator(const String& value) noexcept
-  { getImpl()._designator = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDesignator(String&& value) noexcept
-  { getImpl()._designator = std::move(value); }
-#endif
-  String& getDesignator() noexcept
-  { return getImpl()._designator; }
-  const String& getDesignator() const noexcept
-  { return getConstImpl()._designator; }
-
-  FOMModule& swap(FOMModule& rhs)
+  FOMModule2& swap(FOMModule2& rhs)
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMModule& rhs) const noexcept
+  bool operator==(const FOMModule2& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
-    if (getModuleHandle() != rhs.getModuleHandle()) return false;
-    if (getTransportationTypeList() != rhs.getTransportationTypeList()) return false;
-    if (getDimensionList() != rhs.getDimensionList()) return false;
-    if (getRoutingSpaceList() != rhs.getRoutingSpaceList()) return false;
-    if (getInteractionClassList() != rhs.getInteractionClassList()) return false;
-    if (getObjectClassList() != rhs.getObjectClassList()) return false;
-    if (getUpdateRateList() != rhs.getUpdateRateList()) return false;
-    if (getSwitchList() != rhs.getSwitchList()) return false;
     if (getBasicDataTypeList() != rhs.getBasicDataTypeList()) return false;
     if (getSimpleDataTypeList() != rhs.getSimpleDataTypeList()) return false;
     if (getEnumeratedDataTypeList() != rhs.getEnumeratedDataTypeList()) return false;
     if (getArrayDataTypeList() != rhs.getArrayDataTypeList()) return false;
     if (getFixedRecordDataTypeList() != rhs.getFixedRecordDataTypeList()) return false;
     if (getVariantRecordDataTypeList() != rhs.getVariantRecordDataTypeList()) return false;
-    if (getArtificialInteractionRoot() != rhs.getArtificialInteractionRoot()) return false;
-    if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
-    if (getDesignator() != rhs.getDesignator()) return false;
     return true;
   }
-  bool operator<(const FOMModule& rhs) const noexcept
+  bool operator<(const FOMModule2& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
-    if (getModuleHandle() < rhs.getModuleHandle()) return true;
-    if (rhs.getModuleHandle() < getModuleHandle()) return false;
-    if (getTransportationTypeList() < rhs.getTransportationTypeList()) return true;
-    if (rhs.getTransportationTypeList() < getTransportationTypeList()) return false;
-    if (getDimensionList() < rhs.getDimensionList()) return true;
-    if (rhs.getDimensionList() < getDimensionList()) return false;
-    if (getRoutingSpaceList() < rhs.getRoutingSpaceList()) return true;
-    if (rhs.getRoutingSpaceList() < getRoutingSpaceList()) return false;
-    if (getInteractionClassList() < rhs.getInteractionClassList()) return true;
-    if (rhs.getInteractionClassList() < getInteractionClassList()) return false;
-    if (getObjectClassList() < rhs.getObjectClassList()) return true;
-    if (rhs.getObjectClassList() < getObjectClassList()) return false;
-    if (getUpdateRateList() < rhs.getUpdateRateList()) return true;
-    if (rhs.getUpdateRateList() < getUpdateRateList()) return false;
-    if (getSwitchList() < rhs.getSwitchList()) return true;
-    if (rhs.getSwitchList() < getSwitchList()) return false;
     if (getBasicDataTypeList() < rhs.getBasicDataTypeList()) return true;
     if (rhs.getBasicDataTypeList() < getBasicDataTypeList()) return false;
     if (getSimpleDataTypeList() < rhs.getSimpleDataTypeList()) return true;
@@ -5197,58 +6118,30 @@ public:
     if (rhs.getFixedRecordDataTypeList() < getFixedRecordDataTypeList()) return false;
     if (getVariantRecordDataTypeList() < rhs.getVariantRecordDataTypeList()) return true;
     if (rhs.getVariantRecordDataTypeList() < getVariantRecordDataTypeList()) return false;
-    if (getArtificialInteractionRoot() < rhs.getArtificialInteractionRoot()) return true;
-    if (rhs.getArtificialInteractionRoot() < getArtificialInteractionRoot()) return false;
-    if (getArtificialObjectRoot() < rhs.getArtificialObjectRoot()) return true;
-    if (rhs.getArtificialObjectRoot() < getArtificialObjectRoot()) return false;
-    if (getDesignator() < rhs.getDesignator()) return true;
-    if (rhs.getDesignator() < getDesignator()) return false;
     return false;
   }
-  bool operator>(const FOMModule& rhs) const noexcept
+  bool operator>(const FOMModule2& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMModule& rhs) const noexcept
+  bool operator>=(const FOMModule2& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMModule& rhs) const noexcept
+  bool operator<=(const FOMModule2& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   struct OPENRTI_API Implementation final : public Referenced {
     Implementation() noexcept :
-      _moduleHandle(),
-      _transportationTypeList(),
-      _dimensionList(),
-      _routingSpaceList(),
-      _interactionClassList(),
-      _objectClassList(),
-      _updateRateList(),
-      _switchList(),
       _basicDataTypeList(),
       _simpleDataTypeList(),
       _enumeratedDataTypeList(),
       _arrayDataTypeList(),
       _fixedRecordDataTypeList(),
-      _variantRecordDataTypeList(),
-      _artificialInteractionRoot(),
-      _artificialObjectRoot(),
-      _designator()
+      _variantRecordDataTypeList()
     { }
-    ModuleHandle _moduleHandle;
-    FOMTransportationTypeList _transportationTypeList;
-    FOMDimensionList _dimensionList;
-    FOMRoutingSpaceList _routingSpaceList;
-    FOMInteractionClassList _interactionClassList;
-    FOMObjectClassList _objectClassList;
-    FOMUpdateRateList _updateRateList;
-    FOMSwitchList _switchList;
     FOMBasicDataTypeList _basicDataTypeList;
     FOMSimpleDataTypeList _simpleDataTypeList;
     FOMEnumeratedDataTypeList _enumeratedDataTypeList;
     FOMArrayDataTypeList _arrayDataTypeList;
     FOMFixedRecordDataTypeList _fixedRecordDataTypeList;
     FOMVariantRecordDataTypeList _variantRecordDataTypeList;
-    Bool _artificialInteractionRoot;
-    Bool _artificialObjectRoot;
-    String _designator;
   };
 
   const Implementation& getConstImpl() const
@@ -5266,7 +6159,7 @@ private:
   SharedPtr<Implementation> _impl;
 };
 
-typedef std::vector<FOMModule> FOMModuleList;
+typedef std::vector<FOMModule2> FOMModule2List;
 
 class OPENRTI_API ConnectionLostMessage final : public AbstractMessage {
 public:
@@ -5364,6 +6257,67 @@ private:
   String _federationExecution;
   String _logicalTimeFactoryName;
   FOMStringModuleList _fOMStringModuleList;
+};
+
+class OPENRTI_API CreateFederationExecutionRequest2Message final : public AbstractMessage {
+public:
+  CreateFederationExecutionRequest2Message() noexcept;
+  virtual ~CreateFederationExecutionRequest2Message() noexcept;
+
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CreateFederationExecutionRequest2Message& rhs) const noexcept;
+  bool operator<(const CreateFederationExecutionRequest2Message& rhs) const noexcept;
+  bool operator!=(const CreateFederationExecutionRequest2Message& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const CreateFederationExecutionRequest2Message& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const CreateFederationExecutionRequest2Message& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const CreateFederationExecutionRequest2Message& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setFederationExecution(const String& value) noexcept
+  { _federationExecution = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederationExecution(String&& value) noexcept
+  { _federationExecution = std::move(value); }
+#endif
+  String& getFederationExecution() noexcept
+  { return _federationExecution; }
+  const String& getFederationExecution() const noexcept
+  { return _federationExecution; }
+
+  void setLogicalTimeFactoryName(const String& value) noexcept
+  { _logicalTimeFactoryName = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setLogicalTimeFactoryName(String&& value) noexcept
+  { _logicalTimeFactoryName = std::move(value); }
+#endif
+  String& getLogicalTimeFactoryName() noexcept
+  { return _logicalTimeFactoryName; }
+  const String& getLogicalTimeFactoryName() const noexcept
+  { return _logicalTimeFactoryName; }
+
+  void setFOMStringModuleList(const FOMStringModule2List& value) noexcept
+  { _fOMStringModuleList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFOMStringModuleList(FOMStringModule2List&& value) noexcept
+  { _fOMStringModuleList = std::move(value); }
+#endif
+  FOMStringModule2List& getFOMStringModuleList() noexcept
+  { return _fOMStringModuleList; }
+  const FOMStringModule2List& getFOMStringModuleList() const noexcept
+  { return _fOMStringModuleList; }
+
+private:
+  String _federationExecution;
+  String _logicalTimeFactoryName;
+  FOMStringModule2List _fOMStringModuleList;
 };
 
 class OPENRTI_API CreateFederationExecutionResponseMessage final : public AbstractMessage {
@@ -5784,6 +6738,55 @@ private:
   FOMModuleList _fOMModuleList;
 };
 
+class OPENRTI_API InsertModules2Message final : public AbstractMessage {
+public:
+  InsertModules2Message() noexcept;
+  virtual ~InsertModules2Message() noexcept;
+
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertModules2Message& rhs) const noexcept;
+  bool operator<(const InsertModules2Message& rhs) const noexcept;
+  bool operator!=(const InsertModules2Message& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const InsertModules2Message& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const InsertModules2Message& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const InsertModules2Message& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value) noexcept
+  { _federationHandle = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederationHandle(FederationHandle&& value) noexcept
+  { _federationHandle = std::move(value); }
+#endif
+  FederationHandle& getFederationHandle() noexcept
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const noexcept
+  { return _federationHandle; }
+
+  void setFOMModule2List(const FOMModule2List& value) noexcept
+  { _fOMModule2List = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFOMModule2List(FOMModule2List&& value) noexcept
+  { _fOMModule2List = std::move(value); }
+#endif
+  FOMModule2List& getFOMModule2List() noexcept
+  { return _fOMModule2List; }
+  const FOMModule2List& getFOMModule2List() const noexcept
+  { return _fOMModule2List; }
+
+private:
+  FederationHandle _federationHandle;
+  FOMModule2List _fOMModule2List;
+};
+
 class OPENRTI_API JoinFederationExecutionRequestMessage final : public AbstractMessage {
 public:
   JoinFederationExecutionRequestMessage() noexcept;
@@ -5877,6 +6880,103 @@ private:
   String _federateType;
   String _federateName;
   FOMStringModuleList _fOMStringModuleList;
+  ConfigurationParameterMap _configurationParameterMap;
+  Bool _isInternal;
+};
+
+class OPENRTI_API JoinFederationExecutionRequest2Message final : public AbstractMessage {
+public:
+  JoinFederationExecutionRequest2Message() noexcept;
+  virtual ~JoinFederationExecutionRequest2Message() noexcept;
+
+  virtual const char* getTypeName() const override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const JoinFederationExecutionRequest2Message& rhs) const noexcept;
+  bool operator<(const JoinFederationExecutionRequest2Message& rhs) const noexcept;
+  bool operator!=(const JoinFederationExecutionRequest2Message& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const JoinFederationExecutionRequest2Message& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const JoinFederationExecutionRequest2Message& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const JoinFederationExecutionRequest2Message& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setFederationExecution(const String& value) noexcept
+  { _federationExecution = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederationExecution(String&& value) noexcept
+  { _federationExecution = std::move(value); }
+#endif
+  String& getFederationExecution() noexcept
+  { return _federationExecution; }
+  const String& getFederationExecution() const noexcept
+  { return _federationExecution; }
+
+  void setFederateType(const String& value) noexcept
+  { _federateType = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederateType(String&& value) noexcept
+  { _federateType = std::move(value); }
+#endif
+  String& getFederateType() noexcept
+  { return _federateType; }
+  const String& getFederateType() const noexcept
+  { return _federateType; }
+
+  void setFederateName(const String& value) noexcept
+  { _federateName = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFederateName(String&& value) noexcept
+  { _federateName = std::move(value); }
+#endif
+  String& getFederateName() noexcept
+  { return _federateName; }
+  const String& getFederateName() const noexcept
+  { return _federateName; }
+
+  void setFOMStringModuleList(const FOMStringModule2List& value) noexcept
+  { _fOMStringModuleList = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setFOMStringModuleList(FOMStringModule2List&& value) noexcept
+  { _fOMStringModuleList = std::move(value); }
+#endif
+  FOMStringModule2List& getFOMStringModuleList() noexcept
+  { return _fOMStringModuleList; }
+  const FOMStringModule2List& getFOMStringModuleList() const noexcept
+  { return _fOMStringModuleList; }
+
+  void setConfigurationParameterMap(const ConfigurationParameterMap& value) noexcept
+  { _configurationParameterMap = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setConfigurationParameterMap(ConfigurationParameterMap&& value) noexcept
+  { _configurationParameterMap = std::move(value); }
+#endif
+  ConfigurationParameterMap& getConfigurationParameterMap() noexcept
+  { return _configurationParameterMap; }
+  const ConfigurationParameterMap& getConfigurationParameterMap() const noexcept
+  { return _configurationParameterMap; }
+
+  void setIsInternal(const Bool& value) noexcept
+  { _isInternal = value; }
+#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
+  void setIsInternal(Bool&& value) noexcept
+  { _isInternal = std::move(value); }
+#endif
+  Bool& getIsInternal() noexcept
+  { return _isInternal; }
+  const Bool& getIsInternal() const noexcept
+  { return _isInternal; }
+
+private:
+  String _federationExecution;
+  String _federateType;
+  String _federateName;
+  FOMStringModule2List _fOMStringModuleList;
   ConfigurationParameterMap _configurationParameterMap;
   Bool _isInternal;
 };
@@ -9530,14 +10630,24 @@ std::ostream& operator<<(std::ostream& os, const FOMStringEnumeratedDataType& va
 std::ostream& operator<<(std::ostream& os, const FOMStringEnumeratedDataTypeList& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringArrayDataType& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringArrayDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringArrayDataType2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringArrayDataType2List& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordField& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordFieldList& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordDataType& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordField2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordField2List& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordDataType2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordDataType2List& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordAlternative& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordAlternativeList& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordDataType& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordAlternative2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordAlternative2List& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordDataType2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordDataType2List& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringTransportationType& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringTransportationTypeList& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringDimension& value);
@@ -9558,6 +10668,8 @@ std::ostream& operator<<(std::ostream& os, const FOMStringSwitch& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringSwitchList& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringModule& value);
 std::ostream& operator<<(std::ostream& os, const FOMStringModuleList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringModule2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringModule2List& value);
 std::ostream& operator<<(std::ostream& os, const FOMTransportationType& value);
 std::ostream& operator<<(std::ostream& os, const FOMTransportationTypeList& value);
 std::ostream& operator<<(std::ostream& os, const FOMDimension& value);
@@ -9596,8 +10708,11 @@ std::ostream& operator<<(std::ostream& os, const FOMVariantRecordDataType& value
 std::ostream& operator<<(std::ostream& os, const FOMVariantRecordDataTypeList& value);
 std::ostream& operator<<(std::ostream& os, const FOMModule& value);
 std::ostream& operator<<(std::ostream& os, const FOMModuleList& value);
+std::ostream& operator<<(std::ostream& os, const FOMModule2& value);
+std::ostream& operator<<(std::ostream& os, const FOMModule2List& value);
 std::ostream& operator<<(std::ostream& os, const ConnectionLostMessage& value);
 std::ostream& operator<<(std::ostream& os, const CreateFederationExecutionRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const CreateFederationExecutionRequest2Message& value);
 std::ostream& operator<<(std::ostream& os, const CreateFederationExecutionResponseMessage& value);
 std::ostream& operator<<(std::ostream& os, const DestroyFederationExecutionRequestMessage& value);
 std::ostream& operator<<(std::ostream& os, const DestroyFederationExecutionResponseMessage& value);
@@ -9608,7 +10723,9 @@ std::ostream& operator<<(std::ostream& os, const ShutdownFederationExecutionMess
 std::ostream& operator<<(std::ostream& os, const EraseFederationExecutionMessage& value);
 std::ostream& operator<<(std::ostream& os, const ReleaseFederationHandleMessage& value);
 std::ostream& operator<<(std::ostream& os, const InsertModulesMessage& value);
+std::ostream& operator<<(std::ostream& os, const InsertModules2Message& value);
 std::ostream& operator<<(std::ostream& os, const JoinFederationExecutionRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const JoinFederationExecutionRequest2Message& value);
 std::ostream& operator<<(std::ostream& os, const JoinFederationExecutionResponseMessage& value);
 std::ostream& operator<<(std::ostream& os, const ResignFederationExecutionLeafRequestMessage& value);
 std::ostream& operator<<(std::ostream& os, const ResignFederationExecutionRequestMessage& value);
@@ -9738,14 +10855,24 @@ std::ostream& prettyprint(std::ostream& os, const FOMStringEnumeratedDataType& v
 std::ostream& prettyprint(std::ostream& os, const FOMStringEnumeratedDataTypeList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringArrayDataType& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringArrayDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringArrayDataType2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringArrayDataType2List& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordField& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordFieldList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordDataType& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordField2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordField2List& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordDataType2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordDataType2List& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordAlternativeList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordDataType& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative2List& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordDataType2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordDataType2List& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringTransportationType& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringTransportationTypeList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringDimension& value);
@@ -9766,6 +10893,8 @@ std::ostream& prettyprint(std::ostream& os, const FOMStringSwitch& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringSwitchList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringModule& value);
 std::ostream& prettyprint(std::ostream& os, const FOMStringModuleList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringModule2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringModule2List& value);
 std::ostream& prettyprint(std::ostream& os, const FOMTransportationType& value);
 std::ostream& prettyprint(std::ostream& os, const FOMTransportationTypeList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMDimension& value);
@@ -9804,8 +10933,11 @@ std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordDataType& valu
 std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordDataTypeList& value);
 std::ostream& prettyprint(std::ostream& os, const FOMModule& value);
 std::ostream& prettyprint(std::ostream& os, const FOMModuleList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMModule2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMModule2List& value);
 std::ostream& prettyprint(std::ostream& os, const ConnectionLostMessage& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const CreateFederationExecutionRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const CreateFederationExecutionRequest2Message& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const CreateFederationExecutionResponseMessage& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const DestroyFederationExecutionRequestMessage& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const DestroyFederationExecutionResponseMessage& value, ServerModel::Federation* federation);
@@ -9816,7 +10948,9 @@ std::ostream& prettyprint(std::ostream& os, const ShutdownFederationExecutionMes
 std::ostream& prettyprint(std::ostream& os, const EraseFederationExecutionMessage& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const ReleaseFederationHandleMessage& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const InsertModulesMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const InsertModules2Message& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const JoinFederationExecutionRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const JoinFederationExecutionRequest2Message& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const JoinFederationExecutionResponseMessage& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const ResignFederationExecutionLeafRequestMessage& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const ResignFederationExecutionRequestMessage& value, ServerModel::Federation* federation);
@@ -9950,6 +11084,14 @@ inline std::string to_string(const FOMStringArrayDataType& value)
     return out.str();
 }
 
+// StructDataType FOMStringArrayDataType2
+inline std::string to_string(const FOMStringArrayDataType2& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
 // StructDataType FOMStringFixedRecordField
 inline std::string to_string(const FOMStringFixedRecordField& value)
 {
@@ -9966,6 +11108,22 @@ inline std::string to_string(const FOMStringFixedRecordDataType& value)
     return out.str();
 }
 
+// StructDataType FOMStringFixedRecordField2
+inline std::string to_string(const FOMStringFixedRecordField2& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringFixedRecordDataType2
+inline std::string to_string(const FOMStringFixedRecordDataType2& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
 // StructDataType FOMStringVariantRecordAlternative
 inline std::string to_string(const FOMStringVariantRecordAlternative& value)
 {
@@ -9976,6 +11134,22 @@ inline std::string to_string(const FOMStringVariantRecordAlternative& value)
 
 // StructDataType FOMStringVariantRecordDataType
 inline std::string to_string(const FOMStringVariantRecordDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringVariantRecordAlternative2
+inline std::string to_string(const FOMStringVariantRecordAlternative2& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringVariantRecordDataType2
+inline std::string to_string(const FOMStringVariantRecordDataType2& value)
 {
     std::ostringstream out;
     out << value;
@@ -10056,6 +11230,14 @@ inline std::string to_string(const FOMStringSwitch& value)
 
 // StructDataType FOMStringModule
 inline std::string to_string(const FOMStringModule& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringModule2
+inline std::string to_string(const FOMStringModule2& value)
 {
     std::ostringstream out;
     out << value;
@@ -10208,6 +11390,14 @@ inline std::string to_string(const FOMVariantRecordDataType& value)
 
 // StructDataType FOMModule
 inline std::string to_string(const FOMModule& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMModule2
+inline std::string to_string(const FOMModule2& value)
 {
     std::ostringstream out;
     out << value;

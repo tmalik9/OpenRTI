@@ -26,6 +26,8 @@
 #include "FOMStringModuleBuilder.h"
 #include "Message.h"
 #include "StringUtils.h"
+#include "TranslateTypes.h"
+
 #include <functional>
 #include <iostream>
 
@@ -222,33 +224,6 @@ public:
   std::list<std::shared_ptr<XmlSchemaNodeBase>> _contextStack;
 };
 
-template<typename T>
-inline T from_string(const std::string& str)
-{
-  std::istringstream ss(str);
-  T ret;
-  ss >> ret;
-  return ret;
-}
-
-template<>
-inline Endianness from_string<Endianness>(const std::string& str)
-{
-  if (caseInSensitiveStringEqual(str, "little"))
-    return Endianness::LittleEndian;
-  else
-    return Endianness::BigEndian;
-}
-
-template<>
-inline ArrayDataTypeEncoding from_string<ArrayDataTypeEncoding>(const std::string& str)
-{
-  if (caseInSensitiveStringEqual(str, "HLAfixedArray"))
-    return ArrayDataTypeEncoding::FixedArrayDataTypeEncoding;
-  else
-    return ArrayDataTypeEncoding::VariableArrayDataTypeEncoding;
-}
-
 FDD1516EContentHandler::FDD1516EContentHandler() noexcept
 {
   XmlSchemaTreeBuilder b;
@@ -361,7 +336,7 @@ FDD1516EContentHandler::FDD1516EContentHandler() noexcept
           .leaf("encoding", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().setEncoding(s); })
           .leaf("semantics")
           .leaf("nocode")
-          .node("field", [this]() {_fomStringModuleBuilder.getCurrentFixedRecordDataType().getFields().push_back(FOMStringFixedRecordField()); })
+          .node("field", [this]() {_fomStringModuleBuilder.getCurrentFixedRecordDataType().getFields().push_back(FOMStringFixedRecordField2()); })
             .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().getFields().back().setName(name); })
             .leaf("dataType", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().getFields().back().setDataType(s); })
             .leaf("version", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentFixedRecordDataType().getFields().back().setVersion(from_string<uint32_t>(s)); })
@@ -479,7 +454,7 @@ FDD1516EContentHandler::characters(const char* data, unsigned length)
   _characterData = std::string(data, length);
 }
 
-FOMStringModule
+FOMStringModule2
 FDD1516EFileReader::read(std::istream& stream, const std::string& encoding)
 {
   // Set up the fdd parser

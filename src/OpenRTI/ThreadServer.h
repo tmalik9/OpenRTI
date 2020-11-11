@@ -32,6 +32,7 @@ public:
   virtual ~ThreadServer();
 
   int exec() override;
+  uint32_t getProtocolVersion() const override;
 
 protected:
   void _postMessage(const _MessageConnectHandlePair& messageConnectHandlePair) override;

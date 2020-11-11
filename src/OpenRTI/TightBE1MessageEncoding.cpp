@@ -924,7 +924,7 @@ public:
     writeString(value.getName());
     writeString(value.getDataType());
     writeString(value.getCardinality());
-    writeArrayDataTypeEncoding(value.getEncoding());
+    writeString(value.getEncoding());
   }
 
   void writeFOMStringArrayDataTypeList(const FOMStringArrayDataTypeList& value)
@@ -935,11 +935,26 @@ public:
     }
   }
 
-  void writeFOMStringFixedRecordField(const FOMStringFixedRecordField& value)
+  void writeFOMStringArrayDataType2(const FOMStringArrayDataType2& value)
   {
     writeString(value.getName());
     writeString(value.getDataType());
-    writeUnsigned(value.getVersion());
+    writeString(value.getCardinality());
+    writeArrayDataTypeEncoding(value.getEncoding());
+  }
+
+  void writeFOMStringArrayDataType2List(const FOMStringArrayDataType2List& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringArrayDataType2List::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringArrayDataType2(*i);
+    }
+  }
+
+  void writeFOMStringFixedRecordField(const FOMStringFixedRecordField& value)
+  {
+    writeString(value.getName());
+    writeUnsigned(value.getDataType());
   }
 
   void writeFOMStringFixedRecordFieldList(const FOMStringFixedRecordFieldList& value)
@@ -954,8 +969,6 @@ public:
   {
     writeString(value.getName());
     writeString(value.getEncoding());
-    writeString(value.getInclude());
-    writeUnsigned(value.getVersion());
     writeFOMStringFixedRecordFieldList(value.getFields());
   }
 
@@ -967,11 +980,43 @@ public:
     }
   }
 
+  void writeFOMStringFixedRecordField2(const FOMStringFixedRecordField2& value)
+  {
+    writeString(value.getName());
+    writeString(value.getDataType());
+    writeUnsigned(value.getVersion());
+  }
+
+  void writeFOMStringFixedRecordField2List(const FOMStringFixedRecordField2List& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringFixedRecordField2List::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringFixedRecordField2(*i);
+    }
+  }
+
+  void writeFOMStringFixedRecordDataType2(const FOMStringFixedRecordDataType2& value)
+  {
+    writeString(value.getName());
+    writeString(value.getEncoding());
+    writeString(value.getInclude());
+    writeUnsigned(value.getVersion());
+    writeFOMStringFixedRecordField2List(value.getFields());
+  }
+
+  void writeFOMStringFixedRecordDataType2List(const FOMStringFixedRecordDataType2List& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringFixedRecordDataType2List::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringFixedRecordDataType2(*i);
+    }
+  }
+
   void writeFOMStringVariantRecordAlternative(const FOMStringVariantRecordAlternative& value)
   {
     writeString(value.getEnumerator());
     writeString(value.getName());
-    writeString(value.getDataType());
+    writeUnsigned(value.getDataType());
   }
 
   void writeFOMStringVariantRecordAlternativeList(const FOMStringVariantRecordAlternativeList& value)
@@ -996,6 +1041,38 @@ public:
     writeSizeTCompressed(value.size());
     for (FOMStringVariantRecordDataTypeList::const_iterator i = value.begin(); i != value.end(); ++i) {
       writeFOMStringVariantRecordDataType(*i);
+    }
+  }
+
+  void writeFOMStringVariantRecordAlternative2(const FOMStringVariantRecordAlternative2& value)
+  {
+    writeString(value.getEnumerator());
+    writeString(value.getName());
+    writeString(value.getDataType());
+  }
+
+  void writeFOMStringVariantRecordAlternative2List(const FOMStringVariantRecordAlternative2List& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringVariantRecordAlternative2List::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringVariantRecordAlternative2(*i);
+    }
+  }
+
+  void writeFOMStringVariantRecordDataType2(const FOMStringVariantRecordDataType2& value)
+  {
+    writeString(value.getName());
+    writeString(value.getDiscriminant());
+    writeString(value.getDataType());
+    writeFOMStringVariantRecordAlternative2List(value.getAlternatives());
+    writeString(value.getEncoding());
+  }
+
+  void writeFOMStringVariantRecordDataType2List(const FOMStringVariantRecordDataType2List& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringVariantRecordDataType2List::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringVariantRecordDataType2(*i);
     }
   }
 
@@ -1142,7 +1219,6 @@ public:
     writeFOMStringObjectClassList(value.getObjectClassList());
     writeFOMStringUpdateRateList(value.getUpdateRateList());
     writeFOMStringSwitchList(value.getSwitchList());
-    writeFOMStringBasicDataTypeList(value.getBasicDataTypeList());
     writeFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
     writeFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
     writeFOMStringArrayDataTypeList(value.getArrayDataTypeList());
@@ -1157,6 +1233,34 @@ public:
     writeSizeTCompressed(value.size());
     for (FOMStringModuleList::const_iterator i = value.begin(); i != value.end(); ++i) {
       writeFOMStringModule(*i);
+    }
+  }
+
+  void writeFOMStringModule2(const FOMStringModule2& value)
+  {
+    writeString(value.getDesignator());
+    writeFOMStringTransportationTypeList(value.getTransportationTypeList());
+    writeFOMStringDimensionList(value.getDimensionList());
+    writeFOMStringRoutingSpaceList(value.getRoutingSpaceList());
+    writeFOMStringInteractionClassList(value.getInteractionClassList());
+    writeFOMStringObjectClassList(value.getObjectClassList());
+    writeFOMStringUpdateRateList(value.getUpdateRateList());
+    writeFOMStringSwitchList(value.getSwitchList());
+    writeFOMStringBasicDataTypeList(value.getBasicDataTypeList());
+    writeFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
+    writeFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
+    writeFOMStringArrayDataType2List(value.getArrayDataTypeList());
+    writeFOMStringFixedRecordDataType2List(value.getFixedRecordDataTypeList());
+    writeFOMStringVariantRecordDataType2List(value.getVariantRecordDataTypeList());
+    writeBool(value.getArtificialInteractionRoot());
+    writeBool(value.getArtificialObjectRoot());
+  }
+
+  void writeFOMStringModule2List(const FOMStringModule2List& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMStringModule2List::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMStringModule2(*i);
     }
   }
 
@@ -1455,12 +1559,6 @@ public:
     writeFOMObjectClassList(value.getObjectClassList());
     writeFOMUpdateRateList(value.getUpdateRateList());
     writeFOMSwitchList(value.getSwitchList());
-    writeFOMBasicDataTypeList(value.getBasicDataTypeList());
-    writeFOMSimpleDataTypeList(value.getSimpleDataTypeList());
-    writeFOMEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
-    writeFOMArrayDataTypeList(value.getArrayDataTypeList());
-    writeFOMFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
-    writeFOMVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
     writeBool(value.getArtificialInteractionRoot());
     writeBool(value.getArtificialObjectRoot());
     writeString(value.getDesignator());
@@ -1474,6 +1572,24 @@ public:
     }
   }
 
+  void writeFOMModule2(const FOMModule2& value)
+  {
+    writeFOMBasicDataTypeList(value.getBasicDataTypeList());
+    writeFOMSimpleDataTypeList(value.getSimpleDataTypeList());
+    writeFOMEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
+    writeFOMArrayDataTypeList(value.getArrayDataTypeList());
+    writeFOMFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
+    writeFOMVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
+  }
+
+  void writeFOMModule2List(const FOMModule2List& value)
+  {
+    writeSizeTCompressed(value.size());
+    for (FOMModule2List::const_iterator i = value.begin(); i != value.end(); ++i) {
+      writeFOMModule2(*i);
+    }
+  }
+
   void writeConnectionLostMessage(const ConnectionLostMessage& value)
   {
     writeString(value.getFaultDescription());
@@ -1484,6 +1600,13 @@ public:
     writeString(value.getFederationExecution());
     writeString(value.getLogicalTimeFactoryName());
     writeFOMStringModuleList(value.getFOMStringModuleList());
+  }
+
+  void writeCreateFederationExecutionRequest2Message(const CreateFederationExecutionRequest2Message& value)
+  {
+    writeString(value.getFederationExecution());
+    writeString(value.getLogicalTimeFactoryName());
+    writeFOMStringModule2List(value.getFOMStringModuleList());
   }
 
   void writeCreateFederationExecutionResponseMessage(const CreateFederationExecutionResponseMessage& value)
@@ -1540,12 +1663,28 @@ public:
     writeFOMModuleList(value.getFOMModuleList());
   }
 
+  void writeInsertModules2Message(const InsertModules2Message& value)
+  {
+    writeFederationHandle(value.getFederationHandle());
+    writeFOMModule2List(value.getFOMModule2List());
+  }
+
   void writeJoinFederationExecutionRequestMessage(const JoinFederationExecutionRequestMessage& value)
   {
     writeString(value.getFederationExecution());
     writeString(value.getFederateType());
     writeString(value.getFederateName());
     writeFOMStringModuleList(value.getFOMStringModuleList());
+    writeConfigurationParameterMap(value.getConfigurationParameterMap());
+    writeBool(value.getIsInternal());
+  }
+
+  void writeJoinFederationExecutionRequest2Message(const JoinFederationExecutionRequest2Message& value)
+  {
+    writeString(value.getFederationExecution());
+    writeString(value.getFederateType());
+    writeString(value.getFederateName());
+    writeFOMStringModule2List(value.getFOMStringModuleList());
     writeConfigurationParameterMap(value.getConfigurationParameterMap());
     writeBool(value.getIsInternal());
   }
@@ -1986,6 +2125,16 @@ public:
   }
 
   void
+  encode(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionRequest2Message& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(104);
+    encodeStream.writeCreateFederationExecutionRequest2Message(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
   encode(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionResponseMessage& message) const
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
@@ -2086,12 +2235,32 @@ public:
   }
 
   void
+  encode(TightBE1MessageEncoding& messageEncoding, const InsertModules2Message& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(106);
+    encodeStream.writeInsertModules2Message(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
   encode(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionRequestMessage& message) const
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
     encodeStream.writeUInt16Compressed(13);
     encodeStream.writeJoinFederationExecutionRequestMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionRequest2Message& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(105);
+    encodeStream.writeJoinFederationExecutionRequest2Message(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
@@ -3434,7 +3603,7 @@ public:
     readString(value.getName());
     readString(value.getDataType());
     readString(value.getCardinality());
-    readArrayDataTypeEncoding(value.getEncoding());
+    readString(value.getEncoding());
   }
 
   void readFOMStringArrayDataTypeList(FOMStringArrayDataTypeList& value)
@@ -3445,11 +3614,26 @@ public:
     }
   }
 
-  void readFOMStringFixedRecordField(FOMStringFixedRecordField& value)
+  void readFOMStringArrayDataType2(FOMStringArrayDataType2& value)
   {
     readString(value.getName());
     readString(value.getDataType());
-    readUnsigned(value.getVersion());
+    readString(value.getCardinality());
+    readArrayDataTypeEncoding(value.getEncoding());
+  }
+
+  void readFOMStringArrayDataType2List(FOMStringArrayDataType2List& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringArrayDataType2List::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringArrayDataType2(*i);
+    }
+  }
+
+  void readFOMStringFixedRecordField(FOMStringFixedRecordField& value)
+  {
+    readString(value.getName());
+    readUnsigned(value.getDataType());
   }
 
   void readFOMStringFixedRecordFieldList(FOMStringFixedRecordFieldList& value)
@@ -3464,8 +3648,6 @@ public:
   {
     readString(value.getName());
     readString(value.getEncoding());
-    readString(value.getInclude());
-    readUnsigned(value.getVersion());
     readFOMStringFixedRecordFieldList(value.getFields());
   }
 
@@ -3477,11 +3659,43 @@ public:
     }
   }
 
+  void readFOMStringFixedRecordField2(FOMStringFixedRecordField2& value)
+  {
+    readString(value.getName());
+    readString(value.getDataType());
+    readUnsigned(value.getVersion());
+  }
+
+  void readFOMStringFixedRecordField2List(FOMStringFixedRecordField2List& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringFixedRecordField2List::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringFixedRecordField2(*i);
+    }
+  }
+
+  void readFOMStringFixedRecordDataType2(FOMStringFixedRecordDataType2& value)
+  {
+    readString(value.getName());
+    readString(value.getEncoding());
+    readString(value.getInclude());
+    readUnsigned(value.getVersion());
+    readFOMStringFixedRecordField2List(value.getFields());
+  }
+
+  void readFOMStringFixedRecordDataType2List(FOMStringFixedRecordDataType2List& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringFixedRecordDataType2List::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringFixedRecordDataType2(*i);
+    }
+  }
+
   void readFOMStringVariantRecordAlternative(FOMStringVariantRecordAlternative& value)
   {
     readString(value.getEnumerator());
     readString(value.getName());
-    readString(value.getDataType());
+    readUnsigned(value.getDataType());
   }
 
   void readFOMStringVariantRecordAlternativeList(FOMStringVariantRecordAlternativeList& value)
@@ -3506,6 +3720,38 @@ public:
     value.resize(readSizeTCompressed());
     for (FOMStringVariantRecordDataTypeList::iterator i = value.begin(); i != value.end(); ++i) {
       readFOMStringVariantRecordDataType(*i);
+    }
+  }
+
+  void readFOMStringVariantRecordAlternative2(FOMStringVariantRecordAlternative2& value)
+  {
+    readString(value.getEnumerator());
+    readString(value.getName());
+    readString(value.getDataType());
+  }
+
+  void readFOMStringVariantRecordAlternative2List(FOMStringVariantRecordAlternative2List& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringVariantRecordAlternative2List::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringVariantRecordAlternative2(*i);
+    }
+  }
+
+  void readFOMStringVariantRecordDataType2(FOMStringVariantRecordDataType2& value)
+  {
+    readString(value.getName());
+    readString(value.getDiscriminant());
+    readString(value.getDataType());
+    readFOMStringVariantRecordAlternative2List(value.getAlternatives());
+    readString(value.getEncoding());
+  }
+
+  void readFOMStringVariantRecordDataType2List(FOMStringVariantRecordDataType2List& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringVariantRecordDataType2List::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringVariantRecordDataType2(*i);
     }
   }
 
@@ -3652,7 +3898,6 @@ public:
     readFOMStringObjectClassList(value.getObjectClassList());
     readFOMStringUpdateRateList(value.getUpdateRateList());
     readFOMStringSwitchList(value.getSwitchList());
-    readFOMStringBasicDataTypeList(value.getBasicDataTypeList());
     readFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
     readFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
     readFOMStringArrayDataTypeList(value.getArrayDataTypeList());
@@ -3667,6 +3912,34 @@ public:
     value.resize(readSizeTCompressed());
     for (FOMStringModuleList::iterator i = value.begin(); i != value.end(); ++i) {
       readFOMStringModule(*i);
+    }
+  }
+
+  void readFOMStringModule2(FOMStringModule2& value)
+  {
+    readString(value.getDesignator());
+    readFOMStringTransportationTypeList(value.getTransportationTypeList());
+    readFOMStringDimensionList(value.getDimensionList());
+    readFOMStringRoutingSpaceList(value.getRoutingSpaceList());
+    readFOMStringInteractionClassList(value.getInteractionClassList());
+    readFOMStringObjectClassList(value.getObjectClassList());
+    readFOMStringUpdateRateList(value.getUpdateRateList());
+    readFOMStringSwitchList(value.getSwitchList());
+    readFOMStringBasicDataTypeList(value.getBasicDataTypeList());
+    readFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
+    readFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
+    readFOMStringArrayDataType2List(value.getArrayDataTypeList());
+    readFOMStringFixedRecordDataType2List(value.getFixedRecordDataTypeList());
+    readFOMStringVariantRecordDataType2List(value.getVariantRecordDataTypeList());
+    readBool(value.getArtificialInteractionRoot());
+    readBool(value.getArtificialObjectRoot());
+  }
+
+  void readFOMStringModule2List(FOMStringModule2List& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMStringModule2List::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMStringModule2(*i);
     }
   }
 
@@ -3965,12 +4238,6 @@ public:
     readFOMObjectClassList(value.getObjectClassList());
     readFOMUpdateRateList(value.getUpdateRateList());
     readFOMSwitchList(value.getSwitchList());
-    readFOMBasicDataTypeList(value.getBasicDataTypeList());
-    readFOMSimpleDataTypeList(value.getSimpleDataTypeList());
-    readFOMEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
-    readFOMArrayDataTypeList(value.getArrayDataTypeList());
-    readFOMFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
-    readFOMVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
     readBool(value.getArtificialInteractionRoot());
     readBool(value.getArtificialObjectRoot());
     readString(value.getDesignator());
@@ -3984,6 +4251,24 @@ public:
     }
   }
 
+  void readFOMModule2(FOMModule2& value)
+  {
+    readFOMBasicDataTypeList(value.getBasicDataTypeList());
+    readFOMSimpleDataTypeList(value.getSimpleDataTypeList());
+    readFOMEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
+    readFOMArrayDataTypeList(value.getArrayDataTypeList());
+    readFOMFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
+    readFOMVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
+  }
+
+  void readFOMModule2List(FOMModule2List& value)
+  {
+    value.resize(readSizeTCompressed());
+    for (FOMModule2List::iterator i = value.begin(); i != value.end(); ++i) {
+      readFOMModule2(*i);
+    }
+  }
+
   void readConnectionLostMessage(ConnectionLostMessage& value)
   {
     readString(value.getFaultDescription());
@@ -3994,6 +4279,13 @@ public:
     readString(value.getFederationExecution());
     readString(value.getLogicalTimeFactoryName());
     readFOMStringModuleList(value.getFOMStringModuleList());
+  }
+
+  void readCreateFederationExecutionRequest2Message(CreateFederationExecutionRequest2Message& value)
+  {
+    readString(value.getFederationExecution());
+    readString(value.getLogicalTimeFactoryName());
+    readFOMStringModule2List(value.getFOMStringModuleList());
   }
 
   void readCreateFederationExecutionResponseMessage(CreateFederationExecutionResponseMessage& value)
@@ -4050,12 +4342,28 @@ public:
     readFOMModuleList(value.getFOMModuleList());
   }
 
+  void readInsertModules2Message(InsertModules2Message& value)
+  {
+    readFederationHandle(value.getFederationHandle());
+    readFOMModule2List(value.getFOMModule2List());
+  }
+
   void readJoinFederationExecutionRequestMessage(JoinFederationExecutionRequestMessage& value)
   {
     readString(value.getFederationExecution());
     readString(value.getFederateType());
     readString(value.getFederateName());
     readFOMStringModuleList(value.getFOMStringModuleList());
+    readConfigurationParameterMap(value.getConfigurationParameterMap());
+    readBool(value.getIsInternal());
+  }
+
+  void readJoinFederationExecutionRequest2Message(JoinFederationExecutionRequest2Message& value)
+  {
+    readString(value.getFederationExecution());
+    readString(value.getFederateType());
+    readString(value.getFederateName());
+    readFOMStringModule2List(value.getFOMStringModuleList());
     readConfigurationParameterMap(value.getConfigurationParameterMap());
     readBool(value.getIsInternal());
   }
@@ -4604,7 +4912,7 @@ TightBE1MessageEncoding::readPacket(const Buffer& buffer)
   } else {
     decodePayload(i);
   }
-  if (getInputBufferComplete())
+  if (getInputBufferComplete() && _message != nullptr)
   {
 #ifdef ENABLE_NETWORKSTATISTICS
     GetNetworkStatistics().MessageReceived(_message->getTypeName());
@@ -4626,6 +4934,10 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
   case 2:
     _message = MakeShared<CreateFederationExecutionRequestMessage>();
     decodeStream.readCreateFederationExecutionRequestMessage(static_cast<CreateFederationExecutionRequestMessage&>(*_message));
+    break;
+  case 104:
+    _message = MakeShared<CreateFederationExecutionRequest2Message>();
+    decodeStream.readCreateFederationExecutionRequest2Message(static_cast<CreateFederationExecutionRequest2Message&>(*_message));
     break;
   case 3:
     _message = MakeShared<CreateFederationExecutionResponseMessage>();
@@ -4667,9 +4979,17 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
     _message = MakeShared<InsertModulesMessage>();
     decodeStream.readInsertModulesMessage(static_cast<InsertModulesMessage&>(*_message));
     break;
+  case 106:
+    _message = MakeShared<InsertModules2Message>();
+    decodeStream.readInsertModules2Message(static_cast<InsertModules2Message&>(*_message));
+    break;
   case 13:
     _message = MakeShared<JoinFederationExecutionRequestMessage>();
     decodeStream.readJoinFederationExecutionRequestMessage(static_cast<JoinFederationExecutionRequestMessage&>(*_message));
+    break;
+  case 105:
+    _message = MakeShared<JoinFederationExecutionRequest2Message>();
+    decodeStream.readJoinFederationExecutionRequest2Message(static_cast<JoinFederationExecutionRequest2Message&>(*_message));
     break;
   case 14:
     _message = MakeShared<JoinFederationExecutionResponseMessage>();

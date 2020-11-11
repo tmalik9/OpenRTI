@@ -32,7 +32,9 @@ namespace OpenRTI {
 class ConnectHandle;
 class ServerMessageDispatcher;
 class ServerOptions;
-
+namespace ServerModel {
+class NodeConnect;
+}
 class OPENRTI_LOCAL ServerNode : public AbstractServerNode {
 public:
   ServerNode();
@@ -57,6 +59,8 @@ public:
 
   void setServer(AbstractServer* server) override { _server = server; }
   AbstractServer* getServer() const override { return _server; }
+
+  ServerModel::NodeConnect* getParentConnect() const;
 private:
   ServerNode(const ServerNode&) = delete;
   ServerNode& operator=(const ServerNode&) = delete;

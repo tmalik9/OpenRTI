@@ -634,6 +634,8 @@ class StructField(object):
 
     def resolveHasPayloadAndHasSwap(self, typeMap):
         t = typeMap.getType(self.getTypeName())
+        if t is None:
+            raise Exception("struct field type not defined: field={0} {1}".format(self.getName(), self.getTypeName()))
         t.resolveHasPayloadAndHasSwap(typeMap)
         self._hasPayload = t.hasPayload()
 
@@ -836,7 +838,7 @@ class StructDataType(DataType):
         if self.getParentTypeName() is None:
             sourceStream.writeline('class OPENRTI_API {name} {{'.format(name = self.getName()))
         else:
-            sourceStream.writeline('class OPENRTI_API {name} final : public {parentTypeName} {{'.format(name = self.getName(), parentTypeName = self.getParentTypeName()))
+            sourceStream.writeline('class OPENRTI_API {name} : public {parentTypeName} {{'.format(name = self.getName(), parentTypeName = self.getParentTypeName()))
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
 
@@ -1387,6 +1389,9 @@ class MessageEncoding(object):
             'DisableTimeConstrainedNotifyMessage' : 101,
             'QueryAttributeOwnershipRequestMessage' : 102,
             'QueryAttributeOwnershipResponseMessage' : 103,
+            'CreateFederationExecutionRequest2Message' : 104,
+            'JoinFederationExecutionRequest2Message' : 105,
+            'InsertModules2Message' : 106,
         }
 
     def getName(self):
@@ -1873,7 +1878,7 @@ class MessageEncoding(object):
         sourceStream.writeline('} else {')
         sourceStream.writeline('  decodePayload(i);')
         sourceStream.writeline('}')
-        sourceStream.writeline('if (getInputBufferComplete())')
+        sourceStream.writeline('if (getInputBufferComplete() && _message != nullptr)')
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         sourceStream.writelineNoIndent('#ifdef ENABLE_NETWORKSTATISTICS')
