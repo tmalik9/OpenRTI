@@ -2665,6 +2665,8 @@ Federation::insert(const FOMStringModule& stringModule)
   //UNREACHABLE: return ModuleHandle();
 }
 
+// TODO: better handle this by implementing an appropriate 
+// FOMStringModule2List TranslateTypes::translate(FOMStringModuleList)
 void
 Federation::insert(const FOMStringModuleList& stringModuleList)
 {
@@ -2722,12 +2724,11 @@ Federation::insert(const FOMStringModule2& stringModule)
         created = true;
     }
 
-    /*
     for (auto& basicDataType : stringModule.getBasicDataTypeList()) {
       if (insertOrCheck(*module, basicDataType))
         created = true;
     }
-    */
+
     for (auto& simpleDataType : stringModule.getSimpleDataTypeList()) {
       if (insertOrCheck(*module, simpleDataType))
         created = true;
