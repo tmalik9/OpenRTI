@@ -204,6 +204,8 @@ set(OpenRTI_SOURCES
   StringUtils.cpp
   TightBE1MessageEncoding.cpp
   ThreadServer.cpp
+  TranslateTypes.cpp
+  TranslateTypes.h
   URL.cpp
   VariableLengthDataTuple.cpp
   WeakReferenced.cpp
