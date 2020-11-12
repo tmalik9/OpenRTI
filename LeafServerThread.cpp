@@ -39,6 +39,8 @@ public:
   _Registry(const _Registry&) = delete;
   ~_Registry() noexcept;
   static SharedPtr<_Registry>& GetInstance();
+  static bool allowCreation;
+
   SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
 
   void erase(LeafServerThread& serverThread);
@@ -73,6 +75,7 @@ LeafServerThread::_Registry::~_Registry() noexcept
     leafServerThread->postShutdown();
   }
   _urlServerMap.clear();
+  LeafServerThread::_Registry::allowCreation = true;
 }
 
 SharedPtr<AbstractConnect>
@@ -165,6 +168,7 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
         server->connectParentServer(URL::fromUrl(stringPair.second), abstime);
       }
     }
+
     return server;
   } else {
     return SharedPtr<AbstractServer>();
@@ -177,9 +181,15 @@ LeafServerThread::_Registry::createServerNode()
   return new ServerNode;
 }
 
+bool LeafServerThread::_Registry::allowCreation = true;
 SharedPtr<LeafServerThread::_Registry>& LeafServerThread::_Registry::GetInstance()
 {
-  static SharedPtr<LeafServerThread::_Registry> _instance = new LeafServerThread::_Registry;
+  static SharedPtr<LeafServerThread::_Registry> _instance = nullptr;
+
+  if (_instance == nullptr && LeafServerThread::_Registry::allowCreation)
+  {
+    _instance = new LeafServerThread::_Registry;
+  }
   return _instance;
 }
 
@@ -202,6 +212,7 @@ LeafServerThread::connect(const StringStringListMap& clientOptions)
 
 void LeafServerThread::shutdown()
 {
+  _Registry::allowCreation = false;
   _Registry::GetInstance().clear();
 }
 
