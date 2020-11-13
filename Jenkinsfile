@@ -1,6 +1,10 @@
 def docker_images = ["pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4",
                      "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"]
 
+//TODO replace with productive system
+artifactoryServer = Artifactory.server 'vistrpndart1-test'
+artifactoryBuildInfo = Artifactory.newBuildInfo()
+
 
 def get_linux_stages(img) {
   return {
@@ -20,6 +24,7 @@ def get_linux_stages(img) {
                   sh "mkdir build"
                   sh "chmod +x build.sh"
                   dir('build') {
+                    //TODO dynamically determine version
                     def build_cmd = '../build.sh Release 1234'
                     if (img.contains('centos')) {
                       sh "scl enable llvm-toolset-6.0 '${build_cmd}'"
@@ -29,7 +34,16 @@ def get_linux_stages(img) {
                   }
                 }
                 stage('Deploy') {
-                  echo "TODO deploy"
+                  //TODO dynamically determine version
+                  artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
+                        "files": [
+                            {
+                            "pattern": "build/*.tar.gz",
+                            "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/1234/",
+                            "flat" : "true"
+                            }
+                        ]
+                    }"""
                 }
               }
             }
