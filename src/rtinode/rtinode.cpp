@@ -89,7 +89,7 @@ extern "C" {
 
 static void sighandler(int sig)
 {
-  SignalNetworkServer::setDoneStatic()
+  SignalNetworkServer::setDoneStatic();
 }
 
 }
