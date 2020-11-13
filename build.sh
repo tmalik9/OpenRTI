@@ -18,5 +18,6 @@ make -j4 install
 mkdir pkg
 mv install/bin/rtinode pkg/
 mv install/bin/fom2cpp pkg/
-mv install/lib/*.so pkg/
+test -d install/lib && mv install/lib/*.so pkg/
+test -d install/lib64 && mv install/lib64/*.so pkg/
 tar czvf ${PKG_NAME} -C pkg .
