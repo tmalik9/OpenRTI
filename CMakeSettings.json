@@ -1,0 +1,155 @@
+{
+  "environments": [
+    {
+      "environment": "wsl_clang",
+      "CC": "clang",
+      "CXX": "clang++"
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Winx64Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${workspaceRoot}\\build\\${name}",
+      "installRoot": "${workspaceRoot}\\bin\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "OPENRTI_ENABLE_RTI13",
+          "value": "Off",
+          "type": "STRING"
+        },
+        {
+          "name": "OPENRTI_ENABLE_RTI1516",
+          "value": "Off",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "name": "Winx64Release",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${workspaceRoot}\\build\\${name}",
+      "installRoot": "${workspaceRoot}\\bin\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "variables": [
+        {
+          "name": "OPENRTI_ENABLE_RTI13",
+          "value": "Off",
+          "type": "STRING"
+        },
+        {
+          "name": "OPENRTI_ENABLE_RTI1516",
+          "value": "Off",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "name": "Winx86Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${workspaceRoot}\\build\\${name}",
+      "installRoot": "${workspaceRoot}\\bin\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": [
+        {
+          "name": "OPENRTI_ENABLE_RTI13",
+          "value": "Off",
+          "type": "STRING"
+        },
+        {
+          "name": "OPENRTI_ENABLE_RTI1516",
+          "value": "Off",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "name": "Winx86Release",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${workspaceRoot}\\build\\${name}",
+      "installRoot": "${workspaceRoot}\\bin\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": [
+        {
+          "name": "OPENRTI_ENABLE_RTI13",
+          "value": "Off",
+          "type": "STRING"
+        },
+        {
+          "name": "OPENRTI_ENABLE_RTI1516",
+          "value": "Off",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "name": "WSLDebug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}\\bin\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "linux_x64", "wsl_clang" ],
+      "wslPath": "${defaultWSLPath}",
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": [
+        {
+          "name": "OPENRTI_ENABLE_RTI13",
+          "value": "Off",
+          "type": "STRING"
+        },
+        {
+          "name": "OPENRTI_ENABLE_RTI1516",
+          "value": "Off",
+          "type": "STRING"
+        }
+      ],
+      "cmakeExecutable": "/usr/local/bin/cmake"
+    },
+    {
+      "name": "WSLRelease",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}\\bin\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "linux_x64", "wsl_clang" ],
+      "wslPath": "${defaultWSLPath}",
+      "addressSanitizerRuntimeFlags": "detect_leaks=0",
+      "variables": [
+        {
+          "name": "OPENRTI_ENABLE_RTI13",
+          "value": "Off",
+          "type": "STRING"
+        },
+        {
+          "name": "OPENRTI_ENABLE_RTI1516",
+          "value": "Off",
+          "type": "STRING"
+        }
+      ],
+      "cmakeExecutable": "/usr/local/bin/cmake"
+    }
+  ]
+}
