@@ -9,13 +9,13 @@
   "configurations": [
     {
       "name": "Winx64Debug",
-      "generator": "Ninja",
+      "generator": "Visual Studio 16 2019 Win64",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "buildRoot": "${workspaceRoot}\\build\\${name}",
       "installRoot": "${workspaceRoot}\\bin\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
+      "cmakeCommandArgs": "-T v141",
+      "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "variables": [
         {
@@ -32,13 +32,13 @@
     },
     {
       "name": "Winx64Release",
-      "generator": "Ninja",
+      "generator": "Visual Studio 16 2019 Win64",
       "configurationType": "RelWithDebInfo",
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "buildRoot": "${workspaceRoot}\\build\\${name}",
       "installRoot": "${workspaceRoot}\\bin\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
+      "cmakeCommandArgs": "-T v141",
+      "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "variables": [
         {
@@ -55,12 +55,12 @@
     },
     {
       "name": "Winx86Debug",
-      "generator": "Ninja",
+      "generator": "Visual Studio 16 2019",
       "configurationType": "Debug",
       "buildRoot": "${workspaceRoot}\\build\\${name}",
       "installRoot": "${workspaceRoot}\\bin\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
+      "cmakeCommandArgs": "-T v141",
+      "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": [
@@ -78,12 +78,12 @@
     },
     {
       "name": "Winx86Release",
-      "generator": "Ninja",
+      "generator": "Visual Studio 16 2019",
       "configurationType": "RelWithDebInfo",
       "buildRoot": "${workspaceRoot}\\build\\${name}",
       "installRoot": "${workspaceRoot}\\bin\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "-v",
+      "cmakeCommandArgs": "-T v141",
+      "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": [
