@@ -24,6 +24,7 @@ def get_linux_stages(img) {
                   sh "mkdir build"
                   sh "chmod +x build.sh"
                   dir('build') {
+                    //TODO build debug
                     //TODO dynamically determine version
                     def build_cmd = '../build.sh Release 1234'
                     if (img.contains('centos')) {
@@ -34,11 +35,12 @@ def get_linux_stages(img) {
                   }
                 }
                 stage('Deploy') {
+                  //TODO only deploy on tags
                   //TODO dynamically determine version
                   artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
                         "files": [
                             {
-                            "pattern": "build/*.tar.gz",
+                            "pattern": "build/*.tgz",
                             "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/1234/",
                             "flat" : "true"
                             }
