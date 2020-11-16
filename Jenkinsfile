@@ -8,16 +8,14 @@ artifactoryServer = Artifactory.server 'vistrpndart1-test'
 artifactoryBuildInfo = Artifactory.newBuildInfo()
 
 def isTag(svnUrl) {
-  SVN_URL
-    def result = svnUrl.contains('tags')
-    print("-----> isTag() == ${result}")
-    return result
+  def result = svnUrl.contains('tags')
+  echo "-----> isTag() == ${result}"
+  return result
 }
 def getTag(svnUrl) {
-  SVN_URL
-    def result = svnUrl.tokenize('/').last()
-    print("-----> getTag() == ${result}")
-    return result
+  def result = svnUrl.tokenize('/').last()
+  echo "-----> getTag() == ${result}"
+  return result
 }
 
 def get_linux_stages(img) {
