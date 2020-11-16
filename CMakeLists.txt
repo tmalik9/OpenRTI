@@ -64,7 +64,6 @@ endif()
 
 if(MSVC)
   # bkd Preprocessor Definitions
-  add_definitions(-DMP)
   add_definitions(-DNOMINMAX)
   add_definitions(-DTIME64)
   add_definitions(-DUNICODE)
@@ -165,6 +164,8 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wuninitialized>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-reorder>)
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unknown-pragmas>)
+elseif(MSVC)
+  add_compile_options(/MP)
 endif()
 
 
