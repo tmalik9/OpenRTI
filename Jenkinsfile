@@ -10,18 +10,18 @@ artifactoryBuildInfo = Artifactory.newBuildInfo()
 
 def isTag(svnUrl) {
   def result = svnUrl.contains('tags')
-  echo "-----> isTag() == ${result}"
+  //echo "-----> isTag() == ${result}"
   return result
 }
 def getTag(svnUrl) {
   def result = svnUrl.tokenize('/').last()
-  echo "-----> getTag() == ${result}"
+  //echo "-----> getTag() == ${result}"
   return result
 }
 
 def buildAndTest(img, configType) {
+    def buildDir = "build_${configType}"
     stage("Build ${configType}") {
-        def buildDir = "build_${configType}"
         sh "mkdir ${buildDir}"
         sh "chmod +x build.sh"
         dir(buildDir) {
@@ -33,9 +33,10 @@ def buildAndTest(img, configType) {
           }
         }
     }
-    stage("Tests ${configType}") {
-      echo "-----> TODO ctest"
-        //runCtest(buildDir, configType, "UnitTest")
+    stage("Test ${configType}") {
+        dir(buildDir) {
+            sh "ctest"
+        }
     }
 }
 
