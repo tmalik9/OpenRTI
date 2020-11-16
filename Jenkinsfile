@@ -30,8 +30,8 @@ def get_linux_stages(img) {
           {
             stage("Checkout") {
               def checkoutResults = checkout scm
-              //echo '-----> checkout results:\n' + checkoutResults.toString()
-              //echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
+              echo '-----> checkout results:\n' + checkoutResults.toString()
+              echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
               isTag(checkoutResults.SVN_URL)
               getTag(checkoutResults.SVN_URL)
             }
