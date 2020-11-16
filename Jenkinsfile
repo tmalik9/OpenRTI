@@ -7,16 +7,7 @@
 artifactoryServer = Artifactory.server 'vistrpndart1-test'
 artifactoryBuildInfo = Artifactory.newBuildInfo()
 
-def isTag(svnUrl) {
-  def result = svnUrl.contains('tags')
-  //echo "-----> isTag() == ${result}"
-  return result
-}
-def getTag(svnUrl) {
-  def result = svnUrl.tokenize('/').last()
-  //echo "-----> getTag() == ${result}"
-  return result
-}
+
 
 def buildAndTest_linux(img, configType) {
     def buildDir = "build_${configType}"
@@ -61,20 +52,29 @@ def buildAndTest_win(img, configType, additionalCmakeArgs) {
     }
 }
 
+def isTag(svnUrl) {
+  def result = svnUrl.contains('tags')
+  //echo "-----> isTag() == ${result}"
+  return result
+}
+def getTag(svnUrl) {
+  def result = svnUrl.tokenize('/').last()
+  //echo "-----> getTag() == ${result}"
+  return result
+}
 
 def checkout() {
   stage("Checkout") {
-              def checkoutResults = checkout scm
-              //echo '-----> checkout results:\n' + checkoutResults.toString()
-              env.isTag = isTag(checkoutResults.SVN_URL)
-              if (env.isTag) {
-                env.tagNr = getTag(checkoutResults.SVN_URL)
-              } else {
-                env.tagNr = ""
-              }
-              echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
-
-            }
+    def checkoutResults = checkout scm
+    //echo '-----> checkout results:\n' + checkoutResults.toString()
+    env.isTag = isTag(checkoutResults.SVN_URL)
+    if (env.isTag) {
+      env.tagNr = getTag(checkoutResults.SVN_URL)
+    } else {
+      env.tagNr = ""
+    }
+    //echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
+  }
 }
 
 def stages_linux(build_name, comp_env, img) {
