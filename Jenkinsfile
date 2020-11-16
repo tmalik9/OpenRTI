@@ -181,9 +181,9 @@ pipeline {
           docker_image_centos = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4"
           docker_image_ubuntu = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"
 
-          builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos))
+          builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos, true))
           //builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
-          builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu))
+          builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu, true))
 
           // Win flavours
           builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
