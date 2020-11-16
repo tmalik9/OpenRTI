@@ -19,9 +19,9 @@ def getTag(svnUrl) {
   return result
 }
 
-def buildAndTest(configType) {
-    def buildDir = "build_${configType}"
+def buildAndTest(img, configType) {
     stage("Build ${configType}") {
+        def buildDir = "build_${configType}"
         sh "mkdir ${buildDir}"
         sh "chmod +x build.sh"
         dir(buildDir) {
@@ -64,9 +64,9 @@ def get_linux_stages(img) {
             docker.withRegistry('https://pnd-rtklinux-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
               docker.image(img).inside {
 
-                buildAndTest('debug')
+                buildAndTest(img, "debug")
 
-                buildAndTest('release')
+                buildAndTest(img, "release")
 
                 if (env.isTag) {
                   stage('Deploy') {
