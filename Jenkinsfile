@@ -1,56 +1,8 @@
-
-
-//TODO
-//def windows_profiles = 
-
 //TODO replace with productive system
 artifactoryServer = Artifactory.server 'vistrpndart1-test'
 artifactoryBuildInfo = Artifactory.newBuildInfo()
 
 
-
-def buildAndTest_linux(img, configType) {
-    def buildDir = "build_${configType}"
-    stage("Build ${configType}") {
-        sh "mkdir ${buildDir}"
-        sh "chmod +x build.sh"
-        dir(buildDir) {
-          def build_cmd = "../build.sh ${configType} ${env.tagNr}"
-          if (img.contains('centos')) {
-            sh "scl enable llvm-toolset-6.0 '${build_cmd}'"
-          } else {
-            sh "${build_cmd}"
-          }
-        }
-    }
-    stage("Test ${configType}") {
-        dir(buildDir) {
-            sh "ctest --verbose --build-config ${configType}"
-        }
-    }
-}
-
-def buildAndTest_win(img, configType, additionalCmakeArgs) {
-    def buildDir = "build_${configType}"
-    cmakeBuild(
-        installation: 'InSearchPath', 
-        buildDir: "${buildDir}",
-        buildType: "${configType}",
-        generator: "Visual Studio 16 2019",
-        cleanBuild: true,
-        cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType}",
-        steps: [[
-            args: "--config ${configType}",
-            withCmake: true // "--build ." Argument
-        ]]
-    )
-    stage("Test ${configType}") {
-      ctest(
-          installation: 'InSearchPath',
-          arguments: "--verbose --build-config ${configType}"
-      )
-    }
-}
 
 def isTag(svnUrl) {
   def result = svnUrl.contains('tags')
@@ -75,6 +27,27 @@ def checkout() {
     }
     //echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
   }
+}
+
+def buildAndTest_linux(img, configType) {
+    def buildDir = "build_${configType}"
+    stage("Build ${configType}") {
+        sh "mkdir ${buildDir}"
+        sh "chmod +x build.sh"
+        dir(buildDir) {
+          def build_cmd = "../build.sh ${configType} ${env.tagNr}"
+          if (img.contains('centos')) {
+            sh "scl enable llvm-toolset-6.0 '${build_cmd}'"
+          } else {
+            sh "${build_cmd}"
+          }
+        }
+    }
+    stage("Test ${configType}") {
+        dir(buildDir) {
+            sh "ctest --verbose --build-config ${configType}"
+        }
+    }
 }
 
 def stages_linux(build_name, comp_env, img) {
@@ -118,6 +91,29 @@ def stages_linux(build_name, comp_env, img) {
   }
 }
 
+
+def buildAndTest_win(configType, additionalCmakeArgs) {
+    def buildDir = "build_${configType}"
+    cmakeBuild(
+        installation: 'InSearchPath', 
+        buildDir: "${buildDir}",
+        buildType: "${configType}",
+        generator: "Visual Studio 16 2019",
+        cleanBuild: true,
+        cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType}",
+        steps: [[
+            args: "--config ${configType}",
+            withCmake: true // "--build ." Argument
+        ]]
+    )
+    stage("Test ${configType}") {
+      ctest(
+          installation: 'InSearchPath',
+          arguments: "--verbose --build-config ${configType}"
+      )
+    }
+}
+
 def stages_win(build_name, additionalCmakeArgs) {
   return {
     stage(build_name) {
@@ -127,9 +123,9 @@ def stages_win(build_name, additionalCmakeArgs) {
           {
             checkout()
 
-            buildAndTest_win(img, "debug", additionalCmakeArgs)
+            buildAndTest_win("debug", additionalCmakeArgs)
 
-            buildAndTest_win(img, "release", additionalCmakeArgs)
+            buildAndTest_win("release", additionalCmakeArgs)
 
           }
           finally {
@@ -152,19 +148,25 @@ pipeline {
     stage('Build') {
       steps {
         script {
+          def builds = [:]
 
+          // Linux flavours
           env_clang = ["CC=clang","CXX=clang++"]
           env_gcc = ["CC=gcc","CXX=g++"]
           docker_image_centos = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4"
           docker_image_ubuntu = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"
 
-          def builds = [:]
           builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos))
-          // builds.put("centos7 gcc", build_linux("centos7 gcc", env_gcc, docker_image_centos))
           builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
           builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu))
           
+          builds.put("VS2015-x86", stages_win("VS2015-x86","-A x86 -T v140"))
+          //builds.put("VS2017-x86", stages_win("VS2017-x86","-A x86 -T v141"))
+          //builds.put("VS2019-x86", stages_win("VS2019-x86","-A x86 -T v142"))
+
           builds.put("VS2015-x64", stages_win("VS2015-x64","-A x64 -T v140"))
+          //builds.put("VS2017-x64", stages_win("VS2017-x64","-A x64 -T v141"))
+          //builds.put("VS2019-x64", stages_win("VS2019-x64","-A x64 -T v142"))
           
           // all_stages = windows_profiles.collectEntries { pr, labels -> ["${pr}": get_windows_stages(pr, labels)]}
           //all_stages = docker_images.collectEntries { img -> ["${img}": get_linux_stages(img)]}
