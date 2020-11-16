@@ -21,6 +21,7 @@ def get_linux_stages(img) {
             stage("Checkout") {
               def checkoutResults = checkout scm
               echo '-----> checkout results' + checkoutResults.toString()
+              echo '-----> env' + env.toString()
             }
             docker.withRegistry('https://pnd-rtklinux-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
               docker.image(img).inside {
