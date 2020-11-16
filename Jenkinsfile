@@ -1,5 +1,4 @@
-def docker_images = ["pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4",
-                     "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"]
+
 
 //TODO
 //def windows_profiles = 
@@ -40,19 +39,16 @@ def buildAndTest(img, configType) {
     }
 }
 
-def get_linux_stages(img) {
+def build_linux(build_name, comp_env, img) {
   return {
-    stage(img) {
+    stage(build_name) {
       node('docker && linux') {
-        withEnv([
-          "CC=clang",
-          "CXX=clang++"
-          ]) {
+        withEnv(comp_env) {
           try 
           {
             stage("Checkout") {
               def checkoutResults = checkout scm
-              echo '-----> checkout results:\n' + checkoutResults.toString()
+              //echo '-----> checkout results:\n' + checkoutResults.toString()
               env.isTag = isTag(checkoutResults.SVN_URL)
               if (env.isTag) {
                 env.tagNr = getTag(checkoutResults.SVN_URL)
@@ -105,9 +101,20 @@ pipeline {
     stage('Build') {
       steps {
         script {
+          env_clang = ["CC=clang","CXX=clang++"]
+          env_gcc = ["CC=gcc","CXX=g++"]
+          docker_image_centos = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4"
+          docker_image_ubuntu = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"
+          
+          def builds = [:]
+          builds.put("centos clang", env_clang, docker_image_centos)
+          builds.put("centos gcc", env_gcc, docker_image_centos)
+          builds.put("ubuntu clang", env_clang, docker_image_ubuntu)
+          builds.put("ubuntu gcc", env_gcc, docker_image_ubuntu)
+
           // all_stages = windows_profiles.collectEntries { pr, labels -> ["${pr}": get_windows_stages(pr, labels)]}
-          all_stages = docker_images.collectEntries { img -> ["${img}": get_linux_stages(img)]}
-          parallel all_stages
+          //all_stages = docker_images.collectEntries { img -> ["${img}": get_linux_stages(img)]}
+          parallel builds
         }
       }
     }
