@@ -140,8 +140,7 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
                           }
                       ]
                   }"""
-              }
-              artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
+                artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
                       "files": [
                           {
                           "pattern": "build_release/bin/*",
