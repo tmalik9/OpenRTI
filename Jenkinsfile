@@ -7,6 +7,18 @@ def windows_profiles =
 artifactoryServer = Artifactory.server 'vistrpndart1-test'
 artifactoryBuildInfo = Artifactory.newBuildInfo()
 
+def isTag(svnUrl) {
+  SVN_URL
+    def result = svnUrl.contains('tags')
+    print("-----> isTag() == ${result}")
+    return result
+}
+def getTag(svnUrl) {
+  SVN_URL
+    def result = svnUrl.tokenize('/').last()
+    print("-----> getTag() == ${result}")
+    return result
+}
 
 def get_linux_stages(img) {
   return {
@@ -20,8 +32,10 @@ def get_linux_stages(img) {
           {
             stage("Checkout") {
               def checkoutResults = checkout scm
-              echo '-----> checkout results' + checkoutResults.toString()
-              echo '-----> env' + sh(script: 'env|sort', returnStdout: true)
+              //echo '-----> checkout results:\n' + checkoutResults.toString()
+              //echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
+              isTag(checkoutResults.SVN_URL)
+              getTag(checkoutResults.SVN_URL)
             }
             docker.withRegistry('https://pnd-rtklinux-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
               docker.image(img).inside {
