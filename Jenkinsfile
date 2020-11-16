@@ -159,14 +159,15 @@ pipeline {
           builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos))
           builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
           builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu))
-          
-          builds.put("VS2015-x86", stages_win("VS2015-x86","-A x86 -T v140"))
-          //builds.put("VS2017-x86", stages_win("VS2017-x86","-A x86 -T v141"))
-          //builds.put("VS2019-x86", stages_win("VS2019-x86","-A x86 -T v142"))
 
-          builds.put("VS2015-x64", stages_win("VS2015-x64","-A x64 -T v140"))
-          //builds.put("VS2017-x64", stages_win("VS2017-x64","-A x64 -T v141"))
-          //builds.put("VS2019-x64", stages_win("VS2019-x64","-A x64 -T v142"))
+          // Win flavours
+          builds.put("VS-v140-x86", stages_win("VS2015-x86","-A x86 -T v140"))
+          builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A x86 -T v141"))
+          builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A x86 -T v142"))
+
+          builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140"))
+          builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141"))
+          builds.put("VS-v142-x64", stages_win("VS-v142-x64","-A x64 -T v142"))
           
           // all_stages = windows_profiles.collectEntries { pr, labels -> ["${pr}": get_windows_stages(pr, labels)]}
           //all_stages = docker_images.collectEntries { img -> ["${img}": get_linux_stages(img)]}
