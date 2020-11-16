@@ -1,6 +1,8 @@
 def docker_images = ["pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4",
                      "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"]
 
+def windows_profiles = 
+
 //TODO replace with productive system
 artifactoryServer = Artifactory.server 'vistrpndart1-test'
 artifactoryBuildInfo = Artifactory.newBuildInfo()
@@ -14,9 +16,11 @@ def get_linux_stages(img) {
           "CC=clang",
           "CXX=clang++"
           ]) {
-          try {
+          try 
+          {
             stage("Checkout") {
-              checkout scm
+              def checkoutResults = checkout scm
+              echo '-----> checkout results' + checkoutResults.toString()
             }
             docker.withRegistry('https://pnd-rtklinux-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
               docker.image(img).inside {
