@@ -18,7 +18,7 @@ def getTag(svnUrl) {
   return result
 }
 
-def buildAndTest(img, configType) {
+def buildAndTest_linux(img, configType) {
     def buildDir = "build_${configType}"
     stage("Build ${configType}") {
         sh "mkdir ${buildDir}"
@@ -34,19 +34,36 @@ def buildAndTest(img, configType) {
     }
     stage("Test ${configType}") {
         dir(buildDir) {
-            sh "ctest"
+            sh "ctest --verbose --build-config ${configType}"
         }
     }
 }
 
-def build_linux(build_name, comp_env, img) {
-  return {
-    stage(build_name) {
-      node('docker && linux') {
-        withEnv(comp_env) {
-          try 
-          {
-            stage("Checkout") {
+def buildAndTest_win(img, configType, additionalCmakeArgs) {
+    def buildDir = "build_${configType}"
+    cmakeBuild(
+        installation: 'InSearchPath', 
+        buildDir: "${buildDir}",
+        buildType: "${configType}",
+        generator: "Visual Studio 16 2019",
+        cleanBuild: true,
+        cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType}",
+        steps: [[
+            args: "--config ${configType}",
+            withCmake: true // "--build ." Argument
+        ]]
+    )
+    stage("Test ${configType}") {
+      ctest(
+          installation: 'InSearchPath',
+          arguments: "--verbose --build-config ${configType}"
+      )
+    }
+}
+
+
+def checkout() {
+  stage("Checkout") {
               def checkoutResults = checkout scm
               //echo '-----> checkout results:\n' + checkoutResults.toString()
               env.isTag = isTag(checkoutResults.SVN_URL)
@@ -58,12 +75,23 @@ def build_linux(build_name, comp_env, img) {
               echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
 
             }
+}
+
+def stages_linux(build_name, comp_env, img) {
+  return {
+    stage(build_name) {
+      node('docker && linux') {
+        withEnv(comp_env) {
+          try 
+          {
+            checkout()
+
             docker.withRegistry('https://pnd-rtklinux-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
               docker.image(img).inside {
 
-                buildAndTest(img, "debug")
+                buildAndTest_linux(img, "debug")
 
-                buildAndTest(img, "release")
+                buildAndTest_linux(img, "release")
 
                 if (env.isTag) {
                   stage('Deploy') {
@@ -90,6 +118,29 @@ def build_linux(build_name, comp_env, img) {
   }
 }
 
+def stages_win(build_name, additionalCmakeArgs) {
+  return {
+    stage(build_name) {
+      node('buildtools2019') {
+        withEnv([]) {
+          try 
+          {
+            checkout()
+
+            buildAndTest_win(img, "debug", additionalCmakeArgs)
+
+            buildAndTest_win(img, "release", additionalCmakeArgs)
+
+          }
+          finally {
+            cleanWs()
+          }
+        }
+      }
+    }
+  }
+}
+
 pipeline {
   agent none
   options {
@@ -101,17 +152,20 @@ pipeline {
     stage('Build') {
       steps {
         script {
+
           env_clang = ["CC=clang","CXX=clang++"]
           env_gcc = ["CC=gcc","CXX=g++"]
           docker_image_centos = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4"
           docker_image_ubuntu = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"
-          
+
           def builds = [:]
-          builds.put("centos7 clang", build_linux("centos7 clang", env_clang, docker_image_centos))
-          builds.put("centos7 gcc", build_linux("centos7 gcc", env_gcc, docker_image_centos))
-          builds.put("ubuntu1804 clang", build_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
-          builds.put("ubuntu1804 gcc", build_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu))
-          echo "----> builds ${builds}"
+          builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos))
+          // builds.put("centos7 gcc", build_linux("centos7 gcc", env_gcc, docker_image_centos))
+          builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
+          builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu))
+          
+          builds.put("VS2015-x64", stages_win("VS2015-x64","-A x64 -T v140"))
+          
           // all_stages = windows_profiles.collectEntries { pr, labels -> ["${pr}": get_windows_stages(pr, labels)]}
           //all_stages = docker_images.collectEntries { img -> ["${img}": get_linux_stages(img)]}
           parallel(builds)
