@@ -50,7 +50,7 @@ def buildAndTest_linux(img, configType) {
     }
 }
 
-def stages_linux(build_name, comp_env, img) {
+def stages_linux(build_name, comp_env, img, deploy) {
   return {
     stage(build_name) {
       node('docker && linux') {
@@ -66,12 +66,12 @@ def stages_linux(build_name, comp_env, img) {
 
                 buildAndTest_linux(img, "release")
 
-                if (env.isTag) {
+                if (env.isTag && deploy) {
                   stage('Deploy') {
                     artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
                           "files": [
                               {
-                              "pattern": "build/*.tgz",
+                              "pattern": "build_*/*.tgz",
                               "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/${env.tagNr}/",
                               "flat" : "true"
                               }
@@ -94,18 +94,20 @@ def stages_linux(build_name, comp_env, img) {
 
 def buildAndTest_win(configType, additionalCmakeArgs) {
     def buildDir = "build_${configType}"
-    cmakeBuild(
-        installation: 'InSearchPath', 
-        buildDir: "${buildDir}",
-        buildType: "${configType}",
-        generator: "Visual Studio 16 2019",
-        cleanBuild: true,
-        cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType}",
-        steps: [[
-            args: "--config ${configType}",
-            withCmake: true // "--build ." Argument
-        ]]
-    )
+    stage("Build ${configType}") {
+      cmakeBuild(
+          installation: 'InSearchPath', 
+          buildDir: "${buildDir}",
+          buildType: "${configType}",
+          generator: "Visual Studio 16 2019",
+          cleanBuild: true,
+          cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType}",
+          steps: [[
+              args: "--config ${configType}",
+              withCmake: true // "--build ." Argument
+          ]]
+      )
+    }
     stage("Test ${configType}") {
       ctest(
           installation: 'InSearchPath',
@@ -114,7 +116,7 @@ def buildAndTest_win(configType, additionalCmakeArgs) {
     }
 }
 
-def stages_win(build_name, additionalCmakeArgs) {
+def stages_win(build_name, additionalCmakeArgs, deploy) {
   return {
     stage(build_name) {
       node('buildtools2019') {
@@ -126,6 +128,30 @@ def stages_win(build_name, additionalCmakeArgs) {
             buildAndTest_win("debug", additionalCmakeArgs)
 
             buildAndTest_win("release", additionalCmakeArgs)
+
+            if (env.isTag && deploy) {
+              stage('Deploy') {
+                artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
+                      "files": [
+                          {
+                          "pattern": "build_debug/bin/*",
+                          "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/win-jenkins-test/${env.tagNr}/${build_name}/debug/",
+                          "flat" : "true"
+                          }
+                      ]
+                  }"""
+              }
+              artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
+                      "files": [
+                          {
+                          "pattern": "build_release/bin/*",
+                          "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/win-jenkins-test/${env.tagNr}/${build_name}/release/",
+                          "flat" : "true"
+                          }
+                      ]
+                  }"""
+              }
+            }
 
           }
           finally {
@@ -157,17 +183,17 @@ pipeline {
           docker_image_ubuntu = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"
 
           builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos))
-          builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
+          //builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
           builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu))
 
           // Win flavours
-          builds.put("VS-v140-x86", stages_win("VS2015-x86","-A x86 -T v140"))
-          builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A x86 -T v141"))
-          builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A x86 -T v142"))
+          builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
+          builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A Win32 -T v141", false))
+          builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A Win32 -T v142", true))
 
-          builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140"))
-          builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141"))
-          builds.put("VS-v142-x64", stages_win("VS-v142-x64","-A x64 -T v142"))
+          builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140", false))
+          builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141", false))
+          builds.put("VS-v142-x64", stages_win("VS-v142-x64","-A x64 -T v142", true))
           
           // all_stages = windows_profiles.collectEntries { pr, labels -> ["${pr}": get_windows_stages(pr, labels)]}
           //all_stages = docker_images.collectEntries { img -> ["${img}": get_linux_stages(img)]}
