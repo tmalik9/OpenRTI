@@ -1,7 +1,8 @@
 def docker_images = ["pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4",
                      "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"]
 
-def windows_profiles = 
+//TODO
+//def windows_profiles = 
 
 //TODO replace with productive system
 artifactoryServer = Artifactory.server 'vistrpndart1-test'
@@ -18,6 +19,26 @@ def getTag(svnUrl) {
   return result
 }
 
+def buildAndTest(configType) {
+    def buildDir = "build_${configType}"
+    stage("Build ${configType}") {
+        sh "mkdir ${buildDir}"
+        sh "chmod +x build.sh"
+        dir(buildDir) {
+          def build_cmd = '../build.sh ${configType} ${env.tagNr}'
+          if (img.contains('centos')) {
+            sh "scl enable llvm-toolset-6.0 '${build_cmd}'"
+          } else {
+            sh "${build_cmd}"
+          }
+        }
+    }
+    stage("Tests ${configType}") {
+      echo "-----> TODO ctest"
+        //runCtest(buildDir, configType, "UnitTest")
+    }
+}
+
 def get_linux_stages(img) {
   return {
     stage(img) {
@@ -31,38 +52,34 @@ def get_linux_stages(img) {
             stage("Checkout") {
               def checkoutResults = checkout scm
               echo '-----> checkout results:\n' + checkoutResults.toString()
+              env.isTag = isTag(checkoutResults.SVN_URL)
+              if (env.isTag) {
+                env.tagNr = getTag(checkoutResults.SVN_URL)
+              } else {
+                env.tagNr = ""
+              }
               echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
-              isTag(checkoutResults.SVN_URL)
-              getTag(checkoutResults.SVN_URL)
+
             }
             docker.withRegistry('https://pnd-rtklinux-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
               docker.image(img).inside {
-                stage('Build') {
-                  sh "mkdir build"
-                  sh "chmod +x build.sh"
-                  dir('build') {
-                    //TODO build debug
-                    //TODO dynamically determine version
-                    def build_cmd = '../build.sh Release 1234'
-                    if (img.contains('centos')) {
-                      sh "scl enable llvm-toolset-6.0 '${build_cmd}'"
-                    } else {
-                      sh "${build_cmd}"
-                    }
+
+                buildAndTest('debug')
+
+                buildAndTest('release')
+
+                if (env.isTag) {
+                  stage('Deploy') {
+                    artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
+                          "files": [
+                              {
+                              "pattern": "build/*.tgz",
+                              "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/${env.tagNr}/",
+                              "flat" : "true"
+                              }
+                          ]
+                      }"""
                   }
-                }
-                stage('Deploy') {
-                  //TODO only deploy on tags
-                  //TODO dynamically determine version
-                  artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
-                        "files": [
-                            {
-                            "pattern": "build/*.tgz",
-                            "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/1234/",
-                            "flat" : "true"
-                            }
-                        ]
-                    }"""
                 }
               }
             }
