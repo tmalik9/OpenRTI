@@ -111,10 +111,10 @@ pipeline {
           builds.put(build_linux("centos7 gcc", env_gcc, docker_image_centos))
           builds.put(build_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
           builds.put(build_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu))
-
+          echo "----> builds ${builds}"
           // all_stages = windows_profiles.collectEntries { pr, labels -> ["${pr}": get_windows_stages(pr, labels)]}
           //all_stages = docker_images.collectEntries { img -> ["${img}": get_linux_stages(img)]}
-          parallel builds
+          parallel(builds)
         }
       }
     }
