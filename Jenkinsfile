@@ -25,7 +25,7 @@ def buildAndTest(img, configType) {
         sh "mkdir ${buildDir}"
         sh "chmod +x build.sh"
         dir(buildDir) {
-          def build_cmd = '../build.sh ${configType} ${env.tagNr}'
+          def build_cmd = "../build.sh ${configType} ${env.tagNr}"
           if (img.contains('centos')) {
             sh "scl enable llvm-toolset-6.0 '${build_cmd}'"
           } else {
