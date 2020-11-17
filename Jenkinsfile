@@ -163,6 +163,9 @@ pipeline {
     stage('Build') {
       steps {
         script {
+
+          env.mailTo = "Konrad.Breitsprecher@vector.com" //;Thomas.Malik@vector.com;Dominik.Herr@vector.com;Matthias.Kaschub@vector.com"
+
           def builds = [:]
 
           // Linux flavours
@@ -190,18 +193,17 @@ pipeline {
     }
   }
   post {
-    def mail_recipients = 'Konrad.Breitsprecher@vector.com' //;Thomas.Malik@vector.com;Dominik.Herr@vector.com;Matthias.Kaschub@vector.com'
     failure {
       emailext ( subject: '[Jenkins OpenRTI] OpenRTI Build Failed',
                  mimeType: 'text/html',
-                 to: "${mail_recipients}",
+                 to: "${env.mailTo}",
                  recipientProviders: [[$class: 'CulpritsRecipientProvider']],
                  body: "The OpenRTI Build failed:  ${env.RUN_DISPLAY_URL} <br/> Please check if you are responsible for the build break.")
     }
     success {
       emailext ( subject: '[Jenkins OpenRTI] OpenRTI Build Succeeded',
                   mimeType: 'text/html',
-                  to: "${mail_recipients}",
+                  to: "${env.mailTo}",
                   recipientProviders: [[$class: 'CulpritsRecipientProvider']],
                   body: "The OpenRTI Build succeeded:  ${env.RUN_DISPLAY_URL}")
     }
