@@ -190,7 +190,7 @@ pipeline {
     }
   }
   post {
-    mail_recipients = 'Konrad.Breitsprecher@vector.com' //;Thomas.Malik@vector.com;Dominik.Herr@vector.com;Matthias.Kaschub@vector.com'
+    def mail_recipients = 'Konrad.Breitsprecher@vector.com' //;Thomas.Malik@vector.com;Dominik.Herr@vector.com;Matthias.Kaschub@vector.com'
     failure {
       emailext ( subject: '[Jenkins OpenRTI] OpenRTI Build Failed',
                  mimeType: 'text/html',
