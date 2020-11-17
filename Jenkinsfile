@@ -7,7 +7,7 @@ def checkout() {
     def checkoutResults = checkout scm
     //echo '-----> checkout results:\n' + checkoutResults.toString()
     env.isTag = checkoutResults.SVN_URL.contains('tags')
-    if (env.isTag == true) {
+    if (env.isTag == "true") {
       env.tagNr = checkoutResults.SVN_URL.tokenize('/').last()
     } else {
       env.tagNr = ""
@@ -53,7 +53,7 @@ def stages_linux(build_name, comp_env, img, deploy) {
                 buildAndTest_linux(img, "debug")
                 buildAndTest_linux(img, "release")
 
-                if (env.isTag == true && deploy) {
+                if (env.isTag == "true" && deploy) {
                   upload("build_*/*.tgz")
                 }
               }
@@ -104,7 +104,7 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
             buildAndTest_win("debug", additionalCmakeArgs)
             buildAndTest_win("release", additionalCmakeArgs)
 
-            if (env.isTag == true && deploy) {
+            if (env.isTag == "true" && deploy) {
                 
               def zipFileName_debug = "openrti-${env.tagNr}-${build_name}-debug.zip"
               zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin'
