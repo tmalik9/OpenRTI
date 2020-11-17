@@ -128,13 +128,16 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
             if (env.isTag && deploy) {
               stage('Deploy') {
                 
-                def zipFileName = "OpenRTI-${build_name}-debug.zip"
-                zip zipFile: zipFileName, archive: false, dir: 'build_debug/bin'
+                def zipFileName_debug = "OpenRTI-Win-${build_name}-debug.zip"
+                zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin'
+                
+                def zipFileName_release = "OpenRTI-Win-${build_name}-release.zip"
+                zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin'
 
                 artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
                       "files": [
                           {
-                          "pattern": ${zipFileName},
+                          "pattern": "OpenRTI-Win-*.zip",
                           "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/win-jenkins-test/${env.tagNr}/",
                           "flat" : "true"
                           }
