@@ -1,27 +1,19 @@
 //TODO replace with productive system
-artifactoryServer = Artifactory.server 'vistrpndart1-test'
+artifactoryServer = Artifactory.server 'vistrpndart1'
 artifactoryBuildInfo = Artifactory.newBuildInfo()
-
-def isTag(svnUrl) {
-  def result = svnUrl.contains('tags')
-  return result
-}
-def getTag(svnUrl) {
-  def result = svnUrl.tokenize('/').last()
-  return result
-}
 
 def checkout() {
   stage("Checkout") {
     def checkoutResults = checkout scm
     //echo '-----> checkout results:\n' + checkoutResults.toString()
-    env.isTag = isTag(checkoutResults.SVN_URL)
-    if (env.isTag) {
-      env.tagNr = getTag(checkoutResults.SVN_URL)
+    env.isTag = checkoutResults.SVN_URL.contains('tags')
+    if (env.isTag == true) {
+      env.tagNr = checkoutResults.SVN_URL.tokenize('/').last()
     } else {
       env.tagNr = ""
     }
     //echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
+    echo "-----> Checkout: isTag ${env.isTag} tagNr ${env.tagNr}"
   }
 }
 
@@ -59,10 +51,9 @@ def stages_linux(build_name, comp_env, img, deploy) {
               docker.image(img).inside {
 
                 buildAndTest_linux(img, "debug")
-
                 buildAndTest_linux(img, "release")
 
-                if (env.isTag && deploy) {
+                if (env.isTag == true && deploy) {
                   upload("build_*/*.tgz")
                 }
               }
@@ -74,21 +65,6 @@ def stages_linux(build_name, comp_env, img, deploy) {
         }
       }
     }
-  }
-}
-
-def upload(pattern) {
-  def tagNrShort = env.tagNr.substring(0,env.tagNr.lastIndexOf('.'))
-  stage('Deploy') {
-    artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
-          "files": [
-              {
-              "pattern": "${pattern}",
-              "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/${tagNrShort}/${env.tagNr}/",
-              "flat" : "true"
-              }
-          ]
-      }"""
   }
 }
 
@@ -126,20 +102,17 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
             checkout()
 
             buildAndTest_win("debug", additionalCmakeArgs)
-
             buildAndTest_win("release", additionalCmakeArgs)
 
-            if (env.isTag && deploy) {
-              stage('Deploy') {
+            if (env.isTag == true && deploy) {
                 
-                def zipFileName_debug = "openrti-${env.tag}-${build_name}-debug.zip"
-                zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin'
-                
-                def zipFileName_release = "openrti-${env.tag}-${build_name}-release.zip"
-                zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin'
+              def zipFileName_debug = "openrti-${env.tagNr}-${build_name}-debug.zip"
+              zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin'
+              
+              def zipFileName_release = "openrti-${env.tagNr}-${build_name}-release.zip"
+              zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin'
 
-                upload("openrti-*.zip")
-              }
+              upload("openrti-*.zip")
             }
 
           }
@@ -149,6 +122,21 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
         }
       }
     }
+  }
+}
+
+def upload(pattern) {
+  def tagNrShort = env.tagNr.substring(0,env.tagNr.lastIndexOf('.'))
+  stage('Deploy') {
+    artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
+          "files": [
+              {
+              "pattern": "${pattern}",
+              "target": "pnd-rtklinux-generic-dev/OpenRTI/upload/${tagNrShort}/${env.tagNr}/",
+              "flat" : "true"
+              }
+          ]
+      }"""
   }
 }
 
@@ -164,7 +152,8 @@ pipeline {
       steps {
         script {
 
-          env.mailTo = "Konrad.Breitsprecher@vector.com" //;Thomas.Malik@vector.com;Dominik.Herr@vector.com;Matthias.Kaschub@vector.com"
+          //env.mailTo = "V-VGPNDVATDistSim@vector.com"
+          env.mailTo = "Konrad.Breitsprecher@vector.com"
 
           def builds = [:]
 
@@ -174,18 +163,18 @@ pipeline {
           docker_image_centos = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4"
           docker_image_ubuntu = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"
 
-          // builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos, true))
-          // //builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
+          builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos, true))
+          //builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
           builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu, true))
 
-          // // Win flavours
-          // //builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
-          // //builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A Win32 -T v141", false))
-          // builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A Win32 -T v142", true))
+          // Win flavours
+          //builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
+          builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A Win32 -T v141", true))
+          //builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A Win32 -T v142", false))
 
           //builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140", false))
-          //builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141", false))
-          builds.put("VS-v142-x64", stages_win("VS-v142-x64","-A x64 -T v142", true))
+          builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141", true))
+          //builds.put("VS-v142-x64", stages_win("VS-v142-x64","-A x64 -T v142", false))
 
           parallel(builds)
         }
