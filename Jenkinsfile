@@ -186,16 +186,14 @@ pipeline {
           builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu, true))
 
           // Win flavours
-          builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
-          builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A Win32 -T v141", false))
+          // builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
+          // builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A Win32 -T v141", false))
           builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A Win32 -T v142", true))
 
-          builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140", false))
-          builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141", false))
+          // builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140", false))
+          // builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141", false))
           builds.put("VS-v142-x64", stages_win("VS-v142-x64","-A x64 -T v142", true))
-          
-          // all_stages = windows_profiles.collectEntries { pr, labels -> ["${pr}": get_windows_stages(pr, labels)]}
-          //all_stages = docker_images.collectEntries { img -> ["${img}": get_linux_stages(img)]}
+
           parallel(builds)
         }
       }
