@@ -63,18 +63,7 @@ def stages_linux(build_name, comp_env, img, deploy) {
                 buildAndTest_linux(img, "release")
 
                 if (env.isTag && deploy) {
-                  def tagNrShort = env.tagNr.substring(0,env.tagNr.lastIndexOf('.'))
-                  stage('Deploy') {
-                    artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
-                          "files": [
-                              {
-                              "pattern": "build_*/*.tgz",
-                              "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/${tagNrShort}/${env.tagNr}/",
-                              "flat" : "true"
-                              }
-                          ]
-                      }"""
-                  }
+                  upload("build_*/*.tgz")
                 }
               }
             }
@@ -85,6 +74,21 @@ def stages_linux(build_name, comp_env, img, deploy) {
         }
       }
     }
+  }
+}
+
+def upload(pattern) {
+  def tagNrShort = env.tagNr.substring(0,env.tagNr.lastIndexOf('.'))
+  stage('Deploy') {
+    artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
+          "files": [
+              {
+              "pattern": "${pattern}",
+              "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/${tagNrShort}/${env.tagNr}/",
+              "flat" : "true"
+              }
+          ]
+      }"""
   }
 }
 
@@ -128,21 +132,13 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
             if (env.isTag && deploy) {
               stage('Deploy') {
                 
-                def zipFileName_debug = "OpenRTI-Win-${build_name}-debug.zip"
+                def zipFileName_debug = "openrti-${env.tag}-${build_name}-debug.zip"
                 zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin'
                 
-                def zipFileName_release = "OpenRTI-Win-${build_name}-release.zip"
+                def zipFileName_release = "openrti-${env.tag}-${build_name}-release.zip"
                 zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin'
 
-                artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
-                      "files": [
-                          {
-                          "pattern": "OpenRTI-Win-*.zip",
-                          "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/win-jenkins-test/${env.tagNr}/",
-                          "flat" : "true"
-                          }
-                      ]
-                  }"""
+                upload("openrti-*.zip")
               }
             }
 
