@@ -63,12 +63,13 @@ def stages_linux(build_name, comp_env, img, deploy) {
                 buildAndTest_linux(img, "release")
 
                 if (env.isTag && deploy) {
+                  def tagNrShort = env.tagNr.substring(0,env.tagNr.lastIndexOf('.'))
                   stage('Deploy') {
                     artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
                           "files": [
                               {
                               "pattern": "build_*/*.tgz",
-                              "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/${env.tagNr}/",
+                              "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/${tagNrShort}/${env.tagNr}/",
                               "flat" : "true"
                               }
                           ]
@@ -87,7 +88,6 @@ def stages_linux(build_name, comp_env, img, deploy) {
   }
 }
 
-
 def buildAndTest_win(configType, additionalCmakeArgs) {
     def buildDir = "build_${configType}"
     stage("Build ${configType}") {
@@ -100,7 +100,7 @@ def buildAndTest_win(configType, additionalCmakeArgs) {
           cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType}",
           steps: [[
               args: "--config ${configType}",
-              withCmake: true // "--build ." Argument
+              withCmake: true
           ]]
       )
     }
@@ -143,15 +143,6 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
                           }
                       ]
                   }"""
-                // artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
-                //       "files": [
-                //           {
-                //           "pattern": "build_release/bin/*",
-                //           "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/win-jenkins-test/${env.tagNr}/${build_name}/release/",
-                //           "flat" : "true"
-                //           }
-                //       ]
-                //   }"""
               }
             }
 
@@ -186,7 +177,7 @@ pipeline {
 
           // builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos, true))
           // //builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
-          // builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu, true))
+          builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu, true))
 
           // // Win flavours
           // //builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
@@ -202,20 +193,21 @@ pipeline {
       }
     }
   }
-  // post {
-  //   failure {
-  //     emailext ( subject: '[Jenkins OpenRTI] OpenRTI Build Failed',
-  //                mimeType: 'text/html',
-  //                to: 'abc@vector.com',
-  //                recipientProviders: [[$class: 'CulpritsRecipientProvider']],
-  //                body: "The OpenRTI Build failed:  ${env.RUN_DISPLAY_URL} <br/> Please check if you are responsible for the build break.")
-  //   }
-  //   success {
-  //     emailext ( subject: '[Jenkins OpenRTI] OpenRTI Build Succeeded',
-  //                 mimeType: 'text/html',
-  //                 to: 'abc@vector.com',
-  //                 recipientProviders: [[$class: 'CulpritsRecipientProvider']],
-  //                 body: "The OpenRTI Build succeeded:  ${env.RUN_DISPLAY_URL}")
-  //   }
-  // }
+  post {
+    mail_recipients = 'Konrad.Breitsprecher@vector.com' //;Thomas.Malik@vector.com;Dominik.Herr@vector.com;Matthias.Kaschub@vector.com'
+    failure {
+      emailext ( subject: '[Jenkins OpenRTI] OpenRTI Build Failed',
+                 mimeType: 'text/html',
+                 to: "${mail_recipients}",
+                 recipientProviders: [[$class: 'CulpritsRecipientProvider']],
+                 body: "The OpenRTI Build failed:  ${env.RUN_DISPLAY_URL} <br/> Please check if you are responsible for the build break.")
+    }
+    success {
+      emailext ( subject: '[Jenkins OpenRTI] OpenRTI Build Succeeded',
+                  mimeType: 'text/html',
+                  to: "${mail_recipients}",
+                  recipientProviders: [[$class: 'CulpritsRecipientProvider']],
+                  body: "The OpenRTI Build succeeded:  ${env.RUN_DISPLAY_URL}")
+    }
+  }
 }
