@@ -1,4 +1,3 @@
-//TODO replace with productive system
 artifactoryServer = Artifactory.server 'vistrpndart1'
 artifactoryBuildInfo = Artifactory.newBuildInfo()
 
@@ -13,7 +12,7 @@ def checkout() {
       env.tagNr = ""
     }
     //echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
-    echo "-----> Checkout: isTag ${env.isTag} tagNr ${env.tagNr}"
+    //echo "-----> Checkout: isTag ${env.isTag} tagNr ${env.tagNr}"
   }
 }
 
@@ -152,8 +151,8 @@ pipeline {
       steps {
         script {
 
-          //env.mailTo = "V-VGPNDVATDistSim@vector.com"
-          env.mailTo = "Konrad.Breitsprecher@vector.com"
+          env.mailTo = "V-VGPNDVATDistSim@vector.com"
+          //env.mailTo = "Konrad.Breitsprecher@vector.com"
 
           def builds = [:]
 
