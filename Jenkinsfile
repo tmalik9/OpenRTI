@@ -2,16 +2,12 @@
 artifactoryServer = Artifactory.server 'vistrpndart1-test'
 artifactoryBuildInfo = Artifactory.newBuildInfo()
 
-
-
 def isTag(svnUrl) {
   def result = svnUrl.contains('tags')
-  //echo "-----> isTag() == ${result}"
   return result
 }
 def getTag(svnUrl) {
   def result = svnUrl.tokenize('/').last()
-  //echo "-----> getTag() == ${result}"
   return result
 }
 
@@ -131,24 +127,28 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
 
             if (env.isTag && deploy) {
               stage('Deploy') {
+                
+                def zipFileName = "OpenRTI-${build_name}-debug.zip"
+                zip zipFile: zipFileName, archive: false, dir: 'build_debug/bin'
+
                 artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
                       "files": [
                           {
-                          "pattern": "build_debug/bin/*",
-                          "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/win-jenkins-test/${env.tagNr}/${build_name}/debug/",
+                          "pattern": ${zipFileName},
+                          "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/win-jenkins-test/${env.tagNr}/",
                           "flat" : "true"
                           }
                       ]
                   }"""
-                artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
-                      "files": [
-                          {
-                          "pattern": "build_release/bin/*",
-                          "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/win-jenkins-test/${env.tagNr}/${build_name}/release/",
-                          "flat" : "true"
-                          }
-                      ]
-                  }"""
+                // artifactoryServer.upload buildInfo: artifactoryBuildInfo, spec: """{
+                //       "files": [
+                //           {
+                //           "pattern": "build_release/bin/*",
+                //           "target": "pnd-rtklinux-generic-dev-local/OpenRTI/upload/win-jenkins-test/${env.tagNr}/${build_name}/release/",
+                //           "flat" : "true"
+                //           }
+                //       ]
+                //   }"""
               }
             }
 
@@ -181,21 +181,19 @@ pipeline {
           docker_image_centos = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4"
           docker_image_ubuntu = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"
 
-          builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos, true))
-          //builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
-          builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu, true))
+          // builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos, true))
+          // //builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
+          // builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu, true))
 
-          // Win flavours
-          builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
-          builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A Win32 -T v141", false))
-          builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A Win32 -T v142", true))
+          // // Win flavours
+          // //builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
+          // //builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A Win32 -T v141", false))
+          // builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A Win32 -T v142", true))
 
-          builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140", false))
-          builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141", false))
+          //builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140", false))
+          //builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141", false))
           builds.put("VS-v142-x64", stages_win("VS-v142-x64","-A x64 -T v142", true))
-          
-          // all_stages = windows_profiles.collectEntries { pr, labels -> ["${pr}": get_windows_stages(pr, labels)]}
-          //all_stages = docker_images.collectEntries { img -> ["${img}": get_linux_stages(img)]}
+
           parallel(builds)
         }
       }
