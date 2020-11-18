@@ -369,7 +369,7 @@ void MomServer::accept(const ReserveObjectInstanceNameRequestMessage& message)
 
 void MomServer::joinFederationExecution(ServerModel::Federation* federation)
 {
-  // The destroy request message
+  // The join request message
   SharedPtr<JoinFederationExecutionRequestMessage> request;
   request = new JoinFederationExecutionRequestMessage;
   request->setFederationExecution(federation->getName());

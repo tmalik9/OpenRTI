@@ -2354,24 +2354,17 @@ public:
   bool insertOrCheck(Module& module, const FOMStringBasicDataType& stringDataType);
   bool insertOrCheck(Module& module, const FOMStringSimpleDataType& stringDataType);
   bool insertOrCheck(Module& module, const FOMStringEnumeratedDataType& stringDataType);
-  bool insertOrCheck(Module& module, const FOMStringArrayDataType& stringDataType);
   bool insertOrCheck(Module& module, const FOMStringArrayDataType2& stringDataType);
-  bool insertOrCheck(Module& module, const FOMStringFixedRecordDataType& stringDataType);
   bool insertOrCheck(Module& module, const FOMStringFixedRecordDataType2& stringDataType);
-  bool insertOrCheck(Module& module, const FOMStringVariantRecordDataType& stringDataType);
   bool insertOrCheck(Module& module, const FOMStringVariantRecordDataType2& stringDataType);
 
   bool insertOrCheck(Module& module, const FOMStringInteractionClass& stringInteractionClass);
   bool insertOrCheck(Module& module, const FOMStringObjectClass& stringObjectClass);
 
   /// This is for inserting the initial object model
-  ModuleHandle insert(const FOMStringModule& stringModule);
-  void insert(const FOMStringModuleList& stringModuleList);
-
   ModuleHandle insert(const FOMStringModule2& stringModule);
   void insert(const FOMStringModule2List& stringModuleList);
 
-  void insert(ModuleHandleVector& moduleHandleVector, const FOMStringModuleList& stringModuleList);
   void insert(ModuleHandleVector& moduleHandleVector, const FOMStringModule2List& stringModuleList);
 
   /// Either insert a new entity or creates a new one.
