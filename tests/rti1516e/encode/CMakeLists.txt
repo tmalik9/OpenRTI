@@ -5,4 +5,4 @@ else()
 target_link_libraries(encode-1516e rti1516e fedtime1516e OpenRTI)
 endif()
 
-add_test(rti1516e/encode-1516e "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/encode-1516e")
+add_test(rti1516e/encode-1516e-1 "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/encode-1516e" -O "${CMAKE_CURRENT_SOURCE_DIR}/fdd-1.xml")

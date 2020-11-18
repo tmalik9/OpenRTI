@@ -198,6 +198,7 @@ public:
     Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
 
     // The join request message
+    // the protocol version might even be checked later
     if (getProtocolVersion() == 8)
     {
       SharedPtr<JoinFederationExecutionRequestMessage> request = MakeShared<JoinFederationExecutionRequestMessage>();

@@ -429,7 +429,7 @@ public:
     return true;
   }
 
-  virtual bool exec()
+  virtual bool exec() override
   {
     if (_constructorArgs._joinOnce)
       return execJoinOnce();
@@ -437,133 +437,133 @@ public:
       return execJoinMultiple();
   }
 
-  virtual void connectionLost(const std::wstring& faultDescription)
+  virtual void connectionLost(const std::wstring& faultDescription) override
   {
   }
 
-  virtual void reportFederationExecutions(const rti1516e::FederationExecutionInformationVector& theFederationExecutionInformationList)
+  virtual void reportFederationExecutions(const rti1516e::FederationExecutionInformationVector& theFederationExecutionInformationList) override
   {
   }
 
-  virtual void synchronizationPointRegistrationSucceeded(const std::wstring& label)
+  virtual void synchronizationPointRegistrationSucceeded(const std::wstring& label) override
   {
   }
 
-  virtual void synchronizationPointRegistrationFailed(const std::wstring& label, rti1516e::SynchronizationPointFailureReason reason)
+  virtual void synchronizationPointRegistrationFailed(const std::wstring& label, rti1516e::SynchronizationPointFailureReason reason) override
   {
   }
 
-  virtual void announceSynchronizationPoint(const std::wstring& label, const rti1516e::VariableLengthData& tag)
+  virtual void announceSynchronizationPoint(const std::wstring& label, const rti1516e::VariableLengthData& tag) override
   {
     _federateSet.erase(label);
   }
 
-  virtual void federationSynchronized(const std::wstring& label, const rti1516e::FederateHandleSet& failedToSyncSet)
+  virtual void federationSynchronized(const std::wstring& label, const rti1516e::FederateHandleSet& failedToSyncSet) override
   {
     ++_synchronized;
   }
 
-  virtual void initiateFederateSave(const std::wstring& label)
+  virtual void initiateFederateSave(const std::wstring& label) override
   {
   }
 
-  virtual void initiateFederateSave(const std::wstring& label, const rti1516e::LogicalTime& logicalTime)
+  virtual void initiateFederateSave(const std::wstring& label, const rti1516e::LogicalTime& logicalTime) override
   {
   }
 
-  virtual void federationSaved()
+  virtual void federationSaved() override
   {
   }
 
-  virtual void federationNotSaved(rti1516e::SaveFailureReason theSaveFailureReason)
+  virtual void federationNotSaved(rti1516e::SaveFailureReason theSaveFailureReason) override
   {
   }
 
-  virtual void federationSaveStatusResponse(const rti1516e::FederateHandleSaveStatusPairVector& theFederateStatusVector)
+  virtual void federationSaveStatusResponse(const rti1516e::FederateHandleSaveStatusPairVector& theFederateStatusVector) override
   {
   }
 
-  virtual void requestFederationRestoreSucceeded(const std::wstring& label)
+  virtual void requestFederationRestoreSucceeded(const std::wstring& label) override
   {
   }
 
-  virtual void requestFederationRestoreFailed(const std::wstring& label)
+  virtual void requestFederationRestoreFailed(const std::wstring& label) override
   {
   }
 
-  virtual void federationRestoreBegun()
+  virtual void federationRestoreBegun() override
   {
   }
 
-  virtual void initiateFederateRestore(const std::wstring& label, const std::wstring& federateName, rti1516e::FederateHandle handle)
+  virtual void initiateFederateRestore(const std::wstring& label, const std::wstring& federateName, rti1516e::FederateHandle handle) override
   {
   }
 
-  virtual void federationRestored()
+  virtual void federationRestored() override
   {
   }
 
-  virtual void federationNotRestored(rti1516e::RestoreFailureReason theRestoreFailureReason)
+  virtual void federationNotRestored(rti1516e::RestoreFailureReason theRestoreFailureReason) override
   {
   }
 
-  virtual void federationRestoreStatusResponse(const rti1516e::FederateRestoreStatusVector& theFederateStatusVector)
+  virtual void federationRestoreStatusResponse(const rti1516e::FederateRestoreStatusVector& theFederateStatusVector) override
   {
   }
 
-  virtual void startRegistrationForObjectClass(rti1516e::ObjectClassHandle)
+  virtual void startRegistrationForObjectClass(rti1516e::ObjectClassHandle) override
   {
   }
 
-  virtual void stopRegistrationForObjectClass(rti1516e::ObjectClassHandle)
+  virtual void stopRegistrationForObjectClass(rti1516e::ObjectClassHandle) override
   {
   }
 
-  virtual void turnInteractionsOn(rti1516e::InteractionClassHandle)
+  virtual void turnInteractionsOn(rti1516e::InteractionClassHandle) override
   {
   }
 
-  virtual void turnInteractionsOff(rti1516e::InteractionClassHandle)
+  virtual void turnInteractionsOff(rti1516e::InteractionClassHandle) override
   {
   }
 
-  virtual void objectInstanceNameReservationSucceeded(const std::wstring&)
+  virtual void objectInstanceNameReservationSucceeded(const std::wstring&) override
   {
   }
 
-  virtual void objectInstanceNameReservationFailed(const std::wstring&)
+  virtual void objectInstanceNameReservationFailed(const std::wstring&) override
   {
   }
 
-  virtual void multipleObjectInstanceNameReservationSucceeded(const std::set<std::wstring>& theObjectInstanceNames)
+  virtual void multipleObjectInstanceNameReservationSucceeded(const std::set<std::wstring>& theObjectInstanceNames) override
   {
   }
 
-  virtual void multipleObjectInstanceNameReservationFailed(const std::set<std::wstring>& theObjectInstanceNames)
-  {
-  }
-
-  virtual void discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::ObjectClassHandle theObjectClass,
-                                      std::wstring const & theObjectInstanceName)
+  virtual void multipleObjectInstanceNameReservationFailed(const std::set<std::wstring>& theObjectInstanceNames) override
   {
   }
 
   virtual void discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::ObjectClassHandle theObjectClass,
-                                      std::wstring const & theObjectInstanceName, rti1516e::FederateHandle producingFederate)
+                                      std::wstring const & theObjectInstanceName) override
+  {
+  }
+
+  virtual void discoverObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::ObjectClassHandle theObjectClass,
+                                      std::wstring const & theObjectInstanceName, rti1516e::FederateHandle producingFederate) override
   {
     discoverObjectInstance(theObject, theObjectClass, theObjectInstanceName);
   }
 
   virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues,
                                       rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
-                                      rti1516e::TransportationType theType, rti1516e::SupplementalReflectInfo theReflectInfo)
+                                      rti1516e::TransportationType theType, rti1516e::SupplementalReflectInfo theReflectInfo) override
   {
   }
 
   virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues,
                                       rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
                                       rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime,
-                                      rti1516e::OrderType receivedOrder, rti1516e::SupplementalReflectInfo theReflectInfo)
+                                      rti1516e::OrderType receivedOrder, rti1516e::SupplementalReflectInfo theReflectInfo) override
   {
     reflectAttributeValues(theObject, theAttributeValues, theUserSuppliedTag, sentOrder, theType, theReflectInfo);
   }
@@ -571,20 +571,20 @@ public:
   virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle theObject, rti1516e::AttributeHandleValueMap const & theAttributeValues,
                                       rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
                                       rti1516e::TransportationType theType, rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder,
-                                      rti1516e::MessageRetractionHandle theHandle, rti1516e::SupplementalReflectInfo theReflectInfo)
+                                      rti1516e::MessageRetractionHandle theHandle, rti1516e::SupplementalReflectInfo theReflectInfo) override
   {
     reflectAttributeValues(theObject, theAttributeValues, theUserSuppliedTag, sentOrder, theType, theTime, receivedOrder, theReflectInfo);
   }
 
   virtual void receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues,
                                   rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::TransportationType theType,
-                                  rti1516e::SupplementalReceiveInfo theReceiveInfo)
+                                  rti1516e::SupplementalReceiveInfo theReceiveInfo) override
   {
   }
 
   virtual void receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues,
                                   rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::TransportationType theType,
-                                  rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::SupplementalReceiveInfo theReceiveInfo)
+                                  rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::SupplementalReceiveInfo theReceiveInfo) override
   {
     receiveInteraction(theInteraction, theParameterValues, theUserSuppliedTag, sentOrder, theType, theReceiveInfo);
   }
@@ -592,123 +592,123 @@ public:
   virtual void receiveInteraction(rti1516e::InteractionClassHandle theInteraction, rti1516e::ParameterHandleValueMap const & theParameterValues,
                                   rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder, rti1516e::TransportationType theType,
                                   rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::MessageRetractionHandle theHandle,
-                                  rti1516e::SupplementalReceiveInfo theReceiveInfo)
+                                  rti1516e::SupplementalReceiveInfo theReceiveInfo) override
   {
     receiveInteraction(theInteraction, theParameterValues, theUserSuppliedTag, sentOrder, theType, theTime, receivedOrder, theReceiveInfo);
   }
 
   virtual void removeObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::VariableLengthData const & theUserSuppliedTag,
-                                    rti1516e::OrderType sentOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo)
+                                    rti1516e::OrderType sentOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo) override
   {
   }
 
   virtual void removeObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
-                                    rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo)
+                                    rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::SupplementalRemoveInfo theRemoveInfo) override
   {
     removeObjectInstance(theObject, theUserSuppliedTag, sentOrder, theRemoveInfo);
   }
 
   virtual void removeObjectInstance(rti1516e::ObjectInstanceHandle theObject, rti1516e::VariableLengthData const & theUserSuppliedTag, rti1516e::OrderType sentOrder,
                                     rti1516e::LogicalTime const & theTime, rti1516e::OrderType receivedOrder, rti1516e::MessageRetractionHandle theHandle,
-                                    rti1516e::SupplementalRemoveInfo theRemoveInfo)
+                                    rti1516e::SupplementalRemoveInfo theRemoveInfo) override
   {
     removeObjectInstance(theObject, theUserSuppliedTag, sentOrder, theTime, receivedOrder, theRemoveInfo);
   }
 
   virtual void attributesInScope(rti1516e::ObjectInstanceHandle theObject,
-                                 rti1516e::AttributeHandleSet const & theAttributes)
+                                 rti1516e::AttributeHandleSet const & theAttributes) override
   {
   }
 
   virtual void attributesOutOfScope(rti1516e::ObjectInstanceHandle theObject,
-                                    rti1516e::AttributeHandleSet const & theAttributes)
+                                    rti1516e::AttributeHandleSet const & theAttributes) override
   {
   }
 
   virtual void provideAttributeValueUpdate(rti1516e::ObjectInstanceHandle theObject,
                                            rti1516e::AttributeHandleSet const & theAttributes,
-                                           rti1516e::VariableLengthData const & theUserSuppliedTag)
+                                           rti1516e::VariableLengthData const & theUserSuppliedTag) override
   {
   }
 
   virtual void turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle theObject,
-                                              rti1516e::AttributeHandleSet const & theAttributes)
+                                              rti1516e::AttributeHandleSet const & theAttributes) override
   {
   }
 
   virtual void turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle theObject,
                                               rti1516e::AttributeHandleSet const & theAttributes,
-                                              std::wstring const & updateRateDesignator)
+                                              std::wstring const & updateRateDesignator) override
   {
   }
 
   virtual void turnUpdatesOffForObjectInstance(rti1516e::ObjectInstanceHandle theObject,
-                                               rti1516e::AttributeHandleSet const & theAttributes)
+                                               rti1516e::AttributeHandleSet const & theAttributes) override
   {
   }
 
   virtual void requestAttributeOwnershipAssumption(rti1516e::ObjectInstanceHandle theObject,
                                                    rti1516e::AttributeHandleSet const & offeredAttributes,
-                                                   rti1516e::VariableLengthData const & theUserSuppliedTag)
+                                                   rti1516e::VariableLengthData const & theUserSuppliedTag) override
   {
   }
 
   virtual void requestDivestitureConfirmation(rti1516e::ObjectInstanceHandle theObject,
-                                              rti1516e::AttributeHandleSet const & releasedAttributes)
+                                              rti1516e::AttributeHandleSet const & releasedAttributes) override
   {
   }
 
   virtual void attributeOwnershipAcquisitionNotification(rti1516e::ObjectInstanceHandle theObject,
                                                          rti1516e::AttributeHandleSet const & securedAttributes,
-                                                         rti1516e::VariableLengthData const & theUserSuppliedTag)
+                                                         rti1516e::VariableLengthData const & theUserSuppliedTag) override
   {
   }
 
   virtual void attributeOwnershipUnavailable(rti1516e::ObjectInstanceHandle theObject,
-                                             rti1516e::AttributeHandleSet const & theAttributes)
+                                             rti1516e::AttributeHandleSet const & theAttributes) override
   {
   }
 
   virtual void requestAttributeOwnershipRelease(rti1516e::ObjectInstanceHandle theObject,
                                                 rti1516e::AttributeHandleSet const & candidateAttributes,
-                                                rti1516e::VariableLengthData const & theUserSuppliedTag)
+                                                rti1516e::VariableLengthData const & theUserSuppliedTag) override
   {
   }
 
   virtual void confirmAttributeOwnershipAcquisitionCancellation(rti1516e::ObjectInstanceHandle theObject,
-                                                                rti1516e::AttributeHandleSet const & theAttributes)
+                                                                rti1516e::AttributeHandleSet const & theAttributes) override
   {
   }
 
   virtual void informAttributeOwnership(rti1516e::ObjectInstanceHandle theObject,
                                         rti1516e::AttributeHandle theAttribute,
-                                        rti1516e::FederateHandle theOwner)
+                                        rti1516e::FederateHandle theOwner) override
   {
   }
 
   virtual void attributeIsNotOwned(rti1516e::ObjectInstanceHandle theObject,
-                                   rti1516e::AttributeHandle theAttribute)
+                                   rti1516e::AttributeHandle theAttribute) override
   {
   }
 
   virtual void attributeIsOwnedByRTI(rti1516e::ObjectInstanceHandle theObject,
-                                     rti1516e::AttributeHandle theAttribute)
+                                     rti1516e::AttributeHandle theAttribute) override
   {
   }
 
-  virtual void timeRegulationEnabled(rti1516e::LogicalTime const & theFederateTime)
+  virtual void timeRegulationEnabled(rti1516e::LogicalTime const & theFederateTime) override
   {
   }
 
-  virtual void timeConstrainedEnabled(rti1516e::LogicalTime const & theFederateTime)
+  virtual void timeConstrainedEnabled(rti1516e::LogicalTime const & theFederateTime) override
   {
   }
 
-  virtual void timeAdvanceGrant(rti1516e::LogicalTime const & theTime)
+  virtual void timeAdvanceGrant(rti1516e::LogicalTime const & theTime) override
   {
   }
 
-  virtual void requestRetraction(rti1516e::MessageRetractionHandle theHandle)
+  virtual void requestRetraction(rti1516e::MessageRetractionHandle theHandle) override
   {
   }
 
@@ -1482,113 +1482,113 @@ public:
   }
 
 protected:
-  virtual void connectionLost(const std::wstring& faultDescription)
+  virtual void connectionLost(const std::wstring& faultDescription) override
   {
   }
 
-  virtual void reportFederationExecutions(const rti1516e::FederationExecutionInformationVector& theFederationExecutionInformationList)
+  virtual void reportFederationExecutions(const rti1516e::FederationExecutionInformationVector& theFederationExecutionInformationList) override
   {
   }
 
-  virtual void synchronizationPointRegistrationSucceeded(const std::wstring& label)
+  virtual void synchronizationPointRegistrationSucceeded(const std::wstring& label) override
   {
   }
 
-  virtual void synchronizationPointRegistrationFailed(const std::wstring& label, rti1516e::SynchronizationPointFailureReason reason)
+  virtual void synchronizationPointRegistrationFailed(const std::wstring& label, rti1516e::SynchronizationPointFailureReason reason) override
   {
   }
 
-  virtual void announceSynchronizationPoint(const std::wstring& label, const rti1516e::VariableLengthData& tag)
+  virtual void announceSynchronizationPoint(const std::wstring& label, const rti1516e::VariableLengthData& tag) override
   {
   }
 
-  virtual void federationSynchronized(const std::wstring& label, const rti1516e::FederateHandleSet& failedToSyncSet)
+  virtual void federationSynchronized(const std::wstring& label, const rti1516e::FederateHandleSet& failedToSyncSet) override
   {
   }
 
-  virtual void initiateFederateSave(const std::wstring& label)
+  virtual void initiateFederateSave(const std::wstring& label) override
   {
   }
 
-  virtual void initiateFederateSave(const std::wstring& label, const rti1516e::LogicalTime& logicalTime)
+  virtual void initiateFederateSave(const std::wstring& label, const rti1516e::LogicalTime& logicalTime) override
   {
   }
 
-  virtual void federationSaved()
+  virtual void federationSaved() override
   {
   }
 
-  virtual void federationNotSaved(rti1516e::SaveFailureReason theSaveFailureReason)
+  virtual void federationNotSaved(rti1516e::SaveFailureReason theSaveFailureReason) override
   {
   }
 
-  virtual void federationSaveStatusResponse(const rti1516e::FederateHandleSaveStatusPairVector& federateStatusVector)
+  virtual void federationSaveStatusResponse(const rti1516e::FederateHandleSaveStatusPairVector& federateStatusVector) override
   {
   }
 
-  virtual void requestFederationRestoreSucceeded(const std::wstring& label)
+  virtual void requestFederationRestoreSucceeded(const std::wstring& label) override
   {
   }
 
-  virtual void requestFederationRestoreFailed(const std::wstring& label)
+  virtual void requestFederationRestoreFailed(const std::wstring& label) override
   {
   }
 
-  virtual void federationRestoreBegun()
+  virtual void federationRestoreBegun() override
   {
   }
 
-  virtual void initiateFederateRestore(const std::wstring& label, const std::wstring& federateName, rti1516e::FederateHandle handle)
+  virtual void initiateFederateRestore(const std::wstring& label, const std::wstring& federateName, rti1516e::FederateHandle handle) override
   {
   }
 
-  virtual void federationRestored()
+  virtual void federationRestored() override
   {
   }
 
-  virtual void federationNotRestored(rti1516e::RestoreFailureReason restoreFailureReason)
+  virtual void federationNotRestored(rti1516e::RestoreFailureReason restoreFailureReason) override
   {
   }
 
-  virtual void federationRestoreStatusResponse(const rti1516e::FederateRestoreStatusVector& federateStatusVector)
+  virtual void federationRestoreStatusResponse(const rti1516e::FederateRestoreStatusVector& federateStatusVector) override
   {
   }
 
-  virtual void startRegistrationForObjectClass(rti1516e::ObjectClassHandle)
+  virtual void startRegistrationForObjectClass(rti1516e::ObjectClassHandle) override
   {
   }
 
-  virtual void stopRegistrationForObjectClass(rti1516e::ObjectClassHandle)
+  virtual void stopRegistrationForObjectClass(rti1516e::ObjectClassHandle) override
   {
   }
 
-  virtual void turnInteractionsOn(rti1516e::InteractionClassHandle)
+  virtual void turnInteractionsOn(rti1516e::InteractionClassHandle) override
   {
   }
 
-  virtual void turnInteractionsOff(rti1516e::InteractionClassHandle)
+  virtual void turnInteractionsOff(rti1516e::InteractionClassHandle) override
   {
   }
 
-  virtual void objectInstanceNameReservationSucceeded(const std::wstring&)
+  virtual void objectInstanceNameReservationSucceeded(const std::wstring&) override
   {
   }
 
-  virtual void objectInstanceNameReservationFailed(const std::wstring&)
+  virtual void objectInstanceNameReservationFailed(const std::wstring&) override
   {
   }
 
-  virtual void multipleObjectInstanceNameReservationSucceeded(const std::set<std::wstring>& theObjectInstanceNames)
+  virtual void multipleObjectInstanceNameReservationSucceeded(const std::set<std::wstring>& theObjectInstanceNames) override
   {
   }
 
-  virtual void multipleObjectInstanceNameReservationFailed(const std::set<std::wstring>& theObjectInstanceNames)
+  virtual void multipleObjectInstanceNameReservationFailed(const std::set<std::wstring>& theObjectInstanceNames) override
   {
   }
 
   virtual void discoverObjectInstance(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                       rti1516e::ObjectClassHandle objectClassHandle,
-                                      const std::wstring& objectInstanceName)
+                                      const std::wstring& objectInstanceName) override
   {
       // ObjectClassAttributeHandleSetMap::iterator i = _subscribedObjectClassAttributeHandleSetMap.find(objectClassHandle);
       // if (i == _subscribedObjectClassAttributeHandleSetMap.end()) {
@@ -1606,7 +1606,7 @@ protected:
 
   virtual void discoverObjectInstance(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                       rti1516e::ObjectClassHandle objectClassHandle, const std::wstring& objectInstanceName,
-                                      rti1516e::FederateHandle producingFederate)
+                                      rti1516e::FederateHandle producingFederate) override
   {
     discoverObjectInstance(objectInstanceHandle, objectClassHandle, objectInstanceName);
   }
@@ -1614,65 +1614,65 @@ protected:
   virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                       const rti1516e::AttributeHandleValueMap& attributeHandleValueMap,
                                       const rti1516e::VariableLengthData& tag, rti1516e::OrderType, rti1516e::TransportationType,
-                                      rti1516e::SupplementalReflectInfo)
+                                      rti1516e::SupplementalReflectInfo) override
   {
       // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
   }
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                      const rti1516e::AttributeHandleValueMap& attributeHandleValueMap,
-                                      const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                      const rti1516e::RegionHandleSet&, rti1516e::SupplementalReflectInfo)
-  {
-      // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
-  }
+  //virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
+  //                                    const rti1516e::AttributeHandleValueMap& attributeHandleValueMap,
+  //                                    const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
+  //                                    const rti1516e::RegionHandleSet&, rti1516e::SupplementalReflectInfo)
+  //{
+  //    // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
+  //}
 
   virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                       const rti1516e::AttributeHandleValueMap& attributeHandleValueMap,
                                       const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                      const rti1516e::LogicalTime&, rti1516e::OrderType, rti1516e::SupplementalReflectInfo)
+                                      const rti1516e::LogicalTime&, rti1516e::OrderType, rti1516e::SupplementalReflectInfo) override
   {
       // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
   }
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                      const rti1516e::AttributeHandleValueMap& attributeHandleValueMap,
-                                      const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                      const rti1516e::LogicalTime&, rti1516e::OrderType, const rti1516e::RegionHandleSet&,
-                                      rti1516e::SupplementalReflectInfo)
-  {
-      // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
-  }
-
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                      const rti1516e::AttributeHandleValueMap& attributeHandleValueMap,
-                                      const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                      const rti1516e::LogicalTime&, rti1516e::OrderType, rti1516e::MessageRetractionHandle,
-                                      rti1516e::SupplementalReflectInfo)
-  {
-      // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
-  }
+  //virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
+  //                                    const rti1516e::AttributeHandleValueMap& attributeHandleValueMap,
+  //                                    const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
+  //                                    const rti1516e::LogicalTime&, rti1516e::OrderType, const rti1516e::RegionHandleSet&,
+  //                                    rti1516e::SupplementalReflectInfo)
+  //{
+  //    // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
+  //}
 
   virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                       const rti1516e::AttributeHandleValueMap& attributeHandleValueMap,
                                       const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
                                       const rti1516e::LogicalTime&, rti1516e::OrderType, rti1516e::MessageRetractionHandle,
-                                      const rti1516e::RegionHandleSet&, rti1516e::SupplementalReflectInfo)
+                                      rti1516e::SupplementalReflectInfo) override
   {
       // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
   }
 
-  virtual void receiveInteraction(rti1516e::InteractionClassHandle, const rti1516e::ParameterHandleValueMap&,
-                                  const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                  rti1516e::SupplementalReceiveInfo theReceiveInfo)
-  {
-  }
+  //virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle,
+  //                                    const rti1516e::AttributeHandleValueMap& attributeHandleValueMap,
+  //                                    const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
+  //                                    const rti1516e::LogicalTime&, rti1516e::OrderType, rti1516e::MessageRetractionHandle,
+  //                                    const rti1516e::RegionHandleSet&, rti1516e::SupplementalReflectInfo)
+  //{
+  //    // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
+  //}
 
   virtual void receiveInteraction(rti1516e::InteractionClassHandle, const rti1516e::ParameterHandleValueMap&,
                                   const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                  const rti1516e::RegionHandleSet&, rti1516e::SupplementalReceiveInfo theReceiveInfo)
+                                  rti1516e::SupplementalReceiveInfo theReceiveInfo) override
   {
   }
+
+  //virtual void receiveInteraction(rti1516e::InteractionClassHandle, const rti1516e::ParameterHandleValueMap&,
+  //                                const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
+  //                                const rti1516e::RegionHandleSet&, rti1516e::SupplementalReceiveInfo theReceiveInfo)
+  //{
+  //}
 
   virtual void receiveInteraction(rti1516e::InteractionClassHandle interaction,
                                   rti1516e::ParameterHandleValueMap const & parameterValues,
@@ -1681,21 +1681,21 @@ protected:
                                   rti1516e::TransportationType theType,
                                   rti1516e::LogicalTime const & logicalTime,
                                   rti1516e::OrderType receivedOrder,
-                                  rti1516e::SupplementalReceiveInfo theReceiveInfo)
+                                  rti1516e::SupplementalReceiveInfo theReceiveInfo) override
   {
   }
 
-  virtual void receiveInteraction(rti1516e::InteractionClassHandle interaction,
-                                  rti1516e::ParameterHandleValueMap const & parameterValues,
-                                  rti1516e::VariableLengthData const & tag,
-                                  rti1516e::OrderType sentOrder,
-                                  rti1516e::TransportationType theType,
-                                  rti1516e::LogicalTime const & logicalTime,
-                                  rti1516e::OrderType receivedOrder,
-                                  rti1516e::RegionHandleSet const & theSentRegionHandleSet,
-                                  rti1516e::SupplementalReceiveInfo theReceiveInfo)
-  {
-  }
+  //virtual void receiveInteraction(rti1516e::InteractionClassHandle interaction,
+  //                                rti1516e::ParameterHandleValueMap const & parameterValues,
+  //                                rti1516e::VariableLengthData const & tag,
+  //                                rti1516e::OrderType sentOrder,
+  //                                rti1516e::TransportationType theType,
+  //                                rti1516e::LogicalTime const & logicalTime,
+  //                                rti1516e::OrderType receivedOrder,
+  //                                rti1516e::RegionHandleSet const & theSentRegionHandleSet,
+  //                                rti1516e::SupplementalReceiveInfo theReceiveInfo)
+  //{
+  //}
 
   virtual void receiveInteraction(rti1516e::InteractionClassHandle interaction,
                                   rti1516e::ParameterHandleValueMap const & parameterValues,
@@ -1705,27 +1705,27 @@ protected:
                                   rti1516e::LogicalTime const & logicalTime,
                                   rti1516e::OrderType receivedOrder,
                                   rti1516e::MessageRetractionHandle theHandle,
-                                  rti1516e::SupplementalReceiveInfo theReceiveInfo)
+                                  rti1516e::SupplementalReceiveInfo theReceiveInfo) override
   {
   }
 
-  virtual void receiveInteraction(rti1516e::InteractionClassHandle interaction,
-                                  rti1516e::ParameterHandleValueMap const & parameterValues,
-                                  rti1516e::VariableLengthData const & tag,
-                                  rti1516e::OrderType sentOrder,
-                                  rti1516e::TransportationType theType,
-                                  rti1516e::LogicalTime const & logicalTime,
-                                  rti1516e::OrderType receivedOrder,
-                                  rti1516e::MessageRetractionHandle theHandle,
-                                  rti1516e::RegionHandleSet const & theSentRegionHandleSet,
-                                  rti1516e::SupplementalReceiveInfo theReceiveInfo)
-  {
-  }
+  //virtual void receiveInteraction(rti1516e::InteractionClassHandle interaction,
+  //                                rti1516e::ParameterHandleValueMap const & parameterValues,
+  //                                rti1516e::VariableLengthData const & tag,
+  //                                rti1516e::OrderType sentOrder,
+  //                                rti1516e::TransportationType theType,
+  //                                rti1516e::LogicalTime const & logicalTime,
+  //                                rti1516e::OrderType receivedOrder,
+  //                                rti1516e::MessageRetractionHandle theHandle,
+  //                                rti1516e::RegionHandleSet const & theSentRegionHandleSet,
+  //                                rti1516e::SupplementalReceiveInfo theReceiveInfo)
+  //{
+  //}
 
   virtual void removeObjectInstance(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                     rti1516e::VariableLengthData const & tag,
                                     rti1516e::OrderType sentOrder,
-                                    rti1516e::SupplementalRemoveInfo theRemoveInfo)
+                                    rti1516e::SupplementalRemoveInfo theRemoveInfo) override
   {
       // _verifyRemoveObjectInstance(objectInstanceHandle);
   }
@@ -1735,7 +1735,7 @@ protected:
                                     rti1516e::OrderType sentOrder,
                                     rti1516e::LogicalTime const & logicalTime,
                                     rti1516e::OrderType receivedOrder,
-                                    rti1516e::SupplementalRemoveInfo theRemoveInfo)
+                                    rti1516e::SupplementalRemoveInfo theRemoveInfo) override
   {
       // _verifyRemoveObjectInstance(objectInstanceHandle);
   }
@@ -1746,134 +1746,134 @@ protected:
                                     rti1516e::LogicalTime const & logicalTime,
                                     rti1516e::OrderType receivedOrder,
                                     rti1516e::MessageRetractionHandle theHandle,
-                                    rti1516e::SupplementalRemoveInfo theRemoveInfo)
+                                    rti1516e::SupplementalRemoveInfo theRemoveInfo) override
   {
       // _verifyRemoveObjectInstance(objectInstanceHandle);
   }
 
   virtual void attributesInScope(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                 rti1516e::AttributeHandleSet const & attributes)
+                                 rti1516e::AttributeHandleSet const & attributes) override
   {
   }
 
   virtual void attributesOutOfScope(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                    rti1516e::AttributeHandleSet const & attributes)
+                                    rti1516e::AttributeHandleSet const & attributes) override
   {
   }
 
   virtual void provideAttributeValueUpdate(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                            rti1516e::AttributeHandleSet const & attributes,
-                                           rti1516e::VariableLengthData const & tag)
+                                           rti1516e::VariableLengthData const & tag) override
   {
   }
 
   virtual void turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                              rti1516e::AttributeHandleSet const & attributes)
+                                              rti1516e::AttributeHandleSet const & attributes) override
   {
   }
 
   virtual void turnUpdatesOnForObjectInstance(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                               rti1516e::AttributeHandleSet const & attributes,
-                                              const std::wstring& updateRateDesignator)
+                                              const std::wstring& updateRateDesignator) override
   {
   }
 
   virtual void turnUpdatesOffForObjectInstance(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                               rti1516e::AttributeHandleSet const & attributes)
+                                               rti1516e::AttributeHandleSet const & attributes) override
   {
   }
 
   virtual void confirmAttributeTransportationTypeChange(rti1516e::ObjectInstanceHandle theObject,
                                                         rti1516e::AttributeHandleSet theAttributes,
-                                                        rti1516e::TransportationType theTransportation)
+                                                        rti1516e::TransportationType theTransportation) override
   {
   }
 
   virtual void reportAttributeTransportationType(rti1516e::ObjectInstanceHandle theObject,
                                                  rti1516e::AttributeHandle theAttribute,
-                                                 rti1516e::TransportationType theTransportation)
+                                                 rti1516e::TransportationType theTransportation) override
   {
   }
 
   virtual void confirmInteractionTransportationTypeChange(rti1516e::InteractionClassHandle theInteraction,
-                                                          rti1516e::TransportationType theTransportation)
+                                                          rti1516e::TransportationType theTransportation) override
   {
   }
 
   virtual void reportInteractionTransportationType(rti1516e::FederateHandle federateHandle,
                                                    rti1516e::InteractionClassHandle theInteraction,
-                                                   rti1516e::TransportationType theTransportation)
+                                                   rti1516e::TransportationType theTransportation) override
   {
   }
 
   virtual void requestAttributeOwnershipAssumption(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                                    rti1516e::AttributeHandleSet const & offeredAttributes,
-                                                   rti1516e::VariableLengthData const & tag)
+                                                   rti1516e::VariableLengthData const & tag) override
   {
   }
 
   virtual void requestDivestitureConfirmation(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                              rti1516e::AttributeHandleSet const & releasedAttributes)
+                                              rti1516e::AttributeHandleSet const & releasedAttributes) override
   {
   }
 
   virtual void attributeOwnershipAcquisitionNotification(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                                          rti1516e::AttributeHandleSet const & securedAttributes,
-                                                         rti1516e::VariableLengthData const & tag)
+                                                         rti1516e::VariableLengthData const & tag) override
   {
   }
 
   virtual void attributeOwnershipUnavailable(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                             rti1516e::AttributeHandleSet const & attributes)
+                                             rti1516e::AttributeHandleSet const & attributes) override
   {
   }
 
   virtual void requestAttributeOwnershipRelease(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                                 rti1516e::AttributeHandleSet const & candidateAttributes,
-                                                rti1516e::VariableLengthData const & tag)
+                                                rti1516e::VariableLengthData const & tag) override
   {
   }
 
   virtual void confirmAttributeOwnershipAcquisitionCancellation(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                                                rti1516e::AttributeHandleSet const & attributes)
+                                                                rti1516e::AttributeHandleSet const & attributes) override
   {
   }
 
   virtual void informAttributeOwnership(rti1516e::ObjectInstanceHandle objectInstanceHandle,
                                         rti1516e::AttributeHandle attribute,
-                                        rti1516e::FederateHandle owner)
+                                        rti1516e::FederateHandle owner) override
   {
   }
 
   virtual void attributeIsNotOwned(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                   rti1516e::AttributeHandle attribute)
+                                   rti1516e::AttributeHandle attribute) override
   {
   }
 
   virtual void attributeIsOwnedByRTI(rti1516e::ObjectInstanceHandle objectInstanceHandle,
-                                     rti1516e::AttributeHandle attribute)
+                                     rti1516e::AttributeHandle attribute) override
   {
   }
 
-  virtual void timeRegulationEnabled(const rti1516e::LogicalTime& logicalTime)
+  virtual void timeRegulationEnabled(const rti1516e::LogicalTime& logicalTime) override
   {
     _timeRegulationEnabled = true;
     *_grantedLogicalTime = logicalTime;
   }
 
-  virtual void timeConstrainedEnabled(const rti1516e::LogicalTime& logicalTime)
+  virtual void timeConstrainedEnabled(const rti1516e::LogicalTime& logicalTime) override
   {
     _timeConstrainedEnabled = true;
     *_grantedLogicalTime = logicalTime;
   }
 
-  virtual void timeAdvanceGrant(const rti1516e::LogicalTime& logicalTime)
+  virtual void timeAdvanceGrant(const rti1516e::LogicalTime& logicalTime) override
   {
     _timeAdvancePending = false;
     *_grantedLogicalTime = logicalTime;
   }
 
-  virtual void requestRetraction(rti1516e::MessageRetractionHandle theHandle)
+  virtual void requestRetraction(rti1516e::MessageRetractionHandle theHandle) override
   {
   }
 

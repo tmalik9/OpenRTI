@@ -47,7 +47,7 @@ public:
 protected:
   ThreadTest() : _threadWasRun(false)
   { }
-  virtual void run()
+  virtual void run() override
   { _threadWasRun = true; }
   bool _threadWasRun;
 };
@@ -65,7 +65,7 @@ public:
   }
 
 protected:
-  virtual void run()
+  virtual void run() override
   {
     Clock::sleep_for(Clock::max());
   }
@@ -94,7 +94,7 @@ protected:
     _counter = counter;
     Thread::start();
   }
-  virtual void run()
+  virtual void run() override
   {
     for (unsigned i = 0; i < 1000000; ++i) {
       ++(*_counter);
@@ -141,7 +141,7 @@ protected:
     _lockedData = lockedData;
     Thread::start();
   }
-  virtual void run()
+  virtual void run() override
   {
     for (unsigned i = 0; i < 1000000; ++i)
       _lockedData->exec();
@@ -176,7 +176,7 @@ public:
   }
 
 protected:
-  virtual void run()
+  virtual void run() override
   {
     _ping.wait();
     _pong.notify_one();
