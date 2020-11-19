@@ -76,7 +76,7 @@ def buildAndTest_win(configType, additionalCmakeArgs) {
           buildType: "${configType}",
           generator: "Visual Studio 16 2019",
           cleanBuild: true,
-          cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType}",
+          cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType} -DOPENRTI_ENABLE_TESTS=ON",
           steps: [[
               args: "--config ${configType}",
               withCmake: true
