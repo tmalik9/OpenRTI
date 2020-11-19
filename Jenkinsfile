@@ -86,6 +86,7 @@ def buildAndTest_win(configType, additionalCmakeArgs) {
     stage("Test ${configType}") {
       ctest(
           installation: 'InSearchPath',
+		  workingDir: "${buildDir}",
           arguments: "--verbose --build-config ${configType}"
       )
     }
