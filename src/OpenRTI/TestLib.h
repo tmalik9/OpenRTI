@@ -140,7 +140,7 @@ private:
     { return _address; }
 
   protected:
-    virtual void run()
+    virtual void run() override
     { _server.exec(); }
 
     NetworkServer _server;
@@ -555,7 +555,7 @@ private:
     { return _success; }
 
   protected:
-    virtual void run()
+    virtual void run() override
     { _success = _testAmbassador->callExec(); }
 
   private:

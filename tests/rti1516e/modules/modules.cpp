@@ -453,8 +453,13 @@ static std::vector<std::wstring> prependPath(const std::wstring& path, const std
 {
   std::vector<std::wstring> withPath;
   withPath.reserve(additionalFomModules.size());
-  for (std::vector<std::wstring>::const_iterator i = additionalFomModules.begin(); i != additionalFomModules.end(); ++i)
-    withPath.push_back(path + L"/" + *i);
+  for (auto& additionalFomModule : additionalFomModules)
+  {
+    if (!path.empty())
+      withPath.push_back(path + L"/" + additionalFomModule);
+    else
+      withPath.push_back(additionalFomModule);
+  }
   return withPath;
 }
 
@@ -464,7 +469,7 @@ public:
     RTITest::Ambassador(constructorArgs)
   { }
 
-  virtual bool exec()
+  virtual bool exec() override
   {
     RTI1516ESimpleAmbassador ambassador;
     ambassador.connect(getConnectUrl());
@@ -754,7 +759,7 @@ public:
     insertOptionString("D");
   }
 
-  virtual bool processOption(char optchar, const std::string& argument)
+  virtual bool processOption(char optchar, const std::string& argument) override
   {
     switch (optchar) {
     case 'D':
@@ -765,7 +770,7 @@ public:
     }
   }
 
-  virtual Ambassador* createAmbassador(const ConstructorArgs& constructorArgs)
+  virtual Ambassador* createAmbassador(const ConstructorArgs& constructorArgs) override
   {
     return new TestAmbassador(constructorArgs);
   }

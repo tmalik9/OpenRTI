@@ -2232,26 +2232,6 @@ static inline ArrayDataTypeEncoding convert(const std::string& s)
     return FixedArrayDataTypeEncoding;
 }
 
-bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType& stringDataType)
-{
-  ArrayDataType::NameMap::iterator i;
-  i = _arrayDataTypeNameArrayDataTypeMap.find(stringDataType.getName());
-  if (i != _arrayDataTypeNameArrayDataTypeMap.end()) {
-    module.insert(*i);
-    return false;
-  } else {
-    ArrayDataType* arrayDataType = new ArrayDataType(*this);
-    arrayDataType->setName(stringDataType.getName());
-    arrayDataType->setEncoding(convert(stringDataType.getEncoding()));
-    arrayDataType->setDataType(stringDataType.getDataType());
-    arrayDataType->setCardinality(stringDataType.getCardinality());
-    arrayDataType->setHandle(_arrayDataTypeHandleAllocator.get());
-    insert(*arrayDataType);
-    module.insert(*arrayDataType);
-    return true;
-  }
-}
-
 bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType2& stringDataType)
 {
   ArrayDataType::NameMap::iterator i;
@@ -2268,28 +2248,6 @@ bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType2& st
     arrayDataType->setHandle(_arrayDataTypeHandleAllocator.get());
     insert(*arrayDataType);
     module.insert(*arrayDataType);
-    return true;
-  }
-}
-
-bool Federation::insertOrCheck(Module& module, const FOMStringFixedRecordDataType& stringDataType)
-{
-  FixedRecordDataType::NameMap::iterator i;
-  i = _fixedRecordDataTypeNameFixedRecordDataTypeMap.find(stringDataType.getName());
-  if (i != _fixedRecordDataTypeNameFixedRecordDataTypeMap.end()) {
-    module.insert(*i);
-    return false;
-  } else {
-    FixedRecordDataType* fixedRecordDataType = new FixedRecordDataType(*this);
-    fixedRecordDataType->setName(stringDataType.getName());
-    for (auto& field : stringDataType.getFields())
-    {
-      fixedRecordDataType->addField(field.getName(), 0);
-    }
-    fixedRecordDataType->setEncoding(stringDataType.getEncoding());
-    fixedRecordDataType->setHandle(_fixedRecordDataTypeHandleAllocator.get());
-    insert(*fixedRecordDataType);
-    module.insert(*fixedRecordDataType);
     return true;
   }
 }
@@ -2314,23 +2272,6 @@ bool Federation::insertOrCheck(Module& module, const FOMStringFixedRecordDataTyp
     fixedRecordDataType->setHandle(_fixedRecordDataTypeHandleAllocator.get());
     insert(*fixedRecordDataType);
     module.insert(*fixedRecordDataType);
-    return true;
-  }
-}
-
-bool Federation::insertOrCheck(Module& module, const FOMStringVariantRecordDataType& stringDataType)
-{
-  VariantRecordDataType::NameMap::iterator i;
-  i = _variantRecordDataTypeNameVariantRecordDataTypeMap.find(stringDataType.getName());
-  if (i != _variantRecordDataTypeNameVariantRecordDataTypeMap.end()) {
-    module.insert(*i);
-    return false;
-  } else {
-    VariantRecordDataType* variantRecordDataType = new VariantRecordDataType(*this);
-    variantRecordDataType->setName(stringDataType.getName());
-    variantRecordDataType->setHandle(_variantRecordDataTypeHandleAllocator.get());
-    insert(*variantRecordDataType);
-    module.insert(*variantRecordDataType);
     return true;
   }
 }
@@ -2588,92 +2529,7 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
   }
 }
 
-ModuleHandle
-Federation::insert(const FOMStringModule& stringModule)
-{
-  Module* module = new Module(*this, stringModule.getDesignator());
-  module->setModuleHandle(_moduleHandleAllocator.get());
-  module->setArtificialInteractionRoot(stringModule.getArtificialInteractionRoot());
-  module->setArtificialObjectRoot(stringModule.getArtificialObjectRoot());
-  insert(*module);
-
-  bool created = false;
-  try {
-
-    for (auto& stringDimension : stringModule.getDimensionList()) {
-      if (insertOrCheck(*module, stringDimension))
-        created = true;
-    }
-
-    for (auto& stringUpdateRate : stringModule.getUpdateRateList()) {
-      if (insertOrCheck(*module, stringUpdateRate))
-        created = true;
-    }
-
-    for (auto& stringInteractionClassList : stringModule.getInteractionClassList()) {
-      if (insertOrCheck(*module, stringInteractionClassList))
-        created = true;
-    }
-
-    for (auto& stringObjectClass : stringModule.getObjectClassList()) {
-      if (insertOrCheck(*module, stringObjectClass))
-        created = true;
-    }
-
-    /*
-    for (auto& basicDataType : stringModule.getBasicDataTypeList()) {
-      if (insertOrCheck(*module, basicDataType))
-        created = true;
-    }
-    */
-    for (auto& simpleDataType : stringModule.getSimpleDataTypeList()) {
-      if (insertOrCheck(*module, simpleDataType))
-        created = true;
-    }
-
-    for (auto& enumeratedDataType : stringModule.getEnumeratedDataTypeList()) {
-      if (insertOrCheck(*module, enumeratedDataType))
-        created = true;
-    }
-
-    for (auto& arrayDataType : stringModule.getArrayDataTypeList()) {
-      if (insertOrCheck(*module, arrayDataType))
-        created = true;
-    }
-
-    for (auto& fixedRecordDataType : stringModule.getFixedRecordDataTypeList()) {
-      if (insertOrCheck(*module, fixedRecordDataType))
-        created = true;
-    }
-
-    for (auto& variantRecordDataType : stringModule.getVariantRecordDataTypeList()) {
-      if (insertOrCheck(*module, variantRecordDataType))
-        created = true;
-    }
-
-    if (!created) {
-      erase(*module);
-      return ModuleHandle();
-    }
-
-    return module->getModuleHandle();
-  } catch (...) {
-    erase(*module);
-    throw;
-  }
-
-  //UNREACHABLE: return ModuleHandle();
-}
-
-// TODO: better handle this by implementing an appropriate 
-// FOMStringModule2List TranslateTypes::translate(FOMStringModuleList)
-void
-Federation::insert(const FOMStringModuleList& stringModuleList)
-{
-  ModuleHandleVector moduleHandleVector;
-  insert(moduleHandleVector, stringModuleList);
-}
-
+/*
 void
 Federation::insert(ModuleHandleVector& moduleHandleVector, const FOMStringModuleList& stringModuleList)
 {
@@ -2691,7 +2547,7 @@ Federation::insert(ModuleHandleVector& moduleHandleVector, const FOMStringModule
     throw;
   }
 }
-
+*/
 ModuleHandle
 Federation::insert(const FOMStringModule2& stringModule)
 {

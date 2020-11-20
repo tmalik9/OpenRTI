@@ -76,7 +76,7 @@ def buildAndTest_win(configType, additionalCmakeArgs) {
           buildType: "${configType}",
           generator: "Visual Studio 16 2019",
           cleanBuild: true,
-          cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType}",
+          cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType} -DOPENRTI_ENABLE_TESTS=ON",
           steps: [[
               args: "--config ${configType}",
               withCmake: true
@@ -86,6 +86,7 @@ def buildAndTest_win(configType, additionalCmakeArgs) {
     stage("Test ${configType}") {
       ctest(
           installation: 'InSearchPath',
+		  workingDir: "${buildDir}",
           arguments: "--verbose --build-config ${configType}"
       )
     }
@@ -106,10 +107,10 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
             if (env.isTag == "true" && deploy) {
                 
               def zipFileName_debug = "openrti-${env.tagNr}-${build_name}-debug.zip"
-              zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin/Debug/'
+              zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin/Debug/', glob: 'OpenRTId.dll,OpenRTId.pdb,fedtime1516ed.dll,fedtime1516ed.pdb,fom2cpp.exe,fom2cpp.pdb,rti1516ed.dll,rti1516ed.pdb,rtinode.exe,rtinode.pdb'
               
               def zipFileName_release = "openrti-${env.tagNr}-${build_name}-release.zip"
-              zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin/Release/'
+              zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin/Release/', glob: 'OpenRTI.dll,fedtime1516e.dll,fom2cpp.exe,rti1516e.dll,rtinode.exe'
 
               upload("openrti-*.zip")
             }

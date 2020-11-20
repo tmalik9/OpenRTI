@@ -49,10 +49,29 @@ class OPENRTI_API TranslateTypes
 public:
   TranslateTypes();
   ~TranslateTypes();
+
+  // these translate a new-style FOMStringModule2 (as read from the FDD) into an old-style
+  // FOMStringModule (as needed by CreateFederationExecutionRequestMessage 1st version)
   static FOMStringModule translate(const FOMStringModule2& ref);
   static FOMStringModuleList translate(const FOMStringModule2List& ref);
   static FOMStringArrayDataType translate(const FOMStringArrayDataType2& ref);
   static FOMStringArrayDataTypeList translate(const FOMStringArrayDataType2List& ref);
+
+  // these translate an old-style FOM into new-style FOM (as received with a 
+  // CreateFederationExecutionRequestMessage 1st version)
+  static FOMStringModule2 translate(const FOMStringModule& ref);
+  static FOMStringModule2List translate(const FOMStringModuleList& ref);
+  static FOMStringArrayDataType2 translate(const FOMStringArrayDataType& ref);
+  static FOMStringArrayDataType2List translate(const FOMStringArrayDataTypeList& ref);
+
+  static FOMStringFixedRecordField2 translate(const FOMStringFixedRecordField& ref);
+  static FOMStringFixedRecordField2List translate(const FOMStringFixedRecordFieldList& ref);
+  static FOMStringFixedRecordDataType2 translate(const FOMStringFixedRecordDataType& ref);
+  static FOMStringFixedRecordDataType2List translate(const FOMStringFixedRecordDataTypeList& ref);
+  
+  // translate a CreateFederationExecutionRequestMessage 1st version
+  static CreateFederationExecutionRequest2Message translate(const CreateFederationExecutionRequestMessage& message);
+  static JoinFederationExecutionRequest2Message translate(const JoinFederationExecutionRequestMessage& message);
 };
 
 }

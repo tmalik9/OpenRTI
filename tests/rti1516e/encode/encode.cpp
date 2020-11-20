@@ -2078,6 +2078,21 @@ bool testTightBEEncoding()
 int
 main(int argc, char* argv[])
 {
+  OpenRTI::Options options(argc, argv);
+  std::wstring fomModule = L"fdd-1.xml";
+  std::wstring federationExecutionName = L"test";
+
+  std::vector<std::wstring> args;
+  while (options.next("F:O:")) {
+    switch (options.getOptChar()) {
+    case 'F':
+      federationExecutionName = OpenRTI::localeToUcs(options.getArgument());
+      break;
+    case 'O':
+      fomModule = OpenRTI::localeToUcs(options.getArgument());
+      break;
+    }
+  }
   OpenRTI::RTI1516ESimpleAmbassador ambassador;
   ambassador.setUseDataUrlObjectModels(false);
 
@@ -2095,11 +2110,10 @@ main(int argc, char* argv[])
     std::wcout << L"Unknown Exception!" << std::endl;
     return EXIT_FAILURE;
   }
-  std::wstring federationExecutionName = L"test";
   // create, must work
   try
   {
-    ambassador.createFederationExecution(federationExecutionName, L"fdd-1.xml");
+    ambassador.createFederationExecution(federationExecutionName, fomModule);
   }
   catch (const rti1516e::Exception& e)
   {
