@@ -3651,7 +3651,7 @@ Federation::insertObjectInstance(const ObjectInstanceHandle& objectInstanceHandl
 
 void Federation::initializeMom(AbstractServer* server, FederateHandle federateHandle)
 {
-#ifndef STANDALONE_TEST
+#ifndef OPENRTI_STANDALONE_TESTS
   // be careful: we always get called twice: once for the RTI federate, a second time for the application federate
   if (_momServer == nullptr)
   {
@@ -3664,7 +3664,7 @@ void Federation::initializeMom(AbstractServer* server, FederateHandle federateHa
 
 void Federation::resignMomServer()
 {
-#ifndef STANDALONE_TEST
+#ifndef OPENRTI_STANDALONE_TESTS
   if (_momServer != nullptr)
   {
     _momServer->resignFederationExecution();
@@ -3679,7 +3679,7 @@ SharedPtr<MomServer> Federation::getMomServer() const
 
 std::shared_ptr<AbstractFederateMetrics> Federation::getFederateMetrics(const ConnectHandle& connectHandle)
 {
-#ifndef STANDALONE_TEST
+#ifndef OPENRTI_STANDALONE_TESTS
   if (_momServer != nullptr)
   {
     for (auto iter = _federateHandleFederateMap.begin(); iter != _federateHandleFederateMap.end(); iter++)

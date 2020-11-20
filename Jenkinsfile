@@ -16,13 +16,13 @@ def checkout() {
   }
 }
 
-def buildAndTest_linux(img, configType) {
+def build_linux(img, configType, additionalCmakeArgs) {
     def buildDir = "build_${configType}"
     stage("Build ${configType}") {
         sh "mkdir ${buildDir}"
         sh "chmod +x build.sh"
         dir(buildDir) {
-          def build_cmd = "../build.sh ${configType} ${env.tagNr}"
+          def build_cmd = "../build.sh ${configType} ${env.tagNr} ${additionalCmakeArgs}"
           if (img.contains('centos')) {
             sh "scl enable llvm-toolset-6.0 '${build_cmd}'"
           } else {
@@ -30,6 +30,10 @@ def buildAndTest_linux(img, configType) {
           }
         }
     }
+}
+
+def test_linux(configType) {
+	def buildDir = "build_${configType}"
     stage("Test ${configType}") {
         dir(buildDir) {
             sh "ctest --verbose --build-config ${configType}"
@@ -49,9 +53,19 @@ def stages_linux(build_name, comp_env, img, deploy) {
             docker.withRegistry('https://pnd-rtklinux-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
               docker.image(img).inside {
 
-                buildAndTest_linux(img, "debug")
-                buildAndTest_linux(img, "release")
+				def additionalCmakeArgs = ""
+				if (env.isTag == "false") {
+					additionalCmakeArgs = "-DOPENRTI_ENABLE_TESTS=ON"
+				}
 
+                build_linux(img, "debug", additionalCmakeArgs)
+                build_linux(img, "release" , additionalCmakeArgs)
+
+                if (env.isTag == "false") {
+					test_linux("debug")
+					test_linux("release")
+				}
+				
                 if (env.isTag == "true" && deploy) {
                   upload("build_*/*.tgz")
                 }
@@ -67,7 +81,7 @@ def stages_linux(build_name, comp_env, img, deploy) {
   }
 }
 
-def buildAndTest_win(configType, additionalCmakeArgs) {
+def build_win(configType, additionalCmakeArgs) {
     def buildDir = "build_${configType}"
     stage("Build ${configType}") {
       cmakeBuild(
@@ -76,13 +90,17 @@ def buildAndTest_win(configType, additionalCmakeArgs) {
           buildType: "${configType}",
           generator: "Visual Studio 16 2019",
           cleanBuild: true,
-          cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType} -DOPENRTI_ENABLE_TESTS=ON",
+          cmakeArgs: "${additionalCmakeArgs} -DCMAKE_BUILD_TYPE=${configType}",
           steps: [[
               args: "--config ${configType}",
               withCmake: true
           ]]
       )
     }
+}
+
+def test_win(configType) {
+	def buildDir = "build_${configType}"
     stage("Test ${configType}") {
       ctest(
           installation: 'InSearchPath',
@@ -101,16 +119,25 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
           {
             checkout()
 
-            buildAndTest_win("debug", additionalCmakeArgs)
-            buildAndTest_win("release", additionalCmakeArgs)
+			if (env.isTag == "false") {
+				additionalCmakeArgs = "${additionalCmakeArgs} -DOPENRTI_ENABLE_TESTS=ON"
+			}
+				
+            build_win("debug", additionalCmakeArgs)
+            build_win("release", additionalCmakeArgs)
 
+            if (env.isTag == "false") {
+			    test_win("debug")
+				test_win("release")
+			}
+			
             if (env.isTag == "true" && deploy) {
                 
               def zipFileName_debug = "openrti-${env.tagNr}-${build_name}-debug.zip"
-              zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin/Debug/', glob: 'OpenRTId.dll,OpenRTId.pdb,fedtime1516ed.dll,fedtime1516ed.pdb,fom2cpp.exe,fom2cpp.pdb,rti1516ed.dll,rti1516ed.pdb,rtinode.exe,rtinode.pdb'
+              zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin/Debug/', glob: '*[!.ilk]'
               
               def zipFileName_release = "openrti-${env.tagNr}-${build_name}-release.zip"
-              zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin/Release/', glob: 'OpenRTI.dll,fedtime1516e.dll,fom2cpp.exe,rti1516e.dll,rtinode.exe'
+              zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin/Release/', glob: '*[!.ilk]'
 
               upload("openrti-*.zip")
             }
