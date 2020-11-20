@@ -9,7 +9,7 @@ def checkout() {
     if (env.isTag == "true") {
       env.tagNr = checkoutResults.SVN_URL.tokenize('/').last()
     } else {
-      env.tagNr = ""
+      env.tagNr = "OFF"
     }
     //echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
     //echo "-----> Checkout: isTag ${env.isTag} tagNr ${env.tagNr}"

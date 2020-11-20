@@ -14,7 +14,8 @@ DISTRO_VERSION="${VERSION_ID/./}"
 cmake ${ADD_CMAKE_ARGS} -DOPENRTI_ENABLE_RTI13=Off -DOPENRTI_ENABLE_RTI1516=Off -DCMAKE_BUILD_TYPE=${BUILD_CONFIG} -DCMAKE_INSTALL_PREFIX=install ..
 make -j4 install
 
-if [ ! -z "$OPENRTI_VERSION" ]; then	
+
+if [ ${OPENRTI_VERSION} != "OFF" ]; then	
 	mkdir pkg
 	mv install/bin/rtinode pkg/
 	mv install/bin/fom2cpp pkg/
