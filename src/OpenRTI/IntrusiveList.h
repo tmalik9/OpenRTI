@@ -114,15 +114,13 @@ private:
 };
 
 template<typename T, typename Tag>
-class OPENRTI_LOCAL _IntrusiveListIterator :
-  public std::iterator<std::bidirectional_iterator_tag, T, std::ptrdiff_t> {
-  typedef std::iterator<std::bidirectional_iterator_tag, T, std::ptrdiff_t> _Base;
+class OPENRTI_LOCAL _IntrusiveListIterator {
 public:
-  typedef typename _Base::value_type value_type;
-  typedef typename _Base::difference_type difference_type;
-  typedef typename _Base::pointer pointer;
-  typedef typename _Base::reference reference;
-  typedef typename _Base::iterator_category iterator_category;
+  using iterator_category = std::bidirectional_iterator_tag;
+  using value_type = T;
+  using difference_type = std::ptrdiff_t;
+  using pointer = T*;
+  using reference = T&;
 
   _IntrusiveListIterator() :
     _intrusiveListHook(NULL)
@@ -174,11 +172,11 @@ template<typename T, typename Tag>
 class OPENRTI_LOCAL _ForwardIntrusiveListIterator : public _IntrusiveListIterator<T, Tag> {
   typedef _IntrusiveListIterator<T, Tag> _Base;
 public:
-  typedef typename _Base::value_type value_type;
-  typedef typename _Base::difference_type difference_type;
-  typedef typename _Base::pointer pointer;
-  typedef typename _Base::reference reference;
-  typedef typename _Base::iterator_category iterator_category;
+  using _Base::value_type;
+  using _Base::difference_type;
+  using _Base::pointer;
+  using _Base::reference;
+  using _Base::iterator_category;
 
   _ForwardIntrusiveListIterator()
   { }
@@ -230,11 +228,11 @@ template<typename T, typename Tag>
 class OPENRTI_LOCAL _ReverseIntrusiveListIterator : public _IntrusiveListIterator<T, Tag> {
   typedef _IntrusiveListIterator<T, Tag> _Base;
 public:
-  typedef typename _Base::value_type value_type;
-  typedef typename _Base::difference_type difference_type;
-  typedef typename _Base::pointer pointer;
-  typedef typename _Base::reference reference;
-  typedef typename _Base::iterator_category iterator_category;
+  using _Base::value_type;
+  using _Base::difference_type;
+  using _Base::pointer;
+  using _Base::reference;
+  using _Base::iterator_category;
 
   _ReverseIntrusiveListIterator()
   { }
