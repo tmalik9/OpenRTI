@@ -9,7 +9,7 @@ def checkout() {
     if (env.isTag == "true") {
       env.tagNr = checkoutResults.SVN_URL.tokenize('/').last()
     } else {
-      env.tagNr = ""
+      env.tagNr = "OFF"
     }
     //echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
     //echo "-----> Checkout: isTag ${env.isTag} tagNr ${env.tagNr}"
@@ -59,10 +59,12 @@ def stages_linux(build_name, comp_env, img, deploy) {
 				}
 
                 build_linux(img, "debug", additionalCmakeArgs)
-                build_linux(img, "release" , additionalCmakeArgs)
-
-                if (env.isTag == "false") {
+				if (env.isTag == "false") {
 					test_linux("debug")
+				}
+				
+                build_linux(img, "release" , additionalCmakeArgs)
+                if (env.isTag == "false") {
 					test_linux("release")
 				}
 				
@@ -124,10 +126,12 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
 			}
 				
             build_win("debug", additionalCmakeArgs)
-            build_win("release", additionalCmakeArgs)
-
-            if (env.isTag == "false") {
+			if (env.isTag == "false") {
 			    test_win("debug")
+			}
+			
+            build_win("release", additionalCmakeArgs)
+            if (env.isTag == "false") {
 				test_win("release")
 			}
 			
