@@ -138,10 +138,10 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
             if (env.isTag == "true" && deploy) {
                 
               def zipFileName_debug = "openrti-${env.tagNr}-${build_name}-debug.zip"
-              zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin/Debug/', glob: '*[!.ilk]'
+              zip zipFile: zipFileName_debug, archive: false, dir: 'build_debug/bin/Debug/', glob: '*.dll,*.exe,*.pdb'
               
               def zipFileName_release = "openrti-${env.tagNr}-${build_name}-release.zip"
-              zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin/Release/', glob: '*[!.ilk]'
+              zip zipFile: zipFileName_release, archive: false, dir: 'build_release/bin/Release/', glob: '*.dll,*.exe'
 
               upload("openrti-*.zip")
             }
