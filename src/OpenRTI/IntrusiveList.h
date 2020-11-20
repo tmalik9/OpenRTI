@@ -172,11 +172,11 @@ template<typename T, typename Tag>
 class OPENRTI_LOCAL _ForwardIntrusiveListIterator : public _IntrusiveListIterator<T, Tag> {
   typedef _IntrusiveListIterator<T, Tag> _Base;
 public:
-  using _Base::value_type;
-  using _Base::difference_type;
-  using _Base::pointer;
-  using _Base::reference;
-  using _Base::iterator_category;
+  using typename _Base::value_type;
+  using typename _Base::difference_type;
+  using typename _Base::pointer;
+  using typename _Base::reference;
+  using typename _Base::iterator_category;
 
   _ForwardIntrusiveListIterator()
   { }
@@ -228,11 +228,11 @@ template<typename T, typename Tag>
 class OPENRTI_LOCAL _ReverseIntrusiveListIterator : public _IntrusiveListIterator<T, Tag> {
   typedef _IntrusiveListIterator<T, Tag> _Base;
 public:
-  using _Base::value_type;
-  using _Base::difference_type;
-  using _Base::pointer;
-  using _Base::reference;
-  using _Base::iterator_category;
+  using typename _Base::value_type;
+  using typename _Base::difference_type;
+  using typename _Base::pointer;
+  using typename _Base::reference;
+  using typename _Base::iterator_category;
 
   _ReverseIntrusiveListIterator()
   { }
