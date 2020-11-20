@@ -68,7 +68,6 @@ if(MSVC)
   add_definitions(-DTIME64)
   add_definitions(-DUNICODE)
   add_definitions(-D_UNICODE)
-  add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 	
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4290")
