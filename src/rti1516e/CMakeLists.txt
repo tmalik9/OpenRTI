@@ -53,44 +53,65 @@ set(RTI1516E_PUBLIC_TIME_HEADERS
 )
 
 set(LIB_RTI1516E_SOURCES
-        BasicDataElements.cpp
+		Encoding.h
+		HandleFactory.cpp
+		HandleFactory.h
+		HandleImplementation.h
+		RTI1516ELogicalTimeFactory.h
+		RTI1516Efloat64TimeFactory.h
+		RTI1516Einteger64TimeFactory.h
+		RTIambassadorImplementation.h
+		VariableLengthDataImplementation.h
         ../OpenRTI/dprintf.cpp
+        ../OpenRTI/dprintf.h
+        BasicDataElements.cpp
         DataElement.cpp
         EncodingExceptions.cpp
         Exception.cpp
         FederateAmbassador.cpp
-        Handle.cpp
-		HandleFactory.cpp
         HLAfixedArray.cpp
         HLAfixedRecord.cpp
-        HLAopaqueData.cpp
-        HLAvariableArray.cpp
-        HLAvariantRecord.cpp
-        HLAhandle.cpp
-        HLAlogicalTimeFactoryFactory.cpp
         HLAfloat64Interval.cpp
         HLAfloat64Time.cpp
         HLAfloat64TimeFactory.cpp
+        HLAhandle.cpp
         HLAinteger64Interval.cpp
         HLAinteger64Time.cpp
         HLAinteger64TimeFactory.cpp
+        HLAlogicalTimeFactoryFactory.cpp
+        HLAopaqueData.cpp
+        HLAvariableArray.cpp
+        HLAvariantRecord.cpp
+        Handle.cpp
         LogicalTime.cpp
         LogicalTimeFactory.cpp
         LogicalTimeInterval.cpp
         NullFederateAmbassador.cpp
-        RangeBounds.cpp
-        VariableLengthData.cpp
-        Version.cpp
         RTI1516ELogicalTimeFactory.cpp
         RTIambassador.cpp
         RTIambassadorFactory.cpp
         RTIambassadorImplementation.cpp
+        RangeBounds.cpp
         Typedefs.cpp
+        VariableLengthData.cpp
+        Version.cpp
 )
+if (MSVC)
+  set(LIB_RTI1516E_RCFILES
+    rti1516e.rc
+  )
+else ()
+  set(LIB_RTI1516E_RCFILES
+  )
+endif()
 
 if(MSVC)
   set(LIB_FEDTIME1516E_SOURCES
     LogicalTimeFactoryFactory.cpp
+	${RTI1516E_HEADER_PATH}/RTI/LogicalTimeFactory.h
+  )
+  set(LIB_FEDTIME1516E_RCFILES
+    fedtime1516e.rc
   )
 else ()
   set(LIB_FEDTIME1516E_SOURCES
@@ -102,10 +123,12 @@ else ()
     HLAinteger64TimeFactory.cpp
     LogicalTimeFactoryFactory.cpp
   )
+  set(LIB_FEDTIME1516E_RCFILES
+  )
 endif()
 
 if(OPENRTI_BUILD_SHARED)
-  add_library(rti1516e SHARED ${LIB_RTI1516E_SOURCES})
+  add_library(rti1516e SHARED ${LIB_RTI1516E_SOURCES} ${RTI1516E_PUBLIC_HEADERS} ${RTI1516E_PUBLIC_ENCODING_HEADERS} ${RTI1516E_PUBLIC_TIME_HEADERS} ${LIB_RTI1516E_RCFILES})
   set_property(TARGET rti1516e APPEND PROPERTY COMPILE_DEFINITIONS BUILDING_RTI)
 # ems: disable CMake so library versioning
 #  set_property(TARGET rti1516e PROPERTY VERSION 1.0.0)
@@ -145,7 +168,7 @@ if(OPENRTI_BUILD_SHARED)
     set_property(TARGET rti1516e APPEND PROPERTY LINK_FLAGS "-Wl,-undefined,dynamic_lookup ${OPENRTI_BIND_AT_LOAD}")
   endif()
 else()
-  add_library(rti1516e STATIC ${LIB_RTI1516E_SOURCES})
+  add_library(rti1516e STATIC ${LIB_RTI1516E_SOURCES} ${RTI1516E_PUBLIC_HEADERS} ${RTI1516E_PUBLIC_ENCODING_HEADERS} ${RTI1516E_PUBLIC_TIME_HEADERS})
   set_property(TARGET rti1516e APPEND PROPERTY COMPILE_DEFINITIONS STATIC_RTI STATIC_FEDTIME)
   set_property(TARGET rti1516e PROPERTY LINK_INTERFACE_MULTIPLICITY 2)
   openrti_target_position_independent(rti1516e)
@@ -158,7 +181,7 @@ endif()
 
 # libfedtime1516e
 if(OPENRTI_BUILD_SHARED)
-  add_library(fedtime1516e SHARED ${LIB_FEDTIME1516E_SOURCES})
+  add_library(fedtime1516e SHARED ${LIB_FEDTIME1516E_SOURCES} ${LIB_FEDTIME1516E_RCFILES})
   set_property(TARGET fedtime1516e APPEND PROPERTY COMPILE_DEFINITIONS BUILDING_FEDTIME)
 # ems: disable CMake so library versioning
 #  set_property(TARGET fedtime1516e PROPERTY VERSION 1.0.0)
