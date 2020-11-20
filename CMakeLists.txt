@@ -63,6 +63,14 @@ endif()
 # A bunch of sources that are operating system dependent.
 if(WIN32)
   set(OpenRTI_OS_SOURCES
+	win32/ClockWin32.h
+	win32/ConditionPrivateDataWin32.h
+	win32/ErrnoWin32.h
+	win32/MutexPrivateDataWin32.h
+	win32/NetworkStatisticsWin32.h
+	win32/PerformanceCounterStopWatch.h
+	win32/SocketAddressPrivateDataWin32.h
+	win32/SocketPrivateDataWin32.h
     win32/AtomicWin32.cpp
     win32/ClockWin32.cpp
     win32/ConditionWin32.cpp
@@ -76,18 +84,28 @@ if(WIN32)
     win32/SocketEventDispatcherWin32.cpp
     win32/SocketPacketWin32.cpp
     win32/SocketPipeWin32.cpp
-    win32/SocketServerWin32.cpp
     win32/SocketServerPipeWin32.cpp
     win32/SocketServerTCPWin32.cpp
+    win32/SocketServerWin32.cpp
     win32/SocketStreamWin32.cpp
     win32/SocketTCPWin32.cpp
     win32/SocketUDPWin32.cpp
     win32/SocketWin32.cpp
     win32/ThreadLocalWin32.cpp
     win32/ThreadWin32.cpp
+	OpenRTI.rc
   )
 else(WIN32)
   set(OpenRTI_OS_SOURCES
+	posix/ClockPosix.h
+	posix/ConditionPrivateDataPosix.h
+	posix/ErrnoPosix.h
+	posix/MutexPrivateDataPosix.h
+	posix/NetworkStatisticsPosix.h
+	posix/PerformanceCounterStopWatchPosix.h
+	posix/SocketAddressPrivateDataPosix.h
+	posix/SocketPrivateDataPosix.h
+	posix/ThreadPrivateDataPosix.h
     posix/AtomicPosix.cpp
     posix/ClockPosix.cpp
     posix/ConditionPosix.cpp
@@ -101,8 +119,8 @@ else(WIN32)
     posix/SocketPacketPosix.cpp
     posix/SocketPipePosix.cpp
     posix/SocketPosix.cpp
-    posix/SocketServerPosix.cpp
     posix/SocketServerPipePosix.cpp
+    posix/SocketServerPosix.cpp
     posix/SocketServerTCPPosix.cpp
     posix/SocketStreamPosix.cpp
     posix/SocketTCPPosix.cpp
@@ -161,70 +179,214 @@ else()
 endif()
 
 set(OpenRTI_SOURCES
-  AbstractMessage.cpp
-  AbstractMessageEncoding.cpp
-  AbstractMessageSender.cpp
-  AbstractProtocolLayer.cpp
-  AbstractProtocolSocket.cpp
-  AbstractServerNode.cpp
-  AbstractServer.cpp
-  AbstractSocketEvent.cpp
-  Attributes.cpp
-  InternalAmbassador.cpp
-  InternalTimeManagement.cpp
-  Federate.cpp
-  ContentHandler.cpp
-  DefaultErrorHandler.cpp
-  ErrorHandler.cpp
-  ExpatXMLReader.cpp
-  Exception.cpp
-  FDD1516EFileReader.cpp
-  FDD1516FileReader.cpp
-  FEDFileReader.cpp
-  InitialClientStreamProtocol.cpp
-  InitialServerStreamProtocol.cpp
-  InitialStreamProtocol.cpp
-  LogStream.cpp
-  Message.cpp
-  MessageEncodingRegistry.cpp
-  NestedProtocolLayer.cpp
-  NetworkServer.cpp
-  NetworkStatistics.cpp
-  Options.cpp
-  ParenthesesReader.cpp
-  ServerModel.cpp
-  ServerNode.cpp
-  ProtocolSocketEvent.cpp
-  RegionSet.cpp
-  ServerConfigContentHandler.cpp
-  LeafServerThread.cpp
-  SocketEventDispatcher.cpp
-  SocketServerAcceptEvent.cpp
-  StreamBufferProtocol.cpp
-  StringUtils.cpp
-  TightBE1MessageEncoding.cpp
-  ThreadServer.cpp
-  TranslateTypes.cpp
-  TranslateTypes.h
-  URL.cpp
-  VariableLengthDataTuple.cpp
-  WeakReferenced.cpp
-  XMLReader.cpp
-  dprintf.cpp
-  encoding/BasicDataElements.cpp
-  encoding/DataElement.cpp
-  encoding/HLAfixedArray.cpp
-  encoding/HLAfixedRecord.cpp
-  encoding/HLAhandle.cpp
-  encoding/HLAopaqueData.cpp
-  encoding/HLAvariableArray.cpp
-  encoding/HLAvariantRecord.cpp
-  mom/MomFederate.cpp
-  mom/MomFederateMetrics.cpp
-  mom/MomFederation.cpp
-  mom/MomInteractions.cpp
-  mom/MomManager.cpp
-  mom/MomServer.cpp
+	AbstractConnect.h
+	AbstractLogicalTime.h
+	AbstractMessage.cpp
+	AbstractMessage.h
+	AbstractMessageDispatcher.h
+	AbstractMessageEncoding.cpp
+	AbstractMessageEncoding.h
+	AbstractMessageQueue.h
+	AbstractMessageReceiver.h
+	AbstractMessageSender.cpp
+	AbstractMessageSender.h
+	AbstractNetworkStatistics.h
+	AbstractNotificationHandle.h
+	AbstractProtocol.h
+	AbstractProtocolLayer.cpp
+	AbstractProtocolLayer.h
+	AbstractProtocolSocket.cpp
+	AbstractProtocolSocket.h
+	AbstractServer.cpp
+	AbstractServer.h
+	AbstractServerNode.cpp
+	AbstractServerNode.h
+	AbstractSocketEvent.cpp
+	AbstractSocketEvent.h
+	Ambassador.h
+	Atomic.h
+	Attributes.cpp
+	Attributes.h
+	Buffer.h
+	Clock.h
+	Condition.h
+	ContentHandler.cpp
+	ContentHandler.h
+	DebugNew.h
+	DecodeDataStream.h
+	DefaultErrorHandler.cpp
+	DefaultErrorHandler.h
+	DynamicModule.h
+	EncodeDataStream.h
+	ErrorHandler.cpp
+	ErrorHandler.h
+	Exception.cpp
+	Exception.h
+	ExpatXMLReader.cpp
+	ExpatXMLReader.h
+	Export.h
+	FDD1516EFileReader.cpp
+	FDD1516EFileReader.h
+	FDD1516FileReader.cpp
+	FDD1516FileReader.h
+	FEDFileReader.cpp
+	FEDFileReader.h
+	FOMStringModuleBuilder.h
+	Federate.cpp
+	Federate.h
+	FederateHandleLowerBoundTimeStampMap.h
+	Handle.h
+	HandleAllocator.h
+	InitialClientStreamProtocol.cpp
+	InitialClientStreamProtocol.h
+	InitialServerStreamProtocol.cpp
+	InitialServerStreamProtocol.h
+	InitialStreamProtocol.cpp
+	InitialStreamProtocol.h
+	InternalAmbassador.cpp
+	InternalAmbassador.h
+	InternalTimeManagement.cpp
+	InternalTimeManagement.h
+	IntrusiveList.h
+	IntrusiveUnorderedMap.h
+	LeafServerThread.cpp
+	LeafServerThread.h
+	LogStream.cpp
+	LogStream.h
+	Message.cpp
+	Message.h
+	MessageEncodingRegistry.cpp
+	MessageEncodingRegistry.h
+	MessageQueue.h
+	MomTypes.h
+	Mutex.h
+	NestedProtocolLayer.cpp
+	NestedProtocolLayer.h
+	NetworkServer.cpp
+	NetworkServer.h
+	NetworkStatistics.cpp
+	NetworkStatistics.h
+	OpenRTIConfig.h
+	OpenRTIVersion.h
+	Options.cpp
+	Options.h
+	ParenthesesReader.cpp
+	ParenthesesReader.h
+	PooledMessageList.h
+	ProtocolSocketEvent.cpp
+	ProtocolSocketEvent.h
+	Rand.h
+	RangeBounds.h
+	Referenced.h
+	Region.h
+	RegionSet.cpp
+	RegionSet.h
+	ScopeLock.h
+	ScopeUnlock.h
+	ServerConfigContentHandler.cpp
+	ServerConfigContentHandler.h
+	ServerModel.cpp
+	ServerModel.h
+	ServerNode.cpp
+	ServerNode.h
+	ServerOptions.h
+	SharedPtr.h
+	SingletonPtr.h
+	Socket.h
+	SocketAddress.h
+	SocketData.h
+	SocketEventDispatcher.cpp
+	SocketEventDispatcher.h
+	SocketPacket.h
+	SocketPipe.h
+	SocketServer.h
+	SocketServerAcceptEvent.cpp
+	SocketServerAcceptEvent.h
+	SocketServerPipe.h
+	SocketServerTCP.h
+	SocketStream.h
+	SocketTCP.h
+	SocketUDP.h
+	StreamBufferProtocol.cpp
+	StreamBufferProtocol.h
+	StringUtils.cpp
+	StringUtils.h
+	TemplateTimeManagement.h
+	TestLib.h
+	Thread.h
+	ThreadLocal.h
+	ThreadServer.cpp
+	ThreadServer.h
+	TightBE1MessageEncoding.cpp
+	TightBE1MessageEncoding.h
+	TimeManagement.h
+	TranslateTypes.cpp
+	TranslateTypes.h
+	TranslateTypes.h
+	Types.h
+	URL.cpp
+	URL.h
+	ValueImplementation.h
+	VariableLengthData.h
+	VariableLengthDataTuple.cpp
+	VariableLengthDataTuple.h
+	WeakPtr.h
+	WeakReferenced.cpp
+	WeakReferenced.h
+	XMLReader.cpp
+	XMLReader.h
+	ZLibProtocolLayer.h
+	dprintf.cpp
+	dprintf.h
+	encoding/BasicDataElements.cpp
+	encoding/BasicDataElements.h
+	encoding/DataElement.cpp
+	encoding/DataElement.h
+	encoding/Encoding.h
+	encoding/EncodingConfig.h
+	encoding/EncodingExceptions.h
+	encoding/HLAfixedArray.cpp
+	encoding/HLAfixedArray.h
+	encoding/HLAfixedRecord.cpp
+	encoding/HLAfixedRecord.h
+	encoding/HLAhandle.cpp
+	encoding/HLAhandle.h
+	encoding/HLAopaqueData.cpp
+	encoding/HLAopaqueData.h
+	encoding/HLAvariableArray.cpp
+	encoding/HLAvariableArray.h
+	encoding/HLAvariantRecord.cpp
+	encoding/HLAvariantRecord.h
+	mom/AbstractFederateMetrics.h
+	mom/MomFederate.cpp
+	mom/MomFederate.h
+	mom/MomFederateMetrics.cpp
+	mom/MomFederateMetrics.h
+	mom/MomFederation.cpp
+	mom/MomFederation.h
+	mom/MomInteractions.cpp
+	mom/MomInteractions.h
+	mom/MomManager.cpp
+	mom/MomManager.h
+	mom/MomServer.cpp
+	mom/MomServer.h
+	mom/MomTypes.h
+	stdafx.h
+	xml/amigaconfig.h
+	xml/ascii.h
+	xml/asciitab.h
+	xml/expat.h
+	xml/expat_external.h
+	xml/iasciitab.h
+	xml/internal.h
+	xml/latin1tab.h
+	xml/macconfig.h
+	xml/nametab.h
+	xml/utf8tab.h
+	xml/winconfig.h
+	xml/xmlrole.h
+	xml/xmltok.h
+	xml/xmltok_impl.h
   ${OpenRTI_OS_SOURCES}
   ${OpenRTI_EXPAT_SOURCES}
   ${OpenRTI_ZLIB_SOURCES}
