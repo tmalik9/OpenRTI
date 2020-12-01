@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros">
-    <BuildType>Local</BuildType>
-    <!-- <BuildType>CANoe</BuildType> -->
+    <!-- <BuildType>Local</BuildType> -->
+    <BuildType>CANoe</BuildType>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x64'">
     <OBJ_DIR>$(SolutionDir)Obj64</OBJ_DIR>
@@ -13,7 +13,7 @@
     <SOURCE_DIR>.\</SOURCE_DIR>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(BuildType)'=='CANoe'">
-    <BIN_DIR>$(SolutionDir)..\..\bin</BIN_DIR>
+    <BIN_DIR>D:\vfs\CANoe\release\15\bin</BIN_DIR>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(BuildType)'=='Local'">
     <BIN_DIR>$(SolutionDir)bin</BIN_DIR>

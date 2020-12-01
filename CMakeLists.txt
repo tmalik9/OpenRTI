@@ -2,6 +2,9 @@ project(OpenRTI CXX)
 cmake_minimum_required(VERSION 2.6.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+include(GetOpenRTIVersion)
+message(STATUS "Build OpenRTI: ${OPENRTI_VERSION}")
+
 set(PACKAGE_NAME "OpenRTI")
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
 set(CPACK_PACKAGE_VERSION_MINOR 0)
@@ -233,3 +236,26 @@ else()
   message(WARNING "building without tests")
 endif()
 
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    "OpenRTIConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
+    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+)
+
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
+    VERSION "${OPENRTI_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
+
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
+          "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
+)
+
+install(EXPORT OpenRTITargets DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI")

@@ -202,7 +202,7 @@ endif()
 #endif()
 openrti_target_link_private_libraries(fedtime1516e rti1516e OpenRTI)
 
-install(TARGETS fedtime1516e rti1516e
+install(TARGETS fedtime1516e rti1516e EXPORT OpenRTITargets
   RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
   ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
