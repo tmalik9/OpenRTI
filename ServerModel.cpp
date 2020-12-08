@@ -3551,6 +3551,9 @@ Federation::insertTimeConstrained(Federate& federate)
 
   OpenRTIAssert(!federate.getIsTimeConstrained());
   FederationConnect* federationConnect = federate.getFederationConnect();
+  if (federationConnect == nullptr || federate.getResignPending()) {
+    return;
+  }
   OpenRTIAssert(federationConnect);
   if (!federationConnect->getIsTimeConstrained())
     _timeConstrainedFederationConnectList.push_back(*federationConnect);
