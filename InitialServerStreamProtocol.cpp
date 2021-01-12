@@ -55,13 +55,13 @@ InitialServerStreamProtocol::readOptionMap(const StringStringListMap& clientOpti
     return;
   }
 
-  DebugPrintf("%s: version=%s\n", __FUNCTION__, join(i->second, ",").c_str());
+  //DebugPrintf("%s: version=%s\n", __FUNCTION__, join(i->second, ",").c_str());
   std::string protocolVersion = std::to_string(OPENRTI_ENCODING_VERSION);
   if (!getCompatibleVersion(protocolVersion, i->second)) {
     errorResponse("Client does not support version " OPENRTI_ENCODING_VERSION_STRING " of the protocol.");
     return;
   }
-  DebugPrintf("%s: compatible version=%s\n", __FUNCTION__, protocolVersion.c_str());
+  //DebugPrintf("%s: compatible version=%s\n", __FUNCTION__, protocolVersion.c_str());
 
   // Check the encodings
   i = clientOptionMap.find("encoding");

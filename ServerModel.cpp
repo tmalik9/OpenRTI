@@ -1369,6 +1369,7 @@ void ObjectClass::_updateCumulativeSubscription(const ConnectHandle& connectHand
       continue;
 
     if (subscribe) {
+
       // Insert the connect handle into the receiving connects
       if (!instanceAttribute->_receivingConnects.insert(connectHandle).second)
         continue;
@@ -1746,20 +1747,15 @@ FederationConnect::getIsTimeRegulating() const
 void
 FederationConnect::insertTimeRegulating(Federate& federate)
 {
-  //DebugPrintf("bkd: FederationConnect::insertTimeRegulating federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
-
   _timeRegulatingFederateList.push_back(federate);
 }
 
 void
 FederationConnect::eraseTimeRegulating(Federate& federate)
 {
-  //DebugPrintf("bkd: FederationConnect::eraseTimeRegulating federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
-
   _timeRegulatingFederateList.unlink(federate);
 }
 
-// bkd: Bookkeeping timeConstrained federates
 bool
 FederationConnect::getIsTimeConstrained() const
 {
@@ -1770,19 +1766,14 @@ FederationConnect::getIsTimeConstrained() const
 void
 FederationConnect::insertTimeConstrained(Federate& federate)
 {
-  //DebugPrintf("bkd: FederationConnect::insertTimeConstrained federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
-
   _timeConstrainedFederateList.push_back(federate);
 }
 
 void
 FederationConnect::eraseTimeConstrained(Federate& federate)
 {
-  //DebugPrintf("bkd: FederationConnect::eraseTimeConstrained federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
-
   _timeConstrainedFederateList.unlink(federate);
 }
-// --- bkd
 
 void
 FederationConnect::send(const SharedPtr<const AbstractMessage>& message)
@@ -1812,7 +1803,6 @@ Federation::Federation(Node& serverNode)
 
 Federation::~Federation()
 {
-  //DebugPrintf("bkd: %s: name=%s\n", __FUNCTION__, getName().c_str());
   _momServer.clear();
   // In case of an exception tis can be non empty
   _objectInstanceHandleObjectInstanceMap.clear();
@@ -3517,8 +3507,6 @@ Federation::getFederate(const FederateHandle& federateHandle)
 void
 Federation::insertTimeRegulating(Federate& federate)
 {
-  //DebugPrintf("bkd: Federation::insertTimeRegulating federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
-
   OpenRTIAssert(!federate.getIsTimeRegulating());
   FederationConnect* federationConnect = federate.getFederationConnect();
   OpenRTIAssert(federationConnect);
@@ -3530,8 +3518,6 @@ Federation::insertTimeRegulating(Federate& federate)
 void
 Federation::eraseTimeRegulating(Federate& federate)
 {
-  //DebugPrintf("bkd: Federation::eraseTimeRegulating federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
-
   OpenRTIAssert(federate.getIsTimeRegulating());
   FederationConnect* federationConnect = federate.getFederationConnect();
   // We can only be time regulating if this exists and provides us with a link
@@ -3543,12 +3529,9 @@ Federation::eraseTimeRegulating(Federate& federate)
   _timeRegulatingFederationConnectList.unlink(*federationConnect);
 }
 
-//bkd: Bookkeeping timeConstrained federates
 void
 Federation::insertTimeConstrained(Federate& federate)
 {
-  //DebugPrintf("bkd: Federation::insertTimeConstrained federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
-
   OpenRTIAssert(!federate.getIsTimeConstrained());
   FederationConnect* federationConnect = federate.getFederationConnect();
   if (federationConnect == nullptr || federate.getResignPending()) {
@@ -3563,8 +3546,6 @@ Federation::insertTimeConstrained(Federate& federate)
 void
 Federation::eraseTimeConstrained(Federate& federate)
 {
-  //DebugPrintf("bkd: Federation::eraseTimeConstrained federateHandle = %s\n", federate.getFederateHandle().toString().c_str());
-
   OpenRTIAssert(federate.getIsTimeConstrained());
   FederationConnect* federationConnect = federate.getFederationConnect();
   // We can only be time Constrained if this exists and provides us with a link
@@ -3575,7 +3556,6 @@ Federation::eraseTimeConstrained(Federate& federate)
     return;
   _timeConstrainedFederationConnectList.unlink(*federationConnect);
 }
-// --- bkd
 
 Region*
 Federation::getOrCreateRegion(const RegionHandle& regionHandle)
@@ -3854,7 +3834,7 @@ NodeConnect::setOptions(const StringStringListMap& options)
   {
     const char* s = i->second.front().c_str();
     _version = strtoul(s, nullptr, 10);
-    DebugPrintf("%s: client version=%d\n", __FUNCTION__, _version);
+    //DebugPrintf("%s: client version=%d\n", __FUNCTION__, _version);
   }
   else
     _name.clear();

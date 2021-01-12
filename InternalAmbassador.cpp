@@ -259,7 +259,6 @@ InternalAmbassador::acceptInternalMessage(const DisableTimeRegulationRequestMess
     timeManagement->acceptInternalMessage(*this, message);
 }
 
-// bkd: Bookkeeping timeConstrained federates 
 void
 InternalAmbassador::acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& message)
 {
@@ -269,7 +268,6 @@ void
 InternalAmbassador::acceptInternalMessage(const DisableTimeConstrainedNotifyMessage& message)
 {
 }
-// bkd ----
 
 void
 InternalAmbassador::acceptInternalMessage(const CommitLowerBoundTimeStampMessage& message)
@@ -344,8 +342,18 @@ InternalAmbassador::acceptInternalMessage(const ChangeObjectInstanceSubscription
 {
   // probably the wrong place to do this -
   // maybe this should only get through when there is no subscriber left at all.
-  Federate::ObjectClass* objectClass = getFederate()->getObjectClass(message.getObjectClassHandle());
-  Federate::ObjectInstance* objectInstance = getFederate()->getObjectInstance(message.getObjectInstanceHandle());
+
+  ObjectClassHandle objectClassHandle = message.getObjectClassHandle();
+  ObjectInstanceHandle objectInstanceHandle = message.getObjectInstanceHandle();
+  Federate::ObjectClass* objectClass = getFederate()->getObjectClass(objectClassHandle);
+  Federate::ObjectInstance* objectInstance = getFederate()->getObjectInstance(objectInstanceHandle);
+
+  // The object or class could be removed meanwhile
+  if (!objectInstance)
+    return;
+  if (!objectClass)
+    return;
+
   SubscriptionType subscriptionType = message.getSubscriptionType();
   if (objectInstance->setSubscriptionType(subscriptionType))
   {

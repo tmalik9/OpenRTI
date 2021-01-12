@@ -945,6 +945,12 @@ public:
 
     if (objectInstance->setSubscriptionType(Unsubscribed)) // returns true if changed
     {
+
+      //DebugPrintf("unsubscribeObjectInstance: objInst.getName=%s, objInst.getHandle=%s, objInst.subscription=%d\n",
+      //  objectInstance->getName().c_str(),
+      //  objectInstanceHandle.toString().c_str(),
+      //  objectInstance->getSubscriptionType() != Unsubscribed);
+
       // Tell all others this federate has unsubscribed the object instance
       SharedPtr<ChangeObjectInstanceSubscriptionMessage> request = new ChangeObjectInstanceSubscriptionMessage;
       request->setFederationHandle(getFederationHandle());
@@ -953,8 +959,6 @@ public:
       request->setSubscriptionType(Unsubscribed);
       send(request);
     }
-    _releaseObjectInstance(objectInstanceHandle);
-
   }
 
   void subscribeInteractionClass(InteractionClassHandle interactionClassHandle, bool active)
@@ -1403,6 +1407,12 @@ public:
       passels[index].push_back(AttributeValue());
       passels[index].back().setAttributeHandle(i->getAttributeHandle());
       passels[index].back().getValue().swap(i->getValue());
+
+      //DebugPrintf("updateAttributeValues: objInst.getName=%s, objInst.getHandle=%s, objInst.AttrHandle=%s, objInst.subscription=%d\n",
+      //  objectInstance->getName().c_str(),
+      //  objectInstanceHandle.toString().c_str(),
+      //  i->getAttributeHandle().toString().c_str(),
+      //  objectInstance->getSubscriptionType() != Unsubscribed);
     }
 
     for (unsigned i = 0; i < 2; ++i) {
@@ -1454,6 +1464,12 @@ public:
       passels[index0][index1].push_back(AttributeValue());
       passels[index0][index1].back().setAttributeHandle(i->getAttributeHandle());
       passels[index0][index1].back().getValue().swap(i->getValue());
+
+      //DebugPrintf("updateAttributeValues: objInst.getName=%s, objInst.getHandle=%s, objInst.AttrHandle=%s, objInst.subscription=%d\n",
+      //  objectInstance->getName().c_str(),
+      //  objectInstanceHandle.toString().c_str(),
+      //  i->getAttributeHandle().toString().c_str(),
+      //  objectInstance->getSubscriptionType() != Unsubscribed);
     }
     if (timeRegulationEnabled && getTimeManagement()->logicalTimeAlreadyPassed(nativeLogicalTime))
       throw InvalidLogicalTime(getTimeManagement()->logicalTimeToString(nativeLogicalTime));
@@ -1782,6 +1798,9 @@ public:
         throw AttributeNotDefined(j->toString());
     }
 
+   // Implicit resubscribe on requestAttributeValueUpdate
+   objectInstance->setSubscriptionType(SubscribedPassive);
+
     SharedPtr<RequestAttributeUpdateMessage> request;
     request = new RequestAttributeUpdateMessage;
     request->setFederationHandle(getFederationHandle());
@@ -1789,6 +1808,7 @@ public:
     request->getAttributeHandles().swap(attributeHandleVector);
     request->getTag().swap(tag);
     send(request);
+
   }
 
   void requestAttributeValueUpdate(ObjectClassHandle objectClassHandle, AttributeHandleVector& attributeHandleVector,
@@ -3975,6 +3995,10 @@ public:
     Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
       return;
+    // objectInstance update arrived but was just unsubscribed
+    if (objectInstance->getSubscriptionType() == Unsubscribed)
+      return;
+
     Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle());
     if (!objectClass)
       return;
@@ -3993,6 +4017,10 @@ public:
     ObjectInstanceHandle objectInstanceHandle = message.getObjectInstanceHandle();
     Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
+      return;
+
+    // objectInstance update arrived but was just unsubscribed
+    if (objectInstance->getSubscriptionType() == Unsubscribed)
       return;
 
     Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle());

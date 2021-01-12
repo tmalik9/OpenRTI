@@ -228,9 +228,11 @@ public:
     return Unsubscribed;
   }
 
+  // FIXME This returns only the passive subscriptions
   const ConnectHandleSet& getSubscribedConnectHandleSet() const
   { return _subscribedConnects.getConnectHandleSet(); }
 
+  // FIXME This returns only the passive subscriptions
   void getSubscribedAndIntersectingConnectHandleSet(ConnectHandleSet& connectHandleSet, const RegionSet& regionSet) const
   { connectHandleSet = _subscribedConnects.getConnectHandleSet(); }
 

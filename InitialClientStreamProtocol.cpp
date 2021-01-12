@@ -88,12 +88,12 @@ InitialClientStreamProtocol::readOptionMap(const StringStringListMap& optionMap)
   if (i != optionMap.end()) {
     if (i->second.empty())
       throw RTIinternalError("Empty version response from server!");
-    DebugPrintf("%s: version=%s\n", __FUNCTION__, join(i->second, ",").c_str());
+    //DebugPrintf("%s: version=%s\n", __FUNCTION__, join(i->second, ",").c_str());
     std::string protocolVersion = std::to_string(OPENRTI_ENCODING_VERSION);
     if (!getCompatibleVersion(protocolVersion, i->second)) {
       throw RTIinternalError("Client does not support version " OPENRTI_ENCODING_VERSION_STRING " of the protocol.");
     }
-    DebugPrintf("%s: compatible version=%s\n", __FUNCTION__, protocolVersion.c_str());
+    //DebugPrintf("%s: compatible version=%s\n", __FUNCTION__, protocolVersion.c_str());
   }
   i = optionMap.find("encoding");
   // This means 'if (1 < i->second.size())' without running into O(N) size with lists.

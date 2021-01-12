@@ -51,7 +51,6 @@ public:
   { }
   virtual ~FederationServer()
   {
-    //DebugPrintf("bkd: %s: name=%s\n", __FUNCTION__, getName().c_str());
   }
 
   void accept(const ConnectHandle& connectHandle, const InsertModulesMessage* message)
@@ -202,16 +201,13 @@ public:
       broadcast(connectHandle, request);
     }
 
-    // bkd: Bookkeeping timeConstrained federates
     if (federate->getIsTimeConstrained()) {
-      //DebugPrintf("bkd: accept ResignFederationExecutionRequestMessage from federateHandle = %s: eraseTimeConstrained and broadcast DisableTimeConstrainedNotifyMessage \n", federate->getFederateHandle().toString().c_str());
       eraseTimeConstrained(*federate);
       SharedPtr<DisableTimeConstrainedNotifyMessage> request = new DisableTimeConstrainedNotifyMessage;
       request->setFederationHandle(getFederationHandle());
       request->setFederateHandle(federateHandle);
       broadcast(connectHandle, request);
     }
-    /// --- bkd
 
     for (ServerModel::SynchronizationFederate::FirstList::iterator k = federate->getSynchronizationFederateList().begin();
          k != federate->getSynchronizationFederateList().end();) {
@@ -707,15 +703,12 @@ public:
       if (federate->getIsTimeConstrained())
         throw MessageError("EnableTimeConstrainedRequestMessage for already time constrained federate!");
 
-      //DebugPrintf("bkd: rootServer insertTimeConstrained federateHandle = %s\n", federate->getFederateHandle().toString().c_str());
-
       insertTimeConstrained(*federate);
       broadcastToChildren(message);
     }
     else {
       sendToParent(message);
     }
-    // ---bkd
 
    // broadcast(connectHandle, message);
   }
@@ -723,7 +716,6 @@ public:
   void accept(const ConnectHandle& connectHandle, const DisableTimeConstrainedNotifyMessage* message)
   {
     ServerModel::Federate* federate = getFederate(message->getFederateHandle());
-    //DebugPrintf("bkd: accept DisableTimeConstrainedNotifyMessage from federateHandle = %s: broadcast and erase; \n", federate->getFederateHandle().toString().c_str());
     if (!federate)
       throw MessageError("DisableTimeConstrainedNotifyMessage from unknown Federate!");
     if (!federate->getIsTimeConstrained())
@@ -769,19 +761,14 @@ public:
     // 2020-10-27, Mth: REVIEW
     if (getTimeConstrainedFederationConnectList().empty())
     {
-      //DebugPrintf("bkd: accept CommitLowerBoundTimeStampMessage: TimeConstrainedConnectList empty -> broadcast\n");
       broadcast(connectHandle, message);
     }
     else
     {
-      //DebugPrintf("bkd: accept CommitLowerBoundTimeStampMessage\n");
-
-      // bkd: Only time constrained federates are interested in this message.
       for (ServerModel::FederationConnect::TimeConstrainedList::iterator i = getTimeConstrainedFederationConnectList().begin();
         i != getTimeConstrainedFederationConnectList().end(); ++i) {
         if (connectHandle == i->getConnectHandle())
           continue;
-        //DebugPrintf("bkd:    send further from connectHandles: %s to %s \n", connectHandle.toString().c_str(), i->getConnectHandle().toString().c_str());
         i->send(message);
       }
     }
@@ -789,20 +776,16 @@ public:
   }
   void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampResponseMessage* message)
   {
-    //DebugPrintf("bkd: accept CommitLowerBoundTimeStampResponseMessage\n");
     send(message->getFederateHandle(), message);
   }
   void accept(const ConnectHandle& connectHandle, const LockedByNextMessageRequestMessage* message)
   {
-    //DebugPrintf("bkd: accept LockedByNextMessageRequestMessage\n");
-
     // Only time regulating federates are interrested in this message.
     // May be we should at one point track and store this connect handle set.
     for (ServerModel::FederationConnect::TimeRegulatingList::iterator i = getTimeRegulatingFederationConnectList().begin();
          i != getTimeRegulatingFederationConnectList().end(); ++i) {
       if (connectHandle == i->getConnectHandle())
         continue;
-      //DebugPrintf("bkd:    send further from connectHandles: %s to %s \n", connectHandle.toString().c_str(), i->getConnectHandle().toString().c_str());
 
       i->send(message);
     }
@@ -1199,6 +1182,10 @@ public:
     // Insert all object instances that are now new to this connect
     if (message->getSubscriptionType() != Unsubscribed) {
       for (ServerModel::ObjectInstance* objectInstance : objectInstanceList) {
+
+        // The new objectInstance has to be subscribed for this connectHandle 
+        objectInstance->setSubscriptionType(connectHandle, SubscribedPassive);
+
         SharedPtr<InsertObjectInstanceMessage> request = new InsertObjectInstanceMessage;
         request->setFederationHandle(getFederationHandle());
         request->setObjectInstanceHandle(objectInstance->getObjectInstanceHandle());
@@ -1643,13 +1630,11 @@ public:
         continue;
       for (ConnectHandle receivingConnect : instanceAttribute->_receivingConnects)
       {
-        connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
-        connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
-        //DebugPrintf("%s(TimeStampedAttributeUpdateMessage): instance=%s subscription(receivingConnect=%s) = %s, connectHandle=%s\n", __FUNCTION__,
-        //            objectInstance->getName().c_str(), 
-        //            receivingConnect.toString().c_str(),
-        //            to_string(objectInstance->getSubscriptionType(receivingConnect)).c_str(),
-        //            connectHandle.toString().c_str());
+        if (objectInstance->getSubscriptionType(receivingConnect) != Unsubscribed)
+        {
+          connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
+          connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
+        }
       }
     }
 
@@ -1680,6 +1665,10 @@ public:
 
     typedef std::map<ConnectHandle, AttributeValueVector> ConnectHandleAttributeValueVectorMap;
     ConnectHandleAttributeValueVectorMap connectHandleAttributeValueVectorMap;
+
+    //auto connectHandleSet = objectInstance->getSubscribedConnectHandleSet();
+    
+
     for (auto& attributeValue : message->getAttributeValues())
     {
       ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeValue.getAttributeHandle());
@@ -1687,13 +1676,11 @@ public:
         continue;
       for (ConnectHandle receivingConnect : instanceAttribute->_receivingConnects)
       {
-        connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
-        connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
-        ////DebugPrintf("bkd: %s(TimeStampedAttributeUpdateMessage): instance=%s subscription(receivingConnect=%s) = %s, connectHandle=%s\n", __FUNCTION__,
-        //            objectInstance->getName().c_str(), 
-        //            receivingConnect.toString().c_str(),
-        //            to_string(objectInstance->getSubscriptionType(receivingConnect)).c_str(),
-        //            connectHandle.toString().c_str());
+        if (objectInstance->getSubscriptionType(receivingConnect) != Unsubscribed)
+        {
+          connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
+          connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
+        }
       }
     }
 
@@ -1828,6 +1815,10 @@ public:
     ServerModel::ObjectInstance* objectInstance = getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
       return;
+
+    // Sender resubscribes implicitly when sending the RequestAttributeUpdateMessage
+    // Provider resubscribes implicitly here
+    objectInstance->setSubscriptionType(connectHandle, SubscribedPassive);
 
     // Find the server connects that own the attributes and build up a message for those
     ConnectMessageMap connectMessageMap;
@@ -2351,7 +2342,6 @@ public:
 
         Log(ServerFederation, Info) << getServerPath() << ": Create federation execution \""
                                     << message->getFederationExecution() << "\"." << std::endl;
-
 
         // ... and respond with Success
         SharedPtr<CreateFederationExecutionResponseMessage> response;
@@ -2985,7 +2975,7 @@ private:
     ServerModel::NodeConnect* connect = getNodeConnect(getParentConnectHandle());
     OpenRTIAssert(connect);
 
-    DebugPrintf("%s: connect version=%d\n", __FUNCTION__, connect->getVersion());
+    //DebugPrintf("%s: connect version=%d\n", __FUNCTION__, connect->getVersion());
     FederationServer* federationServer = new FederationServer(*this);
     federationServer->setName(name);
     federationServer->setFederationHandle(federationHandle);
