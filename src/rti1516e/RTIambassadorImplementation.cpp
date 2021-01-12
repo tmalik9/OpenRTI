@@ -65,6 +65,7 @@ static std::list<std::string> findHLAstandardMIMFileCandidates()
     moduleName = getBasePart(moduleName);
     // This gets us to the parent directory
     moduleName = getBasePart(moduleName);
+    // FIXME: moduleName depends on the build path, the shared MIM not -> CTests can't find the file
     candidates.push_back(moduleName + std::string("/share/OpenRTI/rti1516e/HLAstandardMIM.xml"));
   }
 
@@ -92,7 +93,8 @@ static void loadHLAstandardMIM(OpenRTI::FOMStringModule2List& fomModuleList)
 {
   std::list<std::string> fileCandidates = findHLAstandardMIMFileCandidates();
   for (auto designator : fileCandidates) {
-    std::ifstream stream(utf8ToLocale(designator).c_str());
+    std::ifstream stream;
+    stream.open(utf8ToLocale(designator).c_str());
     if (!stream.is_open())
       continue;
 

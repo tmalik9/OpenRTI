@@ -191,6 +191,8 @@ protected:
     std::wstring mFederationName;
     FederateHandle mFederateHandle;
 
+    std::vector<ObjectInstanceHandle> mDiscoveredObjectInstances;
+
     double federateTime;
     double federateLookahead;
 

@@ -247,6 +247,7 @@ public:
     std::unique_ptr<rti1516e::RTIambassador> ambassador;
     rti1516e::RTIambassadorFactory factory;
     ambassador = factory.createRTIambassador();
+    ambassador->setOperationWaitTimeout(10000);
     ambassador->connect(*this, rti1516e::HLA_EVOKED, getConnectUrl());
 
     // create, must work once
@@ -303,7 +304,6 @@ public:
       }
 
     }
-
     // Wait for all threads, this is to ensure that we do not destroy before we are ready
     wait();
 
@@ -341,6 +341,8 @@ public:
     std::unique_ptr<rti1516e::RTIambassador> ambassador;
     rti1516e::RTIambassadorFactory factory;
     ambassador = factory.createRTIambassador();
+    ambassador->setOperationWaitTimeout(10000);
+
     ambassador->connect(*this, rti1516e::HLA_EVOKED, getConnectUrl());
 
     // Try that several times. Ensure correct cleanup
@@ -644,6 +646,29 @@ public:
 
   virtual void turnUpdatesOffForObjectInstance(rti1516e::ObjectInstanceHandle theObject,
                                                rti1516e::AttributeHandleSet const & theAttributes) override
+  {
+  }
+
+  virtual void confirmAttributeTransportationTypeChange(rti1516e::ObjectInstanceHandle theObject,
+                                                        rti1516e::AttributeHandleSet theAttributes,
+                                                        rti1516e::TransportationType theTransportation) override
+  {
+  }
+
+  virtual void reportAttributeTransportationType(rti1516e::ObjectInstanceHandle theObject,
+                                                 rti1516e::AttributeHandle theAttribute,
+                                                 rti1516e::TransportationType theTransportation) override
+  {
+  }
+
+  virtual void confirmInteractionTransportationTypeChange(rti1516e::InteractionClassHandle theInteraction,
+                                                          rti1516e::TransportationType theTransportation) override
+  {
+  }
+
+  virtual void reportInteractionTransportationType(rti1516e::FederateHandle federateHandle,
+                                                   rti1516e::InteractionClassHandle theInteraction,
+                                                   rti1516e::TransportationType theTransportation) override
   {
   }
 

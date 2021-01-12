@@ -38,7 +38,6 @@ enable_language(C)
 # c++ standard version using
 set(CMAKE_CXX_STANDARD 11)
 
-
 # Some whole project sensible defines
 if(UNIX)
   # Make sure we get the right libc functions
@@ -92,6 +91,7 @@ endif()
 
 # Change the default build type to something fast
 if(NOT CMAKE_BUILD_TYPE)
+  message("No CMAKE_BUILD_TYPE set, using RelWithDebInfo")
   set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
@@ -128,9 +128,14 @@ else()
 endif()
 set(OPENRTI_INSTALL_WITH_RPATH ${OPENRTI_INSTALL_WITH_RPATH_DEFAULT} CACHE BOOL "Build shared libraries with builtin search path.")
 
-# The only known compiler with this binary incompatibility of debug libraries is cl
-if(MSVC)
-  set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Filename postfix for debug libraries.")
+# # The only known compiler with this binary incompatibility of debug libraries is cl
+# if(MSVC)
+ # set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Filename postfix for debug libraries.")
+# endif()
+
+option(OPENRTI_STANDALONE_TESTS "Disable MOM server for standalone tests" OFF)
+if (OPENRTI_STANDALONE_TESTS)
+	add_definitions(-DOPENRTI_STANDALONE_TESTS)
 endif()
 
 # We really want to hide all the OpenRTI private symbols.

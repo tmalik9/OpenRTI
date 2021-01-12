@@ -148,7 +148,7 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
     server->setServerName("Leaf server");
     Clock abstime = (timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
     server->connectParentServer(url, abstime);
-    DebugPrintf("parent protocol version=%d\n", server->getProtocolVersion());
+    //DebugPrintf("parent protocol version=%d\n", server->getProtocolVersion());
 
     return server;
   } else if (url.getProtocol() == "thread") {
@@ -184,12 +184,7 @@ LeafServerThread::_Registry::createServerNode()
 bool LeafServerThread::_Registry::allowCreation = true;
 SharedPtr<LeafServerThread::_Registry>& LeafServerThread::_Registry::GetInstance()
 {
-  static SharedPtr<LeafServerThread::_Registry> _instance = nullptr;
-
-  if (_instance == nullptr && LeafServerThread::_Registry::allowCreation)
-  {
-    _instance = new LeafServerThread::_Registry;
-  }
+  static SharedPtr<LeafServerThread::_Registry> _instance = new LeafServerThread::_Registry;
   return _instance;
 }
 

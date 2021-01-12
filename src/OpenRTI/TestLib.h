@@ -450,7 +450,7 @@ public:
       _fddFile = localeToUcs(argument);
       return true;
     case 'S':
-      _numServers = atoi(argument.c_str());
+      _numServers = atoi(argument.c_str()); // For S==0, protocol = thread + ThreadServer.cpp is used (otherwise, protocol = rti + NetworkServer.cpp) 
       return true;
     case 'J':
       _joinOnce = true;

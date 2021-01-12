@@ -161,6 +161,7 @@ SimpleTestFederate::~SimpleTestFederate()
 
 void SimpleTestFederate::join(const std::string& address, const std::string& federateName, const std::string& fom, const std::string& federationName, bool regulating, bool constrained)
 {
+  waitForUser("Join");
   mFederationName = to_wstring(federationName);
   ///
   /// 1. create the RTIambassador
@@ -351,7 +352,7 @@ void SimpleTestFederate::waitForUser(const std::string& tag)
  */
 void SimpleTestFederate::advanceTime(double timestep)
 {
-  printf("%s: timestep=%f time=%0.6f\n", __FUNCTION__, timestep,  federateTime);
+  //printf("%s: timestep=%f time=%0.6f\n", __FUNCTION__, timestep,  federateTime);
   /// request the advance
   isAdvancing = true;
   HLAfloat64Time newTime = (federateTime + timestep);
@@ -365,7 +366,7 @@ void SimpleTestFederate::advanceTime(double timestep)
     switch (waitResult)
     {
       case WAIT_OBJECT_0:
-        printf("%s: TID=%d: handle triggered\n", __FUNCTION__, ::GetCurrentThreadId());
+        //printf("%s: TID=%d: handle triggered\n", __FUNCTION__, ::GetCurrentThreadId());
         while (mRtiAmb->evokeCallback(0.001))
         {
           printf("%s: TID=%d: callbacks evoked\n", __FUNCTION__, ::GetCurrentThreadId());
@@ -386,7 +387,7 @@ void SimpleTestFederate::advanceTime(double timestep)
     mRtiAmb->evokeCallback(0.1);
 #endif
   }
-  printf("%0.6f %s: new time=%f\n",  federateTime, __FUNCTION__, federateTime);
+  //printf("%0.6f %s: new time=%f\n",  federateTime, __FUNCTION__, federateTime);
 }
 
 double SimpleTestFederate::getFederateTime() const
@@ -639,6 +640,8 @@ void SimpleTestFederate::discoverObjectInstance(ObjectInstanceHandle theObject,
   ObjectClassHandle theObjectClass,
   std::wstring const& theObjectInstanceName)
 {
+  mDiscoveredObjectInstances.push_back(theObject);
+
   printf("%s: instanceHandle=%ls class=%ls name=%ls", __FUNCTION__, 
               theObject.toString().c_str(),
               mRtiAmb->getObjectClassName(theObjectClass).c_str(),

@@ -1,4 +1,4 @@
-{
+﻿{
   "environments": [
     {
       "environment": "wsl_clang",
@@ -9,13 +9,13 @@
   "configurations": [
     {
       "name": "Winx64Debug",
-      "generator": "Visual Studio 16 2019 Win64",
+      "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${workspaceRoot}\\build\\${name}",
-      "installRoot": "${workspaceRoot}\\bin\\${name}",
-      "cmakeCommandArgs": "-T v141",
-      "buildCommandArgs": "",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "variables": [
         {
@@ -27,19 +27,24 @@
           "name": "OPENRTI_ENABLE_RTI1516",
           "value": "Off",
           "type": "STRING"
+        },
+        {
+          "name": "OPENRTI_ENABLE_TESTS",
+          "value": "True",
+          "type": "BOOL"
         }
       ]
     },
     {
       "name": "Winx64Release",
-      "generator": "Visual Studio 16 2019 Win64",
+      "generator": "Ninja",
       "configurationType": "RelWithDebInfo",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${workspaceRoot}\\build\\${name}",
-      "installRoot": "${workspaceRoot}\\bin\\${name}",
-      "cmakeCommandArgs": "-T v141",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": "",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "--verbose",
       "variables": [
         {
           "name": "OPENRTI_ENABLE_RTI13",
@@ -50,6 +55,11 @@
           "name": "OPENRTI_ENABLE_RTI1516",
           "value": "Off",
           "type": "STRING"
+        },
+        {
+          "name": "OPENRTI_ENABLE_TESTS",
+          "value": "True",
+          "type": "BOOL"
         }
       ]
     },
