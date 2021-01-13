@@ -128,14 +128,9 @@ else()
 endif()
 set(OPENRTI_INSTALL_WITH_RPATH ${OPENRTI_INSTALL_WITH_RPATH_DEFAULT} CACHE BOOL "Build shared libraries with builtin search path.")
 
-# # The only known compiler with this binary incompatibility of debug libraries is cl
-# if(MSVC)
- # set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Filename postfix for debug libraries.")
-# endif()
-
-option(OPENRTI_STANDALONE_TESTS "Disable MOM server for standalone tests" OFF)
-if (OPENRTI_STANDALONE_TESTS)
-	add_definitions(-DOPENRTI_STANDALONE_TESTS)
+# The only known compiler with this binary incompatibility of debug libraries is cl
+if(MSVC)
+ set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Filename postfix for debug libraries.")
 endif()
 
 # We really want to hide all the OpenRTI private symbols.
