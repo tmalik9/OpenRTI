@@ -64,6 +64,7 @@ public:
     JoinFederationExecutionRequest2Message message2 = TranslateTypes::translate(*message);
     accept(connectHandle, &message2);
   }
+
   void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionRequest2Message* message)
   {
     OpenRTIAssert(isRootServer());
@@ -73,6 +74,8 @@ public:
       response = new JoinFederationExecutionResponseMessage;
       response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseFederateNameAlreadyInUse);
       response->setExceptionString(message->getFederateName());
+      response->setFederateName(message->getFederateName());
+      response->setFederateType(message->getFederateType());
       getServerNode().send(connectHandle, response);
       return;
     }

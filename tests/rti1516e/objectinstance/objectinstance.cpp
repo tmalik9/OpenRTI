@@ -23,11 +23,11 @@
 #include <vector>
 #include <iostream>
 
-#include <LogStream.h>
-#include <Options.h>
-#include <StringUtils.h>
+#include "LogStream.h"
+#include "Options.h"
+#include "StringUtils.h"
 
-#include <RTI1516ETestLib.h>
+#include "RTI1516ETestLib.h"
 
 namespace OpenRTI {
 

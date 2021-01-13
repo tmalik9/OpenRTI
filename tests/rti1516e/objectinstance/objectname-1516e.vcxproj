@@ -20,7 +20,6 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3CF2DA46-651A-49C3-BAF5-DE82738B8EBD}</ProjectGuid>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
     <Keyword>Win32Proj</Keyword>
     <Platform>x64</Platform>
     <ProjectName>objectname-1516e</ProjectName>
@@ -83,43 +82,53 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516e;$(SolutionDir)src\OpenRTI;$(SolutionDir)tests\rti1516e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516e;$(SolutionDir)src\OpenRTI;$(SolutionDir)\tests\rti1516e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)tests\rti1516e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516e;$(SolutionDir)src\OpenRTI;$(SolutionDir)\tests\rti1516e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)tests\rti1516e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516e;$(SolutionDir)src\OpenRTI;$(SolutionDir)\tests\rti1516e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)tests\rti1516e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516e;$(SolutionDir)src\OpenRTI;$(SolutionDir)\tests\rti1516e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>RTI_DISABLE_WARNINGS;OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)src\OpenRTI\OpenRTI.vcxproj">
       <Project>{1A1A66B8-408A-301F-AA77-DFD4708C8C6E}</Project>
       <Name>OpenRTI</Name>
-      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\rti1516e\fedtime1516e.vcxproj">
-      <Project>{ac5b586d-f120-3715-bc9c-fc80dd945c84}</Project>
+    <ProjectReference Include="$(SolutionDir)src\rti1516e\fedtime1516e.vcxproj">
+      <Project>{8028FCD5-28A5-3B4E-90BA-1652FBC4C573}</Project>
+      <Name>fedtime1516e</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\rti1516e\rti1516e.vcxproj">
-      <Project>{dee8a809-6531-30d3-9292-e70c38ed75fc}</Project>
+    <ProjectReference Include="$(SolutionDir)src\rti1516e\rti1516e.vcxproj">
+      <Project>{8B44E524-3A8E-32AE-81DD-5115F5A4BAE2}</Project>
+      <Name>rti1516e</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="D:\vfs\OpenRTI_trunk\tests\rti1516e\objectinstance\objectname.cpp" />
+    <ClInclude Include="..\include\RTI1516ETestLib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="objectname.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="fdd.xml">
+      <SubType>Designer</SubType>
+      <DeploymentContent>true</DeploymentContent>
+    </Xml>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
