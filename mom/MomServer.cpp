@@ -98,6 +98,7 @@ MomServer::MomServer(ServerModel::Federation* federation, AbstractServer* server
   , _ownerFederate(ownerFederateHandle)
 {
   //DebugPrintf(">>> %s(federation=%s isRoot=%d)\n", __FUNCTION__, federation->getName().c_str(), isRoot);
+  DebugPrintf("%s: this=%p federation=%s isRoot=%d ownerFederate=%s\n", __FUNCTION__, this, federation->getName().c_str(), isRoot, _ownerFederate.toString().c_str());
   connect(server);
   joinFederationExecution(federation);
   //DebugPrintf("<<< %s\n", __FUNCTION__);
@@ -105,7 +106,7 @@ MomServer::MomServer(ServerModel::Federation* federation, AbstractServer* server
 
 MomServer::~MomServer()
 {
-  //DebugPrintf("%s\n", __FUNCTION__);
+  DebugPrintf("%s: this=%p ownerFederate=%s isRoot=%d\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), _isRoot);
   assert(_rtiFederate == nullptr);
   assert(!_ownerFederate.valid());
 }
@@ -158,7 +159,7 @@ void MomServer::accept(const AbstractMessage& message)
 
 void MomServer::accept(const InsertFederationExecutionMessage& message)
 {
-  //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  DebugPrintf("%s(InsertFederationExecutionMessage): this=%p ownerFederate=%s dispatch message=%s\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), message.toString().c_str());
   // IMPORTANT NOTE: this object's data will be completed later in 
   // accept(const JoinFederationExecutionResponseMessage& message)
   _rtiFederate = new Federate;
@@ -168,7 +169,7 @@ void MomServer::accept(const InsertFederationExecutionMessage& message)
 
 void MomServer::accept(const EraseFederationExecutionMessage& message)
 {
-  //DebugPrintf("%s(EraseFederationExecutionMessage): dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  DebugPrintf("%s(EraseFederationExecutionMessage): this=%p ownerFederate=%s dispatch message=%s\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), message.toString().c_str());
   _federation = nullptr;
   SharedPtr<ReleaseFederationHandleMessage> release = new ReleaseFederationHandleMessage;
   release->setFederationHandle(message.getFederationHandle());
@@ -177,24 +178,39 @@ void MomServer::accept(const EraseFederationExecutionMessage& message)
 
 void MomServer::accept(const JoinFederationExecutionResponseMessage& message)
 {
-  //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  DebugPrintf("%s(JoinFederationExecutionResponseMessage): this=%p ownerFederate=%s dispatch message=%s\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), message.toString().c_str());
   _joinResponse = message.getJoinFederationExecutionResponseType();
-  if (_joinResponse == JoinFederationExecutionResponseSuccess)
+  switch (_joinResponse)
   {
-    Federate* federate = getRtiFederate();
-    if (!federate)
-      return;
-    federate->setFederateHandle(message.getFederateHandle());
-    federate->setFederateName(message.getFederateName());
-    federate->setFederateType(message.getFederateType());
+    case JoinFederationExecutionResponseSuccess:
+    {
+      Federate* federate = getRtiFederate();
+      if (!federate)
+        return;
+      federate->setFederateHandle(message.getFederateHandle());
+      federate->setFederateName(message.getFederateName());
+      federate->setFederateType(message.getFederateType());
 
-    notifyFederationJoined(message.getFederateHandle(), message.getFederateName(), message.getFederateType());
+      notifyFederationJoined(message.getFederateHandle(), message.getFederateName(), message.getFederateType());
+      break;
+    }
+    case JoinFederationExecutionResponseFederateNameAlreadyInUse:
+    {
+      // The join went wrong, probably because of a race condition related to the usage of the owner federate handle?
+      DebugPrintf("%s(JoinFederationExecutionResponseMessage): this=%p ownerFederate=%s join FAILED: FederateNameAlreadyInUse: %s\n\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), message.getFederateName().c_str());
+      // since we didn't join, there will be no resign message, and the _ownerFederate owner federate won't be cleared before the destructor is called.
+      _ownerFederate = FederateHandle();
+    }
+    default:
+      // The join went wrong
+      DebugPrintf("%s(JoinFederationExecutionResponseMessage): this=%p ownerFederate=%s join FAILED: dispatch message=%s\n\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), message.toString().c_str());
+      _ownerFederate = FederateHandle();
   }
 }
 
 void MomServer::accept(const JoinFederateNotifyMessage& message)
 {
-  //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
+  DebugPrintf("%s(JoinFederateNotifyMessage): this=%p ownerFederate=%s dispatch message=%s\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), message.toString().c_str());
   _rtiFederate->insertFederate(message.getFederateHandle(), message.getFederateName());
   if (!_isRoot)
   {
@@ -207,7 +223,7 @@ void MomServer::accept(const JoinFederateNotifyMessage& message)
 
 void MomServer::accept(const ResignFederateNotifyMessage& message)
 {
-  //DebugPrintf("%s: ResignFederateNotifyMessage handle=%s owner=%s\n", __FUNCTION__, message.getFederateHandle().toString().c_str(), _ownerFederate.toString().c_str());
+  DebugPrintf("%s(ResignFederateNotifyMessage): this=%p ownerFederate=%s message.federateHandle=%s\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), message.getFederateHandle().toString().c_str());
   notifyFederateResigned(message.getFederateHandle());
   if (_ownerFederate.valid() && message.getFederateHandle() == _ownerFederate)
   {
@@ -381,6 +397,9 @@ void MomServer::joinFederationExecution(ServerModel::Federation* federation)
   request->setIsInternal(true);
   // Send this message and wait for the response
   sendRequest(request);
+  // Actually we can't wait for a message here, because we are in the midst of 
+  // handling a create or join message in the ServerNode, in the same thread.
+  // Control wouldn't return to the message reception/handling loop.
   /*
   //std::pair<JoinFederationExecutionResponseType, std::string> response;
   //Clock abstime = Clock::max();
