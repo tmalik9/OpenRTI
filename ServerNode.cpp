@@ -90,6 +90,7 @@ public:
         response = new JoinFederationExecutionResponseMessage;
         response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseInconsistentFDD);
         response->setExceptionString(e.what());
+        response->setFederateName(message->getFederateName());
         getServerNode().send(connectHandle, response);
         return;
       }
