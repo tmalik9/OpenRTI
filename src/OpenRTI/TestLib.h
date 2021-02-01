@@ -41,8 +41,63 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
+#include "SocketAddress.h"
 
 namespace OpenRTI {
+
+class OPENRTI_LOCAL ServerThread : public Thread
+{
+  public:
+    void setupServer(const std::string& host, const SocketAddress& parentAddress, bool compress)
+    {
+      std::list<SocketAddress> addressList = SocketAddress::resolve(host, "0", true);
+      // Set up a stream socket for the server connect
+      bool success = false;
+      while (!addressList.empty())
+      {
+        SocketAddress address = addressList.front();
+        addressList.pop_front();
+        try
+        {
+          _address = _server.listenInet(address, 20);
+          success = true;
+          break;
+        }
+        catch (const OpenRTI::Exception&)
+        {
+          if (addressList.empty() && !success)
+            throw;
+        }
+      }
+      _server.setServerName(_address.getNumericName());
+      if (parentAddress.valid())
+      {
+        Clock abstime = Clock::now() + Clock::fromSeconds(1);
+        _server.connectParentInetServer(parentAddress, compress, abstime);
+      }
+      start();
+    }
+
+    void stopServer()
+    {
+      _server.postDone();
+      wait();
+    }
+
+    const SocketAddress& getAddress() const
+    {
+      return _address;
+    }
+
+  protected:
+    virtual void run() override
+    {
+      _server.exec();
+    }
+
+    NetworkServer _server;
+    SocketAddress _address;
+};
 
 class OPENRTI_LOCAL ServerPool {
 public:
@@ -101,52 +156,6 @@ public:
   }
 
 private:
-  class OPENRTI_LOCAL ServerThread : public Thread {
-  public:
-    void setupServer(const std::string& host, const SocketAddress& parentAddress, bool compress)
-    {
-      std::list<SocketAddress> addressList = SocketAddress::resolve(host, "0", true);
-      // Set up a stream socket for the server connect
-      bool success = false;
-      while (!addressList.empty()) {
-        SocketAddress address = addressList.front();
-        addressList.pop_front();
-        try {
-          _address = _server.listenInet(address, 20);
-          success = true;
-          break;
-        } catch (const OpenRTI::Exception&) {
-          if (addressList.empty() && !success)
-            throw;
-        }
-      }
-      _server.setServerName(_address.getNumericName());
-
-      if (parentAddress.valid()) {
-        Clock abstime = Clock::now() + Clock::fromSeconds(1);
-        _server.connectParentInetServer(parentAddress, compress, abstime);
-      }
-
-      start();
-    }
-
-    void stopServer()
-    {
-      _server.postDone();
-      wait();
-    }
-
-    const SocketAddress& getAddress() const
-    { return _address; }
-
-  protected:
-    virtual void run() override
-    { _server.exec(); }
-
-    NetworkServer _server;
-    SocketAddress _address;
-  };
-
   SocketAddress startServer(const SocketAddress& parentAddress, bool compress)
   {
     SharedPtr<ServerThread> serverThread = new ServerThread;

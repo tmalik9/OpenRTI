@@ -248,6 +248,7 @@ public:
     rti1516e::RTIambassadorFactory factory;
     ambassador = factory.createRTIambassador();
     ambassador->setOperationWaitTimeout(10000);
+    _connectionLost = false;
     ambassador->connect(*this, rti1516e::HLA_EVOKED, getConnectUrl());
 
     // create, must work once
@@ -343,6 +344,7 @@ public:
     ambassador = factory.createRTIambassador();
     ambassador->setOperationWaitTimeout(10000);
 
+    _connectionLost = false;
     ambassador->connect(*this, rti1516e::HLA_EVOKED, getConnectUrl());
 
     // Try that several times. Ensure correct cleanup
@@ -441,6 +443,13 @@ public:
 
   virtual void connectionLost(const std::wstring& faultDescription) override
   {
+    std::wcout << L"connection lost:" << faultDescription << std::endl;
+    _connectionLost = true;
+  }
+
+  bool isConnectionLost() const
+  {
+    return _connectionLost;
   }
 
   virtual void reportFederationExecutions(const rti1516e::FederationExecutionInformationVector& theFederationExecutionInformationList) override
@@ -739,6 +748,7 @@ public:
 
 private:
   unsigned _synchronized;
+  bool _connectionLost = false;
   std::set<std::wstring> _federateSet;
 };
 
@@ -750,9 +760,13 @@ public:
     _timeRegulationEnabled(false),
     _timeConstrainedEnabled(false),
     _timeAdvancePending(false)
-  { }
+  {
+    rti1516e::RTIambassadorFactory factory;
+    _ambassador = factory.createRTIambassador();
+  }
   virtual ~RTI1516ESimpleAmbassador()
-  { }
+  {
+  }
 
   void setUseDataUrlObjectModels(bool useDataUrlObjectModels)
   { _useDataUrlObjectModels = useDataUrlObjectModels; }
@@ -774,8 +788,6 @@ public:
 
   void connect(const std::wstring& url)
   {
-    rti1516e::RTIambassadorFactory factory;
-    _ambassador = factory.createRTIambassador();
     _ambassador->connect(*this, rti1516e::HLA_EVOKED, url);
     setLogicalTimeFactory();
   }
@@ -788,6 +800,17 @@ public:
   {
     _ambassador->shutdown();
   }
+
+  void setConnectWaitTimeout(uint32_t timeoutMilliSeconds)
+  {
+    _ambassador->setConnectWaitTimeout(timeoutMilliSeconds);
+  }
+
+  void setOperationWaitTimeout(uint32_t timeoutMilliSeconds)
+  {
+    _ambassador->setOperationWaitTimeout(timeoutMilliSeconds);
+  }
+
   void setLogicalTimeFactory(const std::wstring& logicalTimeImplementationName = std::wstring(L"HLAinteger64Time"))
   {
     _logicalTimeImplementationName = logicalTimeImplementationName;
@@ -1506,9 +1529,16 @@ public:
     return _ambassador->decodeRegionHandle(encodedValue);
   }
 
+  bool isConnectionLost() const
+  {
+    return _connectionLost;
+  }
+
 protected:
   virtual void connectionLost(const std::wstring& faultDescription) override
   {
+    std::wcout << L"connection lost:" << faultDescription << std::endl;
+    _connectionLost = true;
   }
 
   virtual void reportFederationExecutions(const rti1516e::FederationExecutionInformationVector& theFederationExecutionInformationList) override
@@ -1977,7 +2007,6 @@ private:
   bool _timeRegulationEnabled;
   bool _timeConstrainedEnabled;
   bool _timeAdvancePending;
-
   // Hmm, FIXME: make an additional derived checking ambassador for the tests, keep a simple one without expensive tests
   // FIXME make this and for example the simple log below callbacks that we can attach or not as apropriate
 
@@ -1991,6 +2020,7 @@ private:
 
   // typedef std::map<rti1516e::ObjectInstanceHandle, ObjectInstance> ObjectInstanceMap;
   // ObjectInstanceMap _objectInstanceMap;
+  bool _connectionLost = false;
 };
 
 }

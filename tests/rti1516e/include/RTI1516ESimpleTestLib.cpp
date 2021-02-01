@@ -161,7 +161,6 @@ SimpleTestFederate::~SimpleTestFederate()
 
 void SimpleTestFederate::join(const std::string& address, const std::string& federateName, const std::string& fom, const std::string& federationName, bool regulating, bool constrained)
 {
-  waitForUser("Join");
   mFederationName = to_wstring(federationName);
   ///
   /// 1. create the RTIambassador

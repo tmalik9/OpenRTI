@@ -52,6 +52,7 @@ class <#=fixedRecordDataType.Name#><#=fixedRecordDataType.BaseClass != null ? " 
     virtual void Set<#=field.Name#>(const <#=arrayDataType.DataType.CPPType#>* value, size_t size) = 0;
 <# } #>
     virtual <#=field.DataType.CPPType#> Get<#=field.Name#>() const = 0;
+    virtual bool Is<#=field.Name#>Available() const = 0;
 <# } // foreach fixedRecordDataType.Fields #>
 
 }; // class <#=dataType.Name#>

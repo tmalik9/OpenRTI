@@ -79,6 +79,14 @@ class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1
       return m<#=field.Name#>.get();
 <# } // else (field.DataType is FOMParser.EnumeratedDataType) #>
     }
+    bool Is<#=field.Name#>Available() const override
+    {
+<# if (field.Version > 0) { #>
+      return (getVersion() >= <#=field.Version#>);
+<# } else { #>
+      return true;
+<# } #>
+    }
 <# } // foreach fixedRecordDataType.Fields #>
 
   private:
