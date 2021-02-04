@@ -1,436 +1,261 @@
-include(CheckIncludeFiles)
-# include(CheckSymbolExists)
-# include(CheckFunctionExists)
-include(CheckCXXSourceCompiles)
+project(OpenRTI CXX)
+cmake_minimum_required(VERSION 2.6.0)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-check_include_files(cstdint OpenRTI_HAVE_CSTDINT)
-check_include_files(stdint.h OpenRTI_HAVE_STDINT_H)
-check_include_files(inttypes.h OpenRTI_HAVE_INTTYPES_H)
-if(NOT WIN32)
-  set(CMAKE_REQUIRED_LIBRARIES dl)
-  check_cxx_source_compiles("
-#define _GNU_SOURCE
-#include <dlfcn.h>
-int main(int argc, char* argv[])
-{
-  Dl_info info;
-  dladdr((void*)main, &info);
-  return 0;
-}
-" OpenRTI_HAVE_DLADDR)
-  set(CMAKE_REQUIRED_LIBRARIES)
-  if(OpenRTI_HAVE_DLADDR)
-    set(DL_LIBRARIES dl)
+include(GetOpenRTIVersion)
+message(STATUS "Build OpenRTI: ${OPENRTI_VERSION}")
+
+set(PACKAGE_NAME "OpenRTI")
+set(CPACK_PACKAGE_VERSION_MAJOR 1)
+set(CPACK_PACKAGE_VERSION_MINOR 0)
+set(CPACK_PACKAGE_VERSION_PATCH 0)
+
+# Options
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
+# Not fully supported for all operating systems, but currently
+# the only way to make the circular link reference work on android.
+set(OPENRTI_BUILD_SHARED TRUE CACHE BOOL "Build libraries as shared library.")
+mark_as_advanced(OPENRTI_BUILD_SHARED)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(LINUX TRUE)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(MACOS TRUE)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
+  set(SUNOS TRUE)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "HP-UX")
+  set(HPUX TRUE)
+endif()
+
+# We have unit tests
+enable_testing()
+
+# Settings
+enable_language(C)
+
+# Starting with cmake 3.1 we can easily change the
+# c++ standard version using
+set(CMAKE_CXX_STANDARD 11)
+
+# Some whole project sensible defines
+if(UNIX)
+  # Make sure we get the right libc functions
+  add_definitions(-D_REENTRANT -D_THREAD_SAFE)
+endif()
+if(HPUX)
+  if(NOT CMAKE_COMPILER_IS_GNUCXX)
+     message("Using aCC on HP-UX requires -AA -mt somwhere in the compile line!")
   endif()
 endif()
-check_cxx_source_compiles("
-#include <alloca.h>
-int main(int argc, char* argv[])
-{
-  void* data = alloca(17);
-  return 0;
-}
-" OpenRTI_HAVE_ALLOCA)
+if(SUNOS)
+  if(NOT CMAKE_COMPILER_IS_GNUCXX)
+     message("Using CC on Solaris requires -mt somwhere in the compile line!")
+  endif()
+endif()
 
-# sigh, since we do network traffic, we should know that ...
-include(TestBigEndian)
-test_big_endian(BIG_ENDIAN)
-if(BIG_ENDIAN)
-  set(OpenRTI_HOST_IS_BIG_ENDIAN 1)
-else(BIG_ENDIAN)
-  set(OpenRTI_HOST_IS_LITTLE_ENDIAN 1)
-endif(BIG_ENDIAN)
-
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OpenRTIConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.h)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if(LINUX)
-  add_definitions(-D_XOPEN_SOURCE=600)
-  add_definitions(-D_DEFAULT_SOURCE=1)
-elseif(UNIX)
-  add_definitions(-D_XOPEN_SOURCE_EXTENDED=1)
-elseif(WIN32)
-  # for now, silence some win32 warnings - want to review that later ...
+  # Use the DEBUG2 build type on linux to do stl debugging, note that this changes the abi,
+  # In theory the debug build type is the one that is the right one, but since almost nobody else uses this
+  # release type with these defines, we have our own here.
+  set(CMAKE_CXX_FLAGS_DEBUG2 "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_CONCEPT_CHECKS")
+  set(CMAKE_C_FLAGS_DEBUG2 "${CMAKE_C_FLAGS_DEBUG}")
+endif()
+
+
+if(MSVC)
+  # bkd Preprocessor Definitions
+  add_definitions(-DNOMINMAX)
+  add_definitions(-DTIME64)
+  add_definitions(-DUNICODE)
+  add_definitions(-D_UNICODE)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  # We need XP/SP2 We are currently bound to the GetAddrInfo call introduced
-  # in that version.
-  add_definitions(-DWINVER=0x0502 -D_WIN32_WINNT=0x0502)
+	
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4290")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4290")
+  if(CMAKE_CL_64)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+  endif()
+endif()
+add_definitions(-DRTI_DISABLE_WARNINGS)
+
+if(MINGW OR CYGWIN)
+  if(DEFINED ENV{DLLTOOL})
+    set(DLLTOOL "$ENV{DLLTOOL}")
+  else()
+    set(DLLTOOL dlltool)
+  endif()
 endif()
 
+# Change the default build type to something fast
+if(NOT CMAKE_BUILD_TYPE)
+  message("No CMAKE_BUILD_TYPE set, using RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
+      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+      FORCE)
+endif()
 
-# A bunch of sources that are operating system dependent.
-if(WIN32)
-  set(OpenRTI_OS_SOURCES
-	win32/ClockWin32.h
-	win32/ConditionPrivateDataWin32.h
-	win32/ErrnoWin32.h
-	win32/MutexPrivateDataWin32.h
-	win32/NetworkStatisticsWin32.h
-	win32/PerformanceCounterStopWatch.h
-	win32/SocketAddressPrivateDataWin32.h
-	win32/SocketPrivateDataWin32.h
-    win32/AtomicWin32.cpp
-    win32/ClockWin32.cpp
-    win32/ConditionWin32.cpp
-    win32/DynamicModuleWin32.cpp
-    win32/ErrnoWin32.cpp
-    win32/MutexWin32.cpp
-    win32/NetworkStatisticsWin32.cpp
-    win32/PerformanceCounterStopWatch.cpp
-    win32/SocketAddressWin32.cpp
-    win32/SocketDataWin32.cpp
-    win32/SocketEventDispatcherWin32.cpp
-    win32/SocketPacketWin32.cpp
-    win32/SocketPipeWin32.cpp
-    win32/SocketServerPipeWin32.cpp
-    win32/SocketServerTCPWin32.cpp
-    win32/SocketServerWin32.cpp
-    win32/SocketStreamWin32.cpp
-    win32/SocketTCPWin32.cpp
-    win32/SocketUDPWin32.cpp
-    win32/SocketWin32.cpp
-    win32/ThreadLocalWin32.cpp
-    win32/ThreadWin32.cpp
-	OpenRTI.rc
-  )
-else(WIN32)
-  set(OpenRTI_OS_SOURCES
-	posix/ClockPosix.h
-	posix/ConditionPrivateDataPosix.h
-	posix/ErrnoPosix.h
-	posix/MutexPrivateDataPosix.h
-	posix/NetworkStatisticsPosix.h
-	posix/PerformanceCounterStopWatchPosix.h
-	posix/SocketAddressPrivateDataPosix.h
-	posix/SocketPrivateDataPosix.h
-	posix/ThreadPrivateDataPosix.h
-    posix/AtomicPosix.cpp
-    posix/ClockPosix.cpp
-    posix/ConditionPosix.cpp
-    posix/DynamicModulePosix.cpp
-    posix/MutexPosix.cpp
-    posix/NetworkStatisticsPosix.cpp
-    posix/PerformanceCounterStopWatchPosix.cpp
-    posix/SocketAddressPosix.cpp
-    posix/SocketDataPosix.cpp
-    posix/SocketEventDispatcherPosix.cpp
-    posix/SocketPacketPosix.cpp
-    posix/SocketPipePosix.cpp
-    posix/SocketPosix.cpp
-    posix/SocketServerPipePosix.cpp
-    posix/SocketServerPosix.cpp
-    posix/SocketServerTCPPosix.cpp
-    posix/SocketStreamPosix.cpp
-    posix/SocketTCPPosix.cpp
-    posix/SocketUDPPosix.cpp
-    posix/ThreadLocalPosix.cpp
-    posix/ThreadPosix.cpp
-  )
-endif(WIN32)
-
-# We use expat as xml parser, if not on the system, use our own probaby outdated version
-include(FindEXPAT)
-if(EXPAT_FOUND)
-  include_directories(${EXPAT_INCLUDE_DIRS})
-else(EXPAT_FOUND)
-  # Additions for expat
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/xml)
-  add_definitions(-DXML_STATIC)
-  add_definitions(-DHAVE_MEMMOVE)
-
-  set(OpenRTI_EXPAT_SOURCES
-    xml/xmlparse.c
-    xml/xmlrole.c
-    xml/xmltok.c
-    xml/xmltok_impl.c
-    xml/xmltok_ns.c
-  )
-endif(EXPAT_FOUND)
-
-include(FindZLIB)
-if(ZLIB_FOUND)
-# ems: disabled (unused) ZLIB support due to a bug in the implementation:
-# -------------------- 8< --------------------
-# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp: In constructor OpenRTI::ZLibProtocolLayer::ZLibProtocolLayer():
-# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:190:50: error: invalid new-expression of abstract class type OpenRTI::ZLibProtocolLayer::ProtocolSocket
-#    _protocolSocket(new ProtocolSocket(Z_BEST_SPEED))
-#                                                   ^
-# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:27:40: note:   because the following virtual functions are pure within OpenRTI::ZLibProtocolLayer::ProtocolSocket:
-#  class OPENRTI_LOCAL ZLibProtocolLayer::ProtocolSocket : public AbstractProtocolSocket {
-#                                         ^~~~~~~~~~~~~~
-# In file included from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolLayer.h:23:0,
-#                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/NestedProtocolLayer.h:23,
-#                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.h:23,
-#                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:20:
-# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolSocket.h:40:19: note:     virtual OpenRTI::ssize_t OpenRTI::AbstractProtocolSocket::sendBufferSize() const
-#    virtual ssize_t sendBufferSize() const = 0;
-#                    ^~~~~~~~~~~~~~
-# -------------------- >8 --------------------
-  message(WARNING "ZLIB is found but ignored due to a bug in ZLibProtocolLayer implementation. cf. src/OpenRTI/CMakeLists.txt for details.")
-#  include_directories(${ZLIB_INCLUDE_DIRS})
-#  add_definitions(-DOPENRTI_HAVE_ZLIB)
-#  set(OpenRTI_ZLIB_SOURCES
-#    ZLibProtocolLayer.cpp
-#  )
+if(CMAKE_VERSION VERSION_GREATER 2.8.4)
+  include(GNUInstallDirs)
 else()
-  set(OpenRTI_ZLIB_SOURCES "")
+  include(GNUInstallDirsCompat)
 endif()
 
-set(OpenRTI_SOURCES
-	AbstractConnect.h
-	AbstractLogicalTime.h
-	AbstractMessage.cpp
-	AbstractMessage.h
-	AbstractMessageDispatcher.h
-	AbstractMessageEncoding.cpp
-	AbstractMessageEncoding.h
-	AbstractMessageQueue.h
-	AbstractMessageReceiver.h
-	AbstractMessageSender.cpp
-	AbstractMessageSender.h
-	AbstractNetworkStatistics.h
-	AbstractNotificationHandle.h
-	AbstractProtocol.h
-	AbstractProtocolLayer.cpp
-	AbstractProtocolLayer.h
-	AbstractProtocolSocket.cpp
-	AbstractProtocolSocket.h
-	AbstractServer.cpp
-	AbstractServer.h
-	AbstractServerNode.cpp
-	AbstractServerNode.h
-	AbstractSocketEvent.cpp
-	AbstractSocketEvent.h
-	Ambassador.h
-	Atomic.h
-	Attributes.cpp
-	Attributes.h
-	Buffer.h
-	Clock.h
-	Condition.h
-	ContentHandler.cpp
-	ContentHandler.h
-	DebugNew.h
-	DecodeDataStream.h
-	DefaultErrorHandler.cpp
-	DefaultErrorHandler.h
-	DynamicModule.h
-	EncodeDataStream.h
-	ErrorHandler.cpp
-	ErrorHandler.h
-	Exception.cpp
-	Exception.h
-	ExpatXMLReader.cpp
-	ExpatXMLReader.h
-	Export.h
-	FDD1516EFileReader.cpp
-	FDD1516EFileReader.h
-	FDD1516FileReader.cpp
-	FDD1516FileReader.h
-	FEDFileReader.cpp
-	FEDFileReader.h
-	FOMStringModuleBuilder.h
-	Federate.cpp
-	Federate.h
-	FederateHandleLowerBoundTimeStampMap.h
-	Handle.h
-	HandleAllocator.h
-	InitialClientStreamProtocol.cpp
-	InitialClientStreamProtocol.h
-	InitialServerStreamProtocol.cpp
-	InitialServerStreamProtocol.h
-	InitialStreamProtocol.cpp
-	InitialStreamProtocol.h
-	InternalAmbassador.cpp
-	InternalAmbassador.h
-	InternalTimeManagement.cpp
-	InternalTimeManagement.h
-	IntrusiveList.h
-	IntrusiveUnorderedMap.h
-	LeafServerThread.cpp
-	LeafServerThread.h
-	LogStream.cpp
-	LogStream.h
-	Message.cpp
-	Message.h
-	MessageEncodingRegistry.cpp
-	MessageEncodingRegistry.h
-	MessageQueue.h
-	MomTypes.h
-	Mutex.h
-	NestedProtocolLayer.cpp
-	NestedProtocolLayer.h
-	NetworkServer.cpp
-	NetworkServer.h
-	NetworkStatistics.cpp
-	NetworkStatistics.h
-	OpenRTIConfig.h
-	OpenRTIVersion.h
-	Options.cpp
-	Options.h
-	ParenthesesReader.cpp
-	ParenthesesReader.h
-	PooledMessageList.h
-	ProtocolSocketEvent.cpp
-	ProtocolSocketEvent.h
-	Rand.h
-	RangeBounds.h
-	Referenced.h
-	Region.h
-	RegionSet.cpp
-	RegionSet.h
-	ScopeLock.h
-	ScopeUnlock.h
-	ServerConfigContentHandler.cpp
-	ServerConfigContentHandler.h
-	ServerModel.cpp
-	ServerModel.h
-	ServerNode.cpp
-	ServerNode.h
-	ServerOptions.h
-	SharedPtr.h
-	SingletonPtr.h
-	Socket.h
-	SocketAddress.h
-	SocketData.h
-	SocketEventDispatcher.cpp
-	SocketEventDispatcher.h
-	SocketPacket.h
-	SocketPipe.h
-	SocketServer.h
-	SocketServerAcceptEvent.cpp
-	SocketServerAcceptEvent.h
-	SocketServerPipe.h
-	SocketServerTCP.h
-	SocketStream.h
-	SocketTCP.h
-	SocketUDP.h
-	StreamBufferProtocol.cpp
-	StreamBufferProtocol.h
-	StringUtils.cpp
-	StringUtils.h
-	TemplateTimeManagement.h
-	TestLib.h
-	Thread.h
-	ThreadLocal.h
-	ThreadServer.cpp
-	ThreadServer.h
-	TightBE1MessageEncoding.cpp
-	TightBE1MessageEncoding.h
-	TimeManagement.h
-	TranslateTypes.cpp
-	TranslateTypes.h
-	TranslateTypes.h
-	Types.h
-	URL.cpp
-	URL.h
-	ValueImplementation.h
-	VariableLengthData.h
-	VariableLengthDataTuple.cpp
-	VariableLengthDataTuple.h
-	WeakPtr.h
-	WeakReferenced.cpp
-	WeakReferenced.h
-	XMLReader.cpp
-	XMLReader.h
-	ZLibProtocolLayer.h
-	dprintf.cpp
-	dprintf.h
-	encoding/BasicDataElements.cpp
-	encoding/BasicDataElements.h
-	encoding/DataElement.cpp
-	encoding/DataElement.h
-	encoding/Encoding.h
-	encoding/EncodingConfig.h
-	encoding/EncodingExceptions.h
-	encoding/HLAfixedArray.cpp
-	encoding/HLAfixedArray.h
-	encoding/HLAfixedRecord.cpp
-	encoding/HLAfixedRecord.h
-	encoding/HLAhandle.cpp
-	encoding/HLAhandle.h
-	encoding/HLAopaqueData.cpp
-	encoding/HLAopaqueData.h
-	encoding/HLAvariableArray.cpp
-	encoding/HLAvariableArray.h
-	encoding/HLAvariantRecord.cpp
-	encoding/HLAvariantRecord.h
-	mom/AbstractFederateMetrics.h
-	mom/MomFederate.cpp
-	mom/MomFederate.h
-	mom/MomFederateMetrics.cpp
-	mom/MomFederateMetrics.h
-	mom/MomFederation.cpp
-	mom/MomFederation.h
-	mom/MomInteractions.cpp
-	mom/MomInteractions.h
-	mom/MomManager.cpp
-	mom/MomManager.h
-	mom/MomServer.cpp
-	mom/MomServer.h
-	mom/MomTypes.h
-	stdafx.h
-	xml/amigaconfig.h
-	xml/ascii.h
-	xml/asciitab.h
-	xml/expat.h
-	xml/expat_external.h
-	xml/iasciitab.h
-	xml/internal.h
-	xml/latin1tab.h
-	xml/macconfig.h
-	xml/nametab.h
-	xml/utf8tab.h
-	xml/winconfig.h
-	xml/xmlrole.h
-	xml/xmltok.h
-	xml/xmltok_impl.h
-  ${OpenRTI_OS_SOURCES}
-  ${OpenRTI_EXPAT_SOURCES}
-  ${OpenRTI_ZLIB_SOURCES}
+set(OPENRTI_ENABLE_RTI13 OFF CACHE BOOL "Build and install the RTI13 interface.")
+set(OPENRTI_ENABLE_RTI1516 OFF CACHE BOOL "Build and install the RTI1516 interface.")
+set(OPENRTI_ENABLE_RTI1516E ON CACHE BOOL "Build and install the RTI1516E interface (EXPERIMENTAL).")
+OPTION(OPENRTI_ENABLE_TESTS "Build and install the test suite." OFF)
+
+set(OPENRTI_ENABLE_PYTHON_BINDINGS OFF CACHE BOOL "Build python binding extension modules.")
+
+set(OPENRTI_RTI13_INCLUDE_SUBDIR "RTI13" CACHE PATH "Install the RTI13 include files into \${CMAKE_INSTALL_INCLUDEDIR}/\${OPENRTI_RTI13_INCLUDE_SUBDIR}.")
+set(OPENRTI_RTI1516_INCLUDE_SUBDIR "rti1516" CACHE PATH "Install the RTI1516 include files into \${CMAKE_INSTALL_INCLUDEDIR}/\${OPENRTI_RTI1516_INCLUDE_SUBDIR}/RTI.")
+set(OPENRTI_RTI1516E_INCLUDE_SUBDIR "rti1516e" CACHE PATH "Install the RTI1516E include files into \${CMAKE_INSTALL_INCLUDEDIR}/\${OPENRTI_RTI1516E_INCLUDE_SUBDIR}/RTI.")
+mark_as_advanced(OPENRTI_RTI13_INCLUDE_SUBDIR OPENRTI_RTI1516_INCLUDE_SUBDIR OPENRTI_RTI1516E_INCLUDE_SUBDIR)
+
+if(UNIX)
+  # the RPATH to be used when installing, but only if it's not a system directory
+  list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_FULL_LIBDIR}" isSystemDir)
+  if("${isSystemDir}" STREQUAL "-1")
+    set(OPENRTI_INSTALL_WITH_RPATH_DEFAULT 1 CACHE INTERNAL "Default for rpath setting")
+  else()
+    set(OPENRTI_INSTALL_WITH_RPATH_DEFAULT 0 CACHE INTERNAL "Default for rpath setting")
+  endif()
+else()
+  set(OPENRTI_INSTALL_WITH_RPATH_DEFAULT 0 CACHE INTERNAL "Default for rpath setting")
+endif()
+set(OPENRTI_INSTALL_WITH_RPATH ${OPENRTI_INSTALL_WITH_RPATH_DEFAULT} CACHE BOOL "Build shared libraries with builtin search path.")
+
+# The only known compiler with this binary incompatibility of debug libraries is cl
+if(MSVC)
+ set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Filename postfix for debug libraries.")
+endif()
+
+# We really want to hide all the OpenRTI private symbols.
+if(OPENRTI_BUILD_SHARED)
+  add_definitions(-DOPENRTI_DLL)
+endif()
+
+include(CheckCXXSourceRuns)
+if(OPENRTI_INSTALL_WITH_RPATH)
+  set(CMAKE_REQUIRED_FLAGS "-Wl,--enable-new-dtags")
+  check_cxx_source_runs("int main() { return 0; }" hasEnableNewDTags)
+  set(CMAKE_REQUIRED_FLAGS "")
+  if(hasEnableNewDTags)
+    set(OPENRTI_RPATH_LINK_FLAGS "-Wl,--enable-new-dtags" CACHE INTERNAL "Linker flag to enable RUNPATH additional to RPATH.")
+  endif()
+endif()
+
+if(MACOS)
+  set(CMAKE_REQUIRED_FLAGS "-Wl,-bind_at_load")
+  check_cxx_source_runs("int main() { return 0; }" hasBindAtLoad)
+  set(CMAKE_REQUIRED_FLAGS "")
+  if(hasBindAtLoad)
+    set(OPENRTI_BIND_AT_LOAD "-Wl,-bind_at_load" CACHE INTERNAL "Linker flag to resolve symbols at library load time on macos.")
+  endif()
+endif()
+
+message("building with compiler \"" ${CMAKE_CXX_COMPILER_ID} "\"")
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wsuggest-override>)
+#  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wsuggest-final-types>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wuninitialized>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-reorder>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unknown-pragmas>)
+elseif(MSVC)
+  add_compile_options(/MP)
+endif()
+
+
+# Work around some linux linkers that seem to default to --as-needed
+# Actually this also works around cmake reordering the link dependencies
+# ... well and not to forget that the problem originates from that
+# /creative/ way enable user defined logical times for an RTI.
+# Not sure if this is the right approach, but seems to help for now.
+if(CMAKE_CROSSCOMPILING)
+  set(hasNoAsNeeded FALSE)
+else()
+  set(CMAKE_REQUIRED_FLAGS "-Wl,--no-as-needed")
+  check_cxx_source_runs("int main() { return 0; }" hasNoAsNeeded)
+  set(CMAKE_REQUIRED_FLAGS "")
+endif()
+if(hasNoAsNeeded)
+  set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed")
+endif()
+
+set(OPENRTI_CMAKEROOTDIR "${CMAKE_CURRENT_SOURCE_DIR}") # Path used to locate files relative to this CMakeLists.txt at cmake time.
+set(OPENRTI_DATAROOTDIR "${CMAKE_INSTALL_FULL_DATAROOTDIR}/OpenRTI" CACHE PATH "Path where OpenRTI puts runtime required paths." FORCE)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
+
+macro(OPENRTI_TARGET_LINK_PRIVATE_LIBRARIES _target)
+  if(CMAKE_VERSION VERSION_LESS 2.8.12)
+    target_link_libraries(${_target} ${ARGN})
+    # Each library where we have used this up to now uses explicit linking
+    set_property(TARGET ${_target} PROPERTY LINK_INTERFACE_LIBRARIES "")
+  elseif(CMAKE_VERSION VERSION_LESS 3.0.0)
+    target_link_libraries(${_target} LINK_PRIVATE ${ARGN})
+  else()
+    target_link_libraries(${_target} PRIVATE ${ARGN})
+  endif()
+endmacro()
+
+macro(openrti_target_position_independent _target)
+  if(CMAKE_VERSION VERSION_GREATER 2.8.8)
+    set_property(TARGET ${_target} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
+  else()
+    set_property(TARGET ${_target} APPEND PROPERTY COMPILE_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
+  endif()
+endmacro()
+
+function(OPENRTI_SET_MSVC_STUB_DLL_NAME _target _name)
+  # Ideally we could use
+  #  set_property(TARGET fedtime1516Stub APPEND PROPERTY STATIC_LIBRARY_FLAGS_DEBUG "/DEF /NAME:$<TARGET_FILE:fedtime1516>")
+  # to get the final target file name as it is produced, but STATIC_LIBRARY_FLAGS does not evaluate generator expressions
+  set_property(TARGET ${_target} APPEND PROPERTY STATIC_LIBRARY_FLAGS "/DEF /NAME:${_name}.dll")
+  foreach(_config ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${_config} _CONFIG)
+    set(_dllName "${_name}${CMAKE_${_CONFIG}_POSTFIX}.dll")
+    set_property(TARGET ${_target} APPEND PROPERTY STATIC_LIBRARY_FLAGS_${_CONFIG} "/DEF /NAME:${_dllName}")
+  endforeach()
+endfunction()
+
+  
+# bkd: Disable tests
+add_subdirectory(python)
+add_subdirectory(src)
+if(OPENRTI_ENABLE_TESTS)
+  add_subdirectory(tests)
+else()
+  message(WARNING "building without tests")
+endif()
+
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    "OpenRTIConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
+    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
+    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
 )
 
-if(OPENRTI_BUILD_SHARED)
-  add_library(OpenRTI SHARED ${OpenRTI_SOURCES})
-  set_property(TARGET OpenRTI APPEND PROPERTY COMPILE_DEFINITIONS OPENRTI_DLL)
-  set_property(TARGET OpenRTI APPEND PROPERTY COMPILE_DEFINITIONS OPENRTI_DLL_EXPORTS)
-# ems: disable CMake so library versioning
-#  set_property(TARGET OpenRTI PROPERTY VERSION 1.0.0)
-#  set_property(TARGET OpenRTI PROPERTY SOVERSION 1)
-else()
-  add_library(OpenRTI STATIC ${OpenRTI_SOURCES})
-  openrti_target_position_independent(OpenRTI)
-endif()
-set_property(TARGET OpenRTI PROPERTY OUTPUT_NAME OpenRTI)
-if(EXPAT_FOUND)
-  openrti_target_link_private_libraries(OpenRTI ${EXPAT_LIBRARIES})
-endif(EXPAT_FOUND)
-if(ZLIB_FOUND)
-  openrti_target_link_private_libraries(OpenRTI ${ZLIB_LIBRARIES})
-endif()
-if(WIN32)
-  openrti_target_link_private_libraries(OpenRTI ws2_32)
-else(WIN32)
-  if(SUNOS)
-    openrti_target_link_private_libraries(OpenRTI socket)
-    openrti_target_link_private_libraries(OpenRTI nsl)
-  endif()
-  if (NOT ANDROID)
-    openrti_target_link_private_libraries(OpenRTI pthread)
-    if (NOT MACOS)
-      openrti_target_link_private_libraries(OpenRTI rt)
-    endif()
-  endif()
-  openrti_target_link_private_libraries(OpenRTI m)
-endif(WIN32)
-if(DL_LIBRARIES)
-  openrti_target_link_private_libraries(OpenRTI ${DL_LIBRARIES})
-endif(DL_LIBRARIES)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
+    VERSION "${OPENRTI_VERSION}"
+    COMPATIBILITY SameMajorVersion
+)
 
-install(TARGETS OpenRTI EXPORT OpenRTITargets
-  PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-  RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-  ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+install(
+    FILES "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
+          "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
+)
+
+install(EXPORT OpenRTITargets DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI")

@@ -1,0 +1,235 @@
+﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+// Code automatically generated from <#=FOM.Filename#>, do not edit
+
+#pragma once
+
+#include <vector>
+#include <cstring>
+
+#include "RTI/encoding/BasicDataElements.h"
+#include "RTI/encoding/HLAfixedRecord.h"
+#include "RTI/encoding/HLAfixedArray.h"
+#include "RTI/encoding/HLAvariableArray.h"
+#include "<#=DataTypesHeaderFilename#>"
+
+<#
+foreach (var namespacePart in FOM.Namespace)
+{
+#>
+namespace <#=namespacePart#> {
+<#  } #>
+
+<#
+foreach (var dataType in FOM.DataTypes.Values)
+{
+  if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
+  {
+    var fixedRecordDataType = dataType as FOMParser.FixedRecordDataType;
+    if (dataType.Comment != null && dataType.Comment != "")
+    {#>
+<#=dataType.Comment#>
+<#  } #>
+class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1516e::HLAfixedRecord
+{
+  public:
+    <#=dataType.Name#>Encoding() : rti1516e::HLAfixedRecord(<#=fixedRecordDataType.Version#>)
+    {
+<#
+    foreach (var field in fixedRecordDataType.AllFields)
+    {
+#>
+      rti1516e::HLAfixedRecord::appendElementPointer(&m<#=field.Name#>, <#=field.Version#>);
+<#
+    } // foreach fixedRecordDataType.Fields
+#>
+    }
+    virtual ~<#=dataType.Name#>Encoding()
+    {
+    }
+    uint32_t getVersion() const override { return rti1516e::HLAfixedRecord::getVersion(); }
+<# foreach (var field in fixedRecordDataType.AllFields) { #>
+    void Set<#=field.Name#>(<#=field.DataType.CPPType#> value) override
+    {
+	    m<#=field.Name#>.set(value);
+    }
+<# if (field.DataType is FOMParser.ArrayDataType) {
+     var arrayDataType = field.DataType as FOMParser.ArrayDataType;
+#>
+    void Set<#=field.Name#>(const <#=arrayDataType.DataType.CPPType#>* value, size_t size) override
+    {
+	    m<#=field.Name#>.set(value, size);
+    }
+<# } #>
+    <#=field.DataType.CPPType#> Get<#=field.Name#>() const override
+    {
+<# if (field.Version > 0) { #>
+      if (getVersion() < <#=field.Version#>)
+      {
+        throw rti1516e::EncoderException(L"field \"<#=field.Name#>\" is not available in decoded record version " + std::to_wstring(getVersion()));
+      }
+<# } #>
+<# if (field.DataType is FOMParser.EnumeratedDataType) { #>
+      return static_cast<<#=field.DataType.CPPType#>>(m<#=field.Name#>.get());
+<# } else { #>
+      return m<#=field.Name#>.get();
+<# } // else (field.DataType is FOMParser.EnumeratedDataType) #>
+    }
+    bool Is<#=field.Name#>Available() const override
+    {
+<# if (field.Version > 0) { #>
+      return (getVersion() >= <#=field.Version#>);
+<# } else { #>
+      return true;
+<# } #>
+    }
+<# } // foreach fixedRecordDataType.Fields #>
+
+  private:
+<#
+    foreach (var field in fixedRecordDataType.AllFields)
+    {
+#>
+    <#=field.DataType.Encoding#> m<#=field.Name#>;
+<#
+    } // foreach fixedRecordDataType.Fields
+#>
+}; // class <#=dataType.Name#>Encoding
+
+<#
+  } // if (dataType is FOMParser.FixedRecordDataType)
+  else if (dataType is FOMParser.FixedArrayDataType && dataType.Generate)
+  {
+    var fixedArrayDataType = dataType as FOMParser.FixedArrayDataType;
+    if (dataType.Comment != null && dataType.Comment != "")
+    {#>
+<#=dataType.Comment#>
+<#  } #>
+class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
+{
+  public:
+    <#=dataType.Name#>Encoding()
+      : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
+      , mData(<#=fixedArrayDataType.Cardinality#>)
+    {
+      for (int i=0; i < <#=fixedArrayDataType.Cardinality#>; i++)
+      {
+        mEncoding[i].setDataPointer(&mData[i]);
+        setElementPointer(i, &mEncoding[i]);
+      }
+    }
+    <#=dataType.Name#>Encoding(<#=fixedArrayDataType.CPPType#> data)
+      : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
+      , mData(<#=fixedArrayDataType.Cardinality#>)
+    {
+      set(data.data(), data.size());
+      for (int i=0;i<<#=fixedArrayDataType.Cardinality#>;i++)
+      {
+        mEncoding[i].setDataPointer(&mData[i]);
+        setElementPointer(i, &mEncoding[i]);
+      }
+    }
+    void set(<#=fixedArrayDataType.CPPType#> data) {
+      set(data.data(), data.size());
+    }
+    void set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size) 
+    {
+      if (size <= <#=fixedArrayDataType.Cardinality#>) {
+        memcpy(mData.data(), data, size);
+      } else {
+        memcpy(mData.data(), data, <#=fixedArrayDataType.Cardinality#>);
+      }
+    }
+    <#=fixedArrayDataType.CPPType#> get() const { return mData; }
+  private:
+    std::vector<<#=fixedArrayDataType.DataType.CPPType#>> mData;
+    <#=fixedArrayDataType.DataType.Encoding#> mEncoding[<#=fixedArrayDataType.Cardinality#>];
+}; // class <#=dataType.Name#>
+
+<#  
+  }
+  else if (dataType is FOMParser.VariableArrayDataType && dataType.Generate)
+  {
+    var variableArrayDataType = dataType as FOMParser.VariableArrayDataType;
+    if (dataType.Comment != null && dataType.Comment != "")
+    {#>
+<#=dataType.Comment#>
+<#  } #>
+class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
+{
+  public:
+    <#=dataType.Name#>Encoding()
+      : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
+      , mData()
+    {
+    }
+    <#=dataType.Name#>Encoding(<#=variableArrayDataType.CPPType#> data)
+      : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
+      , mData(data)
+    {
+      update();
+    }
+    void set(<#=variableArrayDataType.CPPType#> data)
+    {
+      if (mData.size() != data.size()) {
+        mData = data;
+        update();
+      } else {
+        memcpy(mData.data(), data.data(), mData.size());
+      }
+    }
+    void set(const <#=variableArrayDataType.DataType.CPPType#>* data, size_t size)
+    {
+      if (mData.size() != size) {
+        mData.resize(size);
+        update();
+      }
+      memcpy(mData.data(), data, size);
+    }
+    <#=variableArrayDataType.CPPType#> get() const { return mData; }
+    void resize(size_t size)
+    {
+      mData.resize(size);
+      update();
+    }
+    // resize buffer and encoder array before actually decoding 
+    virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override
+    {
+      size_t newSize = decodedSize(buffer, bufferSize, index);
+      resize(newSize);
+      return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
+    }
+  private:
+    void update()
+    {
+      size_t size = mData.size();
+      mEncoding.resize(size);
+      for (size_t i=0; i<size; i++)
+      {
+        mEncoding[i].setDataPointer(&mData.data()[i]);
+        if (i < HLAvariableArray::size()) {
+          setElementPointer(i, &mEncoding[i]);
+        } else {
+          addElementPointer(&mEncoding[i]);
+        }
+      }
+    }
+    std::vector<<#=variableArrayDataType.DataType.CPPType#>> mData;
+    std::vector<<#=variableArrayDataType.DataType.Encoding#>> mEncoding;
+}; // class <#=dataType.Name#>
+
+<#
+  } // if (dataType is FOMParser.ArrayDataType)
+} // foreach (var dataType in FOM.DataTypes.Values)
+#>
+<#
+foreach (var namespacePart in FOM.Namespace)
+{
+#>
+} // namespace <#=namespacePart#>
+<#  } #>
+

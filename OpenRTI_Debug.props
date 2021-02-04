@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <OutDirName>$(OutDirBase)_Debug</OutDirName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <_PropertySheetDisplayName>OpenRTI_Debug</_PropertySheetDisplayName>
+    <OutDir>$(BIN_DIR)\$(OutDirBase)_Debug\</OutDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <GenerateMapFile>false</GenerateMapFile>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+</Project>
