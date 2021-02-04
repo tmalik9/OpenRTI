@@ -83,7 +83,49 @@ def stages_linux(build_name, comp_env, img, deploy) {
   }
 }
 
-def build_win(configType, additionalCmakeArgs) {
+def stages_mingw(build_name, comp_env, img, deploy) {
+  return {
+    stage(build_name) {
+      node('docker && windows') {
+        withEnv(comp_env) {
+          try 
+          {
+            checkout()
+
+            docker.withRegistry('https://adp-docker-dev.vegistry.vg.vector.int/', 'fa92756a-62a2-4436-9a66-ceb0c2c109a2') {
+              docker.image(img).inside {
+
+				def additionalCmakeArgs = ""
+				if (env.isTag == "false") {
+					additionalCmakeArgs = "-DOPENRTI_ENABLE_TESTS=ON"
+				}
+
+                build_win("debug", "Ninja", additionalCmakeArgs)
+				if (env.isTag == "false") {
+					test_win("debug")
+				}
+				
+				build_win("release", "Ninja", additionalCmakeArgs)
+                if (env.isTag == "false") {
+					test_win("release")
+				}
+				
+                if (env.isTag == "true" && deploy) {
+                  upload("build_*/*.tgz")
+                }
+              }
+            }
+          }
+          finally {
+            cleanWs()
+          }
+        }
+      }
+    }
+  }
+}
+
+def build_win(configType, generator, additionalCmakeArgs) {
     def buildDir = "build_${configType}"
     stage("Build ${configType}") {
       cmakeBuild(
@@ -125,12 +167,12 @@ def stages_win(build_name, additionalCmakeArgs, deploy) {
 				additionalCmakeArgs = "${additionalCmakeArgs} -DOPENRTI_ENABLE_TESTS=ON"
 			}
 				
-            build_win("debug", additionalCmakeArgs)
+            build_win("debug", "Visual Studio 16 2019", additionalCmakeArgs)
 			if (env.isTag == "false") {
 			    test_win("debug")
 			}
 			
-            build_win("release", additionalCmakeArgs)
+            build_win("release", "Visual Studio 16 2019", additionalCmakeArgs)
             if (env.isTag == "false") {
 				test_win("release")
 			}
@@ -193,19 +235,22 @@ pipeline {
           env_gcc = ["CC=gcc","CXX=g++"]
           docker_image_centos = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4"
           docker_image_ubuntu = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"
+		  docker_image_mingw  = "adp-docker-dev.vegistry.vg.vector.int/ltsc2019"
 
-          builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos, true))
-          //builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
-          builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu, true))
+		  builds.put("mingw", stages_mingw("mingw", env_gcc, docker_image_mingw, false))
 
-          // Win flavours
-          //builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
-          builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A Win32 -T v141", true))
-          //builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A Win32 -T v142", false))
-
-          //builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140", false))
-          builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141", true))
-          //builds.put("VS-v142-x64", stages_win("VS-v142-x64","-A x64 -T v142", false))
+          //builds.put("centos7 clang", stages_linux("centos7 clang", env_clang, docker_image_centos, true))
+          ////builds.put("ubuntu1804 clang", stages_linux("ubuntu1804 clang", env_clang, docker_image_ubuntu))
+          //builds.put("ubuntu1804 gcc", stages_linux("ubuntu1804 gcc", env_gcc, docker_image_ubuntu, true))
+		  //
+          //// Win flavours
+          ////builds.put("VS-v140-x86", stages_win("VS-v140-x86","-A Win32 -T v140", false))
+          //builds.put("VS-v141-x86", stages_win("VS-v141-x86","-A Win32 -T v141", true))
+          ////builds.put("VS-v142-x86", stages_win("VS-v142-x86","-A Win32 -T v142", false))
+		  //
+          ////builds.put("VS-v140-x64", stages_win("VS-v140-x64","-A x64 -T v140", false))
+          //builds.put("VS-v141-x64", stages_win("VS-v141-x64","-A x64 -T v141", true))
+          ////builds.put("VS-v142-x64", stages_win("VS-v142-x64","-A x64 -T v142", false))
 
           parallel(builds)
         }
