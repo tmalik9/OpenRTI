@@ -7,6 +7,14 @@ namespace FOMCodeGen
 {
   public class FOMParser
   {
+    public class ModelIdentificationStruct
+    {
+      public string Name { get; set; }
+      public string Version { get; set; }
+      public string Description { get; set; }
+      public string Purpose { get; set; }
+      public string Copyright { get; set; }
+    }
     public class DataType
     {
       public DataType(string name)
@@ -32,23 +40,13 @@ namespace FOMCodeGen
       {
         get {
           if (_comment != null && _comment != "")
-            return formatAsComment(_comment);
+            return FormatAsComment(_comment);
           else
             return null;
         }
         set { _comment = value; }
       }
       private string _comment;
-      string formatAsComment(string value)
-      {
-        var lines = value.Split('\n');
-        string result = "";
-        foreach (var line in lines)
-        {
-          result += "// " + line + "\n";
-        }
-        return result;
-      }
     }
     // A BasicDataRepresentation is a predefined wrapper for a built in C++ simple type (numeric)
     public class BasicDataRepresentation : DataType
@@ -190,7 +188,8 @@ namespace FOMCodeGen
 
     public Dictionary<string, DataType> DataTypes { get; set; }
     public string Filename { get; set; }
-    public string [] Namespace { get; set; }
+    public string[] Namespace { get; set; }
+    public ModelIdentificationStruct ModelIdentification { get; set; }
     private Dictionary<string, string> mBasicDataRepresentations = new Dictionary<string, string>()
     {
       { "HLAASCIIchar", "char" },
@@ -213,6 +212,22 @@ namespace FOMCodeGen
       { "HLAunicodeChar", "wchar_t" },
       { "HLAunicodeString", "std::wstring" },
     };
+    public static string FormatAsComment(string value, string prefix = "")
+    {
+      var lines = value.Split('\n');
+      string result = "";
+      bool firstLine = true;
+      string spaces = new string(' ', prefix.Length);
+      foreach (var line in lines)
+      {
+        if (firstLine)
+          result += "// " + prefix + line;
+        else
+          result += "\n// " + spaces + line;
+        firstLine = false;
+      }
+      return result;
+    }
     public FOMParser(string filename, string enclosingNamespace)
     {
       DataTypes = new Dictionary<string, DataType>();
@@ -222,8 +237,36 @@ namespace FOMCodeGen
       }
       Filename = filename;
       Namespace = enclosingNamespace.Split('.');
+      ModelIdentification = new ModelIdentificationStruct();
+
       XmlDocument doc = new XmlDocument();
       doc.Load(filename);
+
+
+      var modelIdentificationNode = doc.DocumentElement.SelectSingleNode("/objectModel/modelIdentification");
+      if (modelIdentificationNode != null)
+      {
+        if (modelIdentificationNode["name"] != null)
+        {
+          ModelIdentification.Name = modelIdentificationNode["name"].FirstChild.InnerText;
+        }
+        if (modelIdentificationNode["version"] != null)
+        {
+          ModelIdentification.Version = modelIdentificationNode["version"].FirstChild.InnerText;
+        }
+        if (modelIdentificationNode["description"] != null)
+        {
+          ModelIdentification.Description = modelIdentificationNode["description"].FirstChild.InnerText;
+        }
+        if (modelIdentificationNode["purpose"] != null)
+        {
+          ModelIdentification.Purpose = modelIdentificationNode["purpose"].FirstChild.InnerText;
+        }
+        if (modelIdentificationNode["copyright"] != null)
+        {
+          ModelIdentification.Copyright = modelIdentificationNode["copyright"].FirstChild.InnerText;
+        }
+      }
       var simpleDataTypeNodes = doc.DocumentElement.SelectNodes("/objectModel/dataTypes/simpleDataTypes/simpleData");
       foreach (XmlElement simpleDataTypeNode in simpleDataTypeNodes)
       {

@@ -74,6 +74,20 @@ struct SocketEventDispatcher::PrivateData
       }
     }
 
+    static void DebugPrintSockets(const std::vector<SharedPtr<AbstractSocketEvent>>& sockets, const std::vector<HANDLE>& notificationEvents)
+    {
+      DebugPrintf("%s: %d handles:\n", __FUNCTION__, notificationEvents.size());
+      for (size_t i = 0; i < notificationEvents.size(); i++)
+      {
+        DebugPrintf("%s: notificationEvents[%d] = 0x%08x\n", __FUNCTION__, i, notificationEvents[i]);
+      }
+      DebugPrintf("%s: %d sockets:\n", __FUNCTION__, sockets.size());
+      for (size_t i = 0; i < sockets.size(); i++)
+      {
+        DebugPrintf("%s: sockets[%d] = 0x%08x\n", __FUNCTION__, i, sockets[i]->getSocket()->_privateData->_socket);
+      }
+    }
+
     int exec(SocketEventDispatcher& dispatcher, const Clock& absclock)
     {
       int retv = 0;
@@ -88,9 +102,10 @@ struct SocketEventDispatcher::PrivateData
         std::vector<HANDLE> notificationEvents;
         notificationEvents.reserve(dispatcher._socketEventList.size() + 1);
 
-        for (SocketEventList::const_iterator i = dispatcher._socketEventList.begin(); i != dispatcher._socketEventList.end(); ++i)
+        //for (SocketEventList::const_iterator i = dispatcher._socketEventList.begin(); i != dispatcher._socketEventList.end(); ++i)
+        for (auto& socketEventSP : dispatcher._socketEventList)
         {
-          AbstractSocketEvent* socketEvent = i->get();
+          AbstractSocketEvent* socketEvent = socketEventSP.get();
           if (socketEvent->getTimeout() < absTimeout)
           {
             absTimeout = socketEvent->getTimeout();
@@ -124,13 +139,13 @@ struct SocketEventDispatcher::PrivateData
               // The socket has data to write, but either write has not been called before, or the previous
               // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
               // to survey
-              sockets.push_back(*i);
+              sockets.push_back(socketEventSP);
               notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
             }
           }
           else if (socketEvent->getEnableRead())
           {
-            sockets.push_back(*i);
+            sockets.push_back(socketEventSP);
             notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
           }
         }
@@ -171,11 +186,7 @@ struct SocketEventDispatcher::PrivateData
             0, NULL);
           DebugPrintf("%s: WSAWaitForMultipleEvents failed: %S\n", __FUNCTION__, lpMsgBuf);
           LocalFree(lpMsgBuf);
-          DebugPrintf("%s: %d handles:\n", __FUNCTION__, notificationEvents.size());
-          for (size_t i = 0; i < notificationEvents.size(); i++)
-          {
-            DebugPrintf("%s: notificationEvents[%d] = 0x%08x\n", __FUNCTION__, i, notificationEvents[i]);
-          }
+          DebugPrintSockets(sockets, notificationEvents);
           retv = -1;
           break;
         }

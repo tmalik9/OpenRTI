@@ -42,34 +42,7 @@ class Tester
       serverThread = new OpenRTI::ServerThread;
       serverThread->setupServer("127.0.0.1", OpenRTI::SocketAddress(), false);
       listenAddress = serverThread->getAddress();
-      /*
-      std::list<OpenRTI::SocketAddress> addressList = OpenRTI::SocketAddress::resolve("127.0.0.1", "0", true);
-      if (addressList.empty())
-        return EXIT_FAILURE;
-      // Set up a stream socket for the server connect
-      bool success = false;
-      while (!addressList.empty())
-      {
-        OpenRTI::SocketAddress address = addressList.front();
-        addressList.pop_front();
-        // At first set up a listening server and determine an unused socket address
-        listeningNetworkServer = new OpenRTI::NetworkServer;
-        try
-        {
-          listenAddress = listeningNetworkServer->listenInet(address, 1);
-          success = true;
-        }
-        catch (const OpenRTI::Exception&)
-        {
-          continue;
-        }
-      }
-      if (!success)
-      {
-        std::wcout << L"Could not get any listening server to check against refused connects!" << std::endl;
-      }
-      std::wcout << L"listening to " << OpenRTI::localeToUcs(listenAddress.getNumericName()) << std::endl;
-      */
+
       return true;
     }
     void DestroyServer()
@@ -80,7 +53,6 @@ class Tester
     {
       std::wstring federationExecutionName(L"rti://");
       federationExecutionName += OpenRTI::localeToUcs(listenAddress.getNumericName());
-      federationExecutionName += L"/nothingthere";
       ambassador.setConnectWaitTimeout(10000);
       OpenRTI::Clock maxtime = OpenRTI::Clock::now() + OpenRTI::Clock::fromSeconds(20);
       try
@@ -109,8 +81,8 @@ class Tester
     }
     bool ConnectSuccess()
     {
-      std::wstring url(L"rti://");
-      url += OpenRTI::localeToUcs(listenAddress.getNumericName());
+      std::wstring url(L"rti://127.0.0.1:14321");
+      //url += L"127.0.0.1"; // OpenRTI::localeToUcs(listenAddress.getNumericName());
       ambassador.setConnectWaitTimeout(10000);
       ambassador.setOperationWaitTimeout(10000);
       OpenRTI::Clock maxtime = OpenRTI::Clock::now() + OpenRTI::Clock::fromSeconds(20);

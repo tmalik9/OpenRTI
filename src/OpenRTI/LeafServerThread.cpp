@@ -38,8 +38,8 @@ public:
   _Registry();
   _Registry(const _Registry&) = delete;
   ~_Registry() noexcept;
-  static SharedPtr<_Registry>& GetInstance();
-  static bool allowCreation;
+  void Finalize();
+  static _Registry& GetInstance();
 
   SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
 
@@ -48,21 +48,21 @@ public:
   static SharedPtr<AbstractServer> createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode, uint32_t timeoutMilliSeconds);
   static SharedPtr<AbstractServerNode> createServerNode();
 
-  //static SingletonPtr<_Registry> _instance;
-
 private:
   mutable Mutex _mutex;
   UrlServerMap _urlServerMap;
 };
 
-//SingletonPtr<LeafServerThread::_Registry>
-//LeafServerThread::_Registry::_instance;
-//
 LeafServerThread::_Registry::_Registry()
 {
 }
 
 LeafServerThread::_Registry::~_Registry() noexcept
+{
+  Finalize();
+}
+
+void LeafServerThread::_Registry::Finalize()
 {
   ScopeLock scopeLock(_mutex);
   for (UrlServerMap::iterator i = _urlServerMap.begin(); i != _urlServerMap.end();) {
@@ -75,7 +75,6 @@ LeafServerThread::_Registry::~_Registry() noexcept
     leafServerThread->postShutdown();
   }
   _urlServerMap.clear();
-  LeafServerThread::_Registry::allowCreation = true;
 }
 
 SharedPtr<AbstractConnect>
@@ -181,10 +180,9 @@ LeafServerThread::_Registry::createServerNode()
   return new ServerNode;
 }
 
-bool LeafServerThread::_Registry::allowCreation = true;
-SharedPtr<LeafServerThread::_Registry>& LeafServerThread::_Registry::GetInstance()
+LeafServerThread::_Registry& LeafServerThread::_Registry::GetInstance()
 {
-  static SharedPtr<LeafServerThread::_Registry> _instance = new LeafServerThread::_Registry;
+  static LeafServerThread::_Registry _instance;
   return _instance;
 }
 
@@ -207,8 +205,7 @@ LeafServerThread::connect(const StringStringListMap& clientOptions)
 
 void LeafServerThread::shutdown()
 {
-  _Registry::allowCreation = false;
-  _Registry::GetInstance().clear();
+  _Registry::GetInstance().Finalize();
 }
 
 void
@@ -221,10 +218,8 @@ LeafServerThread::postShutdown()
 SharedPtr<AbstractConnect>
 LeafServerThread::connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds)
 {
-  SharedPtr<_Registry> registry = _Registry::GetInstance();
-  if (!registry.valid())
-    return SharedPtr<AbstractConnect>();
-  return registry->connect(url, clientOptions, timeoutMilliSeconds);
+  _Registry& registry = _Registry::GetInstance();
+  return registry.connect(url, clientOptions, timeoutMilliSeconds);
 }
 
 void
@@ -232,9 +227,8 @@ LeafServerThread::run()
 {
   _server->exec();
 
-  SharedPtr<_Registry> registry = _Registry::GetInstance();
-  if (registry.valid())
-    registry->erase(*this);
+  _Registry& registry = _Registry::GetInstance();
+  registry.erase(*this);
 }
 
 } // namespace OpenRTI
