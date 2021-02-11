@@ -411,8 +411,8 @@ public:
   { OpenRTIAssert(_select(t).is_linked()); return const_iterator(const_cast<Hook*>(&_select(t))); }
 
 private:
-  // _IntrusiveList(const _IntrusiveList&);
-  // _IntrusiveList& operator=(const _IntrusiveList&);
+  _IntrusiveList(const _IntrusiveList&) = delete;
+  _IntrusiveList& operator=(const _IntrusiveList&);
 
   static const Hook& _select(const_reference t)
   { return static_cast<const Hook&>(t); }

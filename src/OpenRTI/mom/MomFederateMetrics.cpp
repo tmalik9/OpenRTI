@@ -164,7 +164,6 @@ VariableLengthData MomFederateMetrics::getNumberOfSubscribedClasses() const
 void MomFederateMetrics::setFederate(std::shared_ptr<MomFederate> federate)
 {
   mFederate = federate;
-  // TODO: feed already collected data into mFederate
 }
 
 VariableLengthData MomFederateMetrics::getObjectInstancesReflected() const

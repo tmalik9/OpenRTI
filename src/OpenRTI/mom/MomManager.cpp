@@ -211,7 +211,7 @@ void MomManager::initialize()
             .parameter("HLAexception", "HLAunicodeString")
             .parameter("HLAserialNumber", "HLAcount")
           .end()
-          .interaction("HLAreportMOMexception")       // TODO 1516e only?
+          .interaction("HLAreportMOMexception")
             .parameter("HLAservice", "HLAunicodeString")
             .parameter("HLAexception", "HLAunicodeString")
             .parameter("HLAparameterError", "HLAboolean")
@@ -807,7 +807,6 @@ std::shared_ptr<MomFederateMetrics> MomManager::getFederateMetrics() const
 
 VariableLengthData MomManager::getEncodedFederateHandle() const
 {
-  // TODO: store it readily encoded
   return HLAhandle(mFederate->GetFederateHandle()).encode();
 }
 

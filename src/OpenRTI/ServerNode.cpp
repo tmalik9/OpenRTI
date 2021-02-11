@@ -1119,7 +1119,7 @@ public:
       send(propagationConnectPair.second, message);
       break;
     case ServerModel::PropagateNone:
-      // MUST still be forwarded when filter has changed => TODO: integrate filter settings into setSubscriptionType
+      // MUST still be forwarded when filter has changed
       if (filterChanged)
       {
         send(interactionClass->getPublishingConnectHandleSet(), connectHandle, message);

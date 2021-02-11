@@ -190,7 +190,7 @@ void Mom::initialize()
             .parameter(L"HLAexception", L"HLAunicodeString")
             .parameter(L"HLAserialNumber", L"HLAcount")
           .end()
-          .interaction(L"HLAreportMOMexception")       // TODO 1516e only?
+          .interaction(L"HLAreportMOMexception")
             .parameter(L"HLAservice", L"HLAunicodeString")
             .parameter(L"HLAexception", L"HLAunicodeString")
             .parameter(L"HLAparameterError", L"HLAboolean")

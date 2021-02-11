@@ -149,7 +149,6 @@ void ManagerFederate::initialize(const std::string& address, const std::string& 
   mRtiAmb->subscribeObjectClassAttributes(federationClass, federationClass.attributes);
   mRtiAmb->subscribeObjectClassAttributes(federateClass, federateClass.attributes);
 
-  // TODO: better derive the decoder directly from the datatype given in the MOM tree
   // WARNING: parameter handles from different interactions are thrown together as keys into a single map -
   // the standard does not guarantee that all are distinct/unique (but it works in the current OpenRTI implementation)
   mDecoders[reportInteractions.parameters[L"HLAfederate"]] = [this](const VariableLengthData& v) { decodeFederateHandle(v); };

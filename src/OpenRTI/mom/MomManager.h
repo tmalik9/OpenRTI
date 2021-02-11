@@ -66,7 +66,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
     void discoverObjectInstance(ObjectInstanceHandle objectInstance, ObjectClassHandle objectClass, const std::string& name);
     void removeObjectInstance(ObjectInstanceHandle objectInstance);
     bool provideAttributeValueUpdate(ObjectInstanceHandle theObject, AttributeHandleSet const& theAttributes);
-    // TODO: remove
+
     void reflectAttributeValues(
       ObjectInstanceHandle theObject,
       AttributeHandleValueMap const& theAttributeValues,

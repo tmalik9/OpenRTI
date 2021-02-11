@@ -352,7 +352,7 @@ void MomServer::accept(const InsertObjectInstanceMessage& message)
     if (!objectClass)
       return;
   }
-  // Ok we get duplicate inserts. FIXME investigate this
+  // Ok we get duplicate inserts.
   if (_rtiFederate->getObjectInstance(message.getObjectInstanceHandle()))
     return;
   _rtiFederate->insertObjectInstance(message.getObjectInstanceHandle(), message.getName(), objectClassHandle, false);

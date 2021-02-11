@@ -60,7 +60,6 @@ class OPENRTI_LOCAL MomFederation : public std::enable_shared_from_this<MomFeder
     std::map<AttributeHandle, std::function<VariableLengthData()>> mAttributeGetters;
     std::map<AttributeHandle, std::function<void(const VariableLengthData&)>> mAttributeSetters;
 
-    // TODO: we should also somehow record whether we are the owner of this object
     ObjectClassHandle mFederationClassHandle;
     ObjectInstanceHandle mFederationObjectInstance;
 
