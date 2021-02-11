@@ -24,7 +24,7 @@
 #include "AbstractServer.h"
 #include "MessageEncodingRegistry.h"
 #include "ServerOptions.h"
-#include "ZLibProtocolLayer.h"
+//#include "ZLibProtocolLayer.h"
 
 namespace OpenRTI {
 

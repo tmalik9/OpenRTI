@@ -596,9 +596,6 @@
     <ClInclude Include="XMLReader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="ZLibProtocolLayer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="win32\ClockWin32.h">
       <Filter>Source Files\win32</Filter>
     </ClInclude>

@@ -149,34 +149,35 @@ else(EXPAT_FOUND)
   )
 endif(EXPAT_FOUND)
 
-include(FindZLIB)
-if(ZLIB_FOUND)
-# ems: disabled (unused) ZLIB support due to a bug in the implementation:
-# -------------------- 8< --------------------
-# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp: In constructor OpenRTI::ZLibProtocolLayer::ZLibProtocolLayer():
-# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:190:50: error: invalid new-expression of abstract class type OpenRTI::ZLibProtocolLayer::ProtocolSocket
-#    _protocolSocket(new ProtocolSocket(Z_BEST_SPEED))
-#                                                   ^
-# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:27:40: note:   because the following virtual functions are pure within OpenRTI::ZLibProtocolLayer::ProtocolSocket:
-#  class OPENRTI_LOCAL ZLibProtocolLayer::ProtocolSocket : public AbstractProtocolSocket {
-#                                         ^~~~~~~~~~~~~~
-# In file included from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolLayer.h:23:0,
-#                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/NestedProtocolLayer.h:23,
-#                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.h:23,
-#                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:20:
-# /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolSocket.h:40:19: note:     virtual OpenRTI::ssize_t OpenRTI::AbstractProtocolSocket::sendBufferSize() const
-#    virtual ssize_t sendBufferSize() const = 0;
-#                    ^~~~~~~~~~~~~~
-# -------------------- >8 --------------------
-  message(WARNING "ZLIB is found but ignored due to a bug in ZLibProtocolLayer implementation. cf. src/OpenRTI/CMakeLists.txt for details.")
-#  include_directories(${ZLIB_INCLUDE_DIRS})
-#  add_definitions(-DOPENRTI_HAVE_ZLIB)
-#  set(OpenRTI_ZLIB_SOURCES
-#    ZLibProtocolLayer.cpp
-#  )
-else()
-  set(OpenRTI_ZLIB_SOURCES "")
-endif()
+# bkd: disabled ZLIB support. In case of reintegration, note that SAB CLA has to ship the according zlib licence  
+#include(FindZLIB)
+#if(ZLIB_FOUND)
+## ems: disabled (unused) ZLIB support due to a bug in the implementation:
+## -------------------- 8< --------------------
+## /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp: In constructor OpenRTI::ZLibProtocolLayer::ZLibProtocolLayer():
+## /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:190:50: error: invalid new-expression of abstract class type OpenRTI::ZLibProtocolLayer::ProtocolSocket
+##    _protocolSocket(new ProtocolSocket(Z_BEST_SPEED))
+##                                                   ^
+## /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:27:40: note:   because the following virtual functions are pure within OpenRTI::ZLibProtocolLayer::ProtocolSocket:
+##  class OPENRTI_LOCAL ZLibProtocolLayer::ProtocolSocket : public AbstractProtocolSocket {
+##                                         ^~~~~~~~~~~~~~
+## In file included from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolLayer.h:23:0,
+##                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/NestedProtocolLayer.h:23,
+##                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.h:23,
+##                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:20:
+## /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolSocket.h:40:19: note:     virtual OpenRTI::ssize_t OpenRTI::AbstractProtocolSocket::sendBufferSize() const
+##    virtual ssize_t sendBufferSize() const = 0;
+##                    ^~~~~~~~~~~~~~
+## -------------------- >8 --------------------
+#  message(WARNING "ZLIB is found but ignored due to a bug in ZLibProtocolLayer implementation. cf. src/OpenRTI/CMakeLists.txt for details.")
+##  include_directories(${ZLIB_INCLUDE_DIRS})
+##  add_definitions(-DOPENRTI_HAVE_ZLIB)
+##  set(OpenRTI_ZLIB_SOURCES
+##    ZLibProtocolLayer.cpp
+##  )
+#else()
+#  set(OpenRTI_ZLIB_SOURCES "")
+#endif()
 
 set(OpenRTI_SOURCES
 	AbstractConnect.h
@@ -335,7 +336,7 @@ set(OpenRTI_SOURCES
 	WeakReferenced.h
 	XMLReader.cpp
 	XMLReader.h
-	ZLibProtocolLayer.h
+	#ZLibProtocolLayer.h
 	dprintf.cpp
 	dprintf.h
 	encoding/BasicDataElements.cpp
@@ -389,7 +390,7 @@ set(OpenRTI_SOURCES
 	xml/xmltok_impl.h
   ${OpenRTI_OS_SOURCES}
   ${OpenRTI_EXPAT_SOURCES}
-  ${OpenRTI_ZLIB_SOURCES}
+  #${OpenRTI_ZLIB_SOURCES}
 )
 
 if(OPENRTI_BUILD_SHARED)
@@ -407,9 +408,9 @@ set_property(TARGET OpenRTI PROPERTY OUTPUT_NAME OpenRTI)
 if(EXPAT_FOUND)
   openrti_target_link_private_libraries(OpenRTI ${EXPAT_LIBRARIES})
 endif(EXPAT_FOUND)
-if(ZLIB_FOUND)
-  openrti_target_link_private_libraries(OpenRTI ${ZLIB_LIBRARIES})
-endif()
+#if(ZLIB_FOUND)
+#  openrti_target_link_private_libraries(OpenRTI ${ZLIB_LIBRARIES})
+#endif()
 if(WIN32)
   openrti_target_link_private_libraries(OpenRTI ws2_32)
 else(WIN32)

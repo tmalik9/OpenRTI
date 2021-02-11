@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <WinDDK>$(WinDDK_3790_1830)</WinDDK>
-    <ZLIB>$(ZLIB_1_2_11)</ZLIB>
+    <!-- <ZLIB>$(ZLIB_1_2_11)</ZLIB> -->
 	<OPENRTI>$(SolutionDir)/Projects_Source/OpenRTI-0.9.0</OPENRTI>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='Win32'">
@@ -27,9 +27,9 @@
     <BuildMacro Include="OutDirBase">
       <Value>$(OutDirBase)</Value>
     </BuildMacro>
-    <BuildMacro Include="ZLIB">
-      <Value>$(ZLIB)</Value>
-    </BuildMacro>
+    <!-- <BuildMacro Include="ZLIB"> -->
+      <!-- <Value>$(ZLIB)</Value> -->
+    <!-- </BuildMacro> -->
     <BuildMacro Include="CTEST_BINARY_DIRECTORY">
       <Value>$(BIN_DIR)/$(OutDirBase)_$(Configuration)</Value>
     </BuildMacro>

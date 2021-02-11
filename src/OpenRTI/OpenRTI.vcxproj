@@ -386,7 +386,6 @@
     <ClInclude Include="win32\SocketAddressPrivateDataWin32.h" />
     <ClInclude Include="win32\SocketPrivateDataWin32.h" />
     <ClInclude Include="XMLReader.h" />
-    <ClInclude Include="ZLibProtocolLayer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
