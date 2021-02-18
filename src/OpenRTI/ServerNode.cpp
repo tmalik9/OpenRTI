@@ -1104,7 +1104,16 @@ public:
       // the subscription type will change with respect to subsequent unsubscribe calls:
       // subscribe => subscribeWithFilter => unsubsribeFilter: the interaction class is now unsubscribed.
       // Think about this again.
-      filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues, false);
+      
+      // bkd: The wildcard filter causes a problem for subscriptions without filter + leaving federates:
+      // Scenario: 3 Federates with unfiltered subscription on an IA. If one federate is removed, a changeSubscription(Unsubscribe) is propagated.
+      // The clearParameterFilters (line 1093) reports a filter change and although propagationConnectPair is PropagateNone,
+      // the unsubscription is propagated to the getPublishingConnectHandleSet, causing an unwanted unsubscription on all publishers.
+      // Fix-Idea: only change to a filtered subscription if the request actually contains filter values (first condition)
+      // or when filters are already established (second condition).
+      if (!parameterFilterValues.empty() || !interactionClass->getParameterFilters(connectHandle).empty())  
+        filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues, false);
+
       propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, subscriptionType);
     }
 

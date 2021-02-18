@@ -130,8 +130,8 @@ public:
       // Send this message and wait for the response
       send(request);
     }
-    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
     std::pair<CreateFederationExecutionResponseType, std::string> responseTypeStringPair;
+    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
     responseTypeStringPair = dispatchWaitCreateFederationExecutionResponse(abstime);
     if (responseTypeStringPair.first == CreateFederationExecutionResponseFederationExecutionAlreadyExists)
       throw FederationExecutionAlreadyExists(federationExecutionName);
@@ -157,12 +157,12 @@ public:
     SharedPtr<DestroyFederationExecutionRequestMessage> request = new DestroyFederationExecutionRequestMessage;
     request->setFederationExecution(federationExecutionName);
 
-    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
 
     // Send this message and wait for the response
     send(request);
 
     DestroyFederationExecutionResponseType responseType;
+    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
     responseType = dispatchWaitDestroyFederationExecutionResponse(abstime);
     if (responseType == DestroyFederationExecutionResponseFederatesCurrentlyJoined)
       throw FederatesCurrentlyJoined(federationExecutionName);
@@ -194,9 +194,7 @@ public:
     if (_federate.valid())
       throw FederateAlreadyExecutionMember();
 
-    // The maximum abstime to try to connect
-    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
-
+   
     // The join request message
     // the protocol version might even be checked later
     if (getProtocolVersion() == 8)
@@ -222,6 +220,8 @@ public:
       send(request);
     }
     std::pair<JoinFederationExecutionResponseType, std::string> response;
+    // The maximum abstime to try to connect
+    Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
     response = dispatchWaitJoinFederationExecutionResponse(abstime, federateName);
     switch (response.first) {
     case JoinFederationExecutionResponseFederateNameAlreadyInUse:
@@ -1312,8 +1312,8 @@ public:
         // Ok, if this is allowed, like for a rti13 federate or for the option
         // of allowing that to emulate certi behavior, we need to do the reservation
         // of the name now. This is the only syncronous operation in the rti.
-        Clock timeout = Clock::now() + Clock::fromSeconds(60); // FIXME???
-        objectInstanceHandle = dispatchWaitReserveObjectInstanceName(timeout, objectInstanceName);
+        Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
+        objectInstanceHandle = dispatchWaitReserveObjectInstanceName(abstime, objectInstanceName);
         if (!objectInstanceHandle.valid())
           throw ObjectInstanceNameInUse(objectInstanceName);
       }
@@ -3778,11 +3778,11 @@ public:
     _requestObjectInstanceHandles(1);
 
     if (!_federate->haveFreeObjectInstanceHandleNamePair()) {
-      Clock timeout = Clock::now() + Clock::fromSeconds(60);
+      Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
       while (!_federate->haveFreeObjectInstanceHandleNamePair()) {
-        if (receiveAndDispatchInternalMessage(timeout))
+        if (receiveAndDispatchInternalMessage(abstime))
           continue;
-        if (timeout < Clock::now())
+        if (abstime < Clock::now())
           throw RTIinternalError("Timeout while waiting for free object handles.");
       }
     }
