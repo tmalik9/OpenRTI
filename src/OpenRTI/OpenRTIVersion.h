@@ -14,8 +14,8 @@
 #define OPENRTI_BUILD_NUMBER_STRING      "0"
 
 // Patchnumber of OPENRTI library
-#define OPENRTI_PATCH_NUMBER              8
-#define OPENRTI_PATCH_NUMBER_STRING      "8"
+#define OPENRTI_PATCH_NUMBER              9
+#define OPENRTI_PATCH_NUMBER_STRING      "9"
 
 #define YEAR_STRING                     "2020"
 
