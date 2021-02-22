@@ -185,6 +185,14 @@ public:
   {
     return _protoType->isSameTypeAs(*rhs._protoType);
   }
+  void resize(size_t length)
+  {
+    _dataElementVector.resize(length);
+  }
+  void clear()
+  {
+    _dataElementVector.clear();
+  }
 
   DataElement* _protoType;
 
@@ -359,5 +367,16 @@ HLAvariableArray::operator [](size_t index) const
   return _impl->get(index);
 }
 
+
+void HLAvariableArray::resize(size_t length)
+{
+  _impl->resize(length);
+}
+
+
+void HLAvariableArray::clear()
+{
+  _impl->clear();
+}
 
 }

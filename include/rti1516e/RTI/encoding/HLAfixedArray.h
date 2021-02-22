@@ -114,6 +114,8 @@ namespace rti1516e
       // Must use set to change element.
       DataElement const& operator [](size_t index) const;
 
+      void resize(size_t length);
+      void clear();
    private:
 
       // Default Constructor not allowed

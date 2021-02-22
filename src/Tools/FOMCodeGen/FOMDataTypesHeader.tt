@@ -25,6 +25,7 @@
 #pragma once
 
 #include <vector>
+<#=FOM.PredefinedTypeIncludes#>
 
 <#
 foreach (var namespacePart in FOM.Namespace)
@@ -32,6 +33,8 @@ foreach (var namespacePart in FOM.Namespace)
 #>
 namespace <#=namespacePart#> {
 <#  } #>
+
+<#=FOM.ForwardDeclarations#>
 
 <#
 foreach (var dataType in FOM.DataTypes.Values)
@@ -41,7 +44,7 @@ foreach (var dataType in FOM.DataTypes.Values)
     var simpleDataType = dataType as FOMParser.SimpleDataType;
     if (dataType.Comment != null && dataType.Comment != "")
     {#>
-<#=FOMParser.FormatAsComment(dataType.Comment)#>
+<#=dataType.Comment#>
 <# } #>
 typedef <#=simpleDataType.Representation.CPPType#> <#=simpleDataType.Name#>;
 

@@ -21,6 +21,10 @@ namespace FOMCodeGen
       {
         Name = name;
       }
+      public virtual bool Resolve(Dictionary<string, DataType> dataTypes)
+      {
+        return true;
+      }
       // The name of the data type, as specified in the FOM
       public string Name { get; set; }
       // The corresponding C++ type (usually the same as the name of the defined type, unless defined otherwise)
@@ -44,16 +48,35 @@ namespace FOMCodeGen
           else
             return null;
         }
-        set { _comment = value; }
+        set { if (value != "NA") _comment = value; }
       }
       private string _comment;
     }
-    // A BasicDataRepresentation is a predefined wrapper for a built in C++ simple type (numeric)
+    // A BasicDataRepresentation is a predefined wrapper for a common C++ common
+    // (builtin numeric or string type)
     public class BasicDataRepresentation : DataType
     {
       public BasicDataRepresentation(string name, string cppType) : base(name)
       {
         _cppType = cppType;
+      }
+      private string _cppType;
+      public override string CPPType
+      {
+        get { return _cppType; }
+      }
+      public override string Encoding
+      {
+        get { return "rti1516e::" + Name; }
+      }
+    }
+    // a predefined type is one of the types for which a standard encoding already
+    // exists in the OpenRTI API
+    public class PredefinedType : DataType
+    {
+      public PredefinedType(string name) : base(name)
+      {
+        _cppType = "rti1516e::" + name;
       }
       private string _cppType;
       public override string CPPType
@@ -115,6 +138,14 @@ namespace FOMCodeGen
         DataType = dataType;
       }
       public DataType DataType { get; set; }
+      public override bool Resolve(Dictionary<string, DataType> dataTypes)
+      {
+        if (DataType is UnresolvedDataType)
+        {
+          DataType = dataTypes[DataType.Name];
+        }
+        return true;
+      }
     }
 
     public class FixedArrayDataType : ArrayDataType
@@ -129,6 +160,10 @@ namespace FOMCodeGen
       {
         get { return "const std::vector<" + DataType.CPPType + ">&"; }
       }
+      public override bool Resolve(Dictionary<string, DataType> dataTypes)
+      {
+        return true;
+      }
     }
 
     public class VariableArrayDataType : ArrayDataType
@@ -138,7 +173,20 @@ namespace FOMCodeGen
       }
       public override string CPPType
       {
-        get { return "const std::vector<" + DataType.CPPType + ">&"; }
+        get {
+          if (DataType is FOMParser.BasicDataRepresentation || DataType is FOMParser.SimpleDataType)
+            return "const std::vector<" + DataType.CPPType + ">&";
+          else
+            return "const std::vector<" + DataType.Encoding + ">&";
+        }
+      }
+      public string ConstCppType
+      {
+        get { return "const std::vector<" + DataType.Encoding + ">&"; }
+      }
+      public string NonConstCppType
+      {
+        get { return "std::vector<" + DataType.Encoding + ">&"; }
       }
     }
 
@@ -184,11 +232,29 @@ namespace FOMCodeGen
       }
       public FixedRecordDataType BaseClass { get; set; }
       public bool HasChilds { get; set; }
+      public override bool Resolve(Dictionary<string, DataType> dataTypes)
+      {
+        foreach (var field in Fields)
+        {
+          if (field.DataType is UnresolvedDataType)
+          {
+            field.DataType = dataTypes[field.DataType.Name];
+          }
+        }
+        return true;
+      }
     }
 
+    public class UnresolvedDataType : DataType
+    {
+      public UnresolvedDataType(string name) : base(name)
+      {
+      }
+    }
     public Dictionary<string, DataType> DataTypes { get; set; }
     public string Filename { get; set; }
     public string[] Namespace { get; set; }
+    public bool UsePrecompiledHeaders { get; set; }
     public ModelIdentificationStruct ModelIdentification { get; set; }
     private Dictionary<string, string> mBasicDataRepresentations = new Dictionary<string, string>()
     {
@@ -212,6 +278,61 @@ namespace FOMCodeGen
       { "HLAunicodeChar", "wchar_t" },
       { "HLAunicodeString", "std::wstring" },
     };
+
+    private Dictionary<string, string> mPredefinedTypes = new Dictionary<string, string>()
+    {
+      {"HLAopaqueData", "#include \"RTI/encoding/HLAopaqueData.h\"" },
+      {"HLAhandle", "#include \"RTI/encoding/HLAhandle.h\"" }
+    };
+
+    private HashSet<string> mPredefinedTypeIncludes = new HashSet<string>();
+    public string PredefinedTypeIncludes
+    {
+      get
+      {
+        string[] lines = new string[mPredefinedTypeIncludes.Count];
+        mPredefinedTypeIncludes.CopyTo(lines);
+        return string.Join("\n", lines);
+      }
+    }
+
+    private HashSet<string> mForwardDeclarations = new HashSet<string>();
+    private HashSet<string> mEncdodingForwardDeclarations = new HashSet<string>();
+    public string ForwardDeclarations
+    {
+      get
+      {
+        string[] lines = new string[mForwardDeclarations.Count];
+        mForwardDeclarations.CopyTo(lines);
+        return string.Join("\n", lines);
+      }
+    }
+    public string EncodingForwardDeclarations
+    {
+      get
+      {
+        string[] lines = new string[mEncdodingForwardDeclarations.Count];
+        mEncdodingForwardDeclarations.CopyTo(lines);
+        return string.Join("\n", lines);
+      }
+    }
+    DataType GetDataType(string name)
+    {
+      if (DataTypes.ContainsKey(name))
+      {
+        if (mPredefinedTypes.ContainsKey(name))
+        {
+          mPredefinedTypeIncludes.Add(mPredefinedTypes[name]);
+        }
+        return DataTypes[name];
+      }
+      else
+      {
+        mForwardDeclarations.Add("class " + name + ";");
+        mEncdodingForwardDeclarations.Add("class " + name + "Encoding;");
+        return new UnresolvedDataType(name);
+      }
+    }
     public static string FormatAsComment(string value, string prefix = "")
     {
       var lines = value.Split('\n');
@@ -234,6 +355,10 @@ namespace FOMCodeGen
       foreach (var entry in mBasicDataRepresentations)
       {
         DataTypes.Add(entry.Key, new BasicDataRepresentation(entry.Key, entry.Value));
+      }
+      foreach (var entry in mPredefinedTypes)
+      {
+        DataTypes.Add(entry.Key, new PredefinedType(entry.Key));
       }
       Filename = filename;
       Namespace = enclosingNamespace.Split('.');
@@ -271,6 +396,11 @@ namespace FOMCodeGen
       foreach (XmlElement simpleDataTypeNode in simpleDataTypeNodes)
       {
         string name = simpleDataTypeNode["name"].FirstChild.InnerText;
+        if (mBasicDataRepresentations.ContainsKey(name) || mPredefinedTypes.ContainsKey(name))
+        {
+          System.Console.WriteLine("ignoring predefined type {0}", name);
+          continue;
+        }
         string representation = simpleDataTypeNode["representation"].FirstChild.InnerText;
         var simpleType = new SimpleDataType(name, DataTypes[representation] as BasicDataRepresentation);
         DataTypes[name] = simpleType;
@@ -282,6 +412,11 @@ namespace FOMCodeGen
       foreach (XmlElement enumeratedDataTypeNode in enumeratedDataTypeNodes)
       {
         string name = enumeratedDataTypeNode["name"].FirstChild.InnerText;
+        if (mBasicDataRepresentations.ContainsKey(name) || mPredefinedTypes.ContainsKey(name))
+        {
+          System.Console.WriteLine("ignoring predefined type {0}", name);
+          continue;
+        }
         string representation = enumeratedDataTypeNode["representation"].FirstChild.InnerText;
         var enumeratedDataType = new EnumeratedDataType(name, DataTypes[representation] as BasicDataRepresentation);
         DataTypes[name] = enumeratedDataType;
@@ -300,6 +435,11 @@ namespace FOMCodeGen
       foreach (XmlElement arrayDataTypeNode in arrayDataTypeNodes)
       {
         string name = arrayDataTypeNode["name"].FirstChild.InnerText;
+        if (mBasicDataRepresentations.ContainsKey(name) || mPredefinedTypes.ContainsKey(name))
+        {
+          System.Console.WriteLine("ignoring predefined type {0}", name);
+          continue;
+        }
         string dataType = arrayDataTypeNode["dataType"].FirstChild.InnerText;
         string cardinality = arrayDataTypeNode["cardinality"].FirstChild.InnerText;
         string encoding = arrayDataTypeNode["encoding"].FirstChild.InnerText;
@@ -309,7 +449,7 @@ namespace FOMCodeGen
           {
             throw new ApplicationException("array with encoding \"HLAvariableArray\" must specify cardinality \"Dynamic\"");
           }
-          var arrayDataType = new VariableArrayDataType(name, DataTypes[dataType]);
+          var arrayDataType = new VariableArrayDataType(name, GetDataType(dataType));
           DataTypes[name] = arrayDataType;
           arrayDataType.Generate = (arrayDataTypeNode["nocode"] == null);
           if (arrayDataTypeNode["semantics"] != null && arrayDataTypeNode["semantics"].FirstChild != null)
@@ -322,7 +462,7 @@ namespace FOMCodeGen
           {
             throw new ApplicationException("array with encoding \"HLAfixedArray\" must specify integer cardinality");
           }
-          var arrayDataType = new FixedArrayDataType(name, DataTypes[dataType], cardinality);
+          var arrayDataType = new FixedArrayDataType(name, GetDataType(dataType), cardinality);
           DataTypes[name] = arrayDataType;
           arrayDataType.Generate = (arrayDataTypeNode["nocode"] == null);
           if (arrayDataTypeNode["semantics"] != null) arrayDataType.Comment = arrayDataTypeNode["semantics"].FirstChild.InnerText;
@@ -337,6 +477,10 @@ namespace FOMCodeGen
       foreach (XmlElement fixedRecordDataTypeNode in fixedRecordDataTypeNodes)
       {
         string name = fixedRecordDataTypeNode["name"].FirstChild.InnerText;
+        if (mBasicDataRepresentations.ContainsKey(name) || mPredefinedTypes.ContainsKey(name))
+        {
+          continue;
+        }
         FixedRecordDataType includedFixedRecordType = null;
         if (fixedRecordDataTypeNode["include"] != null)
         {
@@ -374,7 +518,7 @@ namespace FOMCodeGen
               throw new ApplicationException("field version must be an integer: \"" + versionString + "\"");
             }
           }
-          var field = new FixedRecordField(fieldName, DataTypes[fieldDataType], fieldVersion);
+          var field = new FixedRecordField(fieldName, GetDataType(fieldDataType), fieldVersion);
           if (fieldNode["semantics"] != null && fieldNode["semantics"].FirstChild != null)
           {
             field.Comment = fieldNode["semantics"].FirstChild.InnerText;
@@ -401,6 +545,11 @@ namespace FOMCodeGen
         {
           fixedRecordDataType.Comment = fixedRecordDataTypeNode["semantics"].FirstChild.InnerText;
         }
+      }
+
+      foreach (DataType dataType in DataTypes.Values)
+      {
+        dataType.Resolve(DataTypes);
       }
     }
   }

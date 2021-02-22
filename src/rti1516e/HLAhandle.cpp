@@ -65,6 +65,12 @@ HLAhandle::~HLAhandle() noexcept
 {
 }
 
+HLAhandle& HLAhandle::operator=(const HLAhandle& ref)
+{
+  mImpl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref.mImpl.get()));
+  return *this;
+}
+
 FederateHandle HLAhandle::getFederateHandle() const
 {
   FederateHandle rti1516eHandle;

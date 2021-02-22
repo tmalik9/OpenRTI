@@ -124,9 +124,12 @@ namespace rti1516e
       // Return a const reference to the element instance at the specified index.
       // Must use set to change element.
       DataElement const& operator [](size_t index) const;
-      // Assignment Operator not allowed
+      // Assignment Operator
       HLAvariableArray& operator=(HLAvariableArray const & rhs);
       HLAvariableArray& operator=(HLAvariableArray&& rhs);
+
+      void resize(size_t length);
+      void clear();
 
    private:
 

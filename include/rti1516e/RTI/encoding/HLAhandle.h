@@ -32,6 +32,8 @@ public:
   HLAhandle(const InteractionClassHandle& handle);
   HLAhandle(const ParameterHandle& handle);
   ~HLAhandle() noexcept;
+  HLAhandle& operator=(const HLAhandle& ref);
+
   FederateHandle getFederateHandle() const;
   ObjectClassHandle getObjectClassHandle() const;
   ObjectInstanceHandle getObjectInstanceHandle() const;
@@ -64,7 +66,6 @@ public:
 
   size_t getEncodedLength() const override;
   unsigned int getOctetBoundary() const override;
-
 private:
   class Implementation;
   std::unique_ptr<Implementation> mImpl;
