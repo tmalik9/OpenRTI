@@ -599,6 +599,10 @@ public:
       _done = true;
     }
   }
+  void operator()(const CreateFederationExecutionResponseMessage& message)
+  {
+    // Could be a late response from a second call to createFederation, just ignore this
+  }
   template<typename M>
   void operator()(const M& message) const
   { _basicAmbassador.acceptInternalMessage(message); }
