@@ -139,6 +139,8 @@ public:
       throw CouldNotCreateLogicalTimeFactory(logicalTimeFactoryName);
     if (responseTypeStringPair.first == CreateFederationExecutionResponseInconsistentFDD)
       throw InconsistentFDD(responseTypeStringPair.second);
+    if (responseTypeStringPair.first == CreateFederationExecutionResponseTimeout)
+      throw OperationTimeout(responseTypeStringPair.second);
     if (responseTypeStringPair.first != CreateFederationExecutionResponseSuccess)
       throw RTIinternalError(responseTypeStringPair.second);
   }
@@ -243,6 +245,10 @@ public:
     case JoinFederationExecutionResponseInconsistentFDD:
       _federate = 0;
       throw InconsistentFDD(response.second);
+      break;
+    case JoinFederationExecutionResponseTimeout:
+      _federate = 0;
+      throw OperationTimeout(response.second);
       break;
     default:
       break;

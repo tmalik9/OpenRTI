@@ -1701,6 +1701,8 @@ RTIambassadorImplementation::createFederationExecution(std::wstring const & fede
     throw rti1516e::CouldNotCreateLogicalTimeFactory(OpenRTI::utf8ToUcs(e.what()));
   } catch (const OpenRTI::NotConnected& e) {
     throw rti1516e::NotConnected(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::OperationTimeout & e) {
+    throw rti1516e::OperationTimeout(OpenRTI::utf8ToUcs(e.what()));
   } catch (const std::exception& e) {
     throw rti1516e::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
   } catch (...) {
@@ -1878,6 +1880,8 @@ RTIambassadorImplementation::joinFederationExecution(std::wstring const & federa
     throw rti1516e::NotConnected(OpenRTI::utf8ToUcs(e.what()));
   } catch (const OpenRTI::CallNotAllowedFromWithinCallback& e) {
     throw rti1516e::CallNotAllowedFromWithinCallback(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::OperationTimeout & e) {
+    throw rti1516e::OperationTimeout(OpenRTI::utf8ToUcs(e.what()));
   } catch (const std::exception& e) {
     throw rti1516e::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
   } catch (...) {

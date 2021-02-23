@@ -497,7 +497,7 @@ class OPENRTI_LOCAL InternalAmbassador::_CreateFederationExecutionFunctor {
 public:
   _CreateFederationExecutionFunctor(InternalAmbassador& basicAmbassador) :
     _done(false),
-    _responseTypeStringPair(CreateFederationExecutionResponseRTIinternalError, std::string()),
+    _responseTypeStringPair(CreateFederationExecutionResponseTimeout, "Timeout while waiting for CreateFederationExecutionResponse"),
     _basicAmbassador(basicAmbassador)
   { }
   void operator()(const ConnectionLostMessage& message)
@@ -575,7 +575,7 @@ class OPENRTI_LOCAL InternalAmbassador::_JoinFederationExecutionFunctor {
 public:
   _JoinFederationExecutionFunctor(InternalAmbassador& basicAmbassador, std::string federateName) :
     _done(false),
-    _response(JoinFederationExecutionResponseFederationExecutionDoesNotExist, std::string()),
+    _response(JoinFederationExecutionResponseTimeout, "Timeout while waiting for JoinFederationExecutionResponse" ),
     _basicAmbassador(basicAmbassador), _federateName(federateName)
   { }
   void operator()(const ConnectionLostMessage& message)

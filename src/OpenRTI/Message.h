@@ -225,7 +225,8 @@ enum CreateFederationExecutionResponseType {
   CreateFederationExecutionResponseErrorReadingFDD,
   CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory,
   CreateFederationExecutionResponseInconsistentFDD,
-  CreateFederationExecutionResponseRTIinternalError
+  CreateFederationExecutionResponseRTIinternalError,
+  CreateFederationExecutionResponseTimeout
 };
 
 enum DestroyFederationExecutionResponseType {
@@ -241,7 +242,8 @@ enum JoinFederationExecutionResponseType {
   JoinFederationExecutionResponseFederationExecutionDoesNotExist,
   JoinFederationExecutionResponseSaveInProgress,
   JoinFederationExecutionResponseRestoreInProgress,
-  JoinFederationExecutionResponseInconsistentFDD
+  JoinFederationExecutionResponseInconsistentFDD,
+  JoinFederationExecutionResponseTimeout
 };
 
 enum RegisterFederationSynchronizationPointResponseType {
