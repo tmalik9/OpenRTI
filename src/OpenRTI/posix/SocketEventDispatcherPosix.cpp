@@ -32,6 +32,8 @@
 #include "Exception.h"
 #include "LogStream.h"
 #include "SocketPrivateDataPosix.h"
+#include "SocketBufferLimit.h"
+
 
 namespace OpenRTI {
 
@@ -97,6 +99,7 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
       _fdVector.resize(0);
       _socketEventVector.resize(0);
       _timerSocketEventVector.resize(0);
+      SocketEventVector socketsToErase;
 
       Clock timeout = absclock;
 
@@ -114,7 +117,12 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
             if (socketEvent->getEnableRead())
               pfd.events |= POLLRDNORM;
             if (socketEvent->getEnableWrite())
-              pfd.events |= POLLWRNORM;
+            {
+              if (!socketEvent->getSocket()->isWritable() && SocketBufferLimit::GetInstance().isBufferBalanceCritical())
+                socketsToErase.push_back(socketEvent);
+              else
+                pfd.events |= POLLWRNORM;
+            }
 
             if (pfd.events) {
               included = true;
@@ -199,6 +207,15 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
         retv = 0;
         break;
       }
+
+      for (auto& socketEventSP : socketsToErase)
+      {
+        //DebugPrintf("Connection blocked for writing: Closing due to critical buffer balance %d\n", SocketBufferLimit::GetInstance().getBufferBalance());
+        SocketBufferLimit::GetInstance().resetBufferBalance();
+        socketEventSP->error(OpenRTI::ConnectionFailed("Connection blocked for writing: Closing due to critical buffer balance."));
+        dispatcher.erase(socketEventSP);
+      }
+
     }
 
     _fdVector.resize(0);

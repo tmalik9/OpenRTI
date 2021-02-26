@@ -172,6 +172,7 @@
     <ClCompile Include="NetworkStatistics.cpp" />
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="ParenthesesReader.cpp" />
+    <ClCompile Include="SocketBufferLimit.cpp" />
     <ClCompile Include="ServerModel.cpp" />
     <ClCompile Include="ServerNode.cpp" />
     <ClCompile Include="ProtocolSocketEvent.cpp" />
@@ -250,6 +251,7 @@
     <ClInclude Include="mom\MomManager.h" />
     <ClInclude Include="mom\MomTypes.h" />
     <ClInclude Include="OpenRTIVersion.h" />
+    <ClInclude Include="SocketBufferLimit.h" />
     <ClInclude Include="TranslateTypes.h" />
     <ClInclude Include="VariableLengthDataTuple.h" />
     <ClInclude Include="win32\PerformanceCounterStopWatch.h" />

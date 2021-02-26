@@ -32,6 +32,7 @@
 #include "LogStream.h"
 #include "SocketPrivateDataWin32.h"
 #include "AbstractNetworkStatistics.h"
+#include "SocketBufferLimit.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -99,6 +100,8 @@ struct SocketEventDispatcher::PrivateData
         std::vector<SharedPtr<AbstractSocketEvent>> sockets;
         sockets.reserve(dispatcher._socketEventList.size());
 
+        std::vector<SharedPtr<AbstractSocketEvent>> socketsToErase;
+
         std::vector<HANDLE> notificationEvents;
         notificationEvents.reserve(dispatcher._socketEventList.size() + 1);
 
@@ -136,11 +139,22 @@ struct SocketEventDispatcher::PrivateData
             }
             else
             {
-              // The socket has data to write, but either write has not been called before, or the previous
-              // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
-              // to survey
-              sockets.push_back(socketEventSP);
-              notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
+              if (SocketBufferLimit::GetInstance().isBufferBalanceCritical())
+              {
+                // The overall balance of sent/received bytes is critical (above limit) and
+                // the socket returned  WSAEWOULDBLOCK or similar - add the socket to the list of sockets 
+                // to be erased. This prevents the server node to run out of memory and rather disconnects a
+                // blocking receiver. 
+                socketsToErase.push_back(socketEventSP);
+              }
+              else 
+              {
+                // The socket has data to write, but either write has not been called before, or the previous
+                // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
+                // to survey
+                sockets.push_back(socketEventSP);
+                notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
+              }
             }
           }
           else if (socketEvent->getEnableRead())
@@ -225,6 +239,8 @@ struct SocketEventDispatcher::PrivateData
               if (networkEvents.lNetworkEvents & FD_WRITE)
               {
                 socketEvent->getSocket()->setWriteable();
+				// Socket is writable again: reset the buffer balance
+                SocketBufferLimit::GetInstance().resetBufferBalance();
               }
               if (socketEvent->getSocket()->isWritable())
               {
@@ -245,6 +261,14 @@ struct SocketEventDispatcher::PrivateData
                 dispatcher.timeout(socketEvent);
               }
             }
+          }
+
+          for (auto& socketEventSP : socketsToErase)
+          {
+            DebugPrintf("Connection blocked for writing: Closing due to critical buffer balance %d\n", SocketBufferLimit::GetInstance().getBufferBalance());
+            SocketBufferLimit::GetInstance().resetBufferBalance();
+            socketEventSP->error(OpenRTI::ConnectionFailed("Connection blocked for writing: Closing due to critical buffer balance."));
+            dispatcher.erase(socketEventSP);
           }
 
           bool expected = true;

@@ -6597,6 +6597,7 @@ operator<<(std::ostream& os, const CreateFederationExecutionResponseType& value)
   case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: os << "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory"; break;
   case CreateFederationExecutionResponseInconsistentFDD: os << "CreateFederationExecutionResponseInconsistentFDD"; break;
   case CreateFederationExecutionResponseRTIinternalError: os << "CreateFederationExecutionResponseRTIinternalError"; break;
+  case CreateFederationExecutionResponseTimeout: os << "CreateFederationExecutionResponseTimeout"; break;
   }
   return os;
 }
@@ -6618,6 +6619,7 @@ inline std::string to_string(const CreateFederationExecutionResponseType& value)
   case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: return "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory";
   case CreateFederationExecutionResponseInconsistentFDD: return "CreateFederationExecutionResponseInconsistentFDD";
   case CreateFederationExecutionResponseRTIinternalError: return "CreateFederationExecutionResponseRTIinternalError";
+  case CreateFederationExecutionResponseTimeout: return "CreateFederationExecutionResponseTimeout";
   default: return "<Invalid CreateFederationExecutionResponseType>";
   }
 }
@@ -6664,6 +6666,7 @@ operator<<(std::ostream& os, const JoinFederationExecutionResponseType& value)
   case JoinFederationExecutionResponseSaveInProgress: os << "JoinFederationExecutionResponseSaveInProgress"; break;
   case JoinFederationExecutionResponseRestoreInProgress: os << "JoinFederationExecutionResponseRestoreInProgress"; break;
   case JoinFederationExecutionResponseInconsistentFDD: os << "JoinFederationExecutionResponseInconsistentFDD"; break;
+  case JoinFederationExecutionResponseTimeout: os << "JoinFederationExecutionResponseTimeout"; break;
   }
   return os;
 }
@@ -6684,6 +6687,7 @@ inline std::string to_string(const JoinFederationExecutionResponseType& value)
   case JoinFederationExecutionResponseSaveInProgress: return "JoinFederationExecutionResponseSaveInProgress";
   case JoinFederationExecutionResponseRestoreInProgress: return "JoinFederationExecutionResponseRestoreInProgress";
   case JoinFederationExecutionResponseInconsistentFDD: return "JoinFederationExecutionResponseInconsistentFDD";
+  case JoinFederationExecutionResponseTimeout: return "JoinFederationExecutionResponseTimeout";
   default: return "<Invalid JoinFederationExecutionResponseType>";
   }
 }

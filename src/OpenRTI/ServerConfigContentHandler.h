@@ -78,6 +78,8 @@ public:
   bool getLogToConsole() const { return _LogToConsole; }
   bool isLogToConsoleSet() const { return _LogToConsoleSet; }
   bool getEnableNetworkStatistics() const { return _enableNetworkStatistics; }
+  bool isBufferLimitSet() const { return _BufferLimitSet; }
+  size_t getBufferLimit() const { return _BufferLimit; }
 
 private:
   void parseLogCategory(const std::string& s);
@@ -95,7 +97,8 @@ private:
     LogFileMode,
     LogToConsoleMode,
     LogToDebugMode,
-    NetworkStatisticsMode
+    NetworkStatisticsMode,
+    BufferLimitMode
   };
 
   Mode getCurrentMode()
@@ -125,6 +128,10 @@ private:
   bool                      _LogFileSet = false;
   bool                      _LogToConsole = false;
   bool                      _LogToConsoleSet = false;
+
+  // Blocking federates get kicked out if the send/receive balance is above this value (bytes)
+  bool                      _BufferLimitSet = false;
+  size_t                    _BufferLimit = 256000000;
 };
 
 }

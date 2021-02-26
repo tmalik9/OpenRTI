@@ -56,7 +56,7 @@ public:
   virtual Socket* getSocket() const = 0;
 
   /// Here we could also store a timeout value that is used for the poll/select timeout
-  /// Since we need to traverse all active readwriteevents in any case this is not an extra effort.
+  /// Since we need to traverse all active read-write-events in any case this is not an extra effort.
   const Clock& getTimeout() const
   { return _timeout; }
   void setTimeout(const Clock& timeout)
@@ -65,7 +65,7 @@ public:
 private:
   /// The event dispatcher this event is attached to
   SocketEventDispatcher* _socketEventDispatcher;
-  /// If attahced, the iterator into the dispatchers SocketEventList
+  /// If attached, the iterator into the dispatchers SocketEventList
   SocketEventList::iterator _iterator;
   /// The absolute time of the timeout
   Clock _timeout;

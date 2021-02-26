@@ -53,7 +53,7 @@ public:
   VariableLengthData& addScratchWriteBuffer();
   Buffer& getOutputBuffer() { return _outputBuffer; }
 private:
-  // Buffer for the incomming data
+  // Buffer for the incoming data
   Buffer _inputBuffer;
   Buffer::byte_iterator _inputIterator;
 

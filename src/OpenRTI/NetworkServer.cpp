@@ -47,6 +47,7 @@
 #include "StringUtils.h"
 #include "LogStream.h"
 #include "ServerModel.h"
+#include "SocketBufferLimit.h"
 
 namespace OpenRTI {
 
@@ -119,6 +120,9 @@ NetworkServer::setUpFromConfig(std::istream& stream)
   if (contentHandler->isLogCategorySet()) LogStream::setCategory(contentHandler->getLogCategory());
   if (contentHandler->isLogFileSet()) LogStream::AddLogFile(contentHandler->getLogFile());
   if (contentHandler->isLogToConsoleSet()) LogStream::EnableLogToConsole(contentHandler->getLogToConsole());
+
+  //if (contentHandler->isBufferLimitSet()) SocketBufferLimit::GetInstance().setBufferLimit(contentHandler->getBufferLimit());
+  SocketBufferLimit::GetInstance().setBufferLimit(contentHandler->getBufferLimit());
 
   getServerNode().getServerOptions()._preferCompression = contentHandler->getEnableZLibCompression();
 
