@@ -11,7 +11,7 @@ namespace OpenRTI
     return _instance;
   }
 
-  SocketBufferLimit::SocketBufferLimit() noexcept : _bufferLimitEnabled(false), _bufferBalance(0), _bufferLimit(256000000)
+  SocketBufferLimit::SocketBufferLimit() noexcept : _bufferLimitActive(true), _bufferBalance(0), _bufferLimit(256000000)
   {
   }
 
@@ -21,8 +21,12 @@ namespace OpenRTI
 
   void SocketBufferLimit::setBufferLimit(ssize_t bytes)
   {
-    _bufferLimitEnabled = true;
     _bufferLimit = bytes;
+  }
+
+  void SocketBufferLimit::setBufferLimitActive(bool active)
+  {
+    _bufferLimitActive = active;
   }
 
   ssize_t SocketBufferLimit::getBufferBalance()
@@ -37,7 +41,7 @@ namespace OpenRTI
 
   bool SocketBufferLimit::isBufferBalanceCritical() 
   {
-    return _bufferLimitEnabled && _bufferBalance > _bufferLimit;
+    return _bufferLimitActive && _bufferBalance > _bufferLimit;
   }
 
   void SocketBufferLimit::resetBufferBalance() 

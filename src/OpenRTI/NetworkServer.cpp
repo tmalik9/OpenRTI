@@ -121,8 +121,8 @@ NetworkServer::setUpFromConfig(std::istream& stream)
   if (contentHandler->isLogFileSet()) LogStream::AddLogFile(contentHandler->getLogFile());
   if (contentHandler->isLogToConsoleSet()) LogStream::EnableLogToConsole(contentHandler->getLogToConsole());
 
-  //if (contentHandler->isBufferLimitSet()) SocketBufferLimit::GetInstance().setBufferLimit(contentHandler->getBufferLimit());
   SocketBufferLimit::GetInstance().setBufferLimit(contentHandler->getBufferLimit());
+  SocketBufferLimit::GetInstance().setBufferLimitActive(contentHandler->getBufferLimitActive());
 
   getServerNode().getServerOptions()._preferCompression = contentHandler->getEnableZLibCompression();
 

@@ -175,7 +175,15 @@ ServerConfigContentHandler::startElement(const char* uri, const char* name,
     }
     _modeStack.push_back(BufferLimitMode);
     _BufferLimit = static_cast<size_t>(std::stoi(trim(atts->getValue("value"))));
-    _BufferLimitSet = true;
+  }
+  else if (strcmp(name, "bufferLimitActive") == 0)
+  {
+    if (getCurrentMode() != OpenRTIServerConfigMode)
+    {
+      throw RTIinternalError("bufferLimitActive tag not inside of OpenRTIServerConfig!");
+    }
+    _modeStack.push_back(BufferLimitActiveMode);
+    _BufferLimitActive = enableFlagToBool(atts->getValue("enable"));
   }
   else if (strcmp(name, "LogPriority") == 0)
   {

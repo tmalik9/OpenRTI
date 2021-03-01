@@ -78,7 +78,7 @@ public:
   bool getLogToConsole() const { return _LogToConsole; }
   bool isLogToConsoleSet() const { return _LogToConsoleSet; }
   bool getEnableNetworkStatistics() const { return _enableNetworkStatistics; }
-  bool isBufferLimitSet() const { return _BufferLimitSet; }
+  bool getBufferLimitActive() const { return _BufferLimitActive; }
   size_t getBufferLimit() const { return _BufferLimit; }
 
 private:
@@ -98,7 +98,8 @@ private:
     LogToConsoleMode,
     LogToDebugMode,
     NetworkStatisticsMode,
-    BufferLimitMode
+    BufferLimitMode,
+    BufferLimitActiveMode
   };
 
   Mode getCurrentMode()
@@ -130,7 +131,7 @@ private:
   bool                      _LogToConsoleSet = false;
 
   // Blocking federates get kicked out if the send/receive balance is above this value (bytes)
-  bool                      _BufferLimitSet = false;
+  bool                      _BufferLimitActive = true;
   size_t                    _BufferLimit = 256000000;
 };
 

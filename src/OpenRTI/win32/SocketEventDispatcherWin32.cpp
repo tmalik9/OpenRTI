@@ -142,19 +142,17 @@ struct SocketEventDispatcher::PrivateData
               if (SocketBufferLimit::GetInstance().isBufferBalanceCritical())
               {
                 // The overall balance of sent/received bytes is critical (above limit) and
-                // the socket returned  WSAEWOULDBLOCK or similar - add the socket to the list of sockets 
+                // the socket returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets 
                 // to be erased. This prevents the server node to run out of memory and rather disconnects a
                 // blocking receiver. 
                 socketsToErase.push_back(socketEventSP);
               }
-              else 
-              {
-                // The socket has data to write, but either write has not been called before, or the previous
-                // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
-                // to survey
-                sockets.push_back(socketEventSP);
-                notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
-              }
+
+              // The socket has data to write, but either write has not been called before, or the previous
+              // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
+              // to survey
+              sockets.push_back(socketEventSP);
+              notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
             }
           }
           else if (socketEvent->getEnableRead())
@@ -239,7 +237,7 @@ struct SocketEventDispatcher::PrivateData
               if (networkEvents.lNetworkEvents & FD_WRITE)
               {
                 socketEvent->getSocket()->setWriteable();
-				// Socket is writable again: reset the buffer balance
+				        // Socket is writable again: reset the buffer balance
                 SocketBufferLimit::GetInstance().resetBufferBalance();
               }
               if (socketEvent->getSocket()->isWritable())
