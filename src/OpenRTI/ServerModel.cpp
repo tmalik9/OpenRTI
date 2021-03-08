@@ -2286,10 +2286,12 @@ bool Federation::insertOrCheck(Module& module, const FOMStringVariantRecordDataT
 bool
 Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& stringInteractionClass)
 {
+
   InteractionClass::NameMap::iterator i;
   i = _interactionClassNameInteractionClassMap.find(stringInteractionClass.getName());
   if (i != _interactionClassNameInteractionClassMap.end()) {
     OpenRTIAssert(!i->getName().empty());
+    bool created = false;
 
     if (i->getOrderType() != resolveOrderType(stringInteractionClass.getOrderType())) {
       std::stringstream ss;
@@ -2323,22 +2325,44 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
     }
 
     // In this case we need to check for the parameter list being the same on both ends.
+    // i: Established IA Class
+    // j: IA Class to check
     if (!stringInteractionClass.getParameterList().empty()) {
       std::vector<ParameterHandle> parameterHandles;
       parameterHandles.reserve(stringInteractionClass.getParameterList().size());
+
       for (FOMStringParameterList::const_iterator j = stringInteractionClass.getParameterList().begin();
-           j != stringInteractionClass.getParameterList().end(); ++j) {
+            j != stringInteractionClass.getParameterList().end(); ++j) {
+
         ParameterDefinition* parameterDefinition;
         parameterDefinition = i->getParameterDefinition(j->getName());
+
         if (!parameterDefinition) {
-          std::stringstream ss;
-          ss << "Inconsistent InteractionClass \"" << stringInteractionClass.getName() << "\": Parameter \""
-             << j->getName() << "\" not present in already established interaction class!";
-          throw InconsistentFDD(ss.str());
+
+
+
+          ParameterDefinition* addParameterDefinition;
+          InteractionClass* interactionClass = getInteractionClass(i->getInteractionClassHandle());
+          addParameterDefinition = new ParameterDefinition(*interactionClass);
+          addParameterDefinition->setName(j->getName());
+          addParameterDefinition->setDataType(j->getDataType());
+          addParameterDefinition->setParameterHandle(module.getFederation()._parameterHandleAllocator.get());
+          i->insert(*addParameterDefinition);
+          parameterHandles.push_back(addParameterDefinition->getParameterHandle());
+
+          // This path so far only made consistency checks. We extended the IA class, so we have to return created = true.
+          // Otherwise the changed module is discarded.
+          created = true;
+
+          DebugPrintf("%s:  Adding unknown parameter '%s' to established IA class '%s'\n", __FUNCTION__, j->getName().c_str(), interactionClass->getName().back().c_str());
         }
-        parameterHandles.push_back(parameterDefinition->getParameterHandle());
+        else
+          parameterHandles.push_back(parameterDefinition->getParameterHandle());
       }
+
+      // Sort by handles...
       std::sort(parameterHandles.begin(), parameterHandles.end());
+      // ... to check for duplicate handles
       if (std::unique(parameterHandles.begin(), parameterHandles.end()) != parameterHandles.end()) {
         std::stringstream ss;
         ss << "Inconsistent InteractionClass \"" << stringInteractionClass.getName()
@@ -2351,7 +2375,7 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
     if (!stringInteractionClass.getParameterList().empty())
       module.insertParameters(*i);
 
-    return false;
+    return created;
   } else {
     InteractionClass* parentInteractionClass;
     parentInteractionClass = resolveParentInteractionClass(stringInteractionClass.getName());
@@ -2406,54 +2430,85 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
   i = _objectClassNameObjectClassMap.find(stringObjectClass.getName());
   if (i != _objectClassNameObjectClassMap.end()) {
     OpenRTIAssert(!i->getName().empty());
+    bool created = false;
 
     // In this case we need to check for the attribute list being the same on both ends.
     if (!stringObjectClass.getAttributeList().empty()) {
       std::vector<AttributeHandle> attributeHandles;
       attributeHandles.reserve(stringObjectClass.getAttributeList().size());
-      for (const FOMStringAttribute& stringAttribute :  stringObjectClass.getAttributeList()) {
+      for (const FOMStringAttribute& stringAttribute : stringObjectClass.getAttributeList()) {
         AttributeDefinition* attributeDefinition;
         attributeDefinition = i->getAttributeDefinition(stringAttribute.getName());
+
+        //
         if (!attributeDefinition) {
-          std::stringstream ss;
-          ss << "Inconsistent ObjectClass \"" << stringObjectClass.getName() << "\": Attribute \""
-             << stringAttribute.getName() << "\" not present in already established object class!";
-          throw InconsistentFDD(ss.str());
-        }
-        if (attributeDefinition->getOrderType() != resolveOrderType(stringAttribute.getOrderType())) {
-          std::stringstream ss;
-          ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
-             << stringAttribute.getName() << "\": OrderType " << stringAttribute.getOrderType()
-             << " does not match the already established value of "
-             << attributeDefinition->getOrderType() << "!";
-          throw InconsistentFDD(ss.str());
-        }
-        if (attributeDefinition->getTransportationType() != resolveTransportationType(stringAttribute.getTransportationType())) {
-          std::stringstream ss;
-          ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
-             << stringAttribute.getName() << "\": TransportationType " << stringAttribute.getTransportationType()
-             << " does not match the already established value of "
-             << attributeDefinition->getTransportationType() << "!";
-          throw InconsistentFDD(ss.str());
-        }
 
-        DimensionHandleSet dimensionHandleSet;
-        for (StringSet::const_iterator k = stringAttribute.getDimensionSet().begin();
-             k != stringAttribute.getDimensionSet().end(); ++k) {
-          Dimension* dimension = resolveDimension(*k);
-          if (!dimension)
-            throw InconsistentFDD("Cannot resolve dimension \"" + *k + "\"!");
-          /// FIXME avoid using the handle sets ...
-          dimensionHandleSet.insert(dimension->getDimensionHandle());
-        }
-        if (attributeDefinition->_dimensionHandleSet != dimensionHandleSet) {
-          std::stringstream ss;
-          ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
-             << stringAttribute.getName() << "\": Dimensions do not match the already established value!";
-          throw InconsistentFDD(ss.str());
-        }
 
-        attributeHandles.push_back(attributeDefinition->getAttributeHandle());
+          AttributeDefinition* addAttributeDefinition;
+          ObjectClass* objectClass = getObjectClass(i->getObjectClassHandle());
+          addAttributeDefinition = new AttributeDefinition(*objectClass);
+          addAttributeDefinition->setName(stringAttribute.getName());
+          addAttributeDefinition->setDataType(stringAttribute.getDataType());
+          addAttributeDefinition->setAttributeHandle(objectClass->getFirstUnusedAttributeHandle());
+          i->insert(*addAttributeDefinition);
+
+          addAttributeDefinition->setOrderType(resolveOrderType(stringAttribute.getOrderType()));
+          addAttributeDefinition->setTransportationType(resolveTransportationType(stringAttribute.getTransportationType()));
+          for (StringSet::const_iterator j = stringAttribute.getDimensionSet().begin();
+            j != stringAttribute.getDimensionSet().end(); ++j) {
+            Dimension* dimension = resolveDimension(*j);
+            if (!dimension)
+              throw InconsistentFDD("Cannot resolve dimension \"" + *j + "\"!");
+            /// FIXME avoid using the handle sets ...
+            addAttributeDefinition->_dimensionHandleSet.insert(dimension->getDimensionHandle());
+          }
+
+          attributeHandles.push_back(addAttributeDefinition->getAttributeHandle());
+
+          //objectClass->writeCurrentFDD(std::cout, 0);
+
+          // This path so far only made consistency checks. We extended the object class, so we have to return created = true.
+          // Otherwise the changed module is discarded.
+          created = true;
+
+          DebugPrintf("%s:  Adding unknown attribute '%s' to established object class '%s'\n", __FUNCTION__, stringAttribute.getName().c_str(), objectClass->getName().back().c_str());
+        }
+        else
+        {
+          if (attributeDefinition->getOrderType() != resolveOrderType(stringAttribute.getOrderType())) {
+            std::stringstream ss;
+            ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
+              << stringAttribute.getName() << "\": OrderType " << stringAttribute.getOrderType()
+              << " does not match the already established value of "
+              << attributeDefinition->getOrderType() << "!";
+            throw InconsistentFDD(ss.str());
+          }
+          if (attributeDefinition->getTransportationType() != resolveTransportationType(stringAttribute.getTransportationType())) {
+            std::stringstream ss;
+            ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
+              << stringAttribute.getName() << "\": TransportationType " << stringAttribute.getTransportationType()
+              << " does not match the already established value of "
+              << attributeDefinition->getTransportationType() << "!";
+            throw InconsistentFDD(ss.str());
+          }
+
+          DimensionHandleSet dimensionHandleSet;
+          for (StringSet::const_iterator k = stringAttribute.getDimensionSet().begin();
+            k != stringAttribute.getDimensionSet().end(); ++k) {
+            Dimension* dimension = resolveDimension(*k);
+            if (!dimension)
+              throw InconsistentFDD("Cannot resolve dimension \"" + *k + "\"!");
+            /// FIXME avoid using the handle sets ...
+            dimensionHandleSet.insert(dimension->getDimensionHandle());
+          }
+          if (attributeDefinition->_dimensionHandleSet != dimensionHandleSet) {
+            std::stringstream ss;
+            ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
+              << stringAttribute.getName() << "\": Dimensions do not match the already established value!";
+            throw InconsistentFDD(ss.str());
+          }
+          attributeHandles.push_back(attributeDefinition->getAttributeHandle());
+        }
       }
       std::sort(attributeHandles.begin(), attributeHandles.end());
       if (std::unique(attributeHandles.begin(), attributeHandles.end()) != attributeHandles.end()) {
@@ -2468,7 +2523,7 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
     if (!stringObjectClass.getAttributeList().empty())
       module.insertAttributes(*i);
 
-    return false;
+    return created;
   } else {
     ObjectClass* parentObjectClass;
     parentObjectClass = resolveParentObjectClass(stringObjectClass.getName());
@@ -2835,10 +2890,23 @@ Federation::insert(Module& module, const FOMInteractionClass& fomInteractionClas
              j != fomInteractionClass.getParameterList().end(); ++j) {
           ParameterDefinition* parameterDefinition;
           parameterDefinition = i->getParameterDefinition(j->getParameterHandle());
+          
+          //if (!parameterDefinition)
+          //  throw MessageError("InteractionClass parameter lists do not match.");
           if (!parameterDefinition)
+          {
+            ParameterDefinition* addParameterDefinition;
+            InteractionClass* interactionClass = getInteractionClass(i->getInteractionClassHandle());
+            addParameterDefinition = new ParameterDefinition(*interactionClass);
+            addParameterDefinition->setName(j->getName());
+            addParameterDefinition->setDataType(j->getDataType());
+            addParameterDefinition->setParameterHandle(j->getParameterHandle());   
+            i->insert(*addParameterDefinition);
+            DebugPrintf("%s:  Adding unknown parameter '%s' to established IA class '%s'\n", __FUNCTION__, j->getName().c_str(), interactionClass->getName().back().c_str());
+          }
+          else if (parameterDefinition->getName() != j->getName())
             throw MessageError("InteractionClass parameter lists do not match.");
-          if (parameterDefinition->getName() != j->getName())
-            throw MessageError("InteractionClass parameter lists do not match.");
+
           parameterHandles.push_back(j->getParameterHandle());
         }
         std::sort(parameterHandles.begin(), parameterHandles.end());
@@ -2920,16 +2988,33 @@ Federation::insert(Module& module, const FOMObjectClass& fomObjectClass)
              j != fomObjectClass.getAttributeList().end(); ++j) {
           AttributeDefinition* attributeDefinition;
           attributeDefinition = i->getAttributeDefinition(j->getAttributeHandle());
+          //if (!attributeDefinition)
+          //  throw MessageError("ObjectClass attribute lists do not match.");
           if (!attributeDefinition)
-            throw MessageError("ObjectClass attribute lists do not match.");
-          if (attributeDefinition->getName() != j->getName())
-            throw MessageError("ObjectClass attribute lists do not match.");
-          if (attributeDefinition->getOrderType() != j->getOrderType())
-            throw MessageError("ObjectClass order type does not match.");
-          if (attributeDefinition->getTransportationType() != j->getTransportationType())
-            throw MessageError("ObjectClass transportation type does not match.");
-          if (attributeDefinition->_dimensionHandleSet != j->getDimensionHandleSet())
-            throw MessageError("ObjectClass dimension handle set does not match.");
+          {
+            AttributeDefinition* addAttributeDefinition;
+            ObjectClass* objectClass = getObjectClass(i->getObjectClassHandle());
+            addAttributeDefinition = new AttributeDefinition(*objectClass);
+            addAttributeDefinition->setName(j->getName());
+            addAttributeDefinition->setDataType(j->getDataType());
+            addAttributeDefinition->setAttributeHandle(objectClass->getFirstUnusedAttributeHandle());
+            i->insert(*addAttributeDefinition);
+            addAttributeDefinition->setOrderType(j->getOrderType());
+            addAttributeDefinition->setTransportationType(j->getTransportationType());
+            addAttributeDefinition->_dimensionHandleSet = j->getDimensionHandleSet();
+            DebugPrintf("%s:  Adding unknown attribute '%s' to established object class '%s'\n", __FUNCTION__, j->getName().c_str(), objectClass->getName().back().c_str());
+          }
+          else
+          {
+            if (attributeDefinition->getName() != j->getName())
+              throw MessageError("ObjectClass attribute lists do not match.");
+            if (attributeDefinition->getOrderType() != j->getOrderType())
+              throw MessageError("ObjectClass order type does not match.");
+            if (attributeDefinition->getTransportationType() != j->getTransportationType())
+              throw MessageError("ObjectClass transportation type does not match.");
+            if (attributeDefinition->_dimensionHandleSet != j->getDimensionHandleSet())
+              throw MessageError("ObjectClass dimension handle set does not match.");
+          }
           attributeHandles.push_back(j->getAttributeHandle());
         }
         std::sort(attributeHandles.begin(), attributeHandles.end());
