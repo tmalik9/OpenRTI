@@ -70,7 +70,7 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
   DWORD flags = 0;
   DWORD numBytesSent = 0;
   int ret = WSASend(_privateData->_socket, buffers, bufferCount, &numBytesSent, flags, NULL, NULL);
-  //DebugPrintf("%s: socket=0x%08x bufferCount=%d bytelen=%d numBytesSent=%d ret=%d\n", __FUNCTION__, _privateData->_socket, bufferCount, bytelen, numBytesSent, ret);
+  //DebugPrintf("%s: socket=%d bufferCount=%d bytelen=%d numBytesSent=%d ret=%d\n", __FUNCTION__, _privateData->_socket, bufferCount, bytelen, numBytesSent, ret);
   // get the error of the send call before trying setsocketopt
   int errorNumber = WSAGetLastError();
 

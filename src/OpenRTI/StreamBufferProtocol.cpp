@@ -22,7 +22,6 @@
 
 #include "LogStream.h"
 #include "AbstractNetworkStatistics.h"
-#include "SocketBufferLimit.h"
 
 namespace OpenRTI {
 
@@ -61,9 +60,6 @@ StreamBufferProtocol::read(AbstractProtocolSocket& protocolSocket)
       }
       _inputIterator += ret;
       _inputIterator.skip_empty_chunks(_inputBuffer.byte_end());
-
-      // Buffer balance
-      SocketBufferLimit::GetInstance().adjustBufferBalance(+ret);
 
 #ifdef ENABLE_NETWORKSTATISTICS
       GetNetworkStatistics().BytesReceived(ret);
@@ -147,9 +143,6 @@ StreamBufferProtocol::write(AbstractProtocolSocket& protocolSocket)
       _outputIterator += ret;
       _outputIterator.skip_empty_chunks(_outputBuffer.byte_end());
       
-      // Buffer balance
-      SocketBufferLimit::GetInstance().adjustBufferBalance(-ret);
-
 #ifdef ENABLE_NETWORKSTATISTICS
       GetNetworkStatistics().BytesSent(ret);
 #endif

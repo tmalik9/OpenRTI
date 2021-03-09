@@ -55,4 +55,9 @@ Socket::~Socket()
   _privateData = 0;
 }
 
+uint32_t Socket::getFd() const
+{
+  return _privateData->_socket;
+}
+
 } // namespace OpenRTI

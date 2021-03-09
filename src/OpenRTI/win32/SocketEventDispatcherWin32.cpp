@@ -32,7 +32,6 @@
 #include "LogStream.h"
 #include "SocketPrivateDataWin32.h"
 #include "AbstractNetworkStatistics.h"
-#include "SocketBufferLimit.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -128,6 +127,7 @@ struct SocketEventDispatcher::PrivateData
             continue;
           }
 
+          bool notificationInserted = false;
           if (socketEvent->getEnableWrite())
           {
             if (socketEvent->getSocket()->isWritable())
@@ -139,23 +139,25 @@ struct SocketEventDispatcher::PrivateData
             }
             else
             {
-              if (SocketBufferLimit::GetInstance().isBufferBalanceCritical())
+              //DebugPrintf("%s: socket=%d bytesQueued=%d writable=%d\n", __FUNCTION__, socketEvent->getSocket()->getFd(), socketEvent->bytesQueued(), socketEvent->getSocket()->isWritable());
+              if (socketEvent->bytesQueued() > dispatcher.getQueueLimit())
               {
-                // The overall balance of sent/received bytes is critical (above limit) and
-                // the socket returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets 
-                // to be erased. This prevents the server node to run out of memory and rather disconnects a
-                // blocking receiver. 
+                // queue overflow - close connection
                 socketsToErase.push_back(socketEventSP);
               }
-
-              // The socket has data to write, but either write has not been called before, or the previous
-              // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
-              // to survey
-              sockets.push_back(socketEventSP);
-              notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
+              else
+              {
+                // The socket has data to write, but either write has not been called before, or the previous
+                // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
+                // to survey
+                sockets.push_back(socketEventSP);
+                notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
+                notificationInserted = true;
+              }
             }
           }
-          else if (socketEvent->getEnableRead())
+          
+          if (socketEvent->getEnableRead() && !notificationInserted)
           {
             sockets.push_back(socketEventSP);
             notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
@@ -237,14 +239,11 @@ struct SocketEventDispatcher::PrivateData
               if (networkEvents.lNetworkEvents & FD_WRITE)
               {
                 socketEvent->getSocket()->setWriteable();
-				        // Socket is writable again: reset the buffer balance
-                SocketBufferLimit::GetInstance().resetBufferBalance();
               }
               if (socketEvent->getSocket()->isWritable())
               {
                 dispatcher.write(socketEvent);
               }
-
               if (networkEvents.lNetworkEvents & FD_CLOSE)
               {
                 socketEvent->error(OpenRTI::ConnectionFailed("connection closed"));
@@ -263,9 +262,8 @@ struct SocketEventDispatcher::PrivateData
 
           for (auto& socketEventSP : socketsToErase)
           {
-            DebugPrintf("Connection blocked for writing: Closing due to critical buffer balance %d\n", SocketBufferLimit::GetInstance().getBufferBalance());
-            SocketBufferLimit::GetInstance().resetBufferBalance();
-            socketEventSP->error(OpenRTI::ConnectionFailed("Connection blocked for writing: Closing due to critical buffer balance."));
+            DebugPrintf("%s: closing connection due to queue overflow: socket=%d bytesQueued=%d writable=%d\n", __FUNCTION__, socketEventSP->getSocket()->getFd(), socketEventSP->bytesQueued(), socketEventSP->getSocket()->isWritable());
+            socketEventSP->error(OpenRTI::ConnectionFailed("closing connection due to queue overflow."));
             dispatcher.erase(socketEventSP);
           }
 
@@ -301,7 +299,8 @@ struct SocketEventDispatcher::PrivateData
 
 SocketEventDispatcher::SocketEventDispatcher() :
   _privateData(new PrivateData),
-  _done(false)
+  _done(false),
+  _queueLimit(std::numeric_limits<size_t>::max())
 {
 }
 

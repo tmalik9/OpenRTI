@@ -167,23 +167,14 @@ ServerConfigContentHandler::startElement(const char* uri, const char* name,
     _listenConfig.push_back(ListenConfig());
     _listenConfig.back()._url = trim(atts->getValue("url"));
   }
-  else if (strcmp(name, "bufferLimit") == 0)
+  else if (strcmp(name, "QueueLimit") == 0)
   {
     if (getCurrentMode() != OpenRTIServerConfigMode)
     {
-      throw RTIinternalError("bufferLimit tag not inside of OpenRTIServerConfig!");
+      throw RTIinternalError("QueueLimit tag not inside of OpenRTIServerConfig!");
     }
-    _modeStack.push_back(BufferLimitMode);
-    _BufferLimit = static_cast<size_t>(std::stoi(trim(atts->getValue("value"))));
-  }
-  else if (strcmp(name, "bufferLimitActive") == 0)
-  {
-    if (getCurrentMode() != OpenRTIServerConfigMode)
-    {
-      throw RTIinternalError("bufferLimitActive tag not inside of OpenRTIServerConfig!");
-    }
-    _modeStack.push_back(BufferLimitActiveMode);
-    _BufferLimitActive = enableFlagToBool(atts->getValue("enable"));
+    _modeStack.push_back(QueueLimitMode);
+    _queueLimit = static_cast<size_t>(std::stoull(trim(atts->getValue("value"))) * 1024);
   }
   else if (strcmp(name, "LogPriority") == 0)
   {

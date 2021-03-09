@@ -285,17 +285,18 @@ void SimpleTestFederate::run(unsigned int stepMs)
 {
   //mRtiAmb->setNotificationHandle(mHandle.get());
   std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
-  double evokeSeconds = double(stepMs) / 1000.0;
+  std::chrono::milliseconds stepDuration(stepMs);
+  double evokeSeconds = 0.01;
   while (!_done)
   {
-    mRtiAmb->evokeCallback(evokeSeconds);
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-    int64_t milliSeconds = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - lastTime).count();
-    if (milliSeconds >= stepMs)
+    while (currentTime - lastTime < stepDuration)
     {
-      step();
-      lastTime = currentTime;
+      mRtiAmb->evokeCallback(evokeSeconds);
+      currentTime = std::chrono::steady_clock::now();
     }
+    step();
+    lastTime = currentTime;
   }
 }
 

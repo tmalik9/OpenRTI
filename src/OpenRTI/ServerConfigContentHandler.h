@@ -78,9 +78,7 @@ public:
   bool getLogToConsole() const { return _LogToConsole; }
   bool isLogToConsoleSet() const { return _LogToConsoleSet; }
   bool getEnableNetworkStatistics() const { return _enableNetworkStatistics; }
-  bool getBufferLimitActive() const { return _BufferLimitActive; }
-  size_t getBufferLimit() const { return _BufferLimit; }
-
+  size_t getQueueLimit() const { return _queueLimit; }
 private:
   void parseLogCategory(const std::string& s);
   // poor man's schema checking ...
@@ -98,6 +96,7 @@ private:
     LogToConsoleMode,
     LogToDebugMode,
     NetworkStatisticsMode,
+    QueueLimitMode,
     BufferLimitMode,
     BufferLimitActiveMode
   };
@@ -130,9 +129,7 @@ private:
   bool                      _LogToConsole = false;
   bool                      _LogToConsoleSet = false;
 
-  // Blocking federates get kicked out if the send/receive balance is above this value (bytes)
-  bool                      _BufferLimitActive = false;
-  size_t                    _BufferLimit = 256000000;
+  size_t                    _queueLimit = std::numeric_limits<size_t>::max();
 };
 
 }

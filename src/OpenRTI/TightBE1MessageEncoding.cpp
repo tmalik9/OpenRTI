@@ -780,8 +780,11 @@ public:
     case CreateFederationExecutionResponseRTIinternalError:
       writeUInt32Compressed(6);
       break;
-    default:
+    case CreateFederationExecutionResponseTimeout:
       writeUInt32Compressed(7);
+      break;
+    default:
+      writeUInt32Compressed(8);
       break;
     }
   }
@@ -828,8 +831,11 @@ public:
     case JoinFederationExecutionResponseInconsistentFDD:
       writeUInt32Compressed(5);
       break;
-    default:
+    case JoinFederationExecutionResponseTimeout:
       writeUInt32Compressed(6);
+      break;
+    default:
+      writeUInt32Compressed(7);
       break;
     }
   }
@@ -2114,6 +2120,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ConnectionLostMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeConnectionLostMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionRequestMessage& message) const
   {
@@ -2122,6 +2138,16 @@ public:
     encodeStream.writeUInt16Compressed(2);
     encodeStream.writeCreateFederationExecutionRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeCreateFederationExecutionRequestMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2134,6 +2160,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionRequest2Message& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeCreateFederationExecutionRequest2Message(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionResponseMessage& message) const
   {
@@ -2142,6 +2178,16 @@ public:
     encodeStream.writeUInt16Compressed(3);
     encodeStream.writeCreateFederationExecutionResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeCreateFederationExecutionResponseMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2154,6 +2200,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const DestroyFederationExecutionRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeDestroyFederationExecutionRequestMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const DestroyFederationExecutionResponseMessage& message) const
   {
@@ -2162,6 +2218,16 @@ public:
     encodeStream.writeUInt16Compressed(5);
     encodeStream.writeDestroyFederationExecutionResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const DestroyFederationExecutionResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeDestroyFederationExecutionResponseMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2174,6 +2240,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnumerateFederationExecutionsRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeEnumerateFederationExecutionsRequestMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const EnumerateFederationExecutionsResponseMessage& message) const
   {
@@ -2182,6 +2258,16 @@ public:
     encodeStream.writeUInt16Compressed(7);
     encodeStream.writeEnumerateFederationExecutionsResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnumerateFederationExecutionsResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeEnumerateFederationExecutionsResponseMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2194,6 +2280,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertFederationExecutionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeInsertFederationExecutionMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ShutdownFederationExecutionMessage& message) const
   {
@@ -2202,6 +2298,16 @@ public:
     encodeStream.writeUInt16Compressed(9);
     encodeStream.writeShutdownFederationExecutionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ShutdownFederationExecutionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeShutdownFederationExecutionMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2214,6 +2320,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const EraseFederationExecutionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeEraseFederationExecutionMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ReleaseFederationHandleMessage& message) const
   {
@@ -2222,6 +2338,16 @@ public:
     encodeStream.writeUInt16Compressed(11);
     encodeStream.writeReleaseFederationHandleMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReleaseFederationHandleMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeReleaseFederationHandleMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2234,6 +2360,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertModulesMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeInsertModulesMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const InsertModules2Message& message) const
   {
@@ -2242,6 +2378,16 @@ public:
     encodeStream.writeUInt16Compressed(106);
     encodeStream.writeInsertModules2Message(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertModules2Message& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeInsertModules2Message(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2254,6 +2400,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeJoinFederationExecutionRequestMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionRequest2Message& message) const
   {
@@ -2262,6 +2418,16 @@ public:
     encodeStream.writeUInt16Compressed(105);
     encodeStream.writeJoinFederationExecutionRequest2Message(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionRequest2Message& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeJoinFederationExecutionRequest2Message(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2274,6 +2440,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeJoinFederationExecutionResponseMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ResignFederationExecutionRequestMessage& message) const
   {
@@ -2282,6 +2458,16 @@ public:
     encodeStream.writeUInt16Compressed(15);
     encodeStream.writeResignFederationExecutionRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ResignFederationExecutionRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeResignFederationExecutionRequestMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2294,6 +2480,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const JoinFederateNotifyMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeJoinFederateNotifyMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ResignFederateNotifyMessage& message) const
   {
@@ -2302,6 +2498,16 @@ public:
     encodeStream.writeUInt16Compressed(17);
     encodeStream.writeResignFederateNotifyMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ResignFederateNotifyMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeResignFederateNotifyMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2314,6 +2520,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeAutomaticResignDirectiveMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeChangeAutomaticResignDirectiveMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const RegisterFederationSynchronizationPointMessage& message) const
   {
@@ -2322,6 +2538,16 @@ public:
     encodeStream.writeUInt16Compressed(30);
     encodeStream.writeRegisterFederationSynchronizationPointMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const RegisterFederationSynchronizationPointMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeRegisterFederationSynchronizationPointMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2334,6 +2560,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const RegisterFederationSynchronizationPointResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeRegisterFederationSynchronizationPointResponseMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const AnnounceSynchronizationPointMessage& message) const
   {
@@ -2342,6 +2578,16 @@ public:
     encodeStream.writeUInt16Compressed(32);
     encodeStream.writeAnnounceSynchronizationPointMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const AnnounceSynchronizationPointMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeAnnounceSynchronizationPointMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2354,6 +2600,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const SynchronizationPointAchievedMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeSynchronizationPointAchievedMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const FederationSynchronizedMessage& message) const
   {
@@ -2362,6 +2618,16 @@ public:
     encodeStream.writeUInt16Compressed(34);
     encodeStream.writeFederationSynchronizedMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const FederationSynchronizedMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeFederationSynchronizedMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2374,6 +2640,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnableTimeRegulationRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeEnableTimeRegulationRequestMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const EnableTimeRegulationResponseMessage& message) const
   {
@@ -2382,6 +2658,16 @@ public:
     encodeStream.writeUInt16Compressed(41);
     encodeStream.writeEnableTimeRegulationResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnableTimeRegulationResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeEnableTimeRegulationResponseMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2394,6 +2680,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const DisableTimeRegulationRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeDisableTimeRegulationRequestMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const EnableTimeConstrainedNotifyMessage& message) const
   {
@@ -2402,6 +2698,16 @@ public:
     encodeStream.writeUInt16Compressed(100);
     encodeStream.writeEnableTimeConstrainedNotifyMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnableTimeConstrainedNotifyMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeEnableTimeConstrainedNotifyMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2414,6 +2720,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const DisableTimeConstrainedNotifyMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeDisableTimeConstrainedNotifyMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const CommitLowerBoundTimeStampMessage& message) const
   {
@@ -2422,6 +2738,16 @@ public:
     encodeStream.writeUInt16Compressed(43);
     encodeStream.writeCommitLowerBoundTimeStampMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const CommitLowerBoundTimeStampMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeCommitLowerBoundTimeStampMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2434,6 +2760,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const CommitLowerBoundTimeStampResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeCommitLowerBoundTimeStampResponseMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const LockedByNextMessageRequestMessage& message) const
   {
@@ -2442,6 +2778,16 @@ public:
     encodeStream.writeUInt16Compressed(45);
     encodeStream.writeLockedByNextMessageRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const LockedByNextMessageRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeLockedByNextMessageRequestMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2454,6 +2800,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertRegionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeInsertRegionMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const CommitRegionMessage& message) const
   {
@@ -2462,6 +2818,16 @@ public:
     encodeStream.writeUInt16Compressed(47);
     encodeStream.writeCommitRegionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const CommitRegionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeCommitRegionMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2474,6 +2840,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const EraseRegionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeEraseRegionMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ChangeInteractionClassPublicationMessage& message) const
   {
@@ -2482,6 +2858,16 @@ public:
     encodeStream.writeUInt16Compressed(50);
     encodeStream.writeChangeInteractionClassPublicationMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeInteractionClassPublicationMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeChangeInteractionClassPublicationMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2494,6 +2880,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeObjectClassPublicationMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeChangeObjectClassPublicationMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ChangeInteractionClassSubscriptionMessage& message) const
   {
@@ -2502,6 +2898,16 @@ public:
     encodeStream.writeUInt16Compressed(52);
     encodeStream.writeChangeInteractionClassSubscriptionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeInteractionClassSubscriptionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeChangeInteractionClassSubscriptionMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2514,6 +2920,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeObjectClassSubscriptionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeChangeObjectClassSubscriptionMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ChangeObjectInstanceSubscriptionMessage& message) const
   {
@@ -2522,6 +2938,16 @@ public:
     encodeStream.writeUInt16Compressed(99);
     encodeStream.writeChangeObjectInstanceSubscriptionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeObjectInstanceSubscriptionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeChangeObjectInstanceSubscriptionMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2534,6 +2960,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const InteractionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeInteractionMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const TimeStampedInteractionMessage& message) const
   {
@@ -2542,6 +2978,16 @@ public:
     encodeStream.writeUInt16Compressed(81);
     encodeStream.writeTimeStampedInteractionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const TimeStampedInteractionMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeTimeStampedInteractionMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2554,6 +3000,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ObjectInstanceHandlesRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeObjectInstanceHandlesRequestMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ObjectInstanceHandlesResponseMessage& message) const
   {
@@ -2562,6 +3018,16 @@ public:
     encodeStream.writeUInt16Compressed(61);
     encodeStream.writeObjectInstanceHandlesResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ObjectInstanceHandlesResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeObjectInstanceHandlesResponseMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2574,6 +3040,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReleaseMultipleObjectInstanceNameHandlePairsMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeReleaseMultipleObjectInstanceNameHandlePairsMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ReserveObjectInstanceNameRequestMessage& message) const
   {
@@ -2582,6 +3058,16 @@ public:
     encodeStream.writeUInt16Compressed(63);
     encodeStream.writeReserveObjectInstanceNameRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReserveObjectInstanceNameRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeReserveObjectInstanceNameRequestMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2594,6 +3080,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReserveObjectInstanceNameResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeReserveObjectInstanceNameResponseMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ReserveMultipleObjectInstanceNameRequestMessage& message) const
   {
@@ -2602,6 +3098,16 @@ public:
     encodeStream.writeUInt16Compressed(65);
     encodeStream.writeReserveMultipleObjectInstanceNameRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReserveMultipleObjectInstanceNameRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeReserveMultipleObjectInstanceNameRequestMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2614,6 +3120,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReserveMultipleObjectInstanceNameResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeReserveMultipleObjectInstanceNameResponseMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const InsertObjectInstanceMessage& message) const
   {
@@ -2622,6 +3138,16 @@ public:
     encodeStream.writeUInt16Compressed(90);
     encodeStream.writeInsertObjectInstanceMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertObjectInstanceMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeInsertObjectInstanceMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2634,6 +3160,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const DeleteObjectInstanceMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeDeleteObjectInstanceMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const TimeStampedDeleteObjectInstanceMessage& message) const
   {
@@ -2642,6 +3178,16 @@ public:
     encodeStream.writeUInt16Compressed(92);
     encodeStream.writeTimeStampedDeleteObjectInstanceMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const TimeStampedDeleteObjectInstanceMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeTimeStampedDeleteObjectInstanceMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2654,6 +3200,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const AttributeUpdateMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeAttributeUpdateMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const TimeStampedAttributeUpdateMessage& message) const
   {
@@ -2662,6 +3218,16 @@ public:
     encodeStream.writeUInt16Compressed(96);
     encodeStream.writeTimeStampedAttributeUpdateMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const TimeStampedAttributeUpdateMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeTimeStampedAttributeUpdateMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2674,6 +3240,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const RequestAttributeUpdateMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeRequestAttributeUpdateMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const RequestClassAttributeUpdateMessage& message) const
   {
@@ -2682,6 +3258,16 @@ public:
     encodeStream.writeUInt16Compressed(98);
     encodeStream.writeRequestClassAttributeUpdateMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const RequestClassAttributeUpdateMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeRequestClassAttributeUpdateMessage(message);
+    result += 4;
+    return result;
   }
 
   void
@@ -2694,6 +3280,16 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipRequestMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeQueryAttributeOwnershipRequestMessage(message);
+    result += 4;
+    return result;
+  }
+
   void
   encode(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipResponseMessage& message) const
   {
@@ -2702,6 +3298,16 @@ public:
     encodeStream.writeUInt16Compressed(103);
     encodeStream.writeQueryAttributeOwnershipResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  size_t
+  encodedSize(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipResponseMessage& message) const
+  {
+    size_t result = 0;
+    result += 2;
+    // encodeStream.writeQueryAttributeOwnershipResponseMessage(message);
+    result += 4;
+    return result;
   }
 
 private:
@@ -3458,8 +4064,11 @@ public:
     case 6:
       value = CreateFederationExecutionResponseRTIinternalError;
       break;
+    case 7:
+      value = CreateFederationExecutionResponseTimeout;
+      break;
     default:
-      value = CreateFederationExecutionResponseRTIinternalError;
+      value = CreateFederationExecutionResponseTimeout;
       break;
     }
   }
@@ -3506,8 +4115,11 @@ public:
     case 5:
       value = JoinFederationExecutionResponseInconsistentFDD;
       break;
+    case 6:
+      value = JoinFederationExecutionResponseTimeout;
+      break;
     default:
-      value = JoinFederationExecutionResponseInconsistentFDD;
+      value = JoinFederationExecutionResponseTimeout;
       break;
     }
   }

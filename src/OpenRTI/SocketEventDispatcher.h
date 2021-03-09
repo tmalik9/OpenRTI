@@ -38,8 +38,9 @@ public:
 
   void insert(const SharedPtr<AbstractSocketEvent>& socketEvent);
   void erase(const SharedPtr<AbstractSocketEvent>& socketEvent);
-  bool empty() const
-  { return _socketEventList.empty(); }
+  bool empty() const { return _socketEventList.empty(); }
+  size_t getQueueLimit() const { return _queueLimit; }
+  void setQueueLimit(size_t newLimit) { _queueLimit = newLimit; }
 
   // Make the exec loop exit one time ???
   void wakeUp();
@@ -64,6 +65,7 @@ private:
 
   SocketEventList _socketEventList;
   bool _done;
+  size_t _queueLimit;
 };
 
 } // namespace OpenRTI

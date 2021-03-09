@@ -6172,6 +6172,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ConnectionLostMessage& rhs) const noexcept;
@@ -6209,6 +6210,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const CreateFederationExecutionRequestMessage& rhs) const noexcept;
@@ -6270,6 +6272,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const CreateFederationExecutionRequest2Message& rhs) const noexcept;
@@ -6331,6 +6334,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const CreateFederationExecutionResponseMessage& rhs) const noexcept;
@@ -6380,6 +6384,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const DestroyFederationExecutionRequestMessage& rhs) const noexcept;
@@ -6417,6 +6422,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const DestroyFederationExecutionResponseMessage& rhs) const noexcept;
@@ -6454,6 +6460,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept;
@@ -6479,6 +6486,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept;
@@ -6516,6 +6524,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const InsertFederationExecutionMessage& rhs) const noexcept;
@@ -6589,6 +6598,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ShutdownFederationExecutionMessage& rhs) const noexcept;
@@ -6626,6 +6636,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const EraseFederationExecutionMessage& rhs) const noexcept;
@@ -6663,6 +6674,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ReleaseFederationHandleMessage& rhs) const noexcept;
@@ -6700,6 +6712,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const InsertModulesMessage& rhs) const noexcept;
@@ -6749,6 +6762,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const InsertModules2Message& rhs) const noexcept;
@@ -6798,6 +6812,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const JoinFederationExecutionRequestMessage& rhs) const noexcept;
@@ -6895,6 +6910,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const JoinFederationExecutionRequest2Message& rhs) const noexcept;
@@ -6992,6 +7008,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const JoinFederationExecutionResponseMessage& rhs) const noexcept;
@@ -7089,6 +7106,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept;
@@ -7150,6 +7168,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ResignFederationExecutionRequestMessage& rhs) const noexcept;
@@ -7199,6 +7218,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const JoinFederateNotifyMessage& rhs) const noexcept;
@@ -7284,6 +7304,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ResignFederateNotifyMessage& rhs) const noexcept;
@@ -7333,6 +7354,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept;
@@ -7394,6 +7416,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept;
@@ -7479,6 +7502,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept;
@@ -7552,6 +7576,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const AnnounceSynchronizationPointMessage& rhs) const noexcept;
@@ -7637,6 +7662,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const SynchronizationPointAchievedMessage& rhs) const noexcept;
@@ -7698,6 +7724,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const FederationSynchronizedMessage& rhs) const noexcept;
@@ -7759,6 +7786,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const EnableTimeRegulationRequestMessage& rhs) const noexcept;
@@ -7832,6 +7860,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const EnableTimeRegulationResponseMessage& rhs) const noexcept;
@@ -7917,6 +7946,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const DisableTimeRegulationRequestMessage& rhs) const noexcept;
@@ -7966,6 +7996,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept;
@@ -8015,6 +8046,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept;
@@ -8064,6 +8096,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const CommitLowerBoundTimeStampMessage& rhs) const noexcept;
@@ -8149,6 +8182,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept;
@@ -8222,6 +8256,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const LockedByNextMessageRequestMessage& rhs) const noexcept;
@@ -8283,6 +8318,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const TimeConstrainedEnabledMessage& rhs) const noexcept;
@@ -8308,6 +8344,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const TimeRegulationEnabledMessage& rhs) const noexcept;
@@ -8333,6 +8370,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const TimeAdvanceGrantedMessage& rhs) const noexcept;
@@ -8358,6 +8396,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const InsertRegionMessage& rhs) const noexcept;
@@ -8407,6 +8446,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const CommitRegionMessage& rhs) const noexcept;
@@ -8456,6 +8496,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const EraseRegionMessage& rhs) const noexcept;
@@ -8505,6 +8546,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ChangeInteractionClassPublicationMessage& rhs) const noexcept;
@@ -8566,6 +8608,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ChangeObjectClassPublicationMessage& rhs) const noexcept;
@@ -8639,6 +8682,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept;
@@ -8712,6 +8756,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept;
@@ -8785,6 +8830,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept;
@@ -8858,6 +8904,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const RegistrationForObjectClassMessage& rhs) const noexcept;
@@ -8907,6 +8954,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const AttributesInScopeMessage& rhs) const noexcept;
@@ -8970,6 +9018,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept;
@@ -9045,6 +9094,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const TurnInteractionsOnMessage& rhs) const noexcept;
@@ -9094,6 +9144,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const InteractionMessage& rhs) const noexcept;
@@ -9193,6 +9244,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const TimeStampedInteractionMessage& rhs) const noexcept;
@@ -9328,6 +9380,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept;
@@ -9389,6 +9442,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept;
@@ -9450,6 +9504,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept;
@@ -9499,6 +9554,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept;
@@ -9572,6 +9628,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept;
@@ -9645,6 +9702,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept;
@@ -9706,6 +9764,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept;
@@ -9779,6 +9838,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const InsertObjectInstanceMessage& rhs) const noexcept;
@@ -9866,6 +9926,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const DeleteObjectInstanceMessage& rhs) const noexcept;
@@ -9941,6 +10002,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept;
@@ -10052,6 +10114,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const AttributeUpdateMessage& rhs) const noexcept;
@@ -10153,6 +10216,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const TimeStampedAttributeUpdateMessage& rhs) const noexcept;
@@ -10290,6 +10354,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const RequestAttributeUpdateMessage& rhs) const noexcept;
@@ -10365,6 +10430,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const RequestClassAttributeUpdateMessage& rhs) const noexcept;
@@ -10438,6 +10504,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept;
@@ -10499,6 +10566,7 @@ public:
   virtual void out(std::ostream& os) const override;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
   virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const override;
 
   bool operator==(const AbstractMessage& rhs) const noexcept override;
   bool operator==(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept;
@@ -11404,6 +11472,1973 @@ inline std::string to_string(const FOMModule2& value)
     std::ostringstream out;
     out << value;
     return out.str();
+}
+
+
+inline size_t byteSize(const CallbackModel& value)
+{
+ return sizeof(CallbackModel); // sizeof()
+}
+
+inline size_t byteSize(const OrderType& value)
+{
+ return sizeof(OrderType); // sizeof()
+}
+
+inline size_t byteSize(const TransportationType& value)
+{
+ return sizeof(TransportationType); // sizeof()
+}
+
+inline size_t byteSize(const SubscriptionType& value)
+{
+ return sizeof(SubscriptionType); // sizeof()
+}
+
+inline size_t byteSize(const PublicationType& value)
+{
+ return sizeof(PublicationType); // sizeof()
+}
+
+inline size_t byteSize(const ResignAction& value)
+{
+ return sizeof(ResignAction); // sizeof()
+}
+
+inline size_t byteSize(const RestoreFailureReason& value)
+{
+ return sizeof(RestoreFailureReason); // sizeof()
+}
+
+inline size_t byteSize(const RestoreStatus& value)
+{
+ return sizeof(RestoreStatus); // sizeof()
+}
+
+inline size_t byteSize(const SaveFailureReason& value)
+{
+ return sizeof(SaveFailureReason); // sizeof()
+}
+
+inline size_t byteSize(const SaveStatus& value)
+{
+ return sizeof(SaveStatus); // sizeof()
+}
+
+inline size_t byteSize(const ServiceGroupIndicator& value)
+{
+ return sizeof(ServiceGroupIndicator); // sizeof()
+}
+
+inline size_t byteSize(const LowerBoundTimeStampCommitType& value)
+{
+ return sizeof(LowerBoundTimeStampCommitType); // sizeof()
+}
+
+inline size_t byteSize(const SwitchesType& value)
+{
+ return sizeof(SwitchesType); // sizeof()
+}
+
+inline size_t byteSize(const ArrayDataTypeEncoding& value)
+{
+ return sizeof(ArrayDataTypeEncoding); // sizeof()
+}
+
+inline size_t byteSize(const Endianness& value)
+{
+ return sizeof(Endianness); // sizeof()
+}
+
+inline size_t byteSize(const AttributeHandleVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FederateHandleVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const ParameterHandleVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const DimensionHandleVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const DimensionHandleSet& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const ObjectInstanceHandleVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const RegionHandleVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const ModuleHandleVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const StringVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const StringSet& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FederateHandleBoolPair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const FederateHandleBoolPairVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const RangeBoundsValue& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getLowerBound());
+  result += byteSize(value.getUpperBound());
+  return result;
+}
+
+inline size_t byteSize(const DimensionHandleRangeBoundsValuePair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const RegionValue& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const RegionValueList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const RegionHandleDimensionHandleSetPair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const RegionHandleDimensionHandleSetPairVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const RegionHandleSpaceHandlePair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const RegionHandleSpaceHandlePairVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const RegionHandleRegionValuePair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const RegionHandleRegionValuePairVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const InteractionClassHandleRegionValueListPair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const AttributeHandleRegionValueListPair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const AttributeState& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getAttributeHandle());
+  result += byteSize(value.getOwnerFederate());
+  return result;
+}
+
+inline size_t byteSize(const AttributeStateVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const ParameterValue& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getParameterHandle());
+  result += byteSize(value.getValue());
+  return result;
+}
+
+inline size_t byteSize(const ParameterValueVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const AttributeValue& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getAttributeHandle());
+  result += byteSize(value.getValue());
+  return result;
+}
+
+inline size_t byteSize(const AttributeValueVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FederateHandleSaveStatusPair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const FederateHandleSaveStatusPairVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FederateHandleRestoreStatusPair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const FederateHandleRestoreStatusPairVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FederationExecutionInformation& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationExecutionName());
+  result += byteSize(value.getLogicalTimeFactoryName());
+  return result;
+}
+
+inline size_t byteSize(const FederationExecutionInformationVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const ObjectInstanceHandleNamePair& value)
+{
+  return byteSize(value.first) + byteSize(value.second);
+}
+
+inline size_t byteSize(const ObjectInstanceHandleNamePairVector& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const CreateFederationExecutionResponseType& value)
+{
+ return sizeof(CreateFederationExecutionResponseType); // sizeof()
+}
+
+inline size_t byteSize(const DestroyFederationExecutionResponseType& value)
+{
+ return sizeof(DestroyFederationExecutionResponseType); // sizeof()
+}
+
+inline size_t byteSize(const JoinFederationExecutionResponseType& value)
+{
+ return sizeof(JoinFederationExecutionResponseType); // sizeof()
+}
+
+inline size_t byteSize(const RegisterFederationSynchronizationPointResponseType& value)
+{
+ return sizeof(RegisterFederationSynchronizationPointResponseType); // sizeof()
+}
+
+inline size_t byteSize(const ConfigurationParameterMap& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item.first);
+    result += byteSize(item.second);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringBasicDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getSize());
+  result += byteSize(value.getEndian());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringBasicDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringSimpleDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRepresentation());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringSimpleDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringEnumerator& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getValue());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringEnumeratorList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringEnumeratedDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRepresentation());
+  result += byteSize(value.getEnumerators());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringEnumeratedDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringArrayDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getCardinality());
+  result += byteSize(value.getEncoding());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringArrayDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringArrayDataType2& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getCardinality());
+  result += byteSize(value.getEncoding());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringArrayDataType2List& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordField& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordFieldList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getFields());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordField2& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getVersion());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordField2List& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordDataType2& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getInclude());
+  result += byteSize(value.getVersion());
+  result += byteSize(value.getFields());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordDataType2List& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordAlternative& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getEnumerator());
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordAlternativeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDiscriminant());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getAlternatives());
+  result += byteSize(value.getEncoding());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordAlternative2& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getEnumerator());
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordAlternative2List& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordDataType2& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDiscriminant());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getAlternatives());
+  result += byteSize(value.getEncoding());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordDataType2List& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringTransportationType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringTransportationTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringDimension& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getUpperBound());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringDimensionList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringRoutingSpace& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDimensionSet());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringRoutingSpaceList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringParameter& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringParameterList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringInteractionClass& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getRoutingSpace());
+  result += byteSize(value.getDimensionSet());
+  result += byteSize(value.getParameterList());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringInteractionClassList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringAttribute& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getRoutingSpace());
+  result += byteSize(value.getDimensionSet());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringAttributeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringObjectClass& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getAttributeList());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringObjectClassList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringUpdateRate& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRate());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringUpdateRateList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringSwitch& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getSwitchesType());
+  result += byteSize(value.getEnabled());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringSwitchList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringModule& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getDesignator());
+  result += byteSize(value.getTransportationTypeList());
+  result += byteSize(value.getDimensionList());
+  result += byteSize(value.getRoutingSpaceList());
+  result += byteSize(value.getInteractionClassList());
+  result += byteSize(value.getObjectClassList());
+  result += byteSize(value.getUpdateRateList());
+  result += byteSize(value.getSwitchList());
+  result += byteSize(value.getSimpleDataTypeList());
+  result += byteSize(value.getEnumeratedDataTypeList());
+  result += byteSize(value.getArrayDataTypeList());
+  result += byteSize(value.getFixedRecordDataTypeList());
+  result += byteSize(value.getVariantRecordDataTypeList());
+  result += byteSize(value.getArtificialInteractionRoot());
+  result += byteSize(value.getArtificialObjectRoot());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringModuleList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringModule2& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getDesignator());
+  result += byteSize(value.getTransportationTypeList());
+  result += byteSize(value.getDimensionList());
+  result += byteSize(value.getRoutingSpaceList());
+  result += byteSize(value.getInteractionClassList());
+  result += byteSize(value.getObjectClassList());
+  result += byteSize(value.getUpdateRateList());
+  result += byteSize(value.getSwitchList());
+  result += byteSize(value.getBasicDataTypeList());
+  result += byteSize(value.getSimpleDataTypeList());
+  result += byteSize(value.getEnumeratedDataTypeList());
+  result += byteSize(value.getArrayDataTypeList());
+  result += byteSize(value.getFixedRecordDataTypeList());
+  result += byteSize(value.getVariantRecordDataTypeList());
+  result += byteSize(value.getArtificialInteractionRoot());
+  result += byteSize(value.getArtificialObjectRoot());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringModule2List& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMTransportationType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getTransportationType());
+  return result;
+}
+
+inline size_t byteSize(const FOMTransportationTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMDimension& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDimensionHandle());
+  result += byteSize(value.getUpperBound());
+  return result;
+}
+
+inline size_t byteSize(const FOMDimensionList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMRoutingSpace& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getSpaceHandle());
+  result += byteSize(value.getDimensionHandleSet());
+  return result;
+}
+
+inline size_t byteSize(const FOMRoutingSpaceList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMParameter& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getParameterHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMParameterList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMInteractionClass& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getParentInteractionClassHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getDimensionHandleSet());
+  result += byteSize(value.getParameterList());
+  return result;
+}
+
+inline size_t byteSize(const FOMInteractionClassList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMAttribute& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getAttributeHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getDimensionHandleSet());
+  return result;
+}
+
+inline size_t byteSize(const FOMAttributeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMObjectClass& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getParentObjectClassHandle());
+  result += byteSize(value.getAttributeList());
+  return result;
+}
+
+inline size_t byteSize(const FOMObjectClassList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMUpdateRate& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getUpdateRateHandle());
+  result += byteSize(value.getRate());
+  return result;
+}
+
+inline size_t byteSize(const FOMUpdateRateList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMSwitch& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getSwitchesType());
+  result += byteSize(value.getEnabled());
+  return result;
+}
+
+inline size_t byteSize(const FOMSwitchList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMBasicDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getSize());
+  result += byteSize(value.getEndian());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMBasicDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMSimpleDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRepresentation());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMSimpleDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMEnumerator& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getValue());
+  return result;
+}
+
+inline size_t byteSize(const FOMEnumeratorList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMEnumeratedDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRepresentation());
+  result += byteSize(value.getEnumerators());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMEnumeratedDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMArrayDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getCardinality());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMArrayDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMFixedRecordField& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getVersion());
+  return result;
+}
+
+inline size_t byteSize(const FOMFixedRecordFieldList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMFixedRecordDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getInclude());
+  result += byteSize(value.getVersion());
+  result += byteSize(value.getFields());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMFixedRecordDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMVariantRecordAlternative& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getEnumerator());
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMVariantRecordAlternativeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMVariantRecordDataType& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDiscriminant());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getAlternatives());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMVariantRecordDataTypeList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMModule& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getModuleHandle());
+  result += byteSize(value.getTransportationTypeList());
+  result += byteSize(value.getDimensionList());
+  result += byteSize(value.getRoutingSpaceList());
+  result += byteSize(value.getInteractionClassList());
+  result += byteSize(value.getObjectClassList());
+  result += byteSize(value.getUpdateRateList());
+  result += byteSize(value.getSwitchList());
+  result += byteSize(value.getArtificialInteractionRoot());
+  result += byteSize(value.getArtificialObjectRoot());
+  result += byteSize(value.getDesignator());
+  return result;
+}
+
+inline size_t byteSize(const FOMModuleList& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMModule2& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getBasicDataTypeList());
+  result += byteSize(value.getSimpleDataTypeList());
+  result += byteSize(value.getEnumeratedDataTypeList());
+  result += byteSize(value.getArrayDataTypeList());
+  result += byteSize(value.getFixedRecordDataTypeList());
+  result += byteSize(value.getVariantRecordDataTypeList());
+  return result;
+}
+
+inline size_t byteSize(const FOMModule2List& value)
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const ConnectionLostMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFaultDescription());
+  return result;
+}
+
+inline size_t byteSize(const CreateFederationExecutionRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationExecution());
+  result += byteSize(value.getLogicalTimeFactoryName());
+  result += byteSize(value.getFOMStringModuleList());
+  return result;
+}
+
+inline size_t byteSize(const CreateFederationExecutionRequest2Message& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationExecution());
+  result += byteSize(value.getLogicalTimeFactoryName());
+  result += byteSize(value.getFOMStringModuleList());
+  return result;
+}
+
+inline size_t byteSize(const CreateFederationExecutionResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getCreateFederationExecutionResponseType());
+  result += byteSize(value.getExceptionString());
+  return result;
+}
+
+inline size_t byteSize(const DestroyFederationExecutionRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationExecution());
+  return result;
+}
+
+inline size_t byteSize(const DestroyFederationExecutionResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getDestroyFederationExecutionResponseType());
+  return result;
+}
+
+inline size_t byteSize(const EnumerateFederationExecutionsRequestMessage& value)
+{
+  size_t result = 0;
+  return result;
+}
+
+inline size_t byteSize(const EnumerateFederationExecutionsResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationExecutionInformationVector());
+  return result;
+}
+
+inline size_t byteSize(const InsertFederationExecutionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederationName());
+  result += byteSize(value.getLogicalTimeFactoryName());
+  result += byteSize(value.getConfigurationParameterMap());
+  return result;
+}
+
+inline size_t byteSize(const ShutdownFederationExecutionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  return result;
+}
+
+inline size_t byteSize(const EraseFederationExecutionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  return result;
+}
+
+inline size_t byteSize(const ReleaseFederationHandleMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  return result;
+}
+
+inline size_t byteSize(const InsertModulesMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFOMModuleList());
+  return result;
+}
+
+inline size_t byteSize(const InsertModules2Message& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFOMModule2List());
+  return result;
+}
+
+inline size_t byteSize(const JoinFederationExecutionRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationExecution());
+  result += byteSize(value.getFederateType());
+  result += byteSize(value.getFederateName());
+  result += byteSize(value.getFOMStringModuleList());
+  result += byteSize(value.getConfigurationParameterMap());
+  result += byteSize(value.getIsInternal());
+  return result;
+}
+
+inline size_t byteSize(const JoinFederationExecutionRequest2Message& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationExecution());
+  result += byteSize(value.getFederateType());
+  result += byteSize(value.getFederateName());
+  result += byteSize(value.getFOMStringModuleList());
+  result += byteSize(value.getConfigurationParameterMap());
+  result += byteSize(value.getIsInternal());
+  return result;
+}
+
+inline size_t byteSize(const JoinFederationExecutionResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getJoinFederationExecutionResponseType());
+  result += byteSize(value.getExceptionString());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getFederateType());
+  result += byteSize(value.getFederateName());
+  return result;
+}
+
+inline size_t byteSize(const ResignFederationExecutionLeafRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getResignAction());
+  return result;
+}
+
+inline size_t byteSize(const ResignFederationExecutionRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const JoinFederateNotifyMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getFederateType());
+  result += byteSize(value.getFederateName());
+  result += byteSize(value.getIsInternal());
+  return result;
+}
+
+inline size_t byteSize(const ResignFederateNotifyMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const ChangeAutomaticResignDirectiveMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getResignAction());
+  return result;
+}
+
+inline size_t byteSize(const RegisterFederationSynchronizationPointMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getFederateHandleVector());
+  return result;
+}
+
+inline size_t byteSize(const RegisterFederationSynchronizationPointResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getRegisterFederationSynchronizationPointResponseType());
+  return result;
+}
+
+inline size_t byteSize(const AnnounceSynchronizationPointMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getAddJoiningFederates());
+  result += byteSize(value.getFederateHandleVector());
+  return result;
+}
+
+inline size_t byteSize(const SynchronizationPointAchievedMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getFederateHandleBoolPairVector());
+  return result;
+}
+
+inline size_t byteSize(const FederationSynchronizedMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getFederateHandleBoolPairVector());
+  return result;
+}
+
+inline size_t byteSize(const EnableTimeRegulationRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getCommitId());
+  return result;
+}
+
+inline size_t byteSize(const EnableTimeRegulationResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getRespondingFederateHandle());
+  result += byteSize(value.getTimeStampValid());
+  result += byteSize(value.getTimeStamp());
+  return result;
+}
+
+inline size_t byteSize(const DisableTimeRegulationRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const EnableTimeConstrainedNotifyMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const DisableTimeConstrainedNotifyMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const CommitLowerBoundTimeStampMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getCommitType());
+  result += byteSize(value.getCommitId());
+  return result;
+}
+
+inline size_t byteSize(const CommitLowerBoundTimeStampResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getSendingFederateHandle());
+  result += byteSize(value.getCommitId());
+  return result;
+}
+
+inline size_t byteSize(const LockedByNextMessageRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getSendingFederateHandle());
+  result += byteSize(value.getLockedByNextMessage());
+  return result;
+}
+
+inline size_t byteSize(const TimeConstrainedEnabledMessage& value)
+{
+  size_t result = 0;
+  return result;
+}
+
+inline size_t byteSize(const TimeRegulationEnabledMessage& value)
+{
+  size_t result = 0;
+  return result;
+}
+
+inline size_t byteSize(const TimeAdvanceGrantedMessage& value)
+{
+  size_t result = 0;
+  return result;
+}
+
+inline size_t byteSize(const InsertRegionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getRegionHandleDimensionHandleSetPairVector());
+  return result;
+}
+
+inline size_t byteSize(const CommitRegionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getRegionHandleRegionValuePairVector());
+  return result;
+}
+
+inline size_t byteSize(const EraseRegionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getRegionHandleVector());
+  return result;
+}
+
+inline size_t byteSize(const ChangeInteractionClassPublicationMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getPublicationType());
+  result += byteSize(value.getInteractionClassHandle());
+  return result;
+}
+
+inline size_t byteSize(const ChangeObjectClassPublicationMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getPublicationType());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getAttributeHandles());
+  return result;
+}
+
+inline size_t byteSize(const ChangeInteractionClassSubscriptionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getSubscriptionType());
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getParameterFilterValues());
+  return result;
+}
+
+inline size_t byteSize(const ChangeObjectClassSubscriptionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getSubscriptionType());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getAttributeHandles());
+  return result;
+}
+
+inline size_t byteSize(const ChangeObjectInstanceSubscriptionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getSubscriptionType());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  return result;
+}
+
+inline size_t byteSize(const RegistrationForObjectClassMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getStart());
+  return result;
+}
+
+inline size_t byteSize(const AttributesInScopeMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandles());
+  result += byteSize(value.getInScope());
+  return result;
+}
+
+inline size_t byteSize(const TurnUpdatesOnForInstanceMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandles());
+  result += byteSize(value.getUpdateRate());
+  result += byteSize(value.getOn());
+  return result;
+}
+
+inline size_t byteSize(const TurnInteractionsOnMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getOn());
+  return result;
+}
+
+inline size_t byteSize(const InteractionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getParameterValues());
+  return result;
+}
+
+inline size_t byteSize(const TimeStampedInteractionMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getMessageRetractionHandle());
+  result += byteSize(value.getParameterValues());
+  return result;
+}
+
+inline size_t byteSize(const ObjectInstanceHandlesRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getCount());
+  return result;
+}
+
+inline size_t byteSize(const ObjectInstanceHandlesResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandleNamePairVector());
+  return result;
+}
+
+inline size_t byteSize(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectInstanceHandleVector());
+  return result;
+}
+
+inline size_t byteSize(const ReserveObjectInstanceNameRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getName());
+  result += byteSize(value.getIsInternal());
+  return result;
+}
+
+inline size_t byteSize(const ReserveObjectInstanceNameResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandleNamePair());
+  result += byteSize(value.getSuccess());
+  return result;
+}
+
+inline size_t byteSize(const ReserveMultipleObjectInstanceNameRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getNameList());
+  return result;
+}
+
+inline size_t byteSize(const ReserveMultipleObjectInstanceNameResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandleNamePairVector());
+  result += byteSize(value.getSuccess());
+  return result;
+}
+
+inline size_t byteSize(const InsertObjectInstanceMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getName());
+  result += byteSize(value.getAttributeStateVector());
+  return result;
+}
+
+inline size_t byteSize(const DeleteObjectInstanceMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getTag());
+  return result;
+}
+
+inline size_t byteSize(const TimeStampedDeleteObjectInstanceMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getMessageRetractionHandle());
+  return result;
+}
+
+inline size_t byteSize(const AttributeUpdateMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getAttributeValues());
+  return result;
+}
+
+inline size_t byteSize(const TimeStampedAttributeUpdateMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getMessageRetractionHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getAttributeValues());
+  return result;
+}
+
+inline size_t byteSize(const RequestAttributeUpdateMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandles());
+  result += byteSize(value.getTag());
+  return result;
+}
+
+inline size_t byteSize(const RequestClassAttributeUpdateMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getAttributeHandles());
+  result += byteSize(value.getTag());
+  return result;
+}
+
+inline size_t byteSize(const QueryAttributeOwnershipRequestMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandle());
+  return result;
+}
+
+inline size_t byteSize(const QueryAttributeOwnershipResponseMessage& value)
+{
+  size_t result = 0;
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandle());
+  result += byteSize(value.getOwner());
+  return result;
 }
 
 } // namespace OpenRTI

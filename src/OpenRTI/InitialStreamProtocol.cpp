@@ -204,6 +204,11 @@ InitialStreamProtocol::getEnableWrite() const
   return StreamBufferProtocol::getEnableWrite();
 }
 
+size_t InitialStreamProtocol::bytesQueued() const
+{
+  return 0;
+}
+
 void
 InitialStreamProtocol::error(const Exception& e)
 {

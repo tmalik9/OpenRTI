@@ -37,6 +37,7 @@ public:
 
   void setWriteable() { _mIsWritable = true; }
   bool isWritable() const { return _mIsWritable; }
+  uint32_t getFd() const;
   // Sigh, a strange access problem on aCC and early gcc, just disable that control here
 #if !defined(__hpux) && !(defined(__GNUC__) && (__GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ <= 1)))
 protected:

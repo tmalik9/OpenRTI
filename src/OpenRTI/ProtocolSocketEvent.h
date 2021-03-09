@@ -50,6 +50,8 @@ public:
   void setProtocolLayer(const SharedPtr<AbstractProtocolLayer>& protocolLayer);
   const SharedPtr<AbstractProtocolLayer>& getProtocolLayer() const noexcept;
 
+  size_t bytesQueued() const override;
+
 private:
   ProtocolSocketEvent(const ProtocolSocketEvent&) = delete;
   ProtocolSocketEvent& operator=(ProtocolSocketEvent&) = delete;

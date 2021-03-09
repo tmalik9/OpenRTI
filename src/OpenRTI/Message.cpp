@@ -49,7 +49,7 @@ ConnectionLostMessage::getTypeName() const
 void
 ConnectionLostMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ConnectionLostMessage { ";
   os << "faultDescription: " << getFaultDescription();
   os << " }";
 }
@@ -64,6 +64,14 @@ void
 ConnectionLostMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ConnectionLostMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFaultDescription());
+  return result;
 }
 
 bool
@@ -110,7 +118,7 @@ CreateFederationExecutionRequestMessage::getTypeName() const
 void
 CreateFederationExecutionRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "CreateFederationExecutionRequestMessage { ";
   os << "federationExecution: " << getFederationExecution();
   os << ", ";
   os << "logicalTimeFactoryName: " << getLogicalTimeFactoryName();
@@ -129,6 +137,16 @@ void
 CreateFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+CreateFederationExecutionRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationExecution());
+  result += byteSize(getLogicalTimeFactoryName());
+  result += byteSize(getFOMStringModuleList());
+  return result;
 }
 
 bool
@@ -181,7 +199,7 @@ CreateFederationExecutionRequest2Message::getTypeName() const
 void
 CreateFederationExecutionRequest2Message::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "CreateFederationExecutionRequest2Message { ";
   os << "federationExecution: " << getFederationExecution();
   os << ", ";
   os << "logicalTimeFactoryName: " << getLogicalTimeFactoryName();
@@ -200,6 +218,16 @@ void
 CreateFederationExecutionRequest2Message::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+CreateFederationExecutionRequest2Message::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationExecution());
+  result += byteSize(getLogicalTimeFactoryName());
+  result += byteSize(getFOMStringModuleList());
+  return result;
 }
 
 bool
@@ -251,7 +279,7 @@ CreateFederationExecutionResponseMessage::getTypeName() const
 void
 CreateFederationExecutionResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "CreateFederationExecutionResponseMessage { ";
   os << "createFederationExecutionResponseType: " << getCreateFederationExecutionResponseType();
   os << ", ";
   os << "exceptionString: " << getExceptionString();
@@ -268,6 +296,15 @@ void
 CreateFederationExecutionResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+CreateFederationExecutionResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getCreateFederationExecutionResponseType());
+  result += byteSize(getExceptionString());
+  return result;
 }
 
 bool
@@ -315,7 +352,7 @@ DestroyFederationExecutionRequestMessage::getTypeName() const
 void
 DestroyFederationExecutionRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "DestroyFederationExecutionRequestMessage { ";
   os << "federationExecution: " << getFederationExecution();
   os << " }";
 }
@@ -330,6 +367,14 @@ void
 DestroyFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+DestroyFederationExecutionRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationExecution());
+  return result;
 }
 
 bool
@@ -374,7 +419,7 @@ DestroyFederationExecutionResponseMessage::getTypeName() const
 void
 DestroyFederationExecutionResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "DestroyFederationExecutionResponseMessage { ";
   os << "destroyFederationExecutionResponseType: " << getDestroyFederationExecutionResponseType();
   os << " }";
 }
@@ -389,6 +434,14 @@ void
 DestroyFederationExecutionResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+DestroyFederationExecutionResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getDestroyFederationExecutionResponseType());
+  return result;
 }
 
 bool
@@ -432,7 +485,7 @@ EnumerateFederationExecutionsRequestMessage::getTypeName() const
 void
 EnumerateFederationExecutionsRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "EnumerateFederationExecutionsRequestMessage { ";
   os << " }";
 }
 
@@ -446,6 +499,13 @@ void
 EnumerateFederationExecutionsRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+EnumerateFederationExecutionsRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  return result;
 }
 
 bool
@@ -487,7 +547,7 @@ EnumerateFederationExecutionsResponseMessage::getTypeName() const
 void
 EnumerateFederationExecutionsResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "EnumerateFederationExecutionsResponseMessage { ";
   os << "federationExecutionInformationVector: " << getFederationExecutionInformationVector();
   os << " }";
 }
@@ -502,6 +562,14 @@ void
 EnumerateFederationExecutionsResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+EnumerateFederationExecutionsResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationExecutionInformationVector());
+  return result;
 }
 
 bool
@@ -549,7 +617,7 @@ InsertFederationExecutionMessage::getTypeName() const
 void
 InsertFederationExecutionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "InsertFederationExecutionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -571,6 +639,17 @@ void
 InsertFederationExecutionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+InsertFederationExecutionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederationName());
+  result += byteSize(getLogicalTimeFactoryName());
+  result += byteSize(getConfigurationParameterMap());
+  return result;
 }
 
 bool
@@ -624,7 +703,7 @@ ShutdownFederationExecutionMessage::getTypeName() const
 void
 ShutdownFederationExecutionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ShutdownFederationExecutionMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << " }";
 }
@@ -639,6 +718,14 @@ void
 ShutdownFederationExecutionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ShutdownFederationExecutionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  return result;
 }
 
 bool
@@ -683,7 +770,7 @@ EraseFederationExecutionMessage::getTypeName() const
 void
 EraseFederationExecutionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "EraseFederationExecutionMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << " }";
 }
@@ -698,6 +785,14 @@ void
 EraseFederationExecutionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+EraseFederationExecutionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  return result;
 }
 
 bool
@@ -742,7 +837,7 @@ ReleaseFederationHandleMessage::getTypeName() const
 void
 ReleaseFederationHandleMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ReleaseFederationHandleMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << " }";
 }
@@ -757,6 +852,14 @@ void
 ReleaseFederationHandleMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ReleaseFederationHandleMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  return result;
 }
 
 bool
@@ -802,7 +905,7 @@ InsertModulesMessage::getTypeName() const
 void
 InsertModulesMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "InsertModulesMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -821,6 +924,15 @@ void
 InsertModulesMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+InsertModulesMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFOMModuleList());
+  return result;
 }
 
 bool
@@ -869,7 +981,7 @@ InsertModules2Message::getTypeName() const
 void
 InsertModules2Message::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "InsertModules2Message { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -888,6 +1000,15 @@ void
 InsertModules2Message::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+InsertModules2Message::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFOMModule2List());
+  return result;
 }
 
 bool
@@ -940,7 +1061,7 @@ JoinFederationExecutionRequestMessage::getTypeName() const
 void
 JoinFederationExecutionRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "JoinFederationExecutionRequestMessage { ";
   os << "federationExecution: " << getFederationExecution();
   os << ", ";
   os << "federateType: " << getFederateType();
@@ -965,6 +1086,19 @@ void
 JoinFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+JoinFederationExecutionRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationExecution());
+  result += byteSize(getFederateType());
+  result += byteSize(getFederateName());
+  result += byteSize(getFOMStringModuleList());
+  result += byteSize(getConfigurationParameterMap());
+  result += byteSize(getIsInternal());
+  return result;
 }
 
 bool
@@ -1029,7 +1163,7 @@ JoinFederationExecutionRequest2Message::getTypeName() const
 void
 JoinFederationExecutionRequest2Message::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "JoinFederationExecutionRequest2Message { ";
   os << "federationExecution: " << getFederationExecution();
   os << ", ";
   os << "federateType: " << getFederateType();
@@ -1054,6 +1188,19 @@ void
 JoinFederationExecutionRequest2Message::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+JoinFederationExecutionRequest2Message::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationExecution());
+  result += byteSize(getFederateType());
+  result += byteSize(getFederateName());
+  result += byteSize(getFOMStringModuleList());
+  result += byteSize(getConfigurationParameterMap());
+  result += byteSize(getIsInternal());
+  return result;
 }
 
 bool
@@ -1118,7 +1265,7 @@ JoinFederationExecutionResponseMessage::getTypeName() const
 void
 JoinFederationExecutionResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "JoinFederationExecutionResponseMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "joinFederationExecutionResponseType: " << getJoinFederationExecutionResponseType();
@@ -1143,6 +1290,19 @@ void
 JoinFederationExecutionResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+JoinFederationExecutionResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getJoinFederationExecutionResponseType());
+  result += byteSize(getExceptionString());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getFederateType());
+  result += byteSize(getFederateName());
+  return result;
 }
 
 bool
@@ -1204,7 +1364,7 @@ ResignFederationExecutionLeafRequestMessage::getTypeName() const
 void
 ResignFederationExecutionLeafRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ResignFederationExecutionLeafRequestMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -1223,6 +1383,16 @@ void
 ResignFederationExecutionLeafRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ResignFederationExecutionLeafRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getResignAction());
+  return result;
 }
 
 bool
@@ -1274,7 +1444,7 @@ ResignFederationExecutionRequestMessage::getTypeName() const
 void
 ResignFederationExecutionRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ResignFederationExecutionRequestMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -1291,6 +1461,15 @@ void
 ResignFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ResignFederationExecutionRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  return result;
 }
 
 bool
@@ -1342,7 +1521,7 @@ JoinFederateNotifyMessage::getTypeName() const
 void
 JoinFederateNotifyMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "JoinFederateNotifyMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -1365,6 +1544,18 @@ void
 JoinFederateNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+JoinFederateNotifyMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getFederateType());
+  result += byteSize(getFederateName());
+  result += byteSize(getIsInternal());
+  return result;
 }
 
 bool
@@ -1422,7 +1613,7 @@ ResignFederateNotifyMessage::getTypeName() const
 void
 ResignFederateNotifyMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ResignFederateNotifyMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -1439,6 +1630,15 @@ void
 ResignFederateNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ResignFederateNotifyMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  return result;
 }
 
 bool
@@ -1488,7 +1688,7 @@ ChangeAutomaticResignDirectiveMessage::getTypeName() const
 void
 ChangeAutomaticResignDirectiveMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ChangeAutomaticResignDirectiveMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -1507,6 +1707,16 @@ void
 ChangeAutomaticResignDirectiveMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ChangeAutomaticResignDirectiveMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getResignAction());
+  return result;
 }
 
 bool
@@ -1561,7 +1771,7 @@ RegisterFederationSynchronizationPointMessage::getTypeName() const
 void
 RegisterFederationSynchronizationPointMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "RegisterFederationSynchronizationPointMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -1585,6 +1795,18 @@ void
 RegisterFederationSynchronizationPointMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+RegisterFederationSynchronizationPointMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getLabel());
+  result += byteSize(getTag());
+  result += byteSize(getFederateHandleVector());
+  return result;
 }
 
 bool
@@ -1644,7 +1866,7 @@ RegisterFederationSynchronizationPointResponseMessage::getTypeName() const
 void
 RegisterFederationSynchronizationPointResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "RegisterFederationSynchronizationPointResponseMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -1666,6 +1888,17 @@ void
 RegisterFederationSynchronizationPointResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+RegisterFederationSynchronizationPointResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getLabel());
+  result += byteSize(getRegisterFederationSynchronizationPointResponseType());
+  return result;
 }
 
 bool
@@ -1723,7 +1956,7 @@ AnnounceSynchronizationPointMessage::getTypeName() const
 void
 AnnounceSynchronizationPointMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "AnnounceSynchronizationPointMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -1747,6 +1980,18 @@ void
 AnnounceSynchronizationPointMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+AnnounceSynchronizationPointMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getLabel());
+  result += byteSize(getTag());
+  result += byteSize(getAddJoiningFederates());
+  result += byteSize(getFederateHandleVector());
+  return result;
 }
 
 bool
@@ -1805,7 +2050,7 @@ SynchronizationPointAchievedMessage::getTypeName() const
 void
 SynchronizationPointAchievedMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "SynchronizationPointAchievedMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -1825,6 +2070,16 @@ void
 SynchronizationPointAchievedMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+SynchronizationPointAchievedMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getLabel());
+  result += byteSize(getFederateHandleBoolPairVector());
+  return result;
 }
 
 bool
@@ -1877,7 +2132,7 @@ FederationSynchronizedMessage::getTypeName() const
 void
 FederationSynchronizedMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "FederationSynchronizedMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -1897,6 +2152,16 @@ void
 FederationSynchronizedMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+FederationSynchronizedMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getLabel());
+  result += byteSize(getFederateHandleBoolPairVector());
+  return result;
 }
 
 bool
@@ -1950,7 +2215,7 @@ EnableTimeRegulationRequestMessage::getTypeName() const
 void
 EnableTimeRegulationRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "EnableTimeRegulationRequestMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -1972,6 +2237,17 @@ void
 EnableTimeRegulationRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+EnableTimeRegulationRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getTimeStamp());
+  result += byteSize(getCommitId());
+  return result;
 }
 
 bool
@@ -2029,7 +2305,7 @@ EnableTimeRegulationResponseMessage::getTypeName() const
 void
 EnableTimeRegulationResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "EnableTimeRegulationResponseMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -2053,6 +2329,18 @@ void
 EnableTimeRegulationResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+EnableTimeRegulationResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getRespondingFederateHandle());
+  result += byteSize(getTimeStampValid());
+  result += byteSize(getTimeStamp());
+  return result;
 }
 
 bool
@@ -2110,7 +2398,7 @@ DisableTimeRegulationRequestMessage::getTypeName() const
 void
 DisableTimeRegulationRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "DisableTimeRegulationRequestMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -2127,6 +2415,15 @@ void
 DisableTimeRegulationRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+DisableTimeRegulationRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  return result;
 }
 
 bool
@@ -2175,7 +2472,7 @@ EnableTimeConstrainedNotifyMessage::getTypeName() const
 void
 EnableTimeConstrainedNotifyMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "EnableTimeConstrainedNotifyMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -2193,6 +2490,15 @@ void
 EnableTimeConstrainedNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+EnableTimeConstrainedNotifyMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  return result;
 }
 
 bool
@@ -2241,7 +2547,7 @@ DisableTimeConstrainedNotifyMessage::getTypeName() const
 void
 DisableTimeConstrainedNotifyMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "DisableTimeConstrainedNotifyMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -2259,6 +2565,15 @@ void
 DisableTimeConstrainedNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+DisableTimeConstrainedNotifyMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  return result;
 }
 
 bool
@@ -2310,7 +2625,7 @@ CommitLowerBoundTimeStampMessage::getTypeName() const
 void
 CommitLowerBoundTimeStampMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "CommitLowerBoundTimeStampMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   // StructField federateHandle (hidden)
@@ -2334,6 +2649,18 @@ void
 CommitLowerBoundTimeStampMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+CommitLowerBoundTimeStampMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getTimeStamp());
+  result += byteSize(getCommitType());
+  result += byteSize(getCommitId());
+  return result;
 }
 
 bool
@@ -2393,7 +2720,7 @@ CommitLowerBoundTimeStampResponseMessage::getTypeName() const
 void
 CommitLowerBoundTimeStampResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "CommitLowerBoundTimeStampResponseMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -2415,6 +2742,17 @@ void
 CommitLowerBoundTimeStampResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+CommitLowerBoundTimeStampResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getSendingFederateHandle());
+  result += byteSize(getCommitId());
+  return result;
 }
 
 bool
@@ -2470,7 +2808,7 @@ LockedByNextMessageRequestMessage::getTypeName() const
 void
 LockedByNextMessageRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "LockedByNextMessageRequestMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -2490,6 +2828,16 @@ void
 LockedByNextMessageRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+LockedByNextMessageRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getSendingFederateHandle());
+  result += byteSize(getLockedByNextMessage());
+  return result;
 }
 
 bool
@@ -2539,7 +2887,7 @@ TimeConstrainedEnabledMessage::getTypeName() const
 void
 TimeConstrainedEnabledMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "TimeConstrainedEnabledMessage { ";
   os << " }";
 }
 
@@ -2553,6 +2901,13 @@ void
 TimeConstrainedEnabledMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+TimeConstrainedEnabledMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  return result;
 }
 
 bool
@@ -2593,7 +2948,7 @@ TimeRegulationEnabledMessage::getTypeName() const
 void
 TimeRegulationEnabledMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "TimeRegulationEnabledMessage { ";
   os << " }";
 }
 
@@ -2607,6 +2962,13 @@ void
 TimeRegulationEnabledMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+TimeRegulationEnabledMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  return result;
 }
 
 bool
@@ -2647,7 +3009,7 @@ TimeAdvanceGrantedMessage::getTypeName() const
 void
 TimeAdvanceGrantedMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "TimeAdvanceGrantedMessage { ";
   os << " }";
 }
 
@@ -2661,6 +3023,13 @@ void
 TimeAdvanceGrantedMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+TimeAdvanceGrantedMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  return result;
 }
 
 bool
@@ -2703,7 +3072,7 @@ InsertRegionMessage::getTypeName() const
 void
 InsertRegionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "InsertRegionMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "regionHandleDimensionHandleSetPairVector: " << getRegionHandleDimensionHandleSetPairVector();
@@ -2720,6 +3089,15 @@ void
 InsertRegionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+InsertRegionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getRegionHandleDimensionHandleSetPairVector());
+  return result;
 }
 
 bool
@@ -2768,7 +3146,7 @@ CommitRegionMessage::getTypeName() const
 void
 CommitRegionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "CommitRegionMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "regionHandleRegionValuePairVector: " << getRegionHandleRegionValuePairVector();
@@ -2785,6 +3163,15 @@ void
 CommitRegionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+CommitRegionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getRegionHandleRegionValuePairVector());
+  return result;
 }
 
 bool
@@ -2833,7 +3220,7 @@ EraseRegionMessage::getTypeName() const
 void
 EraseRegionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "EraseRegionMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "regionHandleVector: " << getRegionHandleVector();
@@ -2850,6 +3237,15 @@ void
 EraseRegionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+EraseRegionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getRegionHandleVector());
+  return result;
 }
 
 bool
@@ -2899,7 +3295,7 @@ ChangeInteractionClassPublicationMessage::getTypeName() const
 void
 ChangeInteractionClassPublicationMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ChangeInteractionClassPublicationMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -2919,6 +3315,16 @@ void
 ChangeInteractionClassPublicationMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ChangeInteractionClassPublicationMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getPublicationType());
+  result += byteSize(getInteractionClassHandle());
+  return result;
 }
 
 bool
@@ -2972,7 +3378,7 @@ ChangeObjectClassPublicationMessage::getTypeName() const
 void
 ChangeObjectClassPublicationMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ChangeObjectClassPublicationMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -2994,6 +3400,17 @@ void
 ChangeObjectClassPublicationMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ChangeObjectClassPublicationMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getPublicationType());
+  result += byteSize(getObjectClassHandle());
+  result += byteSize(getAttributeHandles());
+  return result;
 }
 
 bool
@@ -3050,7 +3467,7 @@ ChangeInteractionClassSubscriptionMessage::getTypeName() const
 void
 ChangeInteractionClassSubscriptionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ChangeInteractionClassSubscriptionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -3072,6 +3489,17 @@ void
 ChangeInteractionClassSubscriptionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ChangeInteractionClassSubscriptionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getSubscriptionType());
+  result += byteSize(getInteractionClassHandle());
+  result += byteSize(getParameterFilterValues());
+  return result;
 }
 
 bool
@@ -3128,7 +3556,7 @@ ChangeObjectClassSubscriptionMessage::getTypeName() const
 void
 ChangeObjectClassSubscriptionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ChangeObjectClassSubscriptionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -3150,6 +3578,17 @@ void
 ChangeObjectClassSubscriptionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ChangeObjectClassSubscriptionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getSubscriptionType());
+  result += byteSize(getObjectClassHandle());
+  result += byteSize(getAttributeHandles());
+  return result;
 }
 
 bool
@@ -3206,7 +3645,7 @@ ChangeObjectInstanceSubscriptionMessage::getTypeName() const
 void
 ChangeObjectInstanceSubscriptionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ChangeObjectInstanceSubscriptionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -3228,6 +3667,17 @@ void
 ChangeObjectInstanceSubscriptionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ChangeObjectInstanceSubscriptionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getSubscriptionType());
+  result += byteSize(getObjectClassHandle());
+  result += byteSize(getObjectInstanceHandle());
+  return result;
 }
 
 bool
@@ -3282,7 +3732,7 @@ RegistrationForObjectClassMessage::getTypeName() const
 void
 RegistrationForObjectClassMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "RegistrationForObjectClassMessage { ";
   os << "objectClassHandle: " << getObjectClassHandle();
   os << ", ";
   os << "start: " << getStart();
@@ -3299,6 +3749,15 @@ void
 RegistrationForObjectClassMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+RegistrationForObjectClassMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getObjectClassHandle());
+  result += byteSize(getStart());
+  return result;
 }
 
 bool
@@ -3348,7 +3807,7 @@ AttributesInScopeMessage::getTypeName() const
 void
 AttributesInScopeMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "AttributesInScopeMessage { ";
   os << "objectInstanceHandle: " << getObjectInstanceHandle();
   os << ", ";
   os << "attributeHandles: " << getAttributeHandles();
@@ -3367,6 +3826,16 @@ void
 AttributesInScopeMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+AttributesInScopeMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getAttributeHandles());
+  result += byteSize(getInScope());
+  return result;
 }
 
 bool
@@ -3426,7 +3895,7 @@ TurnUpdatesOnForInstanceMessage::getTypeName() const
 void
 TurnUpdatesOnForInstanceMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "TurnUpdatesOnForInstanceMessage { ";
   os << "objectInstanceHandle: " << getObjectInstanceHandle();
   os << ", ";
   os << "attributeHandles: " << getAttributeHandles();
@@ -3447,6 +3916,17 @@ void
 TurnUpdatesOnForInstanceMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+TurnUpdatesOnForInstanceMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getAttributeHandles());
+  result += byteSize(getUpdateRate());
+  result += byteSize(getOn());
+  return result;
 }
 
 bool
@@ -3507,7 +3987,7 @@ TurnInteractionsOnMessage::getTypeName() const
 void
 TurnInteractionsOnMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "TurnInteractionsOnMessage { ";
   os << "interactionClassHandle: " << getInteractionClassHandle();
   os << ", ";
   os << "on: " << getOn();
@@ -3524,6 +4004,15 @@ void
 TurnInteractionsOnMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+TurnInteractionsOnMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getInteractionClassHandle());
+  result += byteSize(getOn());
+  return result;
 }
 
 bool
@@ -3576,7 +4065,7 @@ InteractionMessage::getTypeName() const
 void
 InteractionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "InteractionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -3604,6 +4093,19 @@ void
 InteractionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+InteractionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getInteractionClassHandle());
+  result += byteSize(getTransportationType());
+  result += byteSize(getTag());
+  result += byteSize(getParameterValues());
+  return result;
 }
 
 bool
@@ -3677,7 +4179,7 @@ TimeStampedInteractionMessage::getTypeName() const
 void
 TimeStampedInteractionMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "TimeStampedInteractionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -3712,6 +4214,22 @@ void
 TimeStampedInteractionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+TimeStampedInteractionMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getInteractionClassHandle());
+  result += byteSize(getOrderType());
+  result += byteSize(getTransportationType());
+  result += byteSize(getTag());
+  result += byteSize(getTimeStamp());
+  result += byteSize(getMessageRetractionHandle());
+  result += byteSize(getParameterValues());
+  return result;
 }
 
 bool
@@ -3788,7 +4306,7 @@ ObjectInstanceHandlesRequestMessage::getTypeName() const
 void
 ObjectInstanceHandlesRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ObjectInstanceHandlesRequestMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -3807,6 +4325,16 @@ void
 ObjectInstanceHandlesRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ObjectInstanceHandlesRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getCount());
+  return result;
 }
 
 bool
@@ -3859,7 +4387,7 @@ ObjectInstanceHandlesResponseMessage::getTypeName() const
 void
 ObjectInstanceHandlesResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ObjectInstanceHandlesResponseMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -3880,6 +4408,16 @@ void
 ObjectInstanceHandlesResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ObjectInstanceHandlesResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getObjectInstanceHandleNamePairVector());
+  return result;
 }
 
 bool
@@ -3931,7 +4469,7 @@ ReleaseMultipleObjectInstanceNameHandlePairsMessage::getTypeName() const
 void
 ReleaseMultipleObjectInstanceNameHandlePairsMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ReleaseMultipleObjectInstanceNameHandlePairsMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "objectInstanceHandleVector: " << getObjectInstanceHandleVector();
@@ -3948,6 +4486,15 @@ void
 ReleaseMultipleObjectInstanceNameHandlePairsMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ReleaseMultipleObjectInstanceNameHandlePairsMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getObjectInstanceHandleVector());
+  return result;
 }
 
 bool
@@ -3998,7 +4545,7 @@ ReserveObjectInstanceNameRequestMessage::getTypeName() const
 void
 ReserveObjectInstanceNameRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ReserveObjectInstanceNameRequestMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -4019,6 +4566,17 @@ void
 ReserveObjectInstanceNameRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ReserveObjectInstanceNameRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getName());
+  result += byteSize(getIsInternal());
+  return result;
 }
 
 bool
@@ -4075,7 +4633,7 @@ ReserveObjectInstanceNameResponseMessage::getTypeName() const
 void
 ReserveObjectInstanceNameResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ReserveObjectInstanceNameResponseMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -4096,6 +4654,17 @@ void
 ReserveObjectInstanceNameResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ReserveObjectInstanceNameResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getObjectInstanceHandleNamePair());
+  result += byteSize(getSuccess());
+  return result;
 }
 
 bool
@@ -4151,7 +4720,7 @@ ReserveMultipleObjectInstanceNameRequestMessage::getTypeName() const
 void
 ReserveMultipleObjectInstanceNameRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ReserveMultipleObjectInstanceNameRequestMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -4170,6 +4739,16 @@ void
 ReserveMultipleObjectInstanceNameRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ReserveMultipleObjectInstanceNameRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getNameList());
+  return result;
 }
 
 bool
@@ -4223,7 +4802,7 @@ ReserveMultipleObjectInstanceNameResponseMessage::getTypeName() const
 void
 ReserveMultipleObjectInstanceNameResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "ReserveMultipleObjectInstanceNameResponseMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -4245,6 +4824,17 @@ void
 ReserveMultipleObjectInstanceNameResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+ReserveMultipleObjectInstanceNameResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getObjectInstanceHandleNamePairVector());
+  result += byteSize(getSuccess());
+  return result;
 }
 
 bool
@@ -4302,7 +4892,7 @@ InsertObjectInstanceMessage::getTypeName() const
 void
 InsertObjectInstanceMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "InsertObjectInstanceMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "objectClassHandle: " << getObjectClassHandle();
@@ -4326,6 +4916,18 @@ void
 InsertObjectInstanceMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+InsertObjectInstanceMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getObjectClassHandle());
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getName());
+  result += byteSize(getAttributeStateVector());
+  return result;
 }
 
 bool
@@ -4391,7 +4993,7 @@ DeleteObjectInstanceMessage::getTypeName() const
 void
 DeleteObjectInstanceMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "DeleteObjectInstanceMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -4412,6 +5014,17 @@ void
 DeleteObjectInstanceMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+DeleteObjectInstanceMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getTag());
+  return result;
 }
 
 bool
@@ -4477,7 +5090,7 @@ TimeStampedDeleteObjectInstanceMessage::getTypeName() const
 void
 TimeStampedDeleteObjectInstanceMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "TimeStampedDeleteObjectInstanceMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -4504,6 +5117,20 @@ void
 TimeStampedDeleteObjectInstanceMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+TimeStampedDeleteObjectInstanceMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getOrderType());
+  result += byteSize(getTag());
+  result += byteSize(getTimeStamp());
+  result += byteSize(getMessageRetractionHandle());
+  return result;
 }
 
 bool
@@ -4577,7 +5204,7 @@ AttributeUpdateMessage::getTypeName() const
 void
 AttributeUpdateMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "AttributeUpdateMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -4606,6 +5233,19 @@ void
 AttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+AttributeUpdateMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getTag());
+  result += byteSize(getTransportationType());
+  result += byteSize(getAttributeValues());
+  return result;
 }
 
 bool
@@ -4685,7 +5325,7 @@ TimeStampedAttributeUpdateMessage::getTypeName() const
 void
 TimeStampedAttributeUpdateMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "TimeStampedAttributeUpdateMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "federateHandle: " << getFederateHandle();
@@ -4716,6 +5356,22 @@ void
 TimeStampedAttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+TimeStampedAttributeUpdateMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getFederateHandle());
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getTag());
+  result += byteSize(getTimeStamp());
+  result += byteSize(getMessageRetractionHandle());
+  result += byteSize(getOrderType());
+  result += byteSize(getTransportationType());
+  result += byteSize(getAttributeValues());
+  return result;
 }
 
 bool
@@ -4799,7 +5455,7 @@ RequestAttributeUpdateMessage::getTypeName() const
 void
 RequestAttributeUpdateMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "RequestAttributeUpdateMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << getFederationHandle();
   //os << ", ";
@@ -4822,6 +5478,17 @@ void
 RequestAttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+RequestAttributeUpdateMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getAttributeHandles());
+  result += byteSize(getTag());
+  return result;
 }
 
 bool
@@ -4884,7 +5551,7 @@ RequestClassAttributeUpdateMessage::getTypeName() const
 void
 RequestClassAttributeUpdateMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "RequestClassAttributeUpdateMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "objectClassHandle: " << getObjectClassHandle();
@@ -4905,6 +5572,17 @@ void
 RequestClassAttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+RequestClassAttributeUpdateMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getObjectClassHandle());
+  result += byteSize(getAttributeHandles());
+  result += byteSize(getTag());
+  return result;
 }
 
 bool
@@ -4960,7 +5638,7 @@ QueryAttributeOwnershipRequestMessage::getTypeName() const
 void
 QueryAttributeOwnershipRequestMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "QueryAttributeOwnershipRequestMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "objectInstanceHandle: " << getObjectInstanceHandle();
@@ -4979,6 +5657,16 @@ void
 QueryAttributeOwnershipRequestMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+QueryAttributeOwnershipRequestMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getAttributeHandle());
+  return result;
 }
 
 bool
@@ -5032,7 +5720,7 @@ QueryAttributeOwnershipResponseMessage::getTypeName() const
 void
 QueryAttributeOwnershipResponseMessage::out(std::ostream& os) const
 {
-  os << "{ ";
+  os << "QueryAttributeOwnershipResponseMessage { ";
   os << "federationHandle: " << getFederationHandle();
   os << ", ";
   os << "objectInstanceHandle: " << getObjectInstanceHandle();
@@ -5053,6 +5741,17 @@ void
 QueryAttributeOwnershipResponseMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 {
   dispatcher.accept(*this);
+}
+
+size_t
+QueryAttributeOwnershipResponseMessage::messageSize() const
+{
+  size_t result = AbstractMessage::messageSize();
+  result += byteSize(getFederationHandle());
+  result += byteSize(getObjectInstanceHandle());
+  result += byteSize(getAttributeHandle());
+  result += byteSize(getOwner());
+  return result;
 }
 
 bool
@@ -5913,7 +6612,7 @@ prettyprint(std::ostream& os, const FederateHandleBoolPairVector& value)
 std::ostream&
 operator<<(std::ostream& os, const RangeBoundsValue& value)
 {
-  os << "{ ";
+  os << "RangeBoundsValue { ";
   os << "lowerBound: " << value.getLowerBound();
   os << ", ";
   os << "upperBound: " << value.getUpperBound();
@@ -6217,7 +6916,7 @@ prettyprint(std::ostream& os, const AttributeHandleRegionValueListPair& value, S
 std::ostream&
 operator<<(std::ostream& os, const AttributeState& value)
 {
-  os << "{ ";
+  os << "AttributeState { ";
   os << "attributeHandle: " << value.getAttributeHandle();
   os << ", ";
   os << "ownerFederate: " << value.getOwnerFederate();
@@ -6271,7 +6970,7 @@ prettyprint(std::ostream& os, const AttributeStateVector& value)
 std::ostream&
 operator<<(std::ostream& os, const ParameterValue& value)
 {
-  os << "{ ";
+  os << "ParameterValue { ";
   os << "parameterHandle: " << value.getParameterHandle();
   os << ", ";
   os << "value: " << value.getValue();
@@ -6325,7 +7024,7 @@ prettyprint(std::ostream& os, const ParameterValueVector& value, ServerModel::In
 std::ostream&
 operator<<(std::ostream& os, const AttributeValue& value)
 {
-  os << "{ ";
+  os << "AttributeValue { ";
   os << "attributeHandle: " << value.getAttributeHandle();
   os << ", ";
   os << "value: " << value.getValue();
@@ -6483,7 +7182,7 @@ prettyprint(std::ostream& os, const FederateHandleRestoreStatusPairVector& value
 std::ostream&
 operator<<(std::ostream& os, const FederationExecutionInformation& value)
 {
-  os << "{ ";
+  os << "FederationExecutionInformation { ";
   os << "federationExecutionName: " << value.getFederationExecutionName();
   os << ", ";
   os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
@@ -6721,7 +7420,7 @@ inline std::string to_string(const RegisterFederationSynchronizationPointRespons
   }
 }
 
-// <__main__.MapDataType object at 0x000001F4CDF6CB38>
+// <__main__.MapDataType object at 0x00000189592035C0>
 std::ostream&
 operator<<(std::ostream& os, const ConfigurationParameterMap& value)
 {
@@ -6756,7 +7455,7 @@ prettyprint(std::ostream& os, const ConfigurationParameterMap& value, ServerMode
 std::ostream&
 operator<<(std::ostream& os, const FOMStringBasicDataType& value)
 {
-  os << "{ ";
+  os << "FOMStringBasicDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "size: " << value.getSize();
@@ -6814,7 +7513,7 @@ prettyprint(std::ostream& os, const FOMStringBasicDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringSimpleDataType& value)
 {
-  os << "{ ";
+  os << "FOMStringSimpleDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "representation: " << value.getRepresentation();
@@ -6868,7 +7567,7 @@ prettyprint(std::ostream& os, const FOMStringSimpleDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringEnumerator& value)
 {
-  os << "{ ";
+  os << "FOMStringEnumerator { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "value: " << value.getValue();
@@ -6922,7 +7621,7 @@ prettyprint(std::ostream& os, const FOMStringEnumeratorList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringEnumeratedDataType& value)
 {
-  os << "{ ";
+  os << "FOMStringEnumeratedDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "representation: " << value.getRepresentation();
@@ -6980,7 +7679,7 @@ prettyprint(std::ostream& os, const FOMStringEnumeratedDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringArrayDataType& value)
 {
-  os << "{ ";
+  os << "FOMStringArrayDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -7042,7 +7741,7 @@ prettyprint(std::ostream& os, const FOMStringArrayDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringArrayDataType2& value)
 {
-  os << "{ ";
+  os << "FOMStringArrayDataType2 { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -7104,7 +7803,7 @@ prettyprint(std::ostream& os, const FOMStringArrayDataType2List& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringFixedRecordField& value)
 {
-  os << "{ ";
+  os << "FOMStringFixedRecordField { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -7158,7 +7857,7 @@ prettyprint(std::ostream& os, const FOMStringFixedRecordFieldList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringFixedRecordDataType& value)
 {
-  os << "{ ";
+  os << "FOMStringFixedRecordDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "encoding: " << value.getEncoding();
@@ -7216,7 +7915,7 @@ prettyprint(std::ostream& os, const FOMStringFixedRecordDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringFixedRecordField2& value)
 {
-  os << "{ ";
+  os << "FOMStringFixedRecordField2 { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -7274,7 +7973,7 @@ prettyprint(std::ostream& os, const FOMStringFixedRecordField2List& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringFixedRecordDataType2& value)
 {
-  os << "{ ";
+  os << "FOMStringFixedRecordDataType2 { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "encoding: " << value.getEncoding();
@@ -7340,7 +8039,7 @@ prettyprint(std::ostream& os, const FOMStringFixedRecordDataType2List& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringVariantRecordAlternative& value)
 {
-  os << "{ ";
+  os << "FOMStringVariantRecordAlternative { ";
   os << "enumerator: " << value.getEnumerator();
   os << ", ";
   os << "name: " << value.getName();
@@ -7398,7 +8097,7 @@ prettyprint(std::ostream& os, const FOMStringVariantRecordAlternativeList& value
 std::ostream&
 operator<<(std::ostream& os, const FOMStringVariantRecordDataType& value)
 {
-  os << "{ ";
+  os << "FOMStringVariantRecordDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "discriminant: " << value.getDiscriminant();
@@ -7464,7 +8163,7 @@ prettyprint(std::ostream& os, const FOMStringVariantRecordDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringVariantRecordAlternative2& value)
 {
-  os << "{ ";
+  os << "FOMStringVariantRecordAlternative2 { ";
   os << "enumerator: " << value.getEnumerator();
   os << ", ";
   os << "name: " << value.getName();
@@ -7522,7 +8221,7 @@ prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative2List& valu
 std::ostream&
 operator<<(std::ostream& os, const FOMStringVariantRecordDataType2& value)
 {
-  os << "{ ";
+  os << "FOMStringVariantRecordDataType2 { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "discriminant: " << value.getDiscriminant();
@@ -7588,7 +8287,7 @@ prettyprint(std::ostream& os, const FOMStringVariantRecordDataType2List& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringTransportationType& value)
 {
-  os << "{ ";
+  os << "FOMStringTransportationType { ";
   os << "name: " << value.getName();
   os << " }";
   return os;
@@ -7638,7 +8337,7 @@ prettyprint(std::ostream& os, const FOMStringTransportationTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringDimension& value)
 {
-  os << "{ ";
+  os << "FOMStringDimension { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "upperBound: " << value.getUpperBound();
@@ -7692,7 +8391,7 @@ prettyprint(std::ostream& os, const FOMStringDimensionList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringRoutingSpace& value)
 {
-  os << "{ ";
+  os << "FOMStringRoutingSpace { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dimensionSet: " << value.getDimensionSet();
@@ -7746,7 +8445,7 @@ prettyprint(std::ostream& os, const FOMStringRoutingSpaceList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringParameter& value)
 {
-  os << "{ ";
+  os << "FOMStringParameter { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -7800,7 +8499,7 @@ prettyprint(std::ostream& os, const FOMStringParameterList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringInteractionClass& value)
 {
-  os << "{ ";
+  os << "FOMStringInteractionClass { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "orderType: " << value.getOrderType();
@@ -7870,7 +8569,7 @@ prettyprint(std::ostream& os, const FOMStringInteractionClassList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringAttribute& value)
 {
-  os << "{ ";
+  os << "FOMStringAttribute { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -7940,7 +8639,7 @@ prettyprint(std::ostream& os, const FOMStringAttributeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringObjectClass& value)
 {
-  os << "{ ";
+  os << "FOMStringObjectClass { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "attributeList: " << value.getAttributeList();
@@ -7994,7 +8693,7 @@ prettyprint(std::ostream& os, const FOMStringObjectClassList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringUpdateRate& value)
 {
-  os << "{ ";
+  os << "FOMStringUpdateRate { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "rate: " << value.getRate();
@@ -8048,7 +8747,7 @@ prettyprint(std::ostream& os, const FOMStringUpdateRateList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringSwitch& value)
 {
-  os << "{ ";
+  os << "FOMStringSwitch { ";
   os << "switchesType: " << value.getSwitchesType();
   os << ", ";
   os << "enabled: " << value.getEnabled();
@@ -8102,7 +8801,7 @@ prettyprint(std::ostream& os, const FOMStringSwitchList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringModule& value)
 {
-  os << "{ ";
+  os << "FOMStringModule { ";
   os << "designator: " << value.getDesignator();
   os << ", ";
   os << "transportationTypeList: " << value.getTransportationTypeList();
@@ -8208,7 +8907,7 @@ prettyprint(std::ostream& os, const FOMStringModuleList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMStringModule2& value)
 {
-  os << "{ ";
+  os << "FOMStringModule2 { ";
   os << "designator: " << value.getDesignator();
   os << ", ";
   os << "transportationTypeList: " << value.getTransportationTypeList();
@@ -8318,7 +9017,7 @@ prettyprint(std::ostream& os, const FOMStringModule2List& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMTransportationType& value)
 {
-  os << "{ ";
+  os << "FOMTransportationType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "transportationType: " << value.getTransportationType();
@@ -8372,7 +9071,7 @@ prettyprint(std::ostream& os, const FOMTransportationTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMDimension& value)
 {
-  os << "{ ";
+  os << "FOMDimension { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dimensionHandle: " << value.getDimensionHandle();
@@ -8430,7 +9129,7 @@ prettyprint(std::ostream& os, const FOMDimensionList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMRoutingSpace& value)
 {
-  os << "{ ";
+  os << "FOMRoutingSpace { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "spaceHandle: " << value.getSpaceHandle();
@@ -8488,7 +9187,7 @@ prettyprint(std::ostream& os, const FOMRoutingSpaceList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMParameter& value)
 {
-  os << "{ ";
+  os << "FOMParameter { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -8546,7 +9245,7 @@ prettyprint(std::ostream& os, const FOMParameterList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMInteractionClass& value)
 {
-  os << "{ ";
+  os << "FOMInteractionClass { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "interactionClassHandle: " << value.getInteractionClassHandle();
@@ -8620,7 +9319,7 @@ prettyprint(std::ostream& os, const FOMInteractionClassList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMAttribute& value)
 {
-  os << "{ ";
+  os << "FOMAttribute { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -8690,7 +9389,7 @@ prettyprint(std::ostream& os, const FOMAttributeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMObjectClass& value)
 {
-  os << "{ ";
+  os << "FOMObjectClass { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "objectClassHandle: " << value.getObjectClassHandle();
@@ -8752,7 +9451,7 @@ prettyprint(std::ostream& os, const FOMObjectClassList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMUpdateRate& value)
 {
-  os << "{ ";
+  os << "FOMUpdateRate { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "updateRateHandle: " << value.getUpdateRateHandle();
@@ -8810,7 +9509,7 @@ prettyprint(std::ostream& os, const FOMUpdateRateList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMSwitch& value)
 {
-  os << "{ ";
+  os << "FOMSwitch { ";
   os << "switchesType: " << value.getSwitchesType();
   os << ", ";
   os << "enabled: " << value.getEnabled();
@@ -8864,7 +9563,7 @@ prettyprint(std::ostream& os, const FOMSwitchList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMBasicDataType& value)
 {
-  os << "{ ";
+  os << "FOMBasicDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "size: " << value.getSize();
@@ -8926,7 +9625,7 @@ prettyprint(std::ostream& os, const FOMBasicDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMSimpleDataType& value)
 {
-  os << "{ ";
+  os << "FOMSimpleDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "representation: " << value.getRepresentation();
@@ -8984,7 +9683,7 @@ prettyprint(std::ostream& os, const FOMSimpleDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMEnumerator& value)
 {
-  os << "{ ";
+  os << "FOMEnumerator { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "value: " << value.getValue();
@@ -9038,7 +9737,7 @@ prettyprint(std::ostream& os, const FOMEnumeratorList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMEnumeratedDataType& value)
 {
-  os << "{ ";
+  os << "FOMEnumeratedDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "representation: " << value.getRepresentation();
@@ -9100,7 +9799,7 @@ prettyprint(std::ostream& os, const FOMEnumeratedDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMArrayDataType& value)
 {
-  os << "{ ";
+  os << "FOMArrayDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -9166,7 +9865,7 @@ prettyprint(std::ostream& os, const FOMArrayDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMFixedRecordField& value)
 {
-  os << "{ ";
+  os << "FOMFixedRecordField { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "dataType: " << value.getDataType();
@@ -9224,7 +9923,7 @@ prettyprint(std::ostream& os, const FOMFixedRecordFieldList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMFixedRecordDataType& value)
 {
-  os << "{ ";
+  os << "FOMFixedRecordDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "encoding: " << value.getEncoding();
@@ -9294,7 +9993,7 @@ prettyprint(std::ostream& os, const FOMFixedRecordDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMVariantRecordAlternative& value)
 {
-  os << "{ ";
+  os << "FOMVariantRecordAlternative { ";
   os << "enumerator: " << value.getEnumerator();
   os << ", ";
   os << "name: " << value.getName();
@@ -9352,7 +10051,7 @@ prettyprint(std::ostream& os, const FOMVariantRecordAlternativeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMVariantRecordDataType& value)
 {
-  os << "{ ";
+  os << "FOMVariantRecordDataType { ";
   os << "name: " << value.getName();
   os << ", ";
   os << "discriminant: " << value.getDiscriminant();
@@ -9422,7 +10121,7 @@ prettyprint(std::ostream& os, const FOMVariantRecordDataTypeList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMModule& value)
 {
-  os << "{ ";
+  os << "FOMModule { ";
   os << "moduleHandle: " << value.getModuleHandle();
   os << ", ";
   os << "transportationTypeList: " << value.getTransportationTypeList();
@@ -9512,7 +10211,7 @@ prettyprint(std::ostream& os, const FOMModuleList& value)
 std::ostream&
 operator<<(std::ostream& os, const FOMModule2& value)
 {
-  os << "{ ";
+  os << "FOMModule2 { ";
   os << "basicDataTypeList: " << value.getBasicDataTypeList();
   os << ", ";
   os << "simpleDataTypeList: " << value.getSimpleDataTypeList();
@@ -9582,7 +10281,7 @@ prettyprint(std::ostream& os, const FOMModule2List& value)
 std::ostream&
 operator<<(std::ostream& os, const ConnectionLostMessage& value)
 {
-  os << "{ ";
+  os << "ConnectionLostMessage { ";
   os << "faultDescription: " << value.getFaultDescription();
   os << " }";
   return os;
@@ -9601,7 +10300,7 @@ prettyprint(std::ostream& os, const ConnectionLostMessage& value, ServerModel::F
 std::ostream&
 operator<<(std::ostream& os, const CreateFederationExecutionRequestMessage& value)
 {
-  os << "{ ";
+  os << "CreateFederationExecutionRequestMessage { ";
   os << "federationExecution: " << value.getFederationExecution();
   os << ", ";
   os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
@@ -9628,7 +10327,7 @@ prettyprint(std::ostream& os, const CreateFederationExecutionRequestMessage& val
 std::ostream&
 operator<<(std::ostream& os, const CreateFederationExecutionRequest2Message& value)
 {
-  os << "{ ";
+  os << "CreateFederationExecutionRequest2Message { ";
   os << "federationExecution: " << value.getFederationExecution();
   os << ", ";
   os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
@@ -9655,7 +10354,7 @@ prettyprint(std::ostream& os, const CreateFederationExecutionRequest2Message& va
 std::ostream&
 operator<<(std::ostream& os, const CreateFederationExecutionResponseMessage& value)
 {
-  os << "{ ";
+  os << "CreateFederationExecutionResponseMessage { ";
   os << "createFederationExecutionResponseType: " << value.getCreateFederationExecutionResponseType();
   os << ", ";
   os << "exceptionString: " << value.getExceptionString();
@@ -9678,7 +10377,7 @@ prettyprint(std::ostream& os, const CreateFederationExecutionResponseMessage& va
 std::ostream&
 operator<<(std::ostream& os, const DestroyFederationExecutionRequestMessage& value)
 {
-  os << "{ ";
+  os << "DestroyFederationExecutionRequestMessage { ";
   os << "federationExecution: " << value.getFederationExecution();
   os << " }";
   return os;
@@ -9697,7 +10396,7 @@ prettyprint(std::ostream& os, const DestroyFederationExecutionRequestMessage& va
 std::ostream&
 operator<<(std::ostream& os, const DestroyFederationExecutionResponseMessage& value)
 {
-  os << "{ ";
+  os << "DestroyFederationExecutionResponseMessage { ";
   os << "destroyFederationExecutionResponseType: " << value.getDestroyFederationExecutionResponseType();
   os << " }";
   return os;
@@ -9716,7 +10415,7 @@ prettyprint(std::ostream& os, const DestroyFederationExecutionResponseMessage& v
 std::ostream&
 operator<<(std::ostream& os, const EnumerateFederationExecutionsRequestMessage& value)
 {
-  os << "{ ";
+  os << "EnumerateFederationExecutionsRequestMessage { ";
   os << " }";
   return os;
 }
@@ -9733,7 +10432,7 @@ prettyprint(std::ostream& os, const EnumerateFederationExecutionsRequestMessage&
 std::ostream&
 operator<<(std::ostream& os, const EnumerateFederationExecutionsResponseMessage& value)
 {
-  os << "{ ";
+  os << "EnumerateFederationExecutionsResponseMessage { ";
   os << "federationExecutionInformationVector: " << value.getFederationExecutionInformationVector();
   os << " }";
   return os;
@@ -9752,7 +10451,7 @@ prettyprint(std::ostream& os, const EnumerateFederationExecutionsResponseMessage
 std::ostream&
 operator<<(std::ostream& os, const InsertFederationExecutionMessage& value)
 {
-  os << "{ ";
+  os << "InsertFederationExecutionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -9783,7 +10482,7 @@ prettyprint(std::ostream& os, const InsertFederationExecutionMessage& value, Ser
 std::ostream&
 operator<<(std::ostream& os, const ShutdownFederationExecutionMessage& value)
 {
-  os << "{ ";
+  os << "ShutdownFederationExecutionMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << " }";
   return os;
@@ -9802,7 +10501,7 @@ prettyprint(std::ostream& os, const ShutdownFederationExecutionMessage& value, S
 std::ostream&
 operator<<(std::ostream& os, const EraseFederationExecutionMessage& value)
 {
-  os << "{ ";
+  os << "EraseFederationExecutionMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << " }";
   return os;
@@ -9821,7 +10520,7 @@ prettyprint(std::ostream& os, const EraseFederationExecutionMessage& value, Serv
 std::ostream&
 operator<<(std::ostream& os, const ReleaseFederationHandleMessage& value)
 {
-  os << "{ ";
+  os << "ReleaseFederationHandleMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << " }";
   return os;
@@ -9840,7 +10539,7 @@ prettyprint(std::ostream& os, const ReleaseFederationHandleMessage& value, Serve
 std::ostream&
 operator<<(std::ostream& os, const InsertModulesMessage& value)
 {
-  os << "{ ";
+  os << "InsertModulesMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -9864,7 +10563,7 @@ prettyprint(std::ostream& os, const InsertModulesMessage& value, ServerModel::Fe
 std::ostream&
 operator<<(std::ostream& os, const InsertModules2Message& value)
 {
-  os << "{ ";
+  os << "InsertModules2Message { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -9888,7 +10587,7 @@ prettyprint(std::ostream& os, const InsertModules2Message& value, ServerModel::F
 std::ostream&
 operator<<(std::ostream& os, const JoinFederationExecutionRequestMessage& value)
 {
-  os << "{ ";
+  os << "JoinFederationExecutionRequestMessage { ";
   os << "federationExecution: " << value.getFederationExecution();
   os << ", ";
   os << "federateType: " << value.getFederateType();
@@ -9927,7 +10626,7 @@ prettyprint(std::ostream& os, const JoinFederationExecutionRequestMessage& value
 std::ostream&
 operator<<(std::ostream& os, const JoinFederationExecutionRequest2Message& value)
 {
-  os << "{ ";
+  os << "JoinFederationExecutionRequest2Message { ";
   os << "federationExecution: " << value.getFederationExecution();
   os << ", ";
   os << "federateType: " << value.getFederateType();
@@ -9966,7 +10665,7 @@ prettyprint(std::ostream& os, const JoinFederationExecutionRequest2Message& valu
 std::ostream&
 operator<<(std::ostream& os, const JoinFederationExecutionResponseMessage& value)
 {
-  os << "{ ";
+  os << "JoinFederationExecutionResponseMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "joinFederationExecutionResponseType: " << value.getJoinFederationExecutionResponseType();
@@ -10005,7 +10704,7 @@ prettyprint(std::ostream& os, const JoinFederationExecutionResponseMessage& valu
 std::ostream&
 operator<<(std::ostream& os, const ResignFederationExecutionLeafRequestMessage& value)
 {
-  os << "{ ";
+  os << "ResignFederationExecutionLeafRequestMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -10032,7 +10731,7 @@ prettyprint(std::ostream& os, const ResignFederationExecutionLeafRequestMessage&
 std::ostream&
 operator<<(std::ostream& os, const ResignFederationExecutionRequestMessage& value)
 {
-  os << "{ ";
+  os << "ResignFederationExecutionRequestMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -10055,7 +10754,7 @@ prettyprint(std::ostream& os, const ResignFederationExecutionRequestMessage& val
 std::ostream&
 operator<<(std::ostream& os, const JoinFederateNotifyMessage& value)
 {
-  os << "{ ";
+  os << "JoinFederateNotifyMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -10090,7 +10789,7 @@ prettyprint(std::ostream& os, const JoinFederateNotifyMessage& value, ServerMode
 std::ostream&
 operator<<(std::ostream& os, const ResignFederateNotifyMessage& value)
 {
-  os << "{ ";
+  os << "ResignFederateNotifyMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -10113,7 +10812,7 @@ prettyprint(std::ostream& os, const ResignFederateNotifyMessage& value, ServerMo
 std::ostream&
 operator<<(std::ostream& os, const ChangeAutomaticResignDirectiveMessage& value)
 {
-  os << "{ ";
+  os << "ChangeAutomaticResignDirectiveMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -10140,7 +10839,7 @@ prettyprint(std::ostream& os, const ChangeAutomaticResignDirectiveMessage& value
 std::ostream&
 operator<<(std::ostream& os, const RegisterFederationSynchronizationPointMessage& value)
 {
-  os << "{ ";
+  os << "RegisterFederationSynchronizationPointMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10175,7 +10874,7 @@ prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointMessag
 std::ostream&
 operator<<(std::ostream& os, const RegisterFederationSynchronizationPointResponseMessage& value)
 {
-  os << "{ ";
+  os << "RegisterFederationSynchronizationPointResponseMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10206,7 +10905,7 @@ prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointRespon
 std::ostream&
 operator<<(std::ostream& os, const AnnounceSynchronizationPointMessage& value)
 {
-  os << "{ ";
+  os << "AnnounceSynchronizationPointMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10241,7 +10940,7 @@ prettyprint(std::ostream& os, const AnnounceSynchronizationPointMessage& value, 
 std::ostream&
 operator<<(std::ostream& os, const SynchronizationPointAchievedMessage& value)
 {
-  os << "{ ";
+  os << "SynchronizationPointAchievedMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10268,7 +10967,7 @@ prettyprint(std::ostream& os, const SynchronizationPointAchievedMessage& value, 
 std::ostream&
 operator<<(std::ostream& os, const FederationSynchronizedMessage& value)
 {
-  os << "{ ";
+  os << "FederationSynchronizedMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10295,7 +10994,7 @@ prettyprint(std::ostream& os, const FederationSynchronizedMessage& value, Server
 std::ostream&
 operator<<(std::ostream& os, const EnableTimeRegulationRequestMessage& value)
 {
-  os << "{ ";
+  os << "EnableTimeRegulationRequestMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10326,7 +11025,7 @@ prettyprint(std::ostream& os, const EnableTimeRegulationRequestMessage& value, S
 std::ostream&
 operator<<(std::ostream& os, const EnableTimeRegulationResponseMessage& value)
 {
-  os << "{ ";
+  os << "EnableTimeRegulationResponseMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10361,7 +11060,7 @@ prettyprint(std::ostream& os, const EnableTimeRegulationResponseMessage& value, 
 std::ostream&
 operator<<(std::ostream& os, const DisableTimeRegulationRequestMessage& value)
 {
-  os << "{ ";
+  os << "DisableTimeRegulationRequestMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -10384,7 +11083,7 @@ prettyprint(std::ostream& os, const DisableTimeRegulationRequestMessage& value, 
 std::ostream&
 operator<<(std::ostream& os, const EnableTimeConstrainedNotifyMessage& value)
 {
-  os << "{ ";
+  os << "EnableTimeConstrainedNotifyMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10407,7 +11106,7 @@ prettyprint(std::ostream& os, const EnableTimeConstrainedNotifyMessage& value, S
 std::ostream&
 operator<<(std::ostream& os, const DisableTimeConstrainedNotifyMessage& value)
 {
-  os << "{ ";
+  os << "DisableTimeConstrainedNotifyMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10430,7 +11129,7 @@ prettyprint(std::ostream& os, const DisableTimeConstrainedNotifyMessage& value, 
 std::ostream&
 operator<<(std::ostream& os, const CommitLowerBoundTimeStampMessage& value)
 {
-  os << "{ ";
+  os << "CommitLowerBoundTimeStampMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   // StructField federateHandle (hidden)
@@ -10465,7 +11164,7 @@ prettyprint(std::ostream& os, const CommitLowerBoundTimeStampMessage& value, Ser
 std::ostream&
 operator<<(std::ostream& os, const CommitLowerBoundTimeStampResponseMessage& value)
 {
-  os << "{ ";
+  os << "CommitLowerBoundTimeStampResponseMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10496,7 +11195,7 @@ prettyprint(std::ostream& os, const CommitLowerBoundTimeStampResponseMessage& va
 std::ostream&
 operator<<(std::ostream& os, const LockedByNextMessageRequestMessage& value)
 {
-  os << "{ ";
+  os << "LockedByNextMessageRequestMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10523,7 +11222,7 @@ prettyprint(std::ostream& os, const LockedByNextMessageRequestMessage& value, Se
 std::ostream&
 operator<<(std::ostream& os, const TimeConstrainedEnabledMessage& value)
 {
-  os << "{ ";
+  os << "TimeConstrainedEnabledMessage { ";
   os << " }";
   return os;
 }
@@ -10540,7 +11239,7 @@ prettyprint(std::ostream& os, const TimeConstrainedEnabledMessage& value, Server
 std::ostream&
 operator<<(std::ostream& os, const TimeRegulationEnabledMessage& value)
 {
-  os << "{ ";
+  os << "TimeRegulationEnabledMessage { ";
   os << " }";
   return os;
 }
@@ -10557,7 +11256,7 @@ prettyprint(std::ostream& os, const TimeRegulationEnabledMessage& value, ServerM
 std::ostream&
 operator<<(std::ostream& os, const TimeAdvanceGrantedMessage& value)
 {
-  os << "{ ";
+  os << "TimeAdvanceGrantedMessage { ";
   os << " }";
   return os;
 }
@@ -10574,7 +11273,7 @@ prettyprint(std::ostream& os, const TimeAdvanceGrantedMessage& value, ServerMode
 std::ostream&
 operator<<(std::ostream& os, const InsertRegionMessage& value)
 {
-  os << "{ ";
+  os << "InsertRegionMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "regionHandleDimensionHandleSetPairVector: " << value.getRegionHandleDimensionHandleSetPairVector();
@@ -10597,7 +11296,7 @@ prettyprint(std::ostream& os, const InsertRegionMessage& value, ServerModel::Fed
 std::ostream&
 operator<<(std::ostream& os, const CommitRegionMessage& value)
 {
-  os << "{ ";
+  os << "CommitRegionMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "regionHandleRegionValuePairVector: " << value.getRegionHandleRegionValuePairVector();
@@ -10620,7 +11319,7 @@ prettyprint(std::ostream& os, const CommitRegionMessage& value, ServerModel::Fed
 std::ostream&
 operator<<(std::ostream& os, const EraseRegionMessage& value)
 {
-  os << "{ ";
+  os << "EraseRegionMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "regionHandleVector: " << value.getRegionHandleVector();
@@ -10643,7 +11342,7 @@ prettyprint(std::ostream& os, const EraseRegionMessage& value, ServerModel::Fede
 std::ostream&
 operator<<(std::ostream& os, const ChangeInteractionClassPublicationMessage& value)
 {
-  os << "{ ";
+  os << "ChangeInteractionClassPublicationMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10670,7 +11369,7 @@ prettyprint(std::ostream& os, const ChangeInteractionClassPublicationMessage& va
 std::ostream&
 operator<<(std::ostream& os, const ChangeObjectClassPublicationMessage& value)
 {
-  os << "{ ";
+  os << "ChangeObjectClassPublicationMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10701,7 +11400,7 @@ prettyprint(std::ostream& os, const ChangeObjectClassPublicationMessage& value, 
 std::ostream&
 operator<<(std::ostream& os, const ChangeInteractionClassSubscriptionMessage& value)
 {
-  os << "{ ";
+  os << "ChangeInteractionClassSubscriptionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10733,7 +11432,7 @@ prettyprint(std::ostream& os, const ChangeInteractionClassSubscriptionMessage& v
 std::ostream&
 operator<<(std::ostream& os, const ChangeObjectClassSubscriptionMessage& value)
 {
-  os << "{ ";
+  os << "ChangeObjectClassSubscriptionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10764,7 +11463,7 @@ prettyprint(std::ostream& os, const ChangeObjectClassSubscriptionMessage& value,
 std::ostream&
 operator<<(std::ostream& os, const ChangeObjectInstanceSubscriptionMessage& value)
 {
-  os << "{ ";
+  os << "ChangeObjectInstanceSubscriptionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10795,7 +11494,7 @@ prettyprint(std::ostream& os, const ChangeObjectInstanceSubscriptionMessage& val
 std::ostream&
 operator<<(std::ostream& os, const RegistrationForObjectClassMessage& value)
 {
-  os << "{ ";
+  os << "RegistrationForObjectClassMessage { ";
   os << "objectClassHandle: " << value.getObjectClassHandle();
   os << ", ";
   os << "start: " << value.getStart();
@@ -10818,7 +11517,7 @@ prettyprint(std::ostream& os, const RegistrationForObjectClassMessage& value, Se
 std::ostream&
 operator<<(std::ostream& os, const AttributesInScopeMessage& value)
 {
-  os << "{ ";
+  os << "AttributesInScopeMessage { ";
   os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
   os << ", ";
   os << "attributeHandles: " << value.getAttributeHandles();
@@ -10845,7 +11544,7 @@ prettyprint(std::ostream& os, const AttributesInScopeMessage& value, ServerModel
 std::ostream&
 operator<<(std::ostream& os, const TurnUpdatesOnForInstanceMessage& value)
 {
-  os << "{ ";
+  os << "TurnUpdatesOnForInstanceMessage { ";
   os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
   os << ", ";
   os << "attributeHandles: " << value.getAttributeHandles();
@@ -10876,7 +11575,7 @@ prettyprint(std::ostream& os, const TurnUpdatesOnForInstanceMessage& value, Serv
 std::ostream&
 operator<<(std::ostream& os, const TurnInteractionsOnMessage& value)
 {
-  os << "{ ";
+  os << "TurnInteractionsOnMessage { ";
   os << "interactionClassHandle: " << value.getInteractionClassHandle();
   os << ", ";
   os << "on: " << value.getOn();
@@ -10899,7 +11598,7 @@ prettyprint(std::ostream& os, const TurnInteractionsOnMessage& value, ServerMode
 std::ostream&
 operator<<(std::ostream& os, const InteractionMessage& value)
 {
-  os << "{ ";
+  os << "InteractionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10939,7 +11638,7 @@ prettyprint(std::ostream& os, const InteractionMessage& value, ServerModel::Fede
 std::ostream&
 operator<<(std::ostream& os, const TimeStampedInteractionMessage& value)
 {
-  os << "{ ";
+  os << "TimeStampedInteractionMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -10991,7 +11690,7 @@ prettyprint(std::ostream& os, const TimeStampedInteractionMessage& value, Server
 std::ostream&
 operator<<(std::ostream& os, const ObjectInstanceHandlesRequestMessage& value)
 {
-  os << "{ ";
+  os << "ObjectInstanceHandlesRequestMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -11018,7 +11717,7 @@ prettyprint(std::ostream& os, const ObjectInstanceHandlesRequestMessage& value, 
 std::ostream&
 operator<<(std::ostream& os, const ObjectInstanceHandlesResponseMessage& value)
 {
-  os << "{ ";
+  os << "ObjectInstanceHandlesResponseMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -11046,7 +11745,7 @@ prettyprint(std::ostream& os, const ObjectInstanceHandlesResponseMessage& value,
 std::ostream&
 operator<<(std::ostream& os, const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
 {
-  os << "{ ";
+  os << "ReleaseMultipleObjectInstanceNameHandlePairsMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "objectInstanceHandleVector: " << value.getObjectInstanceHandleVector();
@@ -11069,7 +11768,7 @@ prettyprint(std::ostream& os, const ReleaseMultipleObjectInstanceNameHandlePairs
 std::ostream&
 operator<<(std::ostream& os, const ReserveObjectInstanceNameRequestMessage& value)
 {
-  os << "{ ";
+  os << "ReserveObjectInstanceNameRequestMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -11100,7 +11799,7 @@ prettyprint(std::ostream& os, const ReserveObjectInstanceNameRequestMessage& val
 std::ostream&
 operator<<(std::ostream& os, const ReserveObjectInstanceNameResponseMessage& value)
 {
-  os << "{ ";
+  os << "ReserveObjectInstanceNameResponseMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -11131,7 +11830,7 @@ prettyprint(std::ostream& os, const ReserveObjectInstanceNameResponseMessage& va
 std::ostream&
 operator<<(std::ostream& os, const ReserveMultipleObjectInstanceNameRequestMessage& value)
 {
-  os << "{ ";
+  os << "ReserveMultipleObjectInstanceNameRequestMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -11158,7 +11857,7 @@ prettyprint(std::ostream& os, const ReserveMultipleObjectInstanceNameRequestMess
 std::ostream&
 operator<<(std::ostream& os, const ReserveMultipleObjectInstanceNameResponseMessage& value)
 {
-  os << "{ ";
+  os << "ReserveMultipleObjectInstanceNameResponseMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -11189,7 +11888,7 @@ prettyprint(std::ostream& os, const ReserveMultipleObjectInstanceNameResponseMes
 std::ostream&
 operator<<(std::ostream& os, const InsertObjectInstanceMessage& value)
 {
-  os << "{ ";
+  os << "InsertObjectInstanceMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "objectClassHandle: " << value.getObjectClassHandle();
@@ -11225,7 +11924,7 @@ prettyprint(std::ostream& os, const InsertObjectInstanceMessage& value, ServerMo
 std::ostream&
 operator<<(std::ostream& os, const DeleteObjectInstanceMessage& value)
 {
-  os << "{ ";
+  os << "DeleteObjectInstanceMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -11256,7 +11955,7 @@ prettyprint(std::ostream& os, const DeleteObjectInstanceMessage& value, ServerMo
 std::ostream&
 operator<<(std::ostream& os, const TimeStampedDeleteObjectInstanceMessage& value)
 {
-  os << "{ ";
+  os << "TimeStampedDeleteObjectInstanceMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -11299,7 +11998,7 @@ prettyprint(std::ostream& os, const TimeStampedDeleteObjectInstanceMessage& valu
 std::ostream&
 operator<<(std::ostream& os, const AttributeUpdateMessage& value)
 {
-  os << "{ ";
+  os << "AttributeUpdateMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -11339,7 +12038,7 @@ prettyprint(std::ostream& os, const AttributeUpdateMessage& value, ServerModel::
 std::ostream&
 operator<<(std::ostream& os, const TimeStampedAttributeUpdateMessage& value)
 {
-  os << "{ ";
+  os << "TimeStampedAttributeUpdateMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "federateHandle: " << value.getFederateHandle();
@@ -11390,7 +12089,7 @@ prettyprint(std::ostream& os, const TimeStampedAttributeUpdateMessage& value, Se
 std::ostream&
 operator<<(std::ostream& os, const RequestAttributeUpdateMessage& value)
 {
-  os << "{ ";
+  os << "RequestAttributeUpdateMessage { ";
   // StructField federationHandle (hidden)
   //os << "federationHandle: " << value.getFederationHandle();
   //os << ", ";
@@ -11421,7 +12120,7 @@ prettyprint(std::ostream& os, const RequestAttributeUpdateMessage& value, Server
 std::ostream&
 operator<<(std::ostream& os, const RequestClassAttributeUpdateMessage& value)
 {
-  os << "{ ";
+  os << "RequestClassAttributeUpdateMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "objectClassHandle: " << value.getObjectClassHandle();
@@ -11452,7 +12151,7 @@ prettyprint(std::ostream& os, const RequestClassAttributeUpdateMessage& value, S
 std::ostream&
 operator<<(std::ostream& os, const QueryAttributeOwnershipRequestMessage& value)
 {
-  os << "{ ";
+  os << "QueryAttributeOwnershipRequestMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
@@ -11479,7 +12178,7 @@ prettyprint(std::ostream& os, const QueryAttributeOwnershipRequestMessage& value
 std::ostream&
 operator<<(std::ostream& os, const QueryAttributeOwnershipResponseMessage& value)
 {
-  os << "{ ";
+  os << "QueryAttributeOwnershipResponseMessage { ";
   os << "federationHandle: " << value.getFederationHandle();
   os << ", ";
   os << "objectInstanceHandle: " << value.getObjectInstanceHandle();

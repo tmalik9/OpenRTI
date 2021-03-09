@@ -128,6 +128,12 @@ class DataType(object):
     def writePrettyPrintDecl(self, sourceStream):
         pass
 
+    def writeByteSize(self, sourceStream):
+        pass
+
+    def writeByteSizeDecl(self, sourceStream):
+        pass
+
     def writeToString(self, sourceStream):
         pass
 
@@ -218,15 +224,6 @@ class EnumDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeEnum' + component)(self, sourceStream)
 
-    def writePrettyPrintDecl(self, sourceStream):
-        if not self.getParentObject() is None:
-            parentObjectType=self.getParentObjectType()
-            parentObjectParameter=self.getParentObjectParameter()
-            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
-            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
-        else:
-            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
-
     def writeStreamOutDecl(self, sourceStream):
         sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
 
@@ -243,6 +240,15 @@ class EnumDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writePrettyPrint(self, sourceStream):
         sourceStream.writeline('std::ostream&')
         sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, ServerModel::Federation* )'.format(name = self.getName()))
@@ -258,6 +264,13 @@ class EnumDataType(DataType):
             sourceStream.writeline('  case {enum}: return "{repr}";'.format(enum = enum.getName(), repr=enum.getRepr()))
         sourceStream.writeline('  default: return "<Invalid {name}>";'.format(name = self.getName()))
         sourceStream.writeline('  }')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline(' return sizeof({name}); // sizeof()'.format(name = self.getName()))
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -352,6 +365,21 @@ class VectorDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = 0;');
+        sourceStream.writeline('for (auto& item : value)');
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('result += byteSize(item);');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline()
 
 ###############################################################################
 class SetDataType(DataType):
@@ -425,6 +453,22 @@ class SetDataType(DataType):
         sourceStream.writeline('  }')
         sourceStream.writeline('  os << " }";')
         sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = 0;');
+        sourceStream.writeline('for (auto& item : value)');
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('result += byteSize(item);');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent()
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -521,6 +565,23 @@ class MapDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = 0;');
+        sourceStream.writeline('for (auto& item : value)');
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('result += byteSize(item.first);');
+        sourceStream.writeline('result += byteSize(item.second);');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
 
 ###############################################################################
 class PairDataType(DataType):
@@ -602,6 +663,14 @@ class PairDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('return byteSize(value.first) + byteSize(value.second);');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline()
 
 ###############################################################################
 class StructField(object):
@@ -1005,7 +1074,7 @@ class StructDataType(DataType):
         sourceStream.writeline('std::ostream&')
         sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = self.getName()))
         sourceStream.writeline('{')
-        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  os << "{name} {{ ";'.format(name = self.getName()))
         count = 0
         for field in self.__fieldList:
             count = count + 1
@@ -1079,6 +1148,19 @@ class StructDataType(DataType):
             
         sourceStream.writeline('  os << " }";')
         sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = 0;');
+        for field in self.getFieldList():
+            fieldName = field.getName()
+            sourceStream.writeline('result += byteSize(value.get{fieldName}());'.format(fieldName = fieldName))
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent();
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -1166,6 +1248,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('virtual void out(std::ostream& os) const override;')
         sourceStream.writeline('virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;')
         sourceStream.writeline('virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;')
+        sourceStream.writeline('virtual size_t messageSize() const override;')
         sourceStream.writeline()
 
         sourceStream.writeline('bool operator==(const AbstractMessage& rhs) const noexcept override;')
@@ -1237,7 +1320,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('void')
         sourceStream.writeline('{name}::out(std::ostream& os) const'.format(name = self.getName()))
         sourceStream.writeline('{')
-        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  os << "{name} {{ ";'.format(name = self.getName()))
         count = 0
         fields = self.getFieldList()
         for field in fields:
@@ -1271,6 +1354,19 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('{name}::dispatch(const AbstractMessageDispatcher& dispatcher) const'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  dispatcher.accept(*this);')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+        sourceStream.writeline('size_t')
+        sourceStream.writeline('{name}::messageSize() const'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = {parentTypeName}::messageSize();'.format(parentTypeName = self.getParentTypeName()));
+        for field in self.getFieldList():
+            fieldName = field.getName()
+            sourceStream.writeline('result += byteSize(get{fieldName}());'.format(fieldName = fieldName))
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent();
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -1323,6 +1419,19 @@ class MessageDataType(StructDataType):
     def writeToString(self, sourceStream):
         pass
  
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = 0;');
+        for field in self.getFieldList():
+            fieldName = field.getName()
+            sourceStream.writeline('result += byteSize(value.get{fieldName}());'.format(fieldName = fieldName))
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent();
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
 ###############################################################################
 class MessageEncoding(object):
     def __init__(self, name):
@@ -1803,6 +1912,19 @@ class MessageEncoding(object):
             sourceStream.writeline('}')
             sourceStream.writeline()
 
+            sourceStream.writeline('size_t')
+            sourceStream.writeline('encodedSize(' + encodingClass + '& messageEncoding, const {messageName}& message) const'.format(messageName = messageName))
+            sourceStream.writeline('{')
+            sourceStream.pushIndent()
+            sourceStream.writeline('size_t result = 0;')
+            sourceStream.writeline('result += 2;')
+            sourceStream.writeline('// encodeStream.write{messageName}(message);'.format(messageName = messageName))
+            sourceStream.writeline('result += 4;')
+            sourceStream.writeline('return result;')
+            sourceStream.popIndent()
+            sourceStream.writeline('}')
+            sourceStream.writeline()
+
         sourceStream.popIndent()
         sourceStream.writeline('private:')
         sourceStream.pushIndent()
@@ -2098,6 +2220,9 @@ class TypeMap(object):
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeToString(sourceStream)
+        sourceStream.writeline()
+        for t in self.__typeList:
+            t.writeByteSize(sourceStream)
         sourceStream.writeline('} // namespace OpenRTI')
         sourceStream.writeline()
         sourceStream.writeline('#endif')
@@ -2261,5 +2386,7 @@ else:
     typeMap.writeDispatcher(SourceStream(open('AbstractMessageDispatcher.h', 'w+')))
 
     messageEncoding = TightBE1MessageEncoding()
+    print('write ' + 'TightBE1MessageEncoding.h')
     typeMap.writeEncodingDeclaration(SourceStream(open('TightBE1MessageEncoding.h', 'w+')), messageEncoding)
+    print('write ' + 'TightBE1MessageEncoding.cpp')
     typeMap.writeEncodingImplementation(SourceStream(open('TightBE1MessageEncoding.cpp', 'w+')), messageEncoding)

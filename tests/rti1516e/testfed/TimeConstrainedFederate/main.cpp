@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   try {
     federate = new TimeConstrainedFederate();
     federate->join(rtiAddress, federateName, fomPath, federationName, false, true);
-    federate->run(1000);
+    federate->run(10);
     federate->disconnect();
   }
   catch( Exception& e)

@@ -25,6 +25,11 @@
 namespace OpenRTI {
 
 
+size_t AbstractMessage::messageSize() const
+{
+  return sizeof(AbstractMessage);
+}
+
 std::string AbstractMessage::toString() const
 {
   std::ostringstream s;

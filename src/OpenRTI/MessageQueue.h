@@ -50,6 +50,7 @@ public:
   }
   bool isOpen() const override { return !_isClosed; }
   bool empty() const override { return _messageList.empty(); }
+  virtual size_t pendingBytes() const override { return _messageList.byteSize(); }
   void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) override
   {
     assert(!"not implemented");
@@ -111,7 +112,11 @@ public:
     ScopeLock scopeLock(_mutex);
     return _messageList.empty();
   }
-
+  virtual size_t pendingBytes() const override
+  {
+    ScopeLock scopeLock(_mutex);
+    return _messageList.byteSize();
+  }
 protected:
   virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) override
   {

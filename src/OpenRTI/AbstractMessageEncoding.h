@@ -47,6 +47,7 @@ public:
   bool getEnableRead() const noexcept override;
   void writePacket() override;
   bool getMoreToSend() const override;
+  size_t bytesQueued() const;
   void error(const Exception& e) override;
 
 protected:

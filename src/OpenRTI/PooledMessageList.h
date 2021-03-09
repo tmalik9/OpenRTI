@@ -38,6 +38,7 @@ public:
       _list.splice(_list.end(), _pool, _pool.begin());
       _list.back() = message;
     }
+    _byteSize += message->messageSize();
   }
   SharedPtr<const AbstractMessage> pop_front()
   {
@@ -47,13 +48,15 @@ public:
     SharedPtr<const AbstractMessage> message;
     message.swap(_list.front());
     _pool.splice(_pool.begin(), _list, _list.begin());
+    _byteSize -= message->messageSize();
     return message;
   }
-
+  size_t byteSize() const { return _byteSize; }
 private:
   typedef std::list<SharedPtr<const AbstractMessage> > List;
   List _list;
   List _pool;
+  size_t _byteSize = 0;
 };
 
 } // namespace OpenRTI

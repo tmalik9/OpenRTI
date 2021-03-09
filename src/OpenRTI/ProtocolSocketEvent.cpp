@@ -129,6 +129,14 @@ ProtocolSocketEvent::getEnableWrite() const
   return !_protocolSocket->_closed && _protocolSocket->_protocolLayer->getEnableWrite();
 }
 
+size_t
+ProtocolSocketEvent::bytesQueued() const
+{
+  if (!_protocolSocket->_closed)
+    return _protocolSocket->_protocolLayer->bytesQueued();
+  return 0;
+}
+
 void
 ProtocolSocketEvent::error(const Exception& e)
 {

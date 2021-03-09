@@ -76,4 +76,10 @@ SocketServerAcceptEvent::getSocket() const
   return _socketServer.get();
 }
 
+
+size_t SocketServerAcceptEvent::bytesQueued() const
+{
+  return 0;
+}
+
 } // namespace OpenRTI

@@ -39,6 +39,7 @@ public:
 
   void write(SocketEventDispatcher& dispatcher) override;
   bool getEnableWrite() const override;
+  size_t bytesQueued() const override;
 
   SocketServer* getSocket() const override;
 

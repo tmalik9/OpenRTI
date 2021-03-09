@@ -44,6 +44,7 @@ public:
   void write(AbstractProtocolSocket& protocolSocket) override;
   bool getEnableWrite() const override;
 
+  size_t bytesQueued() const override;
   void error(const Exception& e) override;
 
   static bool getCompatibleVersion(std::string& resultingVersion, const StringList& versions);

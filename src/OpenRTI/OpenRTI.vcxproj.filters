@@ -268,7 +268,6 @@
     <ClCompile Include="TranslateTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SocketBufferLimit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -747,7 +746,6 @@
     <ClInclude Include="TranslateTypes.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="SocketBufferLimit.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

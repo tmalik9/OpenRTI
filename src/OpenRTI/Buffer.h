@@ -215,9 +215,11 @@ public:
   size_t byte_size() const
   {
     size_t result = 0;
-    for (auto iter=begin(); iter != end(); iter++)
+    auto begin = byte_begin();
+    auto end = byte_end();
+    for (auto iter=begin; iter != end; iter++)
     {
-      result += iter->size();
+      result += iter.chunk_size(end);
     }
     return result;
   }
