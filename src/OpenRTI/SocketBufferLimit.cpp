@@ -11,7 +11,7 @@ namespace OpenRTI
     return _instance;
   }
 
-  SocketBufferLimit::SocketBufferLimit() noexcept : _bufferLimitActive(true), _bufferBalance(0), _bufferLimit(256000000)
+  SocketBufferLimit::SocketBufferLimit() noexcept : _bufferLimitActive(false), _bufferBalance(0), _bufferLimit(256000000)
   {
   }
 

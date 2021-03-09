@@ -131,7 +131,7 @@ private:
   bool                      _LogToConsoleSet = false;
 
   // Blocking federates get kicked out if the send/receive balance is above this value (bytes)
-  bool                      _BufferLimitActive = true;
+  bool                      _BufferLimitActive = false;
   size_t                    _BufferLimit = 256000000;
 };
 
