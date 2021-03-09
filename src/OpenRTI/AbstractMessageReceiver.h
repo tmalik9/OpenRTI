@@ -56,7 +56,7 @@ public:
   virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout) = 0;
   virtual bool empty() const = 0;
   virtual bool isOpen() const = 0;
-  virtual size_t pendingBytes() const = 0;
+  virtual size_t getBytesQueued() const = 0;
   virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) = 0;
 };
 

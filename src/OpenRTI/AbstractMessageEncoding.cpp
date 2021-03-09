@@ -44,9 +44,9 @@ bool AbstractMessageEncoding::getMoreToSend() const
   return !_connect->empty();
 }
 
-size_t AbstractMessageEncoding::bytesQueued() const
+size_t AbstractMessageEncoding::getBytesQueued() const
 {
-  return _connect->getMessageReceiver()->pendingBytes();
+  return _connect->getMessageReceiver()->getBytesQueued() + getBytesBuffered();
 }
 
 void

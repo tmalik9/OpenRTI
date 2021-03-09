@@ -204,7 +204,7 @@ InitialStreamProtocol::getEnableWrite() const
   return StreamBufferProtocol::getEnableWrite();
 }
 
-size_t InitialStreamProtocol::bytesQueued() const
+size_t InitialStreamProtocol::getBytesQueued() const
 {
   return 0;
 }

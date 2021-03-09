@@ -52,6 +52,7 @@ public:
   void addWriteBuffer(const VariableLengthData& value);
   VariableLengthData& addScratchWriteBuffer();
   Buffer& getOutputBuffer() { return _outputBuffer; }
+  size_t getBytesBuffered() const { return _outputBuffer.byte_size(); }
 private:
   // Buffer for the incoming data
   Buffer _inputBuffer;

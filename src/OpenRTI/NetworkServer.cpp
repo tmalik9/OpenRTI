@@ -47,7 +47,6 @@
 #include "StringUtils.h"
 #include "LogStream.h"
 #include "ServerModel.h"
-#include "SocketBufferLimit.h"
 
 namespace OpenRTI {
 

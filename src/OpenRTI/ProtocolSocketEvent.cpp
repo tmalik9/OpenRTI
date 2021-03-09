@@ -130,10 +130,10 @@ ProtocolSocketEvent::getEnableWrite() const
 }
 
 size_t
-ProtocolSocketEvent::bytesQueued() const
+ProtocolSocketEvent::getBytesQueued() const
 {
   if (!_protocolSocket->_closed)
-    return _protocolSocket->_protocolLayer->bytesQueued();
+    return _protocolSocket->_protocolLayer->getBytesQueued();
   return 0;
 }
 

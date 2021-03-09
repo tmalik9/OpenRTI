@@ -139,16 +139,17 @@ struct SocketEventDispatcher::PrivateData
             }
             else
             {
-              //DebugPrintf("%s: socket=%d bytesQueued=%d writable=%d\n", __FUNCTION__, socketEvent->getSocket()->getFd(), socketEvent->bytesQueued(), socketEvent->getSocket()->isWritable());
-              if (socketEvent->bytesQueued() > dispatcher.getQueueLimit())
+              // The socket has data to write, but either write has not been called before, or the previous
+              // call to write() returned WSAEWOULDBLOCK or similar - first check queue limit
+              // DebugPrintf("%s: socket=%d getBytesQueued=%d writable=%d\n", __FUNCTION__, socketEvent->getSocket()->getFd(), socketEvent->getBytesQueued(), socketEvent->getSocket()->isWritable());
+              if (socketEvent->getBytesQueued() > dispatcher.getQueueLimit())
               {
                 // queue overflow - close connection
                 socketsToErase.push_back(socketEventSP);
               }
               else
               {
-                // The socket has data to write, but either write has not been called before, or the previous
-                // call to write() returned WSAEWOULDBLOCK or similar - add the socket to the list of sockets
+                // if queue limit has not been reached yet, add the socket to the list of sockets
                 // to survey
                 sockets.push_back(socketEventSP);
                 notificationEvents.push_back(abstractSocket->_privateData->_notificationEvent);
@@ -262,7 +263,7 @@ struct SocketEventDispatcher::PrivateData
 
           for (auto& socketEventSP : socketsToErase)
           {
-            DebugPrintf("%s: closing connection due to queue overflow: socket=%d bytesQueued=%d writable=%d\n", __FUNCTION__, socketEventSP->getSocket()->getFd(), socketEventSP->bytesQueued(), socketEventSP->getSocket()->isWritable());
+            DebugPrintf("%s: closing connection due to queue overflow: socket=%d getBytesQueued=%d writable=%d\n", __FUNCTION__, socketEventSP->getSocket()->getFd(), socketEventSP->getBytesQueued(), socketEventSP->getSocket()->isWritable());
             socketEventSP->error(OpenRTI::ConnectionFailed("closing connection due to queue overflow."));
             dispatcher.erase(socketEventSP);
           }

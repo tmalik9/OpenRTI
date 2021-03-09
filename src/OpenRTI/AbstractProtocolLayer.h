@@ -39,7 +39,7 @@ public:
   // True if there is something to send
   virtual bool getEnableWrite() const = 0;
 
-  virtual size_t bytesQueued() const = 0;
+  virtual size_t getBytesQueued() const = 0;
   // Is called from the parent protocol layer when an unrecoverable error happens.
   // FIXME rethink
   virtual void error(const Exception& e) = 0;

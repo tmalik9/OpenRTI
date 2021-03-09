@@ -77,7 +77,7 @@ SocketServerAcceptEvent::getSocket() const
 }
 
 
-size_t SocketServerAcceptEvent::bytesQueued() const
+size_t SocketServerAcceptEvent::getBytesQueued() const
 {
   return 0;
 }
