@@ -295,8 +295,6 @@ set(OpenRTI_SOURCES
 	SingletonPtr.h
 	Socket.h
 	SocketAddress.h
-	SocketBufferLimit.cpp
-	SocketBufferLimit.h
 	SocketData.h
 	SocketEventDispatcher.cpp
 	SocketEventDispatcher.h
