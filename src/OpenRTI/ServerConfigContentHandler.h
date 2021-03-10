@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include <limits>
 
 #include "Attributes.h"
 #include "ContentHandler.h"
