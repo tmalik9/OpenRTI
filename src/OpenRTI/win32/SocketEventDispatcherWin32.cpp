@@ -130,7 +130,7 @@ struct SocketEventDispatcher::PrivateData
           bool notificationInserted = false;
           if (socketEvent->getEnableWrite())
           {
-           if (socketEvent->getSocket()->isWritable())
+            if (socketEvent->getSocket()->isWritable())
             {
               // The socket has data to write, and hasn't been marked as blocking by a previous call to write -
               // jump right into write() again and restart the outer loop after having processed all sockets
@@ -141,7 +141,7 @@ struct SocketEventDispatcher::PrivateData
             {
               // The socket has data to write, but either write has not been called before, or the previous
               // call to write() returned WSAEWOULDBLOCK or similar - first check queue limit
-              DebugPrintf("%s: socket=%d getBytesQueued=%d writable=%d\n", __FUNCTION__, socketEvent->getSocket()->getFd(), socketEvent->getBytesQueued(), socketEvent->getSocket()->isWritable());
+              // DebugPrintf("%s: socket=%d getBytesQueued=%d writable=%d\n", __FUNCTION__, socketEvent->getSocket()->getFd(), socketEvent->getBytesQueued(), socketEvent->getSocket()->isWritable());
               if (socketEvent->getBytesQueued() > dispatcher.getQueueLimit())
               {
                 // queue overflow - close connection

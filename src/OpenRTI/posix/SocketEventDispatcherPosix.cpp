@@ -117,11 +117,16 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
               pfd.events |= POLLRDNORM;
             if (socketEvent->getEnableWrite())
             {
-              // queue overflow - close connection
-              if (!socketEvent->getSocket()->isWritable() && socketEvent->getBytesQueued() > dispatcher.getQueueLimit())
-                socketsToErase.push_back(socketEvent);
-              else
-                pfd.events |= POLLWRNORM;
+              //// queue overflow - close connection
+              //if (!socketEvent->getSocket()->isWritable()) 
+              //{
+              //  if (socketEvent->getBytesQueued() > dispatcher.getQueueLimit())
+              //  {
+              //    socketsToErase.push_back(socketEvent);
+              //  }
+              //}
+              //else //TODO: check if else is needed here
+              pfd.events |= POLLWRNORM;
             }
 
             if (pfd.events) {
