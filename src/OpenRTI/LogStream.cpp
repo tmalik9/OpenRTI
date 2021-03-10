@@ -69,7 +69,7 @@ public:
     StreamBuf(std::ostream& stream) :
       _referencedMutex(getReferencedMutex())
     {
-      AddStream(stream);
+      //AddStream(stream);
     }
     void AddStream(std::ostream& stream)
     {

@@ -2337,10 +2337,8 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
         ParameterDefinition* parameterDefinition;
         parameterDefinition = i->getParameterDefinition(j->getName());
 
-        if (!parameterDefinition) {
-
-
-
+        if (!parameterDefinition) 
+        {
           ParameterDefinition* addParameterDefinition;
           InteractionClass* interactionClass = getInteractionClass(i->getInteractionClassHandle());
           addParameterDefinition = new ParameterDefinition(*interactionClass);
@@ -2416,7 +2414,6 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
       parameterDefinition->setDataType(stringParameter.getDataType());
       parameterDefinition->setParameterHandle(module.getFederation()._parameterHandleAllocator.get());
       interactionClass->insert(*parameterDefinition);
-
     }
 
     return true;
@@ -2440,10 +2437,8 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
         AttributeDefinition* attributeDefinition;
         attributeDefinition = i->getAttributeDefinition(stringAttribute.getName());
 
-        //
-        if (!attributeDefinition) {
-
-
+        if (!attributeDefinition) 
+        {
           AttributeDefinition* addAttributeDefinition;
           ObjectClass* objectClass = getObjectClass(i->getObjectClassHandle());
           addAttributeDefinition = new AttributeDefinition(*objectClass);
