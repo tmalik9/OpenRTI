@@ -32,7 +32,6 @@
 #include "Exception.h"
 #include "LogStream.h"
 #include "SocketPrivateDataPosix.h"
-#include "SocketBufferLimit.h"
 
 
 namespace OpenRTI {
@@ -118,7 +117,8 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
               pfd.events |= POLLRDNORM;
             if (socketEvent->getEnableWrite())
             {
-              if (!socketEvent->getSocket()->isWritable() && SocketBufferLimit::GetInstance().isBufferBalanceCritical())
+              // queue overflow - close connection
+              if (!socketEvent->getSocket()->isWritable() && socketEvent->getBytesQueued() > dispatcher.getQueueLimit())
                 socketsToErase.push_back(socketEvent);
               else
                 pfd.events |= POLLWRNORM;
@@ -210,9 +210,8 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
 
       for (auto& socketEventSP : socketsToErase)
       {
-        //DebugPrintf("Connection blocked for writing: Closing due to critical buffer balance %d\n", SocketBufferLimit::GetInstance().getBufferBalance());
-        SocketBufferLimit::GetInstance().resetBufferBalance();
-        socketEventSP->error(OpenRTI::ConnectionFailed("Connection blocked for writing: Closing due to critical buffer balance."));
+        //DebugPrintf("%s: closing connection due to queue overflow: socket=%d getBytesQueued=%d writable=%d\n", __FUNCTION__, socketEventSP->getSocket()->getFd(), socketEventSP->getBytesQueued(), socketEventSP->getSocket()->isWritable());
+        socketEventSP->error(OpenRTI::ConnectionFailed("closing connection due to queue overflow."));
         dispatcher.erase(socketEventSP);
       }
 
