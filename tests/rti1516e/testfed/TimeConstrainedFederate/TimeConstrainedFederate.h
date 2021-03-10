@@ -46,6 +46,7 @@ class TimeConstrainedFederate : public SimpleTestFederate
     InteractionClassHandle x_InteractionClass;
     ParameterHandle        xa_Parameter;
     ParameterHandle        xb_Parameter;
+    ParameterHandle        xc_Parameter;
 
     // instance specific
     ObjectClassHandle      myPublishedObjectClass;

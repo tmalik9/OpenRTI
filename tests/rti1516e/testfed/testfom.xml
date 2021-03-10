@@ -79,8 +79,12 @@
           <dataType>HLAunicodeString</dataType>
         </parameter>
         <parameter>
-        <name>xb</name>
+          <name>xb</name>
           <dataType>HLAunicodeString</dataType>
+        </parameter>
+        <parameter>
+          <name>xc</name>
+          <dataType>HLAopaqueData</dataType>
         </parameter>
       </interactionClass>
     </interactionClass>

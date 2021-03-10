@@ -14,6 +14,7 @@
 #include "dprintf.h"
 #include <assert.h>
 #include "RTI/encoding/BasicDataElements.h"
+#include "RTI/encoding/HLAopaqueData.h"
 
 using namespace rti1516e;
 using std::cout;
@@ -56,6 +57,7 @@ void TimeRegulatingFederate::InitializeInteraction()
   x_InteractionClass = mRtiAmb->getInteractionClassHandle(L"HLAinteractionRoot.X");
   xa_Parameter = mRtiAmb->getParameterHandle(x_InteractionClass, to_wstring("xa"));
   xb_Parameter = mRtiAmb->getParameterHandle(x_InteractionClass, to_wstring("xb"));
+  xc_Parameter = mRtiAmb->getParameterHandle(x_InteractionClass, to_wstring("xc"));
 
   //////////////////////////////////////////////////////
   /// publish the interaction class InteractionRoot.X
@@ -135,11 +137,17 @@ void TimeRegulatingFederate::sendInteraction()
   /// generate the new values
   //wchar_t xaValue[16], xbValue[16];
   wchar_t xbValue[16];
+  unsigned char data[1024];
+  for (int i=0;i<sizeof(data);i++)
+  {
+    data[i] = i % 256;
+  }
   //swprintf(xaValue, 16, L"xa:%f", getLbts());
   swprintf(xbValue, 16, L"xb:%f", getLbts());
   //parameters[xaHandle] = xaEncoded.encode();
   parameters[xa_Parameter] = HLAunicodeString(L"test1").encode();
   parameters[xb_Parameter] = HLAunicodeString(xbValue).encode();
+  parameters[xc_Parameter] = HLAopaqueData(data, sizeof(data)).encode();
   ///////////////////////////
   /// send the interaction
   ///////////////////////////

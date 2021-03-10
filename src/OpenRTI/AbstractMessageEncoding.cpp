@@ -46,7 +46,10 @@ bool AbstractMessageEncoding::getMoreToSend() const
 
 size_t AbstractMessageEncoding::getBytesQueued() const
 {
-  return _connect->getMessageReceiver()->getBytesQueued() + getBytesBuffered();
+  size_t bytesQueued = _connect->getMessageReceiver()->getBytesQueued();
+  size_t bytesBuffered = getBytesBuffered();
+  //DebugPrintf("%s: bytesQueued=%d bytesBuffered=%d\n", __FUNCTION__, bytesQueued, bytesBuffered);
+  return bytesQueued + bytesBuffered;
 }
 
 void

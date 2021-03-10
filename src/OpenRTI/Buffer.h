@@ -212,14 +212,12 @@ public:
   { return end(); }
 
   // SLOW
-  size_t byte_size() const
+  size_t byte_size(const_byte_iterator begin, const_byte_iterator end) const
   {
     size_t result = 0;
-    auto begin = byte_begin();
-    auto end = byte_end();
-    for (auto iter=begin; iter != end; iter++)
+    for (auto iter=begin.iterator(); iter != end.iterator(); iter++)
     {
-      result += iter.chunk_size(end);
+      result += iter->size();
     }
     return result;
   }
