@@ -5,6 +5,7 @@
 #include <RTI/RTIambassador.h>
 #include <atomic>
 #include <chrono>
+#include <iostream>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -77,6 +78,11 @@ class SimpleTestFederate : public NullFederateAmbassador
     ///////////////////////////////////
     // synchronization point methods //
     ///////////////////////////////////
+    virtual void connectionLost(const std::wstring& faultDescription) override
+    {
+      std::cout << "connection lost:" << to_string(faultDescription) << std::endl;
+      _done = true;
+    }
     virtual void synchronizationPointRegistrationSucceeded(std::wstring const& label) override;
 
     virtual void synchronizationPointRegistrationFailed(std::wstring const& label,  SynchronizationPointFailureReason reason) override;

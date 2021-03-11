@@ -632,6 +632,9 @@ public:
   void setObjectClassDeliverToSelf(rti1516e::ObjectClassHandle objectClassHandle, bool enable) override;
   void setConnectWaitTimeout(uint32_t timeoutMilliSeconds) override;
   void setOperationWaitTimeout(uint32_t timeoutMilliSeconds) override;
+
+  std::wstring getParameterDataType(rti1516e::InteractionClassHandle interactionClassHandle, rti1516e::ParameterHandle paramterHandle) override;
+  std::wstring getAttributeDataType(rti1516e::ObjectClassHandle rti1516ObjectClassHandle, rti1516e::AttributeHandle rti1516AttributeHandle) override;
 private:
   class RTI1516EAmbassadorInterface;
   RTI1516EAmbassadorInterface* _ambassadorInterface;

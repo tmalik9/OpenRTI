@@ -48,7 +48,9 @@ void TimeConstrainedFederate::initializeSimulation()
   waitForUser("before subscribe");
   InitializeInteraction();
   waitForUser("after subscribe");
+#ifdef _WIN32
   setNotificationHandle();
+#endif
 }
 
 
@@ -147,7 +149,7 @@ void TimeConstrainedFederate::sendInteraction()
   wchar_t xbValue[16];
   swprintf(xbValue, 16, L"xb:%f", getLbts());
   unsigned char data[1024];
-  for (int i=0;i<sizeof(data);i++)
+  for (size_t i = 0; i < sizeof(data); i++)
   {
     data[i] = i % 256;
   }
@@ -167,7 +169,7 @@ void TimeConstrainedFederate::sendInteraction()
 
 void TimeConstrainedFederate::updateAttributeValues(ObjectInstanceHandle theObject)
 {
-  std::wcout << __FUNCTIONW__ << L": " << mRtiAmb->getObjectClassName(mRtiAmb->getKnownObjectClassHandle(theObject)) << std::endl;
+  std::cout << __FUNCTION__ << ": " << to_string(mRtiAmb->getObjectClassName(mRtiAmb->getKnownObjectClassHandle(theObject))) << std::endl;
   ////////////////////////////////////////////////
   /// create the necessary container and values
   ///////////////////////////////////////////////

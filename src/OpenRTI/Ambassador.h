@@ -3062,6 +3062,26 @@ public:
     return attribute->getName();
   }
 
+  std::string getAttributeDataType(ObjectClassHandle objectClassHandle, AttributeHandle attributeHandle)
+    // throw (InvalidObjectClassHandle,
+    //        NameNotFound,
+    //        FederateNotExecutionMember,
+    //        NotConnected,
+    //        RTIinternalError)
+  {
+    if (!isConnected())
+      throw NotConnected();
+    if (!_federate.valid())
+      throw FederateNotExecutionMember();
+    const Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
+    if (!objectClass)
+      throw InvalidObjectClassHandle(objectClassHandle.toString());
+    const Federate::Attribute* attribute = objectClass->getAttribute(attributeHandle);
+    if (!attribute)
+      throw InvalidAttributeHandle(attributeHandle.toString());
+    return attribute->getDataType();
+  }
+
   double getUpdateRateValue(const std::string& updateRateDesignator)
     // throw (InvalidUpdateRateDesignator,
     //        FederateNotExecutionMember,
@@ -3171,6 +3191,27 @@ public:
     if (!parameter)
       throw InvalidParameterHandle(parameterHandle.toString());
     return parameter->getName();
+  }
+
+  std::string getParameterDataType(InteractionClassHandle interactionClassHandle, ParameterHandle parameterHandle)
+    // throw (InvalidInteractionClassHandle,
+    //        InvalidParameterHandle,
+    //        InteractionParameterNotDefined,
+    //        FederateNotExecutionMember,
+    //        NotConnected,
+    //        RTIinternalError)
+  {
+    if (!isConnected())
+      throw NotConnected();
+    if (!_federate.valid())
+      throw FederateNotExecutionMember();
+    const Federate::InteractionClass* interactionClass = _federate->getInteractionClass(interactionClassHandle);
+    if (!interactionClass)
+      throw InvalidInteractionClassHandle(interactionClassHandle.toString());
+    const Federate::Parameter* parameter = interactionClass->getParameter(parameterHandle);
+    if (!parameter)
+      throw InvalidParameterHandle(parameterHandle.toString());
+    return parameter->getDataType();
   }
 
   ObjectInstanceHandle getObjectInstanceHandle(const std::string& name)

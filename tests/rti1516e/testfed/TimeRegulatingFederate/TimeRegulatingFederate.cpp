@@ -48,7 +48,9 @@ void TimeRegulatingFederate::initializeSimulation()
   waitForUser("before publish");
   InitializeInteraction();
   waitForUser("after publish");
+#ifdef _WIN32
   setNotificationHandle();
+#endif
 }
 
 
@@ -138,7 +140,7 @@ void TimeRegulatingFederate::sendInteraction()
   //wchar_t xaValue[16], xbValue[16];
   wchar_t xbValue[16];
   unsigned char data[1024];
-  for (int i=0;i<sizeof(data);i++)
+  for (size_t i = 0; i < sizeof(data); i++)
   {
     data[i] = i % 256;
   }
@@ -162,7 +164,7 @@ void TimeRegulatingFederate::sendInteraction()
 
 void TimeRegulatingFederate::updateAttributeValues(ObjectInstanceHandle theObject)
 {
-  std::wcout << __FUNCTIONW__ << L": " << mRtiAmb->getObjectClassName(mRtiAmb->getKnownObjectClassHandle(theObject)) << std::endl;
+  std::cout << __FUNCTION__ << ": " << to_string(mRtiAmb->getObjectClassName(mRtiAmb->getKnownObjectClassHandle(theObject))) << std::endl;
   ////////////////////////////////////////////////
   /// create the necessary container and values
   ///////////////////////////////////////////////

@@ -4642,6 +4642,31 @@ RTIambassadorImplementation::getAttributeName(rti1516e::ObjectClassHandle rti151
   }
 }
 
+std::wstring
+RTIambassadorImplementation::getAttributeDataType(rti1516e::ObjectClassHandle rti1516ObjectClassHandle,
+                                                  rti1516e::AttributeHandle rti1516AttributeHandle)
+{
+  try {
+    OpenRTI::_I1516EObjectClassHandle objectClassHandle(rti1516ObjectClassHandle);
+    OpenRTI::_I1516EAttributeHandle attributeHandle(rti1516AttributeHandle);
+    return utf8ToUcs(_ambassadorInterface->getAttributeDataType(objectClassHandle, attributeHandle));
+  } catch (const OpenRTI::InvalidObjectClassHandle& e) {
+    throw rti1516e::InvalidObjectClassHandle(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::InvalidAttributeHandle& e) {
+    throw rti1516e::InvalidAttributeHandle(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::AttributeNotDefined& e) {
+    throw rti1516e::AttributeNotDefined(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::FederateNotExecutionMember& e) {
+    throw rti1516e::FederateNotExecutionMember(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::NotConnected& e) {
+    throw rti1516e::NotConnected(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const std::exception& e) {
+    throw rti1516e::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
+  } catch (...) {
+    throw rti1516e::RTIinternalError(L"Unknown internal error!");
+  }
+}
+
 double
 RTIambassadorImplementation::getUpdateRateValue(std::wstring const & updateRateDesignator)
 {
@@ -4750,6 +4775,31 @@ RTIambassadorImplementation::getParameterName(rti1516e::InteractionClassHandle r
     OpenRTI::_I1516EInteractionClassHandle interactionClassHandle(rti1516InteractionClassHandle);
     OpenRTI::_I1516EParameterHandle parameterHandle(rti1516ParameterHandle);
     return utf8ToUcs(_ambassadorInterface->getParameterName(interactionClassHandle, parameterHandle));
+  } catch (const OpenRTI::InvalidInteractionClassHandle& e) {
+    throw rti1516e::InvalidInteractionClassHandle(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::InvalidParameterHandle& e) {
+    throw rti1516e::InvalidParameterHandle(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::InteractionParameterNotDefined& e) {
+    throw rti1516e::InteractionParameterNotDefined(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::FederateNotExecutionMember& e) {
+    throw rti1516e::FederateNotExecutionMember(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::NotConnected& e) {
+    throw rti1516e::NotConnected(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const std::exception& e) {
+    throw rti1516e::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
+  } catch (...) {
+    throw rti1516e::RTIinternalError(L"Unknown internal error!");
+  }
+}
+
+std::wstring
+RTIambassadorImplementation::getParameterDataType(rti1516e::InteractionClassHandle rti1516InteractionClassHandle,
+                                                  rti1516e::ParameterHandle rti1516ParameterHandle)
+{
+  try {
+    OpenRTI::_I1516EInteractionClassHandle interactionClassHandle(rti1516InteractionClassHandle);
+    OpenRTI::_I1516EParameterHandle parameterHandle(rti1516ParameterHandle);
+    return utf8ToUcs(_ambassadorInterface->getParameterDataType(interactionClassHandle, parameterHandle));
   } catch (const OpenRTI::InvalidInteractionClassHandle& e) {
     throw rti1516e::InvalidInteractionClassHandle(OpenRTI::utf8ToUcs(e.what()));
   } catch (const OpenRTI::InvalidParameterHandle& e) {

@@ -224,12 +224,14 @@ public:
     const std::string& getName() const
     { return _name; }
     void setName(const std::string& name);
-
+    void setDataType(const std::string& dataType) { _dataType = dataType; }
+    const std::string& getDataType() const { return _dataType; }
   private:
-    Parameter(const Parameter&);
-    Parameter& operator=(const Parameter&);
+    Parameter(const Parameter&) = delete;
+    Parameter& operator=(const Parameter&) = delete;
 
     std::string _name;
+    std::string _dataType;
   };
   typedef std::vector<SharedPtr<Parameter> > ParameterVector;
 
@@ -258,8 +260,8 @@ public:
     bool setSubscriptionType(SubscriptionType subscriptionType, const ParameterValueVector& filterValues);
     void getFOMInteractionClass(FOMInteractionClass& fomInteractionClass);
   private:
-    InteractionClass(const InteractionClass&);
-    InteractionClass& operator=(const InteractionClass&);
+    InteractionClass(const InteractionClass&) = delete;
+    InteractionClass& operator=(const InteractionClass&) = delete;
 
     bool updateParameterFilterValues(const ParameterValueVector& parameterFilterValues, bool remove = false);
     ParameterValueVector getParameterFilterPrototype() const;
@@ -293,9 +295,9 @@ public:
 
   /// Object Classes
   struct OPENRTI_API Attribute final : public PublishSubscribe {
-  // private:
-  //   Attribute(const Attribute&);
-  //   Attribute& operator=(const Attribute&);
+    void setDataType(const std::string& dataTypeName) { _dataType = dataTypeName; }
+    const std::string& getDataType() const { return _dataType; }
+    std::string _dataType;
   };
   typedef std::vector<SharedPtr<Attribute> > AttributeVector;
 
@@ -321,7 +323,10 @@ public:
     const Attribute* getAttribute(const AttributeHandle& attributeHandle) const;
     Attribute* getAttribute(const AttributeHandle& attributeHandle);
     AttributeHandle getAttributeHandle(const std::string& name) const;
-    uint32_t getNumAttributes() const { return static_cast<uint32_t>(_attributeVector.size()); }
+    std::string getAttributeDataType(const AttributeHandle& attributeHandle);
+    uint32_t getNumAttributes() const {
+      return static_cast<uint32_t>(_attributeVector.size());
+    }
     AttributeVector& getAttributes() { return _attributeVector; }
     const AttributeVector& getAttributes() const { return _attributeVector; }
     AttributeHandleVector getAttributeHandles() const;
@@ -359,8 +364,8 @@ public:
     ObjectClassHandle getClassHandle() const { return _classHandle; }
     void              setClassHandle(ObjectClassHandle handle) { _classHandle = handle; }
   private:
-    ObjectClass(const ObjectClass&);
-    ObjectClass& operator=(const ObjectClass&);
+    ObjectClass(const ObjectClass&) = delete;
+    ObjectClass& operator=(const ObjectClass&) = delete;
 
     std::string _name;
     std::string _fqName;

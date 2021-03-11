@@ -2,6 +2,7 @@
 #include "TimeRegulatingFederate.h"
 #include "RTI/Exception.h"
 #include <signal.h>
+#include <cstring>
 
 TimeRegulatingFederate* federate = nullptr;
 

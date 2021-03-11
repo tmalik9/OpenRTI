@@ -185,6 +185,7 @@ Federate::InteractionClass::insertParameter(const FOMParameter& fomParameter)
   _nameParameterHandleMap[_fqName + "." + fomParameter.getName()] = parameterHandle;
 
   parameter->setName(fomParameter.getName());
+  parameter->setDataType(fomParameter.getDataType());
 
   for (IntrusiveList<InteractionClass>::iterator i = _childInteractionClassList.begin();
        i != _childInteractionClassList.end(); ++i) {
@@ -388,6 +389,14 @@ Federate::ObjectClass::getAttributeHandle(const std::string& name) const
   return i->second;
 }
 
+std::string
+Federate::ObjectClass::getAttributeDataType(const AttributeHandle& attributeHandle)
+{
+  if (_attributeVector.size() <= attributeHandle.getHandle())
+    return 0;
+  return _attributeVector[attributeHandle.getHandle()]->getDataType();
+}
+
 
 AttributeHandleVector Federate::ObjectClass::getAttributeHandles() const
 {
@@ -420,7 +429,7 @@ Federate::ObjectClass::insertAttribute(const FOMAttribute& fomAttribute)
   attribute->setOrderType(fomAttribute.getOrderType());
   attribute->setTransportationType(fomAttribute.getTransportationType());
   attribute->setDimensionHandleSet(fomAttribute.getDimensionHandleSet());
-
+  attribute->setDataType(fomAttribute.getDataType());
   for (IntrusiveList<ObjectClass>::iterator i = _childObjectClassList.begin();
        i != _childObjectClassList.end(); ++i) {
     i->insertAttribute(fomAttribute);
@@ -1026,9 +1035,8 @@ Federate::insertInteractionClass(const FOMInteractionClass& module, bool artific
       parentClass->insertChildInteractionClass(*interactionClass);
     }
   }
-  for (FOMParameterList::const_iterator i = module.getParameterList().begin();
-       i != module.getParameterList().end(); ++i) {
-    _interactionClassVector[index]->insertParameter(*i);
+  for (auto& parameter : module.getParameterList()) {
+    _interactionClassVector[index]->insertParameter(parameter);
   }
 }
 

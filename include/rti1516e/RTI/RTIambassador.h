@@ -753,6 +753,8 @@ namespace rti1516e
       virtual void setConnectWaitTimeout(uint32_t timeoutMilliSeconds) = 0;
       virtual void setOperationWaitTimeout(uint32_t timeoutMilliSeconds) = 0;
 
+      virtual std::wstring getParameterDataType(rti1516e::InteractionClassHandle interactionClassHandle, rti1516e::ParameterHandle paramterHandle) = 0;
+      virtual std::wstring getAttributeDataType(rti1516e::ObjectClassHandle objectClassHandle, rti1516e::AttributeHandle attributeHandle) = 0;
 };
 }
 

@@ -23,5 +23,6 @@ add_subdirectory(fddget)
 add_subdirectory(time)
 add_subdirectory(modules)
 add_subdirectory(objectinstance)
+add_subdirectory(testfed)
 ##bkd disable failing test:
 #add_subdirectory(mom/ManagerFederate)

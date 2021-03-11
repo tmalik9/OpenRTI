@@ -2875,6 +2875,7 @@ Federation::insert(Module& module, const FOMInteractionClass& fomInteractionClas
           ParameterDefinition* parameterDefinition;
           parameterDefinition = new ParameterDefinition(*i);
           parameterDefinition->setName(j->getName());
+          parameterDefinition->setDataType(j->getDataType());
           parameterDefinition->setParameterHandle(j->getParameterHandle());
           i->insert(*parameterDefinition);
         }
@@ -2940,6 +2941,7 @@ Federation::insert(Module& module, const FOMInteractionClass& fomInteractionClas
       parameterDefinition = new ParameterDefinition(*interactionClass);
       parameterDefinition->setName(j->getName());
       parameterDefinition->setParameterHandle(j->getParameterHandle());
+      parameterDefinition->setDataType(j->getDataType());
       interactionClass->insert(*parameterDefinition);
     }
   }

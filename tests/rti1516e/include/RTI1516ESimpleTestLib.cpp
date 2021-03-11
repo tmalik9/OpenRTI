@@ -554,10 +554,12 @@ void SimpleTestFederate::receiveInteraction(
     i != theParameterValues.end(); i++)
   {
     /// print the parameter handle
-    std::wcout << "\tparamHandle=" << i->first;
+    std::wcout << L"\tparamHandle=" << i->first;
+    std::wcout << L"\tdataType=" << mRtiAmb->getParameterDataType(theInteraction, i->first);
     /// print the parameter value
-    std::wstring value = variableLengthDataToWstring(i->second);
-    std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
+    //std::wstring value = variableLengthDataToWstring(i->second);
+    //std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
+    std::wcout << std::endl;
   }
 }
 
@@ -588,9 +590,11 @@ void SimpleTestFederate::receiveInteraction(
   {
     /// print the parameter handle
     std::wcout << "\tparamHandle=" << i->first;
+    std::wcout << L"\tdataType=" << mRtiAmb->getParameterDataType(theInteraction, i->first);
     /// print the parameter value
-    std::wstring value = variableLengthDataToWstring(i->second);
-    std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
+    //std::wstring value = variableLengthDataToWstring(i->second);
+    //std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
+    std::wcout << std::endl;
   }
 }
 
@@ -622,10 +626,12 @@ void SimpleTestFederate::receiveInteraction(
     i != theParameterValues.end(); i++)
   {
     /// print the parameter handle
-    std::wcout << "\tparamHandle=" << i->first;
+    std::wcout << L"\tparamHandle=" << i->first;
+    std::wcout << L"\tdataType=" << mRtiAmb->getParameterDataType(theInteraction, i->first);
     /// print the parameter value
-    std::wstring value = variableLengthDataToWstring(i->second);
-    std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
+    //std::wstring value = variableLengthDataToWstring(i->second);
+    //std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
+    std::wcout << std::endl;
   }
 }
 

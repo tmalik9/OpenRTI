@@ -3,7 +3,6 @@
 
 #include <RTI/RTIambassador.h>
 #include <memory>
-#include <windows.h>
 #include "RTI1516ESimpleTestLib.h"
 
 using namespace rti1516e;

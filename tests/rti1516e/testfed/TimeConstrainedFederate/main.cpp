@@ -2,6 +2,7 @@
 #include "TimeConstrainedFederate.h"
 #include "RTI/Exception.h"
 #include <signal.h>
+#include <cstring>
 
 TimeConstrainedFederate* federate = nullptr;
 
