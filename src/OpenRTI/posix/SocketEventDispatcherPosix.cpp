@@ -116,18 +116,7 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
             if (socketEvent->getEnableRead())
               pfd.events |= POLLRDNORM;
             if (socketEvent->getEnableWrite())
-            {
-              //// queue overflow - close connection
-              //if (!socketEvent->getSocket()->isWritable()) 
-              //{
-              //  if (socketEvent->getBytesQueued() > dispatcher.getQueueLimit())
-              //  {
-              //    socketsToErase.push_back(socketEvent);
-              //  }
-              //}
-              //else //TODO: check if else is needed here
               pfd.events |= POLLWRNORM;
-            }
 
             if (pfd.events) {
               included = true;
@@ -190,6 +179,15 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
               dispatcher.read(socketEvent);
             if (revents & POLLWRNORM)
               dispatcher.write(socketEvent);
+
+            // queue overflow - close connection
+            if (!socketEvent->getSocket()->isWritable())
+            {
+              if (socketEvent->getBytesQueued() > dispatcher.getQueueLimit())
+              {
+                socketsToErase.push_back(socketEvent);
+              }
+            }
           }
         }
         if (socketEvent->getTimeout().getNSec() <= now)
@@ -268,7 +266,8 @@ private:
 
 SocketEventDispatcher::SocketEventDispatcher() :
   _privateData(new PrivateData),
-  _done(false)
+  _done(false),
+  _queueLimit(std::numeric_limits<size_t>::max())
 {
 }
 
