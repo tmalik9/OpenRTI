@@ -233,7 +233,7 @@ pipeline {
           // Linux flavours
           env_clang = ["CC=clang","CXX=clang++"]
           env_gcc = ["CC=gcc","CXX=g++"]
-          docker_image_centos = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.4"
+          docker_image_centos = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-centos7:1.5"
           docker_image_ubuntu = "pnd-rtklinux-docker-dev.vegistry.vg.vector.int/pnd-rtklinux-build-ubuntu1804:1.1"
 		  docker_image_mingw  = "adp-docker-dev.vegistry.vg.vector.int/ltsc2019"
 
