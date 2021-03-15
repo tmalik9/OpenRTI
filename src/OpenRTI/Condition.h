@@ -30,6 +30,7 @@
 #if 201103L <= __CPlusPlusStd
 # include <condition_variable>
 # include "Clock.h"
+# include "AbsTimeout.h"
 # include "Mutex.h"
 #endif
 
@@ -73,12 +74,12 @@ public:
   void wait(ScopeLock& scopeLock);
 #endif
 #if 201103L <= __CPlusPlusStd
-  bool wait_until(ScopeLock& scopeLock, const Clock& timeout)
+  bool wait_until(ScopeLock& scopeLock, const Clock& abstime)
   {
     // Try to prevent overflow
     std::chrono::nanoseconds nsec;
-    if (timeout.getNSec() <= (uint64_t)std::chrono::nanoseconds::max().count())
-      nsec = std::chrono::nanoseconds(timeout.getNSec());
+    if (abstime.getNSec() <= (uint64_t)std::chrono::nanoseconds::max().count())
+      nsec = std::chrono::nanoseconds(abstime.getNSec());
     else
       nsec = std::chrono::nanoseconds::max();
 
@@ -89,8 +90,14 @@ public:
     else
       duration = duration_type::max();
 
+    AbsTimeout timeout(abstime);
     std::chrono::steady_clock::time_point tp = std::chrono::steady_clock::time_point(duration);
-    return std::cv_status::timeout != _condition.wait_until(scopeLock, tp);
+    while (!timeout.isExpired())
+    {
+      std::cv_status status = _condition.wait_until(scopeLock, std::chrono::steady_clock::time_point(timeout.getTimeout()));
+      if (status == std::cv_status::no_timeout) return true;
+    }
+    return false;
   }
 #else
   bool wait_until(ScopeLock& scopeLock, const Clock& abstime);

@@ -59,6 +59,7 @@ public:
 
   /// Here we could also store a timeout value that is used for the poll/select timeout
   /// Since we need to traverse all active read-write-events in any case this is not an extra effort.
+  /// CURRENTLY NOT USED
   const Clock& getTimeout() const
   { return _timeout; }
   void setTimeout(const Clock& timeout)

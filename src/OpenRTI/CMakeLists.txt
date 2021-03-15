@@ -180,6 +180,8 @@ endif(EXPAT_FOUND)
 #endif()
 
 set(OpenRTI_SOURCES
+	AbsTimeout.cpp
+	AbsTimeout.h
 	AbstractConnect.h
 	AbstractLogicalTime.h
 	AbstractMessage.cpp

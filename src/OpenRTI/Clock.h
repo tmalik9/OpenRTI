@@ -44,31 +44,43 @@ namespace OpenRTI {
 // win32 timeouts are just relative milliseconds which is easy to handle with any clock as long as it is consistent
 class OPENRTI_API Clock {
 public:
-  Clock() noexcept : _nsec(0)
-  { }
+  using Rep = uint64_t;
+
+  Clock() noexcept : _nsec(0) { }
   Clock(const Clock&) noexcept = default;
   Clock(Clock&&) noexcept = default;
+
+  Clock(const std::chrono::seconds& s)
+  {
+    _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(s).count();
+  }
+  Clock(const std::chrono::milliseconds& ms)
+  {
+    _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(ms).count();
+  }
+  Clock(const std::chrono::nanoseconds& us)
+  {
+    _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(us).count();
+  }
+  Clock(const std::chrono::steady_clock::time_point& tp)
+  {
+    _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(tp.time_since_epoch()).count();
+  }
+
   ~Clock() noexcept = default;
   Clock& operator=(const Clock&) = default;
   Clock& operator=(Clock&&) = default;
-#if 201103L <= __CPlusPlusStd
+
   static Clock now()
   {
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    return Clock(std::chrono::duration_cast<std::chrono::nanoseconds>(now.time_since_epoch()).count());
+    return std::chrono::steady_clock::now();
   }
-#else
-  static Clock now();
-#endif
 
-#if 201103L <= __CPlusPlusStd
+  operator std::chrono::steady_clock::time_point() const { return std::chrono::steady_clock::time_point(std::chrono::nanoseconds(_nsec)); }
   static void sleep_for(const Clock& reltime)
   {
     std::this_thread::sleep_for(std::chrono::nanoseconds(reltime.getNSec()));
   }
-#else
-  static void sleep_for(const Clock& reltime);
-#endif
 
   static Clock zero()
   { return Clock(0); }
@@ -109,13 +121,21 @@ public:
       return max();
     return Clock(milliSeconds*1000000ULL);
   }
+  uint64_t getMilliSeconds() const noexcept
+  {
+    return _nsec / 1000000ULL;
+  }
+  uint64_t getMicroSeconds() const noexcept
+  {
+    return _nsec / 1000ULL;
+  }
   /// Conversion from nanoseconds
-  static Clock fromNSec(const uint64_t& nsec)
+  static Clock fromNSec(uint64_t nsec)
   { return Clock(nsec); }
 
-  const uint64_t& getNSec() const noexcept
+  uint64_t getNSec() const noexcept
   { return _nsec; }
-  void setNSec(const uint64_t& nsec) noexcept
+  void setNSec(uint64_t nsec) noexcept
   { _nsec = nsec; }
 
   // Arithmetic, note that these two do not wrap.
@@ -151,14 +171,14 @@ public:
   { return _nsec >= clock._nsec; }
 
 private:
-  Clock(const uint64_t& nsecs) :
-    _nsec(nsecs)
+  explicit Clock(Rep nsecs)
+    : _nsec(nsecs)
   { }
 
   // In the worst case this is nanoseconds since epoch.
   // In the usual case this is the simulation time in nanoseconds for the logical time
   // and the monotonic posix clock for timeouts.
-  uint64_t _nsec;
+  Rep _nsec;
 };
 
 inline

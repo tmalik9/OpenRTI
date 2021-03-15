@@ -169,6 +169,8 @@ void SimpleTestFederate::join(const std::string& address, const std::string& fed
 
   rti1516e::RTIambassadorFactory factory;
   mRtiAmb = factory.createRTIambassador();
+  mRtiAmb->setConnectWaitTimeout(1000);
+  mRtiAmb->setOperationWaitTimeout(1000);
   /// create the federate ambassador
   try
   {

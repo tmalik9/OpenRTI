@@ -33,6 +33,7 @@
 #include "StringUtils.h"
 #include "TimeManagement.h"
 #include "TranslateTypes.h"
+#include "AbsTimeout.h"
 
 namespace OpenRTI {
 
@@ -3826,10 +3827,11 @@ public:
 
     if (!_federate->haveFreeObjectInstanceHandleNamePair()) {
       Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
+      AbsTimeout timeout(abstime);
       while (!_federate->haveFreeObjectInstanceHandleNamePair()) {
         if (receiveAndDispatchInternalMessage(abstime))
           continue;
-        if (abstime < Clock::now())
+        if (timeout.isExpired() /*abstime < Clock::now()*/)
           throw RTIinternalError("Timeout while waiting for free object handles.");
       }
     }

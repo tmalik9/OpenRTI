@@ -32,6 +32,7 @@
 #include "LogStream.h"
 #include "SocketPrivateDataWin32.h"
 #include "AbstractNetworkStatistics.h"
+#include "AbsTimeout.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -92,9 +93,10 @@ struct SocketEventDispatcher::PrivateData
     {
       int retv = 0;
       //HANDLE unlockedEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+      AbsTimeout absTimeout(absclock);
       while (!dispatcher._done)
       {
-        Clock absTimeout = absclock;
+        absTimeout.set(absclock);
         bool doWait = true;
         std::vector<SharedPtr<AbstractSocketEvent>> sockets;
         sockets.reserve(dispatcher._socketEventList.size());
@@ -104,13 +106,12 @@ struct SocketEventDispatcher::PrivateData
         std::vector<HANDLE> notificationEvents;
         notificationEvents.reserve(dispatcher._socketEventList.size() + 1);
 
-        //for (SocketEventList::const_iterator i = dispatcher._socketEventList.begin(); i != dispatcher._socketEventList.end(); ++i)
         for (auto& socketEventSP : dispatcher._socketEventList)
         {
           AbstractSocketEvent* socketEvent = socketEventSP.get();
-          if (socketEvent->getTimeout() < absTimeout)
+          if (socketEvent->getTimeout() < absTimeout.getTimeout())
           {
-            absTimeout = socketEvent->getTimeout();
+            absTimeout.set(socketEvent->getTimeout());
           }
           Socket* abstractSocket = socketEvent->getSocket();
           if (!abstractSocket)
@@ -170,17 +171,19 @@ struct SocketEventDispatcher::PrivateData
         notificationEvents.push_back(_wakeupEvent);
 
         uint32_t timeoutMs = INFINITE;
-        if (absTimeout < Clock::max())
+        if (absTimeout.getTimeout() < Clock::max())
         {
-          Clock now = Clock::now();
-          if (absTimeout < now)
+          //Clock now = Clock::now();
+          Clock remaining;
+          if (absTimeout.isExpired(remaining))
           {
             retv = 0;
             break;
           }
           else
           {
-            timeoutMs = static_cast<uint32_t>((absTimeout - now).getNSec() / 1000000ULL);
+            //timeoutMs = static_cast<uint32_t>((absTimeoutClock - now).getNSec() / 1000000ULL);
+            timeoutMs = static_cast<uint32_t>(remaining.getMilliSeconds());
           }
         }
 
@@ -207,8 +210,8 @@ struct SocketEventDispatcher::PrivateData
         }
 
         // Timeout
-        Clock now = Clock::now();
-        if (absclock <= now || waitResult == WAIT_TIMEOUT)
+        //Clock now = Clock::now();
+        if (absTimeout.isExpired() /*absclock <= now*/ || waitResult == WAIT_TIMEOUT)
         {
           retv = 0;
           break;
@@ -254,7 +257,7 @@ struct SocketEventDispatcher::PrivateData
               {
                 dispatcher.read(socketEvent);
               }
-              if (socketEvent->getTimeout() <= now)
+              if (socketEvent->getTimeout() <= absTimeout.getTimeout())
               {
                 dispatcher.timeout(socketEvent);
               }

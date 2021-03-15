@@ -32,6 +32,7 @@
 #include "AbstractServer.h"
 #include "ThreadLocal.h"
 #include "NetworkServer.h"
+#include "AbsTimeout.h"
 
 namespace OpenRTI {
 
@@ -528,7 +529,8 @@ std::pair<CreateFederationExecutionResponseType, std::string>
 InternalAmbassador::dispatchWaitCreateFederationExecutionResponse(const Clock& abstime)
 {
   _CreateFederationExecutionFunctor functor(*this);
-  while (!functor._done && Clock::now() <= abstime)
+  AbsTimeout timeout(abstime);
+  while (!functor._done && !timeout.isExpired())
     receiveAndDispatch(abstime, functor);
   return functor._responseTypeStringPair;
 }
@@ -566,7 +568,8 @@ DestroyFederationExecutionResponseType
 InternalAmbassador::dispatchWaitDestroyFederationExecutionResponse(const Clock& abstime)
 {
   _DestroyFederationExecutionFunctor functor(*this);
-  while (!functor._done && Clock::now() <= abstime)
+  AbsTimeout timeout(abstime);
+  while (!functor._done && !timeout.isExpired())
     receiveAndDispatch(abstime, functor);
   return functor._responseType;
 }
@@ -619,7 +622,8 @@ std::pair<JoinFederationExecutionResponseType, std::string>
 InternalAmbassador::dispatchWaitJoinFederationExecutionResponse(const Clock& abstime, std::string federateName)
 {
   _JoinFederationExecutionFunctor functor(*this, federateName);
-  while (!functor._done && Clock::now() <= abstime)
+  AbsTimeout timeout(abstime);
+  while (!functor._done && !timeout.isExpired())
     receiveAndDispatch(abstime, functor);
   return functor._response;
 }
@@ -656,7 +660,8 @@ bool
 InternalAmbassador::dispatchWaitEraseFederationExecutionResponse(const Clock& abstime)
 {
   _EraseFederationExecutionFunctor functor(*this);
-  while (!functor._done && Clock::now() <= abstime)
+  AbsTimeout timeout(abstime);
+  while (!functor._done && !timeout.isExpired())
     receiveAndDispatch(abstime, functor);
   return functor._done;
 }
@@ -711,7 +716,8 @@ InternalAmbassador::dispatchWaitReserveObjectInstanceName(const Clock& abstime, 
   send(request);
 
   _ReserveObjectInstanceNameFunctor functor(*this, objectInstanceName);
-  while (!functor._done && Clock::now() <= abstime)
+  AbsTimeout timeout(abstime);
+  while (!functor._done && !timeout.isExpired())
     receiveAndDispatch(abstime, functor);
 
   return functor._objectInstanceHandle;

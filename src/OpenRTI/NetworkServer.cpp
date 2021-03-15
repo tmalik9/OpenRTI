@@ -47,6 +47,7 @@
 #include "StringUtils.h"
 #include "LogStream.h"
 #include "ServerModel.h"
+#include "AbsTimeout.h"
 
 namespace OpenRTI {
 
@@ -281,9 +282,10 @@ NetworkServer::connectParentStreamServer(const SharedPtr<SocketStream>& socketSt
   _dispatcher.insert(protocolSocketEvent);
 
   // Process messages until we have either received the servers response or the timeout expires
+  AbsTimeout timeout(abstime);
   do {
-    _dispatcher.exec(abstime);
-  } while (Clock::now() <= abstime && !_dispatcher.getDone());
+    _dispatcher.exec(timeout.getTimeout());
+  } while (!timeout.isExpired() && !_dispatcher.getDone());
 
   setDone(false);
 

@@ -126,6 +126,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AbsTimeout.cpp" />
     <ClCompile Include="AbstractMessage.cpp" />
     <ClCompile Include="AbstractMessageEncoding.cpp" />
     <ClCompile Include="AbstractMessageSender.cpp" />
@@ -229,6 +230,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClInclude Include="AbsTimeout.h" />
     <ClInclude Include="DebugNew.h" />
     <ClInclude Include="encoding\BasicDataElements.h" />
     <ClInclude Include="encoding\DataElement.h" />
