@@ -145,8 +145,8 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
     SharedPtr<NetworkServer> server = new NetworkServer(serverNode);
 
     server->setServerName("Leaf server");
-    Clock abstime = (timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
-    server->connectParentServer(url, abstime);
+    AbsTimeout timeout((timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds));
+    server->connectParentServer(url, timeout);
     //DebugPrintf("parent protocol version=%d\n", server->getProtocolVersion());
 
     return server;
@@ -163,8 +163,8 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
       } else if (stringPair.first == "listen") {
         server->listen(URL::fromUrl(stringPair.second), 20);
       } else if (stringPair.first == "parent") {
-        Clock abstime = (timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds);
-        server->connectParentServer(URL::fromUrl(stringPair.second), abstime);
+        AbsTimeout timeout((timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds));
+        server->connectParentServer(URL::fromUrl(stringPair.second), timeout);
       }
     }
 

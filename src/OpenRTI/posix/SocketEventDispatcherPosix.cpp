@@ -90,7 +90,7 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
     }
   }
 
-  int exec(SocketEventDispatcher& dispatcher, const Clock& absclock)
+  int exec(SocketEventDispatcher& dispatcher, const AbsTimeout& timeout)
   {
     int retv = 0;
 
@@ -99,8 +99,6 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
       _socketEventVector.resize(0);
       _timerSocketEventVector.resize(0);
       SocketEventVector socketsToErase;
-
-      Clock timeout = absclock;
 
       struct pollfd pfd;
       std::memset(&pfd, 0, sizeof(pfd));
@@ -126,11 +124,11 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
           }
         }
 
-        if (socketEvent->getTimeout() != Clock::max()) {
-          timeout = std::min(timeout, socketEvent->getTimeout());
-          if (!included)
-            _timerSocketEventVector.push_back(socketEvent);
-        }
+        //if (socketEvent->getTimeout() != Clock::max()) {
+        //  timeout = std::min(timeout, socketEvent->getTimeout());
+        //  if (!included)
+        //    _timerSocketEventVector.push_back(socketEvent);
+        //}
       }
       // The wakeup event is always put at the end and does *not* have a
       // corresponding _socketEventVector entry!
@@ -139,12 +137,12 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
       _fdVector.push_back(pfd);
 
       int count;
-      if (timeout < Clock::max()) {
-        uint64_t now = ClockPosix::now();
-        if (timeout.getNSec() < now) {
+      if (timeout.getTimeout() < Clock::max()) {
+        if (timeout.isExpired()) {
           count = 0;
         } else {
-          count = ::poll(&_fdVector[0], _fdVector.size(), ClockPosix::toIntMSec(timeout.getNSec() - now));
+          uint32_t pollMilliSeconds = (timeout.getTimeout() - Clock::now()).getMilliSeconds();
+          count = ::poll(&_fdVector[0], _fdVector.size(), pollMilliSeconds);
         }
       } else {
         count = ::poll(&_fdVector[0], _fdVector.size(), -1);
@@ -159,8 +157,7 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
         }
       }
       // Timeout
-      uint64_t now = ClockPosix::now();
-      if (absclock.getNSec() <= now) {
+      if (timeout.isExpired()) {
         retv = 0;
         break;
       }
@@ -190,15 +187,15 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
             }
           }
         }
-        if (socketEvent->getTimeout().getNSec() <= now)
-          dispatcher.timeout(socketEvent);
+        //if (socketEvent->getTimeout().getNSec() <= now)
+        //  dispatcher.timeout(socketEvent);
       }
 
       for (SocketEventVector::size_type i = 0; i < _timerSocketEventVector.size(); ++i) {
         SharedPtr<AbstractSocketEvent> socketEvent;
         socketEvent.swap(_timerSocketEventVector[i]);
-        if (socketEvent->getTimeout().getNSec() <= now)
-          dispatcher.timeout(socketEvent);
+        //if (socketEvent->getTimeout().getNSec() <= now)
+        //  dispatcher.timeout(socketEvent);
       }
 
       OpenRTIAssert(!_fdVector.empty());
@@ -296,9 +293,9 @@ SocketEventDispatcher::wakeUp()
 }
 
 int
-SocketEventDispatcher::exec(const Clock& absclock)
+SocketEventDispatcher::exec(const AbsTimeout& timeout)
 {
-  return _privateData->exec(*this, absclock);
+  return _privateData->exec(*this, timeout);
 }
 
 }

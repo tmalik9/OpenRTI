@@ -68,7 +68,7 @@ Condition::wait_until(ScopeLock& scopeLock, const Clock& absclock)
   Clock now = Clock::now();
   if (absclock < now)
     return false;
-  DWORD msec = ClockWin32::toMsec((absclock - now).getNSec());
+  DWORD msec = ClockWin32::toMsec((absclock - now).getNanoSeconds());
   return _privateData->wait_for(*scopeLock.mutex()->_privateData, msec);
 }
 

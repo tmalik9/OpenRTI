@@ -72,8 +72,8 @@ class OPENRTI_LOCAL ServerThread : public Thread
       _server.setServerName(_address.getNumericName());
       if (parentAddress.valid())
       {
-        Clock abstime = Clock::now() + Clock::fromSeconds(1);
-        _server.connectParentInetServer(parentAddress, compress, abstime);
+        AbsTimeout timeout(Clock::now() + Clock::fromSeconds(1));
+        _server.connectParentInetServer(parentAddress, compress, timeout);
       }
       start();
     }

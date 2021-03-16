@@ -28,10 +28,10 @@ AbstractSocketEvent::AbstractSocketEvent() :
 {
 }
 
-void
-AbstractSocketEvent::timeout(SocketEventDispatcher& dispatcher)
-{
-}
+//void
+//AbstractSocketEvent::timeout(SocketEventDispatcher& dispatcher)
+//{
+//}
 
 void
 AbstractSocketEvent::error(const Exception& e)

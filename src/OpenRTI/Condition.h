@@ -74,30 +74,28 @@ public:
   void wait(ScopeLock& scopeLock);
 #endif
 #if 201103L <= __CPlusPlusStd
+  bool wait_until(ScopeLock& scopeLock, const AbsTimeout& timeout)
+  {
+    if (timeout.getTimeout() == Clock::max())
+    {
+      _condition.wait(scopeLock);
+      return true;
+    }
+    else
+    {
+      while (!timeout.isExpired())
+      {
+        std::chrono::steady_clock::time_point tp(timeout.getTimeout());
+        std::cv_status status = _condition.wait_until(scopeLock, tp);
+        if (status == std::cv_status::no_timeout) return true;
+      }
+      return false;
+    }
+  }
   bool wait_until(ScopeLock& scopeLock, const Clock& abstime)
   {
-    // Try to prevent overflow
-    std::chrono::nanoseconds nsec;
-    if (abstime.getNSec() <= (uint64_t)std::chrono::nanoseconds::max().count())
-      nsec = std::chrono::nanoseconds(abstime.getNSec());
-    else
-      nsec = std::chrono::nanoseconds::max();
-
-    typedef std::chrono::steady_clock::duration duration_type;
-    duration_type duration;
-    if (nsec <= std::chrono::duration_cast<std::chrono::nanoseconds>(duration_type::max()))
-      duration = std::chrono::duration_cast<duration_type>(nsec);
-    else
-      duration = duration_type::max();
-
     AbsTimeout timeout(abstime);
-    std::chrono::steady_clock::time_point tp = std::chrono::steady_clock::time_point(duration);
-    while (!timeout.isExpired())
-    {
-      std::cv_status status = _condition.wait_until(scopeLock, std::chrono::steady_clock::time_point(timeout.getTimeout()));
-      if (status == std::cv_status::no_timeout) return true;
-    }
-    return false;
+    return wait_until(scopeLock, timeout);
   }
 #else
   bool wait_until(ScopeLock& scopeLock, const Clock& abstime);

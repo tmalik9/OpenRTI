@@ -101,16 +101,16 @@ InternalAmbassador::send(const SharedPtr<const AbstractMessage>& message)
 }
 
 bool
-InternalAmbassador::receiveAndDispatchInternalMessage(const Clock& abstime)
+InternalAmbassador::receiveAndDispatchInternalMessage(const AbsTimeout& timeout)
 {
   _InternalMessageDispatchFunctor functor(*this);
-  return receiveAndDispatch(abstime, functor);
+  return receiveAndDispatch(timeout, functor);
 }
 
 bool
-InternalAmbassador::_receiveAndDispatch(const Clock& abstime, const AbstractMessageDispatcher& dispatcher)
+InternalAmbassador::_receiveAndDispatch(const AbsTimeout& timeout, const AbstractMessageDispatcher& dispatcher)
 {
-  SharedPtr<const AbstractMessage> message = _connect->receive(abstime);
+  SharedPtr<const AbstractMessage> message = _connect->receive(timeout);
   if (!message.valid())
     return false;
   message->dispatch(dispatcher);
@@ -526,12 +526,11 @@ private:
 };
 
 std::pair<CreateFederationExecutionResponseType, std::string>
-InternalAmbassador::dispatchWaitCreateFederationExecutionResponse(const Clock& abstime)
+InternalAmbassador::dispatchWaitCreateFederationExecutionResponse(const AbsTimeout& timeout)
 {
   _CreateFederationExecutionFunctor functor(*this);
-  AbsTimeout timeout(abstime);
   while (!functor._done && !timeout.isExpired())
-    receiveAndDispatch(abstime, functor);
+    receiveAndDispatch(timeout, functor);
   return functor._responseTypeStringPair;
 }
 
@@ -565,12 +564,11 @@ private:
 };
 
 DestroyFederationExecutionResponseType
-InternalAmbassador::dispatchWaitDestroyFederationExecutionResponse(const Clock& abstime)
+InternalAmbassador::dispatchWaitDestroyFederationExecutionResponse(const AbsTimeout& timeout)
 {
   _DestroyFederationExecutionFunctor functor(*this);
-  AbsTimeout timeout(abstime);
   while (!functor._done && !timeout.isExpired())
-    receiveAndDispatch(abstime, functor);
+    receiveAndDispatch(timeout, functor);
   return functor._responseType;
 }
 
@@ -619,12 +617,11 @@ private:
 };
 
 std::pair<JoinFederationExecutionResponseType, std::string>
-InternalAmbassador::dispatchWaitJoinFederationExecutionResponse(const Clock& abstime, std::string federateName)
+InternalAmbassador::dispatchWaitJoinFederationExecutionResponse(const AbsTimeout& timeout, std::string federateName)
 {
   _JoinFederationExecutionFunctor functor(*this, federateName);
-  AbsTimeout timeout(abstime);
   while (!functor._done && !timeout.isExpired())
-    receiveAndDispatch(abstime, functor);
+    receiveAndDispatch(timeout, functor);
   return functor._response;
 }
 
@@ -657,12 +654,11 @@ private:
 };
 
 bool
-InternalAmbassador::dispatchWaitEraseFederationExecutionResponse(const Clock& abstime)
+InternalAmbassador::dispatchWaitEraseFederationExecutionResponse(const AbsTimeout& timeout)
 {
   _EraseFederationExecutionFunctor functor(*this);
-  AbsTimeout timeout(abstime);
   while (!functor._done && !timeout.isExpired())
-    receiveAndDispatch(abstime, functor);
+    receiveAndDispatch(timeout, functor);
   return functor._done;
 }
 
@@ -703,7 +699,7 @@ private:
 };
 
 ObjectInstanceHandle
-InternalAmbassador::dispatchWaitReserveObjectInstanceName(const Clock& abstime, const std::string& objectInstanceName)
+InternalAmbassador::dispatchWaitReserveObjectInstanceName(const AbsTimeout& timeout, const std::string& objectInstanceName)
 {
   Federate* federate = getFederate();
   OpenRTIAssert(federate);
@@ -716,9 +712,8 @@ InternalAmbassador::dispatchWaitReserveObjectInstanceName(const Clock& abstime, 
   send(request);
 
   _ReserveObjectInstanceNameFunctor functor(*this, objectInstanceName);
-  AbsTimeout timeout(abstime);
   while (!functor._done && !timeout.isExpired())
-    receiveAndDispatch(abstime, functor);
+    receiveAndDispatch(timeout, functor);
 
   return functor._objectInstanceHandle;
 }

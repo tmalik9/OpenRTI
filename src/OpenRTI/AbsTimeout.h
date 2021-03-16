@@ -18,7 +18,7 @@ class OPENRTI_API AbsTimeout
 {
   public:
 
-    AbsTimeout(const Clock& abstime);
+    explicit AbsTimeout(const Clock& abstime);
 
     ~AbsTimeout();
     void set(const Clock& abstime) { _absTime = abstime; }
@@ -27,7 +27,7 @@ class OPENRTI_API AbsTimeout
 
     Clock getTimeout() const
     {
-      return _absTime + Clock::fromNSec(_delay);
+      return _absTime;
     }
   private:
     Clock getDelay() const;

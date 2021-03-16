@@ -11,8 +11,10 @@
 
 using namespace OpenRTI;
 
-std::chrono::milliseconds timeoutPeriod = std::chrono::milliseconds(5000);
+Clock timeoutPeriod = Clock::fromMilliSeconds(5000);
 std::chrono::milliseconds triggerPeriod = std::chrono::milliseconds(1910);
+Clock kInfinite = Clock::max();
+Clock kZero = Clock::zero();
 
 class SimpleTimeoutTest
 {
@@ -20,7 +22,7 @@ class SimpleTimeoutTest
     static bool exec()
     {
       std::cout << "waiting for timeout " << timeoutPeriod << std::endl;
-      std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+      Clock start = Clock::now();
       {
         Clock absTime = Clock::now() + Clock(timeoutPeriod);
         AbsTimeout timeout(absTime);
@@ -31,9 +33,55 @@ class SimpleTimeoutTest
           std::cout << "remaining: " << remaining << std::endl;
         }
       }
-      std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-      std::cout << "time passed until timeout=" << std::chrono::duration_cast<std::chrono::nanoseconds>(now - start).count() * 1e-9 << std::endl;
-      return (std::chrono::duration_cast<std::chrono::milliseconds>(now - start) >= timeoutPeriod);
+      Clock now = Clock::now();
+      std::cout << "time passed until timeout=" << (now - start).getNanoSeconds() * 1e-9 << std::endl;
+      return ((now - start) >= timeoutPeriod);
+    }
+};
+
+class InfiniteTimeoutTest
+{
+  public:
+    static bool exec()
+    {
+      std::cout << "waiting for timeout " << kInfinite << std::endl;
+      Clock start = Clock::now();
+      {
+        Clock absTime = Clock::now() + Clock(timeoutPeriod);
+        AbsTimeout timeout(kInfinite);
+        Clock remaining;
+        while (!timeout.isExpired(remaining) && Clock::now() < absTime)
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+          std::cout << "remaining: " << remaining << std::endl;
+        }
+      }
+      Clock now = Clock::now();
+      std::cout << "time passed until timeout=" << (now - start).getNanoSeconds() * 1e-9 << std::endl;
+      return ((now - start) >= timeoutPeriod);
+    }
+};
+
+class ZeroTimeoutTest
+{
+  public:
+    static bool exec()
+    {
+      std::cout << "waiting for timeout " << kZero << std::endl;
+      Clock start = Clock::now();
+      {
+        Clock absTime = start + Clock(timeoutPeriod);
+        AbsTimeout timeout(kZero);
+        Clock remaining;
+        while (!timeout.isExpired(remaining) && Clock::now() < absTime)
+        {
+          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+          std::cout << "remaining: " << remaining << std::endl;
+        }
+      }
+      Clock now = Clock::now();
+      std::cout << "time passed until timeout=" << (now - start).getNanoSeconds() * 1e-9 << std::endl;
+      return ((now - start) <= Clock::fromMilliSeconds(100));
     }
 };
 
@@ -45,7 +93,9 @@ class ConditionTest : Thread
       ConditionData() : _signaled(false) {}
       void notify_one()
       {
+        std::cout << __FUNCTION__ << ": acquire lock" << std::endl;
         ScopeLock scopeLock(_mutex);
+        std::cout << __FUNCTION__ << ": got lock" << std::endl;
         _signaled = true;
         _condition.notify_one();
       }
@@ -56,11 +106,26 @@ class ConditionTest : Thread
           _condition.wait(scopeLock);
         _signaled = false;
       }
-      bool wait_until(Clock abstime)
+      bool wait_until(const Clock& abstime)
+      {
+        std::cout << __FUNCTION__ << ": acquire lock" << std::endl;
+        ScopeLock scopeLock(_mutex);
+        std::cout << __FUNCTION__ << ": got lock" << std::endl;
+        while (!_signaled)
+          if (!_condition.wait_until(scopeLock, abstime))
+          {
+            std::cout << __FUNCTION__ << ": wait returned false" << std::endl;
+            return false;
+          }
+        _signaled = false;
+        std::cout << __FUNCTION__ << ": wait returned true" << std::endl;
+        return true;
+      }
+      bool wait_until(const AbsTimeout& timeout)
       {
         ScopeLock scopeLock(_mutex);
         while (!_signaled)
-          if (!_condition.wait_until(scopeLock, abstime))
+          if (!_condition.wait_until(scopeLock, timeout))
             return false;
         _signaled = false;
         return true;
@@ -79,49 +144,84 @@ class ConditionTest : Thread
 
     static bool exec()
     {
-      ConditionData data;
-      ConditionTest testThread(data);
       {
+        ConditionData data;
         bool result;
         std::cout << "Condition.wait_until(" << timeoutPeriod << "), no notification" << std::endl;
         Clock start = Clock::now();
         result = data.wait_until(start + Clock::fromSeconds(5));
         Clock stop = Clock::now();
-        std::cout << "Condition.wait_until returned after: " << (stop - start).getNSec() * 1e-9 << " with result " << result << std::endl;
+        std::cout << "Condition.wait_until returned after: " << (stop - start).getNanoSeconds() * 1e-9 << " with result " << result << std::endl;
       }
       {
+        ConditionData data;
         bool result;
-        std::cout << "Condition.wait_until(" << timeoutPeriod << "), with notification after " << triggerPeriod << std::endl;
+        std::cout << "Condition.wait_until(AbsTimeout(" << timeoutPeriod << ")), no notification" << std::endl;
+        Clock start = Clock::now();
+        AbsTimeout timeout(start + Clock::fromSeconds(5));
+        result = data.wait_until(timeout);
+        Clock stop = Clock::now();
+        std::cout << "Condition.wait_until returned after: " << (stop - start).getNanoSeconds() * 1e-9 << " with result " << result << std::endl;
+      }
+      {
+        ConditionData data;
+        ConditionTest testThread(data);
+        bool result;
+        std::cout << "Condition.wait_until(" << timeoutPeriod << "), with notification after " << triggerPeriod.count() << "ms" << std::endl;
         testThread.start();
         Clock start = Clock::now();
         result = data.wait_until(start + Clock(timeoutPeriod));
         Clock stop = Clock::now();
-        std::cout << "Condition.wait_until returned after: " << (stop - start).getNSec() * 1e-9 << " with result " << result << std::endl;
+        std::cout << "Condition.wait_until returned after: " << (stop - start).getNanoSeconds() * 1e-9 << " with result " << result << std::endl;
+        testThread.wait();
+      }
+      {
+        ConditionData data;
+        ConditionTest testThread(data);
+        bool result;
+        std::cout << "Condition.wait_until(" << kInfinite << "), with notification after " << triggerPeriod.count() << "ms" << std::endl;
+        testThread.start();
+        Clock start = Clock::now();
+        result = data.wait_until(kInfinite);
+        Clock stop = Clock::now();
+        std::cout << "Condition.wait_until returned after: " << (stop - start).getNanoSeconds() * 1e-9 << " with result " << result << std::endl;
+        testThread.wait();
       }
       return true;
     }
   protected:
     virtual void run() override
     {
+      std::cout << "notification thread started" << std::endl;
       std::this_thread::sleep_for(triggerPeriod);
+      std::cout << "notify cv" << std::endl;
       _data.notify_one();
     }
-
     ConditionData& _data;
 };
 
 
 int main()
 {
-  if (!SimpleTimeoutTest::exec())
-  {
-    std::cerr << "SimpleTimeoutTest failed!" << std::endl;
-    return EXIT_FAILURE;
-  }
-  //if (!ConditionTest::exec())
+  //if (!SimpleTimeoutTest::exec())
   //{
-  //  std::cerr << "ConditionTest failed!" << std::endl;
+  //  std::cerr << "SimpleTimeoutTest failed!" << std::endl;
   //  return EXIT_FAILURE;
   //}
+  //if (!InfiniteTimeoutTest::exec())
+  //{
+  //  std::cerr << "InfiniteTimeoutTest failed!" << std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  if (!ZeroTimeoutTest::exec())
+  {
+    std::cerr << "ZeroTimeoutTest failed!" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (!ConditionTest::exec())
+  {
+    std::cerr << "ConditionTest failed!" << std::endl;
+    return EXIT_FAILURE;
+  }
 }
 

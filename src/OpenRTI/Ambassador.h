@@ -133,7 +133,8 @@ public:
     }
     std::pair<CreateFederationExecutionResponseType, std::string> responseTypeStringPair;
     Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
-    responseTypeStringPair = dispatchWaitCreateFederationExecutionResponse(abstime);
+    AbsTimeout timeout(abstime);
+    responseTypeStringPair = dispatchWaitCreateFederationExecutionResponse(timeout);
     if (responseTypeStringPair.first == CreateFederationExecutionResponseFederationExecutionAlreadyExists)
       throw FederationExecutionAlreadyExists(federationExecutionName);
     if (responseTypeStringPair.first == CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory)
@@ -166,7 +167,8 @@ public:
 
     DestroyFederationExecutionResponseType responseType;
     Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
-    responseType = dispatchWaitDestroyFederationExecutionResponse(abstime);
+    AbsTimeout timeout(abstime);
+    responseType = dispatchWaitDestroyFederationExecutionResponse(timeout);
     if (responseType == DestroyFederationExecutionResponseFederatesCurrentlyJoined)
       throw FederatesCurrentlyJoined(federationExecutionName);
     if (responseType == DestroyFederationExecutionResponseFederationExecutionDoesNotExist)
@@ -225,7 +227,8 @@ public:
     std::pair<JoinFederationExecutionResponseType, std::string> response;
     // The maximum abstime to try to connect
     Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
-    response = dispatchWaitJoinFederationExecutionResponse(abstime, federateName);
+    AbsTimeout timeout(abstime);
+    response = dispatchWaitJoinFederationExecutionResponse(timeout, federateName);
     switch (response.first) {
     case JoinFederationExecutionResponseFederateNameAlreadyInUse:
       _federate = 0;
@@ -299,7 +302,8 @@ public:
     _timeManagement = 0;
 
     Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
-    if (!dispatchWaitEraseFederationExecutionResponse(abstime))
+    AbsTimeout timeout(abstime);
+    if (!dispatchWaitEraseFederationExecutionResponse(timeout))
       throw RTIinternalError("resignFederationExecution hit timeout!");
 
     _federate = 0;
@@ -1320,7 +1324,8 @@ public:
         // of allowing that to emulate certi behavior, we need to do the reservation
         // of the name now. This is the only syncronous operation in the rti.
         Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
-        objectInstanceHandle = dispatchWaitReserveObjectInstanceName(abstime, objectInstanceName);
+        AbsTimeout timeout(abstime);
+        objectInstanceHandle = dispatchWaitReserveObjectInstanceName(timeout, objectInstanceName);
         if (!objectInstanceHandle.valid())
           throw ObjectInstanceNameInUse(objectInstanceName);
       }
@@ -3736,7 +3741,8 @@ public:
     // throw (RTIinternalError)
   {
     Clock clock = Clock::now() + Clock::fromSeconds(approximateMinimumTimeInSeconds);
-    return dispatchCallback(clock);
+    AbsTimeout timeout(clock);
+    return dispatchCallback(timeout);
   }
 
   bool evokeMultipleCallbacks(double approximateMinimumTimeInSeconds, double approximateMaximumTimeInSeconds)
@@ -3748,16 +3754,18 @@ public:
     // wall clock time if there are no additional callbacks to be
     // delivered to the federate, the service shall complete.
     Clock clock = reference + Clock::fromSeconds(approximateMinimumTimeInSeconds);
+    AbsTimeout timeout(clock);
     do {
-      if (!dispatchCallback(clock))
+      if (!dispatchCallback(timeout))
         return false;
-    } while (Clock::now() <= clock);
+    } while (!timeout.isExpired());
 
     clock = reference + Clock::fromSeconds(approximateMaximumTimeInSeconds);
+    AbsTimeout zeroTimeout(Clock::zero());
     do {
-      if (!dispatchCallback(Clock::zero()))
+      if (!dispatchCallback(zeroTimeout))
         return false;
-    } while (Clock::now() <= clock);
+    } while (!timeout.isExpired());
 
     return true;
   }
@@ -3829,9 +3837,9 @@ public:
       Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
       AbsTimeout timeout(abstime);
       while (!_federate->haveFreeObjectInstanceHandleNamePair()) {
-        if (receiveAndDispatchInternalMessage(abstime))
+        if (receiveAndDispatchInternalMessage(timeout))
           continue;
-        if (timeout.isExpired() /*abstime < Clock::now()*/)
+        if (timeout.isExpired())
           throw RTIinternalError("Timeout while waiting for free object handles.");
       }
     }
@@ -3880,7 +3888,7 @@ public:
   }
 
   // Here we just should see messages which do callbacks in the ambassador
-  bool dispatchCallback(const Clock& clock)
+  bool dispatchCallback(const AbsTimeout& timeout)
   {
     flushAndDispatchInternalMessage();
     if (!_callbacksEnabled)
@@ -3889,7 +3897,7 @@ public:
       return false;
     }
     while (!_dispatchCallbackMessage()) {
-      if (!receiveAndDispatchInternalMessage(clock))
+      if (!receiveAndDispatchInternalMessage(timeout))
       {
         CondDebugPrintf("%s: !receiveAndDispatchInternalMessage ==> false\n", __FUNCTION__);
         return false;

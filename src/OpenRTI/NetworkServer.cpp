@@ -132,7 +132,8 @@ NetworkServer::setUpFromConfig(std::istream& stream)
       else
         url.setProtocol("rti");
     }
-    connectParentServer(url, Clock::now() + Clock::fromSeconds(90));
+    AbsTimeout timeout(Clock::now() + Clock::fromSeconds(90));
+    connectParentServer(url, timeout);
   }
 
   for (unsigned i = 0; i < contentHandler->getNumListenConfig(); ++i) {
@@ -202,7 +203,7 @@ NetworkServer::listenPipe(const std::string& address, int backlog)
 }
 
 void
-NetworkServer::connectParentServer(const URL& url, const Clock& abstime)
+NetworkServer::connectParentServer(const URL& url, const AbsTimeout& timeout)
 {
   if (url.getProtocol().empty() || url.getProtocol() == "rti" || url.getProtocol() == "rtic") {
     std::string host = url.getHost();
@@ -214,25 +215,25 @@ NetworkServer::connectParentServer(const URL& url, const Clock& abstime)
     bool compress = false;
     if (url.getProtocol() == "rtic")
       compress = true;
-    connectParentInetServer(host, service, compress, abstime);
+    connectParentInetServer(host, service, compress, timeout);
   } else if (url.getProtocol() == "pipe" || url.getProtocol() == "file") {
     std::string path = url.getPath();
     if (path.empty())
       path = OpenRTI_DEFAULT_PIPE_PATH;
-    connectParentPipeServer(path, abstime);
+    connectParentPipeServer(path, timeout);
   } else {
     throw RTIinternalError(std::string("Trying to connect to \"") + url.str() + "\": Unknown protocol type!");
   }
 }
 
 void
-NetworkServer::connectParentInetServer(const std::string& host, const std::string& service, bool compress, const Clock& abstime)
+NetworkServer::connectParentInetServer(const std::string& host, const std::string& service, bool compress, const AbsTimeout& timeout)
 {
   // Note that here the may be lenghty name lookup for the connection address happens
   std::list<SocketAddress> addressList = SocketAddress::resolve(host, service, false);
   while (!addressList.empty()) {
     try {
-      connectParentInetServer(addressList.front(), compress, abstime);
+      connectParentInetServer(addressList.front(), compress, timeout);
       return;
     } catch (const OpenRTI::Exception&) {
       addressList.pop_front();
@@ -245,26 +246,26 @@ NetworkServer::connectParentInetServer(const std::string& host, const std::strin
 }
 
 void
-NetworkServer::connectParentInetServer(const SocketAddress& socketAddress, bool compress, const Clock& abstime)
+NetworkServer::connectParentInetServer(const SocketAddress& socketAddress, bool compress, const AbsTimeout& timeout)
 {
   SharedPtr<SocketTCP> socketStream = new SocketTCP;
   socketStream->connect(socketAddress);
-  connectParentStreamServer(socketStream, abstime, compress);
+  connectParentStreamServer(socketStream, timeout, compress);
 }
 
 void
-NetworkServer::connectParentPipeServer(const std::string& name, const Clock& abstime)
+NetworkServer::connectParentPipeServer(const std::string& name, const AbsTimeout& timeout)
 {
   // Try to connect to a pipe socket
   SharedPtr<SocketPipe> socketStream = new SocketPipe;
   socketStream->connect(name);
 
-  connectParentStreamServer(socketStream, abstime, false);
+  connectParentStreamServer(socketStream, timeout, false);
 }
 
 // Creates a new server thread that is connected to a parent server through the socket stream
 void
-NetworkServer::connectParentStreamServer(const SharedPtr<SocketStream>& socketStream, const Clock& abstime, bool compress)
+NetworkServer::connectParentStreamServer(const SharedPtr<SocketStream>& socketStream, const AbsTimeout& timeout, bool compress)
 {
   // Set up the server configured option map
   StringStringListMap connectOptions;
@@ -282,9 +283,8 @@ NetworkServer::connectParentStreamServer(const SharedPtr<SocketStream>& socketSt
   _dispatcher.insert(protocolSocketEvent);
 
   // Process messages until we have either received the servers response or the timeout expires
-  AbsTimeout timeout(abstime);
   do {
-    _dispatcher.exec(timeout.getTimeout());
+    _dispatcher.exec(timeout);
   } while (!timeout.isExpired() && !_dispatcher.getDone());
 
   setDone(false);

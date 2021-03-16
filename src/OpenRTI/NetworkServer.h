@@ -45,11 +45,11 @@ public:
   SocketAddress listenInet(const SocketAddress& socketAddress, int backlog);
   void listenPipe(const std::string& address, int backlog);
 
-  void connectParentServer(const URL& url, const Clock& abstime);
-  void connectParentInetServer(const std::string& host, const std::string& service, bool compress, const Clock& abstime);
-  void connectParentInetServer(const SocketAddress& socketAddress, bool compress, const Clock& abstime);
-  void connectParentPipeServer(const std::string& name, const Clock& abstime);
-  void connectParentStreamServer(const SharedPtr<SocketStream>& socketStream, const Clock& abstime, bool compress);
+  void connectParentServer(const URL& url, const AbsTimeout& timeout);
+  void connectParentInetServer(const std::string& host, const std::string& service, bool compress, const AbsTimeout& timeout);
+  void connectParentInetServer(const SocketAddress& socketAddress, bool compress, const AbsTimeout& timeout);
+  void connectParentPipeServer(const std::string& name, const AbsTimeout& timeout);
+  void connectParentStreamServer(const SharedPtr<SocketStream>& socketStream, const AbsTimeout& timeout, bool compress);
 
   int exec() override;
   uint32_t getProtocolVersion() const override;

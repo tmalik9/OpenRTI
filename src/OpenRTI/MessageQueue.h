@@ -25,6 +25,7 @@
 #include "PooledMessageList.h"
 #include "Mutex.h"
 #include "ScopeLock.h"
+#include "AbsTimeout.h"
 
 //#include "dprintf.h"
 
@@ -44,7 +45,7 @@ public:
   {
     return _messageList.pop_front();
   }
-  SharedPtr<const AbstractMessage> receive(const Clock&) override
+  SharedPtr<const AbstractMessage> receive(const AbsTimeout&) override
   {
     return _messageList.pop_front();
   }
@@ -84,7 +85,7 @@ public:
     //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
     return message;
   }
-  virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout) override
+  virtual SharedPtr<const AbstractMessage> receive(const AbsTimeout& timeout) override
   {
     ScopeLock scopeLock(_mutex);
     while (_messageList.empty()) {

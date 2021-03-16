@@ -169,7 +169,7 @@ public:
     }
     Clock stop = Clock::now();
 
-    std::cout << "Average thread conditon latency is: " << (stop - start).getNSec()*1e-9/10000 << std::endl;
+    std::cout << "Average thread conditon latency is: " << (stop - start).getNanoSeconds()*1e-9/10000 << std::endl;
 
     testThread.wait();
     return true;

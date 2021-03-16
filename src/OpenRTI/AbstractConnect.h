@@ -25,6 +25,7 @@
 #include "AbstractMessageReceiver.h"
 #include "Clock.h"
 #include "SharedPtr.h"
+#include "AbsTimeout.h"
 
 namespace OpenRTI {
 
@@ -48,10 +49,10 @@ public:
     getMessageSender()->send(message);
   }
 
-  /// Returns the next message. Returns 0 if no new message arrives before abstime
-  SharedPtr<const AbstractMessage> receive(const Clock& abstime)
+  /// Returns the next message. Returns 0 if no new message arrives before timeout.
+  SharedPtr<const AbstractMessage> receive(const AbsTimeout& timeout)
   {
-    return getMessageReceiver()->receive(abstime);
+    return getMessageReceiver()->receive(timeout);
   }
   /// Returns the next message if there is one.
   SharedPtr<const AbstractMessage> receive()

@@ -92,7 +92,7 @@ Clock::now()
 void
 Clock::sleep_for(const Clock& reltime)
 {
-  Sleep(ClockWin32::toMsec(reltime.getNSec()));
+  Sleep(ClockWin32::toMsec(reltime.getNanoSeconds()));
 }
 
 #endif

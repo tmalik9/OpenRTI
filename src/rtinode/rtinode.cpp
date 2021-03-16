@@ -32,6 +32,7 @@
 #include <sys/resource.h>
 #endif
 #include "AbstractNetworkStatistics.h"
+#include "AbsTimeout.h"
 
 static void usage(const char* argv0)
 {
@@ -162,7 +163,8 @@ main(int argc, char* argv[])
           else
             url.setProtocol("rti");
         }
-        networkServer.connectParentServer(url, OpenRTI::Clock::now() + OpenRTI::Clock::fromSeconds(75));
+        OpenRTI::AbsTimeout timeout(OpenRTI::Clock::now() + OpenRTI::Clock::fromSeconds(75));
+        networkServer.connectParentServer(url, timeout);
       } catch (const OpenRTI::Exception& e) {
         std::cerr << "Could not connect parent server:" << std::endl;
         std::cerr << OpenRTI::utf8ToLocale(e.getReason()) << std::endl;

@@ -326,9 +326,6 @@
     <ClInclude Include="AbstractMessageSender.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="AbstractProtocol.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="AbstractProtocolLayer.h">
       <Filter>Source Files</Filter>
     </ClInclude>

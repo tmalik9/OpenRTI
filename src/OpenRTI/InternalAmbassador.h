@@ -23,6 +23,7 @@
 #include "AbstractConnect.h"
 #include "Message.h"
 #include "StringUtils.h"
+#include "AbsTimeout.h"
 
 namespace OpenRTI {
 
@@ -46,14 +47,14 @@ public:
 
   /// Receive a message and put it into the internal message processing,
   /// Returns true if there is an other pending message.
-  bool receiveAndDispatchInternalMessage(const Clock& abstime);
+  bool receiveAndDispatchInternalMessage(const AbsTimeout& timeout);
   template<typename F>
-  bool receiveAndDispatch(const Clock& abstime, F& functor)
-  { return _receiveAndDispatch(abstime, FunctorMessageDispatcher<F>(functor)); }
+  bool receiveAndDispatch(const AbsTimeout& timeout, F& functor)
+  { return _receiveAndDispatch(timeout, FunctorMessageDispatcher<F>(functor)); }
   template<typename F>
-  bool receiveAndDispatch(const Clock& abstime, const F& functor)
-  { return _receiveAndDispatch(abstime, ConstFunctorMessageDispatcher<F>(functor)); }
-  bool _receiveAndDispatch(const Clock& abstime, const AbstractMessageDispatcher& dispatcher);
+  bool receiveAndDispatch(const AbsTimeout& timeout, const F& functor)
+  { return _receiveAndDispatch(timeout, ConstFunctorMessageDispatcher<F>(functor)); }
+  bool _receiveAndDispatch(const AbsTimeout& timeout, const AbstractMessageDispatcher& dispatcher);
   void flushAndDispatchInternalMessage();
   template<typename F>
   void flushReceiveAndDispatch(const F& functor)
@@ -114,17 +115,17 @@ public:
 
 
   std::pair<CreateFederationExecutionResponseType, std::string>
-  dispatchWaitCreateFederationExecutionResponse(const Clock& abstime);
+  dispatchWaitCreateFederationExecutionResponse(const AbsTimeout& timeout);
   DestroyFederationExecutionResponseType
-  dispatchWaitDestroyFederationExecutionResponse(const Clock& abstime);
+  dispatchWaitDestroyFederationExecutionResponse(const AbsTimeout& timeout);
 
   std::pair<JoinFederationExecutionResponseType, std::string>
-  dispatchWaitJoinFederationExecutionResponse(const Clock& abstime, std::string federateName);
-  bool dispatchWaitEraseFederationExecutionResponse(const Clock& abstime);
+  dispatchWaitJoinFederationExecutionResponse(const AbsTimeout& timeout, std::string federateName);
+  bool dispatchWaitEraseFederationExecutionResponse(const AbsTimeout& timeout);
 
   /// Tries to reserve the object instance name in the federate and returns
   /// an object handle for this reserved name if successful.
-  ObjectInstanceHandle dispatchWaitReserveObjectInstanceName(const Clock& abstime, const std::string& objectInstanceName);
+  ObjectInstanceHandle dispatchWaitReserveObjectInstanceName(const AbsTimeout& timeout, const std::string& objectInstanceName);
 
 
   /// Get access to the federate

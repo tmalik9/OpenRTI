@@ -89,14 +89,12 @@ struct SocketEventDispatcher::PrivateData
       }
     }
 
-    int exec(SocketEventDispatcher& dispatcher, const Clock& absclock)
+    int exec(SocketEventDispatcher& dispatcher, const AbsTimeout& timeout)
     {
       int retv = 0;
       //HANDLE unlockedEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
-      AbsTimeout absTimeout(absclock);
       while (!dispatcher._done)
       {
-        absTimeout.set(absclock);
         bool doWait = true;
         std::vector<SharedPtr<AbstractSocketEvent>> sockets;
         sockets.reserve(dispatcher._socketEventList.size());
@@ -109,10 +107,10 @@ struct SocketEventDispatcher::PrivateData
         for (auto& socketEventSP : dispatcher._socketEventList)
         {
           AbstractSocketEvent* socketEvent = socketEventSP.get();
-          if (socketEvent->getTimeout() < absTimeout.getTimeout())
-          {
-            absTimeout.set(socketEvent->getTimeout());
-          }
+          //if (socketEvent->getTimeout() < timeout.getTimeout())
+          //{
+          //  timeout.set(socketEvent->getTimeout());
+          //}
           Socket* abstractSocket = socketEvent->getSocket();
           if (!abstractSocket)
           {
@@ -171,18 +169,18 @@ struct SocketEventDispatcher::PrivateData
         notificationEvents.push_back(_wakeupEvent);
 
         uint32_t timeoutMs = INFINITE;
-        if (absTimeout.getTimeout() < Clock::max())
+        if (timeout.getTimeout() != Clock::max())
         {
           //Clock now = Clock::now();
           Clock remaining;
-          if (absTimeout.isExpired(remaining))
+          if (timeout.isExpired(remaining))
           {
             retv = 0;
             break;
           }
           else
           {
-            //timeoutMs = static_cast<uint32_t>((absTimeoutClock - now).getNSec() / 1000000ULL);
+            //timeoutMs = static_cast<uint32_t>((absTimeoutClock - now).getNanoSeconds() / 1000000ULL);
             timeoutMs = static_cast<uint32_t>(remaining.getMilliSeconds());
           }
         }
@@ -211,7 +209,7 @@ struct SocketEventDispatcher::PrivateData
 
         // Timeout
         //Clock now = Clock::now();
-        if (absTimeout.isExpired() /*absclock <= now*/ || waitResult == WAIT_TIMEOUT)
+        if (timeout.isExpired() /*absclock <= now*/ || waitResult == WAIT_TIMEOUT)
         {
           retv = 0;
           break;
@@ -257,10 +255,11 @@ struct SocketEventDispatcher::PrivateData
               {
                 dispatcher.read(socketEvent);
               }
-              if (socketEvent->getTimeout() <= absTimeout.getTimeout())
-              {
-                dispatcher.timeout(socketEvent);
-              }
+              // NOTE: dispatcher.timeout/AbstractSocketEvent::timeout is empty anyway
+              //if (socketEvent->getTimeout() <= absTimeout.getTimeout())
+              //{
+              //  dispatcher.timeout(socketEvent);
+              //}
             }
           }
 
@@ -334,9 +333,9 @@ SocketEventDispatcher::wakeUp()
 }
 
 int
-SocketEventDispatcher::exec(const Clock& absclock)
+SocketEventDispatcher::exec(const AbsTimeout& timeout)
 {
-  return _privateData->exec(*this, absclock);
+  return _privateData->exec(*this, timeout);
 }
 
 }

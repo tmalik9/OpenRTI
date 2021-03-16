@@ -50,19 +50,19 @@ public:
   Clock(const Clock&) noexcept = default;
   Clock(Clock&&) noexcept = default;
 
-  Clock(const std::chrono::seconds& s)
+  explicit Clock(const std::chrono::seconds& s)
   {
     _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(s).count();
   }
-  Clock(const std::chrono::milliseconds& ms)
+  explicit Clock(const std::chrono::milliseconds& ms)
   {
     _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(ms).count();
   }
-  Clock(const std::chrono::nanoseconds& us)
+  explicit Clock(const std::chrono::nanoseconds& us)
   {
     _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(us).count();
   }
-  Clock(const std::chrono::steady_clock::time_point& tp)
+  explicit Clock(const std::chrono::steady_clock::time_point& tp)
   {
     _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(tp.time_since_epoch()).count();
   }
@@ -73,13 +73,13 @@ public:
 
   static Clock now()
   {
-    return std::chrono::steady_clock::now();
+    return Clock(std::chrono::steady_clock::now());
   }
 
   operator std::chrono::steady_clock::time_point() const { return std::chrono::steady_clock::time_point(std::chrono::nanoseconds(_nsec)); }
   static void sleep_for(const Clock& reltime)
   {
-    std::this_thread::sleep_for(std::chrono::nanoseconds(reltime.getNSec()));
+    std::this_thread::sleep_for(std::chrono::nanoseconds(reltime.getNanoSeconds()));
   }
 
   static Clock zero()
@@ -130,12 +130,12 @@ public:
     return _nsec / 1000ULL;
   }
   /// Conversion from nanoseconds
-  static Clock fromNSec(uint64_t nsec)
+  static Clock fromNanoSeconds(uint64_t nsec)
   { return Clock(nsec); }
 
-  uint64_t getNSec() const noexcept
+  uint64_t getNanoSeconds() const noexcept
   { return _nsec; }
-  void setNSec(uint64_t nsec) noexcept
+  void setNanoSeconds(uint64_t nsec) noexcept
   { _nsec = nsec; }
 
   // Arithmetic, note that these two do not wrap.
@@ -194,17 +194,13 @@ Clock operator-(const Clock& clock1, const Clock& clock2) noexcept
 // Clock operator/(const Clock& clock1, const Clock& clock2)
 // { return Clock(clock1) /= clock2; }
 
-template<typename char_type, typename traits_type>
 inline
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const Clock& c)
+std::ostream&
+operator<<(std::ostream& os, const Clock& c)
 {
-  std::basic_stringstream<char_type, traits_type> stream;
-
-  stream << (c.getNSec() / 1000000000) << stream.widen('.');
-  stream << std::setw(9) << std::setfill(stream.widen('0')) << (c.getNSec() % 1000000000);
-
-  return os << stream.str();
+  os << "Clock(" << c.getNanoSeconds() * 1e-9;
+  os << ", 0x" << std::hex << std::setw(16) << std::setfill('0') << c.getNanoSeconds();
+  return os << ")";
 }
 
 } // namespace OpenRTI

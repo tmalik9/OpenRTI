@@ -29,6 +29,7 @@ namespace OpenRTI {
 
 class AbstractMessage;
 class Clock;
+class AbsTimeout;
 
 template<typename T>
 struct NotificationHandleWrapper final : public AbstractNotificationHandle
@@ -53,7 +54,7 @@ class OPENRTI_API AbstractMessageReceiver : public Referenced {
 public:
   virtual ~AbstractMessageReceiver() noexcept {}
   virtual SharedPtr<const AbstractMessage> receive() = 0;
-  virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout) = 0;
+  virtual SharedPtr<const AbstractMessage> receive(const AbsTimeout& timeout) = 0;
   virtual bool empty() const = 0;
   virtual bool isOpen() const = 0;
   virtual size_t getBytesQueued() const = 0;

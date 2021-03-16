@@ -287,7 +287,6 @@
     <ClInclude Include="AbstractMessageSender.h" />
     <ClInclude Include="AbstractNetworkStatistics.h" />
     <ClInclude Include="AbstractNotificationHandle.h" />
-    <ClInclude Include="AbstractProtocol.h" />
     <ClInclude Include="AbstractProtocolLayer.h" />
     <ClInclude Include="AbstractProtocolSocket.h" />
     <ClInclude Include="AbstractServer.h" />

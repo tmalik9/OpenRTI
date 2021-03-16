@@ -23,11 +23,12 @@
 #include "AbstractSocketEvent.h"
 #include "Export.h"
 #include "SharedPtr.h"
+#include "AbsTimeout.h"
 
 namespace OpenRTI {
 
 class Clock;
-
+class AbsTimeout;
 class OPENRTI_API SocketEventDispatcher {
 public:
   SocketEventDispatcher();
@@ -50,7 +51,7 @@ public:
   // * The timeout expires.
   // * When empty(), that is there are no socket events left.
   // * The wakeUp method is called from some thread.
-  int exec(const Clock& absclock = Clock::max());
+  int exec(const AbsTimeout& timeout = AbsTimeout(Clock::max()));
 
 private:
   SocketEventDispatcher(const SocketEventDispatcher&);
@@ -58,7 +59,7 @@ private:
 
   void read(const SharedPtr<AbstractSocketEvent>& socketEvent);
   void write(const SharedPtr<AbstractSocketEvent>& socketEvent);
-  void timeout(const SharedPtr<AbstractSocketEvent>& socketEvent);
+  //void timeout(const SharedPtr<AbstractSocketEvent>& socketEvent);
 
   struct PrivateData;
   PrivateData* _privateData;

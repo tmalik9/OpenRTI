@@ -195,7 +195,6 @@ set(OpenRTI_SOURCES
 	AbstractMessageSender.h
 	AbstractNetworkStatistics.h
 	AbstractNotificationHandle.h
-	AbstractProtocol.h
 	AbstractProtocolLayer.cpp
 	AbstractProtocolLayer.h
 	AbstractProtocolSocket.cpp
