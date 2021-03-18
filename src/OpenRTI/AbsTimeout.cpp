@@ -44,7 +44,7 @@ bool AbsTimeout::isExpired() const
     return false;
   }
   Clock now = Clock::now();
-  if (_absTime == Clock::zero() || _absTime <= now)
+  if (_absTime == Clock::zero())
   {
     return true;
   }
@@ -68,7 +68,7 @@ bool AbsTimeout::isExpired(Clock& remaining) const
     return false;
   }
   Clock now = Clock::now();
-  if (_absTime == Clock::zero() || _absTime <= now)
+  if (_absTime == Clock::zero())
   {
     remaining = Clock::zero();
     return true;
