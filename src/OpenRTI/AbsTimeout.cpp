@@ -6,7 +6,8 @@
 
 namespace OpenRTI {
 
-Clock AbsTimeout::_watchDogPeriod = Clock::fromMilliSeconds(100);
+Clock AbsTimeout::_watchDogPeriod    = Clock::fromMilliSeconds(100);
+Clock AbsTimeout::_watchDogMinPeriod = Clock::fromMilliSeconds(200);
 
 AbsTimeout::AbsTimeout(const Clock& abstime)
 {
@@ -14,7 +15,7 @@ AbsTimeout::AbsTimeout(const Clock& abstime)
   _delay = 0;
   _start = Clock::now();
   _done = false;
-  if (_absTime > Clock::zero() && _absTime < Clock::max())
+  if (_absTime > Clock::zero() && _absTime < Clock::max() && _absTime > Clock::now() + _watchDogMinPeriod)
   {
     _watchDogThread = std::thread(&AbsTimeout::watchDogFunc, this);
   }
@@ -23,7 +24,7 @@ AbsTimeout::AbsTimeout(const Clock& abstime)
 
 AbsTimeout::~AbsTimeout()
 {
-  if (_absTime > Clock::zero() && _absTime < Clock::max())
+  if (_watchDogThread.joinable())
   {
     {
       std::unique_lock<std::mutex> lock(_doneMutex);
@@ -42,13 +43,20 @@ bool AbsTimeout::isExpired() const
   {
     return false;
   }
-  if (_absTime == Clock::zero())
+  Clock now = Clock::now();
+  if (_absTime == Clock::zero() || _absTime <= now)
   {
     return true;
   }
-  Clock delay = getDelay();
-  Clock now = Clock::now();
-  return now > _absTime + delay;
+  if (_watchDogThread.joinable())
+  {
+    Clock delay = getDelay();
+    return now > _absTime + delay;
+  }
+  else
+  {
+    return now > _absTime;
+  }
   //return getRemaining() == Clock::zero();
 }
 
@@ -59,13 +67,17 @@ bool AbsTimeout::isExpired(Clock& remaining) const
     remaining = Clock::max();
     return false;
   }
-  if (_absTime == Clock::zero())
+  Clock now = Clock::now();
+  if (_absTime == Clock::zero() || _absTime <= now)
   {
     remaining = Clock::zero();
     return true;
   }
-  Clock delay = getDelay();
-  Clock now = Clock::now();
+  Clock delay = Clock::zero();
+  if (_watchDogThread.joinable())
+  {
+    delay = getDelay();
+  }
   if (now < _absTime + delay)
   {
     remaining = (_absTime + delay) - now;

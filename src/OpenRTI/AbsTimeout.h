@@ -36,9 +36,9 @@ class OPENRTI_API AbsTimeout
     Clock                           _start;
     Clock                           _absTime;
     std::thread                     _watchDogThread;
-    std::atomic<Clock::Rep>         _delay;
+    uint64_t                        _delay;
     static Clock                    _watchDogPeriod;
-
+    static Clock                    _watchDogMinPeriod;
     bool                            _done = false;
     mutable std::condition_variable _cvDone;
     mutable std::mutex              _doneMutex;

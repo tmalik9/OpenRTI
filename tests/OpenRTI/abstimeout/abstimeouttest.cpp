@@ -93,9 +93,7 @@ class ConditionTest : Thread
       ConditionData() : _signaled(false) {}
       void notify_one()
       {
-        std::cout << __FUNCTION__ << ": acquire lock" << std::endl;
         ScopeLock scopeLock(_mutex);
-        std::cout << __FUNCTION__ << ": got lock" << std::endl;
         _signaled = true;
         _condition.notify_one();
       }
@@ -108,17 +106,15 @@ class ConditionTest : Thread
       }
       bool wait_until(const Clock& abstime)
       {
-        std::cout << __FUNCTION__ << ": acquire lock" << std::endl;
         ScopeLock scopeLock(_mutex);
-        std::cout << __FUNCTION__ << ": got lock" << std::endl;
         while (!_signaled)
+        {
           if (!_condition.wait_until(scopeLock, abstime))
           {
-            std::cout << __FUNCTION__ << ": wait returned false" << std::endl;
             return false;
           }
+        }
         _signaled = false;
-        std::cout << __FUNCTION__ << ": wait returned true" << std::endl;
         return true;
       }
       bool wait_until(const AbsTimeout& timeout)
@@ -165,6 +161,26 @@ class ConditionTest : Thread
       }
       {
         ConditionData data;
+        bool result;
+        std::cout << "Condition.wait_until(" << 0 << "), no notification" << std::endl;
+        Clock start = Clock::now();
+        result = data.wait_until(start);
+        Clock stop = Clock::now();
+        std::cout << "Condition.wait_until returned after: " << (stop - start).getNanoSeconds() * 1e-9 << " with result " << result << std::endl;
+      }
+      uint32_t rounds = 10000;
+      std::cout << "Busy Loop Test(" << std::dec << rounds << " rounds): Condition.wait_until(" << 0 << "), no notification" << std::endl;
+      Clock loopStart = Clock::now();
+      for (uint32_t i=0;i<rounds;i++)
+      {
+        Clock now = Clock::now();
+        ConditionData data;
+        data.wait_until(now);
+      }
+      Clock loopStop = Clock::now();
+      std::cout << "Busy loop test took " << (loopStop - loopStart).getNanoSeconds() * 1e-9 << " seconds" << std::endl;
+      {
+        ConditionData data;
         ConditionTest testThread(data);
         bool result;
         std::cout << "Condition.wait_until(" << timeoutPeriod << "), with notification after " << triggerPeriod.count() << "ms" << std::endl;
@@ -203,16 +219,16 @@ class ConditionTest : Thread
 
 int main()
 {
-  //if (!SimpleTimeoutTest::exec())
-  //{
-  //  std::cerr << "SimpleTimeoutTest failed!" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
-  //if (!InfiniteTimeoutTest::exec())
-  //{
-  //  std::cerr << "InfiniteTimeoutTest failed!" << std::endl;
-  //  return EXIT_FAILURE;
-  //}
+  if (!SimpleTimeoutTest::exec())
+  {
+    std::cerr << "SimpleTimeoutTest failed!" << std::endl;
+    return EXIT_FAILURE;
+  }
+  if (!InfiniteTimeoutTest::exec())
+  {
+    std::cerr << "InfiniteTimeoutTest failed!" << std::endl;
+    return EXIT_FAILURE;
+  }
   if (!ZeroTimeoutTest::exec())
   {
     std::cerr << "ZeroTimeoutTest failed!" << std::endl;
