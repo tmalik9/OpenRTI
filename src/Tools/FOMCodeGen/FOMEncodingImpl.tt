@@ -6,8 +6,6 @@
 
 // Code automatically generated from <#=FOM.Filename#>, do not edit
 
-#pragma once
-
 #include <vector>
 #include <cstring>
 
