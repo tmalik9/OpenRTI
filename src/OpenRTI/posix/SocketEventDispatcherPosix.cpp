@@ -104,7 +104,7 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
       std::memset(&pfd, 0, sizeof(pfd));
       for (SocketEventList::const_iterator i = dispatcher._socketEventList.begin(); i != dispatcher._socketEventList.end(); ++i) {
         AbstractSocketEvent* socketEvent = i->get();
-        bool included = false;
+        //bool included = false;
         Socket* abstractSocket = socketEvent->getSocket();
         if (abstractSocket) {
           int fd = abstractSocket->_privateData->_fd;
@@ -117,7 +117,7 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
               pfd.events |= POLLWRNORM;
 
             if (pfd.events) {
-              included = true;
+              //included = true;
               _fdVector.push_back(pfd);
               _socketEventVector.push_back(socketEvent);
             }

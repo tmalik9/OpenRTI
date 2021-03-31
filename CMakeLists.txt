@@ -233,7 +233,7 @@ add_subdirectory(src)
 if(OPENRTI_ENABLE_TESTS)
   add_subdirectory(tests)
 else()
-  message(WARNING "building without tests")
+  message("building without tests")
 endif()
 
 

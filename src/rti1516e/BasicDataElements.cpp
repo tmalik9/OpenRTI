@@ -269,7 +269,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 {
   if (index >= bufferSize)
     throw EncoderException(L"Insufficient buffer size for decoding!");
-  *_valuePointer = bool(buffer[index]);
+  *_valuePointer = buffer[index] != 0;
   return index + 1;
 }
 
