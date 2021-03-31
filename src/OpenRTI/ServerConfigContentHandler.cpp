@@ -122,8 +122,8 @@ ServerConfigContentHandler::parseLogCategory(const std::string& s)
 }
 
 void
-ServerConfigContentHandler::startElement(const char* uri, const char* name,
-  const char* qName, const XML::Attributes* atts)
+ServerConfigContentHandler::startElement(const char* /*uri*/, const char* name,
+  const char* /*qName*/, const XML::Attributes* atts)
 {
   if (strcmp(name, "OpenRTIServerConfig") == 0)
   {
@@ -247,7 +247,7 @@ ServerConfigContentHandler::startElement(const char* uri, const char* name,
 }
 
 void
-ServerConfigContentHandler::endElement(const char* uri, const char* name, const char* qName)
+ServerConfigContentHandler::endElement(const char* /*uri*/, const char* /*name*/, const char* /*qName*/)
 {
   _modeStack.pop_back();
 }

@@ -112,7 +112,7 @@ InteractionHandlerFederateRequestPublications::InteractionHandlerFederateRequest
 }
 
 InteractionHandlerFederateRequestPublications::ResponseList
-InteractionHandlerFederateRequestPublications::operator()(const ParameterHandleValueMap& requestParameters)
+InteractionHandlerFederateRequestPublications::operator()(const ParameterHandleValueMap& /*requestParameters*/)
 {
   ResponseList responses;
   {
@@ -201,7 +201,7 @@ InteractionHandlerFederateRequestSubscriptions::InteractionHandlerFederateReques
   }
 }
 
-MomInteractionHandler::ResponseList InteractionHandlerFederateRequestSubscriptions::operator()(const ParameterHandleValueMap& requestParameters)
+MomInteractionHandler::ResponseList InteractionHandlerFederateRequestSubscriptions::operator()(const ParameterHandleValueMap& /*requestParameters*/)
 {
   ResponseList responses;
   {
@@ -294,7 +294,7 @@ InteractionHandlerFederateRequestUpdatesSent::InteractionHandlerFederateRequestU
     mParameterGetters[mResponseFederateParameter] = [this] { return mMomManager->getEncodedFederateHandle(); };
     ParameterHandle p1 = response.parameters["HLAtransportation"];
     assert(p1.valid());
-    mParameterGetters[p1] = [this] { return HLAunicodeString(L"HLAreliable").encode(); };
+    mParameterGetters[p1] = [] { return HLAunicodeString(L"HLAreliable").encode(); };
     ParameterHandle p2 = response.parameters["HLAupdateCounts"];
     assert(p2.valid());
     mParameterGetters[p2] = [this] { return mMomManager->getFederateMetrics()->getObjectClassUpdatesSent(); };
@@ -320,7 +320,7 @@ InteractionHandlerFederateRequestReflectionsReceived::InteractionHandlerFederate
     mParameterGetters[mResponseFederateParameter] = [this] { return mMomManager->getEncodedFederateHandle(); };
     ParameterHandle p1 = response.parameters["HLAtransportation"];
     assert(p1.valid());
-    mParameterGetters[p1] = [this] { return HLAunicodeString(L"HLAreliable").encode(); };
+    mParameterGetters[p1] = [] { return HLAunicodeString(L"HLAreliable").encode(); };
     ParameterHandle p2 = response.parameters["HLAreflectCounts"];
     assert(p2.valid());
     mParameterGetters[p2] = [this] { return mMomManager->getFederateMetrics()->getObjectClassReflectionsReceived(); };
@@ -345,7 +345,7 @@ InteractionHandlerFederateRequestInteractionsSent::InteractionHandlerFederateReq
     mParameterGetters[mResponseFederateParameter] = [this] { return mMomManager->getEncodedFederateHandle(); };
     ParameterHandle p1 = response.parameters["HLAtransportation"];
     assert(p1.valid());
-    mParameterGetters[p1] = [this] { return HLAunicodeString(L"HLAreliable").encode(); };
+    mParameterGetters[p1] = [] { return HLAunicodeString(L"HLAreliable").encode(); };
     ParameterHandle p2 = response.parameters["HLAinteractionCounts"];
     assert(p2.valid());
     mParameterGetters[p2] = [this] { return mMomManager->getFederateMetrics()->getInteractionsSent(); };
@@ -375,7 +375,7 @@ InteractionHandlerFederateRequestInteractionsReceived::InteractionHandlerFederat
     mParameterGetters[mResponseFederateParameter] = [this] { return mMomManager->getEncodedFederateHandle(); };
     ParameterHandle p1 = response.parameters["HLAtransportation"];
     assert(p1.valid());
-    mParameterGetters[p1] = [this] { return HLAunicodeString(L"HLAreliable").encode(); };
+    mParameterGetters[p1] = [] { return HLAunicodeString(L"HLAreliable").encode(); };
     ParameterHandle p2 = response.parameters["HLAinteractionCounts"];
     assert(p2.valid());
     mParameterGetters[p2] = [this] { return mMomManager->getFederateMetrics()->getInteractionsReceived(); };

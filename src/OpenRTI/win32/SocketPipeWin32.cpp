@@ -40,13 +40,13 @@ SocketPipe::~SocketPipe() noexcept
 }
 
 void
-SocketPipe::connect(const std::string& file)
+SocketPipe::connect(const std::string& /*file*/)
 {
   throw RTIinternalError("Pipes are not implemented on WIN32");
 }
 
 
-void SocketPipe::cork(bool enable)
+void SocketPipe::cork(bool /*enable*/)
 {
   throw RTIinternalError("Pipes are not implemented on WIN32");
 }

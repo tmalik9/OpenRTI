@@ -37,7 +37,7 @@ namespace <#=namespacePart#> {
 <#=FOM.ForwardDeclarations#>
 
 <#
-foreach (var dataType in FOM.DataTypes.Values)
+foreach (var dataType in FOM.SortedDataTypes)
 {
   if (dataType is FOMParser.SimpleDataType && dataType.Generate)
   {
@@ -64,13 +64,13 @@ class <#=fixedRecordDataType.Name#><#=fixedRecordDataType.BaseClass != null ? " 
     virtual uint32_t getVersion() const = 0;
 <#  } #>
 <# foreach (var field in fixedRecordDataType.Fields) { #>
-    virtual void Set<#=field.Name#>(<#=field.DataType.CPPType#> value) = 0;
+    virtual void Set<#=field.Name#>(<#=field.DataType.ParameterCppType#> value) = 0;
 <# if (field.DataType is FOMParser.ArrayDataType) {
      var arrayDataType = field.DataType as FOMParser.ArrayDataType;
 #>
     virtual void Set<#=field.Name#>(const <#=arrayDataType.DataType.CPPType#>* value, size_t size) = 0;
 <# } #>
-    virtual <#=field.DataType.CPPType#> Get<#=field.Name#>() const = 0;
+    virtual <#=field.DataType.ReturnCppType#> Get<#=field.Name#>() const = 0;
     virtual bool Is<#=field.Name#>Available() const = 0;
 <# } // foreach fixedRecordDataType.Fields #>
 

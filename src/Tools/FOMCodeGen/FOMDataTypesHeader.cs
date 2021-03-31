@@ -173,7 +173,7 @@ foreach (var namespacePart in FOM.Namespace)
             
             #line 39 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
-foreach (var dataType in FOM.DataTypes.Values)
+foreach (var dataType in FOM.SortedDataTypes)
 {
   if (dataType is FOMParser.SimpleDataType && dataType.Generate)
   {
@@ -285,7 +285,7 @@ foreach (var dataType in FOM.DataTypes.Values)
             this.Write("(");
             
             #line 67 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.CPPType));
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.ParameterCppType));
             
             #line default
             #line hidden
@@ -322,7 +322,7 @@ foreach (var dataType in FOM.DataTypes.Values)
             this.Write("    virtual ");
             
             #line 73 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.CPPType));
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.ReturnCppType));
             
             #line default
             #line hidden

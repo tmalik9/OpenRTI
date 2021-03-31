@@ -117,7 +117,7 @@ ProtocolSocketEvent::getEnableRead() const
 }
 
 void
-ProtocolSocketEvent::write(SocketEventDispatcher& dispatcher)
+ProtocolSocketEvent::write(SocketEventDispatcher& /*dispatcher*/)
 {
   //OpenRTIAssert(!_protocolSocket->_closed);
   _protocolSocket->write();

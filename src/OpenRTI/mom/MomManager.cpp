@@ -467,7 +467,7 @@ void MomManager::notifyFederationCreated(const std::string& federationName)
 
 
 // called by all servers after the federation has been created and the RTI federate joined the federation
-void MomManager::notifyFederationJoined(FederateHandle federateHandle, const std::string& federateName, const std::string& federateType)
+void MomManager::notifyFederationJoined(FederateHandle /*federateHandle*/, const std::string& /*federateName*/, const std::string& /*federateType*/)
 {
   //DebugPrintf(">>> %s federateHandle=%s federateName=%s federateType=%s root=%d\n", __FUNCTION__,
   //            federateHandle.toString().c_str(), federateName.c_str(), federateType.c_str(), _momServer->isRoot());
@@ -725,7 +725,7 @@ bool MomManager::provideAttributeValueUpdate(ObjectInstanceHandle theObject, Att
 
 void MomManager::reflectAttributeValues(ObjectInstanceHandle theObject,
                                         AttributeHandleValueMap const& theAttributeValues,
-                                        VariableLengthData const& theUserSuppliedTag)
+                                        VariableLengthData const& /*theUserSuppliedTag*/)
 {
   //DebugPrintf("%s\n", __FUNCTION__);
   try

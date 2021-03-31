@@ -211,7 +211,7 @@ SocketAddress::getNetworkPortData() const
 }
 
 SocketAddress
-SocketAddress::fromInet4Network(const SocketAddress& socketAddress, const VariableLengthData& networkAddressData, const VariableLengthData& networkPortData)
+SocketAddress::fromInet4Network(const SocketAddress& /*socketAddress*/, const VariableLengthData& networkAddressData, const VariableLengthData& networkPortData)
 {
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));

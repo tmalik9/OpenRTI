@@ -870,7 +870,7 @@ Federate::insertDimension(const std::string& name, const DimensionHandle& dimens
 }
 
 void
-Federate::insertRoutingSpace(const std::string& name, const SpaceHandle& spaceHandle, const DimensionHandleSet& dimensionHandles)
+Federate::insertRoutingSpace(const std::string& /*name*/, const SpaceHandle& /*spaceHandle*/, const DimensionHandleSet& /*dimensionHandles*/)
 {
   // FIXME implement for the HLA13 stuff, when the parser is there :)
 }

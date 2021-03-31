@@ -578,8 +578,8 @@ public:
 
   void writeRangeBoundsValue(const RangeBoundsValue& value)
   {
-    writeUnsigned(value.getLowerBound());
-    writeUnsigned(value.getUpperBound());
+    writeUnsigned( value.getLowerBound());
+    writeUnsigned( value.getUpperBound());
   }
 
   void writeDimensionHandleRangeBoundsValuePair(const DimensionHandleRangeBoundsValuePair& value)
@@ -660,8 +660,8 @@ public:
 
   void writeAttributeState(const AttributeState& value)
   {
-    writeAttributeHandle(value.getAttributeHandle());
-    writeFederateHandle(value.getOwnerFederate());
+    writeAttributeHandle( value.getAttributeHandle());
+    writeFederateHandle( value.getOwnerFederate());
   }
 
   void writeAttributeStateVector(const AttributeStateVector& value)
@@ -674,8 +674,8 @@ public:
 
   void writeParameterValue(const ParameterValue& value)
   {
-    writeParameterHandle(value.getParameterHandle());
-    writeVariableLengthData(value.getValue());
+    writeParameterHandle( value.getParameterHandle());
+    writeVariableLengthData( value.getValue());
   }
 
   void writeParameterValueVector(const ParameterValueVector& value)
@@ -688,8 +688,8 @@ public:
 
   void writeAttributeValue(const AttributeValue& value)
   {
-    writeAttributeHandle(value.getAttributeHandle());
-    writeVariableLengthData(value.getValue());
+    writeAttributeHandle( value.getAttributeHandle());
+    writeVariableLengthData( value.getValue());
   }
 
   void writeAttributeValueVector(const AttributeValueVector& value)
@@ -730,8 +730,8 @@ public:
 
   void writeFederationExecutionInformation(const FederationExecutionInformation& value)
   {
-    writeString(value.getFederationExecutionName());
-    writeString(value.getLogicalTimeFactoryName());
+    writeString( value.getFederationExecutionName());
+    writeString( value.getLogicalTimeFactoryName());
   }
 
   void writeFederationExecutionInformationVector(const FederationExecutionInformationVector& value)
@@ -869,9 +869,9 @@ public:
 
   void writeFOMStringBasicDataType(const FOMStringBasicDataType& value)
   {
-    writeString(value.getName());
-    writeUnsigned(value.getSize());
-    writeEndianness(value.getEndian());
+    writeString( value.getName());
+    writeUnsigned( value.getSize());
+    writeEndianness( value.getEndian());
   }
 
   void writeFOMStringBasicDataTypeList(const FOMStringBasicDataTypeList& value)
@@ -884,8 +884,8 @@ public:
 
   void writeFOMStringSimpleDataType(const FOMStringSimpleDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getRepresentation());
+    writeString( value.getName());
+    writeString( value.getRepresentation());
   }
 
   void writeFOMStringSimpleDataTypeList(const FOMStringSimpleDataTypeList& value)
@@ -898,8 +898,8 @@ public:
 
   void writeFOMStringEnumerator(const FOMStringEnumerator& value)
   {
-    writeString(value.getName());
-    writeUnsigned(value.getValue());
+    writeString( value.getName());
+    writeUnsigned( value.getValue());
   }
 
   void writeFOMStringEnumeratorList(const FOMStringEnumeratorList& value)
@@ -912,9 +912,9 @@ public:
 
   void writeFOMStringEnumeratedDataType(const FOMStringEnumeratedDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getRepresentation());
-    writeFOMStringEnumeratorList(value.getEnumerators());
+    writeString( value.getName());
+    writeString( value.getRepresentation());
+    writeFOMStringEnumeratorList( value.getEnumerators());
   }
 
   void writeFOMStringEnumeratedDataTypeList(const FOMStringEnumeratedDataTypeList& value)
@@ -927,10 +927,10 @@ public:
 
   void writeFOMStringArrayDataType(const FOMStringArrayDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getDataType());
-    writeString(value.getCardinality());
-    writeString(value.getEncoding());
+    writeString( value.getName());
+    writeString( value.getDataType());
+    writeString( value.getCardinality());
+    writeString( value.getEncoding());
   }
 
   void writeFOMStringArrayDataTypeList(const FOMStringArrayDataTypeList& value)
@@ -943,10 +943,10 @@ public:
 
   void writeFOMStringArrayDataType2(const FOMStringArrayDataType2& value)
   {
-    writeString(value.getName());
-    writeString(value.getDataType());
-    writeString(value.getCardinality());
-    writeArrayDataTypeEncoding(value.getEncoding());
+    writeString( value.getName());
+    writeString( value.getDataType());
+    writeString( value.getCardinality());
+    writeArrayDataTypeEncoding( value.getEncoding());
   }
 
   void writeFOMStringArrayDataType2List(const FOMStringArrayDataType2List& value)
@@ -959,8 +959,8 @@ public:
 
   void writeFOMStringFixedRecordField(const FOMStringFixedRecordField& value)
   {
-    writeString(value.getName());
-    writeUnsigned(value.getDataType());
+    writeString( value.getName());
+    writeUnsigned( value.getDataType());
   }
 
   void writeFOMStringFixedRecordFieldList(const FOMStringFixedRecordFieldList& value)
@@ -973,9 +973,9 @@ public:
 
   void writeFOMStringFixedRecordDataType(const FOMStringFixedRecordDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getEncoding());
-    writeFOMStringFixedRecordFieldList(value.getFields());
+    writeString( value.getName());
+    writeString( value.getEncoding());
+    writeFOMStringFixedRecordFieldList( value.getFields());
   }
 
   void writeFOMStringFixedRecordDataTypeList(const FOMStringFixedRecordDataTypeList& value)
@@ -988,9 +988,9 @@ public:
 
   void writeFOMStringFixedRecordField2(const FOMStringFixedRecordField2& value)
   {
-    writeString(value.getName());
-    writeString(value.getDataType());
-    writeUnsigned(value.getVersion());
+    writeString( value.getName());
+    writeString( value.getDataType());
+    writeUnsigned( value.getVersion());
   }
 
   void writeFOMStringFixedRecordField2List(const FOMStringFixedRecordField2List& value)
@@ -1003,11 +1003,11 @@ public:
 
   void writeFOMStringFixedRecordDataType2(const FOMStringFixedRecordDataType2& value)
   {
-    writeString(value.getName());
-    writeString(value.getEncoding());
-    writeString(value.getInclude());
-    writeUnsigned(value.getVersion());
-    writeFOMStringFixedRecordField2List(value.getFields());
+    writeString( value.getName());
+    writeString( value.getEncoding());
+    writeString( value.getInclude());
+    writeUnsigned( value.getVersion());
+    writeFOMStringFixedRecordField2List( value.getFields());
   }
 
   void writeFOMStringFixedRecordDataType2List(const FOMStringFixedRecordDataType2List& value)
@@ -1020,9 +1020,9 @@ public:
 
   void writeFOMStringVariantRecordAlternative(const FOMStringVariantRecordAlternative& value)
   {
-    writeString(value.getEnumerator());
-    writeString(value.getName());
-    writeUnsigned(value.getDataType());
+    writeString( value.getEnumerator());
+    writeString( value.getName());
+    writeUnsigned( value.getDataType());
   }
 
   void writeFOMStringVariantRecordAlternativeList(const FOMStringVariantRecordAlternativeList& value)
@@ -1035,11 +1035,11 @@ public:
 
   void writeFOMStringVariantRecordDataType(const FOMStringVariantRecordDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getDiscriminant());
-    writeString(value.getDataType());
-    writeFOMStringVariantRecordAlternativeList(value.getAlternatives());
-    writeString(value.getEncoding());
+    writeString( value.getName());
+    writeString( value.getDiscriminant());
+    writeString( value.getDataType());
+    writeFOMStringVariantRecordAlternativeList( value.getAlternatives());
+    writeString( value.getEncoding());
   }
 
   void writeFOMStringVariantRecordDataTypeList(const FOMStringVariantRecordDataTypeList& value)
@@ -1052,9 +1052,9 @@ public:
 
   void writeFOMStringVariantRecordAlternative2(const FOMStringVariantRecordAlternative2& value)
   {
-    writeString(value.getEnumerator());
-    writeString(value.getName());
-    writeString(value.getDataType());
+    writeString( value.getEnumerator());
+    writeString( value.getName());
+    writeString( value.getDataType());
   }
 
   void writeFOMStringVariantRecordAlternative2List(const FOMStringVariantRecordAlternative2List& value)
@@ -1067,11 +1067,11 @@ public:
 
   void writeFOMStringVariantRecordDataType2(const FOMStringVariantRecordDataType2& value)
   {
-    writeString(value.getName());
-    writeString(value.getDiscriminant());
-    writeString(value.getDataType());
-    writeFOMStringVariantRecordAlternative2List(value.getAlternatives());
-    writeString(value.getEncoding());
+    writeString( value.getName());
+    writeString( value.getDiscriminant());
+    writeString( value.getDataType());
+    writeFOMStringVariantRecordAlternative2List( value.getAlternatives());
+    writeString( value.getEncoding());
   }
 
   void writeFOMStringVariantRecordDataType2List(const FOMStringVariantRecordDataType2List& value)
@@ -1084,7 +1084,7 @@ public:
 
   void writeFOMStringTransportationType(const FOMStringTransportationType& value)
   {
-    writeString(value.getName());
+    writeString( value.getName());
   }
 
   void writeFOMStringTransportationTypeList(const FOMStringTransportationTypeList& value)
@@ -1097,8 +1097,8 @@ public:
 
   void writeFOMStringDimension(const FOMStringDimension& value)
   {
-    writeString(value.getName());
-    writeUnsigned(value.getUpperBound());
+    writeString( value.getName());
+    writeUnsigned( value.getUpperBound());
   }
 
   void writeFOMStringDimensionList(const FOMStringDimensionList& value)
@@ -1111,8 +1111,8 @@ public:
 
   void writeFOMStringRoutingSpace(const FOMStringRoutingSpace& value)
   {
-    writeString(value.getName());
-    writeStringSet(value.getDimensionSet());
+    writeString( value.getName());
+    writeStringSet( value.getDimensionSet());
   }
 
   void writeFOMStringRoutingSpaceList(const FOMStringRoutingSpaceList& value)
@@ -1125,8 +1125,8 @@ public:
 
   void writeFOMStringParameter(const FOMStringParameter& value)
   {
-    writeString(value.getName());
-    writeString(value.getDataType());
+    writeString( value.getName());
+    writeString( value.getDataType());
   }
 
   void writeFOMStringParameterList(const FOMStringParameterList& value)
@@ -1139,12 +1139,12 @@ public:
 
   void writeFOMStringInteractionClass(const FOMStringInteractionClass& value)
   {
-    writeStringVector(value.getName());
-    writeString(value.getOrderType());
-    writeString(value.getTransportationType());
-    writeString(value.getRoutingSpace());
-    writeStringSet(value.getDimensionSet());
-    writeFOMStringParameterList(value.getParameterList());
+    writeStringVector( value.getName());
+    writeString( value.getOrderType());
+    writeString( value.getTransportationType());
+    writeString( value.getRoutingSpace());
+    writeStringSet( value.getDimensionSet());
+    writeFOMStringParameterList( value.getParameterList());
   }
 
   void writeFOMStringInteractionClassList(const FOMStringInteractionClassList& value)
@@ -1157,12 +1157,12 @@ public:
 
   void writeFOMStringAttribute(const FOMStringAttribute& value)
   {
-    writeString(value.getName());
-    writeString(value.getDataType());
-    writeString(value.getOrderType());
-    writeString(value.getTransportationType());
-    writeString(value.getRoutingSpace());
-    writeStringSet(value.getDimensionSet());
+    writeString( value.getName());
+    writeString( value.getDataType());
+    writeString( value.getOrderType());
+    writeString( value.getTransportationType());
+    writeString( value.getRoutingSpace());
+    writeStringSet( value.getDimensionSet());
   }
 
   void writeFOMStringAttributeList(const FOMStringAttributeList& value)
@@ -1175,8 +1175,8 @@ public:
 
   void writeFOMStringObjectClass(const FOMStringObjectClass& value)
   {
-    writeStringVector(value.getName());
-    writeFOMStringAttributeList(value.getAttributeList());
+    writeStringVector( value.getName());
+    writeFOMStringAttributeList( value.getAttributeList());
   }
 
   void writeFOMStringObjectClassList(const FOMStringObjectClassList& value)
@@ -1189,8 +1189,8 @@ public:
 
   void writeFOMStringUpdateRate(const FOMStringUpdateRate& value)
   {
-    writeString(value.getName());
-    writeDouble(value.getRate());
+    writeString( value.getName());
+    writeDouble( value.getRate());
   }
 
   void writeFOMStringUpdateRateList(const FOMStringUpdateRateList& value)
@@ -1203,8 +1203,8 @@ public:
 
   void writeFOMStringSwitch(const FOMStringSwitch& value)
   {
-    writeSwitchesType(value.getSwitchesType());
-    writeBool(value.getEnabled());
+    writeSwitchesType( value.getSwitchesType());
+    writeBool( value.getEnabled());
   }
 
   void writeFOMStringSwitchList(const FOMStringSwitchList& value)
@@ -1217,21 +1217,21 @@ public:
 
   void writeFOMStringModule(const FOMStringModule& value)
   {
-    writeString(value.getDesignator());
-    writeFOMStringTransportationTypeList(value.getTransportationTypeList());
-    writeFOMStringDimensionList(value.getDimensionList());
-    writeFOMStringRoutingSpaceList(value.getRoutingSpaceList());
-    writeFOMStringInteractionClassList(value.getInteractionClassList());
-    writeFOMStringObjectClassList(value.getObjectClassList());
-    writeFOMStringUpdateRateList(value.getUpdateRateList());
-    writeFOMStringSwitchList(value.getSwitchList());
-    writeFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
-    writeFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
-    writeFOMStringArrayDataTypeList(value.getArrayDataTypeList());
-    writeFOMStringFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
-    writeFOMStringVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
-    writeBool(value.getArtificialInteractionRoot());
-    writeBool(value.getArtificialObjectRoot());
+    writeString( value.getDesignator());
+    writeFOMStringTransportationTypeList( value.getTransportationTypeList());
+    writeFOMStringDimensionList( value.getDimensionList());
+    writeFOMStringRoutingSpaceList( value.getRoutingSpaceList());
+    writeFOMStringInteractionClassList( value.getInteractionClassList());
+    writeFOMStringObjectClassList( value.getObjectClassList());
+    writeFOMStringUpdateRateList( value.getUpdateRateList());
+    writeFOMStringSwitchList( value.getSwitchList());
+    writeFOMStringSimpleDataTypeList( value.getSimpleDataTypeList());
+    writeFOMStringEnumeratedDataTypeList( value.getEnumeratedDataTypeList());
+    writeFOMStringArrayDataTypeList( value.getArrayDataTypeList());
+    writeFOMStringFixedRecordDataTypeList( value.getFixedRecordDataTypeList());
+    writeFOMStringVariantRecordDataTypeList( value.getVariantRecordDataTypeList());
+    writeBool( value.getArtificialInteractionRoot());
+    writeBool( value.getArtificialObjectRoot());
   }
 
   void writeFOMStringModuleList(const FOMStringModuleList& value)
@@ -1244,22 +1244,22 @@ public:
 
   void writeFOMStringModule2(const FOMStringModule2& value)
   {
-    writeString(value.getDesignator());
-    writeFOMStringTransportationTypeList(value.getTransportationTypeList());
-    writeFOMStringDimensionList(value.getDimensionList());
-    writeFOMStringRoutingSpaceList(value.getRoutingSpaceList());
-    writeFOMStringInteractionClassList(value.getInteractionClassList());
-    writeFOMStringObjectClassList(value.getObjectClassList());
-    writeFOMStringUpdateRateList(value.getUpdateRateList());
-    writeFOMStringSwitchList(value.getSwitchList());
-    writeFOMStringBasicDataTypeList(value.getBasicDataTypeList());
-    writeFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
-    writeFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
-    writeFOMStringArrayDataType2List(value.getArrayDataTypeList());
-    writeFOMStringFixedRecordDataType2List(value.getFixedRecordDataTypeList());
-    writeFOMStringVariantRecordDataType2List(value.getVariantRecordDataTypeList());
-    writeBool(value.getArtificialInteractionRoot());
-    writeBool(value.getArtificialObjectRoot());
+    writeString( value.getDesignator());
+    writeFOMStringTransportationTypeList( value.getTransportationTypeList());
+    writeFOMStringDimensionList( value.getDimensionList());
+    writeFOMStringRoutingSpaceList( value.getRoutingSpaceList());
+    writeFOMStringInteractionClassList( value.getInteractionClassList());
+    writeFOMStringObjectClassList( value.getObjectClassList());
+    writeFOMStringUpdateRateList( value.getUpdateRateList());
+    writeFOMStringSwitchList( value.getSwitchList());
+    writeFOMStringBasicDataTypeList( value.getBasicDataTypeList());
+    writeFOMStringSimpleDataTypeList( value.getSimpleDataTypeList());
+    writeFOMStringEnumeratedDataTypeList( value.getEnumeratedDataTypeList());
+    writeFOMStringArrayDataType2List( value.getArrayDataTypeList());
+    writeFOMStringFixedRecordDataType2List( value.getFixedRecordDataTypeList());
+    writeFOMStringVariantRecordDataType2List( value.getVariantRecordDataTypeList());
+    writeBool( value.getArtificialInteractionRoot());
+    writeBool( value.getArtificialObjectRoot());
   }
 
   void writeFOMStringModule2List(const FOMStringModule2List& value)
@@ -1272,8 +1272,8 @@ public:
 
   void writeFOMTransportationType(const FOMTransportationType& value)
   {
-    writeString(value.getName());
-    writeTransportationType(value.getTransportationType());
+    writeString( value.getName());
+    writeTransportationType( value.getTransportationType());
   }
 
   void writeFOMTransportationTypeList(const FOMTransportationTypeList& value)
@@ -1286,9 +1286,9 @@ public:
 
   void writeFOMDimension(const FOMDimension& value)
   {
-    writeString(value.getName());
-    writeDimensionHandle(value.getDimensionHandle());
-    writeUnsigned(value.getUpperBound());
+    writeString( value.getName());
+    writeDimensionHandle( value.getDimensionHandle());
+    writeUnsigned( value.getUpperBound());
   }
 
   void writeFOMDimensionList(const FOMDimensionList& value)
@@ -1301,9 +1301,9 @@ public:
 
   void writeFOMRoutingSpace(const FOMRoutingSpace& value)
   {
-    writeString(value.getName());
-    writeSpaceHandle(value.getSpaceHandle());
-    writeDimensionHandleSet(value.getDimensionHandleSet());
+    writeString( value.getName());
+    writeSpaceHandle( value.getSpaceHandle());
+    writeDimensionHandleSet( value.getDimensionHandleSet());
   }
 
   void writeFOMRoutingSpaceList(const FOMRoutingSpaceList& value)
@@ -1316,9 +1316,9 @@ public:
 
   void writeFOMParameter(const FOMParameter& value)
   {
-    writeString(value.getName());
-    writeString(value.getDataType());
-    writeParameterHandle(value.getParameterHandle());
+    writeString( value.getName());
+    writeString( value.getDataType());
+    writeParameterHandle( value.getParameterHandle());
   }
 
   void writeFOMParameterList(const FOMParameterList& value)
@@ -1331,13 +1331,13 @@ public:
 
   void writeFOMInteractionClass(const FOMInteractionClass& value)
   {
-    writeString(value.getName());
-    writeInteractionClassHandle(value.getInteractionClassHandle());
-    writeInteractionClassHandle(value.getParentInteractionClassHandle());
-    writeOrderType(value.getOrderType());
-    writeTransportationType(value.getTransportationType());
-    writeDimensionHandleSet(value.getDimensionHandleSet());
-    writeFOMParameterList(value.getParameterList());
+    writeString( value.getName());
+    writeInteractionClassHandle( value.getInteractionClassHandle());
+    writeInteractionClassHandle( value.getParentInteractionClassHandle());
+    writeOrderType( value.getOrderType());
+    writeTransportationType( value.getTransportationType());
+    writeDimensionHandleSet( value.getDimensionHandleSet());
+    writeFOMParameterList( value.getParameterList());
   }
 
   void writeFOMInteractionClassList(const FOMInteractionClassList& value)
@@ -1350,12 +1350,12 @@ public:
 
   void writeFOMAttribute(const FOMAttribute& value)
   {
-    writeString(value.getName());
-    writeString(value.getDataType());
-    writeAttributeHandle(value.getAttributeHandle());
-    writeOrderType(value.getOrderType());
-    writeTransportationType(value.getTransportationType());
-    writeDimensionHandleSet(value.getDimensionHandleSet());
+    writeString( value.getName());
+    writeString( value.getDataType());
+    writeAttributeHandle( value.getAttributeHandle());
+    writeOrderType( value.getOrderType());
+    writeTransportationType( value.getTransportationType());
+    writeDimensionHandleSet( value.getDimensionHandleSet());
   }
 
   void writeFOMAttributeList(const FOMAttributeList& value)
@@ -1368,10 +1368,10 @@ public:
 
   void writeFOMObjectClass(const FOMObjectClass& value)
   {
-    writeString(value.getName());
-    writeObjectClassHandle(value.getObjectClassHandle());
-    writeObjectClassHandle(value.getParentObjectClassHandle());
-    writeFOMAttributeList(value.getAttributeList());
+    writeString( value.getName());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectClassHandle( value.getParentObjectClassHandle());
+    writeFOMAttributeList( value.getAttributeList());
   }
 
   void writeFOMObjectClassList(const FOMObjectClassList& value)
@@ -1384,9 +1384,9 @@ public:
 
   void writeFOMUpdateRate(const FOMUpdateRate& value)
   {
-    writeString(value.getName());
-    writeUpdateRateHandle(value.getUpdateRateHandle());
-    writeDouble(value.getRate());
+    writeString( value.getName());
+    writeUpdateRateHandle( value.getUpdateRateHandle());
+    writeDouble( value.getRate());
   }
 
   void writeFOMUpdateRateList(const FOMUpdateRateList& value)
@@ -1399,8 +1399,8 @@ public:
 
   void writeFOMSwitch(const FOMSwitch& value)
   {
-    writeSwitchesType(value.getSwitchesType());
-    writeBool(value.getEnabled());
+    writeSwitchesType( value.getSwitchesType());
+    writeBool( value.getEnabled());
   }
 
   void writeFOMSwitchList(const FOMSwitchList& value)
@@ -1413,10 +1413,10 @@ public:
 
   void writeFOMBasicDataType(const FOMBasicDataType& value)
   {
-    writeString(value.getName());
-    writeUnsigned(value.getSize());
-    writeEndianness(value.getEndian());
-    writeBasicDataTypeHandle(value.getHandle());
+    writeString( value.getName());
+    writeUnsigned( value.getSize());
+    writeEndianness( value.getEndian());
+    writeBasicDataTypeHandle( value.getHandle());
   }
 
   void writeFOMBasicDataTypeList(const FOMBasicDataTypeList& value)
@@ -1429,9 +1429,9 @@ public:
 
   void writeFOMSimpleDataType(const FOMSimpleDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getRepresentation());
-    writeSimpleDataTypeHandle(value.getHandle());
+    writeString( value.getName());
+    writeString( value.getRepresentation());
+    writeSimpleDataTypeHandle( value.getHandle());
   }
 
   void writeFOMSimpleDataTypeList(const FOMSimpleDataTypeList& value)
@@ -1444,8 +1444,8 @@ public:
 
   void writeFOMEnumerator(const FOMEnumerator& value)
   {
-    writeString(value.getName());
-    writeUnsigned(value.getValue());
+    writeString( value.getName());
+    writeUnsigned( value.getValue());
   }
 
   void writeFOMEnumeratorList(const FOMEnumeratorList& value)
@@ -1458,10 +1458,10 @@ public:
 
   void writeFOMEnumeratedDataType(const FOMEnumeratedDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getRepresentation());
-    writeFOMEnumeratorList(value.getEnumerators());
-    writeEnumeratedDataTypeHandle(value.getHandle());
+    writeString( value.getName());
+    writeString( value.getRepresentation());
+    writeFOMEnumeratorList( value.getEnumerators());
+    writeEnumeratedDataTypeHandle( value.getHandle());
   }
 
   void writeFOMEnumeratedDataTypeList(const FOMEnumeratedDataTypeList& value)
@@ -1474,11 +1474,11 @@ public:
 
   void writeFOMArrayDataType(const FOMArrayDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getDataType());
-    writeString(value.getCardinality());
-    writeArrayDataTypeEncoding(value.getEncoding());
-    writeArrayDataTypeHandle(value.getHandle());
+    writeString( value.getName());
+    writeString( value.getDataType());
+    writeString( value.getCardinality());
+    writeArrayDataTypeEncoding( value.getEncoding());
+    writeArrayDataTypeHandle( value.getHandle());
   }
 
   void writeFOMArrayDataTypeList(const FOMArrayDataTypeList& value)
@@ -1491,9 +1491,9 @@ public:
 
   void writeFOMFixedRecordField(const FOMFixedRecordField& value)
   {
-    writeString(value.getName());
-    writeString(value.getDataType());
-    writeUnsigned(value.getVersion());
+    writeString( value.getName());
+    writeString( value.getDataType());
+    writeUnsigned( value.getVersion());
   }
 
   void writeFOMFixedRecordFieldList(const FOMFixedRecordFieldList& value)
@@ -1506,12 +1506,12 @@ public:
 
   void writeFOMFixedRecordDataType(const FOMFixedRecordDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getEncoding());
-    writeString(value.getInclude());
-    writeUnsigned(value.getVersion());
-    writeFOMFixedRecordFieldList(value.getFields());
-    writeFixedRecordDataTypeHandle(value.getHandle());
+    writeString( value.getName());
+    writeString( value.getEncoding());
+    writeString( value.getInclude());
+    writeUnsigned( value.getVersion());
+    writeFOMFixedRecordFieldList( value.getFields());
+    writeFixedRecordDataTypeHandle( value.getHandle());
   }
 
   void writeFOMFixedRecordDataTypeList(const FOMFixedRecordDataTypeList& value)
@@ -1524,9 +1524,9 @@ public:
 
   void writeFOMVariantRecordAlternative(const FOMVariantRecordAlternative& value)
   {
-    writeString(value.getEnumerator());
-    writeString(value.getName());
-    writeString(value.getDataType());
+    writeString( value.getEnumerator());
+    writeString( value.getName());
+    writeString( value.getDataType());
   }
 
   void writeFOMVariantRecordAlternativeList(const FOMVariantRecordAlternativeList& value)
@@ -1539,12 +1539,12 @@ public:
 
   void writeFOMVariantRecordDataType(const FOMVariantRecordDataType& value)
   {
-    writeString(value.getName());
-    writeString(value.getDiscriminant());
-    writeString(value.getDataType());
-    writeFOMVariantRecordAlternativeList(value.getAlternatives());
-    writeString(value.getEncoding());
-    writeVariantRecordDataTypeHandle(value.getHandle());
+    writeString( value.getName());
+    writeString( value.getDiscriminant());
+    writeString( value.getDataType());
+    writeFOMVariantRecordAlternativeList( value.getAlternatives());
+    writeString( value.getEncoding());
+    writeVariantRecordDataTypeHandle( value.getHandle());
   }
 
   void writeFOMVariantRecordDataTypeList(const FOMVariantRecordDataTypeList& value)
@@ -1557,17 +1557,17 @@ public:
 
   void writeFOMModule(const FOMModule& value)
   {
-    writeModuleHandle(value.getModuleHandle());
-    writeFOMTransportationTypeList(value.getTransportationTypeList());
-    writeFOMDimensionList(value.getDimensionList());
-    writeFOMRoutingSpaceList(value.getRoutingSpaceList());
-    writeFOMInteractionClassList(value.getInteractionClassList());
-    writeFOMObjectClassList(value.getObjectClassList());
-    writeFOMUpdateRateList(value.getUpdateRateList());
-    writeFOMSwitchList(value.getSwitchList());
-    writeBool(value.getArtificialInteractionRoot());
-    writeBool(value.getArtificialObjectRoot());
-    writeString(value.getDesignator());
+    writeModuleHandle( value.getModuleHandle());
+    writeFOMTransportationTypeList( value.getTransportationTypeList());
+    writeFOMDimensionList( value.getDimensionList());
+    writeFOMRoutingSpaceList( value.getRoutingSpaceList());
+    writeFOMInteractionClassList( value.getInteractionClassList());
+    writeFOMObjectClassList( value.getObjectClassList());
+    writeFOMUpdateRateList( value.getUpdateRateList());
+    writeFOMSwitchList( value.getSwitchList());
+    writeBool( value.getArtificialInteractionRoot());
+    writeBool( value.getArtificialObjectRoot());
+    writeString( value.getDesignator());
   }
 
   void writeFOMModuleList(const FOMModuleList& value)
@@ -1580,12 +1580,12 @@ public:
 
   void writeFOMModule2(const FOMModule2& value)
   {
-    writeFOMBasicDataTypeList(value.getBasicDataTypeList());
-    writeFOMSimpleDataTypeList(value.getSimpleDataTypeList());
-    writeFOMEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
-    writeFOMArrayDataTypeList(value.getArrayDataTypeList());
-    writeFOMFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
-    writeFOMVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
+    writeFOMBasicDataTypeList( value.getBasicDataTypeList());
+    writeFOMSimpleDataTypeList( value.getSimpleDataTypeList());
+    writeFOMEnumeratedDataTypeList( value.getEnumeratedDataTypeList());
+    writeFOMArrayDataTypeList( value.getArrayDataTypeList());
+    writeFOMFixedRecordDataTypeList( value.getFixedRecordDataTypeList());
+    writeFOMVariantRecordDataTypeList( value.getVariantRecordDataTypeList());
   }
 
   void writeFOMModule2List(const FOMModule2List& value)
@@ -1598,497 +1598,497 @@ public:
 
   void writeConnectionLostMessage(const ConnectionLostMessage& value)
   {
-    writeString(value.getFaultDescription());
+    writeString( value.getFaultDescription());
   }
 
   void writeCreateFederationExecutionRequestMessage(const CreateFederationExecutionRequestMessage& value)
   {
-    writeString(value.getFederationExecution());
-    writeString(value.getLogicalTimeFactoryName());
-    writeFOMStringModuleList(value.getFOMStringModuleList());
+    writeString( value.getFederationExecution());
+    writeString( value.getLogicalTimeFactoryName());
+    writeFOMStringModuleList( value.getFOMStringModuleList());
   }
 
   void writeCreateFederationExecutionRequest2Message(const CreateFederationExecutionRequest2Message& value)
   {
-    writeString(value.getFederationExecution());
-    writeString(value.getLogicalTimeFactoryName());
-    writeFOMStringModule2List(value.getFOMStringModuleList());
+    writeString( value.getFederationExecution());
+    writeString( value.getLogicalTimeFactoryName());
+    writeFOMStringModule2List( value.getFOMStringModuleList());
   }
 
   void writeCreateFederationExecutionResponseMessage(const CreateFederationExecutionResponseMessage& value)
   {
-    writeCreateFederationExecutionResponseType(value.getCreateFederationExecutionResponseType());
-    writeString(value.getExceptionString());
+    writeCreateFederationExecutionResponseType( value.getCreateFederationExecutionResponseType());
+    writeString( value.getExceptionString());
   }
 
   void writeDestroyFederationExecutionRequestMessage(const DestroyFederationExecutionRequestMessage& value)
   {
-    writeString(value.getFederationExecution());
+    writeString( value.getFederationExecution());
   }
 
   void writeDestroyFederationExecutionResponseMessage(const DestroyFederationExecutionResponseMessage& value)
   {
-    writeDestroyFederationExecutionResponseType(value.getDestroyFederationExecutionResponseType());
+    writeDestroyFederationExecutionResponseType( value.getDestroyFederationExecutionResponseType());
   }
 
-  void writeEnumerateFederationExecutionsRequestMessage(const EnumerateFederationExecutionsRequestMessage& value)
+  void writeEnumerateFederationExecutionsRequestMessage(const EnumerateFederationExecutionsRequestMessage&)
   {
   }
 
   void writeEnumerateFederationExecutionsResponseMessage(const EnumerateFederationExecutionsResponseMessage& value)
   {
-    writeFederationExecutionInformationVector(value.getFederationExecutionInformationVector());
+    writeFederationExecutionInformationVector( value.getFederationExecutionInformationVector());
   }
 
   void writeInsertFederationExecutionMessage(const InsertFederationExecutionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeString(value.getFederationName());
-    writeString(value.getLogicalTimeFactoryName());
-    writeConfigurationParameterMap(value.getConfigurationParameterMap());
+    writeFederationHandle( value.getFederationHandle());
+    writeString( value.getFederationName());
+    writeString( value.getLogicalTimeFactoryName());
+    writeConfigurationParameterMap( value.getConfigurationParameterMap());
   }
 
   void writeShutdownFederationExecutionMessage(const ShutdownFederationExecutionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
+    writeFederationHandle( value.getFederationHandle());
   }
 
   void writeEraseFederationExecutionMessage(const EraseFederationExecutionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
+    writeFederationHandle( value.getFederationHandle());
   }
 
   void writeReleaseFederationHandleMessage(const ReleaseFederationHandleMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
+    writeFederationHandle( value.getFederationHandle());
   }
 
   void writeInsertModulesMessage(const InsertModulesMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFOMModuleList(value.getFOMModuleList());
+    writeFederationHandle( value.getFederationHandle());
+    writeFOMModuleList( value.getFOMModuleList());
   }
 
   void writeInsertModules2Message(const InsertModules2Message& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFOMModule2List(value.getFOMModule2List());
+    writeFederationHandle( value.getFederationHandle());
+    writeFOMModule2List( value.getFOMModule2List());
   }
 
   void writeJoinFederationExecutionRequestMessage(const JoinFederationExecutionRequestMessage& value)
   {
-    writeString(value.getFederationExecution());
-    writeString(value.getFederateType());
-    writeString(value.getFederateName());
-    writeFOMStringModuleList(value.getFOMStringModuleList());
-    writeConfigurationParameterMap(value.getConfigurationParameterMap());
-    writeBool(value.getIsInternal());
+    writeString( value.getFederationExecution());
+    writeString( value.getFederateType());
+    writeString( value.getFederateName());
+    writeFOMStringModuleList( value.getFOMStringModuleList());
+    writeConfigurationParameterMap( value.getConfigurationParameterMap());
+    writeBool( value.getIsInternal());
   }
 
   void writeJoinFederationExecutionRequest2Message(const JoinFederationExecutionRequest2Message& value)
   {
-    writeString(value.getFederationExecution());
-    writeString(value.getFederateType());
-    writeString(value.getFederateName());
-    writeFOMStringModule2List(value.getFOMStringModuleList());
-    writeConfigurationParameterMap(value.getConfigurationParameterMap());
-    writeBool(value.getIsInternal());
+    writeString( value.getFederationExecution());
+    writeString( value.getFederateType());
+    writeString( value.getFederateName());
+    writeFOMStringModule2List( value.getFOMStringModuleList());
+    writeConfigurationParameterMap( value.getConfigurationParameterMap());
+    writeBool( value.getIsInternal());
   }
 
   void writeJoinFederationExecutionResponseMessage(const JoinFederationExecutionResponseMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeJoinFederationExecutionResponseType(value.getJoinFederationExecutionResponseType());
-    writeString(value.getExceptionString());
-    writeFederateHandle(value.getFederateHandle());
-    writeString(value.getFederateType());
-    writeString(value.getFederateName());
+    writeFederationHandle( value.getFederationHandle());
+    writeJoinFederationExecutionResponseType( value.getJoinFederationExecutionResponseType());
+    writeString( value.getExceptionString());
+    writeFederateHandle( value.getFederateHandle());
+    writeString( value.getFederateType());
+    writeString( value.getFederateName());
   }
 
   void writeResignFederationExecutionLeafRequestMessage(const ResignFederationExecutionLeafRequestMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeResignAction(value.getResignAction());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeResignAction( value.getResignAction());
   }
 
   void writeResignFederationExecutionRequestMessage(const ResignFederationExecutionRequestMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
   }
 
   void writeJoinFederateNotifyMessage(const JoinFederateNotifyMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeString(value.getFederateType());
-    writeString(value.getFederateName());
-    writeBool(value.getIsInternal());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeString( value.getFederateType());
+    writeString( value.getFederateName());
+    writeBool( value.getIsInternal());
   }
 
   void writeResignFederateNotifyMessage(const ResignFederateNotifyMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
   }
 
   void writeChangeAutomaticResignDirectiveMessage(const ChangeAutomaticResignDirectiveMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeResignAction(value.getResignAction());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeResignAction( value.getResignAction());
   }
 
   void writeRegisterFederationSynchronizationPointMessage(const RegisterFederationSynchronizationPointMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeString(value.getLabel());
-    writeVariableLengthData(value.getTag());
-    writeFederateHandleVector(value.getFederateHandleVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeString( value.getLabel());
+    writeVariableLengthData( value.getTag());
+    writeFederateHandleVector( value.getFederateHandleVector());
   }
 
   void writeRegisterFederationSynchronizationPointResponseMessage(const RegisterFederationSynchronizationPointResponseMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeString(value.getLabel());
-    writeRegisterFederationSynchronizationPointResponseType(value.getRegisterFederationSynchronizationPointResponseType());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeString( value.getLabel());
+    writeRegisterFederationSynchronizationPointResponseType( value.getRegisterFederationSynchronizationPointResponseType());
   }
 
   void writeAnnounceSynchronizationPointMessage(const AnnounceSynchronizationPointMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeString(value.getLabel());
-    writeVariableLengthData(value.getTag());
-    writeBool(value.getAddJoiningFederates());
-    writeFederateHandleVector(value.getFederateHandleVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeString( value.getLabel());
+    writeVariableLengthData( value.getTag());
+    writeBool( value.getAddJoiningFederates());
+    writeFederateHandleVector( value.getFederateHandleVector());
   }
 
   void writeSynchronizationPointAchievedMessage(const SynchronizationPointAchievedMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeString(value.getLabel());
-    writeFederateHandleBoolPairVector(value.getFederateHandleBoolPairVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeString( value.getLabel());
+    writeFederateHandleBoolPairVector( value.getFederateHandleBoolPairVector());
   }
 
   void writeFederationSynchronizedMessage(const FederationSynchronizedMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeString(value.getLabel());
-    writeFederateHandleBoolPairVector(value.getFederateHandleBoolPairVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeString( value.getLabel());
+    writeFederateHandleBoolPairVector( value.getFederateHandleBoolPairVector());
   }
 
   void writeEnableTimeRegulationRequestMessage(const EnableTimeRegulationRequestMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeVariableLengthData(value.getTimeStamp());
-    writeUnsigned(value.getCommitId());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeVariableLengthData( value.getTimeStamp());
+    writeUnsigned( value.getCommitId());
   }
 
   void writeEnableTimeRegulationResponseMessage(const EnableTimeRegulationResponseMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeFederateHandle(value.getRespondingFederateHandle());
-    writeBool(value.getTimeStampValid());
-    writeVariableLengthData(value.getTimeStamp());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeFederateHandle( value.getRespondingFederateHandle());
+    writeBool( value.getTimeStampValid());
+    writeVariableLengthData( value.getTimeStamp());
   }
 
   void writeDisableTimeRegulationRequestMessage(const DisableTimeRegulationRequestMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
   }
 
   void writeEnableTimeConstrainedNotifyMessage(const EnableTimeConstrainedNotifyMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
   }
 
   void writeDisableTimeConstrainedNotifyMessage(const DisableTimeConstrainedNotifyMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
   }
 
   void writeCommitLowerBoundTimeStampMessage(const CommitLowerBoundTimeStampMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeVariableLengthData(value.getTimeStamp());
-    writeLowerBoundTimeStampCommitType(value.getCommitType());
-    writeUnsigned(value.getCommitId());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeVariableLengthData( value.getTimeStamp());
+    writeLowerBoundTimeStampCommitType( value.getCommitType());
+    writeUnsigned( value.getCommitId());
   }
 
   void writeCommitLowerBoundTimeStampResponseMessage(const CommitLowerBoundTimeStampResponseMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeFederateHandle(value.getSendingFederateHandle());
-    writeUnsigned(value.getCommitId());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeFederateHandle( value.getSendingFederateHandle());
+    writeUnsigned( value.getCommitId());
   }
 
   void writeLockedByNextMessageRequestMessage(const LockedByNextMessageRequestMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getSendingFederateHandle());
-    writeBool(value.getLockedByNextMessage());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getSendingFederateHandle());
+    writeBool( value.getLockedByNextMessage());
   }
 
-  void writeTimeConstrainedEnabledMessage(const TimeConstrainedEnabledMessage& value)
+  void writeTimeConstrainedEnabledMessage(const TimeConstrainedEnabledMessage&)
   {
   }
 
-  void writeTimeRegulationEnabledMessage(const TimeRegulationEnabledMessage& value)
+  void writeTimeRegulationEnabledMessage(const TimeRegulationEnabledMessage&)
   {
   }
 
-  void writeTimeAdvanceGrantedMessage(const TimeAdvanceGrantedMessage& value)
+  void writeTimeAdvanceGrantedMessage(const TimeAdvanceGrantedMessage&)
   {
   }
 
   void writeInsertRegionMessage(const InsertRegionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeRegionHandleDimensionHandleSetPairVector(value.getRegionHandleDimensionHandleSetPairVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeRegionHandleDimensionHandleSetPairVector( value.getRegionHandleDimensionHandleSetPairVector());
   }
 
   void writeCommitRegionMessage(const CommitRegionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeRegionHandleRegionValuePairVector(value.getRegionHandleRegionValuePairVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeRegionHandleRegionValuePairVector( value.getRegionHandleRegionValuePairVector());
   }
 
   void writeEraseRegionMessage(const EraseRegionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeRegionHandleVector(value.getRegionHandleVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeRegionHandleVector( value.getRegionHandleVector());
   }
 
   void writeChangeInteractionClassPublicationMessage(const ChangeInteractionClassPublicationMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writePublicationType(value.getPublicationType());
-    writeInteractionClassHandle(value.getInteractionClassHandle());
+    writeFederationHandle( value.getFederationHandle());
+    writePublicationType( value.getPublicationType());
+    writeInteractionClassHandle( value.getInteractionClassHandle());
   }
 
   void writeChangeObjectClassPublicationMessage(const ChangeObjectClassPublicationMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writePublicationType(value.getPublicationType());
-    writeObjectClassHandle(value.getObjectClassHandle());
-    writeAttributeHandleVector(value.getAttributeHandles());
+    writeFederationHandle( value.getFederationHandle());
+    writePublicationType( value.getPublicationType());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
   }
 
   void writeChangeInteractionClassSubscriptionMessage(const ChangeInteractionClassSubscriptionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeSubscriptionType(value.getSubscriptionType());
-    writeInteractionClassHandle(value.getInteractionClassHandle());
-    writeParameterValueVector(value.getParameterFilterValues());
+    writeFederationHandle( value.getFederationHandle());
+    writeSubscriptionType( value.getSubscriptionType());
+    writeInteractionClassHandle( value.getInteractionClassHandle());
+    writeParameterValueVector( value.getParameterFilterValues());
   }
 
   void writeChangeObjectClassSubscriptionMessage(const ChangeObjectClassSubscriptionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeSubscriptionType(value.getSubscriptionType());
-    writeObjectClassHandle(value.getObjectClassHandle());
-    writeAttributeHandleVector(value.getAttributeHandles());
+    writeFederationHandle( value.getFederationHandle());
+    writeSubscriptionType( value.getSubscriptionType());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
   }
 
   void writeChangeObjectInstanceSubscriptionMessage(const ChangeObjectInstanceSubscriptionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeSubscriptionType(value.getSubscriptionType());
-    writeObjectClassHandle(value.getObjectClassHandle());
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
+    writeFederationHandle( value.getFederationHandle());
+    writeSubscriptionType( value.getSubscriptionType());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
   }
 
   void writeRegistrationForObjectClassMessage(const RegistrationForObjectClassMessage& value)
   {
-    writeObjectClassHandle(value.getObjectClassHandle());
-    writeBool(value.getStart());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeBool( value.getStart());
   }
 
   void writeAttributesInScopeMessage(const AttributesInScopeMessage& value)
   {
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeAttributeHandleVector(value.getAttributeHandles());
-    writeBool(value.getInScope());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+    writeBool( value.getInScope());
   }
 
   void writeTurnUpdatesOnForInstanceMessage(const TurnUpdatesOnForInstanceMessage& value)
   {
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeAttributeHandleVector(value.getAttributeHandles());
-    writeString(value.getUpdateRate());
-    writeBool(value.getOn());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+    writeString( value.getUpdateRate());
+    writeBool( value.getOn());
   }
 
   void writeTurnInteractionsOnMessage(const TurnInteractionsOnMessage& value)
   {
-    writeInteractionClassHandle(value.getInteractionClassHandle());
-    writeBool(value.getOn());
+    writeInteractionClassHandle( value.getInteractionClassHandle());
+    writeBool( value.getOn());
   }
 
   void writeInteractionMessage(const InteractionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeInteractionClassHandle(value.getInteractionClassHandle());
-    writeTransportationType(value.getTransportationType());
-    writeVariableLengthData(value.getTag());
-    writeParameterValueVector(value.getParameterValues());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeInteractionClassHandle( value.getInteractionClassHandle());
+    writeTransportationType( value.getTransportationType());
+    writeVariableLengthData( value.getTag());
+    writeParameterValueVector( value.getParameterValues());
   }
 
   void writeTimeStampedInteractionMessage(const TimeStampedInteractionMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeInteractionClassHandle(value.getInteractionClassHandle());
-    writeOrderType(value.getOrderType());
-    writeTransportationType(value.getTransportationType());
-    writeVariableLengthData(value.getTag());
-    writeVariableLengthData(value.getTimeStamp());
-    writeMessageRetractionHandle(value.getMessageRetractionHandle());
-    writeParameterValueVector(value.getParameterValues());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeInteractionClassHandle( value.getInteractionClassHandle());
+    writeOrderType( value.getOrderType());
+    writeTransportationType( value.getTransportationType());
+    writeVariableLengthData( value.getTag());
+    writeVariableLengthData( value.getTimeStamp());
+    writeMessageRetractionHandle( value.getMessageRetractionHandle());
+    writeParameterValueVector( value.getParameterValues());
   }
 
   void writeObjectInstanceHandlesRequestMessage(const ObjectInstanceHandlesRequestMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeUnsigned(value.getCount());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeUnsigned( value.getCount());
   }
 
   void writeObjectInstanceHandlesResponseMessage(const ObjectInstanceHandlesResponseMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeObjectInstanceHandleNamePairVector(value.getObjectInstanceHandleNamePairVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeObjectInstanceHandleNamePairVector( value.getObjectInstanceHandleNamePairVector());
   }
 
   void writeReleaseMultipleObjectInstanceNameHandlePairsMessage(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeObjectInstanceHandleVector(value.getObjectInstanceHandleVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectInstanceHandleVector( value.getObjectInstanceHandleVector());
   }
 
   void writeReserveObjectInstanceNameRequestMessage(const ReserveObjectInstanceNameRequestMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeString(value.getName());
-    writeBool(value.getIsInternal());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeString( value.getName());
+    writeBool( value.getIsInternal());
   }
 
   void writeReserveObjectInstanceNameResponseMessage(const ReserveObjectInstanceNameResponseMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeObjectInstanceHandleNamePair(value.getObjectInstanceHandleNamePair());
-    writeBool(value.getSuccess());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeObjectInstanceHandleNamePair( value.getObjectInstanceHandleNamePair());
+    writeBool( value.getSuccess());
   }
 
   void writeReserveMultipleObjectInstanceNameRequestMessage(const ReserveMultipleObjectInstanceNameRequestMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeStringVector(value.getNameList());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeStringVector( value.getNameList());
   }
 
   void writeReserveMultipleObjectInstanceNameResponseMessage(const ReserveMultipleObjectInstanceNameResponseMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeObjectInstanceHandleNamePairVector(value.getObjectInstanceHandleNamePairVector());
-    writeBool(value.getSuccess());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeObjectInstanceHandleNamePairVector( value.getObjectInstanceHandleNamePairVector());
+    writeBool( value.getSuccess());
   }
 
   void writeInsertObjectInstanceMessage(const InsertObjectInstanceMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeObjectClassHandle(value.getObjectClassHandle());
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeString(value.getName());
-    writeAttributeStateVector(value.getAttributeStateVector());
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeString( value.getName());
+    writeAttributeStateVector( value.getAttributeStateVector());
   }
 
   void writeDeleteObjectInstanceMessage(const DeleteObjectInstanceMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeVariableLengthData(value.getTag());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeVariableLengthData( value.getTag());
   }
 
   void writeTimeStampedDeleteObjectInstanceMessage(const TimeStampedDeleteObjectInstanceMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeOrderType(value.getOrderType());
-    writeVariableLengthData(value.getTag());
-    writeVariableLengthData(value.getTimeStamp());
-    writeMessageRetractionHandle(value.getMessageRetractionHandle());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeOrderType( value.getOrderType());
+    writeVariableLengthData( value.getTag());
+    writeVariableLengthData( value.getTimeStamp());
+    writeMessageRetractionHandle( value.getMessageRetractionHandle());
   }
 
   void writeAttributeUpdateMessage(const AttributeUpdateMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeVariableLengthData(value.getTag());
-    writeTransportationType(value.getTransportationType());
-    writeAttributeValueVector(value.getAttributeValues());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeVariableLengthData( value.getTag());
+    writeTransportationType( value.getTransportationType());
+    writeAttributeValueVector( value.getAttributeValues());
   }
 
   void writeTimeStampedAttributeUpdateMessage(const TimeStampedAttributeUpdateMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeFederateHandle(value.getFederateHandle());
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeVariableLengthData(value.getTag());
-    writeVariableLengthData(value.getTimeStamp());
-    writeMessageRetractionHandle(value.getMessageRetractionHandle());
-    writeOrderType(value.getOrderType());
-    writeTransportationType(value.getTransportationType());
-    writeAttributeValueVector(value.getAttributeValues());
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeVariableLengthData( value.getTag());
+    writeVariableLengthData( value.getTimeStamp());
+    writeMessageRetractionHandle( value.getMessageRetractionHandle());
+    writeOrderType( value.getOrderType());
+    writeTransportationType( value.getTransportationType());
+    writeAttributeValueVector( value.getAttributeValues());
   }
 
   void writeRequestAttributeUpdateMessage(const RequestAttributeUpdateMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeAttributeHandleVector(value.getAttributeHandles());
-    writeVariableLengthData(value.getTag());
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+    writeVariableLengthData( value.getTag());
   }
 
   void writeRequestClassAttributeUpdateMessage(const RequestClassAttributeUpdateMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeObjectClassHandle(value.getObjectClassHandle());
-    writeAttributeHandleVector(value.getAttributeHandles());
-    writeVariableLengthData(value.getTag());
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+    writeVariableLengthData( value.getTag());
   }
 
   void writeQueryAttributeOwnershipRequestMessage(const QueryAttributeOwnershipRequestMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeAttributeHandle(value.getAttributeHandle());
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandle( value.getAttributeHandle());
   }
 
   void writeQueryAttributeOwnershipResponseMessage(const QueryAttributeOwnershipResponseMessage& value)
   {
-    writeFederationHandle(value.getFederationHandle());
-    writeObjectInstanceHandle(value.getObjectInstanceHandle());
-    writeAttributeHandle(value.getAttributeHandle());
-    writeFederateHandle(value.getOwner());
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandle( value.getAttributeHandle());
+    writeFederateHandle( value.getOwner());
   }
 
   TightBE1MessageEncoding& _messageEncoding;
@@ -2120,16 +2120,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ConnectionLostMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeConnectionLostMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionRequestMessage& message) const
   {
@@ -2138,16 +2128,6 @@ public:
     encodeStream.writeUInt16Compressed(2);
     encodeStream.writeCreateFederationExecutionRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeCreateFederationExecutionRequestMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2160,16 +2140,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionRequest2Message& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeCreateFederationExecutionRequest2Message(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionResponseMessage& message) const
   {
@@ -2178,16 +2148,6 @@ public:
     encodeStream.writeUInt16Compressed(3);
     encodeStream.writeCreateFederationExecutionResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const CreateFederationExecutionResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeCreateFederationExecutionResponseMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2200,16 +2160,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const DestroyFederationExecutionRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeDestroyFederationExecutionRequestMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const DestroyFederationExecutionResponseMessage& message) const
   {
@@ -2218,16 +2168,6 @@ public:
     encodeStream.writeUInt16Compressed(5);
     encodeStream.writeDestroyFederationExecutionResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const DestroyFederationExecutionResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeDestroyFederationExecutionResponseMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2240,16 +2180,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnumerateFederationExecutionsRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeEnumerateFederationExecutionsRequestMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const EnumerateFederationExecutionsResponseMessage& message) const
   {
@@ -2258,16 +2188,6 @@ public:
     encodeStream.writeUInt16Compressed(7);
     encodeStream.writeEnumerateFederationExecutionsResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnumerateFederationExecutionsResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeEnumerateFederationExecutionsResponseMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2280,16 +2200,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertFederationExecutionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeInsertFederationExecutionMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ShutdownFederationExecutionMessage& message) const
   {
@@ -2298,16 +2208,6 @@ public:
     encodeStream.writeUInt16Compressed(9);
     encodeStream.writeShutdownFederationExecutionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ShutdownFederationExecutionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeShutdownFederationExecutionMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2320,16 +2220,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const EraseFederationExecutionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeEraseFederationExecutionMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ReleaseFederationHandleMessage& message) const
   {
@@ -2338,16 +2228,6 @@ public:
     encodeStream.writeUInt16Compressed(11);
     encodeStream.writeReleaseFederationHandleMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReleaseFederationHandleMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeReleaseFederationHandleMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2360,16 +2240,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertModulesMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeInsertModulesMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const InsertModules2Message& message) const
   {
@@ -2378,16 +2248,6 @@ public:
     encodeStream.writeUInt16Compressed(106);
     encodeStream.writeInsertModules2Message(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertModules2Message& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeInsertModules2Message(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2400,16 +2260,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeJoinFederationExecutionRequestMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionRequest2Message& message) const
   {
@@ -2418,16 +2268,6 @@ public:
     encodeStream.writeUInt16Compressed(105);
     encodeStream.writeJoinFederationExecutionRequest2Message(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionRequest2Message& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeJoinFederationExecutionRequest2Message(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2440,16 +2280,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const JoinFederationExecutionResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeJoinFederationExecutionResponseMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ResignFederationExecutionRequestMessage& message) const
   {
@@ -2458,16 +2288,6 @@ public:
     encodeStream.writeUInt16Compressed(15);
     encodeStream.writeResignFederationExecutionRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ResignFederationExecutionRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeResignFederationExecutionRequestMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2480,16 +2300,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const JoinFederateNotifyMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeJoinFederateNotifyMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ResignFederateNotifyMessage& message) const
   {
@@ -2498,16 +2308,6 @@ public:
     encodeStream.writeUInt16Compressed(17);
     encodeStream.writeResignFederateNotifyMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ResignFederateNotifyMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeResignFederateNotifyMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2520,16 +2320,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeAutomaticResignDirectiveMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeChangeAutomaticResignDirectiveMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const RegisterFederationSynchronizationPointMessage& message) const
   {
@@ -2538,16 +2328,6 @@ public:
     encodeStream.writeUInt16Compressed(30);
     encodeStream.writeRegisterFederationSynchronizationPointMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const RegisterFederationSynchronizationPointMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeRegisterFederationSynchronizationPointMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2560,16 +2340,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const RegisterFederationSynchronizationPointResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeRegisterFederationSynchronizationPointResponseMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const AnnounceSynchronizationPointMessage& message) const
   {
@@ -2578,16 +2348,6 @@ public:
     encodeStream.writeUInt16Compressed(32);
     encodeStream.writeAnnounceSynchronizationPointMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const AnnounceSynchronizationPointMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeAnnounceSynchronizationPointMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2600,16 +2360,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const SynchronizationPointAchievedMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeSynchronizationPointAchievedMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const FederationSynchronizedMessage& message) const
   {
@@ -2618,16 +2368,6 @@ public:
     encodeStream.writeUInt16Compressed(34);
     encodeStream.writeFederationSynchronizedMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const FederationSynchronizedMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeFederationSynchronizedMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2640,16 +2380,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnableTimeRegulationRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeEnableTimeRegulationRequestMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const EnableTimeRegulationResponseMessage& message) const
   {
@@ -2658,16 +2388,6 @@ public:
     encodeStream.writeUInt16Compressed(41);
     encodeStream.writeEnableTimeRegulationResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnableTimeRegulationResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeEnableTimeRegulationResponseMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2680,16 +2400,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const DisableTimeRegulationRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeDisableTimeRegulationRequestMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const EnableTimeConstrainedNotifyMessage& message) const
   {
@@ -2698,16 +2408,6 @@ public:
     encodeStream.writeUInt16Compressed(100);
     encodeStream.writeEnableTimeConstrainedNotifyMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const EnableTimeConstrainedNotifyMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeEnableTimeConstrainedNotifyMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2720,16 +2420,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const DisableTimeConstrainedNotifyMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeDisableTimeConstrainedNotifyMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const CommitLowerBoundTimeStampMessage& message) const
   {
@@ -2738,16 +2428,6 @@ public:
     encodeStream.writeUInt16Compressed(43);
     encodeStream.writeCommitLowerBoundTimeStampMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const CommitLowerBoundTimeStampMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeCommitLowerBoundTimeStampMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2760,16 +2440,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const CommitLowerBoundTimeStampResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeCommitLowerBoundTimeStampResponseMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const LockedByNextMessageRequestMessage& message) const
   {
@@ -2778,16 +2448,6 @@ public:
     encodeStream.writeUInt16Compressed(45);
     encodeStream.writeLockedByNextMessageRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const LockedByNextMessageRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeLockedByNextMessageRequestMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2800,16 +2460,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertRegionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeInsertRegionMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const CommitRegionMessage& message) const
   {
@@ -2818,16 +2468,6 @@ public:
     encodeStream.writeUInt16Compressed(47);
     encodeStream.writeCommitRegionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const CommitRegionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeCommitRegionMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2840,16 +2480,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const EraseRegionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeEraseRegionMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ChangeInteractionClassPublicationMessage& message) const
   {
@@ -2858,16 +2488,6 @@ public:
     encodeStream.writeUInt16Compressed(50);
     encodeStream.writeChangeInteractionClassPublicationMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeInteractionClassPublicationMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeChangeInteractionClassPublicationMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2880,16 +2500,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeObjectClassPublicationMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeChangeObjectClassPublicationMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ChangeInteractionClassSubscriptionMessage& message) const
   {
@@ -2898,16 +2508,6 @@ public:
     encodeStream.writeUInt16Compressed(52);
     encodeStream.writeChangeInteractionClassSubscriptionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeInteractionClassSubscriptionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeChangeInteractionClassSubscriptionMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2920,16 +2520,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeObjectClassSubscriptionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeChangeObjectClassSubscriptionMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ChangeObjectInstanceSubscriptionMessage& message) const
   {
@@ -2938,16 +2528,6 @@ public:
     encodeStream.writeUInt16Compressed(99);
     encodeStream.writeChangeObjectInstanceSubscriptionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ChangeObjectInstanceSubscriptionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeChangeObjectInstanceSubscriptionMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -2960,16 +2540,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const InteractionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeInteractionMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const TimeStampedInteractionMessage& message) const
   {
@@ -2978,16 +2548,6 @@ public:
     encodeStream.writeUInt16Compressed(81);
     encodeStream.writeTimeStampedInteractionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const TimeStampedInteractionMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeTimeStampedInteractionMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -3000,16 +2560,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ObjectInstanceHandlesRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeObjectInstanceHandlesRequestMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ObjectInstanceHandlesResponseMessage& message) const
   {
@@ -3018,16 +2568,6 @@ public:
     encodeStream.writeUInt16Compressed(61);
     encodeStream.writeObjectInstanceHandlesResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ObjectInstanceHandlesResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeObjectInstanceHandlesResponseMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -3040,16 +2580,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReleaseMultipleObjectInstanceNameHandlePairsMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeReleaseMultipleObjectInstanceNameHandlePairsMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ReserveObjectInstanceNameRequestMessage& message) const
   {
@@ -3058,16 +2588,6 @@ public:
     encodeStream.writeUInt16Compressed(63);
     encodeStream.writeReserveObjectInstanceNameRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReserveObjectInstanceNameRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeReserveObjectInstanceNameRequestMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -3080,16 +2600,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReserveObjectInstanceNameResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeReserveObjectInstanceNameResponseMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const ReserveMultipleObjectInstanceNameRequestMessage& message) const
   {
@@ -3098,16 +2608,6 @@ public:
     encodeStream.writeUInt16Compressed(65);
     encodeStream.writeReserveMultipleObjectInstanceNameRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReserveMultipleObjectInstanceNameRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeReserveMultipleObjectInstanceNameRequestMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -3120,16 +2620,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const ReserveMultipleObjectInstanceNameResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeReserveMultipleObjectInstanceNameResponseMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const InsertObjectInstanceMessage& message) const
   {
@@ -3138,16 +2628,6 @@ public:
     encodeStream.writeUInt16Compressed(90);
     encodeStream.writeInsertObjectInstanceMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const InsertObjectInstanceMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeInsertObjectInstanceMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -3160,16 +2640,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const DeleteObjectInstanceMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeDeleteObjectInstanceMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const TimeStampedDeleteObjectInstanceMessage& message) const
   {
@@ -3178,16 +2648,6 @@ public:
     encodeStream.writeUInt16Compressed(92);
     encodeStream.writeTimeStampedDeleteObjectInstanceMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const TimeStampedDeleteObjectInstanceMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeTimeStampedDeleteObjectInstanceMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -3200,16 +2660,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const AttributeUpdateMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeAttributeUpdateMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const TimeStampedAttributeUpdateMessage& message) const
   {
@@ -3218,16 +2668,6 @@ public:
     encodeStream.writeUInt16Compressed(96);
     encodeStream.writeTimeStampedAttributeUpdateMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const TimeStampedAttributeUpdateMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeTimeStampedAttributeUpdateMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -3240,16 +2680,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const RequestAttributeUpdateMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeRequestAttributeUpdateMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const RequestClassAttributeUpdateMessage& message) const
   {
@@ -3258,16 +2688,6 @@ public:
     encodeStream.writeUInt16Compressed(98);
     encodeStream.writeRequestClassAttributeUpdateMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const RequestClassAttributeUpdateMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeRequestClassAttributeUpdateMessage(message);
-    result += 4;
-    return result;
   }
 
   void
@@ -3280,16 +2700,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipRequestMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeQueryAttributeOwnershipRequestMessage(message);
-    result += 4;
-    return result;
-  }
-
   void
   encode(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipResponseMessage& message) const
   {
@@ -3298,16 +2708,6 @@ public:
     encodeStream.writeUInt16Compressed(103);
     encodeStream.writeQueryAttributeOwnershipResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  size_t
-  encodedSize(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipResponseMessage& message) const
-  {
-    size_t result = 0;
-    result += 2;
-    // encodeStream.writeQueryAttributeOwnershipResponseMessage(message);
-    result += 4;
-    return result;
   }
 
 private:
@@ -3862,8 +3262,8 @@ public:
 
   void readRangeBoundsValue(RangeBoundsValue& value)
   {
-    readUnsigned(value.getLowerBound());
-    readUnsigned(value.getUpperBound());
+    readUnsigned( value.getLowerBound());
+    readUnsigned( value.getUpperBound());
   }
 
   void readDimensionHandleRangeBoundsValuePair(DimensionHandleRangeBoundsValuePair& value)
@@ -3944,8 +3344,8 @@ public:
 
   void readAttributeState(AttributeState& value)
   {
-    readAttributeHandle(value.getAttributeHandle());
-    readFederateHandle(value.getOwnerFederate());
+    readAttributeHandle( value.getAttributeHandle());
+    readFederateHandle( value.getOwnerFederate());
   }
 
   void readAttributeStateVector(AttributeStateVector& value)
@@ -3958,8 +3358,8 @@ public:
 
   void readParameterValue(ParameterValue& value)
   {
-    readParameterHandle(value.getParameterHandle());
-    readVariableLengthData(value.getValue());
+    readParameterHandle( value.getParameterHandle());
+    readVariableLengthData( value.getValue());
   }
 
   void readParameterValueVector(ParameterValueVector& value)
@@ -3972,8 +3372,8 @@ public:
 
   void readAttributeValue(AttributeValue& value)
   {
-    readAttributeHandle(value.getAttributeHandle());
-    readVariableLengthData(value.getValue());
+    readAttributeHandle( value.getAttributeHandle());
+    readVariableLengthData( value.getValue());
   }
 
   void readAttributeValueVector(AttributeValueVector& value)
@@ -4014,8 +3414,8 @@ public:
 
   void readFederationExecutionInformation(FederationExecutionInformation& value)
   {
-    readString(value.getFederationExecutionName());
-    readString(value.getLogicalTimeFactoryName());
+    readString( value.getFederationExecutionName());
+    readString( value.getLogicalTimeFactoryName());
   }
 
   void readFederationExecutionInformationVector(FederationExecutionInformationVector& value)
@@ -4154,9 +3554,9 @@ public:
 
   void readFOMStringBasicDataType(FOMStringBasicDataType& value)
   {
-    readString(value.getName());
-    readUnsigned(value.getSize());
-    readEndianness(value.getEndian());
+    readString( value.getName());
+    readUnsigned( value.getSize());
+    readEndianness( value.getEndian());
   }
 
   void readFOMStringBasicDataTypeList(FOMStringBasicDataTypeList& value)
@@ -4169,8 +3569,8 @@ public:
 
   void readFOMStringSimpleDataType(FOMStringSimpleDataType& value)
   {
-    readString(value.getName());
-    readString(value.getRepresentation());
+    readString( value.getName());
+    readString( value.getRepresentation());
   }
 
   void readFOMStringSimpleDataTypeList(FOMStringSimpleDataTypeList& value)
@@ -4183,8 +3583,8 @@ public:
 
   void readFOMStringEnumerator(FOMStringEnumerator& value)
   {
-    readString(value.getName());
-    readUnsigned(value.getValue());
+    readString( value.getName());
+    readUnsigned( value.getValue());
   }
 
   void readFOMStringEnumeratorList(FOMStringEnumeratorList& value)
@@ -4197,9 +3597,9 @@ public:
 
   void readFOMStringEnumeratedDataType(FOMStringEnumeratedDataType& value)
   {
-    readString(value.getName());
-    readString(value.getRepresentation());
-    readFOMStringEnumeratorList(value.getEnumerators());
+    readString( value.getName());
+    readString( value.getRepresentation());
+    readFOMStringEnumeratorList( value.getEnumerators());
   }
 
   void readFOMStringEnumeratedDataTypeList(FOMStringEnumeratedDataTypeList& value)
@@ -4212,10 +3612,10 @@ public:
 
   void readFOMStringArrayDataType(FOMStringArrayDataType& value)
   {
-    readString(value.getName());
-    readString(value.getDataType());
-    readString(value.getCardinality());
-    readString(value.getEncoding());
+    readString( value.getName());
+    readString( value.getDataType());
+    readString( value.getCardinality());
+    readString( value.getEncoding());
   }
 
   void readFOMStringArrayDataTypeList(FOMStringArrayDataTypeList& value)
@@ -4228,10 +3628,10 @@ public:
 
   void readFOMStringArrayDataType2(FOMStringArrayDataType2& value)
   {
-    readString(value.getName());
-    readString(value.getDataType());
-    readString(value.getCardinality());
-    readArrayDataTypeEncoding(value.getEncoding());
+    readString( value.getName());
+    readString( value.getDataType());
+    readString( value.getCardinality());
+    readArrayDataTypeEncoding( value.getEncoding());
   }
 
   void readFOMStringArrayDataType2List(FOMStringArrayDataType2List& value)
@@ -4244,8 +3644,8 @@ public:
 
   void readFOMStringFixedRecordField(FOMStringFixedRecordField& value)
   {
-    readString(value.getName());
-    readUnsigned(value.getDataType());
+    readString( value.getName());
+    readUnsigned( value.getDataType());
   }
 
   void readFOMStringFixedRecordFieldList(FOMStringFixedRecordFieldList& value)
@@ -4258,9 +3658,9 @@ public:
 
   void readFOMStringFixedRecordDataType(FOMStringFixedRecordDataType& value)
   {
-    readString(value.getName());
-    readString(value.getEncoding());
-    readFOMStringFixedRecordFieldList(value.getFields());
+    readString( value.getName());
+    readString( value.getEncoding());
+    readFOMStringFixedRecordFieldList( value.getFields());
   }
 
   void readFOMStringFixedRecordDataTypeList(FOMStringFixedRecordDataTypeList& value)
@@ -4273,9 +3673,9 @@ public:
 
   void readFOMStringFixedRecordField2(FOMStringFixedRecordField2& value)
   {
-    readString(value.getName());
-    readString(value.getDataType());
-    readUnsigned(value.getVersion());
+    readString( value.getName());
+    readString( value.getDataType());
+    readUnsigned( value.getVersion());
   }
 
   void readFOMStringFixedRecordField2List(FOMStringFixedRecordField2List& value)
@@ -4288,11 +3688,11 @@ public:
 
   void readFOMStringFixedRecordDataType2(FOMStringFixedRecordDataType2& value)
   {
-    readString(value.getName());
-    readString(value.getEncoding());
-    readString(value.getInclude());
-    readUnsigned(value.getVersion());
-    readFOMStringFixedRecordField2List(value.getFields());
+    readString( value.getName());
+    readString( value.getEncoding());
+    readString( value.getInclude());
+    readUnsigned( value.getVersion());
+    readFOMStringFixedRecordField2List( value.getFields());
   }
 
   void readFOMStringFixedRecordDataType2List(FOMStringFixedRecordDataType2List& value)
@@ -4305,9 +3705,9 @@ public:
 
   void readFOMStringVariantRecordAlternative(FOMStringVariantRecordAlternative& value)
   {
-    readString(value.getEnumerator());
-    readString(value.getName());
-    readUnsigned(value.getDataType());
+    readString( value.getEnumerator());
+    readString( value.getName());
+    readUnsigned( value.getDataType());
   }
 
   void readFOMStringVariantRecordAlternativeList(FOMStringVariantRecordAlternativeList& value)
@@ -4320,11 +3720,11 @@ public:
 
   void readFOMStringVariantRecordDataType(FOMStringVariantRecordDataType& value)
   {
-    readString(value.getName());
-    readString(value.getDiscriminant());
-    readString(value.getDataType());
-    readFOMStringVariantRecordAlternativeList(value.getAlternatives());
-    readString(value.getEncoding());
+    readString( value.getName());
+    readString( value.getDiscriminant());
+    readString( value.getDataType());
+    readFOMStringVariantRecordAlternativeList( value.getAlternatives());
+    readString( value.getEncoding());
   }
 
   void readFOMStringVariantRecordDataTypeList(FOMStringVariantRecordDataTypeList& value)
@@ -4337,9 +3737,9 @@ public:
 
   void readFOMStringVariantRecordAlternative2(FOMStringVariantRecordAlternative2& value)
   {
-    readString(value.getEnumerator());
-    readString(value.getName());
-    readString(value.getDataType());
+    readString( value.getEnumerator());
+    readString( value.getName());
+    readString( value.getDataType());
   }
 
   void readFOMStringVariantRecordAlternative2List(FOMStringVariantRecordAlternative2List& value)
@@ -4352,11 +3752,11 @@ public:
 
   void readFOMStringVariantRecordDataType2(FOMStringVariantRecordDataType2& value)
   {
-    readString(value.getName());
-    readString(value.getDiscriminant());
-    readString(value.getDataType());
-    readFOMStringVariantRecordAlternative2List(value.getAlternatives());
-    readString(value.getEncoding());
+    readString( value.getName());
+    readString( value.getDiscriminant());
+    readString( value.getDataType());
+    readFOMStringVariantRecordAlternative2List( value.getAlternatives());
+    readString( value.getEncoding());
   }
 
   void readFOMStringVariantRecordDataType2List(FOMStringVariantRecordDataType2List& value)
@@ -4369,7 +3769,7 @@ public:
 
   void readFOMStringTransportationType(FOMStringTransportationType& value)
   {
-    readString(value.getName());
+    readString( value.getName());
   }
 
   void readFOMStringTransportationTypeList(FOMStringTransportationTypeList& value)
@@ -4382,8 +3782,8 @@ public:
 
   void readFOMStringDimension(FOMStringDimension& value)
   {
-    readString(value.getName());
-    readUnsigned(value.getUpperBound());
+    readString( value.getName());
+    readUnsigned( value.getUpperBound());
   }
 
   void readFOMStringDimensionList(FOMStringDimensionList& value)
@@ -4396,8 +3796,8 @@ public:
 
   void readFOMStringRoutingSpace(FOMStringRoutingSpace& value)
   {
-    readString(value.getName());
-    readStringSet(value.getDimensionSet());
+    readString( value.getName());
+    readStringSet( value.getDimensionSet());
   }
 
   void readFOMStringRoutingSpaceList(FOMStringRoutingSpaceList& value)
@@ -4410,8 +3810,8 @@ public:
 
   void readFOMStringParameter(FOMStringParameter& value)
   {
-    readString(value.getName());
-    readString(value.getDataType());
+    readString( value.getName());
+    readString( value.getDataType());
   }
 
   void readFOMStringParameterList(FOMStringParameterList& value)
@@ -4424,12 +3824,12 @@ public:
 
   void readFOMStringInteractionClass(FOMStringInteractionClass& value)
   {
-    readStringVector(value.getName());
-    readString(value.getOrderType());
-    readString(value.getTransportationType());
-    readString(value.getRoutingSpace());
-    readStringSet(value.getDimensionSet());
-    readFOMStringParameterList(value.getParameterList());
+    readStringVector( value.getName());
+    readString( value.getOrderType());
+    readString( value.getTransportationType());
+    readString( value.getRoutingSpace());
+    readStringSet( value.getDimensionSet());
+    readFOMStringParameterList( value.getParameterList());
   }
 
   void readFOMStringInteractionClassList(FOMStringInteractionClassList& value)
@@ -4442,12 +3842,12 @@ public:
 
   void readFOMStringAttribute(FOMStringAttribute& value)
   {
-    readString(value.getName());
-    readString(value.getDataType());
-    readString(value.getOrderType());
-    readString(value.getTransportationType());
-    readString(value.getRoutingSpace());
-    readStringSet(value.getDimensionSet());
+    readString( value.getName());
+    readString( value.getDataType());
+    readString( value.getOrderType());
+    readString( value.getTransportationType());
+    readString( value.getRoutingSpace());
+    readStringSet( value.getDimensionSet());
   }
 
   void readFOMStringAttributeList(FOMStringAttributeList& value)
@@ -4460,8 +3860,8 @@ public:
 
   void readFOMStringObjectClass(FOMStringObjectClass& value)
   {
-    readStringVector(value.getName());
-    readFOMStringAttributeList(value.getAttributeList());
+    readStringVector( value.getName());
+    readFOMStringAttributeList( value.getAttributeList());
   }
 
   void readFOMStringObjectClassList(FOMStringObjectClassList& value)
@@ -4474,8 +3874,8 @@ public:
 
   void readFOMStringUpdateRate(FOMStringUpdateRate& value)
   {
-    readString(value.getName());
-    readDouble(value.getRate());
+    readString( value.getName());
+    readDouble( value.getRate());
   }
 
   void readFOMStringUpdateRateList(FOMStringUpdateRateList& value)
@@ -4488,8 +3888,8 @@ public:
 
   void readFOMStringSwitch(FOMStringSwitch& value)
   {
-    readSwitchesType(value.getSwitchesType());
-    readBool(value.getEnabled());
+    readSwitchesType( value.getSwitchesType());
+    readBool( value.getEnabled());
   }
 
   void readFOMStringSwitchList(FOMStringSwitchList& value)
@@ -4502,21 +3902,21 @@ public:
 
   void readFOMStringModule(FOMStringModule& value)
   {
-    readString(value.getDesignator());
-    readFOMStringTransportationTypeList(value.getTransportationTypeList());
-    readFOMStringDimensionList(value.getDimensionList());
-    readFOMStringRoutingSpaceList(value.getRoutingSpaceList());
-    readFOMStringInteractionClassList(value.getInteractionClassList());
-    readFOMStringObjectClassList(value.getObjectClassList());
-    readFOMStringUpdateRateList(value.getUpdateRateList());
-    readFOMStringSwitchList(value.getSwitchList());
-    readFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
-    readFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
-    readFOMStringArrayDataTypeList(value.getArrayDataTypeList());
-    readFOMStringFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
-    readFOMStringVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
-    readBool(value.getArtificialInteractionRoot());
-    readBool(value.getArtificialObjectRoot());
+    readString( value.getDesignator());
+    readFOMStringTransportationTypeList( value.getTransportationTypeList());
+    readFOMStringDimensionList( value.getDimensionList());
+    readFOMStringRoutingSpaceList( value.getRoutingSpaceList());
+    readFOMStringInteractionClassList( value.getInteractionClassList());
+    readFOMStringObjectClassList( value.getObjectClassList());
+    readFOMStringUpdateRateList( value.getUpdateRateList());
+    readFOMStringSwitchList( value.getSwitchList());
+    readFOMStringSimpleDataTypeList( value.getSimpleDataTypeList());
+    readFOMStringEnumeratedDataTypeList( value.getEnumeratedDataTypeList());
+    readFOMStringArrayDataTypeList( value.getArrayDataTypeList());
+    readFOMStringFixedRecordDataTypeList( value.getFixedRecordDataTypeList());
+    readFOMStringVariantRecordDataTypeList( value.getVariantRecordDataTypeList());
+    readBool( value.getArtificialInteractionRoot());
+    readBool( value.getArtificialObjectRoot());
   }
 
   void readFOMStringModuleList(FOMStringModuleList& value)
@@ -4529,22 +3929,22 @@ public:
 
   void readFOMStringModule2(FOMStringModule2& value)
   {
-    readString(value.getDesignator());
-    readFOMStringTransportationTypeList(value.getTransportationTypeList());
-    readFOMStringDimensionList(value.getDimensionList());
-    readFOMStringRoutingSpaceList(value.getRoutingSpaceList());
-    readFOMStringInteractionClassList(value.getInteractionClassList());
-    readFOMStringObjectClassList(value.getObjectClassList());
-    readFOMStringUpdateRateList(value.getUpdateRateList());
-    readFOMStringSwitchList(value.getSwitchList());
-    readFOMStringBasicDataTypeList(value.getBasicDataTypeList());
-    readFOMStringSimpleDataTypeList(value.getSimpleDataTypeList());
-    readFOMStringEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
-    readFOMStringArrayDataType2List(value.getArrayDataTypeList());
-    readFOMStringFixedRecordDataType2List(value.getFixedRecordDataTypeList());
-    readFOMStringVariantRecordDataType2List(value.getVariantRecordDataTypeList());
-    readBool(value.getArtificialInteractionRoot());
-    readBool(value.getArtificialObjectRoot());
+    readString( value.getDesignator());
+    readFOMStringTransportationTypeList( value.getTransportationTypeList());
+    readFOMStringDimensionList( value.getDimensionList());
+    readFOMStringRoutingSpaceList( value.getRoutingSpaceList());
+    readFOMStringInteractionClassList( value.getInteractionClassList());
+    readFOMStringObjectClassList( value.getObjectClassList());
+    readFOMStringUpdateRateList( value.getUpdateRateList());
+    readFOMStringSwitchList( value.getSwitchList());
+    readFOMStringBasicDataTypeList( value.getBasicDataTypeList());
+    readFOMStringSimpleDataTypeList( value.getSimpleDataTypeList());
+    readFOMStringEnumeratedDataTypeList( value.getEnumeratedDataTypeList());
+    readFOMStringArrayDataType2List( value.getArrayDataTypeList());
+    readFOMStringFixedRecordDataType2List( value.getFixedRecordDataTypeList());
+    readFOMStringVariantRecordDataType2List( value.getVariantRecordDataTypeList());
+    readBool( value.getArtificialInteractionRoot());
+    readBool( value.getArtificialObjectRoot());
   }
 
   void readFOMStringModule2List(FOMStringModule2List& value)
@@ -4557,8 +3957,8 @@ public:
 
   void readFOMTransportationType(FOMTransportationType& value)
   {
-    readString(value.getName());
-    readTransportationType(value.getTransportationType());
+    readString( value.getName());
+    readTransportationType( value.getTransportationType());
   }
 
   void readFOMTransportationTypeList(FOMTransportationTypeList& value)
@@ -4571,9 +3971,9 @@ public:
 
   void readFOMDimension(FOMDimension& value)
   {
-    readString(value.getName());
-    readDimensionHandle(value.getDimensionHandle());
-    readUnsigned(value.getUpperBound());
+    readString( value.getName());
+    readDimensionHandle( value.getDimensionHandle());
+    readUnsigned( value.getUpperBound());
   }
 
   void readFOMDimensionList(FOMDimensionList& value)
@@ -4586,9 +3986,9 @@ public:
 
   void readFOMRoutingSpace(FOMRoutingSpace& value)
   {
-    readString(value.getName());
-    readSpaceHandle(value.getSpaceHandle());
-    readDimensionHandleSet(value.getDimensionHandleSet());
+    readString( value.getName());
+    readSpaceHandle( value.getSpaceHandle());
+    readDimensionHandleSet( value.getDimensionHandleSet());
   }
 
   void readFOMRoutingSpaceList(FOMRoutingSpaceList& value)
@@ -4601,9 +4001,9 @@ public:
 
   void readFOMParameter(FOMParameter& value)
   {
-    readString(value.getName());
-    readString(value.getDataType());
-    readParameterHandle(value.getParameterHandle());
+    readString( value.getName());
+    readString( value.getDataType());
+    readParameterHandle( value.getParameterHandle());
   }
 
   void readFOMParameterList(FOMParameterList& value)
@@ -4616,13 +4016,13 @@ public:
 
   void readFOMInteractionClass(FOMInteractionClass& value)
   {
-    readString(value.getName());
-    readInteractionClassHandle(value.getInteractionClassHandle());
-    readInteractionClassHandle(value.getParentInteractionClassHandle());
-    readOrderType(value.getOrderType());
-    readTransportationType(value.getTransportationType());
-    readDimensionHandleSet(value.getDimensionHandleSet());
-    readFOMParameterList(value.getParameterList());
+    readString( value.getName());
+    readInteractionClassHandle( value.getInteractionClassHandle());
+    readInteractionClassHandle( value.getParentInteractionClassHandle());
+    readOrderType( value.getOrderType());
+    readTransportationType( value.getTransportationType());
+    readDimensionHandleSet( value.getDimensionHandleSet());
+    readFOMParameterList( value.getParameterList());
   }
 
   void readFOMInteractionClassList(FOMInteractionClassList& value)
@@ -4635,12 +4035,12 @@ public:
 
   void readFOMAttribute(FOMAttribute& value)
   {
-    readString(value.getName());
-    readString(value.getDataType());
-    readAttributeHandle(value.getAttributeHandle());
-    readOrderType(value.getOrderType());
-    readTransportationType(value.getTransportationType());
-    readDimensionHandleSet(value.getDimensionHandleSet());
+    readString( value.getName());
+    readString( value.getDataType());
+    readAttributeHandle( value.getAttributeHandle());
+    readOrderType( value.getOrderType());
+    readTransportationType( value.getTransportationType());
+    readDimensionHandleSet( value.getDimensionHandleSet());
   }
 
   void readFOMAttributeList(FOMAttributeList& value)
@@ -4653,10 +4053,10 @@ public:
 
   void readFOMObjectClass(FOMObjectClass& value)
   {
-    readString(value.getName());
-    readObjectClassHandle(value.getObjectClassHandle());
-    readObjectClassHandle(value.getParentObjectClassHandle());
-    readFOMAttributeList(value.getAttributeList());
+    readString( value.getName());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectClassHandle( value.getParentObjectClassHandle());
+    readFOMAttributeList( value.getAttributeList());
   }
 
   void readFOMObjectClassList(FOMObjectClassList& value)
@@ -4669,9 +4069,9 @@ public:
 
   void readFOMUpdateRate(FOMUpdateRate& value)
   {
-    readString(value.getName());
-    readUpdateRateHandle(value.getUpdateRateHandle());
-    readDouble(value.getRate());
+    readString( value.getName());
+    readUpdateRateHandle( value.getUpdateRateHandle());
+    readDouble( value.getRate());
   }
 
   void readFOMUpdateRateList(FOMUpdateRateList& value)
@@ -4684,8 +4084,8 @@ public:
 
   void readFOMSwitch(FOMSwitch& value)
   {
-    readSwitchesType(value.getSwitchesType());
-    readBool(value.getEnabled());
+    readSwitchesType( value.getSwitchesType());
+    readBool( value.getEnabled());
   }
 
   void readFOMSwitchList(FOMSwitchList& value)
@@ -4698,10 +4098,10 @@ public:
 
   void readFOMBasicDataType(FOMBasicDataType& value)
   {
-    readString(value.getName());
-    readUnsigned(value.getSize());
-    readEndianness(value.getEndian());
-    readBasicDataTypeHandle(value.getHandle());
+    readString( value.getName());
+    readUnsigned( value.getSize());
+    readEndianness( value.getEndian());
+    readBasicDataTypeHandle( value.getHandle());
   }
 
   void readFOMBasicDataTypeList(FOMBasicDataTypeList& value)
@@ -4714,9 +4114,9 @@ public:
 
   void readFOMSimpleDataType(FOMSimpleDataType& value)
   {
-    readString(value.getName());
-    readString(value.getRepresentation());
-    readSimpleDataTypeHandle(value.getHandle());
+    readString( value.getName());
+    readString( value.getRepresentation());
+    readSimpleDataTypeHandle( value.getHandle());
   }
 
   void readFOMSimpleDataTypeList(FOMSimpleDataTypeList& value)
@@ -4729,8 +4129,8 @@ public:
 
   void readFOMEnumerator(FOMEnumerator& value)
   {
-    readString(value.getName());
-    readUnsigned(value.getValue());
+    readString( value.getName());
+    readUnsigned( value.getValue());
   }
 
   void readFOMEnumeratorList(FOMEnumeratorList& value)
@@ -4743,10 +4143,10 @@ public:
 
   void readFOMEnumeratedDataType(FOMEnumeratedDataType& value)
   {
-    readString(value.getName());
-    readString(value.getRepresentation());
-    readFOMEnumeratorList(value.getEnumerators());
-    readEnumeratedDataTypeHandle(value.getHandle());
+    readString( value.getName());
+    readString( value.getRepresentation());
+    readFOMEnumeratorList( value.getEnumerators());
+    readEnumeratedDataTypeHandle( value.getHandle());
   }
 
   void readFOMEnumeratedDataTypeList(FOMEnumeratedDataTypeList& value)
@@ -4759,11 +4159,11 @@ public:
 
   void readFOMArrayDataType(FOMArrayDataType& value)
   {
-    readString(value.getName());
-    readString(value.getDataType());
-    readString(value.getCardinality());
-    readArrayDataTypeEncoding(value.getEncoding());
-    readArrayDataTypeHandle(value.getHandle());
+    readString( value.getName());
+    readString( value.getDataType());
+    readString( value.getCardinality());
+    readArrayDataTypeEncoding( value.getEncoding());
+    readArrayDataTypeHandle( value.getHandle());
   }
 
   void readFOMArrayDataTypeList(FOMArrayDataTypeList& value)
@@ -4776,9 +4176,9 @@ public:
 
   void readFOMFixedRecordField(FOMFixedRecordField& value)
   {
-    readString(value.getName());
-    readString(value.getDataType());
-    readUnsigned(value.getVersion());
+    readString( value.getName());
+    readString( value.getDataType());
+    readUnsigned( value.getVersion());
   }
 
   void readFOMFixedRecordFieldList(FOMFixedRecordFieldList& value)
@@ -4791,12 +4191,12 @@ public:
 
   void readFOMFixedRecordDataType(FOMFixedRecordDataType& value)
   {
-    readString(value.getName());
-    readString(value.getEncoding());
-    readString(value.getInclude());
-    readUnsigned(value.getVersion());
-    readFOMFixedRecordFieldList(value.getFields());
-    readFixedRecordDataTypeHandle(value.getHandle());
+    readString( value.getName());
+    readString( value.getEncoding());
+    readString( value.getInclude());
+    readUnsigned( value.getVersion());
+    readFOMFixedRecordFieldList( value.getFields());
+    readFixedRecordDataTypeHandle( value.getHandle());
   }
 
   void readFOMFixedRecordDataTypeList(FOMFixedRecordDataTypeList& value)
@@ -4809,9 +4209,9 @@ public:
 
   void readFOMVariantRecordAlternative(FOMVariantRecordAlternative& value)
   {
-    readString(value.getEnumerator());
-    readString(value.getName());
-    readString(value.getDataType());
+    readString( value.getEnumerator());
+    readString( value.getName());
+    readString( value.getDataType());
   }
 
   void readFOMVariantRecordAlternativeList(FOMVariantRecordAlternativeList& value)
@@ -4824,12 +4224,12 @@ public:
 
   void readFOMVariantRecordDataType(FOMVariantRecordDataType& value)
   {
-    readString(value.getName());
-    readString(value.getDiscriminant());
-    readString(value.getDataType());
-    readFOMVariantRecordAlternativeList(value.getAlternatives());
-    readString(value.getEncoding());
-    readVariantRecordDataTypeHandle(value.getHandle());
+    readString( value.getName());
+    readString( value.getDiscriminant());
+    readString( value.getDataType());
+    readFOMVariantRecordAlternativeList( value.getAlternatives());
+    readString( value.getEncoding());
+    readVariantRecordDataTypeHandle( value.getHandle());
   }
 
   void readFOMVariantRecordDataTypeList(FOMVariantRecordDataTypeList& value)
@@ -4842,17 +4242,17 @@ public:
 
   void readFOMModule(FOMModule& value)
   {
-    readModuleHandle(value.getModuleHandle());
-    readFOMTransportationTypeList(value.getTransportationTypeList());
-    readFOMDimensionList(value.getDimensionList());
-    readFOMRoutingSpaceList(value.getRoutingSpaceList());
-    readFOMInteractionClassList(value.getInteractionClassList());
-    readFOMObjectClassList(value.getObjectClassList());
-    readFOMUpdateRateList(value.getUpdateRateList());
-    readFOMSwitchList(value.getSwitchList());
-    readBool(value.getArtificialInteractionRoot());
-    readBool(value.getArtificialObjectRoot());
-    readString(value.getDesignator());
+    readModuleHandle( value.getModuleHandle());
+    readFOMTransportationTypeList( value.getTransportationTypeList());
+    readFOMDimensionList( value.getDimensionList());
+    readFOMRoutingSpaceList( value.getRoutingSpaceList());
+    readFOMInteractionClassList( value.getInteractionClassList());
+    readFOMObjectClassList( value.getObjectClassList());
+    readFOMUpdateRateList( value.getUpdateRateList());
+    readFOMSwitchList( value.getSwitchList());
+    readBool( value.getArtificialInteractionRoot());
+    readBool( value.getArtificialObjectRoot());
+    readString( value.getDesignator());
   }
 
   void readFOMModuleList(FOMModuleList& value)
@@ -4865,12 +4265,12 @@ public:
 
   void readFOMModule2(FOMModule2& value)
   {
-    readFOMBasicDataTypeList(value.getBasicDataTypeList());
-    readFOMSimpleDataTypeList(value.getSimpleDataTypeList());
-    readFOMEnumeratedDataTypeList(value.getEnumeratedDataTypeList());
-    readFOMArrayDataTypeList(value.getArrayDataTypeList());
-    readFOMFixedRecordDataTypeList(value.getFixedRecordDataTypeList());
-    readFOMVariantRecordDataTypeList(value.getVariantRecordDataTypeList());
+    readFOMBasicDataTypeList( value.getBasicDataTypeList());
+    readFOMSimpleDataTypeList( value.getSimpleDataTypeList());
+    readFOMEnumeratedDataTypeList( value.getEnumeratedDataTypeList());
+    readFOMArrayDataTypeList( value.getArrayDataTypeList());
+    readFOMFixedRecordDataTypeList( value.getFixedRecordDataTypeList());
+    readFOMVariantRecordDataTypeList( value.getVariantRecordDataTypeList());
   }
 
   void readFOMModule2List(FOMModule2List& value)
@@ -4883,497 +4283,497 @@ public:
 
   void readConnectionLostMessage(ConnectionLostMessage& value)
   {
-    readString(value.getFaultDescription());
+    readString( value.getFaultDescription());
   }
 
   void readCreateFederationExecutionRequestMessage(CreateFederationExecutionRequestMessage& value)
   {
-    readString(value.getFederationExecution());
-    readString(value.getLogicalTimeFactoryName());
-    readFOMStringModuleList(value.getFOMStringModuleList());
+    readString( value.getFederationExecution());
+    readString( value.getLogicalTimeFactoryName());
+    readFOMStringModuleList( value.getFOMStringModuleList());
   }
 
   void readCreateFederationExecutionRequest2Message(CreateFederationExecutionRequest2Message& value)
   {
-    readString(value.getFederationExecution());
-    readString(value.getLogicalTimeFactoryName());
-    readFOMStringModule2List(value.getFOMStringModuleList());
+    readString( value.getFederationExecution());
+    readString( value.getLogicalTimeFactoryName());
+    readFOMStringModule2List( value.getFOMStringModuleList());
   }
 
   void readCreateFederationExecutionResponseMessage(CreateFederationExecutionResponseMessage& value)
   {
-    readCreateFederationExecutionResponseType(value.getCreateFederationExecutionResponseType());
-    readString(value.getExceptionString());
+    readCreateFederationExecutionResponseType( value.getCreateFederationExecutionResponseType());
+    readString( value.getExceptionString());
   }
 
   void readDestroyFederationExecutionRequestMessage(DestroyFederationExecutionRequestMessage& value)
   {
-    readString(value.getFederationExecution());
+    readString( value.getFederationExecution());
   }
 
   void readDestroyFederationExecutionResponseMessage(DestroyFederationExecutionResponseMessage& value)
   {
-    readDestroyFederationExecutionResponseType(value.getDestroyFederationExecutionResponseType());
+    readDestroyFederationExecutionResponseType( value.getDestroyFederationExecutionResponseType());
   }
 
-  void readEnumerateFederationExecutionsRequestMessage(EnumerateFederationExecutionsRequestMessage& value)
+  void readEnumerateFederationExecutionsRequestMessage(EnumerateFederationExecutionsRequestMessage&)
   {
   }
 
   void readEnumerateFederationExecutionsResponseMessage(EnumerateFederationExecutionsResponseMessage& value)
   {
-    readFederationExecutionInformationVector(value.getFederationExecutionInformationVector());
+    readFederationExecutionInformationVector( value.getFederationExecutionInformationVector());
   }
 
   void readInsertFederationExecutionMessage(InsertFederationExecutionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readString(value.getFederationName());
-    readString(value.getLogicalTimeFactoryName());
-    readConfigurationParameterMap(value.getConfigurationParameterMap());
+    readFederationHandle( value.getFederationHandle());
+    readString( value.getFederationName());
+    readString( value.getLogicalTimeFactoryName());
+    readConfigurationParameterMap( value.getConfigurationParameterMap());
   }
 
   void readShutdownFederationExecutionMessage(ShutdownFederationExecutionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
+    readFederationHandle( value.getFederationHandle());
   }
 
   void readEraseFederationExecutionMessage(EraseFederationExecutionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
+    readFederationHandle( value.getFederationHandle());
   }
 
   void readReleaseFederationHandleMessage(ReleaseFederationHandleMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
+    readFederationHandle( value.getFederationHandle());
   }
 
   void readInsertModulesMessage(InsertModulesMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFOMModuleList(value.getFOMModuleList());
+    readFederationHandle( value.getFederationHandle());
+    readFOMModuleList( value.getFOMModuleList());
   }
 
   void readInsertModules2Message(InsertModules2Message& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFOMModule2List(value.getFOMModule2List());
+    readFederationHandle( value.getFederationHandle());
+    readFOMModule2List( value.getFOMModule2List());
   }
 
   void readJoinFederationExecutionRequestMessage(JoinFederationExecutionRequestMessage& value)
   {
-    readString(value.getFederationExecution());
-    readString(value.getFederateType());
-    readString(value.getFederateName());
-    readFOMStringModuleList(value.getFOMStringModuleList());
-    readConfigurationParameterMap(value.getConfigurationParameterMap());
-    readBool(value.getIsInternal());
+    readString( value.getFederationExecution());
+    readString( value.getFederateType());
+    readString( value.getFederateName());
+    readFOMStringModuleList( value.getFOMStringModuleList());
+    readConfigurationParameterMap( value.getConfigurationParameterMap());
+    readBool( value.getIsInternal());
   }
 
   void readJoinFederationExecutionRequest2Message(JoinFederationExecutionRequest2Message& value)
   {
-    readString(value.getFederationExecution());
-    readString(value.getFederateType());
-    readString(value.getFederateName());
-    readFOMStringModule2List(value.getFOMStringModuleList());
-    readConfigurationParameterMap(value.getConfigurationParameterMap());
-    readBool(value.getIsInternal());
+    readString( value.getFederationExecution());
+    readString( value.getFederateType());
+    readString( value.getFederateName());
+    readFOMStringModule2List( value.getFOMStringModuleList());
+    readConfigurationParameterMap( value.getConfigurationParameterMap());
+    readBool( value.getIsInternal());
   }
 
   void readJoinFederationExecutionResponseMessage(JoinFederationExecutionResponseMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readJoinFederationExecutionResponseType(value.getJoinFederationExecutionResponseType());
-    readString(value.getExceptionString());
-    readFederateHandle(value.getFederateHandle());
-    readString(value.getFederateType());
-    readString(value.getFederateName());
+    readFederationHandle( value.getFederationHandle());
+    readJoinFederationExecutionResponseType( value.getJoinFederationExecutionResponseType());
+    readString( value.getExceptionString());
+    readFederateHandle( value.getFederateHandle());
+    readString( value.getFederateType());
+    readString( value.getFederateName());
   }
 
   void readResignFederationExecutionLeafRequestMessage(ResignFederationExecutionLeafRequestMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readResignAction(value.getResignAction());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readResignAction( value.getResignAction());
   }
 
   void readResignFederationExecutionRequestMessage(ResignFederationExecutionRequestMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
   }
 
   void readJoinFederateNotifyMessage(JoinFederateNotifyMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readString(value.getFederateType());
-    readString(value.getFederateName());
-    readBool(value.getIsInternal());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readString( value.getFederateType());
+    readString( value.getFederateName());
+    readBool( value.getIsInternal());
   }
 
   void readResignFederateNotifyMessage(ResignFederateNotifyMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
   }
 
   void readChangeAutomaticResignDirectiveMessage(ChangeAutomaticResignDirectiveMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readResignAction(value.getResignAction());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readResignAction( value.getResignAction());
   }
 
   void readRegisterFederationSynchronizationPointMessage(RegisterFederationSynchronizationPointMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readString(value.getLabel());
-    readVariableLengthData(value.getTag());
-    readFederateHandleVector(value.getFederateHandleVector());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readString( value.getLabel());
+    readVariableLengthData( value.getTag());
+    readFederateHandleVector( value.getFederateHandleVector());
   }
 
   void readRegisterFederationSynchronizationPointResponseMessage(RegisterFederationSynchronizationPointResponseMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readString(value.getLabel());
-    readRegisterFederationSynchronizationPointResponseType(value.getRegisterFederationSynchronizationPointResponseType());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readString( value.getLabel());
+    readRegisterFederationSynchronizationPointResponseType( value.getRegisterFederationSynchronizationPointResponseType());
   }
 
   void readAnnounceSynchronizationPointMessage(AnnounceSynchronizationPointMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readString(value.getLabel());
-    readVariableLengthData(value.getTag());
-    readBool(value.getAddJoiningFederates());
-    readFederateHandleVector(value.getFederateHandleVector());
+    readFederationHandle( value.getFederationHandle());
+    readString( value.getLabel());
+    readVariableLengthData( value.getTag());
+    readBool( value.getAddJoiningFederates());
+    readFederateHandleVector( value.getFederateHandleVector());
   }
 
   void readSynchronizationPointAchievedMessage(SynchronizationPointAchievedMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readString(value.getLabel());
-    readFederateHandleBoolPairVector(value.getFederateHandleBoolPairVector());
+    readFederationHandle( value.getFederationHandle());
+    readString( value.getLabel());
+    readFederateHandleBoolPairVector( value.getFederateHandleBoolPairVector());
   }
 
   void readFederationSynchronizedMessage(FederationSynchronizedMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readString(value.getLabel());
-    readFederateHandleBoolPairVector(value.getFederateHandleBoolPairVector());
+    readFederationHandle( value.getFederationHandle());
+    readString( value.getLabel());
+    readFederateHandleBoolPairVector( value.getFederateHandleBoolPairVector());
   }
 
   void readEnableTimeRegulationRequestMessage(EnableTimeRegulationRequestMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readVariableLengthData(value.getTimeStamp());
-    readUnsigned(value.getCommitId());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readVariableLengthData( value.getTimeStamp());
+    readUnsigned( value.getCommitId());
   }
 
   void readEnableTimeRegulationResponseMessage(EnableTimeRegulationResponseMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readFederateHandle(value.getRespondingFederateHandle());
-    readBool(value.getTimeStampValid());
-    readVariableLengthData(value.getTimeStamp());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readFederateHandle( value.getRespondingFederateHandle());
+    readBool( value.getTimeStampValid());
+    readVariableLengthData( value.getTimeStamp());
   }
 
   void readDisableTimeRegulationRequestMessage(DisableTimeRegulationRequestMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
   }
 
   void readEnableTimeConstrainedNotifyMessage(EnableTimeConstrainedNotifyMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
   }
 
   void readDisableTimeConstrainedNotifyMessage(DisableTimeConstrainedNotifyMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
   }
 
   void readCommitLowerBoundTimeStampMessage(CommitLowerBoundTimeStampMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readVariableLengthData(value.getTimeStamp());
-    readLowerBoundTimeStampCommitType(value.getCommitType());
-    readUnsigned(value.getCommitId());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readVariableLengthData( value.getTimeStamp());
+    readLowerBoundTimeStampCommitType( value.getCommitType());
+    readUnsigned( value.getCommitId());
   }
 
   void readCommitLowerBoundTimeStampResponseMessage(CommitLowerBoundTimeStampResponseMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readFederateHandle(value.getSendingFederateHandle());
-    readUnsigned(value.getCommitId());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readFederateHandle( value.getSendingFederateHandle());
+    readUnsigned( value.getCommitId());
   }
 
   void readLockedByNextMessageRequestMessage(LockedByNextMessageRequestMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getSendingFederateHandle());
-    readBool(value.getLockedByNextMessage());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getSendingFederateHandle());
+    readBool( value.getLockedByNextMessage());
   }
 
-  void readTimeConstrainedEnabledMessage(TimeConstrainedEnabledMessage& value)
+  void readTimeConstrainedEnabledMessage(TimeConstrainedEnabledMessage&)
   {
   }
 
-  void readTimeRegulationEnabledMessage(TimeRegulationEnabledMessage& value)
+  void readTimeRegulationEnabledMessage(TimeRegulationEnabledMessage&)
   {
   }
 
-  void readTimeAdvanceGrantedMessage(TimeAdvanceGrantedMessage& value)
+  void readTimeAdvanceGrantedMessage(TimeAdvanceGrantedMessage&)
   {
   }
 
   void readInsertRegionMessage(InsertRegionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readRegionHandleDimensionHandleSetPairVector(value.getRegionHandleDimensionHandleSetPairVector());
+    readFederationHandle( value.getFederationHandle());
+    readRegionHandleDimensionHandleSetPairVector( value.getRegionHandleDimensionHandleSetPairVector());
   }
 
   void readCommitRegionMessage(CommitRegionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readRegionHandleRegionValuePairVector(value.getRegionHandleRegionValuePairVector());
+    readFederationHandle( value.getFederationHandle());
+    readRegionHandleRegionValuePairVector( value.getRegionHandleRegionValuePairVector());
   }
 
   void readEraseRegionMessage(EraseRegionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readRegionHandleVector(value.getRegionHandleVector());
+    readFederationHandle( value.getFederationHandle());
+    readRegionHandleVector( value.getRegionHandleVector());
   }
 
   void readChangeInteractionClassPublicationMessage(ChangeInteractionClassPublicationMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readPublicationType(value.getPublicationType());
-    readInteractionClassHandle(value.getInteractionClassHandle());
+    readFederationHandle( value.getFederationHandle());
+    readPublicationType( value.getPublicationType());
+    readInteractionClassHandle( value.getInteractionClassHandle());
   }
 
   void readChangeObjectClassPublicationMessage(ChangeObjectClassPublicationMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readPublicationType(value.getPublicationType());
-    readObjectClassHandle(value.getObjectClassHandle());
-    readAttributeHandleVector(value.getAttributeHandles());
+    readFederationHandle( value.getFederationHandle());
+    readPublicationType( value.getPublicationType());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
   }
 
   void readChangeInteractionClassSubscriptionMessage(ChangeInteractionClassSubscriptionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readSubscriptionType(value.getSubscriptionType());
-    readInteractionClassHandle(value.getInteractionClassHandle());
-    readParameterValueVector(value.getParameterFilterValues());
+    readFederationHandle( value.getFederationHandle());
+    readSubscriptionType( value.getSubscriptionType());
+    readInteractionClassHandle( value.getInteractionClassHandle());
+    readParameterValueVector( value.getParameterFilterValues());
   }
 
   void readChangeObjectClassSubscriptionMessage(ChangeObjectClassSubscriptionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readSubscriptionType(value.getSubscriptionType());
-    readObjectClassHandle(value.getObjectClassHandle());
-    readAttributeHandleVector(value.getAttributeHandles());
+    readFederationHandle( value.getFederationHandle());
+    readSubscriptionType( value.getSubscriptionType());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
   }
 
   void readChangeObjectInstanceSubscriptionMessage(ChangeObjectInstanceSubscriptionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readSubscriptionType(value.getSubscriptionType());
-    readObjectClassHandle(value.getObjectClassHandle());
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
+    readFederationHandle( value.getFederationHandle());
+    readSubscriptionType( value.getSubscriptionType());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
   }
 
   void readRegistrationForObjectClassMessage(RegistrationForObjectClassMessage& value)
   {
-    readObjectClassHandle(value.getObjectClassHandle());
-    readBool(value.getStart());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readBool( value.getStart());
   }
 
   void readAttributesInScopeMessage(AttributesInScopeMessage& value)
   {
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readAttributeHandleVector(value.getAttributeHandles());
-    readBool(value.getInScope());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+    readBool( value.getInScope());
   }
 
   void readTurnUpdatesOnForInstanceMessage(TurnUpdatesOnForInstanceMessage& value)
   {
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readAttributeHandleVector(value.getAttributeHandles());
-    readString(value.getUpdateRate());
-    readBool(value.getOn());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+    readString( value.getUpdateRate());
+    readBool( value.getOn());
   }
 
   void readTurnInteractionsOnMessage(TurnInteractionsOnMessage& value)
   {
-    readInteractionClassHandle(value.getInteractionClassHandle());
-    readBool(value.getOn());
+    readInteractionClassHandle( value.getInteractionClassHandle());
+    readBool( value.getOn());
   }
 
   void readInteractionMessage(InteractionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readInteractionClassHandle(value.getInteractionClassHandle());
-    readTransportationType(value.getTransportationType());
-    readVariableLengthData(value.getTag());
-    readParameterValueVector(value.getParameterValues());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readInteractionClassHandle( value.getInteractionClassHandle());
+    readTransportationType( value.getTransportationType());
+    readVariableLengthData( value.getTag());
+    readParameterValueVector( value.getParameterValues());
   }
 
   void readTimeStampedInteractionMessage(TimeStampedInteractionMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readInteractionClassHandle(value.getInteractionClassHandle());
-    readOrderType(value.getOrderType());
-    readTransportationType(value.getTransportationType());
-    readVariableLengthData(value.getTag());
-    readVariableLengthData(value.getTimeStamp());
-    readMessageRetractionHandle(value.getMessageRetractionHandle());
-    readParameterValueVector(value.getParameterValues());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readInteractionClassHandle( value.getInteractionClassHandle());
+    readOrderType( value.getOrderType());
+    readTransportationType( value.getTransportationType());
+    readVariableLengthData( value.getTag());
+    readVariableLengthData( value.getTimeStamp());
+    readMessageRetractionHandle( value.getMessageRetractionHandle());
+    readParameterValueVector( value.getParameterValues());
   }
 
   void readObjectInstanceHandlesRequestMessage(ObjectInstanceHandlesRequestMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readUnsigned(value.getCount());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readUnsigned( value.getCount());
   }
 
   void readObjectInstanceHandlesResponseMessage(ObjectInstanceHandlesResponseMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readObjectInstanceHandleNamePairVector(value.getObjectInstanceHandleNamePairVector());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readObjectInstanceHandleNamePairVector( value.getObjectInstanceHandleNamePairVector());
   }
 
   void readReleaseMultipleObjectInstanceNameHandlePairsMessage(ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readObjectInstanceHandleVector(value.getObjectInstanceHandleVector());
+    readFederationHandle( value.getFederationHandle());
+    readObjectInstanceHandleVector( value.getObjectInstanceHandleVector());
   }
 
   void readReserveObjectInstanceNameRequestMessage(ReserveObjectInstanceNameRequestMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readString(value.getName());
-    readBool(value.getIsInternal());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readString( value.getName());
+    readBool( value.getIsInternal());
   }
 
   void readReserveObjectInstanceNameResponseMessage(ReserveObjectInstanceNameResponseMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readObjectInstanceHandleNamePair(value.getObjectInstanceHandleNamePair());
-    readBool(value.getSuccess());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readObjectInstanceHandleNamePair( value.getObjectInstanceHandleNamePair());
+    readBool( value.getSuccess());
   }
 
   void readReserveMultipleObjectInstanceNameRequestMessage(ReserveMultipleObjectInstanceNameRequestMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readStringVector(value.getNameList());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readStringVector( value.getNameList());
   }
 
   void readReserveMultipleObjectInstanceNameResponseMessage(ReserveMultipleObjectInstanceNameResponseMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readObjectInstanceHandleNamePairVector(value.getObjectInstanceHandleNamePairVector());
-    readBool(value.getSuccess());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readObjectInstanceHandleNamePairVector( value.getObjectInstanceHandleNamePairVector());
+    readBool( value.getSuccess());
   }
 
   void readInsertObjectInstanceMessage(InsertObjectInstanceMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readObjectClassHandle(value.getObjectClassHandle());
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readString(value.getName());
-    readAttributeStateVector(value.getAttributeStateVector());
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readString( value.getName());
+    readAttributeStateVector( value.getAttributeStateVector());
   }
 
   void readDeleteObjectInstanceMessage(DeleteObjectInstanceMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readVariableLengthData(value.getTag());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readVariableLengthData( value.getTag());
   }
 
   void readTimeStampedDeleteObjectInstanceMessage(TimeStampedDeleteObjectInstanceMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readOrderType(value.getOrderType());
-    readVariableLengthData(value.getTag());
-    readVariableLengthData(value.getTimeStamp());
-    readMessageRetractionHandle(value.getMessageRetractionHandle());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readOrderType( value.getOrderType());
+    readVariableLengthData( value.getTag());
+    readVariableLengthData( value.getTimeStamp());
+    readMessageRetractionHandle( value.getMessageRetractionHandle());
   }
 
   void readAttributeUpdateMessage(AttributeUpdateMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readVariableLengthData(value.getTag());
-    readTransportationType(value.getTransportationType());
-    readAttributeValueVector(value.getAttributeValues());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readVariableLengthData( value.getTag());
+    readTransportationType( value.getTransportationType());
+    readAttributeValueVector( value.getAttributeValues());
   }
 
   void readTimeStampedAttributeUpdateMessage(TimeStampedAttributeUpdateMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readFederateHandle(value.getFederateHandle());
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readVariableLengthData(value.getTag());
-    readVariableLengthData(value.getTimeStamp());
-    readMessageRetractionHandle(value.getMessageRetractionHandle());
-    readOrderType(value.getOrderType());
-    readTransportationType(value.getTransportationType());
-    readAttributeValueVector(value.getAttributeValues());
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readVariableLengthData( value.getTag());
+    readVariableLengthData( value.getTimeStamp());
+    readMessageRetractionHandle( value.getMessageRetractionHandle());
+    readOrderType( value.getOrderType());
+    readTransportationType( value.getTransportationType());
+    readAttributeValueVector( value.getAttributeValues());
   }
 
   void readRequestAttributeUpdateMessage(RequestAttributeUpdateMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readAttributeHandleVector(value.getAttributeHandles());
-    readVariableLengthData(value.getTag());
+    readFederationHandle( value.getFederationHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+    readVariableLengthData( value.getTag());
   }
 
   void readRequestClassAttributeUpdateMessage(RequestClassAttributeUpdateMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readObjectClassHandle(value.getObjectClassHandle());
-    readAttributeHandleVector(value.getAttributeHandles());
-    readVariableLengthData(value.getTag());
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+    readVariableLengthData( value.getTag());
   }
 
   void readQueryAttributeOwnershipRequestMessage(QueryAttributeOwnershipRequestMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readAttributeHandle(value.getAttributeHandle());
+    readFederationHandle( value.getFederationHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandle( value.getAttributeHandle());
   }
 
   void readQueryAttributeOwnershipResponseMessage(QueryAttributeOwnershipResponseMessage& value)
   {
-    readFederationHandle(value.getFederationHandle());
-    readObjectInstanceHandle(value.getObjectInstanceHandle());
-    readAttributeHandle(value.getAttributeHandle());
-    readFederateHandle(value.getOwner());
+    readFederationHandle( value.getFederationHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandle( value.getAttributeHandle());
+    readFederateHandle( value.getOwner());
   }
 
 private:

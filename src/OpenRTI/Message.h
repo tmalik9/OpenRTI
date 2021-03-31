@@ -10851,7 +10851,7 @@ std::ostream& operator<<(std::ostream& os, const QueryAttributeOwnershipResponse
 
 template<typename T, typename ParentObjectClass>
 std::ostream&
-prettyprint(std::ostream& os, const T& value, ParentObjectClass* parentObject)
+prettyprint(std::ostream& os, const T& value, ParentObjectClass*)
 {
   os << value;
   return os;
@@ -11477,77 +11477,77 @@ inline std::string to_string(const FOMModule2& value)
 
 inline size_t byteSize(const CallbackModel& value)
 {
- return sizeof(CallbackModel); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const OrderType& value)
 {
- return sizeof(OrderType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const TransportationType& value)
 {
- return sizeof(TransportationType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const SubscriptionType& value)
 {
- return sizeof(SubscriptionType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const PublicationType& value)
 {
- return sizeof(PublicationType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const ResignAction& value)
 {
- return sizeof(ResignAction); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const RestoreFailureReason& value)
 {
- return sizeof(RestoreFailureReason); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const RestoreStatus& value)
 {
- return sizeof(RestoreStatus); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const SaveFailureReason& value)
 {
- return sizeof(SaveFailureReason); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const SaveStatus& value)
 {
- return sizeof(SaveStatus); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const ServiceGroupIndicator& value)
 {
- return sizeof(ServiceGroupIndicator); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const LowerBoundTimeStampCommitType& value)
 {
- return sizeof(LowerBoundTimeStampCommitType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const SwitchesType& value)
 {
- return sizeof(SwitchesType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const ArrayDataTypeEncoding& value)
 {
- return sizeof(ArrayDataTypeEncoding); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const Endianness& value)
 {
- return sizeof(Endianness); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const AttributeHandleVector& value)
@@ -11872,22 +11872,22 @@ inline size_t byteSize(const ObjectInstanceHandleNamePairVector& value)
 
 inline size_t byteSize(const CreateFederationExecutionResponseType& value)
 {
- return sizeof(CreateFederationExecutionResponseType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const DestroyFederationExecutionResponseType& value)
 {
- return sizeof(DestroyFederationExecutionResponseType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const JoinFederationExecutionResponseType& value)
 {
- return sizeof(JoinFederationExecutionResponseType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const RegisterFederationSynchronizationPointResponseType& value)
 {
- return sizeof(RegisterFederationSynchronizationPointResponseType); // sizeof()
+ return sizeof(value); // sizeof()
 }
 
 inline size_t byteSize(const ConfigurationParameterMap& value)
@@ -12812,14 +12812,14 @@ inline size_t byteSize(const FOMModule2List& value)
 
 inline size_t byteSize(const ConnectionLostMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFaultDescription());
   return result;
 }
 
 inline size_t byteSize(const CreateFederationExecutionRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationExecution());
   result += byteSize(value.getLogicalTimeFactoryName());
   result += byteSize(value.getFOMStringModuleList());
@@ -12828,7 +12828,7 @@ inline size_t byteSize(const CreateFederationExecutionRequestMessage& value)
 
 inline size_t byteSize(const CreateFederationExecutionRequest2Message& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationExecution());
   result += byteSize(value.getLogicalTimeFactoryName());
   result += byteSize(value.getFOMStringModuleList());
@@ -12837,7 +12837,7 @@ inline size_t byteSize(const CreateFederationExecutionRequest2Message& value)
 
 inline size_t byteSize(const CreateFederationExecutionResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getCreateFederationExecutionResponseType());
   result += byteSize(value.getExceptionString());
   return result;
@@ -12845,34 +12845,34 @@ inline size_t byteSize(const CreateFederationExecutionResponseMessage& value)
 
 inline size_t byteSize(const DestroyFederationExecutionRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationExecution());
   return result;
 }
 
 inline size_t byteSize(const DestroyFederationExecutionResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getDestroyFederationExecutionResponseType());
   return result;
 }
 
-inline size_t byteSize(const EnumerateFederationExecutionsRequestMessage& value)
+inline size_t byteSize(const EnumerateFederationExecutionsRequestMessage&)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   return result;
 }
 
 inline size_t byteSize(const EnumerateFederationExecutionsResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationExecutionInformationVector());
   return result;
 }
 
 inline size_t byteSize(const InsertFederationExecutionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederationName());
   result += byteSize(value.getLogicalTimeFactoryName());
@@ -12882,28 +12882,28 @@ inline size_t byteSize(const InsertFederationExecutionMessage& value)
 
 inline size_t byteSize(const ShutdownFederationExecutionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   return result;
 }
 
 inline size_t byteSize(const EraseFederationExecutionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   return result;
 }
 
 inline size_t byteSize(const ReleaseFederationHandleMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   return result;
 }
 
 inline size_t byteSize(const InsertModulesMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFOMModuleList());
   return result;
@@ -12911,7 +12911,7 @@ inline size_t byteSize(const InsertModulesMessage& value)
 
 inline size_t byteSize(const InsertModules2Message& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFOMModule2List());
   return result;
@@ -12919,7 +12919,7 @@ inline size_t byteSize(const InsertModules2Message& value)
 
 inline size_t byteSize(const JoinFederationExecutionRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationExecution());
   result += byteSize(value.getFederateType());
   result += byteSize(value.getFederateName());
@@ -12931,7 +12931,7 @@ inline size_t byteSize(const JoinFederationExecutionRequestMessage& value)
 
 inline size_t byteSize(const JoinFederationExecutionRequest2Message& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationExecution());
   result += byteSize(value.getFederateType());
   result += byteSize(value.getFederateName());
@@ -12943,7 +12943,7 @@ inline size_t byteSize(const JoinFederationExecutionRequest2Message& value)
 
 inline size_t byteSize(const JoinFederationExecutionResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getJoinFederationExecutionResponseType());
   result += byteSize(value.getExceptionString());
@@ -12955,7 +12955,7 @@ inline size_t byteSize(const JoinFederationExecutionResponseMessage& value)
 
 inline size_t byteSize(const ResignFederationExecutionLeafRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getResignAction());
@@ -12964,7 +12964,7 @@ inline size_t byteSize(const ResignFederationExecutionLeafRequestMessage& value)
 
 inline size_t byteSize(const ResignFederationExecutionRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   return result;
@@ -12972,7 +12972,7 @@ inline size_t byteSize(const ResignFederationExecutionRequestMessage& value)
 
 inline size_t byteSize(const JoinFederateNotifyMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getFederateType());
@@ -12983,7 +12983,7 @@ inline size_t byteSize(const JoinFederateNotifyMessage& value)
 
 inline size_t byteSize(const ResignFederateNotifyMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   return result;
@@ -12991,7 +12991,7 @@ inline size_t byteSize(const ResignFederateNotifyMessage& value)
 
 inline size_t byteSize(const ChangeAutomaticResignDirectiveMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getResignAction());
@@ -13000,7 +13000,7 @@ inline size_t byteSize(const ChangeAutomaticResignDirectiveMessage& value)
 
 inline size_t byteSize(const RegisterFederationSynchronizationPointMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getLabel());
@@ -13011,7 +13011,7 @@ inline size_t byteSize(const RegisterFederationSynchronizationPointMessage& valu
 
 inline size_t byteSize(const RegisterFederationSynchronizationPointResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getLabel());
@@ -13021,7 +13021,7 @@ inline size_t byteSize(const RegisterFederationSynchronizationPointResponseMessa
 
 inline size_t byteSize(const AnnounceSynchronizationPointMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getLabel());
   result += byteSize(value.getTag());
@@ -13032,7 +13032,7 @@ inline size_t byteSize(const AnnounceSynchronizationPointMessage& value)
 
 inline size_t byteSize(const SynchronizationPointAchievedMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getLabel());
   result += byteSize(value.getFederateHandleBoolPairVector());
@@ -13041,7 +13041,7 @@ inline size_t byteSize(const SynchronizationPointAchievedMessage& value)
 
 inline size_t byteSize(const FederationSynchronizedMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getLabel());
   result += byteSize(value.getFederateHandleBoolPairVector());
@@ -13050,7 +13050,7 @@ inline size_t byteSize(const FederationSynchronizedMessage& value)
 
 inline size_t byteSize(const EnableTimeRegulationRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getTimeStamp());
@@ -13060,7 +13060,7 @@ inline size_t byteSize(const EnableTimeRegulationRequestMessage& value)
 
 inline size_t byteSize(const EnableTimeRegulationResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getRespondingFederateHandle());
@@ -13071,7 +13071,7 @@ inline size_t byteSize(const EnableTimeRegulationResponseMessage& value)
 
 inline size_t byteSize(const DisableTimeRegulationRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   return result;
@@ -13079,7 +13079,7 @@ inline size_t byteSize(const DisableTimeRegulationRequestMessage& value)
 
 inline size_t byteSize(const EnableTimeConstrainedNotifyMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   return result;
@@ -13087,7 +13087,7 @@ inline size_t byteSize(const EnableTimeConstrainedNotifyMessage& value)
 
 inline size_t byteSize(const DisableTimeConstrainedNotifyMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   return result;
@@ -13095,7 +13095,7 @@ inline size_t byteSize(const DisableTimeConstrainedNotifyMessage& value)
 
 inline size_t byteSize(const CommitLowerBoundTimeStampMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getTimeStamp());
@@ -13106,7 +13106,7 @@ inline size_t byteSize(const CommitLowerBoundTimeStampMessage& value)
 
 inline size_t byteSize(const CommitLowerBoundTimeStampResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getSendingFederateHandle());
@@ -13116,34 +13116,34 @@ inline size_t byteSize(const CommitLowerBoundTimeStampResponseMessage& value)
 
 inline size_t byteSize(const LockedByNextMessageRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getSendingFederateHandle());
   result += byteSize(value.getLockedByNextMessage());
   return result;
 }
 
-inline size_t byteSize(const TimeConstrainedEnabledMessage& value)
+inline size_t byteSize(const TimeConstrainedEnabledMessage&)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   return result;
 }
 
-inline size_t byteSize(const TimeRegulationEnabledMessage& value)
+inline size_t byteSize(const TimeRegulationEnabledMessage&)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   return result;
 }
 
-inline size_t byteSize(const TimeAdvanceGrantedMessage& value)
+inline size_t byteSize(const TimeAdvanceGrantedMessage&)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   return result;
 }
 
 inline size_t byteSize(const InsertRegionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getRegionHandleDimensionHandleSetPairVector());
   return result;
@@ -13151,7 +13151,7 @@ inline size_t byteSize(const InsertRegionMessage& value)
 
 inline size_t byteSize(const CommitRegionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getRegionHandleRegionValuePairVector());
   return result;
@@ -13159,7 +13159,7 @@ inline size_t byteSize(const CommitRegionMessage& value)
 
 inline size_t byteSize(const EraseRegionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getRegionHandleVector());
   return result;
@@ -13167,7 +13167,7 @@ inline size_t byteSize(const EraseRegionMessage& value)
 
 inline size_t byteSize(const ChangeInteractionClassPublicationMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getPublicationType());
   result += byteSize(value.getInteractionClassHandle());
@@ -13176,7 +13176,7 @@ inline size_t byteSize(const ChangeInteractionClassPublicationMessage& value)
 
 inline size_t byteSize(const ChangeObjectClassPublicationMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getPublicationType());
   result += byteSize(value.getObjectClassHandle());
@@ -13186,7 +13186,7 @@ inline size_t byteSize(const ChangeObjectClassPublicationMessage& value)
 
 inline size_t byteSize(const ChangeInteractionClassSubscriptionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getSubscriptionType());
   result += byteSize(value.getInteractionClassHandle());
@@ -13196,7 +13196,7 @@ inline size_t byteSize(const ChangeInteractionClassSubscriptionMessage& value)
 
 inline size_t byteSize(const ChangeObjectClassSubscriptionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getSubscriptionType());
   result += byteSize(value.getObjectClassHandle());
@@ -13206,7 +13206,7 @@ inline size_t byteSize(const ChangeObjectClassSubscriptionMessage& value)
 
 inline size_t byteSize(const ChangeObjectInstanceSubscriptionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getSubscriptionType());
   result += byteSize(value.getObjectClassHandle());
@@ -13216,7 +13216,7 @@ inline size_t byteSize(const ChangeObjectInstanceSubscriptionMessage& value)
 
 inline size_t byteSize(const RegistrationForObjectClassMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getObjectClassHandle());
   result += byteSize(value.getStart());
   return result;
@@ -13224,7 +13224,7 @@ inline size_t byteSize(const RegistrationForObjectClassMessage& value)
 
 inline size_t byteSize(const AttributesInScopeMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getObjectInstanceHandle());
   result += byteSize(value.getAttributeHandles());
   result += byteSize(value.getInScope());
@@ -13233,7 +13233,7 @@ inline size_t byteSize(const AttributesInScopeMessage& value)
 
 inline size_t byteSize(const TurnUpdatesOnForInstanceMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getObjectInstanceHandle());
   result += byteSize(value.getAttributeHandles());
   result += byteSize(value.getUpdateRate());
@@ -13243,7 +13243,7 @@ inline size_t byteSize(const TurnUpdatesOnForInstanceMessage& value)
 
 inline size_t byteSize(const TurnInteractionsOnMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getInteractionClassHandle());
   result += byteSize(value.getOn());
   return result;
@@ -13251,7 +13251,7 @@ inline size_t byteSize(const TurnInteractionsOnMessage& value)
 
 inline size_t byteSize(const InteractionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getInteractionClassHandle());
@@ -13263,7 +13263,7 @@ inline size_t byteSize(const InteractionMessage& value)
 
 inline size_t byteSize(const TimeStampedInteractionMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getInteractionClassHandle());
@@ -13278,7 +13278,7 @@ inline size_t byteSize(const TimeStampedInteractionMessage& value)
 
 inline size_t byteSize(const ObjectInstanceHandlesRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getCount());
@@ -13287,7 +13287,7 @@ inline size_t byteSize(const ObjectInstanceHandlesRequestMessage& value)
 
 inline size_t byteSize(const ObjectInstanceHandlesResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getObjectInstanceHandleNamePairVector());
@@ -13296,7 +13296,7 @@ inline size_t byteSize(const ObjectInstanceHandlesResponseMessage& value)
 
 inline size_t byteSize(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getObjectInstanceHandleVector());
   return result;
@@ -13304,7 +13304,7 @@ inline size_t byteSize(const ReleaseMultipleObjectInstanceNameHandlePairsMessage
 
 inline size_t byteSize(const ReserveObjectInstanceNameRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getName());
@@ -13314,7 +13314,7 @@ inline size_t byteSize(const ReserveObjectInstanceNameRequestMessage& value)
 
 inline size_t byteSize(const ReserveObjectInstanceNameResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getObjectInstanceHandleNamePair());
@@ -13324,7 +13324,7 @@ inline size_t byteSize(const ReserveObjectInstanceNameResponseMessage& value)
 
 inline size_t byteSize(const ReserveMultipleObjectInstanceNameRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getNameList());
@@ -13333,7 +13333,7 @@ inline size_t byteSize(const ReserveMultipleObjectInstanceNameRequestMessage& va
 
 inline size_t byteSize(const ReserveMultipleObjectInstanceNameResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getObjectInstanceHandleNamePairVector());
@@ -13343,7 +13343,7 @@ inline size_t byteSize(const ReserveMultipleObjectInstanceNameResponseMessage& v
 
 inline size_t byteSize(const InsertObjectInstanceMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getObjectClassHandle());
   result += byteSize(value.getObjectInstanceHandle());
@@ -13354,7 +13354,7 @@ inline size_t byteSize(const InsertObjectInstanceMessage& value)
 
 inline size_t byteSize(const DeleteObjectInstanceMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getObjectInstanceHandle());
@@ -13364,7 +13364,7 @@ inline size_t byteSize(const DeleteObjectInstanceMessage& value)
 
 inline size_t byteSize(const TimeStampedDeleteObjectInstanceMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getObjectInstanceHandle());
@@ -13377,7 +13377,7 @@ inline size_t byteSize(const TimeStampedDeleteObjectInstanceMessage& value)
 
 inline size_t byteSize(const AttributeUpdateMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getObjectInstanceHandle());
@@ -13389,7 +13389,7 @@ inline size_t byteSize(const AttributeUpdateMessage& value)
 
 inline size_t byteSize(const TimeStampedAttributeUpdateMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getFederateHandle());
   result += byteSize(value.getObjectInstanceHandle());
@@ -13404,7 +13404,7 @@ inline size_t byteSize(const TimeStampedAttributeUpdateMessage& value)
 
 inline size_t byteSize(const RequestAttributeUpdateMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getObjectInstanceHandle());
   result += byteSize(value.getAttributeHandles());
@@ -13414,7 +13414,7 @@ inline size_t byteSize(const RequestAttributeUpdateMessage& value)
 
 inline size_t byteSize(const RequestClassAttributeUpdateMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getObjectClassHandle());
   result += byteSize(value.getAttributeHandles());
@@ -13424,7 +13424,7 @@ inline size_t byteSize(const RequestClassAttributeUpdateMessage& value)
 
 inline size_t byteSize(const QueryAttributeOwnershipRequestMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getObjectInstanceHandle());
   result += byteSize(value.getAttributeHandle());
@@ -13433,7 +13433,7 @@ inline size_t byteSize(const QueryAttributeOwnershipRequestMessage& value)
 
 inline size_t byteSize(const QueryAttributeOwnershipResponseMessage& value)
 {
-  size_t result = 0;
+  size_t result = sizeof(AbstractMessage);
   result += byteSize(value.getFederationHandle());
   result += byteSize(value.getObjectInstanceHandle());
   result += byteSize(value.getAttributeHandle());

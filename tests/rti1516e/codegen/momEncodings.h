@@ -1,5 +1,5 @@
 
-// Code automatically generated from D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\tests\rti1516e\codegen\mom.xml, do not edit
+// Code automatically generated from D:\vfs\OpenRTI\tests\rti1516e\codegen\\mom.xml, do not edit
 
 #pragma once
 
@@ -27,48 +27,9 @@ class HLAtokenEncoding : public rti1516e::HLAfixedArray
 {
   public:
     HLAtokenEncoding();
+    // cardinality is 0, no settable contents
   private:
 }; // class HLAtoken
-// String whose legal value shall be a name from any row in the OMT transportation table (IEEE Std
-//                1516.2-2010)
-//             
-// variable array of simple type HLAunicodeChar
-class HLAtransportationNameEncoding : public rti1516e::HLAvariableArray
-{
-  public:
-    HLAtransportationNameEncoding();
-    HLAtransportationNameEncoding(const std::vector<wchar_t>& data);
-    void set(const std::vector<wchar_t>& data);
-    void set(const wchar_t* data, size_t size);
-    const std::vector<wchar_t>& get() const;
-    void resize(size_t size);
-    virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
-  private:
-    void update();
-    std::vector<wchar_t> mData;
-    std::vector<rti1516e::HLAunicodeChar> mEncoding;
-}; // class HLAtransportationName
-
-// String whose legal value shall be a name from any row in the OMT update rate table (IEEE Std
-//                1516.2-2010)
-//             
-// variable array of simple type HLAunicodeChar
-class HLAupdateRateNameEncoding : public rti1516e::HLAvariableArray
-{
-  public:
-    HLAupdateRateNameEncoding();
-    HLAupdateRateNameEncoding(const std::vector<wchar_t>& data);
-    void set(const std::vector<wchar_t>& data);
-    void set(const wchar_t* data, size_t size);
-    const std::vector<wchar_t>& get() const;
-    void resize(size_t size);
-    virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
-  private:
-    void update();
-    std::vector<wchar_t> mData;
-    std::vector<rti1516e::HLAunicodeChar> mEncoding;
-}; // class HLAupdateRateName
-
 // An encoded logical time. An empty array shall indicate that the values is not defined
 //             
 // variable array of simple type HLAbyte
@@ -77,8 +38,10 @@ class HLAlogicalTimeEncoding : public rti1516e::HLAvariableArray
   public:
     HLAlogicalTimeEncoding();
     HLAlogicalTimeEncoding(const std::vector<uint8_t>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<uint8_t>& data);
     void set(const uint8_t* data, size_t size);
+    using rti1516e::HLAvariableArray::get;
     const std::vector<uint8_t>& get() const;
     void resize(size_t size);
     virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
@@ -96,8 +59,10 @@ class HLAtimeIntervalEncoding : public rti1516e::HLAvariableArray
   public:
     HLAtimeIntervalEncoding();
     HLAtimeIntervalEncoding(const std::vector<uint8_t>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<uint8_t>& data);
     void set(const uint8_t* data, size_t size);
+    using rti1516e::HLAvariableArray::get;
     const std::vector<uint8_t>& get() const;
     void resize(size_t size);
     virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
@@ -114,6 +79,7 @@ class HLAhandleListEncoding : public rti1516e::HLAvariableArray
   public:
     HLAhandleListEncoding();
     HLAhandleListEncoding(const std::vector<rti1516e::HLAhandle>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<rti1516e::HLAhandle>& data);
     void set(std::vector<rti1516e::HLAhandle>& data);
     void set(const rti1516e::HLAhandle* data, size_t size);
@@ -128,6 +94,7 @@ class HLAinteractionSubListEncoding : public rti1516e::HLAvariableArray
   public:
     HLAinteractionSubListEncoding();
     HLAinteractionSubListEncoding(const std::vector<HLAinteractionSubscriptionEncoding>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<HLAinteractionSubscriptionEncoding>& data);
     void set(std::vector<HLAinteractionSubscriptionEncoding>& data);
     void set(const HLAinteractionSubscriptionEncoding* data, size_t size);
@@ -142,8 +109,10 @@ class HLAargumentListEncoding : public rti1516e::HLAvariableArray
   public:
     HLAargumentListEncoding();
     HLAargumentListEncoding(const std::vector<std::wstring>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<std::wstring>& data);
     void set(const std::wstring* data, size_t size);
+    using rti1516e::HLAvariableArray::get;
     const std::vector<std::wstring>& get() const;
     void resize(size_t size);
     virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
@@ -168,6 +137,7 @@ class HLAobjectClassBasedCountsEncoding : public rti1516e::HLAvariableArray
   public:
     HLAobjectClassBasedCountsEncoding();
     HLAobjectClassBasedCountsEncoding(const std::vector<HLAobjectClassBasedCountEncoding>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<HLAobjectClassBasedCountEncoding>& data);
     void set(std::vector<HLAobjectClassBasedCountEncoding>& data);
     void set(const HLAobjectClassBasedCountEncoding* data, size_t size);
@@ -189,6 +159,7 @@ class HLAinteractionCountsEncoding : public rti1516e::HLAvariableArray
   public:
     HLAinteractionCountsEncoding();
     HLAinteractionCountsEncoding(const std::vector<HLAinteractionCountEncoding>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<HLAinteractionCountEncoding>& data);
     void set(std::vector<HLAinteractionCountEncoding>& data);
     void set(const HLAinteractionCountEncoding* data, size_t size);
@@ -203,8 +174,10 @@ class HLAsynchPointListEncoding : public rti1516e::HLAvariableArray
   public:
     HLAsynchPointListEncoding();
     HLAsynchPointListEncoding(const std::vector<std::wstring>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<std::wstring>& data);
     void set(const std::wstring* data, size_t size);
+    using rti1516e::HLAvariableArray::get;
     const std::vector<std::wstring>& get() const;
     void resize(size_t size);
     virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
@@ -221,6 +194,7 @@ class HLAsynchPointFederateListEncoding : public rti1516e::HLAvariableArray
   public:
     HLAsynchPointFederateListEncoding();
     HLAsynchPointFederateListEncoding(const std::vector<HLAsynchPointFederateEncoding>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<HLAsynchPointFederateEncoding>& data);
     void set(std::vector<HLAsynchPointFederateEncoding>& data);
     void set(const HLAsynchPointFederateEncoding* data, size_t size);
@@ -235,8 +209,10 @@ class HLAmoduleDesignatorListEncoding : public rti1516e::HLAvariableArray
   public:
     HLAmoduleDesignatorListEncoding();
     HLAmoduleDesignatorListEncoding(const std::vector<std::wstring>& data);
+    using rti1516e::HLAvariableArray::set;
     void set(const std::vector<std::wstring>& data);
     void set(const std::wstring* data, size_t size);
+    using rti1516e::HLAvariableArray::get;
     const std::vector<std::wstring>& get() const;
     void resize(size_t size);
     virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
@@ -264,6 +240,20 @@ class HLAinteractionSubscriptionEncoding : public HLAinteractionSubscription, pu
     rti1516e::HLAboolean mHLAactive;
 }; // class HLAinteractionSubscriptionEncoding
 
+// Test.
+// fixed array of complex type HLAinteractionSubscription
+class HLAinteractionSubscriptionFixedListEncoding : public rti1516e::HLAfixedArray
+{
+  public:
+    HLAinteractionSubscriptionFixedListEncoding();
+    HLAinteractionSubscriptionFixedListEncoding(const std::vector<HLAinteractionSubscriptionEncoding>& data);
+    using rti1516e::HLAfixedArray::set;
+    void set(const std::vector<HLAinteractionSubscriptionEncoding>& data);
+    void set(const HLAinteractionSubscription* data, size_t size);
+    using rti1516e::HLAfixedArray::get;
+    const std::vector<HLAinteractionSubscriptionEncoding>& get() const;
+  private:
+}; // class HLAinteractionSubscriptionFixedList
 // Object class and count of associated items
 class HLAobjectClassBasedCountEncoding : public HLAobjectClassBasedCount, public rti1516e::HLAfixedRecord
 {

@@ -26,7 +26,7 @@ namespace <#=namespacePart#> {
 <#=FOM.EncodingForwardDeclarations#>
 
 <#
-foreach (var dataType in FOM.DataTypes.Values)
+foreach (var dataType in FOM.SortedDataTypes)
 {
   if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
   {
@@ -42,13 +42,13 @@ class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1
     virtual ~<#=dataType.Name#>Encoding();
     uint32_t getVersion() const override;
 <# foreach (var field in fixedRecordDataType.AllFields) { #>
-    void Set<#=field.Name#>(<#=field.DataType.CPPType#> value) override;
+    void Set<#=field.Name#>(<#=field.DataType.ParameterCppType#> value) override;
 <# if (field.DataType is FOMParser.ArrayDataType) {
      var arrayDataType = field.DataType as FOMParser.ArrayDataType;
 #>
     void Set<#=field.Name#>(const <#=arrayDataType.DataType.CPPType#>* value, size_t size) override;
 <# } #>
-    <#=field.DataType.CPPType#> Get<#=field.Name#>() const override;
+    <#=field.DataType.ReturnCppType#> Get<#=field.Name#>() const override;
     bool Is<#=field.Name#>Available() const override;
 <# } // foreach fixedRecordDataType.Fields #>
   private:
@@ -82,10 +82,14 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
   public:
     <#=dataType.Name#>Encoding();
 <# if (cardinality > 0) {#>
-    <#=dataType.Name#>Encoding(<#=fixedArrayDataType.CPPType#> data);
-    void set(<#=fixedArrayDataType.CPPType#> data);
+    <#=dataType.Name#>Encoding(<#=fixedArrayDataType.ParameterCppType#> data);
+    using rti1516e::HLAfixedArray::set;
+    void set(<#=fixedArrayDataType.ParameterCppType#> data);
     void set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size);
-    <#=fixedArrayDataType.CPPType#> get() const;
+    using rti1516e::HLAfixedArray::get;
+    <#=fixedArrayDataType.ReturnCppType#> get() const;
+<#  } else { #>
+    // cardinality is 0, no settable contents
 <#  } #>
   private:
 <# if (cardinality > 0) {#>
@@ -98,47 +102,16 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
 class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
 {
   public:
-    <#=dataType.Name#>Encoding()
-      : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
-    {
+    <#=dataType.Name#>Encoding();
 <# if (cardinality > 0) {#>
-      for (int i=0; i < <#=cardinality#>; i++)
-      {
-        mEncoding[i] = mData[i];
-        setElementPointer(i, &mEncoding[i]);
-      }
-<#  } #>
-    }
-<# if (cardinality > 0) {#>
-    <#=dataType.Name#>Encoding(<#=fixedArrayDataType.CPPType#> data)
-      : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
-      , mData(<#=fixedArrayDataType.Cardinality#>)
-    {
-      set(data.data(), data.size());
-      for (int i=0;i<<#=fixedArrayDataType.Cardinality#>;i++)
-      {
-        mEncoding[i].setDataPointer(&mData[i]);
-        setElementPointer(i, &mEncoding[i]);
-      }
-    }
-    void set(<#=fixedArrayDataType.CPPType#> data) {
-      set(data.data(), data.size());
-    }
-    void set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size) 
-    {
-      if (size <= <#=fixedArrayDataType.Cardinality#>) {
-        memcpy(mData.data(), data, size);
-      } else {
-        memcpy(mData.data(), data, <#=fixedArrayDataType.Cardinality#>);
-      }
-    }
-    <#=fixedArrayDataType.CPPType#> get() const { return mData; }
+    <#=dataType.Name#>Encoding(<#=fixedArrayDataType.ParameterCppType#> data);
+    using rti1516e::HLAfixedArray::set;
+    void set(<#=fixedArrayDataType.ParameterCppType#> data);
+    void set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size);
+    using rti1516e::HLAfixedArray::get;
+    <#=fixedArrayDataType.ReturnCppType#> get() const;
 <#  } #>
   private:
-<# if (cardinality > 0) {#>
-    std::vector<<#=fixedArrayDataType.DataType.CPPType#>> mData;
-    <#=fixedArrayDataType.DataType.Encoding#> mEncoding[<#=fixedArrayDataType.Cardinality#>];
-<#  } #>
 }; // class <#=dataType.Name#>
 <#  } // if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
   }  // if (dataType is FOMParser.FixedArrayDataType)
@@ -158,10 +131,12 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
 {
   public:
     <#=dataType.Name#>Encoding();
-    <#=dataType.Name#>Encoding(<#=variableArrayDataType.CPPType#> data);
-    void set(<#=variableArrayDataType.CPPType#> data);
+    <#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data);
+    using rti1516e::HLAvariableArray::set;
+    void set(<#=variableArrayDataType.ParameterCppType#> data);
     void set(const <#=variableArrayDataType.DataType.CPPType#>* data, size_t size);
-    <#=variableArrayDataType.CPPType#> get() const;
+    using rti1516e::HLAvariableArray::get;
+    <#=variableArrayDataType.ReturnCppType#> get() const;
     void resize(size_t size);
     virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
   private:
@@ -176,9 +151,10 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
 {
   public:
     <#=dataType.Name#>Encoding();
-    <#=dataType.Name#>Encoding(<#=variableArrayDataType.CPPType#> data);
-    void set(<#=variableArrayDataType.ConstCppType#> data);
-    void set(<#=variableArrayDataType.NonConstCppType#> data);
+    <#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data);
+    using rti1516e::HLAvariableArray::set;
+    void set(<#=variableArrayDataType.ConstRefCppType#> data);
+    void set(<#=variableArrayDataType.RefCppType#> data);
     void set(const <#=variableArrayDataType.DataType.Encoding#>* data, size_t size);
     void set(<#=variableArrayDataType.DataType.Encoding#>* data, size_t size);
     virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;

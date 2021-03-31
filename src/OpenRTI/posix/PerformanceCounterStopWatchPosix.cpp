@@ -64,7 +64,7 @@ int64_t GetPerformanceCounterStopWatchStartStopDuration()
 /*static*/ const VPerformanceCounterStopWatch::TTimeNs VPerformanceCounterStopWatch::StartStopDuration              = GetPerformanceCounterStopWatchStartStopDuration();
 
 VPerformanceCounterStopWatch::VPerformanceCounterStopWatch( bool bStartImmediately /*= false*/ )
-  : moPerformanceCounterValueStart( 0 ), _started(false)
+  : _started(false), moPerformanceCounterValueStart(0)
 {
   if( bStartImmediately )
   {

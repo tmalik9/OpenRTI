@@ -28,12 +28,12 @@ ContentHandler::~ContentHandler() noexcept
 }
 
 void
-ContentHandler::characters(const char* data, unsigned length)
+ContentHandler::characters(const char* /*data*/, unsigned /*length*/)
 {
 }
 
 void
-ContentHandler::comment(const char* commentData, unsigned length)
+ContentHandler::comment(const char* /*commentData*/, unsigned /*length*/)
 {
 }
 
@@ -59,7 +59,7 @@ ContentHandler::endElement(const char*, const char*, const char*)
 }
 
 void
-ContentHandler::skippedEntity(const char* name)
+ContentHandler::skippedEntity(const char* /*name*/)
 {
 }
 

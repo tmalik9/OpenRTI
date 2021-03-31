@@ -52,7 +52,7 @@ public:
   bool isOpen() const override { return !_isClosed; }
   bool empty() const override { return _messageList.empty(); }
   virtual size_t getBytesQueued() const override { return _messageList.byteSize(); }
-  void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) override
+  void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle>) override
   {
     assert(!"not implemented");
   }

@@ -1411,11 +1411,11 @@ void ObjectClass::writeCurrentFDD(std::ostream& out, unsigned int level) const
 
 ////////////////////////////////////////////////////////////
 
-Module::Module(Federation& federation, const std::string& designator) :
-  _federation(federation),
-  _artificialInteractionRoot(false),
-  _artificialObjectRoot(false),
-  _designator(designator)
+Module::Module(Federation& federation, const std::string& designator)
+  : _federation(federation)
+  , _designator(designator)
+  , _artificialInteractionRoot(false)
+  , _artificialObjectRoot(false)
 {
 }
 
@@ -1796,8 +1796,8 @@ FederationConnect::sendAndDeactivate(const SharedPtr<const AbstractMessage>& mes
 
 Federation::Federation(Node& serverNode)
   : _serverNode(serverNode)
-  , _objectInstanceHandleObjectInstanceMap(16384/*hash size*/)
   , _momServer()
+  , _objectInstanceHandleObjectInstanceMap(16384/*hash size*/)
 {
 }
 
@@ -2096,7 +2096,7 @@ Federation::insert(Module& module)
 }
 
 
-void Federation::insert(Module& module, const FOMTransportationType& fomObjectClass)
+void Federation::insert(Module& /*module*/, const FOMTransportationType& /*fomObjectClass*/)
 {
 
 }
@@ -2214,13 +2214,13 @@ bool Federation::insertOrCheck(Module& module, const FOMStringEnumeratedDataType
   }
 }
 
-static inline ArrayDataTypeEncoding convert(const std::string& s)
-{
-  if (s == "HLAvariableArray") 
-    return VariableArrayDataTypeEncoding;
-  else
-    return FixedArrayDataTypeEncoding;
-}
+//static inline ArrayDataTypeEncoding convert(const std::string& s)
+//{
+//  if (s == "HLAvariableArray") 
+//    return VariableArrayDataTypeEncoding;
+//  else
+//    return FixedArrayDataTypeEncoding;
+//}
 
 bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType2& stringDataType)
 {

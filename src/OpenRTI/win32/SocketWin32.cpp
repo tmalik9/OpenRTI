@@ -35,7 +35,7 @@ Socket::isOpen() const noexcept
 {
   if (!_privateData)
     return false;
-  return SOCKET_ERROR != _privateData->_socket;
+  return (SOCKET)SOCKET_ERROR != _privateData->_socket;
 }
 
 void
@@ -49,15 +49,10 @@ Socket::Socket(PrivateData* privateData) :
 {
 }
 
-Socket::~Socket()
+Socket::~Socket() noexcept
 {
   delete _privateData;
   _privateData = 0;
-}
-
-uint32_t Socket::getFd() const
-{
-  return _privateData->_socket;
 }
 
 } // namespace OpenRTI

@@ -212,7 +212,7 @@ size_t InitialStreamProtocol::getBytesQueued() const
 void
 InitialStreamProtocol::error(const Exception& e)
 {
-  Log(MessageCoding, Warning) << "Unhandled exception during initials OpenRTI connection negotiation!" << std::endl;
+  Log(MessageCoding, Warning) << "Unhandled exception during initial OpenRTI connection negotiation:" << e.what() << std::endl;
 }
 
 

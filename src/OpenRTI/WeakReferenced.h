@@ -68,8 +68,8 @@ public:
   WeakReferenced() :
     mWeakData(new WeakData(this))
   {}
-  WeakReferenced(const WeakReferenced& weakReferenced) :
-    mWeakData(new WeakData(this))
+  WeakReferenced(const WeakReferenced&)
+    : mWeakData(new WeakData(this))
   {}
   ~WeakReferenced() noexcept 
   {

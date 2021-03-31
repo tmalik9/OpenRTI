@@ -25,13 +25,13 @@
 namespace OpenRTI {
 
 ssize_t
-SocketPacket::send(const SocketAddress& socketAddress, const ConstBufferRange& bufferRange)
+SocketPacket::send(const SocketAddress& /*socketAddress*/, const ConstBufferRange& /*bufferRange*/)
 {
   throw RTIinternalError("No packet sockets on win32 so far!");
 }
 
 ssize_t
-SocketPacket::recv(SocketAddress& socketAddress, const BufferRange& bufferRange, bool peek)
+SocketPacket::recv(SocketAddress& /*socketAddress*/, const BufferRange& /*bufferRange*/, bool /*peek*/)
 {
   throw RTIinternalError("No packet sockets on win32 so far!");
 }

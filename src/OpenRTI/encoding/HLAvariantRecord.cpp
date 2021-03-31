@@ -34,7 +34,7 @@ namespace OpenRTI
 
 class OPENRTI_LOCAL HLAvariantRecordImplementation {
 public:
-  HLAvariantRecordImplementation(DataElement const& discriminantPrototype) :
+  HLAvariantRecordImplementation(DataElement const& /*discriminantPrototype*/) :
     _octetBoundary(0)
   {
   }
@@ -48,17 +48,17 @@ public:
   {
   }
 
-  void encodeInto(std::vector<Octet>& buffer)
+  void encodeInto(std::vector<Octet>& /*buffer*/)
   {
     /* FIXME */
   }
 
-  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset)
+  size_t encodeInto(Octet* /*buffer*/, size_t /*bufferSize*/, size_t offset)
   {
     return offset;
   }
 
-  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+  size_t decodeFrom(const Octet* /*buffer*/, size_t /*bufferSize*/, size_t index)
   {
     /* FIXME */
     return index;
@@ -78,42 +78,42 @@ public:
     return _octetBoundary;
   }
 
-  bool isSameTypeAs(HLAvariantRecordImplementation const& inData) const
+  bool isSameTypeAs(HLAvariantRecordImplementation const& /*inData*/) const
   {
     return false; /*FIXME*/
   }
 
-  bool isSameTypeAs(DataElement const& discriminant, DataElement const& inData) const
+  bool isSameTypeAs(DataElement const& /*discriminant*/, DataElement const& /*inData*/) const
   {
     return false; /*FIXME*/
   }
 
-  bool hasMatchingDiscriminantTypeAs(DataElement const& dataElement) const
+  bool hasMatchingDiscriminantTypeAs(DataElement const& /*dataElement*/) const
   {
     return false; /*FIXME*/
   }
 
-  void addVariant(const DataElement& discriminant, const DataElement& valuePrototype)
+  void addVariant(const DataElement& /*discriminant*/, const DataElement& /*valuePrototype*/)
   {
     /*FIXME*/
   }
 
-  void addVariantPointer(const DataElement& discriminant, DataElement* valuePtr)
+  void addVariantPointer(const DataElement& /*discriminant*/, DataElement* /*valuePtr*/)
   {
     /*FIXME*/
   }
 
-  void setDiscriminant(const DataElement& discriminant)
+  void setDiscriminant(const DataElement& /*discriminant*/)
   {
     /*FIXME*/
   }
 
-  void setVariant(const DataElement& discriminant, DataElement const& value)
+  void setVariant(const DataElement& /*discriminant*/, DataElement const& /*value*/)
   {
     /*FIXME*/
   }
 
-  void setVariantPointer(const DataElement& discriminant, DataElement* valuePtr)
+  void setVariantPointer(const DataElement& /*discriminant*/, DataElement* /*valuePtr*/)
   {
     /*FIXME*/
   }
@@ -133,14 +133,14 @@ public:
   unsigned _octetBoundary;
 };
 
-HLAvariantRecord::HLAvariantRecord(DataElement const& discriminantPrototype) :
+HLAvariantRecord::HLAvariantRecord(DataElement const& /*discriminantPrototype*/) :
     /*FIXME*/
   // _impl(new HLAvariantRecordImplementation(discriminantPrototype))
   _impl(0)
 {
 }
 
-HLAvariantRecord::HLAvariantRecord(HLAvariantRecord const & rhs) :
+HLAvariantRecord::HLAvariantRecord(HLAvariantRecord const & /*rhs*/) :
     /*FIXME*/
   // _impl(new HLAvariantRecordImplementation(*rhs._impl))
   _impl(0)

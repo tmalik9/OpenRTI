@@ -121,7 +121,7 @@ struct SocketEventDispatcher::PrivateData
           {
             continue;
           }
-          if (socket == SOCKET_ERROR)
+          if (socket == (SOCKET)SOCKET_ERROR)
           {
             continue;
           }
@@ -140,7 +140,6 @@ struct SocketEventDispatcher::PrivateData
             {
               // The socket has data to write, but either write has not been called before, or the previous
               // call to write() returned WSAEWOULDBLOCK or similar - first check queue limit
-              // DebugPrintf("%s: socket=%d getBytesQueued=%d writable=%d\n", __FUNCTION__, socketEvent->getSocket()->getFd(), socketEvent->getBytesQueued(), socketEvent->getSocket()->isWritable());
               if (socketEvent->getBytesQueued() > dispatcher.getQueueLimit())
               {
                 // queue overflow - close connection
@@ -265,8 +264,6 @@ struct SocketEventDispatcher::PrivateData
 
           for (auto& socketEventSP : socketsToErase)
           {
-            DebugPrintf("%s: closing connection due to queue overflow: limit=%d socket=%d getBytesQueued=%d writable=%d\n", __FUNCTION__, 
-                        dispatcher.getQueueLimit(), socketEventSP->getSocket()->getFd(), socketEventSP->getBytesQueued(), socketEventSP->getSocket()->isWritable());
             socketEventSP->error(OpenRTI::ConnectionFailed("closing connection due to queue overflow."));
             dispatcher.erase(socketEventSP);
           }

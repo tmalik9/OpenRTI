@@ -177,7 +177,7 @@ OpenRTI::VariableLengthData MomFederate::GetEncodedFederateHandle() const
   return mFederateHandle.encode();
 }
 
-void MomFederate::insertFOMModule(const FOMModule& fomModule)
+void MomFederate::insertFOMModule(const FOMModule& /*fomModule*/)
 {
 
 }

@@ -135,8 +135,8 @@ FDD1516ContentHandler::endDocument()
 }
 
 void
-FDD1516ContentHandler::startElement(const char* uri, const char* name,
-                                    const char* qName, const XML::Attributes* atts)
+FDD1516ContentHandler::startElement(const char* , const char* name,
+                                    const char* , const XML::Attributes* atts)
 {
   if (strcmp(name, "attribute") == 0) {
     if (getCurrentMode() != ObjectClassMode)
@@ -342,7 +342,7 @@ FDD1516ContentHandler::startElement(const char* uri, const char* name,
 }
 
 void
-FDD1516ContentHandler::endElement(const char* uri, const char* name, const char* qName)
+FDD1516ContentHandler::endElement(const char* , const char* name, const char* )
 {
   if (strcmp(name, "objectClass") == 0) {
     _fomStringModuleBuilder.popObjectClass();

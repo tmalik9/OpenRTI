@@ -93,8 +93,8 @@ private:
 
 
 MomServer::MomServer(ServerModel::Federation* federation, AbstractServer* server, bool isRoot, FederateHandle ownerFederateHandle)
-  : _federation(federation)
-  , _isRoot(isRoot)
+  : _isRoot(isRoot)
+  , _federation(federation)
   , _ownerFederate(ownerFederateHandle)
 {
   //DebugPrintf(">>> %s(federation=%s isRoot=%d)\n", __FUNCTION__, federation->getName().c_str(), isRoot);
@@ -152,7 +152,7 @@ FederateHandle MomServer::getFederateHandle(const std::string& name)
   return federateHandle;
 }
 
-void MomServer::accept(const AbstractMessage& message)
+void MomServer::accept(const AbstractMessage& /*message*/)
 {
   //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
 }
@@ -377,7 +377,7 @@ void MomServer::accept(const InsertModulesMessage& message)
   // dispatched before having joined the federation (and thus before the _momManager actually exists)
 }
 
-void MomServer::accept(const ReserveObjectInstanceNameRequestMessage& message)
+void MomServer::accept(const ReserveObjectInstanceNameRequestMessage& /*message*/)
 {
   //DebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message.toString().c_str());
 }

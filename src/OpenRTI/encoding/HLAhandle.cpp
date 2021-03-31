@@ -198,7 +198,7 @@ void HLAhandle::decode(VariableLengthData const& inData)
   decodeFrom(static_cast<const Octet*>(inData.data()), inData.size(), 0);
 }
 
-size_t HLAhandle::decodeFrom(std::vector<Octet> const& buffer, size_t index)
+size_t HLAhandle::decodeFrom(std::vector<Octet> const& buffer, size_t /*index*/)
 {
   return decodeFrom(static_cast<const Octet*>(buffer.data()), buffer.size(), 0);
 }

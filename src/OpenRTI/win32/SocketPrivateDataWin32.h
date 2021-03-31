@@ -41,7 +41,7 @@ struct OPENRTI_LOCAL Socket::PrivateData {
   {
     _notificationEvent = WSA_INVALID_EVENT;
     // Probably too late, but make sure we have a reference as long as we have a socket
-    if (_socket != SOCKET_ERROR)
+    if (_socket != (SOCKET)SOCKET_ERROR)
       wsaStartup();
   }
   ~PrivateData() noexcept

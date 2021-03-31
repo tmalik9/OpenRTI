@@ -104,7 +104,6 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
       std::memset(&pfd, 0, sizeof(pfd));
       for (SocketEventList::const_iterator i = dispatcher._socketEventList.begin(); i != dispatcher._socketEventList.end(); ++i) {
         AbstractSocketEvent* socketEvent = i->get();
-        //bool included = false;
         Socket* abstractSocket = socketEvent->getSocket();
         if (abstractSocket) {
           int fd = abstractSocket->_privateData->_fd;
@@ -117,7 +116,6 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
               pfd.events |= POLLWRNORM;
 
             if (pfd.events) {
-              //included = true;
               _fdVector.push_back(pfd);
               _socketEventVector.push_back(socketEvent);
             }
@@ -210,7 +208,6 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
 
       for (auto& socketEventSP : socketsToErase)
       {
-        //DebugPrintf("%s: closing connection due to queue overflow: socket=%d getBytesQueued=%d writable=%d\n", __FUNCTION__, socketEventSP->getSocket()->getFd(), socketEventSP->getBytesQueued(), socketEventSP->getSocket()->isWritable());
         socketEventSP->error(OpenRTI::ConnectionFailed("closing connection due to queue overflow."));
         dispatcher.erase(socketEventSP);
       }

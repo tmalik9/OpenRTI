@@ -1,7 +1,5 @@
 
-// Code automatically generated from D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\tests\rti1516e\codegen\mom.xml, do not edit
-
-#pragma once
+// Code automatically generated from D:\vfs\OpenRTI\tests\rti1516e\codegen\\mom.xml, do not edit
 
 #include <vector>
 #include <cstring>
@@ -21,134 +19,14 @@ class HLAobjectClassBasedCountEncoding;
 class HLAinteractionCountEncoding;
 class HLAsynchPointFederateEncoding;
 
-// fixed array of HLAbyte
+// fixed array of simple type HLAbyte
 HLAtokenEncoding::HLAtokenEncoding()
   : HLAfixedArray(rti1516e::HLAbyte(), 0)
 {
 }
-// String whose legal value shall be a name from any row in the OMT transportation table (IEEE Std
-//                1516.2-2010)
-//             
-// variable array of HLAunicodeChar
-HLAtransportationNameEncoding::HLAtransportationNameEncoding()
-  : HLAvariableArray(rti1516e::HLAunicodeChar())
-  , mData()
-{
-}
-HLAtransportationNameEncoding::HLAtransportationNameEncoding(const std::vector<wchar_t>& data)
-  : HLAvariableArray(rti1516e::HLAunicodeChar())
-  , mData(data)
-{
-  update();
-}
-void HLAtransportationNameEncoding::set(const std::vector<wchar_t>& data)
-{
-  if (mData.size() != data.size()) {
-    mData = data;
-    update();
-  } else {
-    memcpy(mData.data(), data.data(), mData.size());
-  }
-}
-void HLAtransportationNameEncoding::set(const wchar_t* data, size_t size)
-{
-  if (mData.size() != size) {
-    mData.resize(size);
-    update();
-  }
-  memcpy(mData.data(), data, size);
-}
-const std::vector<wchar_t>& HLAtransportationNameEncoding::get() const { return mData; }
-void HLAtransportationNameEncoding::resize(size_t size)
-{
-  mData.resize(size);
-  update();
-}
-// resize buffer and encoder array before actually decoding 
-size_t HLAtransportationNameEncoding::decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index)
-{
-  size_t newSize = decodedSize(buffer, bufferSize, index);
-  resize(newSize);
-  return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
-}
-void HLAtransportationNameEncoding::update()
-{
-  size_t size = mData.size();
-  mEncoding.resize(size);
-  for (size_t i=0; i<size; i++)
-  {
-    mEncoding[i].setDataPointer(&mData.data()[i]);
-    if (i < HLAvariableArray::size()) {
-      setElementPointer(i, &mEncoding[i]);
-    } else {
-      addElementPointer(&mEncoding[i]);
-    }
-  }
-}
-
-// String whose legal value shall be a name from any row in the OMT update rate table (IEEE Std
-//                1516.2-2010)
-//             
-// variable array of HLAunicodeChar
-HLAupdateRateNameEncoding::HLAupdateRateNameEncoding()
-  : HLAvariableArray(rti1516e::HLAunicodeChar())
-  , mData()
-{
-}
-HLAupdateRateNameEncoding::HLAupdateRateNameEncoding(const std::vector<wchar_t>& data)
-  : HLAvariableArray(rti1516e::HLAunicodeChar())
-  , mData(data)
-{
-  update();
-}
-void HLAupdateRateNameEncoding::set(const std::vector<wchar_t>& data)
-{
-  if (mData.size() != data.size()) {
-    mData = data;
-    update();
-  } else {
-    memcpy(mData.data(), data.data(), mData.size());
-  }
-}
-void HLAupdateRateNameEncoding::set(const wchar_t* data, size_t size)
-{
-  if (mData.size() != size) {
-    mData.resize(size);
-    update();
-  }
-  memcpy(mData.data(), data, size);
-}
-const std::vector<wchar_t>& HLAupdateRateNameEncoding::get() const { return mData; }
-void HLAupdateRateNameEncoding::resize(size_t size)
-{
-  mData.resize(size);
-  update();
-}
-// resize buffer and encoder array before actually decoding 
-size_t HLAupdateRateNameEncoding::decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index)
-{
-  size_t newSize = decodedSize(buffer, bufferSize, index);
-  resize(newSize);
-  return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
-}
-void HLAupdateRateNameEncoding::update()
-{
-  size_t size = mData.size();
-  mEncoding.resize(size);
-  for (size_t i=0; i<size; i++)
-  {
-    mEncoding[i].setDataPointer(&mData.data()[i]);
-    if (i < HLAvariableArray::size()) {
-      setElementPointer(i, &mEncoding[i]);
-    } else {
-      addElementPointer(&mEncoding[i]);
-    }
-  }
-}
-
 // An encoded logical time. An empty array shall indicate that the values is not defined
 //             
-// variable array of HLAbyte
+// variable array of simple type HLAbyte
 HLAlogicalTimeEncoding::HLAlogicalTimeEncoding()
   : HLAvariableArray(rti1516e::HLAbyte())
   , mData()
@@ -207,7 +85,7 @@ void HLAlogicalTimeEncoding::update()
 
 // An encoded logical time interval. An empty array shall indicate that the values is not defined
 //             
-// variable array of HLAbyte
+// variable array of simple type HLAbyte
 HLAtimeIntervalEncoding::HLAtimeIntervalEncoding()
   : HLAvariableArray(rti1516e::HLAbyte())
   , mData()
@@ -265,7 +143,7 @@ void HLAtimeIntervalEncoding::update()
 }
 
 // List of encoded handles
-// variable array of HLAhandle
+// variable array of complex type HLAhandle
 HLAhandleListEncoding::HLAhandleListEncoding()
   : HLAvariableArray(rti1516e::HLAhandle())
 {
@@ -315,7 +193,7 @@ size_t HLAhandleListEncoding::decodeFrom(const rti1516e::Octet* buffer, size_t b
   return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
 }
 // List of interaction subscription indicators
-// variable array of HLAinteractionSubscription
+// variable array of complex type HLAinteractionSubscription
 HLAinteractionSubListEncoding::HLAinteractionSubListEncoding()
   : HLAvariableArray(HLAinteractionSubscriptionEncoding())
 {
@@ -365,7 +243,7 @@ size_t HLAinteractionSubListEncoding::decodeFrom(const rti1516e::Octet* buffer, 
   return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
 }
 // List of arguments
-// variable array of HLAunicodeString
+// variable array of simple type HLAunicodeString
 HLAargumentListEncoding::HLAargumentListEncoding()
   : HLAvariableArray(rti1516e::HLAunicodeString())
   , mData()
@@ -431,7 +309,7 @@ void HLAargumentListEncoding::update()
 //                BasedCounts array shall not have any elements in it; it shall be an empty HLAobjectClassBasedCounts
 //                array.
 //             
-// variable array of HLAobjectClassBasedCount
+// variable array of complex type HLAobjectClassBasedCount
 HLAobjectClassBasedCountsEncoding::HLAobjectClassBasedCountsEncoding()
   : HLAvariableArray(HLAobjectClassBasedCountEncoding())
 {
@@ -488,7 +366,7 @@ size_t HLAobjectClassBasedCountsEncoding::decodeFrom(const rti1516e::Octet* buff
 //                counts have a zero value, then the HLAinteractionCounts array shall not have any elements in it; it shall
 //                be an empty HLAinteractionCounts array.
 //             
-// variable array of HLAinteractionCount
+// variable array of complex type HLAinteractionCount
 HLAinteractionCountsEncoding::HLAinteractionCountsEncoding()
   : HLAvariableArray(HLAinteractionCountEncoding())
 {
@@ -538,7 +416,7 @@ size_t HLAinteractionCountsEncoding::decodeFrom(const rti1516e::Octet* buffer, s
   return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
 }
 // List of names of synchronization points.
-// variable array of HLAunicodeString
+// variable array of simple type HLAunicodeString
 HLAsynchPointListEncoding::HLAsynchPointListEncoding()
   : HLAvariableArray(rti1516e::HLAunicodeString())
   , mData()
@@ -596,7 +474,7 @@ void HLAsynchPointListEncoding::update()
 }
 
 // List of joined federates and the synchronization status of each.
-// variable array of HLAsynchPointFederate
+// variable array of complex type HLAsynchPointFederate
 HLAsynchPointFederateListEncoding::HLAsynchPointFederateListEncoding()
   : HLAvariableArray(HLAsynchPointFederateEncoding())
 {
@@ -646,7 +524,7 @@ size_t HLAsynchPointFederateListEncoding::decodeFrom(const rti1516e::Octet* buff
   return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
 }
 // List of designators of FOM modules.
-// variable array of HLAunicodeString
+// variable array of simple type HLAunicodeString
 HLAmoduleDesignatorListEncoding::HLAmoduleDesignatorListEncoding()
   : HLAvariableArray(rti1516e::HLAunicodeString())
   , mData()
@@ -736,6 +614,33 @@ bool HLAinteractionSubscriptionEncoding::GetHLAactive() const
 bool HLAinteractionSubscriptionEncoding::IsHLAactiveAvailable() const
 {
   return true;
+}
+// Test.
+// fixed array of complex type HLAinteractionSubscription
+HLAinteractionSubscriptionFixedListEncoding::HLAinteractionSubscriptionFixedListEncoding()
+  : HLAfixedArray(HLAinteractionSubscriptionEncoding(), 10)
+{
+}
+HLAinteractionSubscriptionFixedListEncoding::HLAinteractionSubscriptionFixedListEncoding(const std::vector<HLAinteractionSubscriptionEncoding>& data)
+  : HLAfixedArray(HLAinteractionSubscriptionEncoding(), 10)
+{
+  set(data);
+}
+void HLAinteractionSubscriptionFixedListEncoding::set(const std::vector<HLAinteractionSubscriptionEncoding>& data) {
+  set(data.data(), data.size());
+}
+void HLAinteractionSubscriptionFixedListEncoding::set(const HLAinteractionSubscription* data, size_t size) 
+{
+  for (size_t i = 0; i < size; i++)
+  {
+    const HLAinteractionSubscriptionEncoding* encoding = dynamic_cast<const HLAinteractionSubscriptionEncoding*>(&data[i]);
+    HLAfixedArray::set(i, *encoding);
+  }
+}
+std::vector<HLAinteractionSubscriptionEncoding> HLAinteractionSubscriptionFixedListEncoding::get() const
+{
+  std::vector<HLAinteractionSubscriptionEncoding> result;
+  return result;
 }
 // Object class and count of associated items
 HLAobjectClassBasedCountEncoding::HLAobjectClassBasedCountEncoding() : rti1516e::HLAfixedRecord(0)

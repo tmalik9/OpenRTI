@@ -528,7 +528,6 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
         mParent = nullptr;
         interactionClassHandle = handle;
         mType = type;
-        mDatatype = mDatatype;
       }
 
       MomTreeNode(std::string name,
@@ -540,7 +539,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
         mParent = nullptr;
         parameterHandle = handle;
         mType = type;
-        datatype = datatype;
+        mDatatype = datatype;
       }
 
       ~MomTreeNode() noexcept;

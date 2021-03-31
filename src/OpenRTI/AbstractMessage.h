@@ -49,7 +49,7 @@ class OPENRTI_API AbstractMessage : public Referenced {
 public:
   AbstractMessage() noexcept = default;
   AbstractMessage(const AbstractMessage&) = default;
-  AbstractMessage(AbstractMessage&&) = default;
+  AbstractMessage(AbstractMessage&&) = delete;
   virtual ~AbstractMessage() noexcept = default;
 
   virtual const char* getTypeName() const = 0;

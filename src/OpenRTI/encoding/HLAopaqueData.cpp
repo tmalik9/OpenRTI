@@ -40,7 +40,7 @@ public:
     _buffer(inData, inData + dataSize)
   {
   }
-  HLAopaqueDataImplementation(Octet** inData, size_t bufferSize, size_t dataSize)
+  HLAopaqueDataImplementation(Octet** inData, size_t /*bufferSize*/, size_t dataSize)
   {
     // FIXME no clue if this is right!!
     if (!dataSize) {
@@ -75,7 +75,7 @@ public:
     return buffer.size();
   }
 
-  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+  size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
   {
     memcpy(buffer + offset, _buffer.data(), _buffer.size());
     return offset + _buffer.size();
@@ -89,7 +89,7 @@ public:
     return bufferSize;
   }
 
-  void setDataPointer(Octet** inData, size_t bufferSize, size_t dataSize)
+  void setDataPointer(Octet** inData, size_t /*bufferSize*/, size_t dataSize)
   {
     // FIXME no clue if this is right!!
     if (!dataSize) {
@@ -97,9 +97,9 @@ public:
     } else {
       set(*inData, dataSize);
     }
-    if (*inData)
-      delete *inData;
-    inData = 0;
+    //if (*inData)
+    //  delete *inData;
+    //inData = 0;
   }
 
   void set(const Octet* inData, size_t dataSize)

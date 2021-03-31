@@ -159,19 +159,19 @@ InternalAmbassador::acceptInternalMessage(const EnumerateFederationExecutionsRes
 // }
 
 void
-InternalAmbassador::acceptInternalMessage(const ShutdownFederationExecutionMessage& message)
+InternalAmbassador::acceptInternalMessage(const ShutdownFederationExecutionMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const EraseFederationExecutionMessage& message)
+InternalAmbassador::acceptInternalMessage(const EraseFederationExecutionMessage& /*message*/)
 {
   // FIXME?!
   // deleteFederate();
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ReleaseFederationHandleMessage& message)
+InternalAmbassador::acceptInternalMessage(const ReleaseFederationHandleMessage& /*message*/)
 {
 }
 
@@ -212,7 +212,7 @@ InternalAmbassador::acceptInternalMessage(const ResignFederateNotifyMessage& mes
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeAutomaticResignDirectiveMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeAutomaticResignDirectiveMessage& /*message*/)
 {
 }
 
@@ -229,7 +229,7 @@ InternalAmbassador::acceptInternalMessage(const AnnounceSynchronizationPointMess
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const SynchronizationPointAchievedMessage& message)
+InternalAmbassador::acceptInternalMessage(const SynchronizationPointAchievedMessage& /*message*/)
 {
 }
 
@@ -261,12 +261,12 @@ InternalAmbassador::acceptInternalMessage(const DisableTimeRegulationRequestMess
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& message)
+InternalAmbassador::acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const DisableTimeConstrainedNotifyMessage& message)
+InternalAmbassador::acceptInternalMessage(const DisableTimeConstrainedNotifyMessage& /*message*/)
 {
 }
 
@@ -319,22 +319,22 @@ InternalAmbassador::acceptInternalMessage(const EraseRegionMessage& message)
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeInteractionClassPublicationMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeInteractionClassPublicationMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeObjectClassPublicationMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeObjectClassPublicationMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeInteractionClassSubscriptionMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeInteractionClassSubscriptionMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeObjectClassSubscriptionMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeObjectClassSubscriptionMessage& /*message*/)
 {
 }
 
@@ -368,12 +368,12 @@ InternalAmbassador::acceptInternalMessage(const ChangeObjectInstanceSubscription
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const RegistrationForObjectClassMessage& message)
+InternalAmbassador::acceptInternalMessage(const RegistrationForObjectClassMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const TurnInteractionsOnMessage& message)
+InternalAmbassador::acceptInternalMessage(const TurnInteractionsOnMessage& /*message*/)
 {
 }
 
@@ -489,7 +489,7 @@ InternalAmbassador::acceptInternalMessage(const RequestClassAttributeUpdateMessa
 }
 
 
-void InternalAmbassador::acceptInternalMessage(const QueryAttributeOwnershipRequestMessage& message)
+void InternalAmbassador::acceptInternalMessage(const QueryAttributeOwnershipRequestMessage& /*message*/)
 {
 
 }
@@ -600,7 +600,7 @@ public:
       _done = true;
     }
   }
-  void operator()(const CreateFederationExecutionResponseMessage& message)
+  void operator()(const CreateFederationExecutionResponseMessage& /*message*/)
   {
     // Could be a late response from a second call to createFederation, just ignore this
   }

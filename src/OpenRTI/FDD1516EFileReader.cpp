@@ -265,7 +265,7 @@ FDD1516EContentHandler::FDD1516EContentHandler() noexcept
           .leaf("name", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentInteractionClassParameter().setName(name); })
           .leaf("dataType", [this](const std::string& s) { _fomStringModuleBuilder.getCurrentInteractionClassParameter().setDataType(s); })
           .leaf("semantics")
-        .end([this]() {  }) // parameter
+        .end([]() {  }) // parameter
       .end([this]() { _fomStringModuleBuilder.popInteractionClass(); }) // interactionClass
     .end() // interactions
     .node("dimensions")
@@ -375,8 +375,8 @@ FDD1516EContentHandler::endDocument()
 }
 
 void
-FDD1516EContentHandler::startElement(const char* uri, const char* name,
-                                     const char* qName, const XML::Attributes* atts)
+FDD1516EContentHandler::startElement(const char* /*uri*/, const char* name,
+                                     const char* /*qName*/, const XML::Attributes* /*atts*/)
 {
   if (_contextStack.empty())
   {
@@ -413,7 +413,7 @@ FDD1516EContentHandler::startElement(const char* uri, const char* name,
 }
 
 void
-FDD1516EContentHandler::endElement(const char* uri, const char* name, const char* qName)
+FDD1516EContentHandler::endElement(const char* /*uri*/, const char* name, const char* /*qName*/)
 {
   auto currentContext = _contextStack.front();
   std::string characters = _characterData;

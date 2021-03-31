@@ -59,7 +59,7 @@ public:
   virtual bool queryLITS(InternalAmbassador& ambassador, NativeLogicalTime& logicalTime) = 0;
   virtual void modifyLookahead(InternalAmbassador& ambassador, const NativeLogicalTimeInterval& nativeLookahead) = 0;
   virtual void queryLookahead(InternalAmbassador& ambassador, NativeLogicalTimeInterval& logicalTimeInterval) = 0;
-
+  using InternalTimeManagement::logicalTimeToString;
   virtual std::string logicalTimeToString(const NativeLogicalTime& nativeLogicalTime) = 0;
   virtual std::string logicalTimeIntervalToString(const NativeLogicalTimeInterval& nativeLogicalTimeInterval) = 0;
   virtual bool isPositiveLogicalTimeInterval(const NativeLogicalTimeInterval& nativeLogicalTimeInterval) = 0;

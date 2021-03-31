@@ -2847,6 +2847,13 @@
             <encoding>HLAvariableArray</encoding>
             <semantics>List of designators of FOM modules.</semantics>
          </arrayData>
+        <arrayData>
+          <name>HLAinteractionSubscriptionFixedList</name>
+          <dataType>HLAinteractionSubscription</dataType>
+          <cardinality>10</cardinality>
+          <encoding>HLAfixedArray</encoding>
+          <semantics>Test.</semantics>
+        </arrayData>
       </arrayDataTypes>
       <fixedRecordDataTypes>
          <fixedRecordData>

@@ -233,7 +233,7 @@ public:
   { return _subscribedConnects.getConnectHandleSet(); }
 
   // FIXME This returns only the passive subscriptions
-  void getSubscribedAndIntersectingConnectHandleSet(ConnectHandleSet& connectHandleSet, const RegionSet& regionSet) const
+  void getSubscribedAndIntersectingConnectHandleSet(ConnectHandleSet& connectHandleSet, const RegionSet& /*regionSet*/) const
   { connectHandleSet = _subscribedConnects.getConnectHandleSet(); }
 
   void removeConnect(const ConnectHandle& connectHandle)
@@ -1386,7 +1386,7 @@ class OPENRTI_LOCAL VariantRecordAlternative
 {
 public:
   VariantRecordAlternative(const std::string& name, const std::string& enumerator, const std::string& dataType)
-    : _name(name), _enumerator(enumerator), _dataType(dataType)
+    : _enumerator(enumerator), _name(name), _dataType(dataType)
   {
   }
   std::string getDataType() const {

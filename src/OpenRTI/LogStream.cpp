@@ -66,7 +66,7 @@ public:
 
   struct OPENRTI_LOCAL StreamBuf : public std::stringbuf {
   public:
-    StreamBuf(std::ostream& stream) :
+    StreamBuf(std::ostream& /*stream*/) :
       _referencedMutex(getReferencedMutex())
     {
       //AddStream(stream);

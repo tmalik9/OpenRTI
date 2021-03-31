@@ -393,11 +393,11 @@ public:
   }
 
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
-                                      const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType)
-  {
-    _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
-  }
+  //void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
+  //  const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType) override
+  //{
+  //  _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
+  //}
 
   virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
                                       const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,

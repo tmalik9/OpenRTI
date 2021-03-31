@@ -270,7 +270,7 @@ class EnumDataType(DataType):
     def writeByteSize(self, sourceStream):
         sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
         sourceStream.writeline('{')
-        sourceStream.writeline(' return sizeof({name}); // sizeof()'.format(name = self.getName()))
+        sourceStream.writeline(' return sizeof(value); // sizeof()'.format(name = self.getName()))
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -1071,8 +1071,13 @@ class StructDataType(DataType):
 
     def writeStreamOut(self, sourceStream):
         sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
+        valueParameterName = ""
+        for field in self.__fieldList:
+            if not field.hideOnPrint():
+                valueParameterName = " value"
+                break;
         sourceStream.writeline('std::ostream&')
-        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& {value})'.format(name = self.getName(), value=valueParameterName))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{name} {{ ";'.format(name = self.getName()))
         count = 0
@@ -1097,30 +1102,38 @@ class StructDataType(DataType):
 
     def writePrettyPrint(self, sourceStream):
         parentObject=self.getParentObject()
+        valueParameterName = ""
         if not parentObject is None:
             parentObjectType=self.getParentObjectType()
-            parentObjectParameter=self.getParentObjectParameter()
+            parentObjectParameter=""
             fieldParents = set()
             for field in self.__fieldList:
                 fieldType=self.getType(field.getTypeName())
-                if not fieldType.getParentObject() is None and fieldType.getParentObject() != self.getParentObject():
-                    fieldValue=""
-                    fieldParentObject=fieldType.getParentObject()
-                    fieldParentObjectType=fieldType.getParentObjectType()
-                    fieldParentObjectParameter=fieldType.getParentObjectParameter()
-                    s = "{fieldParentObjectType}* {fieldParentObjectParameter} = {parentObjectParameter}->get{fieldParentObject}(value.get{fieldParentObject}Handle());".format(
-                        fieldParentObject=fieldParentObject,
-                        fieldParentObjectType=fieldParentObjectType, 
-                        fieldParentObjectParameter=fieldParentObjectParameter,
-                        parentObjectParameter=parentObjectParameter,
-                        fieldValue=fieldValue)
-                    fieldParents.add(s)
+                if not field.hideOnPrint():
+                    if not fieldType.getParentObject() is None:
+                        parentObjectParameter = self.getParentObjectParameter();
+                        if fieldType.getParentObject() != self.getParentObject():
+                            fieldValue=""
+                            fieldParentObject=fieldType.getParentObject()
+                            fieldParentObjectType=fieldType.getParentObjectType()
+                            fieldParentObjectParameter=fieldType.getParentObjectParameter()
+                            s = "{fieldParentObjectType}* {fieldParentObjectParameter} = {parentObjectParameter}->get{fieldParentObject}(value.get{fieldParentObject}Handle());".format(
+                                fieldParentObject=fieldParentObject,
+                                fieldParentObjectType=fieldParentObjectType, 
+                                fieldParentObjectParameter=fieldParentObjectParameter,
+                                parentObjectParameter=parentObjectParameter,
+                                fieldValue=fieldValue)
+                            fieldParents.add(s)
         sourceStream.writeline('std::ostream&')
+        for field in self.__fieldList:
+            if not field.hideOnPrint():
+                valueParameterName = " value"
+                break;
         if not parentObject is None:
-            sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter})'.format(
-            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}&{value}, {parentObjectType}* {parentObjectParameter})'.format(
+                name = self.getName(), value=valueParameterName, parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
         else:
-            sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value)'.format(name = self.getName()))
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}&{value})'.format(name = self.getName(), value=valueParameterName))
 
         sourceStream.writeline('{')
         if not parentObject is None:
@@ -1179,28 +1192,34 @@ class StructDataType(DataType):
     def writeEncoder(self, sourceStream):
         if not self.isAbstract():
             name = self.getName()
-            sourceStream.writeline('void write{name}(const {name}& value)'.format(name = name))
+            valueParameterName=""
+            if len(self.getFieldList()) > 0:
+                valueParameterName = " value"
+            sourceStream.writeline('void write{name}(const {name}&{value})'.format(name = name, value=valueParameterName))
             sourceStream.writeline('{')
             for field in self.getFieldList():
                 fieldName = field.getName()
                 typeName = field.getTypeName()
                 if type(field) is StructField:
-                    sourceStream.writeline('  write{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
+                    sourceStream.writeline('  write{typeName}({value}.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName, value=valueParameterName))
                 else:
-                    sourceStream.writeline('  write{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
+                    sourceStream.writeline('  write{typeName}({value}.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName, value=valueParameterName))
             sourceStream.writeline('}')
             sourceStream.writeline()
     
     def writeDecoder(self, sourceStream):
         if not self.isAbstract():
             name = self.getName()
-            sourceStream.writeline('void read{name}({name}& value)'.format(name = name))
+            valueParameterName=""
+            if len(self.getFieldList()) > 0:
+                valueParameterName = " value"
+            sourceStream.writeline('void read{name}({name}&{value})'.format(name = name, value=valueParameterName))
             sourceStream.writeline('{')
             for field in self.getFieldList():
                 fieldName = field.getName()
                 typeName = field.getTypeName()
                 if type(field) is StructField:
-                    sourceStream.writeline('  read{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
+                    sourceStream.writeline('  read{typeName}({value}.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName, value=valueParameterName))
                 else:
                     sourceStream.writeline('  {typeName} _dummy{typeName};'.format(typeName = typeName, fieldName = fieldName))
                     sourceStream.writeline('  read{typeName}(_dummy{typeName});'.format(typeName = typeName, fieldName = fieldName))
@@ -1362,7 +1381,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         sourceStream.writeline('size_t result = {parentTypeName}::messageSize();'.format(parentTypeName = self.getParentTypeName()));
-        for field in self.getFieldList():
+        for field in fields:
             fieldName = field.getName()
             sourceStream.writeline('result += byteSize(get{fieldName}());'.format(fieldName = fieldName))
         sourceStream.writeline('return result;');
@@ -1380,7 +1399,10 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
         sourceStream.writeline('bool')
-        sourceStream.writeline('{name}::operator==(const {name}& rhs) const noexcept'.format(name = self.getName()))
+        if len(fields) > 0:
+            sourceStream.writeline('{name}::operator==(const {name}& rhs) const noexcept'.format(name = self.getName()))
+        else:
+            sourceStream.writeline('{name}::operator==(const {name}&) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         for field in self.getFieldList():
             upperName = field.getUpperName()
@@ -1389,9 +1411,12 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
         sourceStream.writeline('bool')
-        sourceStream.writeline('{name}::operator<(const {name}& rhs) const noexcept'.format(name = self.getName()))
+        if len(fields) > 0:
+            sourceStream.writeline('{name}::operator<(const {name}& rhs) const noexcept'.format(name = self.getName()))
+        else:
+            sourceStream.writeline('{name}::operator<(const {name}&) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
-        for field in self.getFieldList():
+        for field in fields:
             upperName = field.getUpperName()
             sourceStream.writeline('  if (get{upperName}() < rhs.get{upperName}()) return true;'.format(upperName = upperName))
             sourceStream.writeline('  if (rhs.get{upperName}() < get{upperName}()) return false;'.format(upperName = upperName))
@@ -1420,10 +1445,15 @@ class MessageDataType(StructDataType):
         pass
  
     def writeByteSize(self, sourceStream):
-        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        fields = self.getFieldList();
+        if len(fields) > 0:
+            sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        else:
+            sourceStream.writeline('inline size_t byteSize(const {name}&)'.format(name = self.getName()))
+
         sourceStream.writeline('{')
         sourceStream.pushIndent()
-        sourceStream.writeline('size_t result = 0;');
+        sourceStream.writeline('size_t result = sizeof(AbstractMessage);');
         for field in self.getFieldList():
             fieldName = field.getName()
             sourceStream.writeline('result += byteSize(value.get{fieldName}());'.format(fieldName = fieldName))
@@ -1912,18 +1942,18 @@ class MessageEncoding(object):
             sourceStream.writeline('}')
             sourceStream.writeline()
 
-            sourceStream.writeline('size_t')
-            sourceStream.writeline('encodedSize(' + encodingClass + '& messageEncoding, const {messageName}& message) const'.format(messageName = messageName))
-            sourceStream.writeline('{')
-            sourceStream.pushIndent()
-            sourceStream.writeline('size_t result = 0;')
-            sourceStream.writeline('result += 2;')
-            sourceStream.writeline('// encodeStream.write{messageName}(message);'.format(messageName = messageName))
-            sourceStream.writeline('result += 4;')
-            sourceStream.writeline('return result;')
-            sourceStream.popIndent()
-            sourceStream.writeline('}')
-            sourceStream.writeline()
+            #sourceStream.writeline('size_t')
+            #sourceStream.writeline('encodedSize(' + encodingClass + '& messageEncoding, const {messageName}& message) const'.format(messageName = messageName))
+            #sourceStream.writeline('{')
+            #sourceStream.pushIndent()
+            #sourceStream.writeline('size_t result = 0;')
+            #sourceStream.writeline('result += 2;')
+            #sourceStream.writeline('// encodeStream.write{messageName}(message);'.format(messageName = messageName))
+            #sourceStream.writeline('result += 4;')
+            #sourceStream.writeline('return result;')
+            #sourceStream.popIndent()
+            #sourceStream.writeline('}')
+            #sourceStream.writeline()
 
         sourceStream.popIndent()
         sourceStream.writeline('private:')
@@ -2207,7 +2237,7 @@ class TypeMap(object):
         sourceStream.writeline()
         sourceStream.writeline('template<typename T, typename ParentObjectClass>')
         sourceStream.writeline('std::ostream&')
-        sourceStream.writeline('prettyprint(std::ostream& os, const T& value, ParentObjectClass* parentObject)')
+        sourceStream.writeline('prettyprint(std::ostream& os, const T& value, ParentObjectClass*)')
         sourceStream.writeline('{')
         sourceStream.writeline('  os << value;')
         sourceStream.writeline('  return os;')

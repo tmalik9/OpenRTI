@@ -61,7 +61,7 @@ class OPENRTI_LOCAL MomServer : public Referenced
 
     void accept(const EnableTimeRegulationRequestMessage& message);
     void accept(const EnableTimeConstrainedNotifyMessage& message);
-    void accept(const CommitLowerBoundTimeStampMessage& message)
+    void accept(const CommitLowerBoundTimeStampMessage& /*message*/)
     {
       // currently ignored (can we make sth. out of this?)
     }
@@ -73,19 +73,19 @@ class OPENRTI_LOCAL MomServer : public Referenced
     void accept(const ReserveObjectInstanceNameResponseMessage& message);
     void accept(const InsertObjectInstanceMessage& message);
     void accept(const DeleteObjectInstanceMessage& message);
-    void accept(const ChangeObjectClassSubscriptionMessage& message)
+    void accept(const ChangeObjectClassSubscriptionMessage& /*message*/)
     {
       // ignore this
     }
-    void accept(const ChangeObjectClassPublicationMessage& message)
+    void accept(const ChangeObjectClassPublicationMessage& /*message*/)
     {
       // ignore this
     }
-    void accept(const ChangeInteractionClassSubscriptionMessage& message)
+    void accept(const ChangeInteractionClassSubscriptionMessage& /*message*/)
     {
       // ignore this
     }
-    void accept(const ChangeInteractionClassPublicationMessage& message)
+    void accept(const ChangeInteractionClassPublicationMessage& /*message*/)
     {
       // ignore this
     }

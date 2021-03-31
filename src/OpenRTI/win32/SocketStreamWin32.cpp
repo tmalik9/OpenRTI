@@ -27,7 +27,7 @@
 namespace OpenRTI {
 
 ssize_t
-SocketStream::send(const ConstBufferRange& bufferRange, bool more)
+SocketStream::send(const ConstBufferRange& bufferRange, bool /*more*/)
 {
   size_t bytelen = 0;
   size_t sendBufferSize = this->sendBufferSize(); /* FIXME Use the real send buffer size instead */
@@ -164,7 +164,7 @@ SocketStream::recv(const BufferRange& bufferRange, bool peek)
 }
 
 void
-SocketStream::cork(bool enable)
+SocketStream::cork(bool /*enable*/)
 {
 }
 

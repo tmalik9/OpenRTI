@@ -33,12 +33,12 @@ public:
   /// Do not copy reference counts. Each new object has it's own counter
   Referenced(const Referenced&) noexcept : _refcount(0u)
   {}
-  Referenced(Referenced&&) = default;
+  Referenced(Referenced&&) = delete;
   virtual ~Referenced() noexcept {}
   /// Do not copy reference counts. Each new object has it's own counter
   Referenced& operator=(const Referenced&) noexcept
   { return *this; }
-  Referenced& operator=(Referenced&&) = default;
+  Referenced& operator=(Referenced&&) = delete;
 
   static void get(const Referenced* ref) noexcept
   { if (!ref) return; ref->_refcount.incFetch(Atomic::MemoryOrderRelease); }

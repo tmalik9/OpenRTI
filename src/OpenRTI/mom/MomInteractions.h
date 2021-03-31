@@ -20,6 +20,7 @@ public:
   typedef std::list<ResponseType> ResponseList;
 
   MomInteractionHandler(std::shared_ptr<MomManager> mom);
+  virtual ~MomInteractionHandler() {}
   FederateHandle getFederateHandleFromParameters(const ParameterHandleValueMap& requestParameters);
   FederateHandle getFederateHandleFromResponse(const ParameterHandleValueMap& responseParameters);
   std::shared_ptr<MomFederate> getFederateFromParameters(const ParameterHandleValueMap& requestParameters);

@@ -34,6 +34,7 @@
 #include <string>
 #include <vector>
 #include <iomanip>
+#include <algorithm>
 
 #ifndef __CPlusPlusStd
 #error "must include OpenRTIConfig.h!"

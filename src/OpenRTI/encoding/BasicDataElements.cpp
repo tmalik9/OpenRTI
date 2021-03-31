@@ -241,7 +241,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
 {
   *(buffer + offset) = *_valuePointer;
   return offset + 1;
@@ -273,7 +273,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
 {
   *(buffer + offset) = *_valuePointer;
   return offset + 1;
@@ -306,7 +306,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
 {
   *(buffer + offset) = *_valuePointer;
   return offset + 1;
@@ -338,7 +338,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
 {
   *(buffer + offset) = *_valuePointer;
   return offset + 1;
@@ -608,7 +608,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 2;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
 {
   auto* p = buffer + offset;
   *p++ = _valuePointer->first;
@@ -644,7 +644,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 2;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
 {
   auto* p = buffer + offset;
   *p++ = _valuePointer->second;

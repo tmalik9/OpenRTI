@@ -31,13 +31,13 @@ SocketServerPipe::SocketServerPipe() :
 }
 
 void
-SocketServerPipe::bind(const std::string& file)
+SocketServerPipe::bind(const std::string& /*file*/)
 {
   throw RTIinternalError("Pipes are not implemented on WIN32");
 }
 
 void
-SocketServerPipe::listen(int backlog)
+SocketServerPipe::listen(int /*backlog*/)
 {
   throw RTIinternalError("Pipes are not implemented on WIN32");
 }

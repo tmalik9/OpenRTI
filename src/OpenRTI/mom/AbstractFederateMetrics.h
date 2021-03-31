@@ -195,6 +195,7 @@ struct OPENRTI_LOCAL OCMetricTracker
 
 struct OPENRTI_LOCAL AbstractFederateMetrics
 {
+    virtual ~AbstractFederateMetrics() {};
     virtual void reflectionReceived(ObjectClassHandle classId, ObjectInstanceHandle instanceId) = 0;
     virtual void sentUpdate(ObjectClassHandle classId, ObjectInstanceHandle instanceId) = 0;
     virtual void interactionReceived(InteractionClassHandle classId) = 0;

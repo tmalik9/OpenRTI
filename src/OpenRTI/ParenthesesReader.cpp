@@ -35,7 +35,7 @@ ParenthesesReader::ContentHandler::endDocument()
 }
 
 void
-ParenthesesReader::ContentHandler::startElement(const ParenthesesReader& parenthesesReader, const StringVector& tokens)
+ParenthesesReader::ContentHandler::startElement(const ParenthesesReader& /*parenthesesReader*/, const StringVector& /*tokens*/)
 {
 }
 
@@ -49,7 +49,7 @@ ParenthesesReader::ErrorHandler::~ErrorHandler()
 }
 
 void
-ParenthesesReader::ErrorHandler::error(const ParenthesesReader& parenthesesReader, const char* msg)
+ParenthesesReader::ErrorHandler::error(const ParenthesesReader& /*parenthesesReader*/, const char* /*msg*/)
 {
 }
 

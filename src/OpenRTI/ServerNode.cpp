@@ -53,7 +53,7 @@ public:
   {
   }
 
-  void accept(const ConnectHandle& connectHandle, const InsertModulesMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const InsertModulesMessage* message)
   {
     broadcastToChildren(message);
     insert(message->getFOMModuleList());
@@ -495,7 +495,7 @@ public:
       sendToParent(message);
     }
   }
-  void accept(const ConnectHandle& connectHandle, const RegisterFederationSynchronizationPointResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const RegisterFederationSynchronizationPointResponseMessage* message)
   {
     if (message->getLabel().empty())
       throw MessageError("Received empty label in RegisterFederationSynchronizationPointResponseMessage!");
@@ -503,7 +503,7 @@ public:
     send(message->getFederateHandle(), message);
   }
 
-  void accept(const ConnectHandle& connectHandle, const AnnounceSynchronizationPointMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const AnnounceSynchronizationPointMessage* message)
   {
     if (message->getLabel().empty())
       throw MessageError("Received empty label in AnnounceSynchronizationPointMessage!");
@@ -563,7 +563,7 @@ public:
       send(j->first, announce);
     }
   }
-  void accept(const ConnectHandle& connectHandle, const SynchronizationPointAchievedMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const SynchronizationPointAchievedMessage* message)
   {
     ServerModel::Synchronization::NameMap::iterator i = _synchronizationNameSynchronizationMap.find(message->getLabel());
     if (i == _synchronizationNameSynchronizationMap.end())
@@ -602,7 +602,7 @@ public:
       }
     }
   }
-  void accept(const ConnectHandle& connectHandle, const FederationSynchronizedMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const FederationSynchronizedMessage* message)
   {
     ServerModel::Synchronization::NameMap::iterator i = _synchronizationNameSynchronizationMap.find(message->getLabel());
     if (i == _synchronizationNameSynchronizationMap.end())
@@ -777,7 +777,7 @@ public:
     }
 
   }
-  void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const CommitLowerBoundTimeStampResponseMessage* message)
   {
     send(message->getFederateHandle(), message);
   }
@@ -1333,7 +1333,7 @@ public:
       sendToParent(message);
     }
   }
-  void accept(const ConnectHandle& connectHandle, const ObjectInstanceHandlesResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ObjectInstanceHandlesResponseMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
@@ -1404,7 +1404,7 @@ public:
   // current server node.
   // FIXME: should work for the instance handles too. As long as the root server is authoritive, it will know all,
   // Once the root is no longer reachable, it is sufficient to know what is here and below ...
-  void accept(const ConnectHandle& connectHandle, const ReserveObjectInstanceNameRequestMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ReserveObjectInstanceNameRequestMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
@@ -1438,7 +1438,7 @@ public:
       sendToParent(message);
     }
   }
-  void accept(const ConnectHandle& connectHandle, const ReserveObjectInstanceNameResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ReserveObjectInstanceNameResponseMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
@@ -1458,7 +1458,7 @@ public:
       federateConnect->send(message);
     }
   }
-  void accept(const ConnectHandle& connectHandle, const ReserveMultipleObjectInstanceNameRequestMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ReserveMultipleObjectInstanceNameRequestMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
@@ -1504,7 +1504,7 @@ public:
       sendToParent(message);
     }
   }
-  void accept(const ConnectHandle& connectHandle, const ReserveMultipleObjectInstanceNameResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ReserveMultipleObjectInstanceNameResponseMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
@@ -2464,7 +2464,7 @@ public:
 
 
   // Enumerate federations
-  void acceptAsRoot(const ConnectHandle& connectHandle, const EnumerateFederationExecutionsRequestMessage* message)
+  void acceptAsRoot(const ConnectHandle& connectHandle, const EnumerateFederationExecutionsRequestMessage* /*message*/)
   {
     OpenRTIAssert(connectHandle.valid());
     OpenRTIAssert(isRootServer());
@@ -2872,7 +2872,7 @@ public:
   void accept(const ConnectHandle& connectHandle, const RequestClassAttributeUpdateMessage* message)
   { acceptFederationMessage(connectHandle, message); }
 
-  void accept(const ConnectHandle&, const AbstractMessage* message)
+  void accept(const ConnectHandle&, const AbstractMessage* /*message*/)
   { throw MessageError("Received unexpected message???"); }
 
   class OPENRTI_LOCAL DispatchFunctor {

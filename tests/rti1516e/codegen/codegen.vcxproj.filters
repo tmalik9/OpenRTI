@@ -5,18 +5,25 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="generated source files">
+      <UniqueIdentifier>{cc01c060-17d0-4d61-bf3f-aceb56740f9d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="momEncodings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="codegen.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="momEncodings.cpp">
+      <Filter>generated source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="momDataTypes.h" />
-    <ClInclude Include="momEncodings.h" />
+    <ClInclude Include="momDataTypes.h">
+      <Filter>generated source files</Filter>
+    </ClInclude>
+    <ClInclude Include="momEncodings.h">
+      <Filter>generated source files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mom.xml" />

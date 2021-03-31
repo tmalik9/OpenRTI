@@ -34,7 +34,7 @@ AbstractSocketEvent::AbstractSocketEvent() :
 //}
 
 void
-AbstractSocketEvent::error(const Exception& e)
+AbstractSocketEvent::error(const Exception& /*e*/)
 {
 }
 

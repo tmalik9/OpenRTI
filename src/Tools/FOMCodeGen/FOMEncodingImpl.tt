@@ -26,7 +26,7 @@ namespace <#=namespacePart#> {
 <#=FOM.EncodingForwardDeclarations#>
 
 <#
-foreach (var dataType in FOM.DataTypes.Values)
+foreach (var dataType in FOM.SortedDataTypes)
 {
   if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
   {
@@ -51,7 +51,7 @@ foreach (var dataType in FOM.DataTypes.Values)
 }
 uint32_t <#=dataType.Name#>Encoding::getVersion() const { return rti1516e::HLAfixedRecord::getVersion(); }
 <# foreach (var field in fixedRecordDataType.AllFields) { #>
-void <#=dataType.Name#>Encoding::Set<#=field.Name#>(<#=field.DataType.CPPType#> value)
+void <#=dataType.Name#>Encoding::Set<#=field.Name#>(<#=field.DataType.ParameterCppType#> value)
 {
 <#  if (field.DataType is FOMParser.BasicDataRepresentation || field.DataType is FOMParser.SimpleDataType || field.DataType is FOMParser.ArrayDataType)
     { #>
@@ -68,7 +68,7 @@ void <#=dataType.Name#>Encoding::Set<#=field.Name#>(const <#=arrayDataType.DataT
 	m<#=field.Name#>.set(value, size);
 }
 <# } #>
-<#=field.DataType.CPPType#> <#=dataType.Name#>Encoding::Get<#=field.Name#>() const
+<#=field.DataType.ReturnCppType#> <#=dataType.Name#>Encoding::Get<#=field.Name#>() const
 {
 <# if (field.Version > 0) { #>
   if (getVersion() < <#=field.Version#>)
@@ -104,10 +104,10 @@ bool <#=dataType.Name#>Encoding::Is<#=field.Name#>Available() const
     {#>
 <#=dataType.Comment#>
 <#  } #>
-// fixed array of <#= fixedArrayDataType.DataType.Name #>
 <#  if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
     { // array of simple or basic types: access data by reference/pointer
 #>
+// fixed array of simple type <#=fixedArrayDataType.DataType.Name#>
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding()
   : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
 <# if (cardinality > 0) {#>
@@ -123,7 +123,7 @@ bool <#=dataType.Name#>Encoding::Is<#=field.Name#>Available() const
 <#  } #>
 }
 <# if (cardinality > 0) {#>
-<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=fixedArrayDataType.CPPType#> data)
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=fixedArrayDataType.ParameterCppType#> data)
   : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
   , mData(<#=fixedArrayDataType.Cardinality#>)
 {
@@ -134,7 +134,7 @@ bool <#=dataType.Name#>Encoding::Is<#=field.Name#>Available() const
     setElementPointer(i, &mEncoding[i]);
   }
 }
-void <#=dataType.Name#>Encoding::set(<#=fixedArrayDataType.CPPType#> data) {
+void <#=dataType.Name#>Encoding::set(<#=fixedArrayDataType.ParameterCppType#> data) {
   set(data.data(), data.size());
 }
 void <#=dataType.Name#>Encoding::set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size) 
@@ -145,50 +145,39 @@ void <#=dataType.Name#>Encoding::set(const <#=fixedArrayDataType.DataType.CPPTyp
     memcpy(mData.data(), data, <#=fixedArrayDataType.Cardinality#>);
   }
 }
-<#=fixedArrayDataType.CPPType#> <#=dataType.Name#>Encoding::get() const
+<#=fixedArrayDataType.ReturnCppType#> <#=dataType.Name#>Encoding::get() const
 {
   return mData;
 }
 <#  } #>
 <#  } else {  // array of complex type #>
-    <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding()
-      : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
-    {
+// fixed array of complex type <#=fixedArrayDataType.DataType.Name#>
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding()
+  : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
+{
+}
 <# if (cardinality > 0) {#>
-      for (int i=0; i < <#=cardinality#>; i++)
-      {
-        mEncoding[i] = mData[i];
-        setElementPointer(i, &mEncoding[i]);
-      }
-<#  } #>
-    }
-<# if (cardinality > 0) {#>
-    <#=fixedArrayDataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=fixedArrayDataType.CPPType#> data)
-      : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
-      , mData(<#=fixedArrayDataType.Cardinality#>)
-    {
-      set(data.data(), data.size());
-      for (int i=0;i<<#=fixedArrayDataType.Cardinality#>;i++)
-      {
-        mEncoding[i].setDataPointer(&mData[i]);
-        setElementPointer(i, &mEncoding[i]);
-      }
-    }
-    void <#=fixedArrayDataType.Name#>Encoding::set(<#=fixedArrayDataType.CPPType#> data) {
-      set(data.data(), data.size());
-    }
-    void <#=fixedArrayDataType.Name#>Encoding::set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size) 
-    {
-      if (size <= <#=fixedArrayDataType.Cardinality#>) {
-        memcpy(mData.data(), data, size);
-      } else {
-        memcpy(mData.data(), data, <#=fixedArrayDataType.Cardinality#>);
-      }
-    }
-    <#=fixedArrayDataType.CPPType#> <#=fixedArrayDataType.Name#>Encoding::get() const
-    {
-      return mData;
-    }
+<#=fixedArrayDataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=fixedArrayDataType.ConstRefCppType#> data)
+  : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
+{
+  set(data);
+}
+void <#=fixedArrayDataType.Name#>Encoding::set(<#=fixedArrayDataType.ConstRefCppType#> data) {
+  set(data.data(), data.size());
+}
+void <#=fixedArrayDataType.Name#>Encoding::set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size) 
+{
+  for (size_t i = 0; i < size; i++)
+  {
+    const <#=fixedArrayDataType.DataType.Encoding#>* encoding = dynamic_cast<const <#=fixedArrayDataType.DataType.Encoding#>*>(&data[i]);
+    HLAfixedArray::set(i, *encoding);
+  }
+}
+<#=fixedArrayDataType.CPPType#> <#=fixedArrayDataType.Name#>Encoding::get() const
+{
+  <#=fixedArrayDataType.CPPType#> result;
+  return result;
+}
 <#  } #>
 <#  } // if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
   }  // if (dataType is FOMParser.FixedArrayDataType)
@@ -200,22 +189,22 @@ void <#=dataType.Name#>Encoding::set(const <#=fixedArrayDataType.DataType.CPPTyp
     {#>
 <#=dataType.Comment#>
 <#  } #>
-// variable array of <#= variableArrayDataType.DataType.Name #>
 <#  if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
     { // array of simple or basic types: access data by reference/pointer
 #>
+// variable array of simple type <#= variableArrayDataType.DataType.Name #>
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding()
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
   , mData()
 {
 }
-<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=variableArrayDataType.CPPType#> data)
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data)
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
   , mData(data)
 {
   update();
 }
-void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.CPPType#> data)
+void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.ParameterCppType#> data)
 {
   if (mData.size() != data.size()) {
     mData = data;
@@ -232,7 +221,7 @@ void <#=dataType.Name#>Encoding::set(const <#=variableArrayDataType.DataType.CPP
   }
   memcpy(mData.data(), data, size);
 }
-<#=variableArrayDataType.CPPType#> <#=dataType.Name#>Encoding::get() const { return mData; }
+<#=variableArrayDataType.ReturnCppType#> <#=dataType.Name#>Encoding::get() const { return mData; }
 void <#=dataType.Name#>Encoding::resize(size_t size)
 {
   mData.resize(size);
@@ -261,16 +250,17 @@ void <#=dataType.Name#>Encoding::update()
 }
 
 <#  } else {  // array of complex type #>
+// variable array of complex type <#= variableArrayDataType.DataType.Name #>
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding()
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
 {
 }
-<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=variableArrayDataType.CPPType#> data)
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data)
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
 {
   set(data);
 }
-void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.CPPType#> data)
+void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.ParameterCppType#> data)
 {
   clear();
   for (size_t i=0; i < data.size();i++)
@@ -278,7 +268,7 @@ void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.CPPType#> data)
     addElement(static_cast<const <#=variableArrayDataType.DataType.Encoding#>&>(data[i]));
   }
 }
-void <#=dataType.Name#>Encoding::set(std::vector<<#=variableArrayDataType.DataType.Encoding#>>& data)
+void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.RefCppType#> data)
 {
   clear();
   for (size_t i=0; i < data.size();i++)

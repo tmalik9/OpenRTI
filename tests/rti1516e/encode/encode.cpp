@@ -161,7 +161,6 @@ class OPENRTI_LOCAL HLAinteractionSubscription : public rti1516e::HLAfixedRecord
 
 
 constexpr bool gDebugPrint = true;
-constexpr int doIterations = 5;
 
 #ifdef _WIN32
 static void DumpHeap()

@@ -35,7 +35,7 @@ class OPENRTI_API AbstractConnect : public Referenced {
 public:
   AbstractConnect() noexcept = default;
   AbstractConnect(const AbstractConnect&) = default;
-  AbstractConnect(AbstractConnect&&) = default;
+  AbstractConnect(AbstractConnect&&) = delete;
   virtual ~AbstractConnect() noexcept = default;
   //AbstractConnect& operator=(const AbstractConnect&) = default;
   //AbstractConnect& operator=(AbstractConnect&&) = default;

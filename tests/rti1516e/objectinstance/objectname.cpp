@@ -38,7 +38,7 @@ public:
   virtual ~TestAmbassador()
   { }
 
-  virtual bool execJoined(rti1516e::RTIambassador& ambassador)
+  virtual bool execJoined(rti1516e::RTIambassador& ambassador) override
   {
 
     if (!waitForAllFederates(ambassador))
@@ -202,13 +202,13 @@ public:
   }
 
   virtual void
-  objectInstanceNameReservationSucceeded(const std::wstring& objectInstanceName)
+  objectInstanceNameReservationSucceeded(const std::wstring& objectInstanceName) override
   {
     _nameReservationMap[objectInstanceName] = true;
   }
 
   virtual void
-  objectInstanceNameReservationFailed(const std::wstring& objectInstanceName)
+  objectInstanceNameReservationFailed(const std::wstring& objectInstanceName) override
   {
     _nameReservationMap[objectInstanceName] = false;
   }
@@ -222,7 +222,7 @@ public:
   Test(int argc, const char* const argv[]) :
     RTITest(argc, argv, false)
   { }
-  virtual Ambassador* createAmbassador(const ConstructorArgs& constructorArgs)
+  virtual Ambassador* createAmbassador(const ConstructorArgs& constructorArgs) override
   {
     return new TestAmbassador(constructorArgs);
   }

@@ -46,11 +46,6 @@ Socket::close()
   _privateData->close();
 }
 
-uint32_t Socket::getFd() const
-{
-  return _privateData->_fd;
-}
-
 Socket::Socket(PrivateData* privateData) :
   _privateData(privateData), _mIsWritable(false)
 {
