@@ -108,8 +108,7 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
     using rti1516e::HLAfixedArray::set;
     void set(<#=fixedArrayDataType.ParameterCppType#> data);
     void set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size);
-    using rti1516e::HLAfixedArray::get;
-    <#=fixedArrayDataType.ReturnCppType#> get() const;
+    // not yet supported: <#=fixedArrayDataType.ReturnCppType#> get() const;
 <#  } #>
   private:
 }; // class <#=dataType.Name#>

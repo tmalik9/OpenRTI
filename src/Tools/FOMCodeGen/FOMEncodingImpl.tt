@@ -173,11 +173,12 @@ void <#=fixedArrayDataType.Name#>Encoding::set(const <#=fixedArrayDataType.DataT
     HLAfixedArray::set(i, *encoding);
   }
 }
-<#=fixedArrayDataType.CPPType#> <#=fixedArrayDataType.Name#>Encoding::get() const
-{
-  <#=fixedArrayDataType.CPPType#> result;
-  return result;
-}
+// not yet supported:
+//<#=fixedArrayDataType.ReturnCppType#> <#=fixedArrayDataType.Name#>Encoding::get() const
+//{
+//  <#=fixedArrayDataType.CPPType#> result;
+//  return result;
+//}
 <#  } #>
 <#  } // if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
   }  // if (dataType is FOMParser.FixedArrayDataType)

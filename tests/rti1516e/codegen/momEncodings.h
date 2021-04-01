@@ -1,5 +1,5 @@
 
-// Code automatically generated from D:\vfs\OpenRTI\tests\rti1516e\codegen\\mom.xml, do not edit
+// Code automatically generated from D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\tests\rti1516e\codegen\\mom.xml, do not edit
 
 #pragma once
 
@@ -250,8 +250,7 @@ class HLAinteractionSubscriptionFixedListEncoding : public rti1516e::HLAfixedArr
     using rti1516e::HLAfixedArray::set;
     void set(const std::vector<HLAinteractionSubscriptionEncoding>& data);
     void set(const HLAinteractionSubscription* data, size_t size);
-    using rti1516e::HLAfixedArray::get;
-    const std::vector<HLAinteractionSubscriptionEncoding>& get() const;
+    // not yet supported: const std::vector<HLAinteractionSubscriptionEncoding>& get() const;
   private:
 }; // class HLAinteractionSubscriptionFixedList
 // Object class and count of associated items

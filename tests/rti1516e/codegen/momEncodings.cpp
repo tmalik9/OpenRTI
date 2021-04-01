@@ -1,5 +1,5 @@
 
-// Code automatically generated from D:\vfs\OpenRTI\tests\rti1516e\codegen\\mom.xml, do not edit
+// Code automatically generated from D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\tests\rti1516e\codegen\\mom.xml, do not edit
 
 #include <vector>
 #include <cstring>
@@ -637,11 +637,12 @@ void HLAinteractionSubscriptionFixedListEncoding::set(const HLAinteractionSubscr
     HLAfixedArray::set(i, *encoding);
   }
 }
-std::vector<HLAinteractionSubscriptionEncoding> HLAinteractionSubscriptionFixedListEncoding::get() const
-{
-  std::vector<HLAinteractionSubscriptionEncoding> result;
-  return result;
-}
+// not yet supported:
+//const std::vector<HLAinteractionSubscriptionEncoding>& HLAinteractionSubscriptionFixedListEncoding::get() const
+//{
+//  std::vector<HLAinteractionSubscriptionEncoding> result;
+//  return result;
+//}
 // Object class and count of associated items
 HLAobjectClassBasedCountEncoding::HLAobjectClassBasedCountEncoding() : rti1516e::HLAfixedRecord(0)
 {
