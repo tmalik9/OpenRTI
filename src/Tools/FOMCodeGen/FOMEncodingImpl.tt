@@ -55,9 +55,9 @@ void <#=dataType.Name#>Encoding::Set<#=field.Name#>(<#=field.DataType.ParameterC
 {
 <#  if (field.DataType is FOMParser.BasicDataRepresentation || field.DataType is FOMParser.SimpleDataType || field.DataType is FOMParser.ArrayDataType)
     { #>
-	m<#=field.Name#>.set(value);
+      m<#=field.Name#>.set(value);
 <#  } else { #>
-	m<#=field.Name#> = value;
+      m<#=field.Name#> = value;
 <#  } #>
 }
 <# if (field.DataType is FOMParser.ArrayDataType) {
