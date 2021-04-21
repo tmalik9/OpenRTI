@@ -43,7 +43,7 @@ public:
   SharedPtr<const AbstractMessage> pop_front()
   {
     if (_list.empty())
-      return 0;
+      return SharedPtr<const AbstractMessage>();
     // take away the front message and move the empty list entry to the pool.
     SharedPtr<const AbstractMessage> message;
     message.swap(_list.front());

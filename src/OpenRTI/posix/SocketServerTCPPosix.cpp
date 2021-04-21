@@ -124,7 +124,7 @@ SocketServerTCP::accept()
   setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &nosigpipe, sizeof(nosigpipe));
 #endif
 
-  return new SocketTCP(new PrivateData(fd));
+  return SharedPtr<SocketTCP>(new SocketTCP(new PrivateData(fd)));
 }
 
 SocketServerTCP::~SocketServerTCP()

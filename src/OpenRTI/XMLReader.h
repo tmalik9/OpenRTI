@@ -39,10 +39,10 @@ public:
   virtual void parse(std::istream& stream, const std::string& encoding) = 0;
 
   ContentHandler* getContentHandler() const;
-  void setContentHandler(ContentHandler* contentHandler);
+  void setContentHandler(const SharedPtr<ContentHandler>& contentHandler);
 
   ErrorHandler* getErrorHandler() const;
-  void setErrorHandler(ErrorHandler* errorHandler);
+  void setErrorHandler(const SharedPtr<ErrorHandler>& errorHandler);
 
 protected:
   SharedPtr<ContentHandler> mContentHandler;

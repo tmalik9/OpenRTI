@@ -83,7 +83,8 @@ LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& 
   ScopeLock scopeLock(_mutex);
   UrlServerMap::iterator i = _urlServerMap.find(url);
   if (i != _urlServerMap.end()) {
-    SharedPtr<AbstractConnect> connect = i->second->connect(clientOptions);
+    SharedPtr<LeafServerThread> leafServerThread = i->second;
+    SharedPtr<AbstractConnect> connect = leafServerThread->connect(clientOptions);
     /// Even if we have a server it might have already decided to stop working.
     /// If it is working it is guaranteed to get at least a connect to this server thread.
     if (connect.valid())
@@ -121,10 +122,12 @@ LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& 
     return SharedPtr<AbstractConnect>();
   }
   server->getServerNode();
-  i->second = new LeafServerThread(server);
+  i->second = MakeShared<LeafServerThread>(server);
   i->second->_iterator = i;
   i->second->start();
-  return i->second->connect(clientOptions);
+  StringStringListMap serverThreadOptions = clientOptions;
+  serverThreadOptions["version"] = std::list<std::string>{std::to_string(server->getProtocolVersion())};
+  return i->second->connect(serverThreadOptions);
 }
 
 void
@@ -142,7 +145,7 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
 {
   // rti://localhost connect is the default.
   if (url.getProtocol().empty() || url.getProtocol() == "rti" || url.getProtocol() == "pipe") {
-    SharedPtr<NetworkServer> server = new NetworkServer(serverNode);
+    SharedPtr<NetworkServer> server = MakeShared<NetworkServer>(serverNode);
 
     server->setServerName("Leaf server");
     AbsTimeout timeout((timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds));
@@ -151,9 +154,9 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
 
     return server;
   } else if (url.getProtocol() == "thread") {
-    return new ThreadServer(serverNode);
+    return MakeShared<ThreadServer>(serverNode);
   } else if (url.getProtocol() == "rtinode") {
-    SharedPtr<NetworkServer> server = new NetworkServer(serverNode);
+    SharedPtr<NetworkServer> server = MakeShared<NetworkServer>(serverNode);
 
     server->setServerName(url.str());
     for (std::size_t i = 0; i < url.getNumQueries(); ++i) {
@@ -177,7 +180,7 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
 SharedPtr<AbstractServerNode>
 LeafServerThread::_Registry::createServerNode()
 {
-  return new ServerNode;
+  return MakeShared<ServerNode>();
 }
 
 LeafServerThread::_Registry& LeafServerThread::_Registry::GetInstance()

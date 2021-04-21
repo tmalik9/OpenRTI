@@ -184,7 +184,7 @@ public:
     _timeRegulationEnableFederateHandleSet.insert(ambassador.getFederate()->getFederateHandle());
 
     SharedPtr<EnableTimeRegulationRequestMessage> request;
-    request = new EnableTimeRegulationRequestMessage;
+    request = MakeShared<EnableTimeRegulationRequestMessage>();
     request->setFederationHandle(ambassador.getFederate()->getFederationHandle());
     request->setFederateHandle(ambassador.getFederate()->getFederateHandle());
     request->setTimeStamp(_logicalTimeFactory.encodeLogicalTime(_outboundLowerBoundTimeStamp.first));
@@ -215,7 +215,7 @@ public:
     _committedNextMessageLowerBoundTimeStamp = _outboundLowerBoundTimeStamp.first;
 
     SharedPtr<DisableTimeRegulationRequestMessage> request;
-    request = new DisableTimeRegulationRequestMessage;
+    request = MakeShared<DisableTimeRegulationRequestMessage>();
     request->setFederationHandle(ambassador.getFederate()->getFederationHandle());
     request->setFederateHandle(ambassador.getFederate()->getFederateHandle());
     ambassador.send(request);
@@ -239,11 +239,11 @@ public:
 
     // There are no changes to the bounds for outbound messages
 
-    SharedPtr<TimeConstrainedEnabledMessage> message = new TimeConstrainedEnabledMessage;
+    SharedPtr<TimeConstrainedEnabledMessage> message = MakeShared<TimeConstrainedEnabledMessage>();
     queueTimeStampedMessage(_pendingLogicalTime, *message);
 
     SharedPtr<EnableTimeConstrainedNotifyMessage> request;
-    request = new EnableTimeConstrainedNotifyMessage;
+    request = MakeShared<EnableTimeConstrainedNotifyMessage>();
     request->setFederationHandle(ambassador.getFederate()->getFederationHandle());
     request->setFederateHandle(ambassador.getFederate()->getFederateHandle());
     ambassador.send(request);
@@ -259,7 +259,7 @@ public:
     InternalTimeManagement::setTimeConstrainedMode(InternalTimeManagement::TimeConstrainedDisabled);
 
     SharedPtr<DisableTimeConstrainedNotifyMessage> disable;
-    disable = new DisableTimeConstrainedNotifyMessage;
+    disable = MakeShared<DisableTimeConstrainedNotifyMessage>();
     disable->setFederationHandle(ambassador.getFederate()->getFederationHandle());
     disable->setFederateHandle(ambassador.getFederate()->getFederateHandle());
     ambassador.send(disable);
@@ -299,7 +299,7 @@ public:
       if (InternalTimeManagement::getTimeRegulationEnabled())
         _sendCommitLowerBoundTimeStampIfChanged(ambassador, _outboundLowerBoundTimeStamp, TimeAdvanceAndNextMessageCommit);
 
-      SharedPtr<TimeAdvanceGrantedMessage> message = new TimeAdvanceGrantedMessage;
+      SharedPtr<TimeAdvanceGrantedMessage> message = MakeShared<TimeAdvanceGrantedMessage>();
       queueTimeStampedMessage(_pendingLogicalTime, *message);
 
     } else if (InternalTimeManagement::getIsAnyNextMessageMode()) {
@@ -324,7 +324,7 @@ public:
       if (InternalTimeManagement::getTimeConstrainedEnabled()) {
         checkForPendingTimeAdvance(ambassador, false);
       } else {
-        SharedPtr<TimeAdvanceGrantedMessage> message = new TimeAdvanceGrantedMessage;
+        SharedPtr<TimeAdvanceGrantedMessage> message = MakeShared<TimeAdvanceGrantedMessage>();
         queueTimeStampedMessage(_pendingLogicalTime, *message);
       }
     } else if (InternalTimeManagement::getFlushQueueMode()) {
@@ -354,7 +354,7 @@ public:
       if (InternalTimeManagement::getTimeConstrainedEnabled()) {
         _timeAdvanceToBeScheduled = true;
       } else {
-        SharedPtr<TimeAdvanceGrantedMessage> message = new TimeAdvanceGrantedMessage;
+        SharedPtr<TimeAdvanceGrantedMessage> message = MakeShared<TimeAdvanceGrantedMessage>();
         queueTimeStampedMessage(_pendingLogicalTime, *message);
       }
 
@@ -518,7 +518,7 @@ public:
         }
 
         SharedPtr<EnableTimeRegulationResponseMessage> response;
-        response = new EnableTimeRegulationResponseMessage;
+        response = MakeShared<EnableTimeRegulationResponseMessage>();
         response->setFederationHandle(ambassador.getFederate()->getFederationHandle());
         response->setFederateHandle(message.getFederateHandle());
         response->setRespondingFederateHandle(ambassador.getFederate()->getFederateHandle());
@@ -712,7 +712,7 @@ public:
     } else {
       _MessageListElement& messageListElement = _messageListPool.front();
       messageListElement.unlink();
-      messageListElement._message = &message;
+      messageListElement._message = SharedPtr<const AbstractMessage>(&message);
       _logicalTimeMessageListMap[logicalTimePair].push_back(messageListElement);
       if (message.getObjectInstanceHandleForMessage().valid()) {
         messageListElement.setObjectInstanceHandle(message.getObjectInstanceHandleForMessage());
@@ -736,7 +736,7 @@ public:
     } else {
       _MessageListElement& messageListElement = _messageListPool.front();
       messageListElement.unlink();
-      messageListElement._message = &message;
+      messageListElement._message = SharedPtr<const AbstractMessage>(&message);
       _receiveOrderMessages.push_back(messageListElement);
       if (message.getObjectInstanceHandleForMessage().valid()) {
         messageListElement.setObjectInstanceHandle(message.getObjectInstanceHandleForMessage());
@@ -813,7 +813,7 @@ public:
     _sendCommitLowerBoundTimeStamp(ambassador, _outboundLowerBoundTimeStamp.first, TimeAdvanceAndNextMessageCommit);
 
     // Ok, now go on ...
-    SharedPtr<TimeRegulationEnabledMessage> message = new TimeRegulationEnabledMessage;
+    SharedPtr<TimeRegulationEnabledMessage> message = MakeShared<TimeRegulationEnabledMessage>();
     queueTimeStampedMessage(_pendingLogicalTime, *message);
   }
 
@@ -828,7 +828,7 @@ public:
       if (allowNextMessage && getIsSaveToAdvanceToNextMessage()) {
         if (canAdvanceToNextMessage(LogicalTimePair(_pendingLogicalTime.first, 0))) {
           _timeAdvanceToBeScheduled = false;
-          SharedPtr<TimeAdvanceGrantedMessage> message = new TimeAdvanceGrantedMessage;
+          SharedPtr<TimeAdvanceGrantedMessage> message = MakeShared<TimeAdvanceGrantedMessage>();
           queueTimeStampedMessage(_pendingLogicalTime, *message);
 
           if (InternalTimeManagement::getTimeRegulationEnabled()) {
@@ -842,7 +842,7 @@ public:
       } else {
         if (canAdvanceTo(LogicalTimePair(_pendingLogicalTime.first, 0))) {
           _timeAdvanceToBeScheduled = false;
-          SharedPtr<TimeAdvanceGrantedMessage> message = new TimeAdvanceGrantedMessage;
+          SharedPtr<TimeAdvanceGrantedMessage> message = MakeShared<TimeAdvanceGrantedMessage>();
           queueTimeStampedMessage(_pendingLogicalTime, *message);
 
           if (InternalTimeManagement::getTimeRegulationEnabled()) {
@@ -864,7 +864,7 @@ public:
     if (_logicalTimeMessageListMap.empty() && InternalTimeManagement::getFlushQueueMode() && _timeAdvanceToBeScheduled) {
       OpenRTIAssert(!InternalTimeManagement::getTimeConstrainedEnabled() || canAdvanceTo(_pendingLogicalTime));
       _timeAdvanceToBeScheduled = false;
-      SharedPtr<TimeAdvanceGrantedMessage> message = new TimeAdvanceGrantedMessage;
+      SharedPtr<TimeAdvanceGrantedMessage> message = MakeShared<TimeAdvanceGrantedMessage>();
       queueTimeStampedMessage(_pendingLogicalTime, *message);
     }
   }
@@ -959,7 +959,7 @@ public:
 
     //DebugPrintf("%s: T=%s type=%d\n", __FUNCTION__, logicalTimeToString(logicalTime).c_str(), commitType);
     SharedPtr<CommitLowerBoundTimeStampMessage> request;
-    request = new CommitLowerBoundTimeStampMessage;
+    request = MakeShared<CommitLowerBoundTimeStampMessage>();
     request->setFederationHandle(ambassador.getFederate()->getFederationHandle());
     request->setFederateHandle(ambassador.getFederate()->getFederateHandle());
     request->setTimeStamp(_logicalTimeFactory.encodeLogicalTime(logicalTime));
@@ -986,7 +986,7 @@ public:
     OpenRTIAssert(_federateLowerBoundMap.getFederateIsInNextMessageModeForAssert(federateHandle));
 
     SharedPtr<CommitLowerBoundTimeStampResponseMessage> request;
-    request = new CommitLowerBoundTimeStampResponseMessage;
+    request = MakeShared<CommitLowerBoundTimeStampResponseMessage>();
     request->setFederationHandle(ambassador.getFederate()->getFederationHandle());
     request->setFederateHandle(federateHandle);
     request->setCommitId(commitId);
@@ -999,7 +999,7 @@ public:
   void _sendLockedByNextMessageRequest(InternalAmbassador& ambassador, bool lockedByNextMessage)
   {
     SharedPtr<LockedByNextMessageRequestMessage> request;
-    request = new LockedByNextMessageRequestMessage;
+    request = MakeShared<LockedByNextMessageRequestMessage>();
     request->setFederationHandle(ambassador.getFederate()->getFederationHandle());
     request->setLockedByNextMessage(lockedByNextMessage);
     request->setSendingFederateHandle(ambassador.getFederate()->getFederateHandle());
@@ -1126,7 +1126,7 @@ public:
     while (i != _objectInstanceHandleMessageListElementMap.end() && i->getObjectInstanceHandle() == objectInstanceHandle) {
       _MessageListElement& messageListElement = *i++;
       messageListElement.unlink();
-      messageListElement._message.clear();
+      messageListElement._message.reset();
       _messageListPool.push_back(messageListElement);
     }
   }
@@ -1174,7 +1174,6 @@ public:
       }
       if (!_timeStampOrderMessagesPermitted())
         break;
-
       _MessageListElement& messageListElement = _logicalTimeMessageListMap.begin()->second.front();
       messageListElement.unlink();
       SharedPtr<const AbstractMessage> message;
@@ -1212,12 +1211,12 @@ public:
     }
     return false;
   }
-    
+
   virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) override
   {
     _notificationHandle = h;
     if (_notificationHandle != nullptr)
-    {  
+    {
       bool havePendingMessages = false;
       if (!_receiveOrderMessages.empty())
       {

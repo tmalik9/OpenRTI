@@ -48,8 +48,8 @@ SocketServerAcceptEvent::read(SocketEventDispatcher& dispatcher)
 
   /// IDEA: peek into the read data to see if this is an OpenRTI or a HTTP request
 
-  SharedPtr<ProtocolSocketEvent> protocolSocketEvent = new ProtocolSocketEvent(s);
-  protocolSocketEvent->setProtocolLayer(new InitialServerStreamProtocol(_abstractServer));
+  SharedPtr<ProtocolSocketEvent> protocolSocketEvent = MakeShared<ProtocolSocketEvent>(s);
+  protocolSocketEvent->setProtocolLayer(MakeShared<InitialServerStreamProtocol>(_abstractServer));
   dispatcher.insert(protocolSocketEvent);
 }
 

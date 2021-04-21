@@ -75,7 +75,7 @@ enum VBusType : int32_t
 typedef uint16_t          VAppChannelNumber;
 
 const VAppChannelNumber kChannelInvalid = ( VAppChannelNumber)YOU_MAY_USE_THIS_DEFINITION_FOR_CHANNEL_INVALID;
-const VAppChannelNumber kChannelWildcard = ( VAppChannelNumber)YOU_MAY_USE_THIS_DEFINITION_FOR_CHANNEL_WILDCARD;
+//const VAppChannelNumber kChannelWildcard = ( VAppChannelNumber)YOU_MAY_USE_THIS_DEFINITION_FOR_CHANNEL_WILDCARD;
 
 class VAppChannel
 {

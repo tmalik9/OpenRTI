@@ -47,7 +47,7 @@
 
 namespace OpenRTI {
 
-static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, std::istream& stream, const std::string& encoding)
+static void loadModule(OpenRTI::FOMStringModule2List& fomModuleList, std::istream& stream, const std::string& encoding)
 {
   try {
     fomModuleList.push_back(OpenRTI::FDD1516FileReader::read(stream, encoding));
@@ -61,7 +61,7 @@ static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, std::istream
 // declaration of 'stream' hides previous local declaration
 # pragma warning(disable: 4456)
 
-static void loadModule(OpenRTI::FOMStringModuleList& fomModuleList, const std::wstring& fomModule)
+static void loadModule(OpenRTI::FOMStringModule2List& fomModuleList, const std::wstring& fomModule)
 {
   if (fomModule.empty())
     throw rti1516::CouldNotOpenFDD(L"Empty module.");
@@ -1434,7 +1434,7 @@ public:
       connectUrl.setPath(_defaultUrl.getPath());
 
     if (!isConnected()) {
-      Ambassador<RTI1516Traits>::connect(connectUrl, _stringStringListMap);
+      Ambassador<RTI1516Traits>::connect(connectUrl, _stringStringListMap, getConnectWaitTimeoutMilliSeconds());
 
       _connectedUrl = connectUrl;;
     } else if (_connectedUrl != connectUrl) {
@@ -1466,7 +1466,7 @@ RTIambassadorImplementation::createFederationExecution(std::wstring const & fede
                                                        std::wstring const & fullPathNameToTheFDDfile,
                                                        std::wstring const & logicalTimeImplementationName)
 {
-  OpenRTI::FOMStringModuleList fomModuleList;
+  OpenRTI::FOMStringModule2List fomModuleList;
   loadModule(fomModuleList, fullPathNameToTheFDDfile);
 
   try {
@@ -1514,7 +1514,7 @@ RTIambassadorImplementation::joinFederationExecution(std::wstring const & federa
 
     FederateHandle federateHandle = _ambassadorInterface->joinFederationExecution(std::string(), ucsToUtf8(federateType),
                                                                                   getFilePart(url.getPath()),
-                                                                                  OpenRTI::FOMStringModuleList());
+                                                                                  OpenRTI::FOMStringModule2List());
     return OpenRTI::_O1516FederateHandle(federateHandle);
   } catch (const OpenRTI::CouldNotCreateLogicalTimeFactory& e) {
     throw rti1516::CouldNotCreateLogicalTimeFactory(OpenRTI::utf8ToUcs(e.what()));

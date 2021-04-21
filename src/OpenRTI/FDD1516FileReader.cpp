@@ -357,12 +357,12 @@ FDD1516FileReader::read(std::istream& stream, const std::string& encoding)
 {
   // Set up the fdd parser
   SharedPtr<XML::XMLReader> reader;
-  reader = new XML::ExpatXMLReader;
+  reader = MakeShared<XML::ExpatXMLReader>();
 
-  SharedPtr<FDD1516ContentHandler> contentHandler = new FDD1516ContentHandler;
-  reader->setContentHandler(contentHandler.get());
-  SharedPtr<DefaultErrorHandler> errorHandler = new DefaultErrorHandler;
-  reader->setErrorHandler(errorHandler.get());
+  SharedPtr<FDD1516ContentHandler> contentHandler = MakeShared<FDD1516ContentHandler>();
+  reader->setContentHandler(contentHandler);
+  SharedPtr<DefaultErrorHandler> errorHandler = MakeShared<DefaultErrorHandler>();
+  reader->setErrorHandler(errorHandler);
 
   reader->parse(stream, encoding);
 

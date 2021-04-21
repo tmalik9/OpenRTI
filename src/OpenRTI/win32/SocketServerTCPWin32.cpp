@@ -137,7 +137,7 @@ SocketServerTCP::accept()
   pd->wsaStartup();
   pd->_socket = fd;
   pd->_notificationEvent = notificationEvent;
-  return new SocketTCP(pd);
+  return SharedPtr<SocketStream>(new SocketTCP(pd)); 
 }
 
 SocketServerTCP::~SocketServerTCP()

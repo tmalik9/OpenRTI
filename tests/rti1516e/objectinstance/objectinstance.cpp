@@ -385,7 +385,7 @@ public:
     _foreignObjectInstanceHandles.erase(objectInstanceHandle);
   }
 
-
+  // this is the only virtual override actually required!
   virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, rti1516e::AttributeHandleValueMap const& attributeValues,
     rti1516e::VariableLengthData const&, rti1516e::OrderType, rti1516e::TransportationType, rti1516e::SupplementalReflectInfo) override
   {
@@ -399,41 +399,41 @@ public:
   //  _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
   //}
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
-                                      const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                      const rti1516e::RegionHandleSet&)
-  {
-    _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
-  }
+  //virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
+  //                                    const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
+  //                                    const rti1516e::RegionHandleSet&)
+  //{
+  //  _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
+  //}
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
-                                      const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                      const rti1516e::LogicalTime&, rti1516e::OrderType)
-  {
-    _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
-  }
+  //virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
+  //                                    const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
+  //                                    const rti1516e::LogicalTime&, rti1516e::OrderType)
+  //{
+  //  _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
+  //}
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
-                                      const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                      const rti1516e::LogicalTime&, rti1516e::OrderType, const rti1516e::RegionHandleSet&)
-  {
-    _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
-  }
+  //virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
+  //                                    const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
+  //                                    const rti1516e::LogicalTime&, rti1516e::OrderType, const rti1516e::RegionHandleSet&)
+  //{
+  //  _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
+  //}
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
-                                      const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                      const rti1516e::LogicalTime&, rti1516e::OrderType, rti1516e::MessageRetractionHandle)
-  {
-    _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
-  }
+  //virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
+  //                                    const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
+  //                                    const rti1516e::LogicalTime&, rti1516e::OrderType, rti1516e::MessageRetractionHandle)
+  //{
+  //  _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
+  //}
 
-  virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
-                                      const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
-                                      const rti1516e::LogicalTime&, rti1516e::OrderType, rti1516e::MessageRetractionHandle,
-                                      const rti1516e::RegionHandleSet&)
-  {
-    _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
-  }
+  //virtual void reflectAttributeValues(rti1516e::ObjectInstanceHandle objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues,
+  //                                    const rti1516e::VariableLengthData&, rti1516e::OrderType, rti1516e::TransportationType,
+  //                                    const rti1516e::LogicalTime&, rti1516e::OrderType, rti1516e::MessageRetractionHandle,
+  //                                    const rti1516e::RegionHandleSet&)
+  //{
+  //  _checkReflectedAttributeValues(objectInstanceHandle, attributeValues);
+  //}
 
   void _checkReflectedAttributeValues(const rti1516e::ObjectInstanceHandle& objectInstanceHandle, const rti1516e::AttributeHandleValueMap& attributeValues)
   {
@@ -487,9 +487,9 @@ public:
   Test(int argc, const char* const argv[]) :
     RTITest(argc, argv, false)
   { }
-  virtual Ambassador* createAmbassador(const ConstructorArgs& constructorArgs) override
+  virtual SharedPtr<Ambassador> createAmbassador(const ConstructorArgs& constructorArgs) override
   {
-    return new TestAmbassador(constructorArgs);
+    return MakeShared<TestAmbassador>(constructorArgs);
   }
 };
 

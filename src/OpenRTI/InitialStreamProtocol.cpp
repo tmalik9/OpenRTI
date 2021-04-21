@@ -249,7 +249,7 @@ InitialStreamProtocol::activateFollowupProtocol(AbstractProtocolSocket& protocol
     return;
   if (_followupProtocol.valid()) {
     protocolSocket.replaceProtocol(_followupProtocol);
-    _followupProtocol = 0;
+    _followupProtocol.reset();
   } else {
     // Ok, if we have no followup, there must be an error, so close.
     // FIXME throw????

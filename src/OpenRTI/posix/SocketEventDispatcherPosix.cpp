@@ -117,7 +117,7 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
 
             if (pfd.events) {
               _fdVector.push_back(pfd);
-              _socketEventVector.push_back(socketEvent);
+              _socketEventVector.push_back(SharedPtr<AbstractSocketEvent>(socketEvent));
             }
           }
         }

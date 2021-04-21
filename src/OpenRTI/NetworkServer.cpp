@@ -52,7 +52,7 @@
 namespace OpenRTI {
 
 NetworkServer::NetworkServer() :
-  AbstractServer(new ServerNode)
+  AbstractServer(MakeShared<ServerNode>())
 {
 }
 
@@ -103,12 +103,12 @@ NetworkServer::setUpFromConfig(std::istream& stream)
 {
   // Set up the config file parser
   SharedPtr<XML::XMLReader> reader;
-  reader = new XML::ExpatXMLReader;
+  reader = MakeShared<XML::ExpatXMLReader>();
 
-  SharedPtr<ServerConfigContentHandler> contentHandler = new ServerConfigContentHandler;
-  reader->setContentHandler(contentHandler.get());
-  SharedPtr<DefaultErrorHandler> errorHandler = new DefaultErrorHandler;
-  reader->setErrorHandler(errorHandler.get());
+  SharedPtr<ServerConfigContentHandler> contentHandler = MakeShared<ServerConfigContentHandler>();
+  reader->setContentHandler(contentHandler);
+  SharedPtr<DefaultErrorHandler> errorHandler = MakeShared<DefaultErrorHandler>();
+  reader->setErrorHandler(errorHandler);
 
   reader->parse(stream, "UTF-8");
 
@@ -185,21 +185,21 @@ NetworkServer::listenInet(const std::string& node, const std::string& service, i
 SocketAddress
 NetworkServer::listenInet(const SocketAddress& socketAddress, int backlog)
 {
-  SharedPtr<SocketServerTCP> socket = new SocketServerTCP;
+  SharedPtr<SocketServerTCP> socket = MakeShared<SocketServerTCP>();
   socket->bind(socketAddress);
   socket->listen(backlog);
   SocketAddress boundAddress = socket->getsockname();
-  _dispatcher.insert(new SocketServerAcceptEvent(socket, *this));
+  _dispatcher.insert(MakeShared<SocketServerAcceptEvent>(socket, *this));
   return boundAddress;
 }
 
 void
 NetworkServer::listenPipe(const std::string& address, int backlog)
 {
-  SharedPtr<SocketServerPipe> socket = new SocketServerPipe();
+  SharedPtr<SocketServerPipe> socket = MakeShared<SocketServerPipe>();
   socket->bind(address);
   socket->listen(backlog);
-  _dispatcher.insert(new SocketServerAcceptEvent(socket, *this));
+  _dispatcher.insert(MakeShared<SocketServerAcceptEvent>(socket, *this));
 }
 
 void
@@ -248,7 +248,7 @@ NetworkServer::connectParentInetServer(const std::string& host, const std::strin
 void
 NetworkServer::connectParentInetServer(const SocketAddress& socketAddress, bool compress, const AbsTimeout& timeout)
 {
-  SharedPtr<SocketTCP> socketStream = new SocketTCP;
+  SharedPtr<SocketTCP> socketStream = MakeShared<SocketTCP>();
   socketStream->connect(socketAddress);
   connectParentStreamServer(socketStream, timeout, compress);
 }
@@ -257,7 +257,7 @@ void
 NetworkServer::connectParentPipeServer(const std::string& name, const AbsTimeout& timeout)
 {
   // Try to connect to a pipe socket
-  SharedPtr<SocketPipe> socketStream = new SocketPipe;
+  SharedPtr<SocketPipe> socketStream = MakeShared<SocketPipe>();
   socketStream->connect(name);
 
   connectParentStreamServer(socketStream, timeout, false);
@@ -277,8 +277,8 @@ NetworkServer::connectParentStreamServer(const SharedPtr<SocketStream>& socketSt
   }
 
   // Set up the protocol and socket events for connection startup
-  SharedPtr<ProtocolSocketEvent> protocolSocketEvent = new ProtocolSocketEvent(socketStream);
-  SharedPtr<InitialClientStreamProtocol> clientStreamProtocol = new InitialClientStreamProtocol(*this, connectOptions);
+  SharedPtr<ProtocolSocketEvent> protocolSocketEvent = MakeShared<ProtocolSocketEvent>(socketStream);
+  SharedPtr<InitialClientStreamProtocol> clientStreamProtocol = MakeShared<InitialClientStreamProtocol>(*this, connectOptions);
   protocolSocketEvent->setProtocolLayer(clientStreamProtocol);
   _dispatcher.insert(protocolSocketEvent);
 

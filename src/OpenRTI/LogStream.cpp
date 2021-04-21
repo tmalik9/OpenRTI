@@ -60,7 +60,7 @@ public:
   };
   static SharedPtr<ReferencedMutex>& getReferencedMutex()
   {
-    static SharedPtr<ReferencedMutex> referencedMutex = new ReferencedMutex;
+    static SharedPtr<ReferencedMutex> referencedMutex = MakeShared<ReferencedMutex>();
     return referencedMutex;
   }
 

@@ -15,3 +15,4 @@ endif()
 
 add_subdirectory(TimeConstrainedFederate)
 add_subdirectory(TimeRegulatingFederate)
+add_subdirectory(ImmediateCallbackFederate)

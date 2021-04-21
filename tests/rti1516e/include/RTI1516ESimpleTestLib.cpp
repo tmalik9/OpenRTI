@@ -6,6 +6,8 @@
 #include "dprintf.h"
 #include <cassert>
 #include "RTI/encoding/BasicDataElements.h"
+#include <thread>
+#include <chrono>
 
 using namespace rti1516e;
 
@@ -133,8 +135,6 @@ rti1516e::VariableLengthData toVariableLengthData(const wchar_t* s)
 /////////////////////// class SimpleTestFederate   ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-static const wchar_t kFederateType[] = L"Example";
-
 SimpleTestFederate::SimpleTestFederate()
   : _done(false)
 {
@@ -222,7 +222,7 @@ void SimpleTestFederate::join(const std::string& address, const std::string& fed
     HLAfloat64Interval lookahead(federateLookahead);
     mRtiAmb->enableTimeRegulation(lookahead);
     /// wait for callback
-    while (isRegulating == false)
+    while (isRegulating == false && !_done)
     {
       mRtiAmb->evokeCallback(12.0);
     }
@@ -235,7 +235,7 @@ void SimpleTestFederate::join(const std::string& address, const std::string& fed
     /////////////////////////////
     mRtiAmb->enableTimeConstrained();
     /// wait for callback
-    while (isConstrained == false)
+    while (isConstrained == false && !_done)
     {
       mRtiAmb->evokeCallback(12.0);
     }
@@ -259,7 +259,7 @@ void SimpleTestFederate::join(const std::string& address, const std::string& fed
   waitForUser("INITIALIZED");
   mRtiAmb->synchronizationPointAchieved(INITIALIZED);
   std::wcout << L"Achieved sync point: " << INITIALIZED << L", waiting for federation..." << std::endl;
-  while (_syncedInitialized == false)
+  while (_syncedInitialized == false && !_done)
   {
     mRtiAmb->evokeCallback(12.0);
   }
@@ -276,25 +276,27 @@ void SimpleTestFederate::join(const std::string& address, const std::string& fed
   /// until the federation has synchronized on
   mRtiAmb->synchronizationPointAchieved(READY_TO_RUN);
   std::wcout << L"Achieved sync point: " << READY_TO_RUN << L", waiting for federation..." << std::endl;
-  while (_syncedReadyToRun == false)
+  while (_syncedReadyToRun == false && !_done)
   {
     mRtiAmb->evokeCallback(12.0);
   }
 }
 
 
-void SimpleTestFederate::run(unsigned int stepMs)
+void SimpleTestFederate::run(std::chrono::milliseconds stepMs)
 {
   //mRtiAmb->setNotificationHandle(mHandle.get());
   std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
-  std::chrono::milliseconds stepDuration(stepMs);
-  double evokeSeconds = 0.01;
+  stepDuration = stepMs;
   while (!_done)
   {
     std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+    auto realDuration = currentTime - lastTime;
     while (currentTime - lastTime < stepDuration)
     {
-      mRtiAmb->evokeCallback(evokeSeconds);
+      std::chrono::duration<double> evokeSeconds = stepDuration - realDuration;
+      //std::cout << "evoke(" << evokeSeconds.count() << ")" << std::endl;
+      mRtiAmb->evokeCallback(evokeSeconds.count());
       currentTime = std::chrono::steady_clock::now();
     }
     step();
@@ -361,7 +363,7 @@ void SimpleTestFederate::advanceTime(double timestep)
   mRtiAmb->timeAdvanceRequest(newTime);
   /// wait for the time advance to be granted. ticking will tell the
   /// LRC to start delivering callbacks to the federate
-  while (isAdvancing)
+  while (isAdvancing && !_done)
   {
 #ifdef _WIN32
     DWORD waitResult = WaitForSingleObject(mHandle->mHandle, 200);
@@ -369,10 +371,8 @@ void SimpleTestFederate::advanceTime(double timestep)
     {
       case WAIT_OBJECT_0:
         //printf("%s: TID=%d: handle triggered\n", __FUNCTION__, ::GetCurrentThreadId());
-        while (mRtiAmb->evokeCallback(0.001))
-        {
-          printf("%s: TID=%d: callbacks evoked\n", __FUNCTION__, ::GetCurrentThreadId());
-        }
+        while (mRtiAmb->evokeCallback(0))
+          ;
         break;
       case WAIT_TIMEOUT:
         printf("%s: TID=%d: timeout\n", __FUNCTION__, ::GetCurrentThreadId());
@@ -469,21 +469,21 @@ void SimpleTestFederate::timeRegulationEnabled(LogicalTime const& theFederateTim
 {
   isRegulating = true;
   federateTime = convertTime(theFederateTime);
-  printf("timeRegulationEnabled(%.9f)\n", federateTime);
+  std::cout << "[TID=" << std::this_thread::get_id() << "] timeRegulationEnabled=" << to_string(theFederateTime.toString()) << std::endl;
 }
 
 void SimpleTestFederate::timeConstrainedEnabled(LogicalTime const& theFederateTime)
 {
   isConstrained = true;
   federateTime = convertTime(theFederateTime);
-  printf("timeConstrainedEnabled(%.9f)\n", federateTime);
+  std::cout << "[TID=" << std::this_thread::get_id() << "] timeConstrainedEnabled=" << to_string(theFederateTime.toString()) << std::endl;
 }
 
 void SimpleTestFederate::timeAdvanceGrant(LogicalTime const& theTime)
 {
   isAdvancing = false;
   federateTime = convertTime(theTime);
-  printf("timeAdvanceGrant(%.9f)\n", federateTime);
+  std::cout << "[TID=" << std::this_thread::get_id() << "] timeAdvanceGrant=" << to_string(theTime.toString()) << std::endl;
 }
 
 //                                 //
@@ -498,14 +498,17 @@ void SimpleTestFederate::reflectAttributeValues(
   SupplementalReflectInfo theReflectInfo)
 {
   ObjectClassHandle theObjectClass = mRtiAmb->getKnownObjectClassHandle(theObject);
-  printf("%s: instance=%ls class=%ls sentOrder=%s", __FUNCTION__, 
-              mRtiAmb->getObjectInstanceName(theObject).c_str(),
-              mRtiAmb->getObjectClassName(theObjectClass).c_str(),
-              to_string(sentOrder).c_str());
-  for (auto attr : theAttributeValues)
+  std::cout << "[TID=" << std::this_thread::get_id() << "] " << __FUNCTION__ << ":"
+    << " instance=" << to_string(mRtiAmb->getObjectInstanceName(theObject))
+    << " class=" << to_string(mRtiAmb->getObjectClassName(theObjectClass))
+    << " sentOrder=" << to_string(sentOrder)
+    << std::endl;
+  if (_printVerbose)
   {
-    std::wstring strData(static_cast<const wchar_t*>(attr.second.data()), attr.second.size() / sizeof(wchar_t));
-    printf("    attribute=%ls value=%ls", mRtiAmb->getAttributeName(theObjectClass, attr.first).c_str(), strData.c_str());
+    for (auto attr : theAttributeValues)
+    {
+      std::wcout << L"    attribute=" << mRtiAmb->getAttributeName(theObjectClass, attr.first) << std::endl;
+    }
   }
 }
 
@@ -520,15 +523,19 @@ void SimpleTestFederate::reflectAttributeValues(
   SupplementalReflectInfo theReflectInfo)
 {
   ObjectClassHandle theObjectClass = mRtiAmb->getKnownObjectClassHandle(theObject);
-  printf("%s: instance=%ls class=%ls time=%ls sentOrder=%s receiveOrder=%s", __FUNCTION__, 
-              mRtiAmb->getObjectInstanceName(theObject).c_str(),
-              mRtiAmb->getObjectClassName(theObjectClass).c_str(),
-              theTime.toString().c_str(),
-              to_string(sentOrder).c_str(),
-              to_string(receivedOrder).c_str());
-  for (auto attr : theAttributeValues)
+  std::cout << "[TID=" << std::this_thread::get_id() << "] " << __FUNCTION__ << ":"
+    << " instance=" << to_string(mRtiAmb->getObjectInstanceName(theObject))
+    << ", class=" << to_string(mRtiAmb->getObjectClassName(theObjectClass))
+    << ", sentOrder=" << to_string(sentOrder)
+    << ", receivedOrder=" << to_string(receivedOrder)
+    << ", time=" << to_string(theTime.toString())
+    << std::endl;
+  if (_printVerbose)
   {
-    printf("    attribute=%ls", mRtiAmb->getAttributeName(theObjectClass, attr.first).c_str());
+    for (auto attr : theAttributeValues)
+    {
+      std::wcout << L"    attribute=" << mRtiAmb->getAttributeName(theObjectClass, attr.first) << std::endl;
+    }
   }
 }
 
@@ -543,25 +550,24 @@ void SimpleTestFederate::receiveInteraction(
   TransportationType theType,
   SupplementalReceiveInfo theReceiveInfo)
 {
-  std::wcout << L"Interaction Received:";
-  /// print the handle
-  std::wcout << " handle=" << theInteraction;
-  /// print the tag
-  // std::wstring data = variableLengthDataToWstring(theUserSuppliedTag);
-  //std::wcout << ", tag=\"" << data << "\"";
-  /// print the attribute information
-  std::wcout << ", parameterCount=" << theParameterValues.size();
-  std::wcout << ", sentOrder=" << sentOrder << std::endl;
-  for (ParameterHandleValueMap::const_iterator i = theParameterValues.begin();
-    i != theParameterValues.end(); i++)
+  std::cout << "[TID=" << std::this_thread::get_id() << "] " << __FUNCTION__ << ":"
+    << " interactionClass=" << to_string(mRtiAmb->getInteractionClassName(theInteraction))
+    << ", parameterCount=" << theParameterValues.size()
+    << ", sentOrder=" << to_string(sentOrder)
+    << std::endl;
+  if (_printVerbose)
   {
-    /// print the parameter handle
-    std::wcout << L"\tparamHandle=" << i->first;
-    std::wcout << L"\tdataType=" << mRtiAmb->getParameterDataType(theInteraction, i->first);
-    /// print the parameter value
-    //std::wstring value = variableLengthDataToWstring(i->second);
-    //std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
-    std::wcout << std::endl;
+    for (ParameterHandleValueMap::const_iterator i = theParameterValues.begin();
+      i != theParameterValues.end(); i++)
+    {
+      /// print the parameter handle
+      std::wcout << L"\tparamHandle=" << i->first;
+      std::wcout << L"\tdataType=" << mRtiAmb->getParameterDataType(theInteraction, i->first);
+      /// print the parameter value
+      //std::wstring value = variableLengthDataToWstring(i->second);
+      //std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
+      std::wcout << std::endl;
+    }
   }
 }
 
@@ -575,28 +581,26 @@ void SimpleTestFederate::receiveInteraction(
   OrderType receivedOrder,
   SupplementalReceiveInfo theReceiveInfo)
 {
-  std::wcout << L"Interaction Received:";
-  /// print the handle
-  std::wcout << " handle=" << theInteraction;
-  /// print the tag
-  // std::wstring data = variableLengthDataToWstring(theUserSuppliedTag);
-  //std::wcout << ", tag=\"" << data << "\"";
-  /// print the attribute information
-  std::wcout << ", parameterCount=" << theParameterValues.size();
-  std::wcout << ", theTime=" << theTime.toString();
-  std::wcout << ", sentOrder=" << sentOrder;
-  std::wcout << ", receivedOrder=" << receivedOrder;
-  std::wcout << std::endl;
-  for (ParameterHandleValueMap::const_iterator i = theParameterValues.begin();
-    i != theParameterValues.end(); i++)
+  std::cout << "[TID=" << std::this_thread::get_id() << "] " << __FUNCTION__ << ":"
+    << " interactionClass=" << to_string(mRtiAmb->getInteractionClassName(theInteraction))
+    << ", parameterCount=" << theParameterValues.size()
+    << ", sentOrder=" << to_string(sentOrder)
+    << ", receivedOrder=" << to_string(receivedOrder)
+    << ", time=" << to_string(theTime.toString())
+    << std::endl;
+  if (_printVerbose)
   {
-    /// print the parameter handle
-    std::wcout << "\tparamHandle=" << i->first;
-    std::wcout << L"\tdataType=" << mRtiAmb->getParameterDataType(theInteraction, i->first);
-    /// print the parameter value
-    //std::wstring value = variableLengthDataToWstring(i->second);
-    //std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
-    std::wcout << std::endl;
+    for (ParameterHandleValueMap::const_iterator i = theParameterValues.begin();
+      i != theParameterValues.end(); i++)
+    {
+      /// print the parameter handle
+      std::wcout << "\tparamHandle=" << i->first;
+      std::wcout << L"\tdataType=" << mRtiAmb->getParameterDataType(theInteraction, i->first);
+      /// print the parameter value
+      //std::wstring value = variableLengthDataToWstring(i->second);
+      //std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
+      std::wcout << std::endl;
+    }
   }
 }
 
@@ -611,29 +615,27 @@ void SimpleTestFederate::receiveInteraction(
   MessageRetractionHandle theMessageRetractionHandle,
   SupplementalReceiveInfo theReceiveInfo)
 {
-  std::wcout << L"Interaction Received:";
-  /// print the handle
-  std::wcout << " handle=" << theInteraction;
-  /// print the tag
-  // std::wstring data = variableLengthDataToWstring(theUserSuppliedTag);
-  //std::wcout << ", tag=\"" << data << "\"";
-  /// print the attribute information
-  std::wcout << ", parameterCount=" << theParameterValues.size();
-  std::wcout << ", theTime=" << theTime.toString();
-  std::wcout << ", sentOrder=" << sentOrder;
-  std::wcout << ", receivedOrder=" << receivedOrder;
-  std::wcout << ", theMessageRetractionHandle=" << theMessageRetractionHandle;
-  std::wcout << std::endl;
-  for (ParameterHandleValueMap::const_iterator i = theParameterValues.begin();
-    i != theParameterValues.end(); i++)
+  std::cout << "[TID=" << std::this_thread::get_id() << "] " << __FUNCTION__ << ":"
+    << " interactionClass=" << to_string(mRtiAmb->getInteractionClassName(theInteraction))
+    << ", parameterCount=" << theParameterValues.size()
+    << ", sentOrder=" << to_string(sentOrder)
+    << ", receivedOrder=" << to_string(receivedOrder)
+    << ", time=" << to_string(theTime.toString())
+    << ", theMessageRetractionHandle=" << to_string(theMessageRetractionHandle.toString())
+    << std::endl;
+  if (_printVerbose)
   {
-    /// print the parameter handle
-    std::wcout << L"\tparamHandle=" << i->first;
-    std::wcout << L"\tdataType=" << mRtiAmb->getParameterDataType(theInteraction, i->first);
-    /// print the parameter value
-    //std::wstring value = variableLengthDataToWstring(i->second);
-    //std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
-    std::wcout << std::endl;
+    for (ParameterHandleValueMap::const_iterator i = theParameterValues.begin();
+      i != theParameterValues.end(); i++)
+    {
+      /// print the parameter handle
+      std::wcout << L"\tparamHandle=" << i->first;
+      std::wcout << L"\tdataType=" << mRtiAmb->getParameterDataType(theInteraction, i->first);
+      /// print the parameter value
+      //std::wstring value = variableLengthDataToWstring(i->second);
+      //std::wcout << ", paramValue=\"" << value << L"\"" << std::endl;
+      std::wcout << std::endl;
+    }
   }
 }
 
@@ -650,10 +652,11 @@ void SimpleTestFederate::discoverObjectInstance(ObjectInstanceHandle theObject,
 {
   mDiscoveredObjectInstances.push_back(theObject);
 
-  printf("%s: instanceHandle=%ls class=%ls name=%ls", __FUNCTION__, 
-              theObject.toString().c_str(),
-              mRtiAmb->getObjectClassName(theObjectClass).c_str(),
-              theObjectInstanceName.c_str());
+  std::cout << "[TID=" << std::this_thread::get_id() << "] " << __FUNCTION__ << ":"
+    << " instance=" << to_string(mRtiAmb->getObjectInstanceName(theObject))
+    << " class=" << to_string(mRtiAmb->getObjectClassName(theObjectClass))
+    << " theObjectInstanceName=" << to_string(theObjectInstanceName)
+    << std::endl;
 }
 
 

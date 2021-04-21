@@ -69,12 +69,12 @@ typedef std::vector<VariableLengthData> VariableLengthDataVector;
 class OPENRTI_API VariableLengthData {
 public:
   VariableLengthData() noexcept :
-    _data(0),
+    _data(nullptr),
     _size(0),
     _offset(0)
   { }
   VariableLengthData(size_t size) :
-    _data(0),
+    _data(nullptr),
     _size(size),
     _offset(0)
   { }
@@ -89,12 +89,12 @@ public:
   //   _offset(0)
   // { }
   VariableLengthData(const char* string) :
-    _data(0),
+    _data(nullptr),
     _size(0),
     _offset(0)
   { setData(string, std::strlen(string)); }
   VariableLengthData(const std::string& s) :
-    _data(0),
+    _data(nullptr),
     _size(0),
     _offset(0)
   { setData(s.c_str(), s.size()); }
@@ -118,7 +118,7 @@ public:
     _offset(value._offset + offset)
   { OpenRTIAssert(offset + size <= value.size()); }
   VariableLengthData(const VariableLengthDataList& variableLengthDataList) :
-    _data(0),
+    _data(nullptr),
     _size(0),
     _offset(0)
   {
@@ -265,7 +265,7 @@ public:
     } else {
       // If possible detach from the data element
       _offset = 0;
-      _data.clear();
+      _data.reset();
     }
   }
 
@@ -982,14 +982,14 @@ private:
     char _dummy[1];
   };
 
-  static Data* createOwnData(size_t capacity)
+  static SharedPtr<Data> createOwnData(size_t capacity)
   {
     void* data = alloc_new(capacity + sizeof(Data));
-    return placement_new<Data>(data, capacity);
+    return SharedPtr<Data>(placement_new<Data>(data, capacity));
   }
-  static Data* createExternalData(void *data)
+  static SharedPtr<Data> createExternalData(void *data)
   {
-    return new Data(data);
+    return MakeShared<Data>(data);
   }
 
   SharedPtr<Data> _data;

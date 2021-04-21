@@ -23,6 +23,7 @@
 #include "Export.h"
 #include "SharedPtr.h"
 #include "WeakReferenced.h"
+#include <string>
 
 namespace OpenRTI {
 
@@ -35,6 +36,8 @@ public:
   bool start();
   void wait();
 
+  void setName(const std::string& name) { _name = name; }
+  std::string getName() { return _name; }
 protected:
   virtual ~Thread() noexcept;
 
@@ -46,6 +49,7 @@ private:
 
   struct PrivateData;
   PrivateData* _privateData;
+  std::string _name;
 };
 
 } // namespace OpenRTI

@@ -80,7 +80,7 @@ public:
   {
     ScopeLock scopeLock(_mutex);
     if (_messageList.empty())
-      return 0;
+      return SharedPtr<const AbstractMessage>();
     SharedPtr<const AbstractMessage> message = _messageList.pop_front();
     //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
     return message;
@@ -94,10 +94,10 @@ public:
       if (!_messageList.empty())
         break;
       if (_isClosed)
-        return 0;
+        return SharedPtr<const AbstractMessage>();
       // Timeout was hit
       if (!signaledOrSpurious)
-        return 0;
+        return SharedPtr<const AbstractMessage>();
     }
     SharedPtr<const AbstractMessage> message = _messageList.pop_front();
     //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());

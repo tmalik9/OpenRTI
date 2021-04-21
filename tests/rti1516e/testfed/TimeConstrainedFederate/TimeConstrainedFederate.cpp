@@ -24,6 +24,7 @@ using std::endl;
 
 TimeConstrainedFederate::TimeConstrainedFederate() : SimpleTestFederate()
 {
+  setPrintVerbose(false);
 }
 
 TimeConstrainedFederate::~TimeConstrainedFederate()
@@ -32,22 +33,20 @@ TimeConstrainedFederate::~TimeConstrainedFederate()
 
 void TimeConstrainedFederate::step()
 {
-  /// 9.1 update the attribute values of the instance
+  /// update the attribute values of the instance
   //updateAttributeValues(myPublishedObject);
-  /// 9.2 send an interaction
+  /// send an interaction
   sendInteraction();
-  /// 9.3 request a time advance and wait until we get it
-  advanceTime(1.0);
+  /// request a time advance
+  advanceTime(std::chrono::duration<double>(getStepDuration()).count());
   //cout << "Time Advanced to " << fedamb->federateTime << endl;
 }
 
 
 void TimeConstrainedFederate::initializeSimulation()
 {
-  //InitializeObjects();
-  waitForUser("before subscribe");
+  InitializeObjects();
   InitializeInteraction();
-  waitForUser("after subscribe");
 #ifdef _WIN32
   setNotificationHandle();
 #endif
@@ -86,7 +85,7 @@ void TimeConstrainedFederate::InitializeInteraction()
   printf("subscribed to interaction %ls with filter %ls => %ls\n",
          mRtiAmb->getInteractionClassName(this->x_InteractionClass).c_str(), mRtiAmb->getParameterName(this->x_InteractionClass, xa_Parameter).c_str(), decoded.get().c_str());
   mRtiAmb->subscribeInteractionClassWithFilter(this->x_InteractionClass, filter);
-  mRtiAmb->setInteractionClassDeliverToSelf(this->x_InteractionClass, true);
+  //mRtiAmb->setInteractionClassDeliverToSelf(this->x_InteractionClass, true);
 }
 
 void TimeConstrainedFederate::InitializeObjects()

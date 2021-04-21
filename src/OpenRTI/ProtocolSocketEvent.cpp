@@ -72,7 +72,7 @@ struct OPENRTI_LOCAL ProtocolSocketEvent::ProtocolSocket : public AbstractProtoc
     if (!_replacingProtocol.valid())
       return;
     _protocolLayer.swap(_replacingProtocol);
-    _replacingProtocol = 0;
+    _replacingProtocol.reset();
   }
 
   SharedPtr<SocketStream> _socketStream;
@@ -105,7 +105,7 @@ ProtocolSocketEvent::read(SocketEventDispatcher& dispatcher)
       ret = _protocolSocket->_socketStream->recv(BufferRange(buffer.byte_begin(), buffer.byte_end()), false);
     } while (0 < ret);
     if (ret == 0) {
-      dispatcher.erase(this);
+      dispatcher.erase(SharedPtr<ProtocolSocketEvent>(this));
     }
   }
 }

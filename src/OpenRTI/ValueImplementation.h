@@ -29,7 +29,7 @@
     ValueImpl(const ValueType& value) :                                 \
       _value(value)                                                     \
     {                                                                   \
-      OpenRTI::Referenced::get(this);                                   \
+      OpenRTI::Referenced::incRef(this);                                \
     }                                                                   \
                                                                         \
     static bool                                                         \
@@ -41,7 +41,7 @@
     {                                                                   \
       if (!useImplementationClass())                                    \
         return;                                                         \
-      if (OpenRTI::Referenced::put(impl))                               \
+      if (OpenRTI::Referenced::decRef(impl))                            \
         return;                                                         \
       delete impl;                                                      \
     }                                                                   \
@@ -50,7 +50,7 @@
     {                                                                   \
       if (!useImplementationClass())                                    \
         return;                                                         \
-      OpenRTI::Referenced::get(impl);                                   \
+      OpenRTI::Referenced::incRef(impl);                                \
     }                                                                   \
                                                                         \
     /* Value accessors */                                               \

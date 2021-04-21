@@ -48,11 +48,10 @@ AbstractServer::_Queue::empty() const
 void
 AbstractServer::_Queue::send(AbstractServer& serverLoop)
 {
-  for (_MessageConnectHandlePairList::iterator i = _messageConnectHandlePairList.begin();
-       i != _messageConnectHandlePairList.end(); ++i) {
-    if (i->first.valid()) {
-      serverLoop._sendMessage(*i);
-      i->first.clear();
+  for (auto& messageConnectHandlePair: _messageConnectHandlePairList) {
+    if (messageConnectHandlePair.first.valid()) {
+      serverLoop._sendMessage(messageConnectHandlePair);
+      messageConnectHandlePair.first.reset();
     } else {
       serverLoop._sendOperation(*_operationList.front());
       _operationList.pop_front();
@@ -109,8 +108,8 @@ AbstractServer::_Connect::~_Connect() noexcept
 {
   if (_messageSender.valid())
     _messageSender->close();
-  _messageSender.clear();
-  _messageReceiver.clear();
+  _messageSender.reset();
+  _messageReceiver.reset();
 }
 
 AbstractMessageSender*
@@ -149,7 +148,7 @@ AbstractServer::_OneWayConnect::~_OneWayConnect()
   if (_messageSender.valid())
     _messageSender->close();
   */
-  _messageSender.clear();
+  _messageSender.reset();
 }
 
 AbstractMessageSender*
@@ -350,7 +349,7 @@ AbstractServer::_SendingMessageSender::close() noexcept
   if (!_serverNode.valid())
     return;
   _serverNode->_eraseConnect(_connectHandle);
-  _serverNode = 0;
+  _serverNode.reset();
   _connectHandle = ConnectHandle();
 }
 
@@ -381,25 +380,25 @@ AbstractServer::getServerNode()
 SharedPtr<AbstractConnect>
 AbstractServer::postConnect(const StringStringListMap& clientOptions)
 {
-  SharedPtr<ThreadMessageQueue> messageQueue = new ThreadMessageQueue;
+  SharedPtr<ThreadMessageQueue> messageQueue = MakeShared<ThreadMessageQueue>();
   ConnectHandle connectHandle = _postConnect(messageQueue->getMessageSender(), clientOptions);
   if (!connectHandle.valid())
-    return 0;
+    return SharedPtr<AbstractConnect>();
   SharedPtr<AbstractMessageSender> messageSender;
-  messageSender = new _PostingMessageSender(this, connectHandle);
-  return new _Connect(messageSender, messageQueue);
+  messageSender = MakeShared<_PostingMessageSender>(SharedPtr<AbstractServer>(this), connectHandle);
+  return MakeShared<_Connect>(messageSender, messageQueue);
 }
 
 SharedPtr<AbstractConnect>
 AbstractServer::sendConnect(const StringStringListMap& optionMap, bool parent)
 {
-  SharedPtr<LocalMessageQueue> messageQueue = new LocalMessageQueue;
-  ConnectHandle connectHandle = _sendConnect(messageQueue->getMessageSender(), optionMap, parent);
+  SharedPtr<LocalMessageQueue> messageQueue = MakeShared<LocalMessageQueue>();
+  ConnectHandle connectHandle = _sendConnect(SharedPtr<AbstractMessageSender>(messageQueue->getMessageSender()), optionMap, parent);
   if (!connectHandle.valid())
-    return 0;
+    return SharedPtr<AbstractConnect>();
   SharedPtr<AbstractMessageSender> messageSender;
-  messageSender = new _SendingMessageSender(&getServerNode(), connectHandle);
-  return new _Connect(messageSender, messageQueue);
+  messageSender = MakeShared<_SendingMessageSender>(SharedPtr<AbstractServerNode>(&getServerNode()), connectHandle);
+  return MakeShared<_Connect>(messageSender, messageQueue);
 }
 
 SharedPtr<AbstractConnect>
@@ -407,10 +406,10 @@ AbstractServer::sendDirectConnect(SharedPtr<AbstractMessageSender> sender, const
 {
   ConnectHandle connectHandle = getServerNode()._insertConnect(sender, optionMap);
   if (!connectHandle.valid())
-    return 0;
+    return SharedPtr<AbstractConnect>();
   SharedPtr<AbstractMessageSender> messageSender;
-  messageSender = new _SendingMessageSender(&getServerNode(), connectHandle);
-  return new _OneWayConnect(messageSender);
+  messageSender = MakeShared<_SendingMessageSender>(SharedPtr<AbstractServerNode>(&getServerNode()), connectHandle);
+  return MakeShared<_OneWayConnect>(messageSender);
 }
 
 ConnectHandle
@@ -465,7 +464,7 @@ ConnectHandle
 AbstractServer::_postConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& clientOptions)
 {
   SharedPtr<_ConnectOperation> connectOperation;
-  connectOperation = new _ConnectOperation(messageSender, clientOptions);
+  connectOperation = MakeShared<_ConnectOperation>(messageSender, clientOptions);
   _postOperation(connectOperation);
   connectOperation->wait();
   return connectOperation->getConnectHandle();
@@ -477,14 +476,14 @@ AbstractServer::_postDisconnect(const ConnectHandle& connectHandle)
   if (!connectHandle.valid())
     return;
   SharedPtr<_DisconnectOperation> disconnectOperation;
-  disconnectOperation = new _DisconnectOperation(connectHandle);
+  disconnectOperation = MakeShared<_DisconnectOperation>(connectHandle);
   _postOperation(disconnectOperation);
 }
 
 void
 AbstractServer::_postDone()
 {
-  _postOperation(new _DoneOperation());
+  _postOperation(MakeShared<_DoneOperation>());
 }
 
 } // namespace OpenRTI

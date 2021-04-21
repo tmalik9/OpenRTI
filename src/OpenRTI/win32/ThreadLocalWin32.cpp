@@ -63,7 +63,7 @@ AbstractThreadLocal::_Provider::~_Provider()
 
 SharedPtr<AbstractThreadLocal::_Provider>& AbstractThreadLocal::_Provider::GetInstance()
 {
-  static SharedPtr<AbstractThreadLocal::_Provider> _instance = new AbstractThreadLocal::_Provider;
+  static SharedPtr<AbstractThreadLocal::_Provider> _instance = MakeShared<AbstractThreadLocal::_Provider>();
   return _instance;
 }
 
@@ -149,7 +149,7 @@ AbstractThreadLocal::_set(AbstractThreadLocal::_AbstractData* abstractThreadLoca
 
 void AbstractThreadLocal::shutdown()
 {
-  _Provider::GetInstance().clear();
+  _Provider::GetInstance().reset();
 }
 
 } // namespace OpenRTI

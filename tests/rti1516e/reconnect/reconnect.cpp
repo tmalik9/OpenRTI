@@ -39,7 +39,7 @@ class Tester
   public:
     bool CreateServer()
     {
-      serverThread = new OpenRTI::ServerThread;
+      serverThread = OpenRTI::MakeShared<OpenRTI::ServerThread>();
       serverThread->setupServer("127.0.0.1", OpenRTI::SocketAddress(), false);
       listenAddress = serverThread->getAddress();
 

@@ -56,7 +56,7 @@ void
 AbstractMessageEncoding::error(const Exception& e)
 {
   /// FIXME!!!, just have a ConnectionClosed message. Depending on the server nodes state, it can decide what to do
-  SharedPtr<ConnectionLostMessage> message = new ConnectionLostMessage;
+  SharedPtr<ConnectionLostMessage> message = MakeShared<ConnectionLostMessage>();
   message->setFaultDescription(e.getReason());
   _connect->send(message);
   _connect->close();

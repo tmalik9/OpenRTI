@@ -58,7 +58,7 @@ public:
 
   void reset()
   {
-    _ptr.clear();
+    _ptr.reset();
     while (unsigned(_initialized) != 0) {
       _initialized.decFetch();
     }

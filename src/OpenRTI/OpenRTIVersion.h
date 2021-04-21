@@ -6,18 +6,18 @@
 #define OPENRTI_MAJOR_NUMBER_STRING      "1"
 
 // Minornumber of OPENRTI library
-#define OPENRTI_MINOR_NUMBER              6
-#define OPENRTI_MINOR_NUMBER_STRING      "6"
+#define OPENRTI_MINOR_NUMBER              7
+#define OPENRTI_MINOR_NUMBER_STRING      "7"
 
 // Buildnumber of OPENRTI library
 #define OPENRTI_BUILD_NUMBER              0
 #define OPENRTI_BUILD_NUMBER_STRING      "0"
 
 // Patchnumber of OPENRTI library
-#define OPENRTI_PATCH_NUMBER              10
-#define OPENRTI_PATCH_NUMBER_STRING      "10"
+#define OPENRTI_PATCH_NUMBER              0
+#define OPENRTI_PATCH_NUMBER_STRING      "0"
 
-#define YEAR_STRING                     "2020"
+#define YEAR_STRING                     "2021"
 
 // Product version
 #define OPENRTI_PRODUCT_VERSION          OPENRTI_MAJOR_NUMBER,OPENRTI_MINOR_NUMBER,0,0

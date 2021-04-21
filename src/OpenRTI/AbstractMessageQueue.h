@@ -37,12 +37,9 @@ namespace OpenRTI {
 class OPENRTI_LOCAL AbstractMessageQueue : public AbstractMessageReceiver {
 public:
   virtual ~AbstractMessageQueue() noexcept {}
-  //virtual SharedPtr<const AbstractMessage> receive() = 0;
-  //virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout) = 0;
-  //virtual bool isOpen() const = 0;
-
-  SharedPtr<AbstractMessageSender> getMessageSender()
-  { return MakeShared<MessageSender>(this); }
+  SharedPtr<AbstractMessageSender> getMessageSender() { 
+    return MakeShared<MessageSender>(this);
+  }
 
 protected:
   // FIXME may be only have const messages in delivery???
@@ -69,7 +66,7 @@ private:
       if (!_messageQueue.valid())
         return;
       _messageQueue->close();
-      _messageQueue = 0;
+      _messageQueue.reset();
     }
     AbstractServer* getServer() const override { return nullptr; }
   private:

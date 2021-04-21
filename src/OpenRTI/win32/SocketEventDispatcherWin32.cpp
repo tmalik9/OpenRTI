@@ -133,7 +133,7 @@ struct SocketEventDispatcher::PrivateData
             {
               // The socket has data to write, and hasn't been marked as blocking by a previous call to write -
               // jump right into write() again and restart the outer loop after having processed all sockets
-              dispatcher.write(socketEvent);
+              dispatcher.write(socketEventSP);
               doWait = false;
             }
             else
@@ -233,6 +233,13 @@ struct SocketEventDispatcher::PrivateData
                 DebugPrintf("%s: wsaError=%d\n", __FUNCTION__, WSAGetLastError());
                 return 0;
               }
+              if (networkEvents.lNetworkEvents & FD_CLOSE)
+              {
+                DebugPrintf("close %p\n", socketEvent->getSocket());
+                socketEvent->error(OpenRTI::ConnectionFailed("connection closed"));
+                dispatcher.erase(socketEvent);
+                continue;
+              }
               if (networkEvents.lNetworkEvents & FD_READ)
               {
                 dispatcher.read(socketEvent);
@@ -244,11 +251,6 @@ struct SocketEventDispatcher::PrivateData
               if (socketEvent->getSocket()->isWritable())
               {
                 dispatcher.write(socketEvent);
-              }
-              if (networkEvents.lNetworkEvents & FD_CLOSE)
-              {
-                socketEvent->error(OpenRTI::ConnectionFailed("connection closed"));
-                dispatcher.erase(socketEvent);
               }
               if (networkEvents.lNetworkEvents & FD_ACCEPT)
               {

@@ -24,6 +24,7 @@ using std::endl;
 
 TimeRegulatingFederate::TimeRegulatingFederate() : SimpleTestFederate()
 {
+  setPrintVerbose(false);
 }
 
 TimeRegulatingFederate::~TimeRegulatingFederate()
@@ -33,21 +34,19 @@ TimeRegulatingFederate::~TimeRegulatingFederate()
 
 void TimeRegulatingFederate::step()
 {
-  /// 9.1 update the attribute values of the instance
+  /// update the attribute values of the instance
   //updateAttributeValues(myPublishedObject);
-  /// 9.2 send an interaction
+  /// send an interaction
   sendInteraction();
-  /// 9.3 request a time advance and wait until we get it
-  advanceTime(1.0);
+  /// request a time advance
+  advanceTime(std::chrono::duration<double>(getStepDuration()).count());
   //cout << "Time Advanced to " << fedamb->federateTime << endl;
 }
 
 void TimeRegulatingFederate::initializeSimulation()
 {
   //InitializeObjects();
-  waitForUser("before publish");
   InitializeInteraction();
-  waitForUser("after publish");
 #ifdef _WIN32
   setNotificationHandle();
 #endif
@@ -76,7 +75,7 @@ void TimeRegulatingFederate::InitializeInteraction()
   /// we also want to receive other interaction of the same type that are
   /// sent out by other federates, so we have to subscribe to it first
   mRtiAmb->subscribeInteractionClass(this->x_InteractionClass);
-  mRtiAmb->setInteractionClassDeliverToSelf(this->x_InteractionClass, true);
+  //mRtiAmb->setInteractionClassDeliverToSelf(this->x_InteractionClass, true);
 }
 
 void TimeRegulatingFederate::InitializeObjects()

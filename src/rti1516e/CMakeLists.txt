@@ -5,7 +5,7 @@ set(RTI1516E_DATA_PATH ${OPENRTI_CMAKEROOTDIR}/share/rti1516e)
 # All the -I arguments
 include_directories(${RTI1516E_HEADER_PATH})
 # The OpenRTI implementation files and may be build generated sources
-include_directories(${CMAKE_BINARY_DIR}/src/OpenRTI)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/../OpenRTI)
 include_directories(${OPENRTI_CMAKEROOTDIR}/src/OpenRTI)
 
 include(CreateResource)
@@ -53,15 +53,15 @@ set(RTI1516E_PUBLIC_TIME_HEADERS
 )
 
 set(LIB_RTI1516E_SOURCES
-		Encoding.h
-		HandleFactory.cpp
-		HandleFactory.h
-		HandleImplementation.h
-		RTI1516ELogicalTimeFactory.h
-		RTI1516Efloat64TimeFactory.h
-		RTI1516Einteger64TimeFactory.h
-		RTIambassadorImplementation.h
-		VariableLengthDataImplementation.h
+        Encoding.h
+        HandleFactory.cpp
+        HandleFactory.h
+        HandleImplementation.h
+        RTI1516ELogicalTimeFactory.h
+        RTI1516Efloat64TimeFactory.h
+        RTI1516Einteger64TimeFactory.h
+        RTIambassadorImplementation.h
+        VariableLengthDataImplementation.h
         ../OpenRTI/dprintf.cpp
         ../OpenRTI/dprintf.h
         BasicDataElements.cpp
@@ -108,7 +108,7 @@ endif()
 if(MSVC)
   set(LIB_FEDTIME1516E_SOURCES
     LogicalTimeFactoryFactory.cpp
-	${RTI1516E_HEADER_PATH}/RTI/LogicalTimeFactory.h
+  ${RTI1516E_HEADER_PATH}/RTI/LogicalTimeFactory.h
   )
   set(LIB_FEDTIME1516E_RCFILES
     fedtime1516e.rc

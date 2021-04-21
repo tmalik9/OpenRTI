@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include <pthread.h>
 
-#include "../OpenRTIConfig.h"
+#include "OpenRTIConfig.h"
 #include "../Clock.h"
 #include "ClockPosix.h"
 

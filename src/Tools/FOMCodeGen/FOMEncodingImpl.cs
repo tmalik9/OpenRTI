@@ -231,7 +231,7 @@ foreach (var dataType in FOM.SortedDataTypes)
             
             #line default
             #line hidden
-            this.Write("\tm");
+            this.Write("  m");
             
             #line 58 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
@@ -245,7 +245,7 @@ foreach (var dataType in FOM.SortedDataTypes)
             
             #line default
             #line hidden
-            this.Write("\tm");
+            this.Write("  m");
             
             #line 60 "D:\vfs\CANoe\release\15\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));

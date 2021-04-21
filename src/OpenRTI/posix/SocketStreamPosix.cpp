@@ -228,7 +228,7 @@ SocketStream::getpeername() const
     throw TransportError(errnoToUtf8(errorNumber));
   }
 
-  SharedPtr<SocketAddress::PrivateData> privateData = SocketAddress::PrivateData::create(addrlen);
+  SharedPtr<SocketAddress::PrivateData> privateData = SharedPtr<SocketAddress::PrivateData>(SocketAddress::PrivateData::create(addrlen));
   struct sockaddr* sockaddr = SocketAddress::PrivateData::sockaddr(privateData.get());
   addrlen = SocketAddress::PrivateData::capacity(privateData.get());
   ret = ::getpeername(_privateData->_fd, sockaddr, &addrlen);

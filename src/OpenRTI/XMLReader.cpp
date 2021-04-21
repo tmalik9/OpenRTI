@@ -35,7 +35,7 @@ XMLReader::getContentHandler() const
 }
 
 void
-XMLReader::setContentHandler(ContentHandler* contentHandler)
+XMLReader::setContentHandler(const SharedPtr<ContentHandler>& contentHandler)
 {
   mContentHandler = contentHandler;
 }
@@ -48,7 +48,7 @@ XMLReader::getErrorHandler() const
 }
 
 void
-XMLReader::setErrorHandler(ErrorHandler* errorHandler)
+XMLReader::setErrorHandler(const SharedPtr<ErrorHandler>& errorHandler)
 {
   mErrorHandler = errorHandler;
 }

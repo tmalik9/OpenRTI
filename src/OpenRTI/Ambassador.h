@@ -53,8 +53,7 @@ public:
   typedef typename Traits::NativeLogicalTimeInterval NativeLogicalTimeInterval;
   static const uint32_t kInfinite = static_cast<uint32_t>(-1);
   Ambassador()
-    : _callbacksEnabled(true)
-    , _connectWaitTimeout(70 * 1000)
+    : _connectWaitTimeout(70 * 1000)
     , _operationWaitTimeout(70 * 1000)
   {
 
@@ -112,7 +111,7 @@ public:
     if (getProtocolVersion() == 8)
     {
       // The create request message
-      SharedPtr<CreateFederationExecutionRequestMessage> request = new CreateFederationExecutionRequestMessage;
+      SharedPtr<CreateFederationExecutionRequestMessage> request = MakeShared<CreateFederationExecutionRequestMessage>();
       request->setFederationExecution(federationExecutionName);
       request->setLogicalTimeFactoryName(logicalTimeFactoryName);
       request->setFOMStringModuleList(TranslateTypes::translate(fomModules));
@@ -123,7 +122,7 @@ public:
     else if (getProtocolVersion() == 9)
     {
       // The create request message
-      SharedPtr<CreateFederationExecutionRequest2Message> request = new CreateFederationExecutionRequest2Message;
+      SharedPtr<CreateFederationExecutionRequest2Message> request = MakeShared<CreateFederationExecutionRequest2Message>();
       request->setFederationExecution(federationExecutionName);
       request->setLogicalTimeFactoryName(logicalTimeFactoryName);
       request->setFOMStringModuleList(fomModules);
@@ -158,7 +157,7 @@ public:
                          federationExecutionName + std::string("\"."));
 
     // The destroy request message
-    SharedPtr<DestroyFederationExecutionRequestMessage> request = new DestroyFederationExecutionRequestMessage;
+    SharedPtr<DestroyFederationExecutionRequestMessage> request = MakeShared<DestroyFederationExecutionRequestMessage>();
     request->setFederationExecution(federationExecutionName);
 
 
@@ -173,6 +172,8 @@ public:
       throw FederatesCurrentlyJoined(federationExecutionName);
     if (responseType == DestroyFederationExecutionResponseFederationExecutionDoesNotExist)
       throw FederationExecutionDoesNotExist(federationExecutionName);
+    if (responseType == DestroyFederationExecutionResponseRTIinternalError)
+      throw NotConnected("disconnected while destroying federation execution");
     if (responseType != DestroyFederationExecutionResponseSuccess)
       throw RTIinternalError("Unspecified internal error FIXME");
   }
@@ -185,7 +186,7 @@ public:
       throw NotConnected();
 
     SharedPtr<EnumerateFederationExecutionsRequestMessage> request;
-    request = new EnumerateFederationExecutionsRequestMessage;
+    request = MakeShared<EnumerateFederationExecutionsRequestMessage>();
     send(request);
   }
 
@@ -231,27 +232,27 @@ public:
     response = dispatchWaitJoinFederationExecutionResponse(timeout, federateName);
     switch (response.first) {
     case JoinFederationExecutionResponseFederateNameAlreadyInUse:
-      _federate = 0;
+      _federate.reset();
       throw FederateNameAlreadyInUse(federateName);
       break;
     case JoinFederationExecutionResponseFederationExecutionDoesNotExist:
-      _federate = 0;
+      _federate.reset();
       throw FederationExecutionDoesNotExist(federationExecutionName);
       break;
     case JoinFederationExecutionResponseSaveInProgress:
-      _federate = 0;
+      _federate.reset();
       throw SaveInProgress();
       break;
     case JoinFederationExecutionResponseRestoreInProgress:
-      _federate = 0;
+      _federate.reset();
       throw RestoreInProgress();
       break;
     case JoinFederationExecutionResponseInconsistentFDD:
-      _federate = 0;
+      _federate.reset();
       throw InconsistentFDD(response.second);
       break;
     case JoinFederationExecutionResponseTimeout:
-      _federate = 0;
+      _federate.reset();
       throw OperationTimeout(response.second);
       break;
     default:
@@ -292,21 +293,21 @@ public:
       return;
 
     SharedPtr<ResignFederationExecutionLeafRequestMessage> resign;
-    resign = new ResignFederationExecutionLeafRequestMessage;
+    resign = MakeShared<ResignFederationExecutionLeafRequestMessage>();
     resign->setFederationHandle(getFederationHandle());
     resign->setFederateHandle(getFederateHandle());
     resign->setResignAction(resignAction);
     send(resign);
 
     // We should no longer respond to time regulation requests.
-    _timeManagement = 0;
+    _timeManagement.reset();
 
     Clock abstime = (_operationWaitTimeout == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(_operationWaitTimeout);
     AbsTimeout timeout(abstime);
     if (!dispatchWaitEraseFederationExecutionResponse(timeout))
       throw RTIinternalError("resignFederationExecution hit timeout!");
 
-    _federate = 0;
+    _federate.reset();
   }
 
 
@@ -324,7 +325,7 @@ public:
 
     // Tell all federates about that label
     SharedPtr<RegisterFederationSynchronizationPointMessage> message;
-    message = new RegisterFederationSynchronizationPointMessage;
+    message = MakeShared<RegisterFederationSynchronizationPointMessage>();
     message->setFederationHandle(getFederationHandle());
     message->setFederateHandle(getFederateHandle());
     message->setLabel(label);
@@ -350,7 +351,7 @@ public:
 
     // tell all federates about that label
     SharedPtr<SynchronizationPointAchievedMessage> message;
-    message = new SynchronizationPointAchievedMessage;
+    message = MakeShared<SynchronizationPointAchievedMessage>();
     message->setFederationHandle(getFederationHandle());
     message->getFederateHandleBoolPairVector().push_back(FederateHandleBoolPair(getFederateHandle(), successfully));
     message->setLabel(label);
@@ -570,7 +571,7 @@ public:
     if (attributeHandleVector.empty())
       return;
 
-    SharedPtr<ChangeObjectClassPublicationMessage> request = new ChangeObjectClassPublicationMessage;
+    SharedPtr<ChangeObjectClassPublicationMessage> request = MakeShared<ChangeObjectClassPublicationMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectClassHandle(objectClassHandle);
     request->setPublicationType(Published);
@@ -580,7 +581,7 @@ public:
     // Simple implementation only listening to the ambassadors own publication
     // see comment in enableObjectClassRelevanceAdvisorySwitch()
     if (objectClassFreshPublished && _federate->getObjectClassRelevanceAdvisorySwitchEnabled()) {
-      SharedPtr<RegistrationForObjectClassMessage> message = new RegistrationForObjectClassMessage;
+      SharedPtr<RegistrationForObjectClassMessage> message = MakeShared<RegistrationForObjectClassMessage>();
       message->setObjectClassHandle(objectClassHandle);
       message->setStart(true);
 
@@ -623,7 +624,7 @@ public:
     if (attributeHandleVector.empty())
       return;
 
-    SharedPtr<ChangeObjectClassPublicationMessage> request = new ChangeObjectClassPublicationMessage;
+    SharedPtr<ChangeObjectClassPublicationMessage> request = MakeShared<ChangeObjectClassPublicationMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectClassHandle(objectClassHandle);
     request->setPublicationType(Unpublished);
@@ -673,7 +674,7 @@ public:
     if (attributeHandleVector.empty())
       return;
 
-    SharedPtr<ChangeObjectClassPublicationMessage> request = new ChangeObjectClassPublicationMessage;
+    SharedPtr<ChangeObjectClassPublicationMessage> request = MakeShared<ChangeObjectClassPublicationMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectClassHandle(objectClassHandle);
     request->setPublicationType(Unpublished);
@@ -701,7 +702,7 @@ public:
     if (!interactionClass->setPublicationType(Published))
       return;
 
-    SharedPtr<ChangeInteractionClassPublicationMessage> request = new ChangeInteractionClassPublicationMessage;
+    SharedPtr<ChangeInteractionClassPublicationMessage> request = MakeShared<ChangeInteractionClassPublicationMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setInteractionClassHandle(interactionClassHandle);
     request->setPublicationType(Published);
@@ -711,7 +712,7 @@ public:
     // Simple implementation only listening to the ambassadors own publication
     // see comment in enableInteractionRelevanceAdvisorySwitch()
     if (_federate->getInteractionRelevanceAdvisorySwitchEnabled()) {
-      SharedPtr<TurnInteractionsOnMessage> message = new TurnInteractionsOnMessage;
+      SharedPtr<TurnInteractionsOnMessage> message = MakeShared<TurnInteractionsOnMessage>();
       message->setInteractionClassHandle(interactionClassHandle);
       message->setOn(true);
 
@@ -738,7 +739,7 @@ public:
     if (!interactionClass->setPublicationType(Unpublished))
       return;
 
-    SharedPtr<ChangeInteractionClassPublicationMessage> request = new ChangeInteractionClassPublicationMessage;
+    SharedPtr<ChangeInteractionClassPublicationMessage> request = MakeShared<ChangeInteractionClassPublicationMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setInteractionClassHandle(interactionClassHandle);
     request->setPublicationType(Unpublished);
@@ -811,7 +812,7 @@ public:
     if (attributeHandleVector.empty())
       return;
 
-    SharedPtr<ChangeObjectClassSubscriptionMessage> request = new ChangeObjectClassSubscriptionMessage;
+    SharedPtr<ChangeObjectClassSubscriptionMessage> request = MakeShared<ChangeObjectClassSubscriptionMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectClassHandle(objectClassHandle);
     request->getAttributeHandles().swap(attributeHandleVector);
@@ -853,7 +854,7 @@ public:
     if (attributeHandleVector.empty())
       return;
 
-    SharedPtr<ChangeObjectClassSubscriptionMessage> request = new ChangeObjectClassSubscriptionMessage;
+    SharedPtr<ChangeObjectClassSubscriptionMessage> request = MakeShared<ChangeObjectClassSubscriptionMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectClassHandle(objectClassHandle);
     request->setSubscriptionType(Unsubscribed);
@@ -911,7 +912,7 @@ public:
     if (attributeHandleVector.empty())
       return;
 
-    SharedPtr<ChangeObjectClassSubscriptionMessage> request = new ChangeObjectClassSubscriptionMessage;
+    SharedPtr<ChangeObjectClassSubscriptionMessage> request = MakeShared<ChangeObjectClassSubscriptionMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectClassHandle(objectClassHandle);
     request->setSubscriptionType(Unsubscribed);
@@ -963,7 +964,7 @@ public:
       //  objectInstance->getSubscriptionType() != Unsubscribed);
 
       // Tell all others this federate has unsubscribed the object instance
-      SharedPtr<ChangeObjectInstanceSubscriptionMessage> request = new ChangeObjectInstanceSubscriptionMessage;
+      SharedPtr<ChangeObjectInstanceSubscriptionMessage> request = MakeShared<ChangeObjectInstanceSubscriptionMessage>();
       request->setFederationHandle(getFederationHandle());
       request->setObjectClassHandle(objectClassHandle);
       request->setObjectInstanceHandle(objectInstanceHandle);
@@ -998,7 +999,7 @@ public:
     bool subscriptionChanged = interactionClass->setSubscriptionType(subscriptionType, ParameterValueVector());
     if (subscriptionChanged)
     {
-      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = MakeShared<ChangeInteractionClassSubscriptionMessage>();
       request->setFederationHandle(getFederationHandle());
       request->setInteractionClassHandle(interactionClassHandle);
       request->setSubscriptionType(subscriptionType);
@@ -1036,7 +1037,7 @@ public:
     if (subscriptionChanged)
     {
       // maybe we want to store parameter filters in the federate's InteractionClass as well.
-      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = MakeShared<ChangeInteractionClassSubscriptionMessage>();
       request->setFederationHandle(getFederationHandle());
       request->setInteractionClassHandle(interactionClassHandle);
       request->setSubscriptionType(subscriptionType);
@@ -1065,7 +1066,7 @@ public:
     bool subscriptionChanged = interactionClass->setSubscriptionType(Unsubscribed, ParameterValueVector());
     if (subscriptionChanged)
     {
-      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = MakeShared<ChangeInteractionClassSubscriptionMessage>();
       request->setFederationHandle(getFederationHandle());
       request->setInteractionClassHandle(interactionClassHandle);
       request->setSubscriptionType(Unsubscribed);
@@ -1094,7 +1095,7 @@ public:
     bool subscriptionChanged = interactionClass->setSubscriptionType(Unsubscribed, filterValues);
     if (subscriptionChanged)
     {
-      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+      SharedPtr<ChangeInteractionClassSubscriptionMessage> request = MakeShared<ChangeInteractionClassSubscriptionMessage>();
       request->setFederationHandle(getFederationHandle());
       request->setInteractionClassHandle(interactionClassHandle);
       request->setSubscriptionType(Unsubscribed);
@@ -1122,7 +1123,7 @@ public:
       throw IllegalName("Object instance names starting with \"HLA\" are reserved for the RTI.");
 
     SharedPtr<ReserveObjectInstanceNameRequestMessage> request;
-    request = new ReserveObjectInstanceNameRequestMessage;
+    request = MakeShared<ReserveObjectInstanceNameRequestMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setFederateHandle(getFederateHandle());
     request->setName(objectInstanceName);
@@ -1148,7 +1149,7 @@ public:
 
     // ... and send the release message to the rti
     SharedPtr<ReleaseMultipleObjectInstanceNameHandlePairsMessage> message;
-    message = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
+    message = MakeShared<ReleaseMultipleObjectInstanceNameHandlePairsMessage>();
     message->setFederationHandle(getFederationHandle());
     message->getObjectInstanceHandleVector().push_back(objectInstanceHandle);
 
@@ -1172,7 +1173,7 @@ public:
       throw NameSetWasEmpty("Empty object name set is not allowed!");
 
     SharedPtr<ReserveMultipleObjectInstanceNameRequestMessage> request;
-    request = new ReserveMultipleObjectInstanceNameRequestMessage;
+    request = MakeShared<ReserveMultipleObjectInstanceNameRequestMessage>();
     request->getNameList().reserve(objectInstanceNameSet.size());
     for (std::set<std::string>::const_iterator i = objectInstanceNameSet.begin(); i != objectInstanceNameSet.end(); ++i) {
       if (i->empty())
@@ -1205,7 +1206,7 @@ public:
     }
 
     SharedPtr<ReleaseMultipleObjectInstanceNameHandlePairsMessage> message;
-    message = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
+    message = MakeShared<ReleaseMultipleObjectInstanceNameHandlePairsMessage>();
     message->setFederationHandle(getFederationHandle());
     message->getObjectInstanceHandleVector().reserve(objectInstanceNameSet.size());
     for (std::set<std::string>::const_iterator i = objectInstanceNameSet.begin(); i != objectInstanceNameSet.end(); ++i) {
@@ -1241,7 +1242,7 @@ public:
     _federate->insertObjectInstance(handleNamePair.first, handleNamePair.second, objectClassHandle, true);
 
     SharedPtr<InsertObjectInstanceMessage> request;
-    request = new InsertObjectInstanceMessage;
+    request = MakeShared<InsertObjectInstanceMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectClassHandle(objectClassHandle);
     request->setObjectInstanceHandle(handleNamePair.first);
@@ -1263,7 +1264,7 @@ public:
 
     if (!attributeHandleVector.empty()) {
       if (_federate->getAttributeScopeAdvisorySwitchEnabled()) {
-        SharedPtr<AttributesInScopeMessage> message = new AttributesInScopeMessage;
+        SharedPtr<AttributesInScopeMessage> message = MakeShared<AttributesInScopeMessage>();
         message->setObjectInstanceHandle(handleNamePair.first);
         // Copy this here since we might need it later
         message->setAttributeHandles(attributeHandleVector);
@@ -1271,7 +1272,7 @@ public:
         queueCallback(message);
       }
       if (_federate->getAttributeRelevanceAdvisorySwitchEnabled()) {
-        SharedPtr<TurnUpdatesOnForInstanceMessage> message = new TurnUpdatesOnForInstanceMessage;
+        SharedPtr<TurnUpdatesOnForInstanceMessage> message = MakeShared<TurnUpdatesOnForInstanceMessage>();
         message->setObjectInstanceHandle(handleNamePair.first);
         message->getAttributeHandles().swap(attributeHandleVector);
         message->setOn(true);
@@ -1337,7 +1338,7 @@ public:
     _federate->insertObjectInstance(objectInstanceHandle, objectInstanceName, objectClassHandle, true);
 
     SharedPtr<InsertObjectInstanceMessage> request;
-    request = new InsertObjectInstanceMessage;
+    request = MakeShared<InsertObjectInstanceMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectClassHandle(objectClassHandle);
     request->setObjectInstanceHandle(objectInstanceHandle);
@@ -1359,7 +1360,7 @@ public:
 
     if (!attributeHandleVector.empty()) {
       if (_federate->getAttributeScopeAdvisorySwitchEnabled()) {
-        SharedPtr<AttributesInScopeMessage> message = new AttributesInScopeMessage;
+        SharedPtr<AttributesInScopeMessage> message = MakeShared<AttributesInScopeMessage>();
         message->setObjectInstanceHandle(objectInstanceHandle);
         // Copy this here since we might need it later
         message->setAttributeHandles(attributeHandleVector);
@@ -1367,7 +1368,7 @@ public:
         queueCallback(message);
       }
       if (_federate->getAttributeRelevanceAdvisorySwitchEnabled()) {
-        SharedPtr<TurnUpdatesOnForInstanceMessage> message = new TurnUpdatesOnForInstanceMessage;
+        SharedPtr<TurnUpdatesOnForInstanceMessage> message = MakeShared<TurnUpdatesOnForInstanceMessage>();
         message->setObjectInstanceHandle(objectInstanceHandle);
         message->getAttributeHandles().swap(attributeHandleVector);
         message->setOn(true);
@@ -1431,7 +1432,7 @@ public:
       if (passels[i].empty())
         continue;
       SharedPtr<AttributeUpdateMessage> request;
-      request = new AttributeUpdateMessage;
+      request = MakeShared<AttributeUpdateMessage>();
       request->setFederationHandle(getFederationHandle());
       request->setFederateHandle(getFederateHandle());
       request->setObjectInstanceHandle(objectInstanceHandle);
@@ -1483,8 +1484,9 @@ public:
       //  i->getAttributeHandle().toString().c_str(),
       //  objectInstance->getSubscriptionType() != Unsubscribed);
     }
-    if (timeRegulationEnabled && getTimeManagement()->logicalTimeAlreadyPassed(nativeLogicalTime))
-      throw InvalidLogicalTime(getTimeManagement()->logicalTimeToString(nativeLogicalTime));
+    std::string reason;
+    if (timeRegulationEnabled && getTimeManagement()->logicalTimeAlreadyPassed(nativeLogicalTime, reason))
+      throw InvalidLogicalTime(reason);
 
     MessageRetractionHandle messageRetractionHandle = getNextMessageRetractionHandle();
     VariableLengthData timeStamp = getTimeManagement()->encodeLogicalTime(nativeLogicalTime);
@@ -1495,7 +1497,7 @@ public:
         if (passels[i][j].empty())
           continue;
         SharedPtr<TimeStampedAttributeUpdateMessage> request;
-        request = new TimeStampedAttributeUpdateMessage;
+        request = MakeShared<TimeStampedAttributeUpdateMessage>();
         request->setFederationHandle(getFederationHandle());
         request->setFederateHandle(getFederateHandle());
         request->setObjectInstanceHandle(objectInstanceHandle);
@@ -1549,7 +1551,7 @@ public:
         throw InteractionParameterNotDefined(i->getParameterHandle().toString());
 
     SharedPtr<InteractionMessage> request;
-    request = new InteractionMessage;
+    request = MakeShared<InteractionMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setFederateHandle(getFederateHandle());
     request->setInteractionClassHandle(interactionClassHandle);
@@ -1600,7 +1602,7 @@ public:
     MessageRetractionHandle messageRetractionHandle = getNextMessageRetractionHandle();
     VariableLengthData timeStamp = getTimeManagement()->encodeLogicalTime(logicalTime);
     SharedPtr<TimeStampedInteractionMessage> request;
-    request = new TimeStampedInteractionMessage;
+    request = MakeShared<TimeStampedInteractionMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setFederateHandle(getFederateHandle());
     request->setInteractionClassHandle(interactionClassHandle);
@@ -1651,7 +1653,7 @@ public:
       throw DeletePrivilegeNotHeld(objectInstanceHandle.toString());
 
     SharedPtr<DeleteObjectInstanceMessage> request;
-    request = new DeleteObjectInstanceMessage;
+    request = MakeShared<DeleteObjectInstanceMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setFederateHandle(getFederateHandle());
     request->setObjectInstanceHandle(objectInstanceHandle);
@@ -1690,7 +1692,7 @@ public:
     MessageRetractionHandle messageRetractionHandle = getNextMessageRetractionHandle();
 
     SharedPtr<TimeStampedDeleteObjectInstanceMessage> request;
-    request = new TimeStampedDeleteObjectInstanceMessage;
+    request = MakeShared<TimeStampedDeleteObjectInstanceMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setFederateHandle(getFederateHandle());
     request->setObjectInstanceHandle(objectInstanceHandle);
@@ -1814,7 +1816,7 @@ public:
    objectInstance->setSubscriptionType(SubscribedPassive);
 
     SharedPtr<RequestAttributeUpdateMessage> request;
-    request = new RequestAttributeUpdateMessage;
+    request = MakeShared<RequestAttributeUpdateMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectInstanceHandle(objectInstanceHandle);
     request->getAttributeHandles().swap(attributeHandleVector);
@@ -1846,7 +1848,7 @@ public:
     }
 
     SharedPtr<RequestClassAttributeUpdateMessage> request;
-    request = new RequestClassAttributeUpdateMessage;
+    request = MakeShared<RequestClassAttributeUpdateMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectClassHandle(objectClassHandle);
     request->getAttributeHandles().swap(attributeHandleVector);
@@ -2106,7 +2108,7 @@ public:
     if (!attribute)
       throw AttributeNotDefined(attributeHandle.toString());
     SharedPtr<QueryAttributeOwnershipRequestMessage> request;
-    request = new QueryAttributeOwnershipRequestMessage;
+    request = MakeShared<QueryAttributeOwnershipRequestMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setObjectInstanceHandle(objectInstanceHandle);
     request->setAttributeHandle(attributeHandle);
@@ -2148,6 +2150,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (_timeManagement->getTimeRegulationEnabled())
@@ -2176,6 +2179,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (_timeManagement->getTimeRegulationEnabled())
@@ -2201,6 +2205,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (!_timeManagement->getTimeRegulationEnabled())
@@ -2220,6 +2225,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (_timeManagement->getTimeConstrainedEnabled())
@@ -2241,6 +2247,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (!_timeManagement->getTimeConstrainedEnabled())
@@ -2262,6 +2269,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (_timeManagement->isLogicalTimeInThePast(logicalTime))
@@ -2289,6 +2297,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (_timeManagement->isLogicalTimeInThePast(logicalTime))
@@ -2316,6 +2325,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (_timeManagement->isLogicalTimeInThePast(logicalTime))
@@ -2343,6 +2353,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (_timeManagement->isLogicalTimeInThePast(logicalTime))
@@ -2370,6 +2381,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (_timeManagement->isLogicalTimeInThePast(logicalTime))
@@ -2393,6 +2405,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (_timeManagement->getAsynchronousDeliveryEnabled())
@@ -2410,6 +2423,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (!_timeManagement->getAsynchronousDeliveryEnabled())
@@ -2426,6 +2440,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     return _timeManagement->queryGALT(*this, logicalTime);
@@ -2440,6 +2455,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     _timeManagement->queryLogicalTime(*this, logicalTime);
@@ -2454,6 +2470,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     return _timeManagement->queryLITS(*this, logicalTime);
@@ -2471,6 +2488,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (checkForTimeRegulation && !_timeManagement->getTimeRegulationEnabled())
@@ -2492,6 +2510,7 @@ public:
   {
     if (!isConnected())
       throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
     if (checkForTimeRegulation && !_timeManagement->getTimeRegulationEnabled())
@@ -2517,6 +2536,7 @@ public:
       throw InvalidMessageRetractionHandle(messageRetractionHandle.toString());
     if (messageRetractionHandle.getFederateHandle() != getFederateHandle())
       throw InvalidMessageRetractionHandle(messageRetractionHandle.toString());
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!getTimeManagement()->getTimeRegulationEnabled())
       throw TimeRegulationIsNotEnabled();
 
@@ -2591,7 +2611,7 @@ public:
     }
     RegionHandle regionHandle = _federate->insertLocalRegion(dimensionHandleSet);
 
-    SharedPtr<InsertRegionMessage> request = new InsertRegionMessage;
+    SharedPtr<InsertRegionMessage> request = MakeShared<InsertRegionMessage>();
     request->setFederationHandle(getFederationHandle());
     RegionHandleDimensionHandleSetPairVector value(1);
     value[0].first = regionHandle;
@@ -2627,7 +2647,7 @@ public:
         throw InvalidRegion(i->toString());
       region->getRegion().getRegionValue(regionHandleRegionValuePairVector.back().second);
     }
-    SharedPtr<CommitRegionMessage> request = new CommitRegionMessage;
+    SharedPtr<CommitRegionMessage> request = MakeShared<CommitRegionMessage>();
     request->setFederationHandle(getFederationHandle());
     request->getRegionHandleRegionValuePairVector().swap(regionHandleRegionValuePairVector);
     send(request);
@@ -2658,7 +2678,7 @@ public:
     // FIXME check for in use
     _federate->eraseLocalRegion(regionHandle);
 
-    SharedPtr<EraseRegionMessage> request = new EraseRegionMessage;
+    SharedPtr<EraseRegionMessage> request = MakeShared<EraseRegionMessage>();
     request->setFederationHandle(getFederationHandle());
     RegionHandleVector value(1);
     value[0] = regionHandle;
@@ -2951,7 +2971,7 @@ public:
     _federate->setAutomaticResignDirective(resignAction);
 
     SharedPtr<ChangeAutomaticResignDirectiveMessage> message;
-    message = new ChangeAutomaticResignDirectiveMessage;
+    message = MakeShared<ChangeAutomaticResignDirectiveMessage>();
     message->setFederationHandle(getFederationHandle());
     message->setFederateHandle(getFederateHandle());
     message->setResignAction(resignAction);
@@ -3444,7 +3464,7 @@ public:
         continue;
       if (!objectClass->isPublished())
         continue;
-      SharedPtr<RegistrationForObjectClassMessage> message = new RegistrationForObjectClassMessage;
+      SharedPtr<RegistrationForObjectClassMessage> message = MakeShared<RegistrationForObjectClassMessage>();
       message->setObjectClassHandle(ObjectClassHandle(i));
       message->setStart(true);
       queueCallback(message);
@@ -3504,7 +3524,7 @@ public:
       }
       if (attributeHandleVector.empty())
         continue;
-      SharedPtr<TurnUpdatesOnForInstanceMessage> message = new TurnUpdatesOnForInstanceMessage;
+      SharedPtr<TurnUpdatesOnForInstanceMessage> message = MakeShared<TurnUpdatesOnForInstanceMessage>();
       message->setObjectInstanceHandle(i->first);
       message->getAttributeHandles().swap(attributeHandleVector);
       message->setOn(true);
@@ -3566,7 +3586,7 @@ public:
       }
       if (attributeHandleVector.empty())
         continue;
-      SharedPtr<AttributesInScopeMessage> message = new AttributesInScopeMessage;
+      SharedPtr<AttributesInScopeMessage> message = MakeShared<AttributesInScopeMessage>();
       message->setObjectInstanceHandle(i->first);
       message->getAttributeHandles().swap(attributeHandleVector);
       message->setInScope(true);
@@ -3618,7 +3638,7 @@ public:
         continue;
       if (!interactionClass->isPublished())
         continue;
-      SharedPtr<TurnInteractionsOnMessage> message = new TurnInteractionsOnMessage;
+      SharedPtr<TurnInteractionsOnMessage> message = MakeShared<TurnInteractionsOnMessage>();
       message->setInteractionClassHandle(InteractionClassHandle(i));
       message->setOn(true);
       queueCallback(message);
@@ -3770,22 +3790,6 @@ public:
     return true;
   }
 
-  void enableCallbacks()
-    // throw (SaveInProgress,
-    //        RestoreInProgress,
-    //        RTIinternalError)
-  {
-    _callbacksEnabled = true;
-  }
-
-  void disableCallbacks()
-    // throw (SaveInProgress,
-    //        RestoreInProgress,
-    //        RTIinternalError)
-  {
-    _callbacksEnabled = false;
-  }
-
   // Vector Extension
   void setInteractionClassDeliverToSelf(InteractionClassHandle interactionClassHandle, bool enable)
   {
@@ -3818,7 +3822,7 @@ public:
   void _requestObjectInstanceHandles(unsigned count)
   {
     SharedPtr<ObjectInstanceHandlesRequestMessage> request;
-    request = new ObjectInstanceHandlesRequestMessage;
+    request = MakeShared<ObjectInstanceHandlesRequestMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setFederateHandle(getFederateHandle());
     request->setCount(count);
@@ -3854,18 +3858,21 @@ public:
 
     // Unreference the object instance handle resource
     SharedPtr<ReleaseMultipleObjectInstanceNameHandlePairsMessage> message;
-    message = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
+    message = MakeShared<ReleaseMultipleObjectInstanceNameHandlePairsMessage>();
     message->setFederationHandle(getFederationHandle());
     message->getObjectInstanceHandleVector().push_back(objectInstanceHandle);
     send(message);
 
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (_timeManagement.valid())
       _timeManagement->eraseMessagesForObjectInstance(*this, objectInstanceHandle);
   }
 
   // Get a next message retraction handle
-  MessageRetractionHandle getNextMessageRetractionHandle()
-  { return MessageRetractionHandle(getFederateHandle(), getTimeManagement()->getNextMessageRetractionSerial()); }
+  MessageRetractionHandle getNextMessageRetractionHandle() {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
+    return MessageRetractionHandle(getFederateHandle(), getTimeManagement()->getNextMessageRetractionSerial());
+  }
 
   class OPENRTI_LOCAL _CallbackDispatchFunctor {
   public:
@@ -3873,10 +3880,12 @@ public:
       _ambassador(ambassador)
     { }
     template<typename M>
-      void operator()(const M& message) const
-    { _ambassador.acceptCallbackMessage(message); }
+    void operator()(const M& message) const
+    {
+      _ambassador.acceptCallbackMessage(message);
+    }
   private:
-    Ambassador& _ambassador;
+    Ambassador & _ambassador;
   };
 
   // Returns true if a callback has been dispatched
@@ -3893,18 +3902,33 @@ public:
     flushAndDispatchInternalMessage();
     if (!_callbacksEnabled)
     {
-      CondDebugPrintf("%s: !_callbacksEnabled ==> false\n", __FUNCTION__);
       return false;
     }
     while (!_dispatchCallbackMessage()) {
       if (!receiveAndDispatchInternalMessage(timeout))
       {
-        CondDebugPrintf("%s: !receiveAndDispatchInternalMessage ==> false\n", __FUNCTION__);
         return false;
       }
     }
     bool avail = _callbackMessageAvailable();
-    CondDebugPrintf("%s _callbackMessageAvailable ==> %d\n", __FUNCTION__, avail);
+    return avail;
+  }
+  // same, w.o. timeout
+  bool dispatchCallback() override
+  {
+    flushAndDispatchInternalMessage();
+    if (!_callbacksEnabled)
+    {
+      return false;
+    }
+    while (!_dispatchCallbackMessage()) {
+      // NOTE: receive w.o. timeout will return nullptr without waiting, if no message is readily available
+      if (!receiveAndDispatchInternalMessage())
+      {
+        return false;
+      }
+    }
+    bool avail = _callbackMessageAvailable();
     return avail;
   }
 
@@ -3917,7 +3941,9 @@ public:
   }
 
   void acceptCallbackMessage(const ConnectionLostMessage& message)
-  { connectionLost(message.getFaultDescription()); }
+  {
+    connectionLost(message.getFaultDescription());
+  }
   void acceptCallbackMessage(const EnumerateFederationExecutionsResponseMessage& message)
   { reportFederationExecutions(message.getFederationExecutionInformationVector()); }
 
@@ -4036,6 +4062,7 @@ public:
       return;
     if (Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle())) {
       if (Unsubscribed != objectClass->getEffectiveSubscriptionType()) {
+        OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
         _timeManagement->removeObjectInstance(*this, message);
       }
     }
@@ -4083,6 +4110,7 @@ public:
     Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle());
     if (!objectClass)
       return;
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     _timeManagement->reflectAttributeValues(*this, *objectClass, message);
   }
   void acceptCallbackMessage(const InteractionMessage& message)
@@ -4127,24 +4155,28 @@ public:
         return;
       }
     }
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     _timeManagement->receiveInteraction(*this, *interactionClass, interactionClassHandle, message);
   }
   void acceptCallbackMessage(const TimeConstrainedEnabledMessage& message)
   {
     if (!_timeManagement.valid())
       return;
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     _timeManagement->acceptCallbackMessage(*this, message);
   }
   void acceptCallbackMessage(const TimeRegulationEnabledMessage& message)
   {
     if (!_timeManagement.valid())
       return;
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     _timeManagement->acceptCallbackMessage(*this, message);
   }
   void acceptCallbackMessage(const TimeAdvanceGrantedMessage& message)
   {
     if (!_timeManagement.valid())
       return;
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     _timeManagement->acceptCallbackMessage(*this, message);
   }
   void acceptCallbackMessage(const RequestAttributeUpdateMessage& message)
@@ -4256,7 +4288,7 @@ public:
 
   virtual void requestRetraction(MessageRetractionHandle messageRetractionHandle) = 0;
 
-  virtual TimeManagement<Traits>* createTimeManagement(Federate& federate) = 0;
+  virtual SharedPtr<TimeManagement<Traits>> createTimeManagement(Federate& federate) = 0;
 
   Federate* getFederate() override
   {
@@ -4271,7 +4303,7 @@ public:
   {
     // IMPORTANT NOTE: this object's data will be completed later in 
     // InternalAmbassador::acceptInternalMessage(const JoinFederationExecutionResponseMessage& message)
-    _federate = new Federate;
+    _federate = MakeShared<Federate>();
     _federate->setFederationHandle(message.getFederationHandle());
     _federate->setLogicalTimeFactoryName(message.getLogicalTimeFactoryName());
 
@@ -4298,9 +4330,7 @@ public:
     }
   };
 
- private:
-  // True if callback dispatch is enabled or if callbacks are held back
-  bool _callbacksEnabled;
+private:
   // The federate if available
   SharedPtr<Federate> _federate;
   // The timestamped queues

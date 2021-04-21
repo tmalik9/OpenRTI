@@ -62,7 +62,7 @@ SocketServerPipe::bind(const std::string& file)
 
     // We could not bind to that file, try to find out if the server behind is still alive
     try {
-      SharedPtr<SocketPipe> socket = new SocketPipe;
+      SharedPtr<SocketPipe> socket = MakeShared<SocketPipe>();
       socket->connect(file);
       // We could connect, we assume that the server is living, don't replace that
       free(addr);
@@ -123,7 +123,7 @@ SocketServerPipe::accept()
     throw TransportError(errnoToUtf8(errorNumber));
   }
 
-  return new SocketPipe(new PrivateData(fd));
+  return MakeShared<SocketPipe>(new PrivateData(fd));
 }
 
 void

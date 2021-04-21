@@ -28,8 +28,6 @@
 
 namespace OpenRTI {
 
-#if 201103L <= __CPlusPlusStd
-
 class ScopeLock : public std::unique_lock<std::mutex> {
 public:
   ScopeLock(Mutex& mutex) : std::unique_lock<std::mutex>(mutex._mutex)
@@ -43,27 +41,18 @@ private:
   ScopeLock& operator=(const ScopeLock&);
 };
 
-#else
-
-class ScopeLock {
+class RecursiveScopeLock : public std::unique_lock<std::recursive_mutex> {
 public:
-  ScopeLock(Mutex& mutex) : mMutex(mutex)
-  { mMutex.lock(); }
-  ~ScopeLock() noexcept
-  { mMutex.unlock(); }
-
-  Mutex* mutex() const
-  { return &mMutex; }
+  RecursiveScopeLock(RecursiveMutex& mutex) : std::unique_lock<std::recursive_mutex>(mutex._mutex)
+  { }
+  ~RecursiveScopeLock() noexcept
+  { }
 
 private:
-  ScopeLock();
-  ScopeLock(const ScopeLock&);
-  ScopeLock& operator=(const ScopeLock&);
-
-  Mutex& mMutex;
+  RecursiveScopeLock();
+  RecursiveScopeLock(const RecursiveScopeLock&);
+  RecursiveScopeLock& operator=(const RecursiveScopeLock&);
 };
-
-#endif
 
 } // namespace OpenRTI
 

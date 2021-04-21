@@ -222,9 +222,9 @@ public:
   Test(int argc, const char* const argv[]) :
     RTITest(argc, argv, false)
   { }
-  virtual Ambassador* createAmbassador(const ConstructorArgs& constructorArgs) override
+  virtual SharedPtr<Ambassador> createAmbassador(const ConstructorArgs& constructorArgs) override
   {
-    return new TestAmbassador(constructorArgs);
+    return MakeShared<TestAmbassador>(constructorArgs);
   }
 };
 

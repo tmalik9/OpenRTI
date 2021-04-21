@@ -305,7 +305,7 @@ SocketAddress::data()
 {
   if (PrivateData::count(_privateData.get()) == 1)
     return _privateData.get();
-  _privateData = new PrivateData;
+  _privateData = MakeShared<PrivateData>();
   return _privateData.get();
 }
 

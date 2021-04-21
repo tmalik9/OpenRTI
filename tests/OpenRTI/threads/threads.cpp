@@ -58,7 +58,7 @@ public:
 
   static bool exec()
   {
-    SharedPtr<DetachedTest> testThread = new DetachedTest;
+    SharedPtr<DetachedTest> testThread = MakeShared<DetachedTest>();
     if (!testThread->start())
       return false;
     return true;

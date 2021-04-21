@@ -178,7 +178,7 @@ Federate::InteractionClass::insertParameter(const FOMParameter& fomParameter)
     _parameterVector.resize(index + 1);
   if (_parameterVector[index].valid())
     return;
-  _parameterVector[index] = new Parameter;
+  _parameterVector[index] = MakeShared<Parameter>();
   Parameter* parameter = _parameterVector[index].get();
 
   _nameParameterHandleMap[fomParameter.getName()] = parameterHandle;
@@ -419,7 +419,7 @@ Federate::ObjectClass::insertAttribute(const FOMAttribute& fomAttribute)
     _attributeVector.resize(index + 1);
   if (_attributeVector[index].valid())
     return;
-  _attributeVector[index] = new Attribute;
+  _attributeVector[index] = MakeShared<Attribute>();
   Attribute* attribute = _attributeVector[index].get();
 
   _nameAttributeHandleMap[fomAttribute.getName()] = attributeHandle;
@@ -440,16 +440,16 @@ void
 Federate::ObjectClass::insertChildObjectClass(ObjectClass& objectClass)
 {
   objectClass._attributeVector.reserve(_attributeVector.size());
-  for (AttributeVector::const_iterator i = _attributeVector.begin();
-       i != _attributeVector.end(); ++i) {
-    if (i->valid()) {
-      objectClass._attributeVector.push_back(new Attribute(**i));
-    } else {
-      objectClass._attributeVector.push_back(0);
+  for (const SharedPtr<Attribute>& attributePtr : _attributeVector)
+  {
+    if (attributePtr.valid()) {
+      objectClass._attributeVector.push_back(MakeShared<Attribute>(*attributePtr));
+    }
+    else {
+      objectClass._attributeVector.push_back(SharedPtr<Attribute>());
     }
   }
   objectClass._nameAttributeHandleMap = _nameAttributeHandleMap;
-
   _childObjectClassList.push_back(objectClass);
 }
 
@@ -593,11 +593,11 @@ Federate::ObjectInstance::ObjectInstance(NameObjectInstanceHandleMap::iterator n
     const Attribute* attribute = objectClass.getAttribute(AttributeHandle(k));
     if (attribute) {
       if (objectClass.isAttributePublished(AttributeHandle(k)))
-        _instanceAttributeVector.push_back(new InstanceAttribute(*attribute, owned));
+        _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>(new InstanceAttribute(*attribute, owned)));
       else
-        _instanceAttributeVector.push_back(new InstanceAttribute(*attribute, false));
+        _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>(new InstanceAttribute(*attribute, false)));
     } else {
-      _instanceAttributeVector.push_back(0);
+      _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>());
     }
   }
 }
@@ -865,7 +865,7 @@ Federate::insertDimension(const std::string& name, const DimensionHandle& dimens
   size_t index = dimensionHandle.getHandle();
   if (_dimensionVector.size() <= index)
     _dimensionVector.resize(index + 1);
-  _dimensionVector[index] = new Dimension(name, upperBound);
+  _dimensionVector[index] = MakeShared<Dimension>(name, upperBound);
   _nameDimensionHandleMap[name] = dimensionHandle;
 }
 
@@ -897,7 +897,7 @@ void
 Federate::insertRegion(const RegionHandle& regionHandle, const DimensionHandleSet& dimensionHandleSet)
 {
   OpenRTIAssert(_regionHandleRegionDataMap.find(regionHandle) == _regionHandleRegionDataMap.end());
-  _regionHandleRegionDataMap[regionHandle] = new RegionData(dimensionHandleSet);
+  _regionHandleRegionDataMap[regionHandle] = MakeShared<RegionData>(dimensionHandleSet);
 }
 
 void
@@ -1001,7 +1001,7 @@ Federate::insertInteractionClass(const FOMInteractionClass& module, bool artific
   if (_interactionClassVector.size() <= index)
     _interactionClassVector.resize(index + 1);
   if (!_interactionClassVector[index].valid()) {
-    _interactionClassVector[index] = new InteractionClass;
+    _interactionClassVector[index] = MakeShared<InteractionClass>();
 
     InteractionClassHandle parentHandle = module.getParentInteractionClassHandle();
 
@@ -1072,7 +1072,7 @@ Federate::insertObjectClass(const FOMObjectClass& module, bool artificialObjectR
   if (_objectClassVector.size() <= index)
     _objectClassVector.resize(index + 1);
   if (!_objectClassVector[index].valid()) {
-    _objectClassVector[index] = new ObjectClass;
+    _objectClassVector[index] = MakeShared<ObjectClass>();
     ObjectClass* objectClass = _objectClassVector[index].get();
     objectClass->setClassHandle(module.getObjectClassHandle());
     ObjectClassHandle parentHandle = module.getParentObjectClassHandle();
@@ -1145,7 +1145,7 @@ Federate::insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const 
   OpenRTIAssert(objectClass);
   NameObjectInstanceHandleMap::iterator i;
   i = _nameObjectInstanceHandleMap.insert(NameObjectInstanceHandleMap::value_type(name, objectInstanceHandle)).first;
-  SharedPtr<ObjectInstance> objectInstance = new ObjectInstance(i, *objectClass, owned);
+  SharedPtr<ObjectInstance> objectInstance = MakeShared<ObjectInstance>(i, *objectClass, owned);
   objectInstance->setObjectClassHandle(objectClassHandle);
   objectInstance->setSubscriptionType(SubscribedActive);
   _objectInstanceHandleMap.insert(ObjectInstanceHandleMap::value_type(objectInstanceHandle, objectInstance));
@@ -1251,7 +1251,7 @@ Federate::insertFederate(const FederateHandle& federateHandle, const std::string
   OpenRTIAssert(_federateHandleMap.find(federateHandle) == _federateHandleMap.end());
   NameFederateHandleMap::iterator i;
   i = _nameFederateHandleMap.insert(NameFederateHandleMap::value_type(name, federateHandle)).first;
-  SharedPtr<_Federate> federate = new _Federate(i);
+  SharedPtr<_Federate> federate = MakeShared<_Federate>(i);
   _federateHandleMap.insert(FederateHandleMap::value_type(federateHandle, federate));
 }
 
@@ -1289,27 +1289,42 @@ Federate::synchronizationLabelAnnounced(const std::string& label) const
 void
 Federate::insertFOMModule(const FOMModule& module)
 {
-  for (FOMUpdateRateList::const_iterator i = module.getUpdateRateList().begin();
-       i != module.getUpdateRateList().end(); ++i)
-    insertUpdateRate(i->getName(), i->getRate());
-  for (FOMDimensionList::const_iterator i = module.getDimensionList().begin();
-       i != module.getDimensionList().end(); ++i)
-    insertDimension(i->getName(), i->getDimensionHandle(), i->getUpperBound());
-  for (FOMRoutingSpaceList::const_iterator i = module.getRoutingSpaceList().begin();
-       i != module.getRoutingSpaceList().end(); ++i)
-    insertRoutingSpace(i->getName(), i->getSpaceHandle(), i->getDimensionHandleSet());
-  for (FOMTransportationTypeList::const_iterator i = module.getTransportationTypeList().begin();
-       i != module.getTransportationTypeList().end(); ++i)
-    insertTransportationType(i->getName(), i->getTransportationType());
-  for (FOMInteractionClassList::const_iterator i = module.getInteractionClassList().begin();
-       i != module.getInteractionClassList().end(); ++i)
-    insertInteractionClass(*i, module.getArtificialInteractionRoot());
-  for (FOMObjectClassList::const_iterator i = module.getObjectClassList().begin();
-       i != module.getObjectClassList().end(); ++i)
-    insertObjectClass(*i, module.getArtificialObjectRoot());
-  for (FOMSwitchList::const_iterator i = module.getSwitchList().begin();
-       i != module.getSwitchList().end(); ++i)
-    applySwitch(*i);
+  for (auto& updateRate : module.getUpdateRateList())
+    insertUpdateRate(updateRate.getName(), updateRate.getRate());
+  for (auto& dimension : module.getDimensionList())
+    insertDimension(dimension.getName(), dimension.getDimensionHandle(), dimension.getUpperBound());
+  for (auto& routingSpace : module.getRoutingSpaceList())
+    insertRoutingSpace(routingSpace.getName(), routingSpace.getSpaceHandle(), routingSpace.getDimensionHandleSet());
+  for (auto& transportationType : module.getTransportationTypeList())
+    insertTransportationType(transportationType.getName(), transportationType.getTransportationType());
+  for (auto& interactionClass : module.getInteractionClassList())
+    insertInteractionClass(interactionClass, module.getArtificialInteractionRoot());
+  for (auto& objectClass : module.getObjectClassList())
+    insertObjectClass(objectClass, module.getArtificialObjectRoot());
+  for (auto& hlaSwitch : module.getSwitchList())
+    applySwitch(hlaSwitch);
+  _moduleMap.insert(std::make_pair(module.getModuleHandle(), module));
+}
+
+
+void Federate::insertFOMModule2(const FOMModule2& module)
+{
+  for (auto& updateRate : module.getUpdateRateList())
+    insertUpdateRate(updateRate.getName(), updateRate.getRate());
+  for (auto& dimension : module.getDimensionList())
+    insertDimension(dimension.getName(), dimension.getDimensionHandle(), dimension.getUpperBound());
+  for (auto& routingSpace : module.getRoutingSpaceList())
+    insertRoutingSpace(routingSpace.getName(), routingSpace.getSpaceHandle(), routingSpace.getDimensionHandleSet());
+  for (auto& transportationType : module.getTransportationTypeList())
+    insertTransportationType(transportationType.getName(), transportationType.getTransportationType());
+  for (auto& interactionClass : module.getInteractionClassList())
+    insertInteractionClass(interactionClass, module.getArtificialInteractionRoot());
+  for (auto& objectClass : module.getObjectClassList())
+    insertObjectClass(objectClass, module.getArtificialObjectRoot());
+  //for (auto& simpleDataType : module.getSimpleDataTypeList())
+  //  insertSimpleDataType(*i, module.getArtificialObjectRoot());
+  for (auto& hlaSwitch : module.getSwitchList())
+    applySwitch(hlaSwitch);
   _moduleMap.insert(std::make_pair(module.getModuleHandle(), module));
 }
 
@@ -1323,8 +1338,8 @@ Federate::insertFOMModuleList(const FOMModuleList& moduleList)
 void
 Federate::insertFOMModule2List(const FOMModule2List& moduleList)
 {
-  for (auto& fomModule : moduleList)
-    insertFOMModule(fomModule);
+  for (auto& fomModule2 : moduleList)
+    insertFOMModule2(fomModule2);
 }
 
 

@@ -100,7 +100,7 @@ InitialServerStreamProtocol::readOptionMap(const StringStringListMap& clientOpti
     }
   }
   SharedPtr<AbstractConnect> connect;
-  connect = _abstractServer.sendConnect(clientOptionMap, false /*parent*/);
+  connect = _abstractServer.sendConnect(resultingClientOptionMap, false /*parent*/);
   if (!connect.valid()) {
     errorResponse("Could not get an internal connect structure from the server!");
     return;

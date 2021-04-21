@@ -45,7 +45,7 @@ public:
 
   /// Convenience methods for obvious tasks
   void send(const SharedPtr<const AbstractMessage>& message)
-  { 
+  {
     getMessageSender()->send(message);
   }
 

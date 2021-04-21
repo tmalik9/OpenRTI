@@ -482,8 +482,8 @@ public:
     { return _nameFederateHandleMapIterator; }
 
   private:
-    _Federate(const _Federate&);
-    _Federate& operator=(const _Federate&);
+    _Federate(const _Federate&) = delete;
+    _Federate& operator=(const _Federate&) = delete;
 
     NameFederateHandleMap::iterator _nameFederateHandleMapIterator;
   };
@@ -532,8 +532,8 @@ public:
   void insertFOMModule2List(const FOMModule2List& moduleList);
   void getFOMModule(FOMModule& module);
 private:
-  Federate(const Federate&);
-  Federate& operator=(const Federate&);
+  Federate(const Federate&) = delete;
+  Federate& operator=(const Federate&) = delete;
 
   std::string _federateType;
   std::string _federateName;

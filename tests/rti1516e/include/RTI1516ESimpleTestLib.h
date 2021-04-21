@@ -19,7 +19,7 @@ using namespace rti1516e;
 
 class SimpleTestFederate;
 
-double convertTime(LogicalTime const& theTime);
+//double convertTime(LogicalTime const& theTime);
 
 std::wstring to_wstring(const std::string& str);
 std::string to_string(const std::wstring& str);
@@ -62,7 +62,7 @@ class SimpleTestFederate : public NullFederateAmbassador
     virtual void initializeSimulation() = 0;
     virtual void cleanupSimulation() = 0;
     virtual void disconnect();
-    void run(unsigned int milliSeconds);
+    void run(std::chrono::milliseconds stepMs);
     virtual void step() = 0;
     void setDone() { _done = true; }
 
@@ -190,7 +190,12 @@ class SimpleTestFederate : public NullFederateAmbassador
       MessageRetractionHandle theHandle,
       SupplementalRemoveInfo theRemoveInfo) override;
 
-protected:
+    void setPrintVerbose(bool newValue) { _printVerbose = newValue; }
+
+  protected:
+    std::chrono::milliseconds getStepDuration() const { return stepDuration; }
+    std::chrono::milliseconds stepDuration;
+
 #ifdef _WIN32
     std::unique_ptr<VRTNotificationHandle> mHandle;
 #endif
@@ -212,5 +217,6 @@ protected:
     bool _syncedReadyToRun;
     bool _syncedAllDone;
 
+    bool _printVerbose = true;
     std::atomic_bool _done;
 };

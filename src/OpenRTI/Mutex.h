@@ -79,6 +79,31 @@ private:
   friend class ScopeLock;
 };
 
+class OPENRTI_API RecursiveMutex {
+public:
+  RecursiveMutex() noexcept
+  { }
+  ~RecursiveMutex() noexcept
+  { }
+
+  void lock()
+  {
+    _mutex.lock();
+  }
+  void unlock()
+  {
+    _mutex.unlock();
+  }
+
+private:
+  RecursiveMutex(const RecursiveMutex&) = delete;
+  RecursiveMutex& operator=(const RecursiveMutex&) = delete;
+
+  std::recursive_mutex _mutex;
+
+  friend class Condition;
+  friend class RecursiveScopeLock;
+};
 } // namespace OpenRTI
 
 #endif

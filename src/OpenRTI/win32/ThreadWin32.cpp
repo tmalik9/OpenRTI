@@ -26,8 +26,20 @@
 #include <windows.h>
 #include "Exception.h"
 #include "Export.h"
+#include <processthreadsapi.h>
+#include <vector>
+#include <locale>
 
 namespace OpenRTI {
+
+inline std::wstring to_wstring(const std::string& str)
+{
+  if (str.empty()) return std::wstring();
+  const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
+  std::vector<wchar_t> wideStringBuffer(str.length());
+  CType.widen(str.data(), str.data() + str.length(), &wideStringBuffer[0]);
+  return std::wstring(&wideStringBuffer[0], wideStringBuffer.size());
+}
 
 struct OPENRTI_LOCAL Thread::PrivateData {
   PrivateData() : _handle(INVALID_HANDLE_VALUE)
@@ -51,7 +63,7 @@ struct OPENRTI_LOCAL Thread::PrivateData {
   {
     Thread* thread = reinterpret_cast<Thread*>(data);
     thread->run();
-    if (!Thread::put(thread))
+    if (!Thread::decRef(thread))
       Thread::destruct(thread);
     return 0;
   }
@@ -60,12 +72,19 @@ struct OPENRTI_LOCAL Thread::PrivateData {
   {
     if (_handle != INVALID_HANDLE_VALUE)
       return false;
-    get(&thread);
+    incRef(&thread);
     _handle = CreateThread(0, 0, start_routine, &thread, 0, 0);
     if (_handle == INVALID_HANDLE_VALUE) {
-      put(&thread);
+      decRef(&thread);
       return false;
     }
+#if (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
+    if (!thread.getName().empty())
+    {
+      HRESULT r;
+      r = SetThreadDescription(GetCurrentThread(), to_wstring(thread.getName()).c_str());
+    }
+#endif
     return true;
   }
 

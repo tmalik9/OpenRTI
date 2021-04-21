@@ -1,7 +1,7 @@
 # All the -I arguments
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # The OpenRTI implementation files and may be build generated sources
-include_directories(${CMAKE_BINARY_DIR}/src/OpenRTI)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/../OpenRTI)
 include_directories(${OPENRTI_CMAKEROOTDIR}/src/OpenRTI)
 
 if (MSVC)

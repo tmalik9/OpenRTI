@@ -381,7 +381,7 @@ RTI1516ELogicalTimeFactory::LogicalTime::operator+=(const RTI1516ELogicalTimeFac
     return *this;
   if (!logicalTimeInterval._implementation.valid())
     return *this;
-  _implementation = (*_implementation) + (*logicalTimeInterval._implementation);
+  _implementation = SharedPtr<LogicalTimeImplementation>((*_implementation) + (*logicalTimeInterval._implementation));
   return *this;
 }
 
@@ -392,7 +392,7 @@ RTI1516ELogicalTimeFactory::LogicalTime::operator-=(const RTI1516ELogicalTimeFac
     return *this;
   if (!logicalTimeInterval._implementation.valid())
     return *this;
-  _implementation = (*_implementation) - (*logicalTimeInterval._implementation);
+  _implementation = SharedPtr<LogicalTimeImplementation>((*_implementation) - (*logicalTimeInterval._implementation));
   return *this;
 }
 

@@ -67,7 +67,7 @@ namespace rti1516e
     {                                                                   \
       if (!useImplementationClass())                                    \
         return;                                                         \
-      if (OpenRTI::Referenced::put(impl))                               \
+      if (OpenRTI::Referenced::decRef(impl))                            \
         return;                                                         \
       delete impl;                                                      \
     }                                                                   \
@@ -76,7 +76,7 @@ namespace rti1516e
     {                                                                   \
       if (!useImplementationClass())                                    \
         return;                                                         \
-      OpenRTI::Referenced::get(impl);                                   \
+      OpenRTI::Referenced::incRef(impl);                                   \
     }                                                                   \
                                                                         \
     static OpenRTI::HandleKind                                          \
@@ -102,13 +102,13 @@ namespace rti1516e
     decode(VariableLengthData const & encodedValue)                     \
     { return HandleKind(encodedValue); }                                \
     static void                                                         \
-    copy(OpenRTI::HandleKind& dst, HandleKind const& src)               \
-    { dst = HandleKind##Implementation::getHandle(src._impl); }         \
-    static void                                                         \
-    copy(HandleKind& dst, OpenRTI::HandleKind const& src)               \
-    { dst = HandleKind(HandleKind##Implementation::create(src)); }      \
-    static size_t                                                       \
-    getEncodedLength() {                                                \
+    copy(OpenRTI::HandleKind& dst, HandleKind const& src) {             \
+      dst = HandleKind##Implementation::getHandle(src._impl);           \
+    }                                                                   \
+    static void copy(HandleKind& dst, OpenRTI::HandleKind const& src) { \
+      dst = HandleKind(HandleKind##Implementation::create(src));        \
+    }                                                                   \
+    static size_t  getEncodedLength() {                                 \
        return OpenRTI::HandleKind::kFixedHandleSize;                    \
     }                                                                   \
   };

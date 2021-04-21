@@ -12,8 +12,8 @@
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${workspaceRoot}\\bin\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
@@ -40,8 +40,8 @@
       "generator": "Ninja",
       "configurationType": "RelWithDebInfo",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${workspaceRoot}\\bin\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "--verbose",
@@ -65,11 +65,11 @@
     },
     {
       "name": "Winx86Debug",
-      "generator": "Visual Studio 16 2019",
+      "generator": "Ninja",
       "configurationType": "Debug",
       "buildRoot": "${workspaceRoot}\\build\\${name}",
       "installRoot": "${workspaceRoot}\\bin\\${name}",
-      "cmakeCommandArgs": "-T v141",
+      "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
@@ -88,11 +88,11 @@
     },
     {
       "name": "Winx86Release",
-      "generator": "Visual Studio 16 2019",
+      "generator": "Ninja",
       "configurationType": "RelWithDebInfo",
       "buildRoot": "${workspaceRoot}\\build\\${name}",
       "installRoot": "${workspaceRoot}\\bin\\${name}",
-      "cmakeCommandArgs": "-T v141",
+      "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
@@ -138,7 +138,6 @@
           "type": "BOOL"
         }
       ],
-      "cmakeExecutable": "/usr/local/bin/cmake"
     },
     {
       "name": "WSLRelease",
@@ -162,16 +161,20 @@
           "name": "OPENRTI_ENABLE_RTI1516",
           "value": "Off",
           "type": "STRING"
+        },
+        {
+          "name": "OPENRTI_ENABLE_TESTS",
+          "value": "True",
+          "type": "BOOL"
         }
       ],
-      "cmakeExecutable": "/usr/local/bin/cmake"
     },
     {
       "name": "WSL-Clang-Debug",
       "generator": "Ninja",
       "configurationType": "Debug",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${workspaceRoot}\\bin\\${name}",
       "cmakeExecutable": "/usr/local/bin/cmake",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
@@ -179,14 +182,20 @@
       "inheritEnvironments": [ "linux_clang_x64" ],
       "wslPath": "${defaultWSLPath}",
       "addressSanitizerRuntimeFlags": "detect_leaks=0",
-      "variables": []
+      "variables": [
+        {
+          "name": "OPENRTI_ENABLE_TESTS",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
     },
     {
       "name": "WSL-Clang-Release",
       "generator": "Ninja",
       "configurationType": "RelWithDebInfo",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${workspaceRoot}\\bin\\${name}",
       "cmakeExecutable": "/usr/local/bin/cmake",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
@@ -194,7 +203,13 @@
       "inheritEnvironments": [ "linux_clang_x64" ],
       "wslPath": "${defaultWSLPath}",
       "addressSanitizerRuntimeFlags": "detect_leaks=0",
-      "variables": []
+      "variables": [
+        {
+          "name": "OPENRTI_ENABLE_TESTS",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
     }
   ]
 }

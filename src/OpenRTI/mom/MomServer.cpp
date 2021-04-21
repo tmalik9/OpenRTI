@@ -133,7 +133,9 @@ void MomServer::connect(AbstractServer* server)
 {
   //DebugPrintf(">>> %s\n", __FUNCTION__);
   StringStringListMap connectOptions;
-  _dispatcher = new _MomMessageDispatcher(*this);
+  _dispatcher = MakeShared<_MomMessageDispatcher>(*this);
+  std::list<std::string> protocolVersions{OPENRTI_ENCODING_VERSION_STRING};
+  connectOptions.insert(std::make_pair("version", protocolVersions));
   _connect = server->sendDirectConnect(_dispatcher, connectOptions);
   //DebugPrintf("<<< %s\n", __FUNCTION__);
 }
@@ -162,7 +164,7 @@ void MomServer::accept(const InsertFederationExecutionMessage& message)
   //DebugPrintf("%s(InsertFederationExecutionMessage): this=%p ownerFederate=%s dispatch message=%s\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), message.toString().c_str());
   // IMPORTANT NOTE: this object's data will be completed later in 
   // accept(const JoinFederationExecutionResponseMessage& message)
-  _rtiFederate = new Federate;
+  _rtiFederate = MakeShared<Federate>();
   _rtiFederate->setFederationHandle(message.getFederationHandle());
   _rtiFederate->setLogicalTimeFactoryName(message.getLogicalTimeFactoryName());
 }
@@ -171,7 +173,7 @@ void MomServer::accept(const EraseFederationExecutionMessage& message)
 {
   //DebugPrintf("%s(EraseFederationExecutionMessage): this=%p ownerFederate=%s dispatch message=%s\n", __FUNCTION__, this, _ownerFederate.toString().c_str(), message.toString().c_str());
   _federation = nullptr;
-  SharedPtr<ReleaseFederationHandleMessage> release = new ReleaseFederationHandleMessage;
+  SharedPtr<ReleaseFederationHandleMessage> release = MakeShared<ReleaseFederationHandleMessage>();
   release->setFederationHandle(message.getFederationHandle());
   sendRequest(release);
 }
@@ -238,7 +240,7 @@ void MomServer::accept(const ResignFederateNotifyMessage& message)
   {
     // It's us again - now we're off.
     //DebugPrintf("%s: resigned from federation\n", __FUNCTION__);
-    _rtiFederate = nullptr;
+    _rtiFederate.reset();
     _federation = nullptr;
     //_connect = nullptr;
   }
@@ -273,7 +275,7 @@ void MomServer::accept(const EnableTimeRegulationRequestMessage& message)
   {
 
     SharedPtr<EnableTimeRegulationResponseMessage> response;
-    response = new EnableTimeRegulationResponseMessage;
+    response = MakeShared<EnableTimeRegulationResponseMessage>();
     response->setFederationHandle(getRtiFederate()->getFederationHandle());
     response->setFederateHandle(message.getFederateHandle());
     response->setRespondingFederateHandle(getRtiFederate()->getFederateHandle());
@@ -387,7 +389,7 @@ void MomServer::joinFederationExecution(ServerModel::Federation* federation)
 {
   // The join request message
   SharedPtr<JoinFederationExecutionRequestMessage> request;
-  request = new JoinFederationExecutionRequestMessage;
+  request = MakeShared<JoinFederationExecutionRequestMessage>();
   request->setFederationExecution(federation->getName());
   request->setFederateType("RTI");
   std::string federateName = _ownerFederate.valid() 
@@ -442,14 +444,14 @@ void MomServer::resignFederationExecution()
   // be sent from leaf nodes connected to a parent node
   if (_isRoot)
   {
-    SharedPtr<ResignFederationExecutionRequestMessage> resign = new ResignFederationExecutionRequestMessage;
+    SharedPtr<ResignFederationExecutionRequestMessage> resign = MakeShared<ResignFederationExecutionRequestMessage>();
     resign->setFederationHandle(getFederationHandle());
     resign->setFederateHandle(getFederateHandle());
     sendRequest(resign);
   }
   else
   {
-    SharedPtr<ResignFederationExecutionLeafRequestMessage> resign = new ResignFederationExecutionLeafRequestMessage;
+    SharedPtr<ResignFederationExecutionLeafRequestMessage> resign = MakeShared<ResignFederationExecutionLeafRequestMessage>();
     resign->setFederationHandle(getFederationHandle());
     resign->setFederateHandle(getFederateHandle());
     resign->setResignAction(DELETE_OBJECTS);
@@ -500,7 +502,7 @@ void MomServer::publishObjectClassAttributes(ObjectClassHandle objectClassHandle
   if (attributeHandleVector.empty())
     return;
 
-  SharedPtr<ChangeObjectClassPublicationMessage> request = new ChangeObjectClassPublicationMessage;
+  SharedPtr<ChangeObjectClassPublicationMessage> request = MakeShared<ChangeObjectClassPublicationMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setObjectClassHandle(objectClassHandle);
   request->setPublicationType(Published);
@@ -511,7 +513,7 @@ void MomServer::publishObjectClassAttributes(ObjectClassHandle objectClassHandle
   // see comment in enableObjectClassRelevanceAdvisorySwitch()
   if (objectClassFreshPublished && _rtiFederate->getObjectClassRelevanceAdvisorySwitchEnabled())
   {
-    SharedPtr<RegistrationForObjectClassMessage> message = new RegistrationForObjectClassMessage;
+    SharedPtr<RegistrationForObjectClassMessage> message = MakeShared<RegistrationForObjectClassMessage>();
     message->setObjectClassHandle(objectClassHandle);
     message->setStart(true);
 
@@ -548,7 +550,7 @@ void MomServer::unpublishObjectClass(ObjectClassHandle objectClassHandle) /* thr
   if (attributeHandleVector.empty())
     return;
 
-  SharedPtr<ChangeObjectClassPublicationMessage> request = new ChangeObjectClassPublicationMessage;
+  SharedPtr<ChangeObjectClassPublicationMessage> request = MakeShared<ChangeObjectClassPublicationMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setObjectClassHandle(objectClassHandle);
   request->setPublicationType(Unpublished);
@@ -617,7 +619,7 @@ void MomServer::subscribeObjectClassAttributes(ObjectClassHandle objectClassHand
   if (attributeHandleVector.empty())
     return;
 
-  SharedPtr<ChangeObjectClassSubscriptionMessage> request = new ChangeObjectClassSubscriptionMessage;
+  SharedPtr<ChangeObjectClassSubscriptionMessage> request = MakeShared<ChangeObjectClassSubscriptionMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setObjectClassHandle(objectClassHandle);
   request->getAttributeHandles().swap(attributeHandleVector);
@@ -655,7 +657,7 @@ ObjectInstanceHandle MomServer::registerObjectInstance(ObjectClassHandle objectC
   _rtiFederate->insertObjectInstance(objectInstanceHandle, objectInstanceName, objectClassHandle, true);
 
   SharedPtr<InsertObjectInstanceMessage> request;
-  request = new InsertObjectInstanceMessage;
+  request = MakeShared<InsertObjectInstanceMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setObjectClassHandle(objectClassHandle);
   request->setObjectInstanceHandle(objectInstanceHandle);
@@ -690,7 +692,7 @@ void MomServer::deleteObjectInstance(ObjectInstanceHandle objectInstanceHandle)
     throw DeletePrivilegeNotHeld(objectInstanceHandle.toString());
 
   SharedPtr<DeleteObjectInstanceMessage> request;
-  request = new DeleteObjectInstanceMessage;
+  request = MakeShared<DeleteObjectInstanceMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setFederateHandle(getFederateHandle());
   request->setObjectInstanceHandle(objectInstanceHandle);
@@ -738,7 +740,7 @@ void MomServer::updateAttributeValues(ObjectInstanceHandle objectInstanceHandle,
     if (passels[i].empty())
       continue;
     SharedPtr<AttributeUpdateMessage> request;
-    request = new AttributeUpdateMessage;
+    request = MakeShared<AttributeUpdateMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setFederateHandle(getFederateHandle());
     request->setObjectInstanceHandle(objectInstanceHandle);
@@ -765,7 +767,7 @@ void MomServer::requestAttributeValueUpdate(ObjectInstanceHandle objectInstanceH
   }
 
   SharedPtr<RequestAttributeUpdateMessage> request;
-  request = new RequestAttributeUpdateMessage;
+  request = MakeShared<RequestAttributeUpdateMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setObjectInstanceHandle(objectInstanceHandle);
   request->getAttributeHandles().swap(attributeHandleVector);
@@ -784,7 +786,7 @@ void MomServer::publishInteractionClass(InteractionClassHandle interactionClassH
   if (!interactionClass->setPublicationType(Published))
     return;
 
-  SharedPtr<ChangeInteractionClassPublicationMessage> request = new ChangeInteractionClassPublicationMessage;
+  SharedPtr<ChangeInteractionClassPublicationMessage> request = MakeShared<ChangeInteractionClassPublicationMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setInteractionClassHandle(interactionClassHandle);
   request->setPublicationType(Published);
@@ -795,7 +797,7 @@ void MomServer::publishInteractionClass(InteractionClassHandle interactionClassH
   // see comment in enableInteractionRelevanceAdvisorySwitch()
   if (_rtiFederate->getInteractionRelevanceAdvisorySwitchEnabled())
   {
-    SharedPtr<TurnInteractionsOnMessage> message = new TurnInteractionsOnMessage;
+    SharedPtr<TurnInteractionsOnMessage> message = MakeShared<TurnInteractionsOnMessage>();
     message->setInteractionClassHandle(interactionClassHandle);
     message->setOn(true);
 
@@ -831,7 +833,7 @@ void MomServer::subscribeInteractionClassWithFilter(
   if (subscribeResult)
   {
     // maybe we want to store parameter filters in the federate's InteractionClass as well.
-    SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+    SharedPtr<ChangeInteractionClassSubscriptionMessage> request = MakeShared<ChangeInteractionClassSubscriptionMessage>();
     request->setFederationHandle(getFederationHandle());
     request->setInteractionClassHandle(interactionClassHandle);
     request->setSubscriptionType(subscriptionType);
@@ -863,7 +865,7 @@ void MomServer::subscribeInteractionClass(InteractionClassHandle interactionClas
   if (!interactionClass->setSubscriptionType(subscriptionType, ParameterValueVector()))
     return;
 
-  SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+  SharedPtr<ChangeInteractionClassSubscriptionMessage> request = MakeShared<ChangeInteractionClassSubscriptionMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setInteractionClassHandle(interactionClassHandle);
   request->setSubscriptionType(subscriptionType);
@@ -883,7 +885,7 @@ void MomServer::unsubscribeInteractionClass(InteractionClassHandle interactionCl
   if (!interactionClass->setSubscriptionType(Unsubscribed, ParameterValueVector()))
     return;
 
-  SharedPtr<ChangeInteractionClassSubscriptionMessage> request = new ChangeInteractionClassSubscriptionMessage;
+  SharedPtr<ChangeInteractionClassSubscriptionMessage> request = MakeShared<ChangeInteractionClassSubscriptionMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setInteractionClassHandle(interactionClassHandle);
   request->setSubscriptionType(Unsubscribed);
@@ -908,7 +910,7 @@ void MomServer::sendInteraction(InteractionClassHandle interactionClassHandle, c
       throw InteractionParameterNotDefined(i->getParameterHandle().toString());
 
   SharedPtr<InteractionMessage> request;
-  request = new InteractionMessage;
+  request = MakeShared<InteractionMessage>();
   request->setFederationHandle(getFederationHandle());
   request->setFederateHandle(getFederateHandle());
   request->setInteractionClassHandle(interactionClassHandle);
@@ -960,7 +962,7 @@ void MomServer::reserveObjectInstanceName(const std::string& objectInstanceName,
   OpenRTIAssert(federate);
   mPendingNameReservations[objectInstanceName] = callback;
   SharedPtr<ReserveObjectInstanceNameRequestMessage> request;
-  request = new ReserveObjectInstanceNameRequestMessage;
+  request = MakeShared<ReserveObjectInstanceNameRequestMessage>();
   request->setFederationHandle(federate->getFederationHandle());
   request->setFederateHandle(federate->getFederateHandle());
   request->setName(objectInstanceName);
@@ -975,7 +977,7 @@ void MomServer::_releaseObjectInstance(const ObjectInstanceHandle& objectInstanc
 
   // Unreference the object instance handle resource
   SharedPtr<ReleaseMultipleObjectInstanceNameHandlePairsMessage> message;
-  message = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
+  message = MakeShared<ReleaseMultipleObjectInstanceNameHandlePairsMessage>();
   message->setFederationHandle(getFederationHandle());
   message->getObjectInstanceHandleVector().push_back(objectInstanceHandle);
   sendRequest(message);

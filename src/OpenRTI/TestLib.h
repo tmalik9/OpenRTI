@@ -158,7 +158,7 @@ public:
 private:
   SocketAddress startServer(const SocketAddress& parentAddress, bool compress)
   {
-    SharedPtr<ServerThread> serverThread = new ServerThread;
+    SharedPtr<ServerThread> serverThread = MakeShared<ServerThread>();
     serverThread->setupServer("localhost", parentAddress, compress);
     _serverThreadList.push_back(serverThread);
     return serverThread->getAddress();
@@ -427,7 +427,7 @@ public:
   virtual ~RTITest()
   { }
 
-  virtual Ambassador* createAmbassador(const ConstructorArgs&) = 0;
+  virtual SharedPtr<Ambassador> createAmbassador(const ConstructorArgs&) = 0;
 
   void insertOptionString(const std::string& optionString)
   {
@@ -492,8 +492,8 @@ public:
     ConstructorArgs constructorArgs;
     constructorArgs._fddFile = _fddFile;
     constructorArgs._mimFile = _mimFile;
-    constructorArgs._federationBarrier = new FederationBarrier(_numAmbassadorThreads);
-    constructorArgs._lbts = new LBTS(_numAmbassadorThreads);
+    constructorArgs._federationBarrier = MakeShared<FederationBarrier>(_numAmbassadorThreads);
+    constructorArgs._lbts = MakeShared<LBTS>(_numAmbassadorThreads);
     constructorArgs._argumentList = _globalArgumentList;
     constructorArgs._disjointFederations = _disjointFederations;
     constructorArgs._joinOnce = _joinOnce;
@@ -520,7 +520,7 @@ public:
       testAmbassador = createAmbassador(constructorArgs);
 
       SharedPtr<AmbassadorThread> ambassadorThread;
-      ambassadorThread = new AmbassadorThread(testAmbassador);
+      ambassadorThread = MakeShared<AmbassadorThread>(testAmbassador);
       _ambassadorThreadList.push_back(ambassadorThread);
       ambassadorThread->start();
     }

@@ -351,7 +351,7 @@ SocketAddress::data()
 {
   if (PrivateData::count(_privateData.get()) == 1)
     return _privateData.get();
-  _privateData = PrivateData::create(0);
+  _privateData = SharedPtr<PrivateData>(PrivateData::create(0));
   return _privateData.get();
 }
 

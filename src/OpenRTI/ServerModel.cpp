@@ -1803,7 +1803,7 @@ Federation::Federation(Node& serverNode)
 
 Federation::~Federation()
 {
-  _momServer.clear();
+  _momServer.reset();
   // In case of an exception tis can be non empty
   _objectInstanceHandleObjectInstanceMap.clear();
 
@@ -3721,7 +3721,7 @@ void Federation::initializeMom(AbstractServer* server, FederateHandle federateHa
   if (_momServer == nullptr)
   {
     bool isRoot = !federateHandle.valid();
-    _momServer = new MomServer(this, server, isRoot, federateHandle);
+    _momServer = MakeShared<MomServer>(this, server, isRoot, federateHandle);
   }
 #endif
 }
@@ -3853,7 +3853,7 @@ void Federation::objectInstanceUpdateSent(const ConnectHandle& connectHandle, Ob
 
 NodeConnect::NodeConnect()
   : _isParentConnect(false)
-  , _version(OPENRTI_ENCODING_VERSION)
+  , _version(0)
 {
 }
 
@@ -3912,14 +3912,12 @@ NodeConnect::setOptions(const StringStringListMap& options)
   else
     _name.clear();
   i = options.find("version");
+  assert(i != options.end() && !i->second.empty());
   if (i != options.end() && !i->second.empty())
   {
     const char* s = i->second.front().c_str();
     _version = strtoul(s, nullptr, 10);
-    //DebugPrintf("%s: client version=%d\n", __FUNCTION__, _version);
   }
-  else
-    _name.clear();
 }
 
 void
@@ -3927,6 +3925,7 @@ NodeConnect::send(const SharedPtr<const AbstractMessage>& message)
 {
   if (!_messageSender.valid())
     return;
+  //std::cout << __FUNCTION__ << ": connect=" << getConnectHandle() << " version=" << getVersion() << std::endl;
   _messageSender->send(message);
 }
 

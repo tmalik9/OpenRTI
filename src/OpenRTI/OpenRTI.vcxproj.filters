@@ -271,6 +271,9 @@
     <ClCompile Include="AbsTimeout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ImmediateCallbackDispatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -455,7 +458,7 @@
     <ClInclude Include="NetworkServer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenRTIConfig.h">
+    <ClInclude Include="vsbuild\OpenRTIConfig.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Options.h">
@@ -749,6 +752,9 @@
     <ClInclude Include="AbsTimeout.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ImmediateCallbackDispatcher.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
@@ -765,5 +771,10 @@
     <Xml Include="codegen\Message.xml">
       <Filter>codegen</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

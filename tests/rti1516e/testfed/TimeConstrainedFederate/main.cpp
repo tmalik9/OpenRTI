@@ -3,6 +3,7 @@
 #include "RTI/Exception.h"
 #include <signal.h>
 #include <cstring>
+#include <chrono>
 
 TimeConstrainedFederate* federate = nullptr;
 
@@ -68,7 +69,7 @@ int main(int argc, char* argv[])
   try {
     federate = new TimeConstrainedFederate();
     federate->join(rtiAddress, federateName, fomPath, federationName, false, true);
-    federate->run(10);
+    federate->run(std::chrono::milliseconds(10));
     federate->disconnect();
   }
   catch( Exception& e)

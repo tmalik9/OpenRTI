@@ -156,7 +156,7 @@ RegionSet::empty() const
 void
 RegionSet::insert(const RegionHandle& regionHandle, const Region& region)
 {
-  SharedPtr<Leaf> leaf = new Leaf;
+  SharedPtr<Leaf> leaf = MakeShared<Leaf>();
   leaf->_region = region;
   (*_regionHandleLeafMap)[regionHandle] = leaf;
 }

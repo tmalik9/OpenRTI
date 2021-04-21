@@ -24,7 +24,7 @@
     <Platform>x64</Platform>
     <ProjectName>OpenRTI</ProjectName>
     <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -89,40 +89,40 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);.$(ProjectDir)xml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
       <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);.$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);.$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <Optimization>MaxSpeed</Optimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);.$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <Optimization>MaxSpeed</Optimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -137,6 +137,7 @@
     <ClCompile Include="AbstractSocketEvent.cpp" />
     <ClCompile Include="Attributes.cpp" />
     <ClCompile Include="dprintf.cpp" />
+    <ClCompile Include="ImmediateCallbackDispatcher.cpp" />
     <ClCompile Include="InternalAmbassador.cpp" />
     <ClCompile Include="InternalTimeManagement.cpp" />
     <ClCompile Include="Federate.cpp" />
@@ -243,6 +244,7 @@
     <ClInclude Include="encoding\HLAopaqueData.h" />
     <ClInclude Include="encoding\HLAvariableArray.h" />
     <ClInclude Include="encoding\HLAvariantRecord.h" />
+    <ClInclude Include="ImmediateCallbackDispatcher.h" />
     <ClInclude Include="mom\AbstractFederateMetrics.h" />
     <ClInclude Include="mom\MomServer.h" />
     <ClInclude Include="mom\MomFederate.h" />
@@ -332,7 +334,7 @@
     <ClInclude Include="NestedProtocolLayer.h" />
     <ClInclude Include="NetworkServer.h" />
     <ClInclude Include="NetworkStatistics.h" />
-    <ClInclude Include="OpenRTIConfig.h" />
+    <ClInclude Include="vsbuild\OpenRTIConfig.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="ParenthesesReader.h" />
     <ClInclude Include="PooledMessageList.h" />
@@ -399,6 +401,9 @@
     <Xml Include="codegen\Message.xml">
       <SubType>Designer</SubType>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

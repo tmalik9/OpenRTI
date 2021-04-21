@@ -62,7 +62,7 @@ main(int argc, char* argv[])
     addressList.pop_front();
 
     // At first set up a listening server and determine an unused socket address
-    OpenRTI::SharedPtr<OpenRTI::NetworkServer> listeningNetworkServer = new OpenRTI::NetworkServer;
+    OpenRTI::SharedPtr<OpenRTI::NetworkServer> listeningNetworkServer = OpenRTI::MakeShared<OpenRTI::NetworkServer>();
     try {
       listenAddress = listeningNetworkServer->listenInet(address, 1);
       success = true;
@@ -72,7 +72,7 @@ main(int argc, char* argv[])
 
     // Now retract the listen, which must result in an immediate connection refused
     // Note that this address should not even be reused within this time so this test is (hopefully?) safe.
-    listeningNetworkServer.clear();
+    listeningNetworkServer.reset();
 
     std::wstring federationExecutionName(L"rti://");
     federationExecutionName += OpenRTI::localeToUcs(listenAddress.getNumericName());

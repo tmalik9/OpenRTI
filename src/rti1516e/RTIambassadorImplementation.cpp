@@ -148,8 +148,6 @@ static void loadModules(OpenRTI::FOMStringModule2List& fomModuleList, const std:
 // unreferenced local function has been removed
 #pragma warning(disable: 4505)
 
-/*
-// unused yet
 static OpenRTI::CallbackModel translate(rti1516e::CallbackModel callbackModel)
 {
   switch (callbackModel) {
@@ -160,7 +158,7 @@ static OpenRTI::CallbackModel translate(rti1516e::CallbackModel callbackModel)
     return OpenRTI::HLA_EVOKED;
   }
 }
-*/
+
 static rti1516e::OrderType translate(OpenRTI::OrderType orderType)
 {
   switch (orderType) {
@@ -607,13 +605,13 @@ public:
     return rti1516e::LogicalTimeFactoryFactory::makeLogicalTimeFactory(utf8ToUcs(federate->getLogicalTimeFactoryName()));
   }
 
-  TimeManagement<RTI1516ETraits>* createTimeManagement(Federate& federate) override
+  SharedPtr<TimeManagement<RTI1516ETraits>> createTimeManagement(Federate& federate) override
   {
     std::string logicalTimeFactoryName = federate.getLogicalTimeFactoryName();
     std::unique_ptr<rti1516e::LogicalTimeFactory> logicalTimeFactory;
     logicalTimeFactory = rti1516e::LogicalTimeFactoryFactory::makeLogicalTimeFactory(utf8ToUcs(logicalTimeFactoryName));
     if (!logicalTimeFactory.get())
-      return 0;
+      return SharedPtr<TimeManagement<RTI1516ETraits>>();
 
     // Get logical time and logical time interval. If they are the well known ones,
     // try to use the optimized implementation using the native time data types directly.
@@ -635,7 +633,7 @@ public:
           *logicalTime = time;
           *logicalTimeInterval = interval;
           if (*logicalTime == time && *logicalTimeInterval == interval) {
-            return new TemplateTimeManagement<RTI1516ETraits, RTI1516Einteger64TimeFactory>(RTI1516Einteger64TimeFactory(ucsToUtf8(time.implementationName())));
+            return MakeShared<TemplateTimeManagement<RTI1516ETraits, RTI1516Einteger64TimeFactory>>(RTI1516Einteger64TimeFactory(ucsToUtf8(time.implementationName())));
           }
         }
       } catch (...) {
@@ -651,7 +649,7 @@ public:
           *logicalTime = time;
           *logicalTimeInterval = interval;
           if (*logicalTime == time && *logicalTimeInterval == interval) {
-            return new TemplateTimeManagement<RTI1516ETraits, RTI1516Efloat64TimeFactory>(RTI1516Efloat64TimeFactory(ucsToUtf8(time.implementationName())));
+            return MakeShared<TemplateTimeManagement<RTI1516ETraits, RTI1516Efloat64TimeFactory>>(RTI1516Efloat64TimeFactory(ucsToUtf8(time.implementationName())));
           }
         }
       } catch (...) {
@@ -659,7 +657,7 @@ public:
     }
 
     // Ok, we will just need to use the opaque logical time factory
-    return new TemplateTimeManagement<RTI1516ETraits, RTI1516ELogicalTimeFactory>(RTI1516ELogicalTimeFactory(std::move(logicalTimeFactory)));
+    return MakeShared<TemplateTimeManagement<RTI1516ETraits, RTI1516ELogicalTimeFactory>>(RTI1516ELogicalTimeFactory(std::move(logicalTimeFactory)));
   }
 
   void connectionLost(const std::string& faultDescription) override
@@ -1625,9 +1623,6 @@ void
 RTIambassadorImplementation::connect(rti1516e::FederateAmbassador & federateAmbassador, rti1516e::CallbackModel rti1516CallbackModel,
                                      std::wstring const & localSettingsDesignator)
 {
-  if (rti1516CallbackModel != rti1516e::HLA_EVOKED)
-    throw rti1516e::UnsupportedCallbackModel(L"Only HLA_EVOKED supported!");
-
   try {
     if (_ambassadorInterface->_inCallback)
       throw OpenRTI::CallNotAllowedFromWithinCallback();
@@ -1635,6 +1630,11 @@ RTIambassadorImplementation::connect(rti1516e::FederateAmbassador & federateAmba
     StringStringListMap clientoptions;
     _ambassadorInterface->connect(url, clientoptions, _ambassadorInterface->getConnectWaitTimeoutMilliSeconds());
     _ambassadorInterface->_federateAmbassador = &federateAmbassador;
+    OpenRTI::CallbackModel callbackModel = translate(rti1516CallbackModel);
+    if (callbackModel == HLA_IMMEDIATE)
+    {
+      _ambassadorInterface->enableImmediateProcessing();
+    }
   } catch (const OpenRTI::ConnectionFailed& e) {
     throw rti1516e::ConnectionFailed(OpenRTI::utf8ToUcs(e.what()));
   } catch (const OpenRTI::InvalidLocalSettingsDesignator& e) {
@@ -1657,6 +1657,10 @@ RTIambassadorImplementation::disconnect()
     if (_ambassadorInterface->_inCallback)
       throw OpenRTI::CallNotAllowedFromWithinCallback();
     _ambassadorInterface->disconnect();
+    if (_ambassadorInterface->getCallbackModel() == HLA_IMMEDIATE)
+    {
+      _ambassadorInterface->disableImmediateProcessing();
+    }
     _ambassadorInterface->_federateAmbassador = 0;
   } catch (const OpenRTI::FederateIsExecutionMember& e) {
     throw rti1516e::FederateIsExecutionMember(OpenRTI::utf8ToUcs(e.what()));
@@ -1724,17 +1728,26 @@ RTIambassadorImplementation::createFederationExecution(std::wstring const & fede
 
   try {
     _ambassadorInterface->createFederationExecution(ucsToUtf8(federationExecutionName), fomModuleList, ucsToUtf8(logicalTimeImplementationName));
-  } catch (const OpenRTI::InconsistentFDD& e) {
+  }
+  catch (const OpenRTI::InconsistentFDD& e) {
     throw rti1516e::InconsistentFDD(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::FederationExecutionAlreadyExists& e) {
+  }
+  catch (const OpenRTI::FederationExecutionAlreadyExists& e) {
     throw rti1516e::FederationExecutionAlreadyExists(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::CouldNotCreateLogicalTimeFactory& e) {
+  }
+  catch (const OpenRTI::CouldNotCreateLogicalTimeFactory& e) {
     throw rti1516e::CouldNotCreateLogicalTimeFactory(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::NotConnected& e) {
+  }
+  catch (const OpenRTI::NotConnected& e) {
     throw rti1516e::NotConnected(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const std::exception& e) {
+  }
+  catch (const OpenRTI::OperationTimeout& e) {
+    throw rti1516e::OperationTimeout(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const std::exception& e) {
     throw rti1516e::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
-  } catch (...) {
+  }
+  catch (...) {
     throw rti1516e::RTIinternalError(L"Unknown internal error!");
   }
 }
@@ -1749,11 +1762,14 @@ RTIambassadorImplementation::createFederationExecutionWithMIM (std::wstring cons
 
   try {
     loadModule(fomModuleList, mimModule);
-  } catch (const rti1516e::CouldNotOpenFDD& e) {
+  }
+  catch (const rti1516e::CouldNotOpenFDD& e) {
     throw rti1516e::CouldNotOpenMIM(e.what());
-  } catch (const rti1516e::ErrorReadingFDD& e) {
+  }
+  catch (const rti1516e::ErrorReadingFDD& e) {
     throw rti1516e::ErrorReadingMIM(e.what());
-  } catch (const rti1516e::Exception& e) {
+  }
+  catch (const rti1516e::Exception& e) {
     throw rti1516e::RTIinternalError(e.what());
   } catch (...) {
     throw rti1516e::RTIinternalError(L"Unknown error while reading mim file");
@@ -1764,17 +1780,26 @@ RTIambassadorImplementation::createFederationExecutionWithMIM (std::wstring cons
 
   try {
     _ambassadorInterface->createFederationExecution(ucsToUtf8(federationExecutionName), fomModuleList, ucsToUtf8(logicalTimeImplementationName));
-  } catch (const OpenRTI::InconsistentFDD& e) {
+  }
+  catch (const OpenRTI::InconsistentFDD& e) {
     throw rti1516e::InconsistentFDD(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::FederationExecutionAlreadyExists& e) {
+  }
+  catch (const OpenRTI::FederationExecutionAlreadyExists& e) {
     throw rti1516e::FederationExecutionAlreadyExists(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::CouldNotCreateLogicalTimeFactory& e) {
+  }
+  catch (const OpenRTI::CouldNotCreateLogicalTimeFactory& e) {
     throw rti1516e::CouldNotCreateLogicalTimeFactory(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::NotConnected& e) {
+  }
+  catch (const OpenRTI::NotConnected& e) {
     throw rti1516e::NotConnected(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const std::exception& e) {
+  }
+  catch (const OpenRTI::OperationTimeout& e) {
+      throw rti1516e::OperationTimeout(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const std::exception& e) {
     throw rti1516e::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
-  } catch (...) {
+  }
+  catch (...) {
     throw rti1516e::RTIinternalError(L"Unknown internal error!");
   }
 }
@@ -1825,25 +1850,38 @@ RTIambassadorImplementation::joinFederationExecution(std::wstring const & federa
       throw OpenRTI::CallNotAllowedFromWithinCallback();
     return OpenRTI::_O1516EFederateHandle(_ambassadorInterface->joinFederationExecution(std::string(), ucsToUtf8(federateType),
                                                                                         ucsToUtf8(federationExecutionName), fomModuleList));
-  } catch (const OpenRTI::CouldNotCreateLogicalTimeFactory& e) {
+  }
+  catch (const OpenRTI::CouldNotCreateLogicalTimeFactory& e) {
     throw rti1516e::CouldNotCreateLogicalTimeFactory(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::FederationExecutionDoesNotExist& e) {
+  }
+  catch (const OpenRTI::FederationExecutionDoesNotExist& e) {
     throw rti1516e::FederationExecutionDoesNotExist(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::InconsistentFDD& e) {
+  }
+  catch (const OpenRTI::InconsistentFDD& e) {
     throw rti1516e::InconsistentFDD(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::FederateAlreadyExecutionMember& e) {
+  }
+  catch (const OpenRTI::FederateAlreadyExecutionMember& e) {
     throw rti1516e::FederateAlreadyExecutionMember(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::SaveInProgress& e) {
+  }
+  catch (const OpenRTI::SaveInProgress& e) {
     throw rti1516e::SaveInProgress(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::RestoreInProgress& e) {
+  }
+  catch (const OpenRTI::RestoreInProgress& e) {
     throw rti1516e::RestoreInProgress(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::NotConnected& e) {
+  }
+  catch (const OpenRTI::NotConnected& e) {
     throw rti1516e::NotConnected(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const OpenRTI::CallNotAllowedFromWithinCallback& e) {
+  }
+  catch (const OpenRTI::CallNotAllowedFromWithinCallback& e) {
     throw rti1516e::CallNotAllowedFromWithinCallback(OpenRTI::utf8ToUcs(e.what()));
-  } catch (const std::exception& e) {
+  }
+  catch (const OpenRTI::OperationTimeout& e) {
+    throw rti1516e::OperationTimeout(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const std::exception& e) {
     throw rti1516e::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
-  } catch (...) {
+  }
+  catch (...) {
     throw rti1516e::RTIinternalError(L"Unknown internal error!");
   }
 }

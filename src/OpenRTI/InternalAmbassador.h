@@ -24,6 +24,8 @@
 #include "Message.h"
 #include "StringUtils.h"
 #include "AbsTimeout.h"
+#include "Mutex.h"
+#include "ScopeLock.h"
 
 namespace OpenRTI {
 
@@ -31,6 +33,7 @@ class InternalTimeManagement;
 class Federate;
 class URL;
 class AbstractServer; 
+class ImmediateCallbackDispatcher;
 
 class OPENRTI_API InternalAmbassador {
 public:
@@ -49,18 +52,36 @@ public:
   /// Returns true if there is an other pending message.
   bool receiveAndDispatchInternalMessage(const AbsTimeout& timeout);
   template<typename F>
-  bool receiveAndDispatch(const AbsTimeout& timeout, F& functor)
-  { return _receiveAndDispatch(timeout, FunctorMessageDispatcher<F>(functor)); }
+  bool receiveAndDispatch(const AbsTimeout& timeout, F& functor) {
+    return _receiveAndDispatch(timeout, FunctorMessageDispatcher<F>(functor));
+  }
   template<typename F>
-  bool receiveAndDispatch(const AbsTimeout& timeout, const F& functor)
-  { return _receiveAndDispatch(timeout, ConstFunctorMessageDispatcher<F>(functor)); }
+  bool receiveAndDispatch(const AbsTimeout& timeout, const F& functor) {
+    return _receiveAndDispatch(timeout, ConstFunctorMessageDispatcher<F>(functor));
+  }
   bool _receiveAndDispatch(const AbsTimeout& timeout, const AbstractMessageDispatcher& dispatcher);
+
+  // receiveAndDispatch w.o. timeout, caution: must be used with notification handle
+  bool receiveAndDispatchInternalMessage();
+  template<typename F>
+  bool receiveAndDispatch(F& functor) {
+    return _receiveAndDispatch(FunctorMessageDispatcher<F>(functor));
+  }
+  template<typename F>
+  bool receiveAndDispatch(const F& functor) {
+    return _receiveAndDispatch(ConstFunctorMessageDispatcher<F>(functor));
+  }
+  bool _receiveAndDispatch(const AbstractMessageDispatcher& dispatcher);
+
   void flushAndDispatchInternalMessage();
   template<typename F>
-  void flushReceiveAndDispatch(const F& functor)
-  { _flushReceiveAndDispatch(ConstFunctorMessageDispatcher<F>(functor)); }
+  void flushReceiveAndDispatch(const F& functor) {
+    _flushReceiveAndDispatch(ConstFunctorMessageDispatcher<F>(functor));
+  }
   void _flushReceiveAndDispatch(const AbstractMessageDispatcher& dispatcher);
   //// FIXME rethink this all?!
+
+  virtual bool dispatchCallback() = 0;
 
   /// Default internal message processing method
   void acceptInternalMessage(const AbstractMessage& message);
@@ -70,6 +91,7 @@ public:
   virtual void acceptInternalMessage(const InsertFederationExecutionMessage& message) = 0;
   void acceptInternalMessage(const ShutdownFederationExecutionMessage& message);
   void acceptInternalMessage(const EraseFederationExecutionMessage& message);
+  void acceptInternalMessage(const DestroyFederationExecutionResponseMessage& /*message*/);
   void acceptInternalMessage(const ReleaseFederationHandleMessage& message);
   void acceptInternalMessage(const InsertModulesMessage& message);
   void acceptInternalMessage(const InsertModules2Message& message);
@@ -138,6 +160,7 @@ public:
   // processing of callback messages - this is what the ambassador user sees
   void queueCallback(const SharedPtr<const AbstractMessage>& message)
   {
+    ScopeLock lock(_callbackMessageListMutex);
     if (_messageListPool.empty()) {
       _callbackMessageList.push_back(message);
     } else {
@@ -152,11 +175,12 @@ public:
   }
   void queueCallback(const AbstractMessage& message)
   {
+    ScopeLock lock(_callbackMessageListMutex);
     if (_messageListPool.empty()) {
-      _callbackMessageList.push_back(&message);
+      _callbackMessageList.push_back(SharedPtr<const AbstractMessage>(&message));
     } else {
       _callbackMessageList.splice(_callbackMessageList.end(), _messageListPool, _messageListPool.begin());
-      _callbackMessageList.back() = &message;
+      _callbackMessageList.back() = SharedPtr<const AbstractMessage>(&message);
     }
     if (_notificationHandle != nullptr)
     {
@@ -166,12 +190,33 @@ public:
   }
   void queueTimeStampedMessage(const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback=false);
   void queueReceiveOrderMessage(const AbstractMessage& message);
-
   bool _dispatchCallbackMessage(AbstractMessageDispatcher& messageDispatcher);
   bool _callbackMessageAvailable();
 
   uint32_t getProtocolVersion() const;
-protected:
+
+  void enableCallbacks()
+    // throw (SaveInProgress,
+    //        RestoreInProgress,
+    //        RTIinternalError)
+  {
+    _callbacksEnabled = true;
+  }
+
+  void disableCallbacks()
+    // throw (SaveInProgress,
+    //        RestoreInProgress,
+    //        RTIinternalError)
+  {
+    _callbacksEnabled = false;
+  }
+
+  bool getCallbacksEnabled() const { return _callbacksEnabled; }
+
+  void enableImmediateProcessing();
+  void disableImmediateProcessing();
+  CallbackModel getCallbackModel() const { return _callbackModel; }
+
   void _setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h);
   std::shared_ptr<AbstractNotificationHandle> _getNotificationHandle()
   {
@@ -193,11 +238,19 @@ private:
 
   // List for receive order messages already queued for callback
   MessageList _callbackMessageList;
-
   // List elements for reuse
   MessageList _messageListPool;
+  Mutex _callbackMessageListMutex;
 
   std::shared_ptr<AbstractNotificationHandle> _notificationHandle;
+  CallbackModel _callbackModel = HLA_EVOKED;
+  SharedPtr<ImmediateCallbackDispatcher> _immediateCallbackDispatcher;
+  
+protected:
+  // True if callback dispatch is enabled or if callbacks are held back
+  bool _callbacksEnabled = true;
+  // the big huge lock around the time management
+  RecursiveMutex _timeManagementMutex;
 };
 
 } // namespace OpenRTI
