@@ -137,6 +137,7 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
     using rti1516e::HLAvariableArray::get;
     <#=variableArrayDataType.ReturnCppType#> get() const;
     void resize(size_t size);
+    using rti1516e::HLAvariableArray::decodeFrom;
     virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
   private:
     void update();
