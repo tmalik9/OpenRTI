@@ -883,8 +883,8 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
   size_t length = _valuePointer->size();
-  if (std::numeric_limits<Integer32>::max() < length)
-    length = std::numeric_limits<Integer32>::max();
+  if (std::numeric_limits<size_t>::max() < length)
+    length = std::numeric_limits<size_t>::max();
   offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<int32_t>(length));
   memcpy(buffer + offset, _valuePointer->data(), static_cast<int32_t>(length));
   return offset + length;
@@ -939,8 +939,8 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
 size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
   size_t length = _valuePointer->size();
-  if (std::numeric_limits<Integer32>::max() < length)
-    length = std::numeric_limits<Integer32>::max();
+  if (std::numeric_limits<size_t>::max() < length)
+    length = std::numeric_limits<size_t>::max();
   offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<uint32_t>(length));
   for (size_t i = 0; i < length; ++i) {
     uint16_t unicodeChar = uint16_t((*_valuePointer)[i]);
