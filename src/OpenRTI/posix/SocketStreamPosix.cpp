@@ -196,6 +196,10 @@ SocketStream::recv(const BufferRange& bufferRange, bool peek)
   if (peek)
     flags |= MSG_PEEK;
   ssize_t ret = ::recvmsg(_privateData->_fd, &msg, flags);
+  if (ret == 0)
+  {
+    throw TransportError("connection closed");
+  }
   if (ret != -1)
     return ret;
 

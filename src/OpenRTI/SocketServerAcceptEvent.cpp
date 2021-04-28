@@ -64,6 +64,11 @@ SocketServerAcceptEvent::write(SocketEventDispatcher&)
 {
 }
 
+void SocketServerAcceptEvent::error(const Exception& e)
+{
+
+}
+
 bool
 SocketServerAcceptEvent::getEnableWrite() const
 {

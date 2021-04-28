@@ -38,6 +38,7 @@ public:
   bool getEnableRead() const override;
 
   void write(SocketEventDispatcher& dispatcher) override;
+  void error(const Exception& e) override;
   bool getEnableWrite() const override;
   size_t getBytesQueued() const override;
 

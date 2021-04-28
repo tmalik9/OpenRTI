@@ -22,20 +22,11 @@
 
 namespace OpenRTI {
 
-AbstractSocketEvent::AbstractSocketEvent() :
-  _socketEventDispatcher(0),
-  _timeout(Clock::max())
+AbstractSocketEvent::AbstractSocketEvent()
+  : _socketEventDispatcher(0)
+  //, _timeout(Clock::max())
 {
 }
 
-//void
-//AbstractSocketEvent::timeout(SocketEventDispatcher& dispatcher)
-//{
-//}
-
-void
-AbstractSocketEvent::error(const Exception& /*e*/)
-{
-}
 
 } // namespace OpenRTI

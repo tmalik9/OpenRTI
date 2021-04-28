@@ -160,7 +160,7 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
         break;
       }
 
-      // We know the last one is from _fdVector is the wakup fd. Hence the _socketEventVector size is the one to walk.
+      // We know the last one is from _fdVector is the wakeup fd. Hence the _socketEventVector size is the one to walk.
       for (SocketEventVector::size_type i = 0; i < _socketEventVector.size(); ++i) {
         SharedPtr<AbstractSocketEvent> socketEvent;
         socketEvent.swap(_socketEventVector[i]);
@@ -170,10 +170,22 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
           if (fd != -1) {
             OpenRTIAssert(fd == _fdVector[i].fd);
             short revents = _fdVector[i].revents;
+            /* never occurs - not implemented?
+            if (revents & POLLRDHUP)
+            {
+              socketEvent->error(OpenRTI::ConnectionFailed("connection closed"));
+              dispatcher.erase(socketEvent);
+              continue;
+            }
+            */
             if (revents & POLLRDNORM)
+            {
               dispatcher.read(socketEvent);
+            }
             if (revents & POLLWRNORM)
+            {
               dispatcher.write(socketEvent);
+            }
 
             // queue overflow - close connection
             if (!socketEvent->getSocket()->isWritable())
@@ -185,15 +197,11 @@ struct OPENRTI_LOCAL SocketEventDispatcher::PrivateData {
             }
           }
         }
-        //if (socketEvent->getTimeout().getNSec() <= now)
-        //  dispatcher.timeout(socketEvent);
       }
 
       for (SocketEventVector::size_type i = 0; i < _timerSocketEventVector.size(); ++i) {
         SharedPtr<AbstractSocketEvent> socketEvent;
         socketEvent.swap(_timerSocketEventVector[i]);
-        //if (socketEvent->getTimeout().getNSec() <= now)
-        //  dispatcher.timeout(socketEvent);
       }
 
       OpenRTIAssert(!_fdVector.empty());

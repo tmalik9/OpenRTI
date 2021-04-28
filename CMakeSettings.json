@@ -70,7 +70,7 @@
       "buildRoot": "${workspaceRoot}\\build\\${name}",
       "installRoot": "${workspaceRoot}\\bin\\${name}",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": [
@@ -93,7 +93,7 @@
       "buildRoot": "${workspaceRoot}\\build\\${name}",
       "installRoot": "${workspaceRoot}\\bin\\${name}",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": [
@@ -115,8 +115,9 @@
       "configurationType": "Debug",
       "buildRoot": "${projectDir}\\build\\${name}",
       "installRoot": "${projectDir}\\bin\\${name}",
+      "cmakeExecutable": "/usr/local/bin/cmake",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
@@ -137,7 +138,7 @@
           "value": "True",
           "type": "BOOL"
         }
-      ],
+      ]
     },
     {
       "name": "WSLRelease",
@@ -145,8 +146,9 @@
       "configurationType": "RelWithDebInfo",
       "buildRoot": "${projectDir}\\build\\${name}",
       "installRoot": "${projectDir}\\bin\\${name}",
+      "cmakeExecutable": "/usr/local/bin/cmake",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_x64" ],
       "wslPath": "${defaultWSLPath}",
@@ -167,7 +169,7 @@
           "value": "True",
           "type": "BOOL"
         }
-      ],
+      ]
     },
     {
       "name": "WSL-Clang-Debug",
@@ -177,7 +179,7 @@
       "installRoot": "${workspaceRoot}\\bin\\${name}",
       "cmakeExecutable": "/usr/local/bin/cmake",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_clang_x64" ],
       "wslPath": "${defaultWSLPath}",
@@ -198,7 +200,7 @@
       "installRoot": "${workspaceRoot}\\bin\\${name}",
       "cmakeExecutable": "/usr/local/bin/cmake",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "linux_clang_x64" ],
       "wslPath": "${defaultWSLPath}",
