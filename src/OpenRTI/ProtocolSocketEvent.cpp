@@ -97,14 +97,9 @@ ProtocolSocketEvent::read(SocketEventDispatcher& dispatcher)
 {
   if (!_protocolSocket->_closed) {
     _protocolSocket->read();
-  } else {
-    Buffer buffer;
-    buffer.push_back(VariableLengthData(64*1024));
-    ssize_t ret;
-    do {
-      ret = _protocolSocket->_socketStream->recv(BufferRange(buffer.byte_begin(), buffer.byte_end()), false);
-    } while (0 < ret);
-    if (ret == 0) {
+    if (_protocolSocket->_closed)
+    {
+      error(TransportError("connection closed"));
       dispatcher.erase(SharedPtr<ProtocolSocketEvent>(this));
     }
   }

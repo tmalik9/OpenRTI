@@ -168,11 +168,6 @@ SocketStream::cork(bool /*enable*/)
 {
 }
 
-void
-SocketStream::shutdown()
-{
-}
-
 SocketAddress
 SocketStream::getpeername() const
 {
