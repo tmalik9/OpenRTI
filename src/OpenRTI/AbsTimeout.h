@@ -3,6 +3,7 @@
 #include "Clock.h"
 #include <chrono>
 #include <thread>
+#include <future>
 #include <condition_variable>
 #include <mutex>
 #include <iostream>
@@ -14,6 +15,15 @@
 
 namespace OpenRTI {
 
+// AbsTimeout implements an interruptible timeout clock.
+// Interruptible means that, if program execution gets suspended (e.g. by a debugger)
+// the wall clock time the program does not get executed will be added to the (absolute)
+// timeout time, thus preventing the caller from running into timeouts just because of
+// being halted by the debugger.
+// This is implemented by a watchdog thread waiting repeatedly for a given, short period of time.
+// When the program execution halts, the watchdog thread is also halted and the actual time spent
+// waiting in the watchdog thread differs from the given time period. The difference is added to the 
+// absolute timeout.
 class OPENRTI_API AbsTimeout
 {
   public:
@@ -35,9 +45,14 @@ class OPENRTI_API AbsTimeout
 
     Clock                           _start;
     Clock                           _absTime;
-    std::thread                     _watchDogThread;
+    // the waitable object for the watchdog thread.
+    std::future<void>               _watchDogThreadResult;
+    // the accumulated delay.
     uint64_t                        _delay;
+    // the watch dog thread cycle time.
     static Clock                    _watchDogPeriod;
+    // Minimum timeout period. The watchdog thread will only be started if
+    // the timeout period is longer than _watchDogMinPeriod.
     static Clock                    _watchDogMinPeriod;
     bool                            _done = false;
     mutable std::condition_variable _cvDone;

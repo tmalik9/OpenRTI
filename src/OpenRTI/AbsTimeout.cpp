@@ -17,21 +17,21 @@ AbsTimeout::AbsTimeout(const Clock& abstime)
   _done = false;
   if (_absTime > Clock::zero() && _absTime < Clock::max() && _absTime > Clock::now() + _watchDogMinPeriod)
   {
-    _watchDogThread = std::thread(&AbsTimeout::watchDogFunc, this);
+    _watchDogThreadResult = std::async(std::launch::async, &AbsTimeout::watchDogFunc, this);
   }
 }
 
 
 AbsTimeout::~AbsTimeout()
 {
-  if (_watchDogThread.joinable())
+  if (_watchDogThreadResult.valid())
   {
     {
       std::unique_lock<std::mutex> lock(_doneMutex);
       _done = true;
       _cvDone.notify_one();
     }
-    _watchDogThread.join();
+    _watchDogThreadResult.wait();
   }
 }
 
@@ -43,12 +43,12 @@ bool AbsTimeout::isExpired() const
   {
     return false;
   }
-  Clock now = Clock::now();
   if (_absTime == Clock::zero())
   {
     return true;
   }
-  if (_watchDogThread.joinable())
+  Clock now = Clock::now();
+  if (_watchDogThreadResult.valid())
   {
     Clock delay = getDelay();
     return now > _absTime + delay;
@@ -57,7 +57,6 @@ bool AbsTimeout::isExpired() const
   {
     return now > _absTime;
   }
-  //return getRemaining() == Clock::zero();
 }
 
 bool AbsTimeout::isExpired(Clock& remaining) const
@@ -74,7 +73,7 @@ bool AbsTimeout::isExpired(Clock& remaining) const
     return true;
   }
   Clock delay = Clock::zero();
-  if (_watchDogThread.joinable())
+  if (_watchDogThreadResult.valid())
   {
     delay = getDelay();
   }
@@ -95,16 +94,16 @@ bool AbsTimeout::isExpired(Clock& remaining) const
 // In essence, the following could happen:
 // 1. watchDogFunc sits in _cvDone.wait_for, while the program is in break mode
 // 2. upon return from debug break, _cvDone.wait_for returns (with timeout)
-// 3. isExpired or getRemaining gets called, before watchDogFunc happened to update the break delay.
+// 3. isExpired gets called, before watchDogFunc happened to update the break delay.
 // The actual time spent in _cvDone.wait_for during break won't be taken into account.
 OpenRTI::Clock AbsTimeout::getDelay() const
 {
   // Wait until _cvDone.wait_for has been entered (this will release _doneMutex).
   _doneMutex.lock();
+  _delayProvided = false;
   // Now trigger _cvDone.wait_for, in watchDogFunc.
   // Note that _cvDone.wait_for in watchDogFunc will wait for _doneMutex to be released.
-  _cvDone.notify_one();
-  
+  _cvDone.notify_all();
   // Get the 2nd lock before watchDogFunc can acquire it
   std::unique_lock<std::mutex> delayLock(_delayMutex);
   // Now release _cvDone.wait_for (in watchDogFunc)
@@ -121,19 +120,23 @@ OpenRTI::Clock AbsTimeout::getDelay() const
 
 void AbsTimeout::watchDogFunc()
 {
+  std::unique_lock<std::mutex> lock(_doneMutex);
   while (true)
   {
-    std::unique_lock<std::mutex> lock(_doneMutex);
     if (_done) break;
     Clock start = Clock::now();
-    _cvDone.wait_for(lock, std::chrono::steady_clock::duration(_watchDogPeriod.getNanoSeconds()));
-
+    // _doneMutex is released by this thread while waiting. If another thread takes the lock during wait, wait_for will wait additionally
+    // until the lock is released by the other thread.
+    _cvDone.wait_for(lock, std::chrono::steady_clock::duration(_watchDogPeriod.getNanoSeconds()), [this] { return _done || !_delayProvided; });
+    // _doneMutex is now locked again by this thread.
     std::unique_lock<std::mutex> delayLock(_delayMutex);
+    // now we can safely update _delay.
     Clock now = Clock::now();
     if ((now - start) > _watchDogPeriod)
     {
       _delay += ((now - start) - _watchDogPeriod).getNanoSeconds();
     }
+    // notify a probably waiting getDelay callee about having updated _delay.
     _delayProvided = true;
     _cvDelay.notify_one();
   }

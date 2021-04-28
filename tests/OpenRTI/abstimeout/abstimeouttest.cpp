@@ -183,7 +183,7 @@ class ConditionTest : Thread
         ConditionData data;
         ConditionTest testThread(data);
         bool result;
-        std::cout << "Condition.wait_until(" << timeoutPeriod << "), with notification after " << triggerPeriod.count() << "ms" << std::endl;
+        std::cout << "Condition.wait_until(" << timeoutPeriod << "), with notification after " << std::dec << triggerPeriod.count() << "ms" << std::endl;
         testThread.start();
         Clock start = Clock::now();
         result = data.wait_until(start + Clock(timeoutPeriod));
@@ -195,7 +195,7 @@ class ConditionTest : Thread
         ConditionData data;
         ConditionTest testThread(data);
         bool result;
-        std::cout << "Condition.wait_until(" << kInfinite << "), with notification after " << triggerPeriod.count() << "ms" << std::endl;
+        std::cout << "Condition.wait_until(" << kInfinite << "), with notification after " << std::dec << triggerPeriod.count() << "ms" << std::endl;
         testThread.start();
         Clock start = Clock::now();
         result = data.wait_until(kInfinite);
