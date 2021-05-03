@@ -228,7 +228,7 @@ class EnumDataType(DataType):
         sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
 
     def writeStreamOut(self, sourceStream):
-        sourceStream.writeline('// EnumDataType ' + self.getName())
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
         sourceStream.writeline('std::ostream&')
         sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = self.getName()))
         sourceStream.writeline('{')
@@ -421,7 +421,7 @@ class SetDataType(DataType):
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
-        sourceStream.writeline('// SetDataType ' + self.getName())
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
         sourceStream.writeline('std::ostream&')
         sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = name))
         sourceStream.writeline('{')
@@ -530,7 +530,7 @@ class MapDataType(DataType):
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
-        sourceStream.writeline('// ' + str(self))
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
         sourceStream.writeline('std::ostream&')
         sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = name))
         sourceStream.writeline('{')
@@ -639,7 +639,7 @@ class PairDataType(DataType):
         sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
 
     def writeStreamOut(self, sourceStream):
-        sourceStream.writeline('// PairDataType ' + self.getName())
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
         sourceStream.writeline('std::ostream&')
         sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = self.getName()))
         sourceStream.writeline('{')

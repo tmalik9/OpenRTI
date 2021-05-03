@@ -7420,7 +7420,7 @@ inline std::string to_string(const RegisterFederationSynchronizationPointRespons
   }
 }
 
-// <__main__.MapDataType object at 0x00000229DFCC2630>
+// MapDataType ConfigurationParameterMap
 std::ostream&
 operator<<(std::ostream& os, const ConfigurationParameterMap& value)
 {
