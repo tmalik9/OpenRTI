@@ -1,8 +1,12 @@
 project(OpenRTI CXX)
-cmake_minimum_required(VERSION 3.1)
+
+cmake_minimum_required(VERSION 3.10)
+cmake_policy(VERSION 2.8)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(GetOpenRTIVersion)
+message(STATUS "CMake Version: ${CMAKE_VERSION}") 
 message(STATUS "Build OpenRTI: ${OPENRTI_VERSION}")
 
 set(PACKAGE_NAME "OpenRTI")
@@ -97,11 +101,7 @@ if(NOT CMAKE_BUILD_TYPE)
       FORCE)
 endif()
 
-if(CMAKE_VERSION VERSION_GREATER 2.8.4)
-  include(GNUInstallDirs)
-else()
-  include(GNUInstallDirsCompat)
-endif()
+include(GNUInstallDirs)
 
 set(OPENRTI_ENABLE_RTI13 OFF CACHE BOOL "Build and install the RTI13 interface.")
 set(OPENRTI_ENABLE_RTI1516 OFF CACHE BOOL "Build and install the RTI1516 interface.")
@@ -198,24 +198,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
 
-macro(OPENRTI_TARGET_LINK_PRIVATE_LIBRARIES _target)
-  if(CMAKE_VERSION VERSION_LESS 2.8.12)
-    target_link_libraries(${_target} ${ARGN})
-    # Each library where we have used this up to now uses explicit linking
-    set_property(TARGET ${_target} PROPERTY LINK_INTERFACE_LIBRARIES "")
-  elseif(CMAKE_VERSION VERSION_LESS 3.0.0)
-    target_link_libraries(${_target} LINK_PRIVATE ${ARGN})
-  else()
-    target_link_libraries(${_target} PRIVATE ${ARGN})
-  endif()
+macro(openrti_target_link_private_libraries _target)
+  target_link_libraries(${_target} PRIVATE ${ARGN})
 endmacro()
 
 macro(openrti_target_position_independent _target)
-  if(CMAKE_VERSION VERSION_GREATER 2.8.8)
     set_property(TARGET ${_target} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
-  else()
-    set_property(TARGET ${_target} APPEND PROPERTY COMPILE_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
-  endif()
 endmacro()
 
 function(OPENRTI_SET_MSVC_STUB_DLL_NAME _target _name)
