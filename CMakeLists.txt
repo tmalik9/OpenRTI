@@ -1,13 +1,13 @@
 project(OpenRTI CXX)
 
 cmake_minimum_required(VERSION 3.10)
-cmake_policy(VERSION 2.8)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(GetOpenRTIVersion)
-message(STATUS "CMake Version: ${CMAKE_VERSION}") 
 message(STATUS "Build OpenRTI: ${OPENRTI_VERSION}")
+message(STATUS "CMake Version: ${CMAKE_VERSION}") 
+message(STATUS "Building with compiler: ${CMAKE_CXX_COMPILER_ID}")
 
 set(PACKAGE_NAME "OpenRTI")
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
@@ -99,6 +99,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
+else()
+  message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
 include(GNUInstallDirs)
@@ -156,8 +158,6 @@ if(MACOS)
     set(OPENRTI_BIND_AT_LOAD "-Wl,-bind_at_load" CACHE INTERNAL "Linker flag to resolve symbols at library load time on macos.")
   endif()
 endif()
-
-message("building with compiler \"" ${CMAKE_CXX_COMPILER_ID} "\"")
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>)
@@ -218,16 +218,14 @@ function(OPENRTI_SET_MSVC_STUB_DLL_NAME _target _name)
   endforeach()
 endfunction()
 
-  
-# bkd: Disable tests
 add_subdirectory(python)
 add_subdirectory(src)
+
 if(OPENRTI_ENABLE_TESTS)
   add_subdirectory(tests)
 else()
-  message("building without tests")
+  message("OpenRTI: Building without tests")
 endif()
-
 
 include(CMakePackageConfigHelpers)
 
