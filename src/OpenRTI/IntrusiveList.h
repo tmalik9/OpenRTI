@@ -109,8 +109,8 @@ private:
     std::swap(_prev, intrusiveListHook._prev);
   }
 
-  _IntrusiveListHook* _prev;
-  _IntrusiveListHook* _next;
+  _IntrusiveListHook* _prev = nullptr;
+  _IntrusiveListHook* _next = nullptr;
 };
 
 template<typename T, typename Tag>
@@ -433,19 +433,15 @@ public:
   { }
   IntrusiveList(const IntrusiveList& intrusiveList)
   { OpenRTIAssert(intrusiveList.empty()); }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   IntrusiveList(IntrusiveList&& intrusiveList)
   { _Implementation::swap(intrusiveList); }
-#endif
   ~IntrusiveList()
   { OpenRTIAssert(_Implementation::empty()); }
 
   IntrusiveList& operator=(const IntrusiveList& intrusiveList)
   { OpenRTIAssert(_Implementation::empty()); OpenRTIAssert(intrusiveList.empty()); return *this; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   IntrusiveList& operator=(IntrusiveList&& intrusiveList)
   { _Implementation::swap(intrusiveList); return *this; }
-#endif
 };
 
 } // namespace OpenRTI

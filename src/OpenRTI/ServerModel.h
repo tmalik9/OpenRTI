@@ -123,8 +123,7 @@ class OPENRTI_LOCAL BroadcastConnectHandleSet {
   }
 
   // Returns if any existing connect in this server node publishes this
-  bool empty() const
-  { return _connectHandleSet.empty(); }
+  bool empty() const noexcept { return _connectHandleSet.empty(); }
 
   // Returns if the given connect handle publishes this
   bool contains(const ConnectHandle& connectHandle) const
@@ -140,8 +139,7 @@ class OPENRTI_LOCAL BroadcastConnectHandleSet {
     return false;
   }
 
-  const ConnectHandleSet& getConnectHandleSet() const
-  { return _connectHandleSet; }
+  const ConnectHandleSet& getConnectHandleSet() const noexcept { return _connectHandleSet; }
 
  private:
   ConnectHandleSet _connectHandleSet;
@@ -303,16 +301,13 @@ public:
   typedef IntrusiveList<T, 0> FirstList;
 
 protected:
-  HandleListEntity()
-  { }
-  HandleListEntity(const H& handle) :
-    IntrusiveUnorderedMap<H, T>::Hook(handle)
+  HandleListEntity() noexcept { }
+  HandleListEntity(const H& handle)
+    : IntrusiveUnorderedMap<H, T>::Hook(handle)
   { }
 
-  const H& _getHandle() const
-  { return HandleMap::Hook::getKey(); }
-  void _setHandle(const H& handle)
-  { HandleMap::Hook::setKey(handle); }
+  const H& _getHandle() const { return HandleMap::Hook::getKey(); }
+  void _setHandle(const H& handle) { HandleMap::Hook::setKey(handle); }
 };
 
 ////////////////////////////////////////////////////////////
@@ -324,22 +319,17 @@ public:
   typedef IntrusiveUnorderedMap<S, T> StringMap;
 
 protected:
-  HandleStringEntity()
-  { }
-  HandleStringEntity(const H& handle, const S& name) :
-    IntrusiveUnorderedMap<H, T>::Hook(handle),
-    IntrusiveUnorderedMap<S, T>::Hook(name)
+  HandleStringEntity() noexcept { }
+  HandleStringEntity(const H& handle, const S& name)
+    : IntrusiveUnorderedMap<H, T>::Hook(handle)
+    , IntrusiveUnorderedMap<S, T>::Hook(name)
   { }
 
-  const H& _getHandle() const
-  { return HandleMap::Hook::getKey(); }
-  void _setHandle(const H& handle)
-  { HandleMap::Hook::setKey(handle); }
+  const H& _getHandle() const { return HandleMap::Hook::getKey(); }
+  void _setHandle(const H& handle) { HandleMap::Hook::setKey(handle); }
 
-  const S& _getString() const
-  { return StringMap::Hook::getKey(); }
-  void _setString(const S& string)
-  { StringMap::Hook::setKey(string); }
+  const S& _getString() const { return StringMap::Hook::getKey(); }
+  void _setString(const S& string) { StringMap::Hook::setKey(string); }
 };
 
 ////////////////////////////////////////////////////////////
@@ -397,20 +387,20 @@ public:
   }
   void setAttributeHandle(const AttributeHandle& attributeHandle);
 
-  const ObjectInstance& getObjectInstance() const { return _objectInstance; }
-  ObjectInstance& getObjectInstance() { return _objectInstance; }
+  const ObjectInstance& getObjectInstance() const noexcept { return _objectInstance; }
+  ObjectInstance& getObjectInstance() noexcept { return _objectInstance; }
 
-  const ClassAttribute& getClassAttribute() const { return _classAttribute; }
-  ClassAttribute& getClassAttribute() { return _classAttribute; }
+  const ClassAttribute& getClassAttribute() const noexcept { return _classAttribute; }
+  ClassAttribute& getClassAttribute() noexcept { return _classAttribute; }
 
   /// Get the ConnectHandle this attribute is owned
-  const ConnectHandle& getOwnerConnectHandle() const { return _ownerConnectHandle; }
+  const ConnectHandle& getOwnerConnectHandle() const noexcept { return _ownerConnectHandle; }
   void setOwnerConnectHandle(const ConnectHandle& connectHandle)
   {
     _receivingConnects.erase(connectHandle);
     _ownerConnectHandle = connectHandle;
   }
-  const FederateHandle& getOwnerFederate() const { return _ownerFederate; }
+  const FederateHandle& getOwnerFederate() const noexcept { return _ownerFederate; }
   void setOwnerFederate(const FederateHandle& federateHandle);
 
   void removeConnect(const ConnectHandle& connectHandle);
@@ -447,19 +437,14 @@ public:
   ~ObjectInstanceConnect();
 
   /// The connect handle to identify this connect
-  const ConnectHandle& getConnectHandle() const
-  { return HandleMap::Hook::getKey(); }
+  const ConnectHandle& getConnectHandle() const noexcept { return HandleMap::Hook::getKey(); }
   void setConnectHandle(const ConnectHandle& connectHandle);
 
-  const ObjectInstance& getObjectInstance() const
-  { return _objectInstance; }
-  ObjectInstance& getObjectInstance()
-  { return _objectInstance; }
+  const ObjectInstance& getObjectInstance() const noexcept { return _objectInstance; }
+  ObjectInstance& getObjectInstance() noexcept { return _objectInstance; }
 
-  const FederationConnect& getFederationConnect() const
-  { return _federationConnect; }
-  FederationConnect& getFederationConnect()
-  { return _federationConnect; }
+  const FederationConnect& getFederationConnect() const noexcept { return _federationConnect; }
+  FederationConnect& getFederationConnect() noexcept { return _federationConnect; }
 
 private:
   ObjectInstanceConnect(const ObjectInstanceConnect&) = delete;
@@ -495,19 +480,15 @@ public:
   { return HandleStringEntity<ObjectInstance, ObjectInstanceHandle>::_getString(); }
   void setName(const std::string& name);
 
-  const Federation& getFederation() const
-  { return _federation; }
-  Federation& getFederation()
-  { return _federation; }
+  const Federation& getFederation() const noexcept { return _federation; }
+  Federation& getFederation() noexcept { return _federation; }
 
   //void insert(InstanceAttribute& instanceAttribute);
   InstanceAttribute* getInstanceAttribute(const AttributeHandle& attributeHandle);
   InstanceAttribute* getPrivilegeToDeleteInstanceAttribute();
-  InstanceAttribute::HandleMap& getAttributeHandleInstanceAttributeMap()
-  { return _attributeHandleInstanceAttributeMap; }
+  InstanceAttribute::HandleMap& getAttributeHandleInstanceAttributeMap() noexcept { return _attributeHandleInstanceAttributeMap; }
 
-  ObjectInstanceConnect::HandleMap& getConnectHandleObjectInstanceConnectMap()
-  { return _connectHandleObjectInstanceConnectMap; }
+  ObjectInstanceConnect::HandleMap& getConnectHandleObjectInstanceConnectMap() noexcept { return _connectHandleObjectInstanceConnectMap; }
   /// Mark the name handle pair also represented with this as used in the federationConnect
   void reference(FederationConnect& federationConnect);
   /// Releases the ObjectInstanceConnect entry belonging to the connectHandle
@@ -515,14 +496,14 @@ public:
 
   void removeConnect(const ConnectHandle& connectHandle);
 
-  ObjectClass* getObjectClass()
+  ObjectClass* getObjectClass() const
   { return _objectClass; }
   void setObjectClass(ObjectClass* objectClass);
 
   /// Return the connect that owns this object
   ConnectHandle getOwnerConnectHandle()
   {
-    InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
+    const InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
     if (!instanceAttribute)
       return ConnectHandle();
     return instanceAttribute->getOwnerConnectHandle();
@@ -537,7 +518,7 @@ public:
 
   FederateHandle getOwnerFederate()
   {
-    InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
+    const InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
     if (!instanceAttribute)
       return FederateHandle();
     return instanceAttribute->getOwnerFederate();
@@ -583,17 +564,12 @@ public:
   { return HandleListEntity<SynchronizationFederate, FederateHandle>::_getHandle(); }
   void setFederateHandle(const FederateHandle& federateHandle);
 
-  const Synchronization& getSynchronization() const
-  { return _synchronization; }
-  Synchronization& getSynchronization()
-  { return _synchronization; }
-  const Federate& getFederate() const
-  { return _federate; }
-  Federate& getFederate()
-  { return _federate; }
+  const Synchronization& getSynchronization() const noexcept { return _synchronization; }
+  Synchronization& getSynchronization() noexcept { return _synchronization; }
+  const Federate& getFederate() const noexcept { return _federate; }
+  Federate& getFederate() noexcept { return _federate; }
 
-  bool getSuccessful() const
-  { return _successful; }
+  bool getSuccessful() const noexcept { return _successful; }
   void setSuccessful(bool successful);
 
 private:
@@ -619,12 +595,10 @@ public:
   { return NameMap::Hook::getKey(); }
   void setLabel(const std::string& label);
 
-  const VariableLengthData& getTag() const
-  { return _tag; }
+  const VariableLengthData& getTag() const noexcept { return _tag; }
   void setTag(const VariableLengthData& tag);
 
-  bool getAddJoiningFederates() const
-  { return _addJoiningFederates; }
+  bool getAddJoiningFederates() const noexcept { return _addJoiningFederates; }
   void setAddJoiningFederates(bool addJoiningFederates);
 
   bool getIsWaitingFor(const FederateHandle& federateHandle);
@@ -667,10 +641,8 @@ public:
   Federate(Federation& federation);
   ~Federate();
 
-  const Federation& getFederation() const
-  { return _federation; }
-  Federation& getFederation()
-  { return _federation; }
+  const Federation& getFederation() const noexcept { return _federation; }
+  Federation& getFederation() noexcept { return _federation; }
 
   const std::string& getName() const
   { return HandleStringEntity<Federate, FederateHandle>::_getString(); }
@@ -684,12 +656,10 @@ public:
   { return _federateType; }
   void setFederateType(const std::string& federateType);
 
-  ResignAction getResignAction() const
-  { return _resignAction; }
+  ResignAction getResignAction() const noexcept { return _resignAction; }
   void setResignAction(ResignAction resignAction);
 
-  bool getResignPending() const
-  { return _resignPending; }
+  bool getResignPending() const noexcept { return _resignPending; }
   void setResignPending(bool resignPending);
 
   void insert(SynchronizationFederate& synchronizationFederate);
@@ -728,8 +698,8 @@ public:
   { return _federationConnect; }
   ConnectHandle getConnectHandle() const;
 
-  void setIsInternal(bool isInternal) { _isInternal=isInternal; }
-  bool getIsInternal() const { return _isInternal; }
+  void setIsInternal(bool isInternal) noexcept { _isInternal=isInternal; }
+  bool getIsInternal() const noexcept { return _isInternal; }
   void send(const SharedPtr<const AbstractMessage>& message);
 
 private:
@@ -874,8 +844,11 @@ public:
   { return _module; }
 
 private:
+  UpdateRateModule() = delete;
   UpdateRateModule(const UpdateRateModule&) = delete;
+  UpdateRateModule(UpdateRateModule&&) = delete;
   UpdateRateModule& operator=(const UpdateRateModule&) = delete;
+  UpdateRateModule& operator=(UpdateRateModule&&) = delete;
 
   UpdateRate& _updateRate;
   Module& _module;
@@ -989,11 +962,13 @@ public:
   }
 private:
   BasicDataType(const BasicDataType&) = delete;
+  BasicDataType(BasicDataType&&) = delete;
   BasicDataType& operator=(const BasicDataType&) = delete;
+  BasicDataType& operator=(BasicDataType&&) = delete;
 
   Federation& _federation;
-  uint32_t _size;
-  Endianness _endian;
+  uint32_t _size = 0;
+  Endianness _endian = Endianness::BigEndian;
   BasicDataTypeModule::SecondList _basicDataTypeModuleList;
 };
 
@@ -1053,7 +1028,9 @@ public:
   void writeCurrentFDD(std::ostream& out, unsigned int level) const;
 private:
   SimpleDataType(const SimpleDataType&) = delete;
+  SimpleDataType(SimpleDataType&&) = delete;
   SimpleDataType& operator=(const SimpleDataType&) = delete;
+  SimpleDataType& operator=(SimpleDataType&&) = delete;
 
   Federation& _federation;
   std::string _representation;
@@ -1078,7 +1055,9 @@ public:
 
 private:
   EnumeratedDataTypeModule(const EnumeratedDataTypeModule&) = delete;
+  EnumeratedDataTypeModule(EnumeratedDataTypeModule&&) = delete;
   EnumeratedDataTypeModule& operator=(const EnumeratedDataTypeModule&) = delete;
+  EnumeratedDataTypeModule& operator=(EnumeratedDataTypeModule&&) = delete;
 
   EnumeratedDataType& _simpleDataType;
   Module& _module;
@@ -1150,7 +1129,9 @@ public:
   }
 private:
   EnumeratedDataType(const EnumeratedDataType&) = delete;
+  EnumeratedDataType(EnumeratedDataType&&) = delete;
   EnumeratedDataType& operator=(const EnumeratedDataType&) = delete;
+  EnumeratedDataType& operator=(EnumeratedDataType&&) = delete;
 
   Federation& _federation;
   std::list<Enumerator> _enumerators;
@@ -1230,12 +1211,14 @@ public:
 
 private:
   ArrayDataType(const ArrayDataType&) = delete;
+  ArrayDataType(ArrayDataType&&) = delete;
   ArrayDataType& operator=(const ArrayDataType&) = delete;
+  ArrayDataType& operator=(ArrayDataType&&) = delete;
 
   Federation& _federation;
   std::string _dataType;
   std::string _cardinality;
-  ArrayDataTypeEncoding _encoding;
+  ArrayDataTypeEncoding _encoding = ArrayDataTypeEncoding::FixedArrayDataTypeEncoding;
   ArrayDataTypeModule::SecondList _moduleList;
 };
 
@@ -1257,7 +1240,9 @@ public:
 
 private:
   FixedRecordDataTypeModule(const FixedRecordDataTypeModule&) = delete;
+  FixedRecordDataTypeModule(FixedRecordDataTypeModule&&) = delete;
   FixedRecordDataTypeModule& operator=(const FixedRecordDataTypeModule&) = delete;
+  FixedRecordDataTypeModule& operator=(FixedRecordDataTypeModule&&) = delete;
 
   FixedRecordDataType& _dataType;
   Module& _module;
@@ -1347,14 +1332,16 @@ public:
   }
 private:
   FixedRecordDataType(const FixedRecordDataType&) = delete;
+  FixedRecordDataType(FixedRecordDataType&&) = delete;
   FixedRecordDataType& operator=(const FixedRecordDataType&) = delete;
+  FixedRecordDataType& operator=(FixedRecordDataType&&) = delete;
 
   Federation& _federation;
 
   std::list<FixedRecordField> _fields;
   std::string _encoding;
   std::string _include;
-  uint32_t _version;
+  uint32_t _version = 0;
   FixedRecordDataTypeModule::SecondList _fixedRecordDataTypeModuleList;
 };
 
@@ -1365,18 +1352,16 @@ public:
   VariantRecordDataTypeModule(VariantRecordDataType& simpleDataType, Module& module) : _variantRecordDataType(simpleDataType), _module(module) {}
   ~VariantRecordDataTypeModule() {}
 
-  const VariantRecordDataType& getVariantRecordDataType() const
-  { return _variantRecordDataType; }
-  VariantRecordDataType& getVariantRecordDataType()
-  { return _variantRecordDataType; }
-  const Module& getModule() const
-  { return _module; }
-  Module& getModule()
-  { return _module; }
+  const VariantRecordDataType& getVariantRecordDataType() const { return _variantRecordDataType; }
+  VariantRecordDataType& getVariantRecordDataType() { return _variantRecordDataType; }
+  const Module& getModule() const { return _module; }
+  Module& getModule() { return _module; }
 
 private:
   VariantRecordDataTypeModule(const VariantRecordDataTypeModule&) = delete;
+  VariantRecordDataTypeModule(VariantRecordDataTypeModule&&) = delete;
   VariantRecordDataTypeModule& operator=(const VariantRecordDataTypeModule&) = delete;
+  VariantRecordDataTypeModule& operator=(VariantRecordDataTypeModule&&) = delete;
 
   VariantRecordDataType& _variantRecordDataType;
   Module& _module;
@@ -1459,7 +1444,9 @@ public:
   }
 private:
   VariantRecordDataType(const VariantRecordDataType&) = delete;
+  VariantRecordDataType(VariantRecordDataType&&) = delete;
   VariantRecordDataType& operator=(const VariantRecordDataType&) = delete;
+  VariantRecordDataType& operator=(VariantRecordDataType&&) = delete;
 
   Federation& _federation;
 
@@ -2442,6 +2429,7 @@ public:
   Region* getRegion(const RegionHandle& regionHandle);
 
   void insert(ObjectInstance& objectInstance);
+  const ObjectInstance* getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle) const;
   ObjectInstance* getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle);
   void erase(ObjectInstance& objectInstance);
   ObjectInstance::HandleMap& getObjectInstanceHandleObjectInstanceMap()
@@ -2458,18 +2446,18 @@ public:
 
   // federate metrics stuff
   std::shared_ptr<AbstractFederateMetrics> getFederateMetrics(const ConnectHandle& connectHandle);
-  void interactionSent(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
-  void interactionReceived(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
-  void interactionClassSubscribed(const ConnectHandle& connectHandle, InteractionClass* interactionClass, bool active);
-  void interactionClassUnsubscribed(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
-  void interactionClassPublished(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
-  void interactionClassUnpublished(const ConnectHandle& connectHandle, InteractionClass* interactionClass);
-  void objectClassSubscribed(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes, bool active);
-  void objectClassUnsubscribed(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes);
-  void objectClassPublished(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes);
-  void objectClassUnpublished(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes);
-  void objectInstanceReflectionReceived(const ConnectHandle& connectHandle, ObjectInstance* objectInstance);
-  void objectInstanceUpdateSent(const ConnectHandle& connectHandle, ObjectInstance* objectInstance);
+  void interactionSent(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void interactionReceived(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void interactionClassSubscribed(const ConnectHandle& connectHandle, const InteractionClass* interactionClass, bool active);
+  void interactionClassUnsubscribed(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void interactionClassPublished(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void interactionClassUnpublished(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void objectClassSubscribed(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes, bool active);
+  void objectClassUnsubscribed(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes);
+  void objectClassPublished(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes);
+  void objectClassUnpublished(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes);
+  void objectInstanceReflectionReceived(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance);
+  void objectInstanceUpdateSent(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance);
   /// Synchronization state FIXME
   Synchronization::NameMap _synchronizationNameSynchronizationMap;
 
@@ -2647,8 +2635,6 @@ public:
   void erase(NodeConnect& nodeConnect);
 
   bool getFederationExecutionAlreadyExists(const std::string& federationName) const;
-  Federation* getFederation(const std::string& federationName);
-  Federation* getFederation(const FederationHandle& federationHandle);
   void insert(Federation& federation);
   void erase(Federation& federation);
   void insertName(Federation& federation);

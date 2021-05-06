@@ -28,20 +28,22 @@ namespace OpenRTI {
 
 class OPENRTI_API Referenced {
   public:
-    Referenced() noexcept : _refcount(0u)
-    {}
+    Referenced() noexcept : _refcount(0u) {}
     /// Do not copy reference counts. Each new object has it's own counter
     Referenced(const Referenced&) noexcept : _refcount(0u) {}
-    Referenced(Referenced&&) = delete;
+    Referenced(Referenced&&) = default;
     virtual ~Referenced() noexcept {}
     /// Do not copy reference counts. Each new object has it's own counter
-    Referenced& operator=(const Referenced&) noexcept { return *this; }
-    Referenced& operator=(Referenced&&) = delete;
+    Referenced& operator=(const Referenced&) noexcept {
+      _refcount.exchange(0u);
+      return *this;
+    }
+    Referenced& operator=(Referenced&&) = default;
 
     static void incRef(const Referenced* ref) noexcept {
       if (ref != nullptr) ref->_refcount.incFetch(Atomic::MemoryOrderRelease);
     }
-    static void getFirst(const Referenced* ref) { incRef(ref); }
+    static void getFirst(const Referenced* ref) noexcept { incRef(ref); }
     static unsigned decRef(const Referenced* ref) noexcept {
       if (ref != nullptr) return ref->_refcount.decFetch(Atomic::MemoryOrderAcqRel);
       else return ~0u;

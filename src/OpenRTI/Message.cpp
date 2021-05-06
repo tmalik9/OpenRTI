@@ -21,6 +21,7 @@
  */
 
 
+#include "DebugNew.h"
 #include "Message.h"
 
 #include <ostream>
@@ -31,17 +32,8 @@
 
 namespace OpenRTI {
 
-ConnectionLostMessage::ConnectionLostMessage() noexcept :
-  _faultDescription()
-{
-}
-
-ConnectionLostMessage::~ConnectionLostMessage() noexcept
-{
-}
-
 const char*
-ConnectionLostMessage::getTypeName() const
+ConnectionLostMessage::getTypeName() const noexcept
 {
   return "ConnectionLostMessage";
 }
@@ -67,7 +59,7 @@ ConnectionLostMessage::dispatch(const AbstractMessageDispatcher& dispatcher) con
 }
 
 size_t
-ConnectionLostMessage::messageSize() const
+ConnectionLostMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFaultDescription());
@@ -98,19 +90,8 @@ ConnectionLostMessage::operator<(const ConnectionLostMessage& rhs) const noexcep
   return false;
 }
 
-CreateFederationExecutionRequestMessage::CreateFederationExecutionRequestMessage() noexcept :
-  _federationExecution(),
-  _logicalTimeFactoryName(),
-  _fOMStringModuleList()
-{
-}
-
-CreateFederationExecutionRequestMessage::~CreateFederationExecutionRequestMessage() noexcept
-{
-}
-
 const char*
-CreateFederationExecutionRequestMessage::getTypeName() const
+CreateFederationExecutionRequestMessage::getTypeName() const noexcept
 {
   return "CreateFederationExecutionRequestMessage";
 }
@@ -140,7 +121,7 @@ CreateFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatche
 }
 
 size_t
-CreateFederationExecutionRequestMessage::messageSize() const
+CreateFederationExecutionRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationExecution());
@@ -179,19 +160,8 @@ CreateFederationExecutionRequestMessage::operator<(const CreateFederationExecuti
   return false;
 }
 
-CreateFederationExecutionRequest2Message::CreateFederationExecutionRequest2Message() noexcept :
-  _federationExecution(),
-  _logicalTimeFactoryName(),
-  _fOMStringModuleList()
-{
-}
-
-CreateFederationExecutionRequest2Message::~CreateFederationExecutionRequest2Message() noexcept
-{
-}
-
 const char*
-CreateFederationExecutionRequest2Message::getTypeName() const
+CreateFederationExecutionRequest2Message::getTypeName() const noexcept
 {
   return "CreateFederationExecutionRequest2Message";
 }
@@ -221,7 +191,7 @@ CreateFederationExecutionRequest2Message::dispatch(const AbstractMessageDispatch
 }
 
 size_t
-CreateFederationExecutionRequest2Message::messageSize() const
+CreateFederationExecutionRequest2Message::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationExecution());
@@ -260,18 +230,8 @@ CreateFederationExecutionRequest2Message::operator<(const CreateFederationExecut
   return false;
 }
 
-CreateFederationExecutionResponseMessage::CreateFederationExecutionResponseMessage() noexcept :
-  _createFederationExecutionResponseType(),
-  _exceptionString()
-{
-}
-
-CreateFederationExecutionResponseMessage::~CreateFederationExecutionResponseMessage() noexcept
-{
-}
-
 const char*
-CreateFederationExecutionResponseMessage::getTypeName() const
+CreateFederationExecutionResponseMessage::getTypeName() const noexcept
 {
   return "CreateFederationExecutionResponseMessage";
 }
@@ -299,7 +259,7 @@ CreateFederationExecutionResponseMessage::dispatch(const AbstractMessageDispatch
 }
 
 size_t
-CreateFederationExecutionResponseMessage::messageSize() const
+CreateFederationExecutionResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getCreateFederationExecutionResponseType());
@@ -334,17 +294,8 @@ CreateFederationExecutionResponseMessage::operator<(const CreateFederationExecut
   return false;
 }
 
-DestroyFederationExecutionRequestMessage::DestroyFederationExecutionRequestMessage() noexcept :
-  _federationExecution()
-{
-}
-
-DestroyFederationExecutionRequestMessage::~DestroyFederationExecutionRequestMessage() noexcept
-{
-}
-
 const char*
-DestroyFederationExecutionRequestMessage::getTypeName() const
+DestroyFederationExecutionRequestMessage::getTypeName() const noexcept
 {
   return "DestroyFederationExecutionRequestMessage";
 }
@@ -370,7 +321,7 @@ DestroyFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatch
 }
 
 size_t
-DestroyFederationExecutionRequestMessage::messageSize() const
+DestroyFederationExecutionRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationExecution());
@@ -401,17 +352,8 @@ DestroyFederationExecutionRequestMessage::operator<(const DestroyFederationExecu
   return false;
 }
 
-DestroyFederationExecutionResponseMessage::DestroyFederationExecutionResponseMessage() noexcept :
-  _destroyFederationExecutionResponseType()
-{
-}
-
-DestroyFederationExecutionResponseMessage::~DestroyFederationExecutionResponseMessage() noexcept
-{
-}
-
 const char*
-DestroyFederationExecutionResponseMessage::getTypeName() const
+DestroyFederationExecutionResponseMessage::getTypeName() const noexcept
 {
   return "DestroyFederationExecutionResponseMessage";
 }
@@ -437,7 +379,7 @@ DestroyFederationExecutionResponseMessage::dispatch(const AbstractMessageDispatc
 }
 
 size_t
-DestroyFederationExecutionResponseMessage::messageSize() const
+DestroyFederationExecutionResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getDestroyFederationExecutionResponseType());
@@ -468,16 +410,8 @@ DestroyFederationExecutionResponseMessage::operator<(const DestroyFederationExec
   return false;
 }
 
-EnumerateFederationExecutionsRequestMessage::EnumerateFederationExecutionsRequestMessage() noexcept
-{
-}
-
-EnumerateFederationExecutionsRequestMessage::~EnumerateFederationExecutionsRequestMessage() noexcept
-{
-}
-
 const char*
-EnumerateFederationExecutionsRequestMessage::getTypeName() const
+EnumerateFederationExecutionsRequestMessage::getTypeName() const noexcept
 {
   return "EnumerateFederationExecutionsRequestMessage";
 }
@@ -502,7 +436,7 @@ EnumerateFederationExecutionsRequestMessage::dispatch(const AbstractMessageDispa
 }
 
 size_t
-EnumerateFederationExecutionsRequestMessage::messageSize() const
+EnumerateFederationExecutionsRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   return result;
@@ -529,17 +463,8 @@ EnumerateFederationExecutionsRequestMessage::operator<(const EnumerateFederation
   return false;
 }
 
-EnumerateFederationExecutionsResponseMessage::EnumerateFederationExecutionsResponseMessage() noexcept :
-  _federationExecutionInformationVector()
-{
-}
-
-EnumerateFederationExecutionsResponseMessage::~EnumerateFederationExecutionsResponseMessage() noexcept
-{
-}
-
 const char*
-EnumerateFederationExecutionsResponseMessage::getTypeName() const
+EnumerateFederationExecutionsResponseMessage::getTypeName() const noexcept
 {
   return "EnumerateFederationExecutionsResponseMessage";
 }
@@ -565,7 +490,7 @@ EnumerateFederationExecutionsResponseMessage::dispatch(const AbstractMessageDisp
 }
 
 size_t
-EnumerateFederationExecutionsResponseMessage::messageSize() const
+EnumerateFederationExecutionsResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationExecutionInformationVector());
@@ -596,20 +521,8 @@ EnumerateFederationExecutionsResponseMessage::operator<(const EnumerateFederatio
   return false;
 }
 
-InsertFederationExecutionMessage::InsertFederationExecutionMessage() noexcept :
-  _federationHandle(),
-  _federationName(),
-  _logicalTimeFactoryName(),
-  _configurationParameterMap()
-{
-}
-
-InsertFederationExecutionMessage::~InsertFederationExecutionMessage() noexcept
-{
-}
-
 const char*
-InsertFederationExecutionMessage::getTypeName() const
+InsertFederationExecutionMessage::getTypeName() const noexcept
 {
   return "InsertFederationExecutionMessage";
 }
@@ -642,7 +555,7 @@ InsertFederationExecutionMessage::dispatch(const AbstractMessageDispatcher& disp
 }
 
 size_t
-InsertFederationExecutionMessage::messageSize() const
+InsertFederationExecutionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -685,17 +598,8 @@ InsertFederationExecutionMessage::operator<(const InsertFederationExecutionMessa
   return false;
 }
 
-ShutdownFederationExecutionMessage::ShutdownFederationExecutionMessage() noexcept :
-  _federationHandle()
-{
-}
-
-ShutdownFederationExecutionMessage::~ShutdownFederationExecutionMessage() noexcept
-{
-}
-
 const char*
-ShutdownFederationExecutionMessage::getTypeName() const
+ShutdownFederationExecutionMessage::getTypeName() const noexcept
 {
   return "ShutdownFederationExecutionMessage";
 }
@@ -721,7 +625,7 @@ ShutdownFederationExecutionMessage::dispatch(const AbstractMessageDispatcher& di
 }
 
 size_t
-ShutdownFederationExecutionMessage::messageSize() const
+ShutdownFederationExecutionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -752,17 +656,8 @@ ShutdownFederationExecutionMessage::operator<(const ShutdownFederationExecutionM
   return false;
 }
 
-EraseFederationExecutionMessage::EraseFederationExecutionMessage() noexcept :
-  _federationHandle()
-{
-}
-
-EraseFederationExecutionMessage::~EraseFederationExecutionMessage() noexcept
-{
-}
-
 const char*
-EraseFederationExecutionMessage::getTypeName() const
+EraseFederationExecutionMessage::getTypeName() const noexcept
 {
   return "EraseFederationExecutionMessage";
 }
@@ -788,7 +683,7 @@ EraseFederationExecutionMessage::dispatch(const AbstractMessageDispatcher& dispa
 }
 
 size_t
-EraseFederationExecutionMessage::messageSize() const
+EraseFederationExecutionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -819,17 +714,8 @@ EraseFederationExecutionMessage::operator<(const EraseFederationExecutionMessage
   return false;
 }
 
-ReleaseFederationHandleMessage::ReleaseFederationHandleMessage() noexcept :
-  _federationHandle()
-{
-}
-
-ReleaseFederationHandleMessage::~ReleaseFederationHandleMessage() noexcept
-{
-}
-
 const char*
-ReleaseFederationHandleMessage::getTypeName() const
+ReleaseFederationHandleMessage::getTypeName() const noexcept
 {
   return "ReleaseFederationHandleMessage";
 }
@@ -855,7 +741,7 @@ ReleaseFederationHandleMessage::dispatch(const AbstractMessageDispatcher& dispat
 }
 
 size_t
-ReleaseFederationHandleMessage::messageSize() const
+ReleaseFederationHandleMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -886,18 +772,8 @@ ReleaseFederationHandleMessage::operator<(const ReleaseFederationHandleMessage& 
   return false;
 }
 
-InsertModulesMessage::InsertModulesMessage() noexcept :
-  _federationHandle(),
-  _fOMModuleList()
-{
-}
-
-InsertModulesMessage::~InsertModulesMessage() noexcept
-{
-}
-
 const char*
-InsertModulesMessage::getTypeName() const
+InsertModulesMessage::getTypeName() const noexcept
 {
   return "InsertModulesMessage";
 }
@@ -927,7 +803,7 @@ InsertModulesMessage::dispatch(const AbstractMessageDispatcher& dispatcher) cons
 }
 
 size_t
-InsertModulesMessage::messageSize() const
+InsertModulesMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -962,18 +838,8 @@ InsertModulesMessage::operator<(const InsertModulesMessage& rhs) const noexcept
   return false;
 }
 
-InsertModules2Message::InsertModules2Message() noexcept :
-  _federationHandle(),
-  _fOMModule2List()
-{
-}
-
-InsertModules2Message::~InsertModules2Message() noexcept
-{
-}
-
 const char*
-InsertModules2Message::getTypeName() const
+InsertModules2Message::getTypeName() const noexcept
 {
   return "InsertModules2Message";
 }
@@ -1003,7 +869,7 @@ InsertModules2Message::dispatch(const AbstractMessageDispatcher& dispatcher) con
 }
 
 size_t
-InsertModules2Message::messageSize() const
+InsertModules2Message::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -1038,22 +904,8 @@ InsertModules2Message::operator<(const InsertModules2Message& rhs) const noexcep
   return false;
 }
 
-JoinFederationExecutionRequestMessage::JoinFederationExecutionRequestMessage() noexcept :
-  _federationExecution(),
-  _federateType(),
-  _federateName(),
-  _fOMStringModuleList(),
-  _configurationParameterMap(),
-  _isInternal()
-{
-}
-
-JoinFederationExecutionRequestMessage::~JoinFederationExecutionRequestMessage() noexcept
-{
-}
-
 const char*
-JoinFederationExecutionRequestMessage::getTypeName() const
+JoinFederationExecutionRequestMessage::getTypeName() const noexcept
 {
   return "JoinFederationExecutionRequestMessage";
 }
@@ -1089,7 +941,7 @@ JoinFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatcher&
 }
 
 size_t
-JoinFederationExecutionRequestMessage::messageSize() const
+JoinFederationExecutionRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationExecution());
@@ -1140,22 +992,8 @@ JoinFederationExecutionRequestMessage::operator<(const JoinFederationExecutionRe
   return false;
 }
 
-JoinFederationExecutionRequest2Message::JoinFederationExecutionRequest2Message() noexcept :
-  _federationExecution(),
-  _federateType(),
-  _federateName(),
-  _fOMStringModuleList(),
-  _configurationParameterMap(),
-  _isInternal()
-{
-}
-
-JoinFederationExecutionRequest2Message::~JoinFederationExecutionRequest2Message() noexcept
-{
-}
-
 const char*
-JoinFederationExecutionRequest2Message::getTypeName() const
+JoinFederationExecutionRequest2Message::getTypeName() const noexcept
 {
   return "JoinFederationExecutionRequest2Message";
 }
@@ -1191,7 +1029,7 @@ JoinFederationExecutionRequest2Message::dispatch(const AbstractMessageDispatcher
 }
 
 size_t
-JoinFederationExecutionRequest2Message::messageSize() const
+JoinFederationExecutionRequest2Message::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationExecution());
@@ -1242,22 +1080,8 @@ JoinFederationExecutionRequest2Message::operator<(const JoinFederationExecutionR
   return false;
 }
 
-JoinFederationExecutionResponseMessage::JoinFederationExecutionResponseMessage() noexcept :
-  _federationHandle(),
-  _joinFederationExecutionResponseType(),
-  _exceptionString(),
-  _federateHandle(),
-  _federateType(),
-  _federateName()
-{
-}
-
-JoinFederationExecutionResponseMessage::~JoinFederationExecutionResponseMessage() noexcept
-{
-}
-
 const char*
-JoinFederationExecutionResponseMessage::getTypeName() const
+JoinFederationExecutionResponseMessage::getTypeName() const noexcept
 {
   return "JoinFederationExecutionResponseMessage";
 }
@@ -1293,7 +1117,7 @@ JoinFederationExecutionResponseMessage::dispatch(const AbstractMessageDispatcher
 }
 
 size_t
-JoinFederationExecutionResponseMessage::messageSize() const
+JoinFederationExecutionResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -1344,19 +1168,8 @@ JoinFederationExecutionResponseMessage::operator<(const JoinFederationExecutionR
   return false;
 }
 
-ResignFederationExecutionLeafRequestMessage::ResignFederationExecutionLeafRequestMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _resignAction()
-{
-}
-
-ResignFederationExecutionLeafRequestMessage::~ResignFederationExecutionLeafRequestMessage() noexcept
-{
-}
-
 const char*
-ResignFederationExecutionLeafRequestMessage::getTypeName() const
+ResignFederationExecutionLeafRequestMessage::getTypeName() const noexcept
 {
   return "ResignFederationExecutionLeafRequestMessage";
 }
@@ -1386,7 +1199,7 @@ ResignFederationExecutionLeafRequestMessage::dispatch(const AbstractMessageDispa
 }
 
 size_t
-ResignFederationExecutionLeafRequestMessage::messageSize() const
+ResignFederationExecutionLeafRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -1425,18 +1238,8 @@ ResignFederationExecutionLeafRequestMessage::operator<(const ResignFederationExe
   return false;
 }
 
-ResignFederationExecutionRequestMessage::ResignFederationExecutionRequestMessage() noexcept :
-  _federationHandle(),
-  _federateHandle()
-{
-}
-
-ResignFederationExecutionRequestMessage::~ResignFederationExecutionRequestMessage() noexcept
-{
-}
-
 const char*
-ResignFederationExecutionRequestMessage::getTypeName() const
+ResignFederationExecutionRequestMessage::getTypeName() const noexcept
 {
   return "ResignFederationExecutionRequestMessage";
 }
@@ -1464,7 +1267,7 @@ ResignFederationExecutionRequestMessage::dispatch(const AbstractMessageDispatche
 }
 
 size_t
-ResignFederationExecutionRequestMessage::messageSize() const
+ResignFederationExecutionRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -1499,21 +1302,8 @@ ResignFederationExecutionRequestMessage::operator<(const ResignFederationExecuti
   return false;
 }
 
-JoinFederateNotifyMessage::JoinFederateNotifyMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _federateType(),
-  _federateName(),
-  _isInternal()
-{
-}
-
-JoinFederateNotifyMessage::~JoinFederateNotifyMessage() noexcept
-{
-}
-
 const char*
-JoinFederateNotifyMessage::getTypeName() const
+JoinFederateNotifyMessage::getTypeName() const noexcept
 {
   return "JoinFederateNotifyMessage";
 }
@@ -1547,7 +1337,7 @@ JoinFederateNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatcher)
 }
 
 size_t
-JoinFederateNotifyMessage::messageSize() const
+JoinFederateNotifyMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -1594,18 +1384,8 @@ JoinFederateNotifyMessage::operator<(const JoinFederateNotifyMessage& rhs) const
   return false;
 }
 
-ResignFederateNotifyMessage::ResignFederateNotifyMessage() noexcept :
-  _federationHandle(),
-  _federateHandle()
-{
-}
-
-ResignFederateNotifyMessage::~ResignFederateNotifyMessage() noexcept
-{
-}
-
 const char*
-ResignFederateNotifyMessage::getTypeName() const
+ResignFederateNotifyMessage::getTypeName() const noexcept
 {
   return "ResignFederateNotifyMessage";
 }
@@ -1633,7 +1413,7 @@ ResignFederateNotifyMessage::dispatch(const AbstractMessageDispatcher& dispatche
 }
 
 size_t
-ResignFederateNotifyMessage::messageSize() const
+ResignFederateNotifyMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -1668,19 +1448,8 @@ ResignFederateNotifyMessage::operator<(const ResignFederateNotifyMessage& rhs) c
   return false;
 }
 
-ChangeAutomaticResignDirectiveMessage::ChangeAutomaticResignDirectiveMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _resignAction()
-{
-}
-
-ChangeAutomaticResignDirectiveMessage::~ChangeAutomaticResignDirectiveMessage() noexcept
-{
-}
-
 const char*
-ChangeAutomaticResignDirectiveMessage::getTypeName() const
+ChangeAutomaticResignDirectiveMessage::getTypeName() const noexcept
 {
   return "ChangeAutomaticResignDirectiveMessage";
 }
@@ -1710,7 +1479,7 @@ ChangeAutomaticResignDirectiveMessage::dispatch(const AbstractMessageDispatcher&
 }
 
 size_t
-ChangeAutomaticResignDirectiveMessage::messageSize() const
+ChangeAutomaticResignDirectiveMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -1749,21 +1518,8 @@ ChangeAutomaticResignDirectiveMessage::operator<(const ChangeAutomaticResignDire
   return false;
 }
 
-RegisterFederationSynchronizationPointMessage::RegisterFederationSynchronizationPointMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _label(),
-  _tag(),
-  _federateHandleVector()
-{
-}
-
-RegisterFederationSynchronizationPointMessage::~RegisterFederationSynchronizationPointMessage() noexcept
-{
-}
-
 const char*
-RegisterFederationSynchronizationPointMessage::getTypeName() const
+RegisterFederationSynchronizationPointMessage::getTypeName() const noexcept
 {
   return "RegisterFederationSynchronizationPointMessage";
 }
@@ -1798,7 +1554,7 @@ RegisterFederationSynchronizationPointMessage::dispatch(const AbstractMessageDis
 }
 
 size_t
-RegisterFederationSynchronizationPointMessage::messageSize() const
+RegisterFederationSynchronizationPointMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -1845,20 +1601,8 @@ RegisterFederationSynchronizationPointMessage::operator<(const RegisterFederatio
   return false;
 }
 
-RegisterFederationSynchronizationPointResponseMessage::RegisterFederationSynchronizationPointResponseMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _label(),
-  _registerFederationSynchronizationPointResponseType()
-{
-}
-
-RegisterFederationSynchronizationPointResponseMessage::~RegisterFederationSynchronizationPointResponseMessage() noexcept
-{
-}
-
 const char*
-RegisterFederationSynchronizationPointResponseMessage::getTypeName() const
+RegisterFederationSynchronizationPointResponseMessage::getTypeName() const noexcept
 {
   return "RegisterFederationSynchronizationPointResponseMessage";
 }
@@ -1891,7 +1635,7 @@ RegisterFederationSynchronizationPointResponseMessage::dispatch(const AbstractMe
 }
 
 size_t
-RegisterFederationSynchronizationPointResponseMessage::messageSize() const
+RegisterFederationSynchronizationPointResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -1934,21 +1678,8 @@ RegisterFederationSynchronizationPointResponseMessage::operator<(const RegisterF
   return false;
 }
 
-AnnounceSynchronizationPointMessage::AnnounceSynchronizationPointMessage() noexcept :
-  _federationHandle(),
-  _label(),
-  _tag(),
-  _addJoiningFederates(),
-  _federateHandleVector()
-{
-}
-
-AnnounceSynchronizationPointMessage::~AnnounceSynchronizationPointMessage() noexcept
-{
-}
-
 const char*
-AnnounceSynchronizationPointMessage::getTypeName() const
+AnnounceSynchronizationPointMessage::getTypeName() const noexcept
 {
   return "AnnounceSynchronizationPointMessage";
 }
@@ -1983,7 +1714,7 @@ AnnounceSynchronizationPointMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 size_t
-AnnounceSynchronizationPointMessage::messageSize() const
+AnnounceSynchronizationPointMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2030,19 +1761,8 @@ AnnounceSynchronizationPointMessage::operator<(const AnnounceSynchronizationPoin
   return false;
 }
 
-SynchronizationPointAchievedMessage::SynchronizationPointAchievedMessage() noexcept :
-  _federationHandle(),
-  _label(),
-  _federateHandleBoolPairVector()
-{
-}
-
-SynchronizationPointAchievedMessage::~SynchronizationPointAchievedMessage() noexcept
-{
-}
-
 const char*
-SynchronizationPointAchievedMessage::getTypeName() const
+SynchronizationPointAchievedMessage::getTypeName() const noexcept
 {
   return "SynchronizationPointAchievedMessage";
 }
@@ -2073,7 +1793,7 @@ SynchronizationPointAchievedMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 size_t
-SynchronizationPointAchievedMessage::messageSize() const
+SynchronizationPointAchievedMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2112,19 +1832,8 @@ SynchronizationPointAchievedMessage::operator<(const SynchronizationPointAchieve
   return false;
 }
 
-FederationSynchronizedMessage::FederationSynchronizedMessage() noexcept :
-  _federationHandle(),
-  _label(),
-  _federateHandleBoolPairVector()
-{
-}
-
-FederationSynchronizedMessage::~FederationSynchronizedMessage() noexcept
-{
-}
-
 const char*
-FederationSynchronizedMessage::getTypeName() const
+FederationSynchronizedMessage::getTypeName() const noexcept
 {
   return "FederationSynchronizedMessage";
 }
@@ -2155,7 +1864,7 @@ FederationSynchronizedMessage::dispatch(const AbstractMessageDispatcher& dispatc
 }
 
 size_t
-FederationSynchronizedMessage::messageSize() const
+FederationSynchronizedMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2194,20 +1903,8 @@ FederationSynchronizedMessage::operator<(const FederationSynchronizedMessage& rh
   return false;
 }
 
-EnableTimeRegulationRequestMessage::EnableTimeRegulationRequestMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _timeStamp(),
-  _commitId()
-{
-}
-
-EnableTimeRegulationRequestMessage::~EnableTimeRegulationRequestMessage() noexcept
-{
-}
-
 const char*
-EnableTimeRegulationRequestMessage::getTypeName() const
+EnableTimeRegulationRequestMessage::getTypeName() const noexcept
 {
   return "EnableTimeRegulationRequestMessage";
 }
@@ -2240,7 +1937,7 @@ EnableTimeRegulationRequestMessage::dispatch(const AbstractMessageDispatcher& di
 }
 
 size_t
-EnableTimeRegulationRequestMessage::messageSize() const
+EnableTimeRegulationRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2283,21 +1980,8 @@ EnableTimeRegulationRequestMessage::operator<(const EnableTimeRegulationRequestM
   return false;
 }
 
-EnableTimeRegulationResponseMessage::EnableTimeRegulationResponseMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _respondingFederateHandle(),
-  _timeStampValid(),
-  _timeStamp()
-{
-}
-
-EnableTimeRegulationResponseMessage::~EnableTimeRegulationResponseMessage() noexcept
-{
-}
-
 const char*
-EnableTimeRegulationResponseMessage::getTypeName() const
+EnableTimeRegulationResponseMessage::getTypeName() const noexcept
 {
   return "EnableTimeRegulationResponseMessage";
 }
@@ -2332,7 +2016,7 @@ EnableTimeRegulationResponseMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 size_t
-EnableTimeRegulationResponseMessage::messageSize() const
+EnableTimeRegulationResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2379,18 +2063,8 @@ EnableTimeRegulationResponseMessage::operator<(const EnableTimeRegulationRespons
   return false;
 }
 
-DisableTimeRegulationRequestMessage::DisableTimeRegulationRequestMessage() noexcept :
-  _federationHandle(),
-  _federateHandle()
-{
-}
-
-DisableTimeRegulationRequestMessage::~DisableTimeRegulationRequestMessage() noexcept
-{
-}
-
 const char*
-DisableTimeRegulationRequestMessage::getTypeName() const
+DisableTimeRegulationRequestMessage::getTypeName() const noexcept
 {
   return "DisableTimeRegulationRequestMessage";
 }
@@ -2418,7 +2092,7 @@ DisableTimeRegulationRequestMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 size_t
-DisableTimeRegulationRequestMessage::messageSize() const
+DisableTimeRegulationRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2453,18 +2127,8 @@ DisableTimeRegulationRequestMessage::operator<(const DisableTimeRegulationReques
   return false;
 }
 
-EnableTimeConstrainedNotifyMessage::EnableTimeConstrainedNotifyMessage() noexcept :
-  _federationHandle(),
-  _federateHandle()
-{
-}
-
-EnableTimeConstrainedNotifyMessage::~EnableTimeConstrainedNotifyMessage() noexcept
-{
-}
-
 const char*
-EnableTimeConstrainedNotifyMessage::getTypeName() const
+EnableTimeConstrainedNotifyMessage::getTypeName() const noexcept
 {
   return "EnableTimeConstrainedNotifyMessage";
 }
@@ -2493,7 +2157,7 @@ EnableTimeConstrainedNotifyMessage::dispatch(const AbstractMessageDispatcher& di
 }
 
 size_t
-EnableTimeConstrainedNotifyMessage::messageSize() const
+EnableTimeConstrainedNotifyMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2528,18 +2192,8 @@ EnableTimeConstrainedNotifyMessage::operator<(const EnableTimeConstrainedNotifyM
   return false;
 }
 
-DisableTimeConstrainedNotifyMessage::DisableTimeConstrainedNotifyMessage() noexcept :
-  _federationHandle(),
-  _federateHandle()
-{
-}
-
-DisableTimeConstrainedNotifyMessage::~DisableTimeConstrainedNotifyMessage() noexcept
-{
-}
-
 const char*
-DisableTimeConstrainedNotifyMessage::getTypeName() const
+DisableTimeConstrainedNotifyMessage::getTypeName() const noexcept
 {
   return "DisableTimeConstrainedNotifyMessage";
 }
@@ -2568,7 +2222,7 @@ DisableTimeConstrainedNotifyMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 size_t
-DisableTimeConstrainedNotifyMessage::messageSize() const
+DisableTimeConstrainedNotifyMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2603,21 +2257,8 @@ DisableTimeConstrainedNotifyMessage::operator<(const DisableTimeConstrainedNotif
   return false;
 }
 
-CommitLowerBoundTimeStampMessage::CommitLowerBoundTimeStampMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _timeStamp(),
-  _commitType(),
-  _commitId()
-{
-}
-
-CommitLowerBoundTimeStampMessage::~CommitLowerBoundTimeStampMessage() noexcept
-{
-}
-
 const char*
-CommitLowerBoundTimeStampMessage::getTypeName() const
+CommitLowerBoundTimeStampMessage::getTypeName() const noexcept
 {
   return "CommitLowerBoundTimeStampMessage";
 }
@@ -2652,7 +2293,7 @@ CommitLowerBoundTimeStampMessage::dispatch(const AbstractMessageDispatcher& disp
 }
 
 size_t
-CommitLowerBoundTimeStampMessage::messageSize() const
+CommitLowerBoundTimeStampMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2699,20 +2340,8 @@ CommitLowerBoundTimeStampMessage::operator<(const CommitLowerBoundTimeStampMessa
   return false;
 }
 
-CommitLowerBoundTimeStampResponseMessage::CommitLowerBoundTimeStampResponseMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _sendingFederateHandle(),
-  _commitId()
-{
-}
-
-CommitLowerBoundTimeStampResponseMessage::~CommitLowerBoundTimeStampResponseMessage() noexcept
-{
-}
-
 const char*
-CommitLowerBoundTimeStampResponseMessage::getTypeName() const
+CommitLowerBoundTimeStampResponseMessage::getTypeName() const noexcept
 {
   return "CommitLowerBoundTimeStampResponseMessage";
 }
@@ -2745,7 +2374,7 @@ CommitLowerBoundTimeStampResponseMessage::dispatch(const AbstractMessageDispatch
 }
 
 size_t
-CommitLowerBoundTimeStampResponseMessage::messageSize() const
+CommitLowerBoundTimeStampResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2788,19 +2417,8 @@ CommitLowerBoundTimeStampResponseMessage::operator<(const CommitLowerBoundTimeSt
   return false;
 }
 
-LockedByNextMessageRequestMessage::LockedByNextMessageRequestMessage() noexcept :
-  _federationHandle(),
-  _sendingFederateHandle(),
-  _lockedByNextMessage()
-{
-}
-
-LockedByNextMessageRequestMessage::~LockedByNextMessageRequestMessage() noexcept
-{
-}
-
 const char*
-LockedByNextMessageRequestMessage::getTypeName() const
+LockedByNextMessageRequestMessage::getTypeName() const noexcept
 {
   return "LockedByNextMessageRequestMessage";
 }
@@ -2831,7 +2449,7 @@ LockedByNextMessageRequestMessage::dispatch(const AbstractMessageDispatcher& dis
 }
 
 size_t
-LockedByNextMessageRequestMessage::messageSize() const
+LockedByNextMessageRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -2870,16 +2488,8 @@ LockedByNextMessageRequestMessage::operator<(const LockedByNextMessageRequestMes
   return false;
 }
 
-TimeConstrainedEnabledMessage::TimeConstrainedEnabledMessage() noexcept
-{
-}
-
-TimeConstrainedEnabledMessage::~TimeConstrainedEnabledMessage() noexcept
-{
-}
-
 const char*
-TimeConstrainedEnabledMessage::getTypeName() const
+TimeConstrainedEnabledMessage::getTypeName() const noexcept
 {
   return "TimeConstrainedEnabledMessage";
 }
@@ -2904,7 +2514,7 @@ TimeConstrainedEnabledMessage::dispatch(const AbstractMessageDispatcher& dispatc
 }
 
 size_t
-TimeConstrainedEnabledMessage::messageSize() const
+TimeConstrainedEnabledMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   return result;
@@ -2931,16 +2541,8 @@ TimeConstrainedEnabledMessage::operator<(const TimeConstrainedEnabledMessage&) c
   return false;
 }
 
-TimeRegulationEnabledMessage::TimeRegulationEnabledMessage() noexcept
-{
-}
-
-TimeRegulationEnabledMessage::~TimeRegulationEnabledMessage() noexcept
-{
-}
-
 const char*
-TimeRegulationEnabledMessage::getTypeName() const
+TimeRegulationEnabledMessage::getTypeName() const noexcept
 {
   return "TimeRegulationEnabledMessage";
 }
@@ -2965,7 +2567,7 @@ TimeRegulationEnabledMessage::dispatch(const AbstractMessageDispatcher& dispatch
 }
 
 size_t
-TimeRegulationEnabledMessage::messageSize() const
+TimeRegulationEnabledMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   return result;
@@ -2992,16 +2594,8 @@ TimeRegulationEnabledMessage::operator<(const TimeRegulationEnabledMessage&) con
   return false;
 }
 
-TimeAdvanceGrantedMessage::TimeAdvanceGrantedMessage() noexcept
-{
-}
-
-TimeAdvanceGrantedMessage::~TimeAdvanceGrantedMessage() noexcept
-{
-}
-
 const char*
-TimeAdvanceGrantedMessage::getTypeName() const
+TimeAdvanceGrantedMessage::getTypeName() const noexcept
 {
   return "TimeAdvanceGrantedMessage";
 }
@@ -3026,7 +2620,7 @@ TimeAdvanceGrantedMessage::dispatch(const AbstractMessageDispatcher& dispatcher)
 }
 
 size_t
-TimeAdvanceGrantedMessage::messageSize() const
+TimeAdvanceGrantedMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   return result;
@@ -3053,18 +2647,8 @@ TimeAdvanceGrantedMessage::operator<(const TimeAdvanceGrantedMessage&) const noe
   return false;
 }
 
-InsertRegionMessage::InsertRegionMessage() noexcept :
-  _federationHandle(),
-  _regionHandleDimensionHandleSetPairVector()
-{
-}
-
-InsertRegionMessage::~InsertRegionMessage() noexcept
-{
-}
-
 const char*
-InsertRegionMessage::getTypeName() const
+InsertRegionMessage::getTypeName() const noexcept
 {
   return "InsertRegionMessage";
 }
@@ -3092,7 +2676,7 @@ InsertRegionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 }
 
 size_t
-InsertRegionMessage::messageSize() const
+InsertRegionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -3127,18 +2711,8 @@ InsertRegionMessage::operator<(const InsertRegionMessage& rhs) const noexcept
   return false;
 }
 
-CommitRegionMessage::CommitRegionMessage() noexcept :
-  _federationHandle(),
-  _regionHandleRegionValuePairVector()
-{
-}
-
-CommitRegionMessage::~CommitRegionMessage() noexcept
-{
-}
-
 const char*
-CommitRegionMessage::getTypeName() const
+CommitRegionMessage::getTypeName() const noexcept
 {
   return "CommitRegionMessage";
 }
@@ -3166,7 +2740,7 @@ CommitRegionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 }
 
 size_t
-CommitRegionMessage::messageSize() const
+CommitRegionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -3201,18 +2775,8 @@ CommitRegionMessage::operator<(const CommitRegionMessage& rhs) const noexcept
   return false;
 }
 
-EraseRegionMessage::EraseRegionMessage() noexcept :
-  _federationHandle(),
-  _regionHandleVector()
-{
-}
-
-EraseRegionMessage::~EraseRegionMessage() noexcept
-{
-}
-
 const char*
-EraseRegionMessage::getTypeName() const
+EraseRegionMessage::getTypeName() const noexcept
 {
   return "EraseRegionMessage";
 }
@@ -3240,7 +2804,7 @@ EraseRegionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 }
 
 size_t
-EraseRegionMessage::messageSize() const
+EraseRegionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -3275,19 +2839,8 @@ EraseRegionMessage::operator<(const EraseRegionMessage& rhs) const noexcept
   return false;
 }
 
-ChangeInteractionClassPublicationMessage::ChangeInteractionClassPublicationMessage() noexcept :
-  _federationHandle(),
-  _publicationType(),
-  _interactionClassHandle()
-{
-}
-
-ChangeInteractionClassPublicationMessage::~ChangeInteractionClassPublicationMessage() noexcept
-{
-}
-
 const char*
-ChangeInteractionClassPublicationMessage::getTypeName() const
+ChangeInteractionClassPublicationMessage::getTypeName() const noexcept
 {
   return "ChangeInteractionClassPublicationMessage";
 }
@@ -3318,7 +2871,7 @@ ChangeInteractionClassPublicationMessage::dispatch(const AbstractMessageDispatch
 }
 
 size_t
-ChangeInteractionClassPublicationMessage::messageSize() const
+ChangeInteractionClassPublicationMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -3357,20 +2910,8 @@ ChangeInteractionClassPublicationMessage::operator<(const ChangeInteractionClass
   return false;
 }
 
-ChangeObjectClassPublicationMessage::ChangeObjectClassPublicationMessage() noexcept :
-  _federationHandle(),
-  _publicationType(),
-  _objectClassHandle(),
-  _attributeHandles()
-{
-}
-
-ChangeObjectClassPublicationMessage::~ChangeObjectClassPublicationMessage() noexcept
-{
-}
-
 const char*
-ChangeObjectClassPublicationMessage::getTypeName() const
+ChangeObjectClassPublicationMessage::getTypeName() const noexcept
 {
   return "ChangeObjectClassPublicationMessage";
 }
@@ -3403,7 +2944,7 @@ ChangeObjectClassPublicationMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 size_t
-ChangeObjectClassPublicationMessage::messageSize() const
+ChangeObjectClassPublicationMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -3446,20 +2987,8 @@ ChangeObjectClassPublicationMessage::operator<(const ChangeObjectClassPublicatio
   return false;
 }
 
-ChangeInteractionClassSubscriptionMessage::ChangeInteractionClassSubscriptionMessage() noexcept :
-  _federationHandle(),
-  _subscriptionType(),
-  _interactionClassHandle(),
-  _parameterFilterValues()
-{
-}
-
-ChangeInteractionClassSubscriptionMessage::~ChangeInteractionClassSubscriptionMessage() noexcept
-{
-}
-
 const char*
-ChangeInteractionClassSubscriptionMessage::getTypeName() const
+ChangeInteractionClassSubscriptionMessage::getTypeName() const noexcept
 {
   return "ChangeInteractionClassSubscriptionMessage";
 }
@@ -3492,7 +3021,7 @@ ChangeInteractionClassSubscriptionMessage::dispatch(const AbstractMessageDispatc
 }
 
 size_t
-ChangeInteractionClassSubscriptionMessage::messageSize() const
+ChangeInteractionClassSubscriptionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -3535,20 +3064,8 @@ ChangeInteractionClassSubscriptionMessage::operator<(const ChangeInteractionClas
   return false;
 }
 
-ChangeObjectClassSubscriptionMessage::ChangeObjectClassSubscriptionMessage() noexcept :
-  _federationHandle(),
-  _subscriptionType(),
-  _objectClassHandle(),
-  _attributeHandles()
-{
-}
-
-ChangeObjectClassSubscriptionMessage::~ChangeObjectClassSubscriptionMessage() noexcept
-{
-}
-
 const char*
-ChangeObjectClassSubscriptionMessage::getTypeName() const
+ChangeObjectClassSubscriptionMessage::getTypeName() const noexcept
 {
   return "ChangeObjectClassSubscriptionMessage";
 }
@@ -3581,7 +3098,7 @@ ChangeObjectClassSubscriptionMessage::dispatch(const AbstractMessageDispatcher& 
 }
 
 size_t
-ChangeObjectClassSubscriptionMessage::messageSize() const
+ChangeObjectClassSubscriptionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -3624,20 +3141,8 @@ ChangeObjectClassSubscriptionMessage::operator<(const ChangeObjectClassSubscript
   return false;
 }
 
-ChangeObjectInstanceSubscriptionMessage::ChangeObjectInstanceSubscriptionMessage() noexcept :
-  _federationHandle(),
-  _subscriptionType(),
-  _objectClassHandle(),
-  _objectInstanceHandle()
-{
-}
-
-ChangeObjectInstanceSubscriptionMessage::~ChangeObjectInstanceSubscriptionMessage() noexcept
-{
-}
-
 const char*
-ChangeObjectInstanceSubscriptionMessage::getTypeName() const
+ChangeObjectInstanceSubscriptionMessage::getTypeName() const noexcept
 {
   return "ChangeObjectInstanceSubscriptionMessage";
 }
@@ -3670,7 +3175,7 @@ ChangeObjectInstanceSubscriptionMessage::dispatch(const AbstractMessageDispatche
 }
 
 size_t
-ChangeObjectInstanceSubscriptionMessage::messageSize() const
+ChangeObjectInstanceSubscriptionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -3713,18 +3218,8 @@ ChangeObjectInstanceSubscriptionMessage::operator<(const ChangeObjectInstanceSub
   return false;
 }
 
-RegistrationForObjectClassMessage::RegistrationForObjectClassMessage() noexcept :
-  _objectClassHandle(),
-  _start()
-{
-}
-
-RegistrationForObjectClassMessage::~RegistrationForObjectClassMessage() noexcept
-{
-}
-
 const char*
-RegistrationForObjectClassMessage::getTypeName() const
+RegistrationForObjectClassMessage::getTypeName() const noexcept
 {
   return "RegistrationForObjectClassMessage";
 }
@@ -3752,7 +3247,7 @@ RegistrationForObjectClassMessage::dispatch(const AbstractMessageDispatcher& dis
 }
 
 size_t
-RegistrationForObjectClassMessage::messageSize() const
+RegistrationForObjectClassMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getObjectClassHandle());
@@ -3787,19 +3282,8 @@ RegistrationForObjectClassMessage::operator<(const RegistrationForObjectClassMes
   return false;
 }
 
-AttributesInScopeMessage::AttributesInScopeMessage() noexcept :
-  _objectInstanceHandle(),
-  _attributeHandles(),
-  _inScope()
-{
-}
-
-AttributesInScopeMessage::~AttributesInScopeMessage() noexcept
-{
-}
-
 const char*
-AttributesInScopeMessage::getTypeName() const
+AttributesInScopeMessage::getTypeName() const noexcept
 {
   return "AttributesInScopeMessage";
 }
@@ -3829,7 +3313,7 @@ AttributesInScopeMessage::dispatch(const AbstractMessageDispatcher& dispatcher) 
 }
 
 size_t
-AttributesInScopeMessage::messageSize() const
+AttributesInScopeMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getObjectInstanceHandle());
@@ -3874,20 +3358,8 @@ AttributesInScopeMessage::getObjectInstanceHandleForMessage() const noexcept
   return getObjectInstanceHandle();
 }
 
-TurnUpdatesOnForInstanceMessage::TurnUpdatesOnForInstanceMessage() noexcept :
-  _objectInstanceHandle(),
-  _attributeHandles(),
-  _updateRate(),
-  _on()
-{
-}
-
-TurnUpdatesOnForInstanceMessage::~TurnUpdatesOnForInstanceMessage() noexcept
-{
-}
-
 const char*
-TurnUpdatesOnForInstanceMessage::getTypeName() const
+TurnUpdatesOnForInstanceMessage::getTypeName() const noexcept
 {
   return "TurnUpdatesOnForInstanceMessage";
 }
@@ -3919,7 +3391,7 @@ TurnUpdatesOnForInstanceMessage::dispatch(const AbstractMessageDispatcher& dispa
 }
 
 size_t
-TurnUpdatesOnForInstanceMessage::messageSize() const
+TurnUpdatesOnForInstanceMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getObjectInstanceHandle());
@@ -3968,18 +3440,8 @@ TurnUpdatesOnForInstanceMessage::getObjectInstanceHandleForMessage() const noexc
   return getObjectInstanceHandle();
 }
 
-TurnInteractionsOnMessage::TurnInteractionsOnMessage() noexcept :
-  _interactionClassHandle(),
-  _on()
-{
-}
-
-TurnInteractionsOnMessage::~TurnInteractionsOnMessage() noexcept
-{
-}
-
 const char*
-TurnInteractionsOnMessage::getTypeName() const
+TurnInteractionsOnMessage::getTypeName() const noexcept
 {
   return "TurnInteractionsOnMessage";
 }
@@ -4007,7 +3469,7 @@ TurnInteractionsOnMessage::dispatch(const AbstractMessageDispatcher& dispatcher)
 }
 
 size_t
-TurnInteractionsOnMessage::messageSize() const
+TurnInteractionsOnMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getInteractionClassHandle());
@@ -4042,22 +3504,8 @@ TurnInteractionsOnMessage::operator<(const TurnInteractionsOnMessage& rhs) const
   return false;
 }
 
-InteractionMessage::InteractionMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _interactionClassHandle(),
-  _transportationType(),
-  _tag(),
-  _parameterValues()
-{
-}
-
-InteractionMessage::~InteractionMessage() noexcept
-{
-}
-
 const char*
-InteractionMessage::getTypeName() const
+InteractionMessage::getTypeName() const noexcept
 {
   return "InteractionMessage";
 }
@@ -4096,7 +3544,7 @@ InteractionMessage::dispatch(const AbstractMessageDispatcher& dispatcher) const
 }
 
 size_t
-InteractionMessage::messageSize() const
+InteractionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4153,25 +3601,8 @@ InteractionMessage::getReliable() const noexcept
   return getTransportationType() == RELIABLE;
 }
 
-TimeStampedInteractionMessage::TimeStampedInteractionMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _interactionClassHandle(),
-  _orderType(),
-  _transportationType(),
-  _tag(),
-  _timeStamp(),
-  _messageRetractionHandle(),
-  _parameterValues()
-{
-}
-
-TimeStampedInteractionMessage::~TimeStampedInteractionMessage() noexcept
-{
-}
-
 const char*
-TimeStampedInteractionMessage::getTypeName() const
+TimeStampedInteractionMessage::getTypeName() const noexcept
 {
   return "TimeStampedInteractionMessage";
 }
@@ -4217,7 +3648,7 @@ TimeStampedInteractionMessage::dispatch(const AbstractMessageDispatcher& dispatc
 }
 
 size_t
-TimeStampedInteractionMessage::messageSize() const
+TimeStampedInteractionMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4286,19 +3717,8 @@ TimeStampedInteractionMessage::getReliable() const noexcept
   return getTransportationType() == RELIABLE;
 }
 
-ObjectInstanceHandlesRequestMessage::ObjectInstanceHandlesRequestMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _count()
-{
-}
-
-ObjectInstanceHandlesRequestMessage::~ObjectInstanceHandlesRequestMessage() noexcept
-{
-}
-
 const char*
-ObjectInstanceHandlesRequestMessage::getTypeName() const
+ObjectInstanceHandlesRequestMessage::getTypeName() const noexcept
 {
   return "ObjectInstanceHandlesRequestMessage";
 }
@@ -4328,7 +3748,7 @@ ObjectInstanceHandlesRequestMessage::dispatch(const AbstractMessageDispatcher& d
 }
 
 size_t
-ObjectInstanceHandlesRequestMessage::messageSize() const
+ObjectInstanceHandlesRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4367,19 +3787,8 @@ ObjectInstanceHandlesRequestMessage::operator<(const ObjectInstanceHandlesReques
   return false;
 }
 
-ObjectInstanceHandlesResponseMessage::ObjectInstanceHandlesResponseMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _objectInstanceHandleNamePairVector()
-{
-}
-
-ObjectInstanceHandlesResponseMessage::~ObjectInstanceHandlesResponseMessage() noexcept
-{
-}
-
 const char*
-ObjectInstanceHandlesResponseMessage::getTypeName() const
+ObjectInstanceHandlesResponseMessage::getTypeName() const noexcept
 {
   return "ObjectInstanceHandlesResponseMessage";
 }
@@ -4411,7 +3820,7 @@ ObjectInstanceHandlesResponseMessage::dispatch(const AbstractMessageDispatcher& 
 }
 
 size_t
-ObjectInstanceHandlesResponseMessage::messageSize() const
+ObjectInstanceHandlesResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4450,18 +3859,8 @@ ObjectInstanceHandlesResponseMessage::operator<(const ObjectInstanceHandlesRespo
   return false;
 }
 
-ReleaseMultipleObjectInstanceNameHandlePairsMessage::ReleaseMultipleObjectInstanceNameHandlePairsMessage() noexcept :
-  _federationHandle(),
-  _objectInstanceHandleVector()
-{
-}
-
-ReleaseMultipleObjectInstanceNameHandlePairsMessage::~ReleaseMultipleObjectInstanceNameHandlePairsMessage() noexcept
-{
-}
-
 const char*
-ReleaseMultipleObjectInstanceNameHandlePairsMessage::getTypeName() const
+ReleaseMultipleObjectInstanceNameHandlePairsMessage::getTypeName() const noexcept
 {
   return "ReleaseMultipleObjectInstanceNameHandlePairsMessage";
 }
@@ -4489,7 +3888,7 @@ ReleaseMultipleObjectInstanceNameHandlePairsMessage::dispatch(const AbstractMess
 }
 
 size_t
-ReleaseMultipleObjectInstanceNameHandlePairsMessage::messageSize() const
+ReleaseMultipleObjectInstanceNameHandlePairsMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4524,20 +3923,8 @@ ReleaseMultipleObjectInstanceNameHandlePairsMessage::operator<(const ReleaseMult
   return false;
 }
 
-ReserveObjectInstanceNameRequestMessage::ReserveObjectInstanceNameRequestMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _name(),
-  _isInternal()
-{
-}
-
-ReserveObjectInstanceNameRequestMessage::~ReserveObjectInstanceNameRequestMessage() noexcept
-{
-}
-
 const char*
-ReserveObjectInstanceNameRequestMessage::getTypeName() const
+ReserveObjectInstanceNameRequestMessage::getTypeName() const noexcept
 {
   return "ReserveObjectInstanceNameRequestMessage";
 }
@@ -4569,7 +3956,7 @@ ReserveObjectInstanceNameRequestMessage::dispatch(const AbstractMessageDispatche
 }
 
 size_t
-ReserveObjectInstanceNameRequestMessage::messageSize() const
+ReserveObjectInstanceNameRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4612,20 +3999,8 @@ ReserveObjectInstanceNameRequestMessage::operator<(const ReserveObjectInstanceNa
   return false;
 }
 
-ReserveObjectInstanceNameResponseMessage::ReserveObjectInstanceNameResponseMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _objectInstanceHandleNamePair(),
-  _success()
-{
-}
-
-ReserveObjectInstanceNameResponseMessage::~ReserveObjectInstanceNameResponseMessage() noexcept
-{
-}
-
 const char*
-ReserveObjectInstanceNameResponseMessage::getTypeName() const
+ReserveObjectInstanceNameResponseMessage::getTypeName() const noexcept
 {
   return "ReserveObjectInstanceNameResponseMessage";
 }
@@ -4657,7 +4032,7 @@ ReserveObjectInstanceNameResponseMessage::dispatch(const AbstractMessageDispatch
 }
 
 size_t
-ReserveObjectInstanceNameResponseMessage::messageSize() const
+ReserveObjectInstanceNameResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4700,19 +4075,8 @@ ReserveObjectInstanceNameResponseMessage::operator<(const ReserveObjectInstanceN
   return false;
 }
 
-ReserveMultipleObjectInstanceNameRequestMessage::ReserveMultipleObjectInstanceNameRequestMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _nameList()
-{
-}
-
-ReserveMultipleObjectInstanceNameRequestMessage::~ReserveMultipleObjectInstanceNameRequestMessage() noexcept
-{
-}
-
 const char*
-ReserveMultipleObjectInstanceNameRequestMessage::getTypeName() const
+ReserveMultipleObjectInstanceNameRequestMessage::getTypeName() const noexcept
 {
   return "ReserveMultipleObjectInstanceNameRequestMessage";
 }
@@ -4742,7 +4106,7 @@ ReserveMultipleObjectInstanceNameRequestMessage::dispatch(const AbstractMessageD
 }
 
 size_t
-ReserveMultipleObjectInstanceNameRequestMessage::messageSize() const
+ReserveMultipleObjectInstanceNameRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4781,20 +4145,8 @@ ReserveMultipleObjectInstanceNameRequestMessage::operator<(const ReserveMultiple
   return false;
 }
 
-ReserveMultipleObjectInstanceNameResponseMessage::ReserveMultipleObjectInstanceNameResponseMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _objectInstanceHandleNamePairVector(),
-  _success()
-{
-}
-
-ReserveMultipleObjectInstanceNameResponseMessage::~ReserveMultipleObjectInstanceNameResponseMessage() noexcept
-{
-}
-
 const char*
-ReserveMultipleObjectInstanceNameResponseMessage::getTypeName() const
+ReserveMultipleObjectInstanceNameResponseMessage::getTypeName() const noexcept
 {
   return "ReserveMultipleObjectInstanceNameResponseMessage";
 }
@@ -4827,7 +4179,7 @@ ReserveMultipleObjectInstanceNameResponseMessage::dispatch(const AbstractMessage
 }
 
 size_t
-ReserveMultipleObjectInstanceNameResponseMessage::messageSize() const
+ReserveMultipleObjectInstanceNameResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4870,21 +4222,8 @@ ReserveMultipleObjectInstanceNameResponseMessage::operator<(const ReserveMultipl
   return false;
 }
 
-InsertObjectInstanceMessage::InsertObjectInstanceMessage() noexcept :
-  _federationHandle(),
-  _objectClassHandle(),
-  _objectInstanceHandle(),
-  _name(),
-  _attributeStateVector()
-{
-}
-
-InsertObjectInstanceMessage::~InsertObjectInstanceMessage() noexcept
-{
-}
-
 const char*
-InsertObjectInstanceMessage::getTypeName() const
+InsertObjectInstanceMessage::getTypeName() const noexcept
 {
   return "InsertObjectInstanceMessage";
 }
@@ -4919,7 +4258,7 @@ InsertObjectInstanceMessage::dispatch(const AbstractMessageDispatcher& dispatche
 }
 
 size_t
-InsertObjectInstanceMessage::messageSize() const
+InsertObjectInstanceMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -4972,20 +4311,8 @@ InsertObjectInstanceMessage::getObjectInstanceHandleForMessage() const noexcept
   return getObjectInstanceHandle();
 }
 
-DeleteObjectInstanceMessage::DeleteObjectInstanceMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _objectInstanceHandle(),
-  _tag()
-{
-}
-
-DeleteObjectInstanceMessage::~DeleteObjectInstanceMessage() noexcept
-{
-}
-
 const char*
-DeleteObjectInstanceMessage::getTypeName() const
+DeleteObjectInstanceMessage::getTypeName() const noexcept
 {
   return "DeleteObjectInstanceMessage";
 }
@@ -5017,7 +4344,7 @@ DeleteObjectInstanceMessage::dispatch(const AbstractMessageDispatcher& dispatche
 }
 
 size_t
-DeleteObjectInstanceMessage::messageSize() const
+DeleteObjectInstanceMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -5066,23 +4393,8 @@ DeleteObjectInstanceMessage::getObjectInstanceHandleForMessage() const noexcept
   return getObjectInstanceHandle();
 }
 
-TimeStampedDeleteObjectInstanceMessage::TimeStampedDeleteObjectInstanceMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _objectInstanceHandle(),
-  _orderType(),
-  _tag(),
-  _timeStamp(),
-  _messageRetractionHandle()
-{
-}
-
-TimeStampedDeleteObjectInstanceMessage::~TimeStampedDeleteObjectInstanceMessage() noexcept
-{
-}
-
 const char*
-TimeStampedDeleteObjectInstanceMessage::getTypeName() const
+TimeStampedDeleteObjectInstanceMessage::getTypeName() const noexcept
 {
   return "TimeStampedDeleteObjectInstanceMessage";
 }
@@ -5120,7 +4432,7 @@ TimeStampedDeleteObjectInstanceMessage::dispatch(const AbstractMessageDispatcher
 }
 
 size_t
-TimeStampedDeleteObjectInstanceMessage::messageSize() const
+TimeStampedDeleteObjectInstanceMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -5181,22 +4493,8 @@ TimeStampedDeleteObjectInstanceMessage::getObjectInstanceHandleForMessage() cons
   return getObjectInstanceHandle();
 }
 
-AttributeUpdateMessage::AttributeUpdateMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _objectInstanceHandle(),
-  _tag(),
-  _transportationType(),
-  _attributeValues()
-{
-}
-
-AttributeUpdateMessage::~AttributeUpdateMessage() noexcept
-{
-}
-
 const char*
-AttributeUpdateMessage::getTypeName() const
+AttributeUpdateMessage::getTypeName() const noexcept
 {
   return "AttributeUpdateMessage";
 }
@@ -5236,7 +4534,7 @@ AttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dispatcher) co
 }
 
 size_t
-AttributeUpdateMessage::messageSize() const
+AttributeUpdateMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -5299,25 +4597,8 @@ AttributeUpdateMessage::getObjectInstanceHandleForMessage() const noexcept
   return getObjectInstanceHandle();
 }
 
-TimeStampedAttributeUpdateMessage::TimeStampedAttributeUpdateMessage() noexcept :
-  _federationHandle(),
-  _federateHandle(),
-  _objectInstanceHandle(),
-  _tag(),
-  _timeStamp(),
-  _messageRetractionHandle(),
-  _orderType(),
-  _transportationType(),
-  _attributeValues()
-{
-}
-
-TimeStampedAttributeUpdateMessage::~TimeStampedAttributeUpdateMessage() noexcept
-{
-}
-
 const char*
-TimeStampedAttributeUpdateMessage::getTypeName() const
+TimeStampedAttributeUpdateMessage::getTypeName() const noexcept
 {
   return "TimeStampedAttributeUpdateMessage";
 }
@@ -5359,7 +4640,7 @@ TimeStampedAttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dis
 }
 
 size_t
-TimeStampedAttributeUpdateMessage::messageSize() const
+TimeStampedAttributeUpdateMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -5434,20 +4715,8 @@ TimeStampedAttributeUpdateMessage::getObjectInstanceHandleForMessage() const noe
   return getObjectInstanceHandle();
 }
 
-RequestAttributeUpdateMessage::RequestAttributeUpdateMessage() noexcept :
-  _federationHandle(),
-  _objectInstanceHandle(),
-  _attributeHandles(),
-  _tag()
-{
-}
-
-RequestAttributeUpdateMessage::~RequestAttributeUpdateMessage() noexcept
-{
-}
-
 const char*
-RequestAttributeUpdateMessage::getTypeName() const
+RequestAttributeUpdateMessage::getTypeName() const noexcept
 {
   return "RequestAttributeUpdateMessage";
 }
@@ -5481,7 +4750,7 @@ RequestAttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& dispatc
 }
 
 size_t
-RequestAttributeUpdateMessage::messageSize() const
+RequestAttributeUpdateMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -5530,20 +4799,8 @@ RequestAttributeUpdateMessage::getObjectInstanceHandleForMessage() const noexcep
   return getObjectInstanceHandle();
 }
 
-RequestClassAttributeUpdateMessage::RequestClassAttributeUpdateMessage() noexcept :
-  _federationHandle(),
-  _objectClassHandle(),
-  _attributeHandles(),
-  _tag()
-{
-}
-
-RequestClassAttributeUpdateMessage::~RequestClassAttributeUpdateMessage() noexcept
-{
-}
-
 const char*
-RequestClassAttributeUpdateMessage::getTypeName() const
+RequestClassAttributeUpdateMessage::getTypeName() const noexcept
 {
   return "RequestClassAttributeUpdateMessage";
 }
@@ -5575,7 +4832,7 @@ RequestClassAttributeUpdateMessage::dispatch(const AbstractMessageDispatcher& di
 }
 
 size_t
-RequestClassAttributeUpdateMessage::messageSize() const
+RequestClassAttributeUpdateMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -5618,19 +4875,8 @@ RequestClassAttributeUpdateMessage::operator<(const RequestClassAttributeUpdateM
   return false;
 }
 
-QueryAttributeOwnershipRequestMessage::QueryAttributeOwnershipRequestMessage() noexcept :
-  _federationHandle(),
-  _objectInstanceHandle(),
-  _attributeHandle()
-{
-}
-
-QueryAttributeOwnershipRequestMessage::~QueryAttributeOwnershipRequestMessage() noexcept
-{
-}
-
 const char*
-QueryAttributeOwnershipRequestMessage::getTypeName() const
+QueryAttributeOwnershipRequestMessage::getTypeName() const noexcept
 {
   return "QueryAttributeOwnershipRequestMessage";
 }
@@ -5660,7 +4906,7 @@ QueryAttributeOwnershipRequestMessage::dispatch(const AbstractMessageDispatcher&
 }
 
 size_t
-QueryAttributeOwnershipRequestMessage::messageSize() const
+QueryAttributeOwnershipRequestMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());
@@ -5699,20 +4945,8 @@ QueryAttributeOwnershipRequestMessage::operator<(const QueryAttributeOwnershipRe
   return false;
 }
 
-QueryAttributeOwnershipResponseMessage::QueryAttributeOwnershipResponseMessage() noexcept :
-  _federationHandle(),
-  _objectInstanceHandle(),
-  _attributeHandle(),
-  _owner()
-{
-}
-
-QueryAttributeOwnershipResponseMessage::~QueryAttributeOwnershipResponseMessage() noexcept
-{
-}
-
 const char*
-QueryAttributeOwnershipResponseMessage::getTypeName() const
+QueryAttributeOwnershipResponseMessage::getTypeName() const noexcept
 {
   return "QueryAttributeOwnershipResponseMessage";
 }
@@ -5744,7 +4978,7 @@ QueryAttributeOwnershipResponseMessage::dispatch(const AbstractMessageDispatcher
 }
 
 size_t
-QueryAttributeOwnershipResponseMessage::messageSize() const
+QueryAttributeOwnershipResponseMessage::messageSize() const noexcept
 {
   size_t result = AbstractMessage::messageSize();
   result += byteSize(getFederationHandle());

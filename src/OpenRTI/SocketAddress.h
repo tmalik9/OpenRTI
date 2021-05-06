@@ -84,7 +84,7 @@ public:
 private:
   struct PrivateData;
 
-  SocketAddress(PrivateData* privateData);
+  SocketAddress(SharedPtr<PrivateData> privateData);
 
   int cmp(const SocketAddress& socketAddress) const;
 

@@ -35,13 +35,13 @@ foreach (var dataType in FOM.SortedDataTypes)
     {#>
 <#=dataType.Comment#>
 <#  } #>
-<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding() : rti1516e::HLAfixedRecord(<#=fixedRecordDataType.Version#>)
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding() : rti1516ev::HLAfixedRecord(<#=fixedRecordDataType.Version#>)
 {
 <#
     foreach (var field in fixedRecordDataType.AllFields)
     {
 #>
-  rti1516e::HLAfixedRecord::appendElementPointer(&m<#=field.Name#>, <#=field.Version#>);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&m<#=field.Name#>, <#=field.Version#>);
 <#
     } // foreach fixedRecordDataType.Fields
 #>
@@ -49,7 +49,7 @@ foreach (var dataType in FOM.SortedDataTypes)
 <#=dataType.Name#>Encoding::~<#=dataType.Name#>Encoding()
 {
 }
-uint32_t <#=dataType.Name#>Encoding::getVersion() const { return rti1516e::HLAfixedRecord::getVersion(); }
+uint32_t <#=dataType.Name#>Encoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 <# foreach (var field in fixedRecordDataType.AllFields) { #>
 void <#=dataType.Name#>Encoding::Set<#=field.Name#>(<#=field.DataType.ParameterCppType#> value)
 {
@@ -73,7 +73,7 @@ void <#=dataType.Name#>Encoding::Set<#=field.Name#>(const <#=arrayDataType.DataT
 <# if (field.Version > 0) { #>
   if (getVersion() < <#=field.Version#>)
   {
-    throw rti1516e::EncoderException(L"field \"<#=field.Name#>\" is not available in decoded record version " + std::to_wstring(getVersion()));
+    throw rti1516ev::EncoderException(L"field \"<#=field.Name#>\" is not available in decoded record version " + std::to_wstring(getVersion()));
   }
 <# } #>
 <# if (field.DataType is FOMParser.EnumeratedDataType) { #>
@@ -229,7 +229,7 @@ void <#=dataType.Name#>Encoding::resize(size_t size)
   update();
 }
 // resize buffer and encoder array before actually decoding 
-size_t <#=dataType.Name#>Encoding::decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index)
+size_t <#=dataType.Name#>Encoding::decodeFrom(const rti1516ev::Octet* buffer, size_t bufferSize, size_t index)
 {
   size_t newSize = decodedSize(buffer, bufferSize, index);
   resize(newSize);
@@ -294,7 +294,7 @@ void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.DataType.Encoding#
   }
 }
 // resize buffer and encoder array before actually decoding 
-size_t <#=dataType.Name#>Encoding::decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index)
+size_t <#=dataType.Name#>Encoding::decodeFrom(const rti1516ev::Octet* buffer, size_t bufferSize, size_t index)
 {
   size_t newSize = decodedSize(buffer, bufferSize, index);
   resize(newSize);

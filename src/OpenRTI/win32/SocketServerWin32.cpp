@@ -35,7 +35,7 @@ SocketServer::getsockname() const
   if (ret == -1)
     throw TransportError(errnoToUtf8(WSAGetLastError()));
 
-  return SocketAddress(new SocketAddress::PrivateData((struct sockaddr*)&sockaddr, addrlen));
+  return SocketAddress(MakeShared<SocketAddress::PrivateData>((struct sockaddr*)&sockaddr, addrlen));
 }
 
 SocketServer::SocketServer(PrivateData* privateData) :

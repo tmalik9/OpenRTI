@@ -21,6 +21,7 @@
  */
 
 
+#include "DebugNew.h"
 #include "TightBE1MessageEncoding.h"
 #include "AbstractMessageEncoding.h"
 #include "DecodeDataStream.h"
@@ -2115,7 +2116,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(1);
+    encodeStream.writeUInt16Compressed(ConnectionLostMessage::OpCode);
     encodeStream.writeConnectionLostMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2125,7 +2126,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(2);
+    encodeStream.writeUInt16Compressed(CreateFederationExecutionRequestMessage::OpCode);
     encodeStream.writeCreateFederationExecutionRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2135,7 +2136,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(104);
+    encodeStream.writeUInt16Compressed(CreateFederationExecutionRequest2Message::OpCode);
     encodeStream.writeCreateFederationExecutionRequest2Message(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2145,7 +2146,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(3);
+    encodeStream.writeUInt16Compressed(CreateFederationExecutionResponseMessage::OpCode);
     encodeStream.writeCreateFederationExecutionResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2155,7 +2156,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(4);
+    encodeStream.writeUInt16Compressed(DestroyFederationExecutionRequestMessage::OpCode);
     encodeStream.writeDestroyFederationExecutionRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2165,7 +2166,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(5);
+    encodeStream.writeUInt16Compressed(DestroyFederationExecutionResponseMessage::OpCode);
     encodeStream.writeDestroyFederationExecutionResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2175,7 +2176,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(6);
+    encodeStream.writeUInt16Compressed(EnumerateFederationExecutionsRequestMessage::OpCode);
     encodeStream.writeEnumerateFederationExecutionsRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2185,7 +2186,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(7);
+    encodeStream.writeUInt16Compressed(EnumerateFederationExecutionsResponseMessage::OpCode);
     encodeStream.writeEnumerateFederationExecutionsResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2195,7 +2196,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(8);
+    encodeStream.writeUInt16Compressed(InsertFederationExecutionMessage::OpCode);
     encodeStream.writeInsertFederationExecutionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2205,7 +2206,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(9);
+    encodeStream.writeUInt16Compressed(ShutdownFederationExecutionMessage::OpCode);
     encodeStream.writeShutdownFederationExecutionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2215,7 +2216,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(10);
+    encodeStream.writeUInt16Compressed(EraseFederationExecutionMessage::OpCode);
     encodeStream.writeEraseFederationExecutionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2225,7 +2226,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(11);
+    encodeStream.writeUInt16Compressed(ReleaseFederationHandleMessage::OpCode);
     encodeStream.writeReleaseFederationHandleMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2235,7 +2236,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(12);
+    encodeStream.writeUInt16Compressed(InsertModulesMessage::OpCode);
     encodeStream.writeInsertModulesMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2245,7 +2246,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(106);
+    encodeStream.writeUInt16Compressed(InsertModules2Message::OpCode);
     encodeStream.writeInsertModules2Message(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2255,7 +2256,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(13);
+    encodeStream.writeUInt16Compressed(JoinFederationExecutionRequestMessage::OpCode);
     encodeStream.writeJoinFederationExecutionRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2265,7 +2266,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(105);
+    encodeStream.writeUInt16Compressed(JoinFederationExecutionRequest2Message::OpCode);
     encodeStream.writeJoinFederationExecutionRequest2Message(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2275,7 +2276,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(14);
+    encodeStream.writeUInt16Compressed(JoinFederationExecutionResponseMessage::OpCode);
     encodeStream.writeJoinFederationExecutionResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2285,7 +2286,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(15);
+    encodeStream.writeUInt16Compressed(ResignFederationExecutionRequestMessage::OpCode);
     encodeStream.writeResignFederationExecutionRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2295,7 +2296,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(16);
+    encodeStream.writeUInt16Compressed(JoinFederateNotifyMessage::OpCode);
     encodeStream.writeJoinFederateNotifyMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2305,7 +2306,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(17);
+    encodeStream.writeUInt16Compressed(ResignFederateNotifyMessage::OpCode);
     encodeStream.writeResignFederateNotifyMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2315,7 +2316,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(18);
+    encodeStream.writeUInt16Compressed(ChangeAutomaticResignDirectiveMessage::OpCode);
     encodeStream.writeChangeAutomaticResignDirectiveMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2325,7 +2326,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(30);
+    encodeStream.writeUInt16Compressed(RegisterFederationSynchronizationPointMessage::OpCode);
     encodeStream.writeRegisterFederationSynchronizationPointMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2335,7 +2336,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(31);
+    encodeStream.writeUInt16Compressed(RegisterFederationSynchronizationPointResponseMessage::OpCode);
     encodeStream.writeRegisterFederationSynchronizationPointResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2345,7 +2346,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(32);
+    encodeStream.writeUInt16Compressed(AnnounceSynchronizationPointMessage::OpCode);
     encodeStream.writeAnnounceSynchronizationPointMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2355,7 +2356,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(33);
+    encodeStream.writeUInt16Compressed(SynchronizationPointAchievedMessage::OpCode);
     encodeStream.writeSynchronizationPointAchievedMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2365,7 +2366,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(34);
+    encodeStream.writeUInt16Compressed(FederationSynchronizedMessage::OpCode);
     encodeStream.writeFederationSynchronizedMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2375,7 +2376,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(40);
+    encodeStream.writeUInt16Compressed(EnableTimeRegulationRequestMessage::OpCode);
     encodeStream.writeEnableTimeRegulationRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2385,7 +2386,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(41);
+    encodeStream.writeUInt16Compressed(EnableTimeRegulationResponseMessage::OpCode);
     encodeStream.writeEnableTimeRegulationResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2395,7 +2396,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(42);
+    encodeStream.writeUInt16Compressed(DisableTimeRegulationRequestMessage::OpCode);
     encodeStream.writeDisableTimeRegulationRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2405,7 +2406,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(100);
+    encodeStream.writeUInt16Compressed(EnableTimeConstrainedNotifyMessage::OpCode);
     encodeStream.writeEnableTimeConstrainedNotifyMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2415,7 +2416,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(101);
+    encodeStream.writeUInt16Compressed(DisableTimeConstrainedNotifyMessage::OpCode);
     encodeStream.writeDisableTimeConstrainedNotifyMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2425,7 +2426,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(43);
+    encodeStream.writeUInt16Compressed(CommitLowerBoundTimeStampMessage::OpCode);
     encodeStream.writeCommitLowerBoundTimeStampMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2435,7 +2436,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(44);
+    encodeStream.writeUInt16Compressed(CommitLowerBoundTimeStampResponseMessage::OpCode);
     encodeStream.writeCommitLowerBoundTimeStampResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2445,7 +2446,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(45);
+    encodeStream.writeUInt16Compressed(LockedByNextMessageRequestMessage::OpCode);
     encodeStream.writeLockedByNextMessageRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2455,7 +2456,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(46);
+    encodeStream.writeUInt16Compressed(InsertRegionMessage::OpCode);
     encodeStream.writeInsertRegionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2465,7 +2466,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(47);
+    encodeStream.writeUInt16Compressed(CommitRegionMessage::OpCode);
     encodeStream.writeCommitRegionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2475,7 +2476,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(48);
+    encodeStream.writeUInt16Compressed(EraseRegionMessage::OpCode);
     encodeStream.writeEraseRegionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2485,7 +2486,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(50);
+    encodeStream.writeUInt16Compressed(ChangeInteractionClassPublicationMessage::OpCode);
     encodeStream.writeChangeInteractionClassPublicationMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2495,7 +2496,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(51);
+    encodeStream.writeUInt16Compressed(ChangeObjectClassPublicationMessage::OpCode);
     encodeStream.writeChangeObjectClassPublicationMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2505,7 +2506,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(52);
+    encodeStream.writeUInt16Compressed(ChangeInteractionClassSubscriptionMessage::OpCode);
     encodeStream.writeChangeInteractionClassSubscriptionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2515,7 +2516,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(53);
+    encodeStream.writeUInt16Compressed(ChangeObjectClassSubscriptionMessage::OpCode);
     encodeStream.writeChangeObjectClassSubscriptionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2525,7 +2526,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(99);
+    encodeStream.writeUInt16Compressed(ChangeObjectInstanceSubscriptionMessage::OpCode);
     encodeStream.writeChangeObjectInstanceSubscriptionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2535,7 +2536,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(80);
+    encodeStream.writeUInt16Compressed(InteractionMessage::OpCode);
     encodeStream.writeInteractionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2545,7 +2546,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(81);
+    encodeStream.writeUInt16Compressed(TimeStampedInteractionMessage::OpCode);
     encodeStream.writeTimeStampedInteractionMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2555,7 +2556,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(60);
+    encodeStream.writeUInt16Compressed(ObjectInstanceHandlesRequestMessage::OpCode);
     encodeStream.writeObjectInstanceHandlesRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2565,7 +2566,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(61);
+    encodeStream.writeUInt16Compressed(ObjectInstanceHandlesResponseMessage::OpCode);
     encodeStream.writeObjectInstanceHandlesResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2575,7 +2576,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(62);
+    encodeStream.writeUInt16Compressed(ReleaseMultipleObjectInstanceNameHandlePairsMessage::OpCode);
     encodeStream.writeReleaseMultipleObjectInstanceNameHandlePairsMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2585,7 +2586,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(63);
+    encodeStream.writeUInt16Compressed(ReserveObjectInstanceNameRequestMessage::OpCode);
     encodeStream.writeReserveObjectInstanceNameRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2595,7 +2596,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(64);
+    encodeStream.writeUInt16Compressed(ReserveObjectInstanceNameResponseMessage::OpCode);
     encodeStream.writeReserveObjectInstanceNameResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2605,7 +2606,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(65);
+    encodeStream.writeUInt16Compressed(ReserveMultipleObjectInstanceNameRequestMessage::OpCode);
     encodeStream.writeReserveMultipleObjectInstanceNameRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2615,7 +2616,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(66);
+    encodeStream.writeUInt16Compressed(ReserveMultipleObjectInstanceNameResponseMessage::OpCode);
     encodeStream.writeReserveMultipleObjectInstanceNameResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2625,7 +2626,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(90);
+    encodeStream.writeUInt16Compressed(InsertObjectInstanceMessage::OpCode);
     encodeStream.writeInsertObjectInstanceMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2635,7 +2636,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(91);
+    encodeStream.writeUInt16Compressed(DeleteObjectInstanceMessage::OpCode);
     encodeStream.writeDeleteObjectInstanceMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2645,7 +2646,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(92);
+    encodeStream.writeUInt16Compressed(TimeStampedDeleteObjectInstanceMessage::OpCode);
     encodeStream.writeTimeStampedDeleteObjectInstanceMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2655,7 +2656,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(94);
+    encodeStream.writeUInt16Compressed(AttributeUpdateMessage::OpCode);
     encodeStream.writeAttributeUpdateMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2665,7 +2666,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(96);
+    encodeStream.writeUInt16Compressed(TimeStampedAttributeUpdateMessage::OpCode);
     encodeStream.writeTimeStampedAttributeUpdateMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2675,7 +2676,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(97);
+    encodeStream.writeUInt16Compressed(RequestAttributeUpdateMessage::OpCode);
     encodeStream.writeRequestAttributeUpdateMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2685,7 +2686,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(98);
+    encodeStream.writeUInt16Compressed(RequestClassAttributeUpdateMessage::OpCode);
     encodeStream.writeRequestClassAttributeUpdateMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2695,7 +2696,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(102);
+    encodeStream.writeUInt16Compressed(QueryAttributeOwnershipRequestMessage::OpCode);
     encodeStream.writeQueryAttributeOwnershipRequestMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -2705,7 +2706,7 @@ public:
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(103);
+    encodeStream.writeUInt16Compressed(QueryAttributeOwnershipResponseMessage::OpCode);
     encodeStream.writeQueryAttributeOwnershipResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
@@ -4939,243 +4940,243 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
   DecodeStream decodeStream(variableLengthData, *this);
   uint16_t opcode = decodeStream.readUInt16Compressed();
   switch (opcode) {
-  case 1:
+  case ConnectionLostMessage::OpCode:
     _message = MakeShared<ConnectionLostMessage>();
     decodeStream.readConnectionLostMessage(static_cast<ConnectionLostMessage&>(*_message));
     break;
-  case 2:
+  case CreateFederationExecutionRequestMessage::OpCode:
     _message = MakeShared<CreateFederationExecutionRequestMessage>();
     decodeStream.readCreateFederationExecutionRequestMessage(static_cast<CreateFederationExecutionRequestMessage&>(*_message));
     break;
-  case 104:
+  case CreateFederationExecutionRequest2Message::OpCode:
     _message = MakeShared<CreateFederationExecutionRequest2Message>();
     decodeStream.readCreateFederationExecutionRequest2Message(static_cast<CreateFederationExecutionRequest2Message&>(*_message));
     break;
-  case 3:
+  case CreateFederationExecutionResponseMessage::OpCode:
     _message = MakeShared<CreateFederationExecutionResponseMessage>();
     decodeStream.readCreateFederationExecutionResponseMessage(static_cast<CreateFederationExecutionResponseMessage&>(*_message));
     break;
-  case 4:
+  case DestroyFederationExecutionRequestMessage::OpCode:
     _message = MakeShared<DestroyFederationExecutionRequestMessage>();
     decodeStream.readDestroyFederationExecutionRequestMessage(static_cast<DestroyFederationExecutionRequestMessage&>(*_message));
     break;
-  case 5:
+  case DestroyFederationExecutionResponseMessage::OpCode:
     _message = MakeShared<DestroyFederationExecutionResponseMessage>();
     decodeStream.readDestroyFederationExecutionResponseMessage(static_cast<DestroyFederationExecutionResponseMessage&>(*_message));
     break;
-  case 6:
+  case EnumerateFederationExecutionsRequestMessage::OpCode:
     _message = MakeShared<EnumerateFederationExecutionsRequestMessage>();
     decodeStream.readEnumerateFederationExecutionsRequestMessage(static_cast<EnumerateFederationExecutionsRequestMessage&>(*_message));
     break;
-  case 7:
+  case EnumerateFederationExecutionsResponseMessage::OpCode:
     _message = MakeShared<EnumerateFederationExecutionsResponseMessage>();
     decodeStream.readEnumerateFederationExecutionsResponseMessage(static_cast<EnumerateFederationExecutionsResponseMessage&>(*_message));
     break;
-  case 8:
+  case InsertFederationExecutionMessage::OpCode:
     _message = MakeShared<InsertFederationExecutionMessage>();
     decodeStream.readInsertFederationExecutionMessage(static_cast<InsertFederationExecutionMessage&>(*_message));
     break;
-  case 9:
+  case ShutdownFederationExecutionMessage::OpCode:
     _message = MakeShared<ShutdownFederationExecutionMessage>();
     decodeStream.readShutdownFederationExecutionMessage(static_cast<ShutdownFederationExecutionMessage&>(*_message));
     break;
-  case 10:
+  case EraseFederationExecutionMessage::OpCode:
     _message = MakeShared<EraseFederationExecutionMessage>();
     decodeStream.readEraseFederationExecutionMessage(static_cast<EraseFederationExecutionMessage&>(*_message));
     break;
-  case 11:
+  case ReleaseFederationHandleMessage::OpCode:
     _message = MakeShared<ReleaseFederationHandleMessage>();
     decodeStream.readReleaseFederationHandleMessage(static_cast<ReleaseFederationHandleMessage&>(*_message));
     break;
-  case 12:
+  case InsertModulesMessage::OpCode:
     _message = MakeShared<InsertModulesMessage>();
     decodeStream.readInsertModulesMessage(static_cast<InsertModulesMessage&>(*_message));
     break;
-  case 106:
+  case InsertModules2Message::OpCode:
     _message = MakeShared<InsertModules2Message>();
     decodeStream.readInsertModules2Message(static_cast<InsertModules2Message&>(*_message));
     break;
-  case 13:
+  case JoinFederationExecutionRequestMessage::OpCode:
     _message = MakeShared<JoinFederationExecutionRequestMessage>();
     decodeStream.readJoinFederationExecutionRequestMessage(static_cast<JoinFederationExecutionRequestMessage&>(*_message));
     break;
-  case 105:
+  case JoinFederationExecutionRequest2Message::OpCode:
     _message = MakeShared<JoinFederationExecutionRequest2Message>();
     decodeStream.readJoinFederationExecutionRequest2Message(static_cast<JoinFederationExecutionRequest2Message&>(*_message));
     break;
-  case 14:
+  case JoinFederationExecutionResponseMessage::OpCode:
     _message = MakeShared<JoinFederationExecutionResponseMessage>();
     decodeStream.readJoinFederationExecutionResponseMessage(static_cast<JoinFederationExecutionResponseMessage&>(*_message));
     break;
-  case 15:
+  case ResignFederationExecutionRequestMessage::OpCode:
     _message = MakeShared<ResignFederationExecutionRequestMessage>();
     decodeStream.readResignFederationExecutionRequestMessage(static_cast<ResignFederationExecutionRequestMessage&>(*_message));
     break;
-  case 16:
+  case JoinFederateNotifyMessage::OpCode:
     _message = MakeShared<JoinFederateNotifyMessage>();
     decodeStream.readJoinFederateNotifyMessage(static_cast<JoinFederateNotifyMessage&>(*_message));
     break;
-  case 17:
+  case ResignFederateNotifyMessage::OpCode:
     _message = MakeShared<ResignFederateNotifyMessage>();
     decodeStream.readResignFederateNotifyMessage(static_cast<ResignFederateNotifyMessage&>(*_message));
     break;
-  case 18:
+  case ChangeAutomaticResignDirectiveMessage::OpCode:
     _message = MakeShared<ChangeAutomaticResignDirectiveMessage>();
     decodeStream.readChangeAutomaticResignDirectiveMessage(static_cast<ChangeAutomaticResignDirectiveMessage&>(*_message));
     break;
-  case 30:
+  case RegisterFederationSynchronizationPointMessage::OpCode:
     _message = MakeShared<RegisterFederationSynchronizationPointMessage>();
     decodeStream.readRegisterFederationSynchronizationPointMessage(static_cast<RegisterFederationSynchronizationPointMessage&>(*_message));
     break;
-  case 31:
+  case RegisterFederationSynchronizationPointResponseMessage::OpCode:
     _message = MakeShared<RegisterFederationSynchronizationPointResponseMessage>();
     decodeStream.readRegisterFederationSynchronizationPointResponseMessage(static_cast<RegisterFederationSynchronizationPointResponseMessage&>(*_message));
     break;
-  case 32:
+  case AnnounceSynchronizationPointMessage::OpCode:
     _message = MakeShared<AnnounceSynchronizationPointMessage>();
     decodeStream.readAnnounceSynchronizationPointMessage(static_cast<AnnounceSynchronizationPointMessage&>(*_message));
     break;
-  case 33:
+  case SynchronizationPointAchievedMessage::OpCode:
     _message = MakeShared<SynchronizationPointAchievedMessage>();
     decodeStream.readSynchronizationPointAchievedMessage(static_cast<SynchronizationPointAchievedMessage&>(*_message));
     break;
-  case 34:
+  case FederationSynchronizedMessage::OpCode:
     _message = MakeShared<FederationSynchronizedMessage>();
     decodeStream.readFederationSynchronizedMessage(static_cast<FederationSynchronizedMessage&>(*_message));
     break;
-  case 40:
+  case EnableTimeRegulationRequestMessage::OpCode:
     _message = MakeShared<EnableTimeRegulationRequestMessage>();
     decodeStream.readEnableTimeRegulationRequestMessage(static_cast<EnableTimeRegulationRequestMessage&>(*_message));
     break;
-  case 41:
+  case EnableTimeRegulationResponseMessage::OpCode:
     _message = MakeShared<EnableTimeRegulationResponseMessage>();
     decodeStream.readEnableTimeRegulationResponseMessage(static_cast<EnableTimeRegulationResponseMessage&>(*_message));
     break;
-  case 42:
+  case DisableTimeRegulationRequestMessage::OpCode:
     _message = MakeShared<DisableTimeRegulationRequestMessage>();
     decodeStream.readDisableTimeRegulationRequestMessage(static_cast<DisableTimeRegulationRequestMessage&>(*_message));
     break;
-  case 100:
+  case EnableTimeConstrainedNotifyMessage::OpCode:
     _message = MakeShared<EnableTimeConstrainedNotifyMessage>();
     decodeStream.readEnableTimeConstrainedNotifyMessage(static_cast<EnableTimeConstrainedNotifyMessage&>(*_message));
     break;
-  case 101:
+  case DisableTimeConstrainedNotifyMessage::OpCode:
     _message = MakeShared<DisableTimeConstrainedNotifyMessage>();
     decodeStream.readDisableTimeConstrainedNotifyMessage(static_cast<DisableTimeConstrainedNotifyMessage&>(*_message));
     break;
-  case 43:
+  case CommitLowerBoundTimeStampMessage::OpCode:
     _message = MakeShared<CommitLowerBoundTimeStampMessage>();
     decodeStream.readCommitLowerBoundTimeStampMessage(static_cast<CommitLowerBoundTimeStampMessage&>(*_message));
     break;
-  case 44:
+  case CommitLowerBoundTimeStampResponseMessage::OpCode:
     _message = MakeShared<CommitLowerBoundTimeStampResponseMessage>();
     decodeStream.readCommitLowerBoundTimeStampResponseMessage(static_cast<CommitLowerBoundTimeStampResponseMessage&>(*_message));
     break;
-  case 45:
+  case LockedByNextMessageRequestMessage::OpCode:
     _message = MakeShared<LockedByNextMessageRequestMessage>();
     decodeStream.readLockedByNextMessageRequestMessage(static_cast<LockedByNextMessageRequestMessage&>(*_message));
     break;
-  case 46:
+  case InsertRegionMessage::OpCode:
     _message = MakeShared<InsertRegionMessage>();
     decodeStream.readInsertRegionMessage(static_cast<InsertRegionMessage&>(*_message));
     break;
-  case 47:
+  case CommitRegionMessage::OpCode:
     _message = MakeShared<CommitRegionMessage>();
     decodeStream.readCommitRegionMessage(static_cast<CommitRegionMessage&>(*_message));
     break;
-  case 48:
+  case EraseRegionMessage::OpCode:
     _message = MakeShared<EraseRegionMessage>();
     decodeStream.readEraseRegionMessage(static_cast<EraseRegionMessage&>(*_message));
     break;
-  case 50:
+  case ChangeInteractionClassPublicationMessage::OpCode:
     _message = MakeShared<ChangeInteractionClassPublicationMessage>();
     decodeStream.readChangeInteractionClassPublicationMessage(static_cast<ChangeInteractionClassPublicationMessage&>(*_message));
     break;
-  case 51:
+  case ChangeObjectClassPublicationMessage::OpCode:
     _message = MakeShared<ChangeObjectClassPublicationMessage>();
     decodeStream.readChangeObjectClassPublicationMessage(static_cast<ChangeObjectClassPublicationMessage&>(*_message));
     break;
-  case 52:
+  case ChangeInteractionClassSubscriptionMessage::OpCode:
     _message = MakeShared<ChangeInteractionClassSubscriptionMessage>();
     decodeStream.readChangeInteractionClassSubscriptionMessage(static_cast<ChangeInteractionClassSubscriptionMessage&>(*_message));
     break;
-  case 53:
+  case ChangeObjectClassSubscriptionMessage::OpCode:
     _message = MakeShared<ChangeObjectClassSubscriptionMessage>();
     decodeStream.readChangeObjectClassSubscriptionMessage(static_cast<ChangeObjectClassSubscriptionMessage&>(*_message));
     break;
-  case 99:
+  case ChangeObjectInstanceSubscriptionMessage::OpCode:
     _message = MakeShared<ChangeObjectInstanceSubscriptionMessage>();
     decodeStream.readChangeObjectInstanceSubscriptionMessage(static_cast<ChangeObjectInstanceSubscriptionMessage&>(*_message));
     break;
-  case 80:
+  case InteractionMessage::OpCode:
     _message = MakeShared<InteractionMessage>();
     decodeStream.readInteractionMessage(static_cast<InteractionMessage&>(*_message));
     break;
-  case 81:
+  case TimeStampedInteractionMessage::OpCode:
     _message = MakeShared<TimeStampedInteractionMessage>();
     decodeStream.readTimeStampedInteractionMessage(static_cast<TimeStampedInteractionMessage&>(*_message));
     break;
-  case 60:
+  case ObjectInstanceHandlesRequestMessage::OpCode:
     _message = MakeShared<ObjectInstanceHandlesRequestMessage>();
     decodeStream.readObjectInstanceHandlesRequestMessage(static_cast<ObjectInstanceHandlesRequestMessage&>(*_message));
     break;
-  case 61:
+  case ObjectInstanceHandlesResponseMessage::OpCode:
     _message = MakeShared<ObjectInstanceHandlesResponseMessage>();
     decodeStream.readObjectInstanceHandlesResponseMessage(static_cast<ObjectInstanceHandlesResponseMessage&>(*_message));
     break;
-  case 62:
+  case ReleaseMultipleObjectInstanceNameHandlePairsMessage::OpCode:
     _message = MakeShared<ReleaseMultipleObjectInstanceNameHandlePairsMessage>();
     decodeStream.readReleaseMultipleObjectInstanceNameHandlePairsMessage(static_cast<ReleaseMultipleObjectInstanceNameHandlePairsMessage&>(*_message));
     break;
-  case 63:
+  case ReserveObjectInstanceNameRequestMessage::OpCode:
     _message = MakeShared<ReserveObjectInstanceNameRequestMessage>();
     decodeStream.readReserveObjectInstanceNameRequestMessage(static_cast<ReserveObjectInstanceNameRequestMessage&>(*_message));
     break;
-  case 64:
+  case ReserveObjectInstanceNameResponseMessage::OpCode:
     _message = MakeShared<ReserveObjectInstanceNameResponseMessage>();
     decodeStream.readReserveObjectInstanceNameResponseMessage(static_cast<ReserveObjectInstanceNameResponseMessage&>(*_message));
     break;
-  case 65:
+  case ReserveMultipleObjectInstanceNameRequestMessage::OpCode:
     _message = MakeShared<ReserveMultipleObjectInstanceNameRequestMessage>();
     decodeStream.readReserveMultipleObjectInstanceNameRequestMessage(static_cast<ReserveMultipleObjectInstanceNameRequestMessage&>(*_message));
     break;
-  case 66:
+  case ReserveMultipleObjectInstanceNameResponseMessage::OpCode:
     _message = MakeShared<ReserveMultipleObjectInstanceNameResponseMessage>();
     decodeStream.readReserveMultipleObjectInstanceNameResponseMessage(static_cast<ReserveMultipleObjectInstanceNameResponseMessage&>(*_message));
     break;
-  case 90:
+  case InsertObjectInstanceMessage::OpCode:
     _message = MakeShared<InsertObjectInstanceMessage>();
     decodeStream.readInsertObjectInstanceMessage(static_cast<InsertObjectInstanceMessage&>(*_message));
     break;
-  case 91:
+  case DeleteObjectInstanceMessage::OpCode:
     _message = MakeShared<DeleteObjectInstanceMessage>();
     decodeStream.readDeleteObjectInstanceMessage(static_cast<DeleteObjectInstanceMessage&>(*_message));
     break;
-  case 92:
+  case TimeStampedDeleteObjectInstanceMessage::OpCode:
     _message = MakeShared<TimeStampedDeleteObjectInstanceMessage>();
     decodeStream.readTimeStampedDeleteObjectInstanceMessage(static_cast<TimeStampedDeleteObjectInstanceMessage&>(*_message));
     break;
-  case 94:
+  case AttributeUpdateMessage::OpCode:
     _message = MakeShared<AttributeUpdateMessage>();
     decodeStream.readAttributeUpdateMessage(static_cast<AttributeUpdateMessage&>(*_message));
     break;
-  case 96:
+  case TimeStampedAttributeUpdateMessage::OpCode:
     _message = MakeShared<TimeStampedAttributeUpdateMessage>();
     decodeStream.readTimeStampedAttributeUpdateMessage(static_cast<TimeStampedAttributeUpdateMessage&>(*_message));
     break;
-  case 97:
+  case RequestAttributeUpdateMessage::OpCode:
     _message = MakeShared<RequestAttributeUpdateMessage>();
     decodeStream.readRequestAttributeUpdateMessage(static_cast<RequestAttributeUpdateMessage&>(*_message));
     break;
-  case 98:
+  case RequestClassAttributeUpdateMessage::OpCode:
     _message = MakeShared<RequestClassAttributeUpdateMessage>();
     decodeStream.readRequestClassAttributeUpdateMessage(static_cast<RequestClassAttributeUpdateMessage&>(*_message));
     break;
-  case 102:
+  case QueryAttributeOwnershipRequestMessage::OpCode:
     _message = MakeShared<QueryAttributeOwnershipRequestMessage>();
     decodeStream.readQueryAttributeOwnershipRequestMessage(static_cast<QueryAttributeOwnershipRequestMessage&>(*_message));
     break;
-  case 103:
+  case QueryAttributeOwnershipResponseMessage::OpCode:
     _message = MakeShared<QueryAttributeOwnershipResponseMessage>();
     decodeStream.readQueryAttributeOwnershipResponseMessage(static_cast<QueryAttributeOwnershipResponseMessage&>(*_message));
     break;
@@ -5192,46 +5193,46 @@ TightBE1MessageEncoding::decodePayload(const Buffer::const_iterator& i)
   uint16_t opcode = decodeStream.readUInt16Compressed();
   PayloadDecoder payloadDecoder(i);
   switch (opcode) {
-  case 30:
+  case RegisterFederationSynchronizationPointMessage::OpCode:
     payloadDecoder.readPayloadRegisterFederationSynchronizationPointMessage(static_cast<RegisterFederationSynchronizationPointMessage&>(*_message));
     break;
-  case 32:
+  case AnnounceSynchronizationPointMessage::OpCode:
     payloadDecoder.readPayloadAnnounceSynchronizationPointMessage(static_cast<AnnounceSynchronizationPointMessage&>(*_message));
     break;
-  case 40:
+  case EnableTimeRegulationRequestMessage::OpCode:
     payloadDecoder.readPayloadEnableTimeRegulationRequestMessage(static_cast<EnableTimeRegulationRequestMessage&>(*_message));
     break;
-  case 41:
+  case EnableTimeRegulationResponseMessage::OpCode:
     payloadDecoder.readPayloadEnableTimeRegulationResponseMessage(static_cast<EnableTimeRegulationResponseMessage&>(*_message));
     break;
-  case 43:
+  case CommitLowerBoundTimeStampMessage::OpCode:
     payloadDecoder.readPayloadCommitLowerBoundTimeStampMessage(static_cast<CommitLowerBoundTimeStampMessage&>(*_message));
     break;
-  case 52:
+  case ChangeInteractionClassSubscriptionMessage::OpCode:
     payloadDecoder.readPayloadChangeInteractionClassSubscriptionMessage(static_cast<ChangeInteractionClassSubscriptionMessage&>(*_message));
     break;
-  case 80:
+  case InteractionMessage::OpCode:
     payloadDecoder.readPayloadInteractionMessage(static_cast<InteractionMessage&>(*_message));
     break;
-  case 81:
+  case TimeStampedInteractionMessage::OpCode:
     payloadDecoder.readPayloadTimeStampedInteractionMessage(static_cast<TimeStampedInteractionMessage&>(*_message));
     break;
-  case 91:
+  case DeleteObjectInstanceMessage::OpCode:
     payloadDecoder.readPayloadDeleteObjectInstanceMessage(static_cast<DeleteObjectInstanceMessage&>(*_message));
     break;
-  case 92:
+  case TimeStampedDeleteObjectInstanceMessage::OpCode:
     payloadDecoder.readPayloadTimeStampedDeleteObjectInstanceMessage(static_cast<TimeStampedDeleteObjectInstanceMessage&>(*_message));
     break;
-  case 94:
+  case AttributeUpdateMessage::OpCode:
     payloadDecoder.readPayloadAttributeUpdateMessage(static_cast<AttributeUpdateMessage&>(*_message));
     break;
-  case 96:
+  case TimeStampedAttributeUpdateMessage::OpCode:
     payloadDecoder.readPayloadTimeStampedAttributeUpdateMessage(static_cast<TimeStampedAttributeUpdateMessage&>(*_message));
     break;
-  case 97:
+  case RequestAttributeUpdateMessage::OpCode:
     payloadDecoder.readPayloadRequestAttributeUpdateMessage(static_cast<RequestAttributeUpdateMessage&>(*_message));
     break;
-  case 98:
+  case RequestClassAttributeUpdateMessage::OpCode:
     payloadDecoder.readPayloadRequestClassAttributeUpdateMessage(static_cast<RequestClassAttributeUpdateMessage&>(*_message));
     break;
   default:

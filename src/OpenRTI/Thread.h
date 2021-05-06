@@ -29,12 +29,12 @@ namespace OpenRTI {
 
 class OPENRTI_API Thread : public WeakReferenced {
 public:
-  Thread();
+  Thread() noexcept;
 
-  static void destruct(Thread* thread);
+  static void destruct(Thread* thread) noexcept;
 
   bool start();
-  void wait();
+  void wait() noexcept;
 
   void setName(const std::string& name) { _name = name; }
   std::string getName() { return _name; }
@@ -45,7 +45,9 @@ protected:
 
 private:
   Thread(const Thread&) = delete;
+  Thread(Thread&&) = delete;
   Thread& operator=(const Thread&) = delete;
+  Thread& operator=(Thread&&) = delete;
 
   struct PrivateData;
   PrivateData* _privateData;

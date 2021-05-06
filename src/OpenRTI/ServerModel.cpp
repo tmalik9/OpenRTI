@@ -3675,6 +3675,15 @@ Federation::insert(ObjectInstance& objectInstance)
   _objectInstanceNameObjectInstanceMap.insert(objectInstance);
 }
 
+const ObjectInstance*
+Federation::getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle) const
+{
+  ObjectInstance::HandleMap::const_iterator i = _objectInstanceHandleObjectInstanceMap.find(objectInstanceHandle);
+  if (i == _objectInstanceHandleObjectInstanceMap.end())
+    return 0;
+  return i.get();
+}
+
 ObjectInstance*
 Federation::getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle)
 {
@@ -3762,71 +3771,71 @@ std::shared_ptr<AbstractFederateMetrics> Federation::getFederateMetrics(const Co
 // conditionally increment the counters, if the connectHandle belongs to a ambassador which connects to this federation
 // through the given connectHandle. In that case, there will be a local/client MomManager with a
 // federate metrics data collector connected to this server.
-void Federation::interactionSent(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+void Federation::interactionSent(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->interactionSent(interactionClass->getInteractionClassHandle());
 }
 
-void Federation::interactionReceived(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+void Federation::interactionReceived(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->interactionReceived(interactionClass->getInteractionClassHandle());
 }
 
-void Federation::interactionClassSubscribed(const ConnectHandle& connectHandle, InteractionClass* interactionClass, bool active)
+void Federation::interactionClassSubscribed(const ConnectHandle& connectHandle, const InteractionClass* interactionClass, bool active)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->interactionSubscribed(interactionClass->getInteractionClassHandle(), active);
 }
-void Federation::interactionClassUnsubscribed(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+void Federation::interactionClassUnsubscribed(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->interactionUnsubscribed(interactionClass->getInteractionClassHandle());
 }
-void Federation::interactionClassPublished(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+void Federation::interactionClassPublished(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->interactionPublished(interactionClass->getInteractionClassHandle());
 }
-void Federation::interactionClassUnpublished(const ConnectHandle& connectHandle, InteractionClass* interactionClass)
+void Federation::interactionClassUnpublished(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->interactionUnpublished(interactionClass->getInteractionClassHandle());
 }
 
-void Federation::objectClassSubscribed(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes, bool active)
+void Federation::objectClassSubscribed(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes, bool active)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->objectClassSubscribed(objectClass->getObjectClassHandle(), attributes, active);
 }
-void Federation::objectClassUnsubscribed(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes)
+void Federation::objectClassUnsubscribed(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->objectClassUnsubscribed(objectClass->getObjectClassHandle(), attributes);
 }
-void Federation::objectClassPublished(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes)
+void Federation::objectClassPublished(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->objectClassPublished(objectClass->getObjectClassHandle(), attributes);
 }
-void Federation::objectClassUnpublished(const ConnectHandle& connectHandle, ObjectClass* objectClass, const AttributeHandleVector& attributes)
+void Federation::objectClassUnpublished(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
     metrics->objectClassUnpublished(objectClass->getObjectClassHandle(), attributes);
 }
 
-void Federation::objectInstanceReflectionReceived(const ConnectHandle& connectHandle, ObjectInstance* objectInstance)
+void Federation::objectInstanceReflectionReceived(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
@@ -3838,7 +3847,7 @@ void Federation::objectInstanceReflectionReceived(const ConnectHandle& connectHa
 }
 
 
-void Federation::objectInstanceUpdateSent(const ConnectHandle& connectHandle, ObjectInstance* objectInstance)
+void Federation::objectInstanceUpdateSent(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance)
 {
   auto metrics = getFederateMetrics(connectHandle);
   if (metrics != nullptr)
@@ -4040,24 +4049,6 @@ bool
 Node::getFederationExecutionAlreadyExists(const std::string& federationName) const
 {
   return _federationNameFederationMap.find(federationName) != _federationNameFederationMap.end();
-}
-
-Federation*
-Node::getFederation(const std::string& federationName)
-{
-  Federation::NameMap::iterator i = _federationNameFederationMap.find(federationName);
-  if (i == _federationNameFederationMap.end())
-    return 0;
-  return i.get();
-}
-
-Federation*
-Node::getFederation(const FederationHandle& federationHandle)
-{
-  Federation::HandleMap::iterator i = _federationHandleFederationMap.find(federationHandle);
-  if (i == _federationHandleFederationMap.end())
-    return 0;
-  return i.get();
 }
 
 void

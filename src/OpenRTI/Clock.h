@@ -33,10 +33,8 @@
 #error "must include OpenRTIConfig.h!"
 #endif
 
-#if 201103L <= __CPlusPlusStd
-# include <chrono>
-# include <thread>
-#endif
+#include <chrono>
+#include <thread>
 
 namespace OpenRTI {
 
@@ -50,19 +48,19 @@ public:
   Clock(const Clock&) noexcept = default;
   Clock(Clock&&) noexcept = default;
 
-  explicit Clock(const std::chrono::seconds& s)
+  explicit Clock(const std::chrono::seconds& s) noexcept
   {
     _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(s).count();
   }
-  explicit Clock(const std::chrono::milliseconds& ms)
+  explicit Clock(const std::chrono::milliseconds& ms) noexcept
   {
     _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(ms).count();
   }
-  explicit Clock(const std::chrono::nanoseconds& us)
+  explicit Clock(const std::chrono::nanoseconds& us) noexcept
   {
     _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(us).count();
   }
-  explicit Clock(const std::chrono::steady_clock::time_point& tp)
+  explicit Clock(const std::chrono::steady_clock::time_point& tp) noexcept
   {
     _nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(tp.time_since_epoch()).count();
   }
@@ -71,35 +69,33 @@ public:
   Clock& operator=(const Clock&) = default;
   Clock& operator=(Clock&&) = default;
 
-  static Clock now()
+  static Clock now() noexcept
   {
     return Clock(std::chrono::steady_clock::now());
   }
 
-  operator std::chrono::steady_clock::time_point() const { return std::chrono::steady_clock::time_point(std::chrono::nanoseconds(_nsec)); }
+  operator std::chrono::steady_clock::time_point() const noexcept { return std::chrono::steady_clock::time_point(std::chrono::nanoseconds(_nsec)); }
   static void sleep_for(const Clock& reltime)
   {
     std::this_thread::sleep_for(std::chrono::nanoseconds(reltime.getNanoSeconds()));
   }
 
-  static Clock zero()
-  { return Clock(0); }
-  static Clock max()
-  { return Clock(std::numeric_limits<uint64_t>::max()); }
+  static Clock zero() noexcept { return Clock(0); }
+  static Clock max() noexcept { return Clock(std::numeric_limits<uint64_t>::max()); }
 
   /// Conversion from seconds, note that these conversions saturate
-  static Clock fromSeconds(int seconds)
+  static Clock fromSeconds(int seconds) noexcept
   {
     if (seconds <= 0)
       return zero();
     // Note that the unsigned cast has a guarantee to be the same
     // width than the int in the input argument. Those get upcasted
     // to the bigger unsigned then.
-    if (std::numeric_limits<uint64_t>::max()/uint64_t(1000000000) <= uint64_t(seconds))
+    if (std::numeric_limits<uint64_t>::max()/1000000000ULL <= static_cast<uint64_t>(seconds))
       return max();
-    return Clock(seconds*uint64_t(1000000000));
+    return Clock(seconds * 1000000000ULL);
   }
-  static Clock fromSeconds(const double& seconds)
+  static Clock fromSeconds(const double& seconds) noexcept
   {
     if (seconds <= 0.0)
       return zero();
@@ -110,7 +106,7 @@ public:
       return Clock(uint64_t(nsec));
     }
   }
-  static Clock fromMilliSeconds(uint32_t milliSeconds)
+  static Clock fromMilliSeconds(uint32_t milliSeconds) noexcept
   {
     if (milliSeconds <= 0)
       return zero();
@@ -130,13 +126,10 @@ public:
     return _nsec / 1000ULL;
   }
   /// Conversion from nanoseconds
-  static Clock fromNanoSeconds(uint64_t nsec)
-  { return Clock(nsec); }
+  static Clock fromNanoSeconds(uint64_t nsec) noexcept { return Clock(nsec); }
 
-  uint64_t getNanoSeconds() const noexcept
-  { return _nsec; }
-  void setNanoSeconds(uint64_t nsec) noexcept
-  { _nsec = nsec; }
+  uint64_t getNanoSeconds() const noexcept { return _nsec; }
+  void setNanoSeconds(uint64_t nsec) noexcept { _nsec = nsec; }
 
   // Arithmetic, note that these two do not wrap.
   Clock& operator+=(const Clock& clock) noexcept
@@ -171,7 +164,7 @@ public:
   { return _nsec >= clock._nsec; }
 
 private:
-  explicit Clock(Rep nsecs)
+  explicit Clock(Rep nsecs) noexcept
     : _nsec(nsecs)
   { }
 

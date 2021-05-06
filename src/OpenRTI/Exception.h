@@ -38,7 +38,11 @@ public:
 protected:
   Exception(const char* type, const char* reason);
   Exception(const char* type, const std::string& reason);
-
+  Exception() = default;
+  Exception(const Exception&) = default;
+  Exception(Exception&&) = default;
+  Exception& operator=(const Exception&) = default;
+  Exception& operator=(Exception&&) = default;
 private:
   std::string _reason;
 };
@@ -66,8 +70,13 @@ private:
 #define RTI_EXCEPTION(name) \
 class OPENRTI_API name : public Exception {                                \
 public:                                                                    \
-  name(const char* reason = 0) noexcept : Exception( #name, reason) { }    \
+  name(const char* reason) noexcept : Exception( #name, reason) { }        \
   name(const std::string& reason) noexcept : Exception( #name, reason) { } \
+  name() noexcept : Exception( #name, "") { }                              \
+  name(const name&) = default;                                             \
+  name(name&&) = default;                                                  \
+  name& operator=(const name&) = default;                                  \
+  name& operator=(name&&) = default;                                       \
   virtual ~name() noexcept { }                                             \
 };
 
@@ -77,7 +86,7 @@ RTI_EXCEPTION(TransportError) // unrecoverable errors on sockets or other transp
 RTI_EXCEPTION(HTTPError) // unrecoverable errors on http connects
 RTI_EXCEPTION(MessageError) // Inconsistent messages reaching a server
 
-// rti ambassador type exceptions, this is the list in rti1516e as this is the most advanced
+// rti ambassador type exceptions, this is the list in rti1516ev as this is the most advanced
 RTI_EXCEPTION(AlreadyConnected)
 RTI_EXCEPTION(AsynchronousDeliveryAlreadyDisabled)
 RTI_EXCEPTION(AsynchronousDeliveryAlreadyEnabled)

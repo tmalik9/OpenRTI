@@ -216,9 +216,11 @@ template<typename char_type, typename traits_type> inline std::basic_ostream<cha
 class ObjectInstanceHandle : public Handle<uint32_t>
 {
   public:
+    ObjectInstanceHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
+    // these may probably all be defaulted
     ObjectInstanceHandle() noexcept = default;
-    ObjectInstanceHandle(const ObjectInstanceHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    ObjectInstanceHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ObjectInstanceHandle(const ObjectInstanceHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    ObjectInstanceHandle(ObjectInstanceHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
     ~ObjectInstanceHandle() noexcept = default;
     ObjectInstanceHandle& operator=(const ObjectInstanceHandle&) = default;
     ObjectInstanceHandle& operator=(ObjectInstanceHandle&&) = default;
@@ -267,8 +269,9 @@ class InteractionClassHandle : public Handle<uint32_t>
 {
   public:
     InteractionClassHandle() noexcept = default;
-    InteractionClassHandle(const InteractionClassHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    InteractionClassHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    InteractionClassHandle(const InteractionClassHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    InteractionClassHandle(InteractionClassHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    InteractionClassHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~InteractionClassHandle() noexcept = default;
     InteractionClassHandle& operator=(const InteractionClassHandle& handle) = default;
     InteractionClassHandle& operator=(InteractionClassHandle&& handle) = default;
@@ -292,8 +295,9 @@ class ParameterHandle : public Handle<uint32_t>
 {
   public:
     ParameterHandle() noexcept = default;
-    ParameterHandle(const ParameterHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    ParameterHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ParameterHandle(const ParameterHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    ParameterHandle(ParameterHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    ParameterHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~ParameterHandle() noexcept = default;
     ParameterHandle& operator=(const ParameterHandle& handle) = default;
     ParameterHandle& operator=(ParameterHandle&& handle) = default;
@@ -316,8 +320,9 @@ class FederateHandle : public Handle<uint32_t>
 {
   public:
     FederateHandle() noexcept = default;
-    FederateHandle(const FederateHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    FederateHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    FederateHandle(const FederateHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    FederateHandle(FederateHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    FederateHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~FederateHandle() noexcept = default;
     FederateHandle& operator=(const FederateHandle& handle) = default;
     FederateHandle& operator=(FederateHandle&& handle) = default;
@@ -390,8 +395,9 @@ class ConnectHandle : public Handle<unsigned>
 {
   public:
     ConnectHandle() noexcept = default;
-    ConnectHandle(const ConnectHandle& handle) noexcept : Handle<unsigned>(handle) { } 
-    ConnectHandle(const unsigned& handle) noexcept : Handle<unsigned>(handle) { } 
+    ConnectHandle(const ConnectHandle& handle) noexcept : Handle<unsigned>(handle) { }
+    ConnectHandle(ConnectHandle&& handle) noexcept : Handle<unsigned>(handle) { }
+    ConnectHandle(const unsigned& handle) noexcept : Handle<unsigned>(handle) { }
     ~ConnectHandle() noexcept = default;
     ConnectHandle& operator=(const ConnectHandle& handle) = default;
     ConnectHandle& operator=(ConnectHandle&& handle) = default;
@@ -414,8 +420,9 @@ class TransportationHandle : public Handle<uint8_t>
 {
   public:
     TransportationHandle() noexcept = default;
-    TransportationHandle(const TransportationHandle& handle) noexcept : Handle<uint8_t>(handle) { } 
-    TransportationHandle(const uint8_t& handle) noexcept : Handle<uint8_t>(handle) { } 
+    TransportationHandle(const TransportationHandle& handle) noexcept : Handle<uint8_t>(handle) { }
+    TransportationHandle(TransportationHandle&& handle) noexcept : Handle<uint8_t>(handle) { }
+    TransportationHandle(const uint8_t& handle) noexcept : Handle<uint8_t>(handle) { }
     ~TransportationHandle() noexcept = default;
     TransportationHandle& operator=(const TransportationHandle& handle) = default;
     TransportationHandle& operator=(TransportationHandle&& handle) = default;
@@ -438,8 +445,9 @@ class OrderingHandle : public Handle<uint8_t>
 {
   public:
     OrderingHandle() noexcept = default;
-    OrderingHandle(const OrderingHandle& handle) noexcept : Handle<uint8_t>(handle) { } 
-    OrderingHandle(const uint8_t& handle) noexcept : Handle<uint8_t>(handle) { } 
+    OrderingHandle(const OrderingHandle& handle) noexcept : Handle<uint8_t>(handle) { }
+    OrderingHandle(OrderingHandle&& handle) noexcept : Handle<uint8_t>(handle) { }
+    OrderingHandle(const uint8_t& handle) noexcept : Handle<uint8_t>(handle) { }
     ~OrderingHandle() noexcept = default;
     OrderingHandle& operator=(const OrderingHandle& handle) = default;
     OrderingHandle& operator=(OrderingHandle&& handle) = default;
@@ -462,8 +470,9 @@ class DimensionHandle : public Handle<uint32_t>
 {
   public:
     DimensionHandle() noexcept = default;
-    DimensionHandle(const DimensionHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    DimensionHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    DimensionHandle(const DimensionHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    DimensionHandle(DimensionHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    DimensionHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~DimensionHandle() noexcept = default;
     DimensionHandle& operator=(const DimensionHandle& handle) = default;
     DimensionHandle& operator=(DimensionHandle&& handle) = default;
@@ -486,10 +495,12 @@ class SpaceHandle : public Handle<uint32_t>
 {
   public:
     SpaceHandle() noexcept = default;
-    SpaceHandle(const SpaceHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    SpaceHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    SpaceHandle(const SpaceHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    SpaceHandle(SpaceHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    SpaceHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~SpaceHandle() noexcept = default;
     SpaceHandle& operator=(const SpaceHandle& handle) = default;
+    SpaceHandle& operator=(SpaceHandle&& handle) = default;
     std::string toString() const
     {
       std::stringstream stream;
@@ -508,8 +519,9 @@ class UpdateRateHandle : public Handle<uint32_t>
 {
   public:
     UpdateRateHandle() noexcept = default;
-    UpdateRateHandle(const UpdateRateHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    UpdateRateHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    UpdateRateHandle(const UpdateRateHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    UpdateRateHandle(UpdateRateHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    UpdateRateHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~UpdateRateHandle() noexcept = default;
     UpdateRateHandle& operator=(const UpdateRateHandle& handle) = default;
     UpdateRateHandle& operator=(UpdateRateHandle&& handle) = default;
@@ -531,8 +543,9 @@ class BasicDataTypeHandle : public Handle<uint32_t>
 {
   public:
     BasicDataTypeHandle() noexcept = default;
-    BasicDataTypeHandle(const BasicDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    BasicDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    BasicDataTypeHandle(const BasicDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    BasicDataTypeHandle(BasicDataTypeHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    BasicDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~BasicDataTypeHandle() noexcept = default;
     BasicDataTypeHandle& operator=(const BasicDataTypeHandle& handle) = default;
     BasicDataTypeHandle& operator=(BasicDataTypeHandle&& handle) = default;
@@ -554,8 +567,9 @@ class SimpleDataTypeHandle : public Handle<uint32_t>
 {
   public:
     SimpleDataTypeHandle() noexcept = default;
-    SimpleDataTypeHandle(const SimpleDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    SimpleDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    SimpleDataTypeHandle(const SimpleDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    SimpleDataTypeHandle(SimpleDataTypeHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    SimpleDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~SimpleDataTypeHandle() noexcept = default;
     SimpleDataTypeHandle& operator=(const SimpleDataTypeHandle& handle) = default;
     SimpleDataTypeHandle& operator=(SimpleDataTypeHandle&& handle) = default;
@@ -577,8 +591,9 @@ class EnumeratedDataTypeHandle : public Handle<uint32_t>
 {
   public:
     EnumeratedDataTypeHandle() noexcept = default;
-    EnumeratedDataTypeHandle(const EnumeratedDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    EnumeratedDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    EnumeratedDataTypeHandle(const EnumeratedDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    EnumeratedDataTypeHandle(EnumeratedDataTypeHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    EnumeratedDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~EnumeratedDataTypeHandle() noexcept = default;
     EnumeratedDataTypeHandle& operator=(const EnumeratedDataTypeHandle& handle) = default;
     EnumeratedDataTypeHandle& operator=(EnumeratedDataTypeHandle&& handle) = default;
@@ -600,8 +615,9 @@ class ArrayDataTypeHandle : public Handle<uint32_t>
 {
   public:
     ArrayDataTypeHandle() noexcept = default;
-    ArrayDataTypeHandle(const ArrayDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    ArrayDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    ArrayDataTypeHandle(const ArrayDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    ArrayDataTypeHandle(ArrayDataTypeHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    ArrayDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~ArrayDataTypeHandle() noexcept = default;
     ArrayDataTypeHandle& operator=(const ArrayDataTypeHandle& handle) = default;
     ArrayDataTypeHandle& operator=(ArrayDataTypeHandle&& handle) = default;
@@ -623,8 +639,9 @@ class FixedRecordDataTypeHandle : public Handle<uint32_t>
 {
   public:
     FixedRecordDataTypeHandle() noexcept = default;
-    FixedRecordDataTypeHandle(const FixedRecordDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    FixedRecordDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    FixedRecordDataTypeHandle(const FixedRecordDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    FixedRecordDataTypeHandle(FixedRecordDataTypeHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    FixedRecordDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~FixedRecordDataTypeHandle() noexcept = default;
     FixedRecordDataTypeHandle& operator=(const FixedRecordDataTypeHandle& handle) = default;
     FixedRecordDataTypeHandle& operator=(FixedRecordDataTypeHandle&& handle) = default;
@@ -646,8 +663,9 @@ class VariantRecordDataTypeHandle : public Handle<uint32_t>
 {
   public:
     VariantRecordDataTypeHandle() noexcept = default;
-    VariantRecordDataTypeHandle(const VariantRecordDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { } 
-    VariantRecordDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { } 
+    VariantRecordDataTypeHandle(const VariantRecordDataTypeHandle& handle) noexcept : Handle<uint32_t>(handle) { }
+    VariantRecordDataTypeHandle(VariantRecordDataTypeHandle&& handle) noexcept : Handle<uint32_t>(handle) { }
+    VariantRecordDataTypeHandle(const uint32_t& handle) noexcept : Handle<uint32_t>(handle) { }
     ~VariantRecordDataTypeHandle() noexcept = default;
     VariantRecordDataTypeHandle& operator=(const VariantRecordDataTypeHandle& handle) = default;
     VariantRecordDataTypeHandle& operator=(VariantRecordDataTypeHandle&& handle) = default;
@@ -669,9 +687,8 @@ class MessageRetractionHandle : public Handle<uint64_t>
 {
   public:
     MessageRetractionHandle() noexcept = default;
-    MessageRetractionHandle(const MessageRetractionHandle& handle) noexcept :
-      Handle<uint64_t>(static_cast<const Handle<uint64_t>&>(handle))
-    { }
+    MessageRetractionHandle(const MessageRetractionHandle& handle) noexcept : Handle<uint64_t>(handle) { }
+    MessageRetractionHandle(MessageRetractionHandle&& handle) noexcept : Handle<uint64_t>(handle) { }
     MessageRetractionHandle(uint64_t handle) noexcept :
       Handle<uint64_t>(handle)
     { }
@@ -729,9 +746,7 @@ class RegionHandle : public Handle<uint64_t>
 {
   public:
     RegionHandle() noexcept = default;
-    RegionHandle(const RegionHandle& handle) noexcept :
-      Handle<uint64_t>(static_cast<const Handle<uint64_t>&>(handle))
-    { }
+    RegionHandle(const RegionHandle& handle) noexcept : Handle<uint64_t>(handle) { }
     RegionHandle(RegionHandle&& handle) noexcept = default;
     RegionHandle(uint64_t handle) noexcept :
       Handle<uint64_t>(handle)
@@ -741,6 +756,7 @@ class RegionHandle : public Handle<uint64_t>
     { }
     ~RegionHandle() noexcept = default;
     RegionHandle& operator=(const RegionHandle& handle) = default;
+    RegionHandle& operator=(RegionHandle&& handle) = default;
 
     FederateHandle getFederateHandle() const noexcept
     {

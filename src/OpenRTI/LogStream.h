@@ -88,7 +88,7 @@ public:
 protected:
   static LogStream& Instance();
   std::ostream* getStream(Category category, Priority priority);
-  bool getEnabled(Category category, Priority priority)
+  bool getEnabled(Category category, Priority priority) const noexcept
   {
     if (priority == Error)
       return true;

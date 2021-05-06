@@ -417,7 +417,7 @@ InternalAmbassador::acceptInternalMessage(const ChangeObjectInstanceSubscription
 
   ObjectClassHandle objectClassHandle = message.getObjectClassHandle();
   ObjectInstanceHandle objectInstanceHandle = message.getObjectInstanceHandle();
-  Federate::ObjectClass* objectClass = getFederate()->getObjectClass(objectClassHandle);
+  const Federate::ObjectClass* objectClass = getFederate()->getObjectClass(objectClassHandle);
   Federate::ObjectInstance* objectInstance = getFederate()->getObjectInstance(objectInstanceHandle);
 
   // The object or class could be removed meanwhile
@@ -780,7 +780,7 @@ private:
 ObjectInstanceHandle
 InternalAmbassador::dispatchWaitReserveObjectInstanceName(const AbsTimeout& timeout, const std::string& objectInstanceName)
 {
-  Federate* federate = getFederate();
+  const Federate* federate = getFederate();
   OpenRTIAssert(federate);
 
   SharedPtr<ReserveObjectInstanceNameRequestMessage> request;
@@ -818,7 +818,7 @@ InternalAmbassador::queueReceiveOrderMessage(const AbstractMessage& message)
 }
 
 bool
-InternalAmbassador::_dispatchCallbackMessage(AbstractMessageDispatcher& messageDispatcher)
+InternalAmbassador::_dispatchCallbackMessage(const AbstractMessageDispatcher& messageDispatcher)
 {
   if (!_callbackMessageList.empty()) {
     SharedPtr<const AbstractMessage> message;
@@ -886,7 +886,7 @@ InternalAmbassador::_callbackMessageAvailable()
 
 uint32_t InternalAmbassador::getProtocolVersion() const
 {
-  AbstractServer* server = _connect->getMessageSender()->getServer();
+  const AbstractServer* server = _connect->getMessageSender()->getServer();
   return server->getProtocolVersion();
 }
 

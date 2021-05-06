@@ -19,16 +19,6 @@
       "ctestCommandArgs": "",
       "variables": [
         {
-          "name": "OPENRTI_ENABLE_RTI13",
-          "value": "Off",
-          "type": "STRING"
-        },
-        {
-          "name": "OPENRTI_ENABLE_RTI1516",
-          "value": "Off",
-          "type": "STRING"
-        },
-        {
           "name": "OPENRTI_ENABLE_TESTS",
           "value": "True",
           "type": "BOOL"
@@ -46,16 +36,6 @@
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "--verbose",
       "variables": [
-        {
-          "name": "OPENRTI_ENABLE_RTI13",
-          "value": "Off",
-          "type": "STRING"
-        },
-        {
-          "name": "OPENRTI_ENABLE_RTI1516",
-          "value": "Off",
-          "type": "STRING"
-        },
         {
           "name": "OPENRTI_ENABLE_TESTS",
           "value": "True",
@@ -75,14 +55,9 @@
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": [
         {
-          "name": "OPENRTI_ENABLE_RTI13",
-          "value": "Off",
-          "type": "STRING"
-        },
-        {
-          "name": "OPENRTI_ENABLE_RTI1516",
-          "value": "Off",
-          "type": "STRING"
+          "name": "OPENRTI_ENABLE_TESTS",
+          "value": "True",
+          "type": "BOOL"
         }
       ]
     },
@@ -96,18 +71,7 @@
       "buildCommandArgs": "-v",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
-      "variables": [
-        {
-          "name": "OPENRTI_ENABLE_RTI13",
-          "value": "Off",
-          "type": "STRING"
-        },
-        {
-          "name": "OPENRTI_ENABLE_RTI1516",
-          "value": "Off",
-          "type": "STRING"
-        }
-      ]
+      "variables": []
     },
     {
       "name": "WSLDebug",
@@ -123,16 +87,6 @@
       "wslPath": "${defaultWSLPath}",
       "addressSanitizerRuntimeFlags": "detect_leaks=0",
       "variables": [
-        {
-          "name": "OPENRTI_ENABLE_RTI13",
-          "value": "Off",
-          "type": "STRING"
-        },
-        {
-          "name": "OPENRTI_ENABLE_RTI1516",
-          "value": "Off",
-          "type": "STRING"
-        },
         {
           "name": "OPENRTI_ENABLE_TESTS",
           "value": "True",
@@ -154,16 +108,6 @@
       "wslPath": "${defaultWSLPath}",
       "addressSanitizerRuntimeFlags": "detect_leaks=0",
       "variables": [
-        {
-          "name": "OPENRTI_ENABLE_RTI13",
-          "value": "Off",
-          "type": "STRING"
-        },
-        {
-          "name": "OPENRTI_ENABLE_RTI1516",
-          "value": "Off",
-          "type": "STRING"
-        },
         {
           "name": "OPENRTI_ENABLE_TESTS",
           "value": "True",

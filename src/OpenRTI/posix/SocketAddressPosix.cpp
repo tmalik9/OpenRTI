@@ -182,18 +182,18 @@ SocketAddress::resolve(const std::string& address, const std::string& service, b
 #if defined(AF_INET_SDP)
     if (res->ai_addr->sa_family == AF_INET) {
       res->ai_addr->sa_family = AF_INET_SDP;
-      socketAddressList.push_back(SocketAddress(PrivateData::create(res->ai_addr, res->ai_addrlen)));
+      socketAddressList.push_back(SocketAddress(SharedPtr<PrivateData>(PrivateData::create(res->ai_addr, res->ai_addrlen))));
       res->ai_addr->sa_family = AF_INET;
     }
 #endif
 #if defined(AF_INET6_SDP)
     if (res->ai_addr->sa_family == AF_INET6) {
       res->ai_addr->sa_family = AF_INET6_SDP;
-      socketAddressList.push_back(SocketAddress(PrivateData::create(res->ai_addr, res->ai_addrlen)));
+      socketAddressList.push_back(SocketAddress(SharedPtr<PrivateData>(PrivateData::create(res->ai_addr, res->ai_addrlen))));
       res->ai_addr->sa_family = AF_INET6;
     }
 #endif
-    socketAddressList.push_back(SocketAddress(PrivateData::create(res->ai_addr, res->ai_addrlen)));
+    socketAddressList.push_back(SocketAddress(SharedPtr<PrivateData>(PrivateData::create(res->ai_addr, res->ai_addrlen))));
     res = res->ai_next;
   }
   ::freeaddrinfo(ai);
@@ -261,7 +261,7 @@ SocketAddress::fromInet4Network(const SocketAddress& socketAddress, const Variab
     throw TransportError("Invalid INET4 network port!");
   std::memcpy(&addr.sin_port, networkPortData.data(), sizeof(addr.sin_port));
 
-  return SocketAddress(PrivateData::create((const struct sockaddr*)&addr, sizeof(addr)));
+  return SocketAddress(SharedPtr<PrivateData>(PrivateData::create((const struct sockaddr*)&addr, sizeof(addr))));
 }
 
 SocketAddress
@@ -292,11 +292,11 @@ SocketAddress::fromInet6Network(const SocketAddress& socketAddress, const Variab
     throw TransportError("Invalid INET6 network port!");
   std::memcpy(&addr.sin6_port, networkPortData.data(), sizeof(addr.sin6_port));
 
-  return SocketAddress(PrivateData::create((const struct sockaddr*)&addr, sizeof(addr)));
+  return SocketAddress(SharedPtr<PrivateData>(PrivateData::create((const struct sockaddr*)&addr, sizeof(addr))));
 }
 
-SocketAddress::SocketAddress(PrivateData* privateData) :
-  _privateData(privateData)
+SocketAddress::SocketAddress(SharedPtr<PrivateData> privateData)
+  : _privateData(privateData)
 {
 }
 

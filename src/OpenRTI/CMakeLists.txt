@@ -80,20 +80,13 @@ endif()
 # A bunch of sources that are operating system dependent.
 if(WIN32)
   set(OpenRTI_OS_SOURCES
-    win32/ClockWin32.h
-    win32/ConditionPrivateDataWin32.h
     win32/ErrnoWin32.h
-    win32/MutexPrivateDataWin32.h
     win32/NetworkStatisticsWin32.h
     win32/PerformanceCounterStopWatch.h
     win32/SocketAddressPrivateDataWin32.h
     win32/SocketPrivateDataWin32.h
-    win32/AtomicWin32.cpp
-    win32/ClockWin32.cpp
-    win32/ConditionWin32.cpp
     win32/DynamicModuleWin32.cpp
     win32/ErrnoWin32.cpp
-    win32/MutexWin32.cpp
     win32/NetworkStatisticsWin32.cpp
     win32/PerformanceCounterStopWatch.cpp
     win32/SocketAddressWin32.cpp
@@ -114,20 +107,13 @@ if(WIN32)
   )
 else(WIN32)
   set(OpenRTI_OS_SOURCES
-    posix/ClockPosix.h
-    posix/ConditionPrivateDataPosix.h
     posix/ErrnoPosix.h
-    posix/MutexPrivateDataPosix.h
     posix/NetworkStatisticsPosix.h
     posix/PerformanceCounterStopWatchPosix.h
     posix/SocketAddressPrivateDataPosix.h
     posix/SocketPrivateDataPosix.h
     posix/ThreadPrivateDataPosix.h
-    posix/AtomicPosix.cpp
-    posix/ClockPosix.cpp
-    posix/ConditionPosix.cpp
     posix/DynamicModulePosix.cpp
-    posix/MutexPosix.cpp
     posix/NetworkStatisticsPosix.cpp
     posix/PerformanceCounterStopWatchPosix.cpp
     posix/SocketAddressPosix.cpp
@@ -246,8 +232,6 @@ set(OpenRTI_SOURCES
     Export.h
     FDD1516EFileReader.cpp
     FDD1516EFileReader.h
-    FDD1516FileReader.cpp
-    FDD1516FileReader.h
     FEDFileReader.cpp
     FEDFileReader.h
     FOMStringModuleBuilder.h

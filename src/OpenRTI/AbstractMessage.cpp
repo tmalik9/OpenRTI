@@ -24,12 +24,6 @@
 
 namespace OpenRTI {
 
-
-size_t AbstractMessage::messageSize() const
-{
-  return sizeof(AbstractMessage);
-}
-
 std::string AbstractMessage::toString() const
 {
   std::ostringstream s;
@@ -59,7 +53,7 @@ AbstractMessage::getObjectInstanceHandleForMessage() const noexcept
 
 std::ostream& prettyprint(std::ostream& os, const InteractionClassHandle& value, ServerModel::Federation* federation)
 {
-  auto* interactionClass = federation->getInteractionClass(value);
+  const auto* interactionClass = federation->getInteractionClass(value);
   os << interactionClass->getFQName();
   return os;
 }
@@ -67,7 +61,7 @@ std::ostream& prettyprint(std::ostream& os, const InteractionClassHandle& value,
 
 std::ostream& prettyprint(std::ostream& os, const ParameterHandle& value, ServerModel::InteractionClass* interactionClass)
 {
-  auto* parameter = interactionClass->findParameterDefinition(value);
+  const auto* parameter = interactionClass->findParameterDefinition(value);
   os << parameter->getName();
   return os;
 }

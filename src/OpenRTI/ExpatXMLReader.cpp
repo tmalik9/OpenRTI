@@ -56,7 +56,7 @@ struct UserData {
 static inline ContentHandler*
 userDataToContentHandler(void* userData)
 {
-  ExpatXMLReader* reader = reinterpret_cast<UserData*>(userData)->reader;
+  const ExpatXMLReader* reader = reinterpret_cast<UserData*>(userData)->reader;
   if (!reader)
     return 0;
   ContentHandler* contentHandler = reader->getContentHandler();

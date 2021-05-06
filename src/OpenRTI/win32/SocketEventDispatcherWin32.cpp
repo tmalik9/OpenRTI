@@ -26,7 +26,6 @@
 
 #include "AbstractSocketEvent.h"
 #include "Clock.h"
-#include "ClockWin32.h"
 #include "ErrnoWin32.h"
 #include "Exception.h"
 #include "LogStream.h"
@@ -106,11 +105,7 @@ struct SocketEventDispatcher::PrivateData
 
         for (auto& socketEventSP : dispatcher._socketEventList)
         {
-          AbstractSocketEvent* socketEvent = socketEventSP.get();
-          //if (socketEvent->getTimeout() < timeout.getTimeout())
-          //{
-          //  timeout.set(socketEvent->getTimeout());
-          //}
+          const AbstractSocketEvent* socketEvent = socketEventSP.get();
           Socket* abstractSocket = socketEvent->getSocket();
           if (!abstractSocket)
           {

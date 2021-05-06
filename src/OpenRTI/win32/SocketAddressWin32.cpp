@@ -165,7 +165,7 @@ SocketAddress::resolve(const std::string& address, const std::string& service, b
   SocketAddressList socketAddressList;
   struct addrinfo *res = ai;
   while (res) {
-    socketAddressList.push_back(SocketAddress(new PrivateData(res->ai_addr, socklen_t(res->ai_addrlen))));
+    socketAddressList.push_back(SocketAddress(MakeShared<PrivateData>(res->ai_addr, socklen_t(res->ai_addrlen))));
     res = res->ai_next;
   }
   ::freeaddrinfo(ai);
@@ -225,7 +225,7 @@ SocketAddress::fromInet4Network(const SocketAddress& /*socketAddress*/, const Va
     throw TransportError("Invalid INET4 network port!");
   std::memcpy(&addr.sin_port, networkPortData.data(), sizeof(addr.sin_port));
 
-  return SocketAddress(new PrivateData((const struct sockaddr*)&addr, sizeof(addr)));
+  return SocketAddress(MakeShared<PrivateData>((const struct sockaddr*)&addr, static_cast<socklen_t>(sizeof(addr))));
 }
 
 SocketAddress
@@ -247,10 +247,10 @@ SocketAddress::fromInet6Network(const SocketAddress& socketAddress, const Variab
     throw TransportError("Invalid INET6 network port!");
   std::memcpy(&addr.sin6_port, networkPortData.data(), sizeof(addr.sin6_port));
 
-  return SocketAddress(new PrivateData((const struct sockaddr*)&addr, sizeof(addr)));
+  return SocketAddress(MakeShared<PrivateData>((const struct sockaddr*)&addr, static_cast<socklen_t>(sizeof(addr))));
 }
 
-SocketAddress::SocketAddress(PrivateData* privateData) :
+SocketAddress::SocketAddress(SharedPtr<PrivateData> privateData) :
   _privateData(privateData)
 {
 }

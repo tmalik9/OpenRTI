@@ -35,8 +35,12 @@ struct OPENRTI_LOCAL AbstractThreadLocal::_Provider : public Referenced {
   typedef std::vector<AbstractThreadLocal::_AbstractData*> ThreadLocalVector;
 
 
-  _Provider();
-  ~_Provider();
+  _Provider() noexcept;
+  _Provider(const _Provider&) = delete;
+  _Provider(_Provider&&) = default;
+  ~_Provider() noexcept;
+  _Provider& operator=(const _Provider&) = delete;
+  _Provider& operator=(_Provider&&) = default;
   static SharedPtr<AbstractThreadLocal::_Provider>& GetInstance();
 
   unsigned getNextIndex();
@@ -49,13 +53,12 @@ struct OPENRTI_LOCAL AbstractThreadLocal::_Provider : public Referenced {
   unsigned _index;
 };
 
-AbstractThreadLocal::_Provider::_Provider() :
-  _key(TlsAlloc()),
-  _index(0)
+AbstractThreadLocal::_Provider::_Provider() noexcept
+  : _key(TlsAlloc()), _index(0)
 {
 }
 
-AbstractThreadLocal::_Provider::~_Provider()
+AbstractThreadLocal::_Provider::~_Provider() noexcept
 {
   TlsFree(_key);
   _key = TLS_OUT_OF_INDEXES;

@@ -1,6 +1,0 @@
-
-add_executable(ImmediateCallbackFederate ImmediateCallbackFederate.cpp main.cpp RTI1516EImmediateCallbackTestLib.cpp)
-target_link_libraries(ImmediateCallbackFederate rti1516e fedtime1516e OpenRTI)
-if(LINUX)
-  openrti_target_link_private_libraries(ImmediateCallbackFederate pthread)
-endif()

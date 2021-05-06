@@ -103,13 +103,11 @@ public:
     _size(value._size),
     _offset(value._offset)
   { }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   VariableLengthData(VariableLengthData&& value) noexcept :
     _data(std::move(value._data)),
     _size(value._size),
     _offset(value._offset)
   { }
-#endif
   // Constructs a subrange of the given variable length data.
   // It references the same data than 'value', but it starts at offset in value and has the given size
   VariableLengthData(const VariableLengthData& value, size_t offset, size_t size) :
@@ -142,7 +140,6 @@ public:
     _offset = value._offset;
     return *this;
   }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   VariableLengthData&
   operator=(VariableLengthData&& value) noexcept
   {
@@ -151,7 +148,6 @@ public:
     _offset = value._offset;
     return *this;
   }
-#endif
 
   const void* data(size_t offset = 0) const
   { return constData(offset); }
@@ -947,11 +943,11 @@ public:
 private:
   class OPENRTI_API Data final : public Referenced {
   public:
-    Data(size_t size) :
+    Data(size_t size) noexcept :
       _capacity(size),
       _data(_dummy)
     { }
-    Data(void* data) :
+    Data(void* data) noexcept :
       _capacity(0),
       _data(data)
     { }
@@ -960,26 +956,25 @@ private:
       if (_data != _dummy)
         ::operator delete(_data);
     }
-    void* data(size_t offset = 0)
+    void* data(size_t offset = 0) const noexcept
     {
       return static_cast<char*>(_data) + offset;
     }
-    void clear()
+    void clear() noexcept
     {
       if (_data != _dummy) {
         ::operator delete(_data);
         _data = 0;
       }
     }
-    size_t capacity() const
-    { return _capacity; }
+    size_t capacity() const noexcept { return _capacity; }
 
   private:
     const size_t _capacity;
     void* _data;
     // Due to the struct layout, this should be aligned to 16 bytes on 64 bits
     // and 8 bytes on 32 bits. That is, the data field should be about aligned enough?!
-    char _dummy[1];
+    char _dummy[1] = {0};
   };
 
   static SharedPtr<Data> createOwnData(size_t capacity)

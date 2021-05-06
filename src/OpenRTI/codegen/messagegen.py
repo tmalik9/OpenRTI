@@ -268,7 +268,7 @@ class EnumDataType(DataType):
         sourceStream.writeline()
 
     def writeByteSize(self, sourceStream):
-        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('inline constexpr size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline(' return sizeof(value); // sizeof()'.format(name = self.getName()))
         sourceStream.writeline('}')
@@ -366,7 +366,7 @@ class VectorDataType(DataType):
         sourceStream.writeline()
 
     def writeByteSize(self, sourceStream):
-        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         sourceStream.writeline('size_t result = 0;');
@@ -457,7 +457,7 @@ class SetDataType(DataType):
         sourceStream.writeline()
 
     def writeByteSize(self, sourceStream):
-        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         sourceStream.writeline('size_t result = 0;');
@@ -566,7 +566,7 @@ class MapDataType(DataType):
         sourceStream.writeline()
 
     def writeByteSize(self, sourceStream):
-        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         sourceStream.writeline('size_t result = 0;');
@@ -664,7 +664,7 @@ class PairDataType(DataType):
         sourceStream.writeline()
 
     def writeByteSize(self, sourceStream):
-        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         sourceStream.writeline('return byteSize(value.first) + byteSize(value.second);');
@@ -722,19 +722,15 @@ class StructField(object):
         memberName = self.getMemberName()
         if self.__abstract:
             sourceStream.writeline('virtual void set{upperName}(const {typeName}& value) noexcept = 0;'.format(upperName = upperName, typeName = typeName))
-            sourceStream.writelineNoIndent('#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference')
             sourceStream.writeline('virtual void set{upperName}({typeName}&& value) noexcept = 0;'.format(upperName = upperName, typeName = typeName))
-            sourceStream.writelineNoIndent('#endif')
         else:
             override=""
             if self.__override:
                 override = " override"
             sourceStream.writeline('void set{upperName}(const {typeName}& value) noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
             sourceStream.writeline('{{ {prefix}{memberName} = value; }}'.format(memberName = memberName, prefix = valuePrefix))
-            sourceStream.writelineNoIndent('#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference')
             sourceStream.writeline('void set{upperName}({typeName}&& value) noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
             sourceStream.writeline('{{ {prefix}{memberName} = std::move(value); }}'.format(memberName = memberName, prefix = valuePrefix))
-            sourceStream.writelineNoIndent('#endif')
 
     def writeGetter(self, sourceStream, valuePrefix):
         upperName = self.getUpperName()
@@ -766,7 +762,17 @@ class StructField(object):
         if not self.__abstract:
             typeName = self.getTypeName()
             memberName = self.getMemberName()
-            sourceStream.writeline('{typeName} {memberName};'.format(typeName = typeName, memberName = memberName))
+            initializer = ''
+            if typeName == 'Bool':
+                initializer = ' = false'
+            elif typeName == 'Unsigned':
+                initializer = ' = 0'
+            else:
+                typeOfField = typeMap.getType(typeName)
+                if type(typeOfField) is EnumDataType:
+                    firstValue = typeOfField.getEnumList()[0].getName()
+                    initializer = ' = ' + firstValue
+            sourceStream.writeline('{typeName} {memberName}{initializer};'.format(typeName = typeName, memberName = memberName, initializer=initializer))
 
     def writeSwap(self, sourceStream, value):
         if not self.__abstract:
@@ -912,14 +918,14 @@ class StructDataType(DataType):
         sourceStream.pushIndent()
 
         if self.__cow:
-            sourceStream.writeline('{name}() : '.format(name = self.getName()))
-            sourceStream.writeline('  _impl(new Implementation())')
+            sourceStream.writeline('{name}() noexcept'.format(name = self.getName()))
+            sourceStream.writeline(' : _impl(MakeShared<Implementation>())')
             sourceStream.writeline('{ }')
             valuePrefix = 'getImpl().'
             constValuePrefix = 'getConstImpl().'
         else:
             # default constructor
-            sourceStream.writeline('{name}()'.format(name = self.getName()) + ' { }')
+            sourceStream.writeline('{name}()'.format(name = self.getName()) + ' noexcept = default;')
 
             fields = self.getNonConstFieldList()
             fieldCount = len(fields)
@@ -933,7 +939,7 @@ class StructDataType(DataType):
                     if index < fieldCount:
                         line += ','
                     else:
-                        line += ')'
+                        line += ') noexcept'
                     sourceStream.writeline(line)
                 index = 0
                 sourceStream.pushIndent()
@@ -948,10 +954,14 @@ class StructDataType(DataType):
                 sourceStream.popIndent()
                 sourceStream.writeline('{ }')
                 sourceStream.popIndent()
-
-
             valuePrefix = ''
             constValuePrefix = ''
+
+        sourceStream.writeline('{name}(const {name}&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}({name}&&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('virtual ~{name}() noexcept = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}& operator=(const {name}&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}& operator=({name}&&) = default;'.format(name = self.getName()))
 
         for field in self.__fieldList:
             field.writeSetter(sourceStream, valuePrefix)
@@ -959,7 +969,7 @@ class StructDataType(DataType):
             field.writeConstGetter(sourceStream, constValuePrefix)
             sourceStream.writeline()
 
-        sourceStream.writeline('{name}& swap({name}& rhs)'.format(name = self.getName()))
+        sourceStream.writeline('{name}& swap({name}& rhs) noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         if self.__cow:
@@ -1027,8 +1037,7 @@ class StructDataType(DataType):
                         sourceStream.writeline(line)
                 sourceStream.popIndent()
                 sourceStream.writeline('{ }')
- 
-            
+
             for field in self.__fieldList:
                 field.writeMemberInstance(sourceStream)
 
@@ -1094,7 +1103,7 @@ class StructDataType(DataType):
                 sourceStream.writeline('  //os << "{lowerName}: " << value.get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
                 if count != len(self.__fieldList):
                     sourceStream.writeline('  //os << ", ";')
-            
+
         sourceStream.writeline('  os << " }";')
         sourceStream.writeline('  return os;')
         sourceStream.writeline('}')
@@ -1158,14 +1167,14 @@ class StructDataType(DataType):
                     sourceStream.writeline('  os << ", ";')
             else:
                 sourceStream.writeline('  // ' + type(field).__name__ + " " + field.getLowerName() + " (hidden)")
-            
+
         sourceStream.writeline('  os << " }";')
         sourceStream.writeline('  return os;')
         sourceStream.writeline('}')
         sourceStream.writeline()
 
     def writeByteSize(self, sourceStream):
-        sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         sourceStream.writeline('size_t result = 0;');
@@ -1206,7 +1215,7 @@ class StructDataType(DataType):
                     sourceStream.writeline('  write{typeName}({value}.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName, value=valueParameterName))
             sourceStream.writeline('}')
             sourceStream.writeline()
-    
+
     def writeDecoder(self, sourceStream):
         if not self.isAbstract():
             name = self.getName()
@@ -1229,11 +1238,82 @@ class StructDataType(DataType):
 
 ###############################################################################
 class MessageDataType(StructDataType):
+    __opcodeMap = {
+        'ConnectionLostMessage' : 1,
+        'CreateFederationExecutionRequestMessage' : 2,
+        'CreateFederationExecutionResponseMessage' : 3,
+        'DestroyFederationExecutionRequestMessage' : 4,
+        'DestroyFederationExecutionResponseMessage' : 5,
+        'EnumerateFederationExecutionsRequestMessage' : 6,
+        'EnumerateFederationExecutionsResponseMessage' : 7,
+        'InsertFederationExecutionMessage' : 8,
+        'ShutdownFederationExecutionMessage' : 9,
+        'EraseFederationExecutionMessage' : 10,
+        'ReleaseFederationHandleMessage' : 11,
+        'InsertModulesMessage' : 12,
+        'JoinFederationExecutionRequestMessage' : 13,
+        'JoinFederationExecutionResponseMessage' : 14,
+        'ResignFederationExecutionRequestMessage' : 15,
+        'JoinFederateNotifyMessage' : 16,
+        'ResignFederateNotifyMessage' : 17,
+        'ChangeAutomaticResignDirectiveMessage' : 18,
+        'RegisterFederationSynchronizationPointMessage' : 30,
+        'RegisterFederationSynchronizationPointResponseMessage' : 31,
+        'AnnounceSynchronizationPointMessage' : 32,
+        'SynchronizationPointAchievedMessage' : 33,
+        'FederationSynchronizedMessage' : 34,
+        'EnableTimeRegulationRequestMessage' : 40,
+        'EnableTimeRegulationResponseMessage' : 41,
+        'DisableTimeRegulationRequestMessage' : 42,
+        'CommitLowerBoundTimeStampMessage' : 43,
+        'CommitLowerBoundTimeStampResponseMessage' : 44,
+        'LockedByNextMessageRequestMessage' : 45,
+        'InsertRegionMessage' : 46,
+        'CommitRegionMessage' : 47,
+        'EraseRegionMessage' : 48,
+        'ChangeInteractionClassPublicationMessage' : 50,
+        'ChangeObjectClassPublicationMessage' : 51,
+        'ChangeInteractionClassSubscriptionMessage' : 52,
+        'ChangeObjectClassSubscriptionMessage' : 53,
+        'ObjectInstanceHandlesRequestMessage' : 60,
+        'ObjectInstanceHandlesResponseMessage' : 61,
+        'ReleaseMultipleObjectInstanceNameHandlePairsMessage' : 62,
+        'ReserveObjectInstanceNameRequestMessage' : 63,
+        'ReserveObjectInstanceNameResponseMessage' : 64,
+        'ReserveMultipleObjectInstanceNameRequestMessage' : 65,
+        'ReserveMultipleObjectInstanceNameResponseMessage' : 66,
+        'InteractionMessage' : 80,
+        'TimeStampedInteractionMessage' : 81,
+        'InsertObjectInstanceMessage' : 90,
+        'DeleteObjectInstanceMessage' : 91,
+        'TimeStampedDeleteObjectInstanceMessage' : 92,
+        # obsolete 'LocalDeleteObjectInstanceMessage' : 93,
+        'DestroyObjectInstanceMessage' : 94,
+        'AttributeUpdateMessage' : 94,
+        'TimeStampedAttributeUpdateMessage' : 96,
+        'RequestAttributeUpdateMessage' : 97,
+        'RequestClassAttributeUpdateMessage' : 98,
+        'ChangeObjectInstanceSubscriptionMessage' : 99,
+        'EnableTimeConstrainedNotifyMessage' : 100,
+        'DisableTimeConstrainedNotifyMessage' : 101,
+        'QueryAttributeOwnershipRequestMessage' : 102,
+        'QueryAttributeOwnershipResponseMessage' : 103,
+        'CreateFederationExecutionRequest2Message' : 104,
+        'JoinFederationExecutionRequest2Message' : 105,
+        'InsertModules2Message' : 106,
+        'InsertObjectInstanceWithRegionsMessage' : 107,
+    }
+    def getMessageOpcode(messageName):
+        if messageName in MessageDataType.__opcodeMap:
+            return MessageDataType.__opcodeMap[messageName]
+        else:
+            return None
+
     def __init__(self, typeMap, name, parentTypeName = None):
         StructDataType.__init__(self, typeMap, name, parentObject='Federation', parentTypeName=parentTypeName)
         self.__reliableExpression = None
         self.__objectInstanceExpression = None
-         
+
     def isMessage(self):
         return True
 
@@ -1259,15 +1339,24 @@ class MessageDataType(StructDataType):
             sourceStream.writeline('class OPENRTI_API {name} final : public {parentTypeName} {{'.format(name = self.getName(), parentTypeName = self.getParentTypeName()))
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
-        sourceStream.writeline('{name}() noexcept;'.format(name = self.getName()))
-        sourceStream.writeline('virtual ~{name}() noexcept;'.format(name = self.getName()))
+        sourceStream.writeline('{name}() noexcept {{}};'.format(name = self.getName()))
+        sourceStream.writeline('{name}(const {name}&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}({name}&&) noexcept = default;'.format(name = self.getName()))
+        sourceStream.writeline('virtual ~{name}() noexcept = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}& operator=(const {name}&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}& operator=({name}&&) noexcept = default;'.format(name = self.getName()))
 
         sourceStream.writeline()
-        sourceStream.writeline('virtual const char* getTypeName() const override;')
+        sourceStream.writeline('virtual const char* getTypeName() const noexcept override;')
+        opcode = MessageDataType.getMessageOpcode(self.getName())
+        if not opcode is None:
+            sourceStream.writeline('static const int OpCode = {opcode};'.format(opcode=opcode))
+        else:
+            print("MessageDataType.writeDeclaration: no opcode:", self.getName())
         sourceStream.writeline('virtual void out(std::ostream& os) const override;')
         sourceStream.writeline('virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;')
         sourceStream.writeline('virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;')
-        sourceStream.writeline('virtual size_t messageSize() const override;')
+        sourceStream.writeline('virtual size_t messageSize() const noexcept override;')
         sourceStream.writeline()
 
         sourceStream.writeline('bool operator==(const AbstractMessage& rhs) const noexcept override;')
@@ -1310,28 +1399,8 @@ class MessageDataType(StructDataType):
 
     def writeImplementation(self, sourceStream):
         fieldCount = len(self.getFieldList())
-        if fieldCount == 0:
-            sourceStream.writeline('{name}::{name}() noexcept'.format(name = self.getName()))
-        else:
-            sourceStream.writeline('{name}::{name}() noexcept :'.format(name = self.getName()))
-        sourceStream.pushIndent()
-        index = 0
-        for field in self.getFieldList():
-            line = '{memberName}()'.format(memberName = field.getMemberName())
-            index = index + 1
-            if index < fieldCount:
-                line += ','
-            sourceStream.writeline(line)
-        sourceStream.popIndent()
-        sourceStream.writeline('{')
-        sourceStream.writeline('}')
-        sourceStream.writeline()
-        sourceStream.writeline('{name}::~{name}() noexcept'.format(name = self.getName()))
-        sourceStream.writeline('{')
-        sourceStream.writeline('}')
-        sourceStream.writeline()
         sourceStream.writeline('const char*')
-        sourceStream.writeline('{name}::getTypeName() const'.format(name = self.getName()))
+        sourceStream.writeline('{name}::getTypeName() const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  return "{name}";'.format(name = self.getName()))
         sourceStream.writeline('}')
@@ -1355,7 +1424,7 @@ class MessageDataType(StructDataType):
                 sourceStream.writeline('  //os << "{lowerName}: " << get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
                 if count != len(fields):
                     sourceStream.writeline('  //os << ", ";')
-            
+
         sourceStream.writeline('  os << " }";')
         # sourceStream.writeline('  os << "{name} " << *this;'.format(name = self.getName()))
         sourceStream.writeline('}')
@@ -1377,7 +1446,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline()
 
         sourceStream.writeline('size_t')
-        sourceStream.writeline('{name}::messageSize() const'.format(name = self.getName()))
+        sourceStream.writeline('{name}::messageSize() const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         sourceStream.writeline('size_t result = {parentTypeName}::messageSize();'.format(parentTypeName = self.getParentTypeName()));
@@ -1447,9 +1516,9 @@ class MessageDataType(StructDataType):
     def writeByteSize(self, sourceStream):
         fields = self.getFieldList();
         if len(fields) > 0:
-            sourceStream.writeline('inline size_t byteSize(const {name}& value)'.format(name = self.getName()))
+            sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
         else:
-            sourceStream.writeline('inline size_t byteSize(const {name}&)'.format(name = self.getName()))
+            sourceStream.writeline('inline size_t byteSize(const {name}&) noexcept'.format(name = self.getName()))
 
         sourceStream.writeline('{')
         sourceStream.pushIndent()
@@ -1468,79 +1537,9 @@ class MessageEncoding(object):
         self.__name = name
         # Currently this is common, but as the first incompatible change starts
         # override this in the encodings
-        self.__opcodeMap = {
-            'ConnectionLostMessage' : 1,
-            'CreateFederationExecutionRequestMessage' : 2,
-            'CreateFederationExecutionResponseMessage' : 3,
-            'DestroyFederationExecutionRequestMessage' : 4,
-            'DestroyFederationExecutionResponseMessage' : 5,
-            'EnumerateFederationExecutionsRequestMessage' : 6,
-            'EnumerateFederationExecutionsResponseMessage' : 7,
-            'InsertFederationExecutionMessage' : 8,
-            'ShutdownFederationExecutionMessage' : 9,
-            'EraseFederationExecutionMessage' : 10,
-            'ReleaseFederationHandleMessage' : 11,
-            'InsertModulesMessage' : 12,
-            'JoinFederationExecutionRequestMessage' : 13,
-            'JoinFederationExecutionResponseMessage' : 14,
-            'ResignFederationExecutionRequestMessage' : 15,
-            'JoinFederateNotifyMessage' : 16,
-            'ResignFederateNotifyMessage' : 17,
-            'ChangeAutomaticResignDirectiveMessage' : 18,
-            'RegisterFederationSynchronizationPointMessage' : 30,
-            'RegisterFederationSynchronizationPointResponseMessage' : 31,
-            'AnnounceSynchronizationPointMessage' : 32,
-            'SynchronizationPointAchievedMessage' : 33,
-            'FederationSynchronizedMessage' : 34,
-            'EnableTimeRegulationRequestMessage' : 40,
-            'EnableTimeRegulationResponseMessage' : 41,
-            'DisableTimeRegulationRequestMessage' : 42,
-            'CommitLowerBoundTimeStampMessage' : 43,
-            'CommitLowerBoundTimeStampResponseMessage' : 44,
-            'LockedByNextMessageRequestMessage' : 45,
-            'InsertRegionMessage' : 46,
-            'CommitRegionMessage' : 47,
-            'EraseRegionMessage' : 48,
-            'ChangeInteractionClassPublicationMessage' : 50,
-            'ChangeObjectClassPublicationMessage' : 51,
-            'ChangeInteractionClassSubscriptionMessage' : 52,
-            'ChangeObjectClassSubscriptionMessage' : 53,
-            'ObjectInstanceHandlesRequestMessage' : 60,
-            'ObjectInstanceHandlesResponseMessage' : 61,
-            'ReleaseMultipleObjectInstanceNameHandlePairsMessage' : 62,
-            'ReserveObjectInstanceNameRequestMessage' : 63,
-            'ReserveObjectInstanceNameResponseMessage' : 64,
-            'ReserveMultipleObjectInstanceNameRequestMessage' : 65,
-            'ReserveMultipleObjectInstanceNameResponseMessage' : 66,
-            'InteractionMessage' : 80,
-            'TimeStampedInteractionMessage' : 81,
-            'InsertObjectInstanceMessage' : 90,
-            'DeleteObjectInstanceMessage' : 91,
-            'TimeStampedDeleteObjectInstanceMessage' : 92,
-            # obsolete 'LocalDeleteObjectInstanceMessage' : 93,
-            'DestroyObjectInstanceMessage' : 94,
-            'AttributeUpdateMessage' : 94,
-            'TimeStampedAttributeUpdateMessage' : 96,
-            'RequestAttributeUpdateMessage' : 97,
-            'RequestClassAttributeUpdateMessage' : 98,
-            'ChangeObjectInstanceSubscriptionMessage' : 99,
-            'EnableTimeConstrainedNotifyMessage' : 100,
-            'DisableTimeConstrainedNotifyMessage' : 101,
-            'QueryAttributeOwnershipRequestMessage' : 102,
-            'QueryAttributeOwnershipResponseMessage' : 103,
-            'CreateFederationExecutionRequest2Message' : 104,
-            'JoinFederationExecutionRequest2Message' : 105,
-            'InsertModules2Message' : 106,
-        }
 
     def getName(self):
         return self.__name
-
-    def getMessageOpcode(self, messageName):
-        if messageName in self.__opcodeMap:
-            return self.__opcodeMap[messageName]
-        else:
-            return None
 
     def writeCEncoder(self, dataType, sourceStream):
         name = dataType.getName()
@@ -1871,6 +1870,7 @@ class MessageEncoding(object):
         encodingClass = encodingName + 'MessageEncoding'
         sourceStream.writeCopyright()
         sourceStream.writeline()
+        sourceStream.writeline('#include "DebugNew.h"')
         sourceStream.writeline('#include "' + encodingName + 'MessageEncoding.h"')
         sourceStream.writeline('#include "AbstractMessageEncoding.h"')
         sourceStream.writeline('#include "DecodeDataStream.h"')
@@ -1926,8 +1926,9 @@ class MessageEncoding(object):
 
         for t in messageMap.getTypeList():
             messageName = t.getName()
-            opcode = self.getMessageOpcode(messageName)
+            opcode = MessageDataType.getMessageOpcode(messageName)
             if opcode is None:
+                if isinstance(t, MessageDataType): print("MessageEncoding.writeEncodingImplementation(encode): no opcode:", t.getName())
                 continue
             sourceStream.writeline('void')
             sourceStream.writeline('encode(' + encodingClass + '& messageEncoding, const {messageName}& message) const'.format(messageName = messageName))
@@ -1935,7 +1936,7 @@ class MessageEncoding(object):
             sourceStream.pushIndent()
             sourceStream.writeline('EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());')
             sourceStream.writeline('EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);')
-            sourceStream.writeline('encodeStream.writeUInt16Compressed({opcode});'.format(opcode = opcode))
+            sourceStream.writeline('encodeStream.writeUInt16Compressed({messageName}::OpCode);'.format(messageName = messageName))
             sourceStream.writeline('encodeStream.write{messageName}(message);'.format(messageName = messageName))
             sourceStream.writeline('headerStream.writeUInt32BE(uint32_t(encodeStream.size()));')
             sourceStream.popIndent()
@@ -2053,10 +2054,11 @@ class MessageEncoding(object):
 
         for t in messageMap.getTypeList():
             messageName = t.getName()
-            opcode = self.getMessageOpcode(messageName)
+            opcode = MessageDataType.getMessageOpcode(messageName)
             if opcode is None:
+                if isinstance(t, MessageDataType): print("MessageEncoding.writeEncodingImplementation(decodeBody): no opcode:", t.getName())
                 continue
-            sourceStream.writeline('case {opcode}:'.format(opcode = opcode))
+            sourceStream.writeline('case {messageName}::OpCode:'.format(messageName = messageName))
             sourceStream.pushIndent()
             sourceStream.writeline('_message = MakeShared<{messageName}>();'.format(messageName = messageName))
             sourceStream.writeline('decodeStream.read{messageName}(static_cast<{messageName}&>(*_message));'.format(messageName = messageName))
@@ -2081,12 +2083,13 @@ class MessageEncoding(object):
         sourceStream.writeline('switch (opcode) {')
         for t in messageMap.getTypeList():
             messageName = t.getName()
-            opcode = self.getMessageOpcode(messageName)
+            opcode = MessageDataType.getMessageOpcode(messageName)
             if opcode is None:
+                if isinstance(t, MessageDataType): print("MessageEncoding.writeEncodingImplementation(decodePayload): no opcode:", t.getName())
                 continue
             if not t.hasPayload():
                 continue
-            sourceStream.writeline('case {opcode}:'.format(opcode = opcode))
+            sourceStream.writeline('case {messageName}::OpCode:'.format(messageName = messageName))
             sourceStream.pushIndent()
             sourceStream.writeline('payloadDecoder.readPayload{messageName}(static_cast<{messageName}&>(*_message));'.format(messageName = messageName))
             sourceStream.writeline('break;')
@@ -2260,6 +2263,7 @@ class TypeMap(object):
     def writeImplementation(self, sourceStream):
         sourceStream.writeCopyright()
         sourceStream.writeline()
+        sourceStream.writeline('#include "DebugNew.h"')
         sourceStream.writeline('#include "Message.h"')
         sourceStream.writeline()
         sourceStream.writeline('#include <ostream>')

@@ -35,7 +35,7 @@ foreach (var dataType in FOM.SortedDataTypes)
     {#>
 <#=dataType.Comment#>
 <#  } #>
-class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1516e::HLAfixedRecord
+class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1516ev::HLAfixedRecord
 {
   public:
     <#=dataType.Name#>Encoding();
@@ -77,16 +77,16 @@ class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1
     { // array of simple or basic types: access data by reference/pointer
 #>
 // fixed array of simple type <#=fixedArrayDataType.DataType.Name#>
-class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
+class <#=dataType.Name#>Encoding : public rti1516ev::HLAfixedArray
 {
   public:
     <#=dataType.Name#>Encoding();
 <# if (cardinality > 0) {#>
     <#=dataType.Name#>Encoding(<#=fixedArrayDataType.ParameterCppType#> data);
-    using rti1516e::HLAfixedArray::set;
+    using rti1516ev::HLAfixedArray::set;
     void set(<#=fixedArrayDataType.ParameterCppType#> data);
     void set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size);
-    using rti1516e::HLAfixedArray::get;
+    using rti1516ev::HLAfixedArray::get;
     <#=fixedArrayDataType.ReturnCppType#> get() const;
 <#  } else { #>
     // cardinality is 0, no settable contents
@@ -99,13 +99,13 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
 }; // class <#=dataType.Name#>
 <#  } else {  // array of complex type #>
 // fixed array of complex type <#=fixedArrayDataType.DataType.Name#>
-class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
+class <#=dataType.Name#>Encoding : public rti1516ev::HLAfixedArray
 {
   public:
     <#=dataType.Name#>Encoding();
 <# if (cardinality > 0) {#>
     <#=dataType.Name#>Encoding(<#=fixedArrayDataType.ParameterCppType#> data);
-    using rti1516e::HLAfixedArray::set;
+    using rti1516ev::HLAfixedArray::set;
     void set(<#=fixedArrayDataType.ParameterCppType#> data);
     void set(const <#=fixedArrayDataType.DataType.CPPType#>* data, size_t size);
     // not yet supported: <#=fixedArrayDataType.ReturnCppType#> get() const;
@@ -126,19 +126,19 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAfixedArray
     { // array of simple or basic types: access data by reference/pointer
 #>
 // variable array of simple type <#= variableArrayDataType.DataType.Name #>
-class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
+class <#=dataType.Name#>Encoding : public rti1516ev::HLAvariableArray
 {
   public:
     <#=dataType.Name#>Encoding();
     <#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data);
-    using rti1516e::HLAvariableArray::set;
+    using rti1516ev::HLAvariableArray::set;
     void set(<#=variableArrayDataType.ParameterCppType#> data);
     void set(const <#=variableArrayDataType.DataType.CPPType#>* data, size_t size);
-    using rti1516e::HLAvariableArray::get;
+    using rti1516ev::HLAvariableArray::get;
     <#=variableArrayDataType.ReturnCppType#> get() const;
     void resize(size_t size);
-    using rti1516e::HLAvariableArray::decodeFrom;
-    virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
+    using rti1516ev::HLAvariableArray::decodeFrom;
+    virtual size_t decodeFrom(const rti1516ev::Octet* buffer, size_t bufferSize, size_t index) override;
   private:
     void update();
     std::vector<<#=variableArrayDataType.DataType.CPPType#>> mData;
@@ -147,17 +147,17 @@ class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
 
 <#  } else { #>
 // variable array of complex type <#= variableArrayDataType.DataType.Name #>
-class <#=dataType.Name#>Encoding : public rti1516e::HLAvariableArray
+class <#=dataType.Name#>Encoding : public rti1516ev::HLAvariableArray
 {
   public:
     <#=dataType.Name#>Encoding();
     <#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data);
-    using rti1516e::HLAvariableArray::set;
+    using rti1516ev::HLAvariableArray::set;
     void set(<#=variableArrayDataType.ConstRefCppType#> data);
     void set(<#=variableArrayDataType.RefCppType#> data);
     void set(const <#=variableArrayDataType.DataType.Encoding#>* data, size_t size);
     void set(<#=variableArrayDataType.DataType.Encoding#>* data, size_t size);
-    virtual size_t decodeFrom(const rti1516e::Octet* buffer, size_t bufferSize, size_t index) override;
+    virtual size_t decodeFrom(const rti1516ev::Octet* buffer, size_t bufferSize, size_t index) override;
 }; // class <#=dataType.Name#>
 
 <#

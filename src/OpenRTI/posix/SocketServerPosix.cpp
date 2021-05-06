@@ -45,7 +45,7 @@ SocketServer::getsockname() const
   }
   SocketAddress::PrivateData::setAddrlen(privateData.get(), addrlen);
 
-  return SocketAddress(privateData.get());
+  return SocketAddress(privateData);
 }
 
 SocketServer::SocketServer(PrivateData* privateData) :

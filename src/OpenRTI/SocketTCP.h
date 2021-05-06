@@ -29,7 +29,7 @@ class SocketServerTCP;
 
 class OPENRTI_API SocketTCP : public SocketStream {
 public:
-  SocketTCP();
+  SocketTCP() noexcept;
 
   void connect(const SocketAddress& address);
   void cork(bool enable) override;

@@ -27,12 +27,10 @@
 #error "must include OpenRTIConfig.h!"
 #endif
 
-#if 201103L <= __CPlusPlusStd
-# include <condition_variable>
-# include "Clock.h"
-# include "AbsTimeout.h"
-# include "Mutex.h"
-#endif
+#include <condition_variable>
+#include "Clock.h"
+#include "AbsTimeout.h"
+#include "Mutex.h"
 
 namespace OpenRTI {
 
@@ -41,39 +39,12 @@ class ScopeLock;
 
 class OPENRTI_API Condition {
 public:
-#if 201103L <= __CPlusPlusStd
-  Condition() noexcept
-  { }
-#else
-  Condition() noexcept;
-#endif
-#if 201103L <= __CPlusPlusStd
-  ~Condition() noexcept
-  { }
-#else
-  ~Condition();
-#endif
+  Condition() noexcept { }
+  ~Condition() noexcept { }
 
-#if 201103L <= __CPlusPlusStd
-  void notify_one() noexcept
-  { _condition.notify_one(); }
-#else
-  void notify_one();
-#endif
-#if 201103L <= __CPlusPlusStd
-  void notify_all()
-  { _condition.notify_all(); }
-#else
-  void notify_all();
-#endif
-
-#if 201103L <= __CPlusPlusStd
-  void wait(ScopeLock& scopeLock)
-  { _condition.wait(scopeLock); }
-#else
-  void wait(ScopeLock& scopeLock);
-#endif
-#if 201103L <= __CPlusPlusStd
+  void notify_one() noexcept { _condition.notify_one(); }
+  void notify_all() { _condition.notify_all(); }
+  void wait(ScopeLock& scopeLock) { _condition.wait(scopeLock); }
   bool wait_until(ScopeLock& scopeLock, const AbsTimeout& timeout)
   {
     if (timeout.getTimeout() == Clock::max())
@@ -97,20 +68,14 @@ public:
     AbsTimeout timeout(abstime);
     return wait_until(scopeLock, timeout);
   }
-#else
-  bool wait_until(ScopeLock& scopeLock, const Clock& abstime);
-#endif
 
 private:
   Condition(const Condition&) = delete;
+  Condition(Condition&&) = delete;
   Condition& operator=(const Condition&) = delete;
+  Condition& operator=(Condition&&) = delete;
 
-#if 201103L <= __CPlusPlusStd
   std::condition_variable _condition;
-#else
-  struct PrivateData;
-  PrivateData* _privateData;
-#endif
 };
 
 } // namespace OpenRTI

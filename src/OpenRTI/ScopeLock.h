@@ -30,15 +30,15 @@ namespace OpenRTI {
 
 class ScopeLock : public std::unique_lock<std::mutex> {
 public:
-  ScopeLock(Mutex& mutex) : std::unique_lock<std::mutex>(mutex._mutex)
-  { }
-  ~ScopeLock() noexcept
-  { }
+  ScopeLock(Mutex& mutex) : std::unique_lock<std::mutex>(mutex._mutex) { }
+  ~ScopeLock() noexcept { }
 
 private:
-  ScopeLock();
-  ScopeLock(const ScopeLock&);
-  ScopeLock& operator=(const ScopeLock&);
+  ScopeLock() = delete;
+  ScopeLock(const ScopeLock&) = delete;
+  ScopeLock(ScopeLock&&) = delete;
+  ScopeLock& operator=(const ScopeLock&) = delete;
+  ScopeLock& operator=(ScopeLock&&) = delete;
 };
 
 class RecursiveScopeLock : public std::unique_lock<std::recursive_mutex> {
@@ -49,9 +49,11 @@ public:
   { }
 
 private:
-  RecursiveScopeLock();
-  RecursiveScopeLock(const RecursiveScopeLock&);
-  RecursiveScopeLock& operator=(const RecursiveScopeLock&);
+  RecursiveScopeLock() = delete;
+  RecursiveScopeLock(const RecursiveScopeLock&) = delete;
+  RecursiveScopeLock(RecursiveScopeLock&&) = delete;
+  RecursiveScopeLock& operator=(const RecursiveScopeLock&) = delete;
+  RecursiveScopeLock& operator=(RecursiveScopeLock&&) = delete;
 };
 
 } // namespace OpenRTI

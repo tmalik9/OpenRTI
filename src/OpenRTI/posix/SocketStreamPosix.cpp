@@ -238,7 +238,7 @@ SocketStream::getpeername() const
   }
   SocketAddress::PrivateData::setAddrlen(privateData.get(), addrlen);
 
-  return SocketAddress(privateData.get());
+  return SocketAddress(privateData);
 }
 
 SocketStream::SocketStream(PrivateData* privateData) :

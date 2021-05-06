@@ -82,23 +82,28 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <CodeAnalysisRuleSet>CppCoreCheckRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>..\..\c++core.ruleset</CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <EnableCppCoreCheck>true</EnableCppCoreCheck>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <CodeAnalysisRuleSet>..\..\c++core.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnablePREfast>true</EnablePREfast>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -110,7 +115,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <Optimization>MaxSpeed</Optimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -122,7 +127,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <Optimization>MaxSpeed</Optimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -147,7 +152,6 @@
     <ClCompile Include="ExpatXMLReader.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="FDD1516EFileReader.cpp" />
-    <ClCompile Include="FDD1516FileReader.cpp" />
     <ClCompile Include="FEDFileReader.cpp" />
     <ClCompile Include="InitialClientStreamProtocol.cpp" />
     <ClCompile Include="InitialServerStreamProtocol.cpp" />
@@ -192,13 +196,9 @@
     <ClCompile Include="WeakReferenced.cpp" />
     <ClCompile Include="win32\PerformanceCounterStopWatch.cpp" />
     <ClCompile Include="XMLReader.cpp" />
-    <ClCompile Include="win32\AtomicWin32.cpp" />
-    <ClCompile Include="win32\ClockWin32.cpp" />
-    <ClCompile Include="win32\ConditionWin32.cpp" />
     <ClCompile Include="win32\DynamicModuleWin32.cpp" />
     <ClCompile Include="win32\ErrnoWin32.cpp" />
     <ClCompile Include="win32\NetworkStatisticsWin32.cpp" />
-    <ClCompile Include="win32\MutexWin32.cpp" />
     <ClCompile Include="win32\SocketAddressWin32.cpp" />
     <ClCompile Include="win32\SocketDataWin32.cpp" />
     <ClCompile Include="win32\SocketEventDispatcherWin32.cpp" />
@@ -311,7 +311,6 @@
     <ClInclude Include="ExpatXMLReader.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="FDD1516EFileReader.h" />
-    <ClInclude Include="FDD1516FileReader.h" />
     <ClInclude Include="Federate.h" />
     <ClInclude Include="FederateHandleLowerBoundTimeStampMap.h" />
     <ClInclude Include="FEDFileReader.h" />
@@ -381,10 +380,7 @@
     <ClInclude Include="VariableLengthData.h" />
     <ClInclude Include="WeakPtr.h" />
     <ClInclude Include="WeakReferenced.h" />
-    <ClInclude Include="win32\ClockWin32.h" />
-    <ClInclude Include="win32\ConditionPrivateDataWin32.h" />
     <ClInclude Include="win32\ErrnoWin32.h" />
-    <ClInclude Include="win32\MutexPrivateDataWin32.h" />
     <ClInclude Include="win32\NetworkStatisticsWin32.h" />
     <ClInclude Include="win32\SocketAddressPrivateDataWin32.h" />
     <ClInclude Include="win32\SocketPrivateDataWin32.h" />

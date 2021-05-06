@@ -190,12 +190,12 @@ public:
   }
   void queueTimeStampedMessage(const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback=false);
   void queueReceiveOrderMessage(const AbstractMessage& message);
-  bool _dispatchCallbackMessage(AbstractMessageDispatcher& messageDispatcher);
+  bool _dispatchCallbackMessage(const AbstractMessageDispatcher& messageDispatcher);
   bool _callbackMessageAvailable();
 
   uint32_t getProtocolVersion() const;
 
-  void enableCallbacks()
+  void enableCallbacks() noexcept
     // throw (SaveInProgress,
     //        RestoreInProgress,
     //        RTIinternalError)
@@ -203,7 +203,7 @@ public:
     _callbacksEnabled = true;
   }
 
-  void disableCallbacks()
+  void disableCallbacks() noexcept
     // throw (SaveInProgress,
     //        RestoreInProgress,
     //        RTIinternalError)
@@ -211,14 +211,14 @@ public:
     _callbacksEnabled = false;
   }
 
-  bool getCallbacksEnabled() const { return _callbacksEnabled; }
+  bool getCallbacksEnabled() const noexcept { return _callbacksEnabled; }
 
   void enableImmediateProcessing();
   void disableImmediateProcessing();
-  CallbackModel getCallbackModel() const { return _callbackModel; }
+  CallbackModel getCallbackModel() const noexcept { return _callbackModel; }
 
   void _setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h);
-  std::shared_ptr<AbstractNotificationHandle> _getNotificationHandle()
+  std::shared_ptr<AbstractNotificationHandle> _getNotificationHandle() const noexcept
   {
     return _notificationHandle;
   }

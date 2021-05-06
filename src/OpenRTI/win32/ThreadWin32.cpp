@@ -61,7 +61,7 @@ struct OPENRTI_LOCAL Thread::PrivateData {
 
   static DWORD WINAPI start_routine(LPVOID data)
   {
-    Thread* thread = reinterpret_cast<Thread*>(data);
+    Thread* thread = static_cast<Thread*>(data);
     thread->run();
     if (!Thread::decRef(thread))
       Thread::destruct(thread);
@@ -88,7 +88,7 @@ struct OPENRTI_LOCAL Thread::PrivateData {
     return true;
   }
 
-  void wait()
+  void wait() noexcept
   {
     if (_handle == INVALID_HANDLE_VALUE)
       return;
@@ -102,7 +102,7 @@ struct OPENRTI_LOCAL Thread::PrivateData {
   HANDLE _handle;
 };
 
-Thread::Thread() :
+Thread::Thread() noexcept :
   _privateData(new PrivateData)
 {
 }
@@ -114,7 +114,7 @@ Thread::~Thread() noexcept
   _privateData = 0;
 }
 
-void Thread::destruct(Thread* thread)
+void Thread::destruct(Thread* thread) noexcept
 {
   delete thread;
 }
@@ -126,7 +126,7 @@ Thread::start()
 }
 
 void
-Thread::wait()
+Thread::wait() noexcept
 {
   _privateData->wait();
 }

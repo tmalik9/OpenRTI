@@ -26,7 +26,6 @@
 #include "ScopeUnlock.h"
 #include "ServerNode.h"
 #include "ServerOptions.h"
-//#include "SingletonPtr.h"
 #include "ThreadServer.h"
 
 namespace OpenRTI {

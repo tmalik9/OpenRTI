@@ -27,7 +27,6 @@
 #include <cstring>
 
 #include "AbstractSocketEvent.h"
-#include "ClockPosix.h"
 #include "ErrnoPosix.h"
 #include "Exception.h"
 #include "LogStream.h"

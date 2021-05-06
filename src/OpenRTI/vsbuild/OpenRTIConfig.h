@@ -37,44 +37,12 @@
 
 #ifdef _MSVC_LANG
 #define __CPlusPlusStd _MSVC_LANG
-#pragma warning(disable : 26496) // The variable 'XXX' is assigned only once, mark it as const
-#pragma warning(disable : 26482) // Only index into arrays using constant expressions
-#pragma warning(disable : 26485) // No array to pointer decay 
-#pragma warning(disable : 26472) // Don't use a static_cast for arithmetic conversions. Use brace initialization, gsl::narrow_cast or gsl::narow
 #else
 #define __CPlusPlusStd __cplusplus
 #endif
 
-#if 201103L <= __CPlusPlusStd
-// In any case this is the best choice as this provides a reliable api for any future
-# define OpenRTI_ATOMIC_USE_STD_ATOMIC
-#else
-# if defined(__GNUC__) && OpenRTI_VERSION_CHECK(4, 7, __GNUC__, __GNUC_MINOR__)
-// No need to include something. Is a Compiler API ...
-#  define OpenRTI_ATOMIC_USE_GCC47_BUILTINS
-# elif defined(__clang__) && OpenRTI_VERSION_CHECK(3, 3, __clang_major__, __clang_minor__)
-// No need to include something. Is a Compiler API. Note that clang aims to be gcc compatible ...
-#  define OpenRTI_ATOMIC_USE_GCC47_BUILTINS
-# elif defined _WIN32
-// Neat old Win32 functions
-#  define OpenRTI_ATOMIC_USE_WIN32_INTERLOCKED
-# elif defined(__GNUC__) && OpenRTI_VERSION_CHECK(4, 1, __GNUC__, __GNUC_MINOR__) && defined(__x86_64__)
-// No need to include something. Is a Compiler API ...
-#  define OpenRTI_ATOMIC_USE_GCC4_BUILTINS
-# elif defined(__GNUC__) && defined(__i386)
-#  define OpenRTI_ATOMIC_USE_GCC_ASM
-# elif defined(__sgi) && defined(_COMPILER_VERSION) && (_COMPILER_VERSION>=730)
-// No need to include something. Is a Compiler API ...
-#  define OpenRTI_ATOMIC_USE_MIPSPRO_BUILTINS
-// FIXME
-// #elif defined(__sun)
-// # define OpenRTI_ATOMIC_USE_SUN
-# elif defined(__APPLE__)
-#  define OpenRTI_ATOMIC_USE_BSD
-# else
-// The sledge hammer ...
-#  define OpenRTI_ATOMIC_USE_MUTEX
-# endif
+#if 201103L > __CPlusPlusStd
+#error "unsupported compiler, C++11 required"
 #endif
 
 #define OpenRTI_HAVE_CSTDINT
@@ -93,8 +61,8 @@
 //#define EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
 #undef EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
 
-// #define OPENRTI_USE_DEBUG_NEW
-#undef OPENRTI_USE_DEBUG_NEW
+#define OPENRTI_USE_DEBUG_NEW
+//#undef OPENRTI_USE_DEBUG_NEW
 #define _QUOTE(x)       # x
 #define QUOTE(x)        _QUOTE(x)
 #define __FILE__LINE__      __FILE__ "(" QUOTE(__LINE__) ") : "

@@ -31,12 +31,11 @@ namespace OpenRTI {
 // May be add some callback mechanism here: depending on the subnet??
 class OPENRTI_API ServerOptions final : public Referenced {
 public:
-  ServerOptions() :
-    _preferCompression(true) // Default to compression for now FIXME
+  ServerOptions() noexcept 
+    : _preferCompression(true) // Default to compression for now FIXME
   { }
 
-  const std::string& getServerName() const
-  { return _serverName; }
+  const std::string& getServerName() const noexcept { return _serverName; }
   void setServerName(const std::string& serverName)
   {
     _serverName = serverName;
@@ -60,8 +59,7 @@ public:
     _setServerPath(i->second);
   }
 
-  const std::string& getServerPath() const
-  { return _serverPath; }
+  const std::string& getServerPath() const noexcept { return _serverPath; }
 
 private:
   void _setServerPath(const StringList& serverPath)

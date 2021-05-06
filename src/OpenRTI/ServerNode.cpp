@@ -1218,7 +1218,7 @@ public:
 
   void accept(const ConnectHandle& connectHandle, const ChangeObjectInstanceSubscriptionMessage* message)
   {
-    ServerModel::ObjectClass* objectClass = ServerModel::Federation::getObjectClass(message->getObjectClassHandle());
+    const ServerModel::ObjectClass* objectClass = ServerModel::Federation::getObjectClass(message->getObjectClassHandle());
     if (!objectClass)
       return;
 
@@ -2226,7 +2226,7 @@ public:
       ServerModel::Federate* federate = getFederate(*i);
       if (!federate)
         continue;
-      ServerModel::FederationConnect* federationConnect = federate->getFederationConnect();
+      const ServerModel::FederationConnect* federationConnect = federate->getFederationConnect();
       if (!federationConnect)
         continue;
       if (federationConnect->getIsParentConnect())
@@ -2523,7 +2523,7 @@ public:
     FederationServer* federationServer = getFederation(federationHandle);
     if (!federationServer)
       throw MessageError("Received ShutdownFederationExecutionMessage for a non existing federation!");
-    ServerModel::FederationConnect* federationConnect = federationServer->getFederationConnect(connectHandle);
+    const ServerModel::FederationConnect* federationConnect = federationServer->getFederationConnect(connectHandle);
     if (federationConnect != nullptr)
     {
       // Check if the federation has again gained a new federate in between
@@ -2600,7 +2600,7 @@ public:
     // If we are still not the last one, wait until this happens
     // FIXME, move that into the erase connect in some way - may be with a new function
     // FIXME See if this is a real problem
-    ServerModel::FederationConnect* federationConnect = federationServer->getFederationConnect(connectHandle);
+    const ServerModel::FederationConnect* federationConnect = federationServer->getFederationConnect(connectHandle);
     if (!federationConnect)
     {
       //DebugPrintf("%s: federationConnect already gone\n", __FUNCTION__);
@@ -2902,13 +2902,13 @@ public:
 
   ConnectHandle insertConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
   {
-    ServerModel::NodeConnect* nodeConnect = Node::insertNodeConnect(messageSender, options);
+    const ServerModel::NodeConnect* nodeConnect = Node::insertNodeConnect(messageSender, options);
     return nodeConnect->getConnectHandle();
   }
 
   ConnectHandle insertParentConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
   {
-    ServerModel::NodeConnect* nodeConnect = Node::insertParentNodeConnect(messageSender, options);
+    const ServerModel::NodeConnect* nodeConnect = Node::insertParentNodeConnect(messageSender, options);
     getServerOptions().setParentOptionMap(options);
     return nodeConnect->getConnectHandle();
   }
@@ -2964,17 +2964,21 @@ public:
 private:
   FederationServer* getFederation(const std::string& federationName)
   {
-    ServerModel::Federation* federation = ServerModel::Node::getFederation(federationName);
-    if (!federation)
-      return 0;
-    return static_cast<FederationServer*>(federation);
+    ServerModel::Federation::NameMap::iterator i = _federationNameFederationMap.find(federationName);
+    if (i == _federationNameFederationMap.end())
+      return nullptr;
+    if (i.get() == nullptr)
+      return nullptr;
+    return static_cast<FederationServer*>(i.get());
   }
   FederationServer* getFederation(const FederationHandle& federationHandle)
   {
-    ServerModel::Federation* federation = ServerModel::Node::getFederation(federationHandle);
-    if (!federation)
-      return 0;
-    return static_cast<FederationServer*>(federation);
+    ServerModel::Federation::HandleMap::iterator i = _federationHandleFederationMap.find(federationHandle);
+    if (i == _federationHandleFederationMap.end())
+      return nullptr;
+    if (i.get() == nullptr)
+      return nullptr;
+    return static_cast<FederationServer*>(i.get());
   }
 
 

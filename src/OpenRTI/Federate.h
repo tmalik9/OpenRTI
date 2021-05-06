@@ -86,7 +86,7 @@ public:
 
   void applySwitch(const FOMSwitch& switchValue);
 
-  /// rti1516e update rates.
+  /// rti1516ev update rates.
   double getUpdateRateValue(const std::string& name) const;
   void insertUpdateRate(const std::string& name, double updateRate);
 

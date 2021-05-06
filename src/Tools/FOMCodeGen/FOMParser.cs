@@ -93,7 +93,7 @@ namespace FOMCodeGen
       }
       public override string Encoding
       {
-        get { return "rti1516e::" + Name; }
+        get { return "rti1516ev::" + Name; }
       }
     }
     // a predefined type is one of the types for which a standard encoding already
@@ -102,7 +102,7 @@ namespace FOMCodeGen
     {
       public PredefinedType(string name) : base(name)
       {
-        _cppType = "rti1516e::" + name;
+        _cppType = "rti1516ev::" + name;
       }
       private string _cppType;
       public override string CPPType
@@ -111,7 +111,7 @@ namespace FOMCodeGen
       }
       public override string Encoding
       {
-        get { return "rti1516e::" + Name; }
+        get { return "rti1516ev::" + Name; }
       }
     }
     // A SimpleDataType is basically a typedef to a BasicDataRepresentation

@@ -36,10 +36,11 @@ class VariableLengthDataTuple
   public:
     typedef ImplType::size_type size_type;
 
-    VariableLengthDataTuple()  : mImpl() {}
+    VariableLengthDataTuple() noexcept : mImpl() {}
     VariableLengthDataTuple(size_t size)  : mImpl(size) {}
     VariableLengthDataTuple(const VariableLengthDataTuple& other) : mImpl(other.mImpl) {}
     VariableLengthDataTuple(VariableLengthDataTuple&& other) : mImpl(std::move(other.mImpl)) {}
+    ~VariableLengthDataTuple() noexcept = default;
     VariableLengthDataTuple& operator=(const VariableLengthDataTuple& other)
     {
       if (this != std::addressof(other))
@@ -48,7 +49,7 @@ class VariableLengthDataTuple
       }
       return *this;
     }
-    VariableLengthDataTuple& operator=(VariableLengthDataTuple&& other)
+    VariableLengthDataTuple& operator=(VariableLengthDataTuple&& other) noexcept
     {
       if (this != std::addressof(other))
       {
@@ -56,12 +57,12 @@ class VariableLengthDataTuple
       }
       return *this;
     }
-    ImplType::iterator begin() { return mImpl.begin(); }
-    ImplType::iterator end() { return mImpl.end(); }
-    ImplType::const_iterator begin() const { return mImpl.begin(); }
-    ImplType::const_iterator end() const { return mImpl.end(); }
-    bool empty() const { return mImpl.empty(); }
-    ImplType::size_type size() const { return mImpl.size(); }
+    ImplType::iterator begin() noexcept { return mImpl.begin(); }
+    ImplType::iterator end() noexcept { return mImpl.end(); }
+    ImplType::const_iterator begin() const noexcept { return mImpl.begin(); }
+    ImplType::const_iterator end() const noexcept { return mImpl.end(); }
+    bool empty() const noexcept { return mImpl.empty(); }
+    ImplType::size_type size() const noexcept { return mImpl.size(); }
     void resize(ImplType::size_type newSize) { mImpl.resize(newSize); }
     VariableLengthData& operator[](size_t index) { return mImpl[index]; }
     const VariableLengthData& operator[](size_t index) const { return mImpl[index]; }
@@ -98,12 +99,12 @@ class VariableLengthDataTupleSet
     VariableLengthDataTupleSet& operator=(const VariableLengthDataTupleSet& other) = default;
     VariableLengthDataTupleSet& operator=(VariableLengthDataTupleSet&& other) = default;
 
-    ImplType::iterator begin() { return mImpl.begin(); }
-    ImplType::iterator end() { return mImpl.end(); }
-    ImplType::const_iterator begin() const { return mImpl.begin(); }
-    ImplType::const_iterator end() const { return mImpl.end(); }
-    bool empty() const { return mImpl.empty(); }
-    ImplType::size_type size() const { return mImpl.size(); }
+    ImplType::iterator begin() noexcept { return mImpl.begin(); }
+    ImplType::iterator end() noexcept { return mImpl.end(); }
+    ImplType::const_iterator begin() const noexcept { return mImpl.begin(); }
+    ImplType::const_iterator end() const noexcept { return mImpl.end(); }
+    bool empty() const noexcept { return mImpl.empty(); }
+    ImplType::size_type size() const noexcept { return mImpl.size(); }
 
     const VariableLengthDataTuple& operator[](size_t index) const { return mImpl[index]; }
 

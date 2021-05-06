@@ -151,7 +151,7 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
         MomTreeNode* currentNode = mRoot;
         while (currentNode != nullptr && currentNode->getType() == MomType::Object)
         {
-          for (MomTreeNode* child : currentNode->children)
+          for (MomTreeNode const* child : currentNode->children)
           {
             if (child->getType() == MomType::Attribute)
             {
@@ -285,10 +285,10 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
       operator ParameterHandleSet() const
       {
         ParameterHandleSet result;
-        MomTreeNode* currentNode = mRoot;
+        const MomTreeNode* currentNode = mRoot;
         while (currentNode != nullptr && currentNode->getType() == MomType::Interaction)
         {
-          for (MomTreeNode* child : currentNode->children)
+          for (const MomTreeNode* child : currentNode->children)
           {
             if (child->getType() == MomType::Parameter)
             {
@@ -543,10 +543,8 @@ class OPENRTI_LOCAL MomManager : public std::enable_shared_from_this<MomManager>
       }
 
       ~MomTreeNode() noexcept;
-      MomTreeNode* getParent()
-      {
-        return mParent;
-      }
+      const MomTreeNode* getParent() const { return mParent; }
+      MomTreeNode* getParent() { return mParent; }
 
       MomType getType() const noexcept
       {

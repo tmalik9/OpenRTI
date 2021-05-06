@@ -31,15 +31,17 @@ class OPENRTI_API AbsTimeout
     explicit AbsTimeout(const Clock& abstime);
 
     ~AbsTimeout();
-    void set(const Clock& abstime) { _absTime = abstime; }
+    void set(const Clock& abstime) noexcept { _absTime = abstime; }
     bool isExpired() const;
     bool isExpired(Clock& remaining) const;
 
-    Clock getTimeout() const
-    {
-      return _absTime;
-    }
+    Clock getTimeout() const noexcept { return _absTime; }
   private:
+    AbsTimeout(const AbsTimeout& abstime) = delete;
+    AbsTimeout(AbsTimeout&&) = delete;
+    AbsTimeout& operator=(const AbsTimeout& abstime) = delete;
+    AbsTimeout& operator=(AbsTimeout&&) = delete;
+
     Clock getDelay() const;
     void watchDogFunc();
 

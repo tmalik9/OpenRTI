@@ -49,9 +49,6 @@
     <ClCompile Include="FDD1516EFileReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FDD1516FileReader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Federate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -139,19 +136,10 @@
     <ClCompile Include="XMLReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="win32\ClockWin32.cpp">
-      <Filter>Source Files\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\ConditionWin32.cpp">
-      <Filter>Source Files\win32</Filter>
-    </ClCompile>
     <ClCompile Include="win32\ErrnoWin32.cpp">
       <Filter>Source Files\win32</Filter>
     </ClCompile>
     <ClCompile Include="win32\DynamicModuleWin32.cpp">
-      <Filter>Source Files\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\MutexWin32.cpp">
       <Filter>Source Files\win32</Filter>
     </ClCompile>
     <ClCompile Include="win32\SocketPacketWin32.cpp">
@@ -191,9 +179,6 @@
       <Filter>Source Files\win32</Filter>
     </ClCompile>
     <ClCompile Include="win32\ThreadLocalWin32.cpp">
-      <Filter>Source Files\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\AtomicWin32.cpp">
       <Filter>Source Files\win32</Filter>
     </ClCompile>
     <ClCompile Include="win32\SocketServerPipeWin32.cpp">
@@ -390,9 +375,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="FDD1516EFileReader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FDD1516FileReader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Federate.h">
@@ -599,16 +581,7 @@
     <ClInclude Include="XMLReader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="win32\ClockWin32.h">
-      <Filter>Source Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\ConditionPrivateDataWin32.h">
-      <Filter>Source Files\win32</Filter>
-    </ClInclude>
     <ClInclude Include="win32\ErrnoWin32.h">
-      <Filter>Source Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\MutexPrivateDataWin32.h">
       <Filter>Source Files\win32</Filter>
     </ClInclude>
     <ClInclude Include="win32\SocketAddressPrivateDataWin32.h">

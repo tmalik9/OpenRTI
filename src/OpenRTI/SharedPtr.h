@@ -42,25 +42,21 @@ class OPENRTI_LOCAL SharedPtr {
     constexpr SharedPtr() noexcept : _ptr(0) {}
     explicit SharedPtr(T* ptr) : _ptr(ptr) { T::getFirst(_ptr); }
     SharedPtr(const SharedPtr& p) : _ptr(p.get()) { T::incRef(_ptr); }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
     SharedPtr(SharedPtr&& p) : _ptr(0) { swap(p); }
-#endif
     template<typename U>
     SharedPtr(const SharedPtr<U>& p) : _ptr(p.get()) { T::incRef(_ptr); }
     ~SharedPtr() { reset(); }
 
     SharedPtr& operator=(const SharedPtr& p) { assign(p.get()); return *this; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
     SharedPtr& operator=(SharedPtr&& p) { swap(p); return *this; }
-#endif
     template<typename U>
     SharedPtr& operator=(const SharedPtr<U>& p) { assign(p.get()); return *this; }
 
-    T* operator->() const { return _ptr; }
-    T& operator*() const { return *_ptr; }
+    T* operator->() const noexcept { return _ptr; }
+    T& operator*() const noexcept { return *_ptr; }
 
-    T* get() const { return _ptr; }
-    T* release() {
+    T* get() const noexcept { return _ptr; }
+    T* release() noexcept {
       T* tmp = _ptr;
       _ptr = 0;
       T::release(tmp);

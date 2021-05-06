@@ -293,7 +293,7 @@ void MomServer::accept(const AttributeUpdateMessage& message)
   // Look for the known object class of this object instance.
   // Is required for the right subset of attributes that are reflected
   ObjectInstanceHandle objectInstanceHandle = message.getObjectInstanceHandle();
-  Federate::ObjectInstance* objectInstance = _rtiFederate->getObjectInstance(objectInstanceHandle);
+  const Federate::ObjectInstance* objectInstance = _rtiFederate->getObjectInstance(objectInstanceHandle);
   if (!objectInstance)
     return;
   Federate::ObjectClass* objectClass = _rtiFederate->getObjectClass(objectInstance->getObjectClassHandle());

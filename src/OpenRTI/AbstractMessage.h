@@ -49,14 +49,18 @@ class OPENRTI_API AbstractMessage : public Referenced {
 public:
   AbstractMessage() noexcept = default;
   AbstractMessage(const AbstractMessage&) = default;
-  AbstractMessage(AbstractMessage&&) = delete;
+  AbstractMessage(AbstractMessage&&) noexcept = default;
   virtual ~AbstractMessage() noexcept = default;
+  AbstractMessage& operator=(const AbstractMessage&) = default;
+  AbstractMessage& operator=(AbstractMessage&&) noexcept = default;
 
-  virtual const char* getTypeName() const = 0;
+  virtual const char* getTypeName() const noexcept = 0;
   virtual void out(std::ostream& os) const = 0;
   virtual void out(std::ostream& os, ServerModel::Federation* federation) const = 0;
   virtual void dispatch(const AbstractMessageDispatcher&) const = 0;
-  virtual size_t messageSize() const;
+
+  virtual size_t messageSize() const noexcept { return sizeof(AbstractMessage); }
+
   std::string toString() const;
   std::string toString(ServerModel::Federation* federation) const;
   // For testing of the transport implementation
@@ -91,25 +95,25 @@ std::ostream& prettyprint(std::ostream& os, const ParameterHandle& value, Server
 
 typedef std::list<SharedPtr<const AbstractMessage> > MessageList;
 
-inline size_t byteSize(const int16_t&) { return sizeof(int16_t); }
-inline size_t byteSize(const uint16_t&) { return sizeof(uint16_t); }
-inline size_t byteSize(const int32_t&) { return sizeof(int32_t); }
-inline size_t byteSize(const uint32_t&) { return sizeof(uint32_t); }
-inline size_t byteSize(const int64_t&) { return sizeof(int64_t); }
-inline size_t byteSize(const uint64_t&) { return sizeof(uint64_t); }
-inline size_t byteSize(const double&) { return sizeof(double); }
-inline size_t byteSize(const std::string& value) { return value.size() + sizeof(std::string::size_type); }
-inline size_t byteSize(const VariableLengthData& value) { return value.size() + 3 * sizeof(size_t); }
-inline size_t byteSize(const FederationHandle&) { return sizeof(FederationHandle); }
-inline size_t byteSize(const FederateHandle&) { return sizeof(FederateHandle); }
-inline size_t byteSize(const ObjectClassHandle&) { return sizeof(ObjectClassHandle); }
-inline size_t byteSize(const ObjectInstanceHandle&) { return sizeof(ObjectInstanceHandle); }
-inline size_t byteSize(const AttributeHandle&) { return sizeof(AttributeHandle); }
-inline size_t byteSize(const InteractionClassHandle&) { return sizeof(InteractionClassHandle); }
-inline size_t byteSize(const ParameterHandle&) { return sizeof(ParameterHandle); }
-inline size_t byteSize(const RegionHandle&) { return sizeof(RegionHandle); }
-inline size_t byteSize(const DimensionHandle&) { return sizeof(DimensionHandle); }
-inline size_t byteSize(const ModuleHandle&) { return sizeof(ModuleHandle); }
+inline constexpr size_t byteSize(const int16_t&) noexcept { return sizeof(int16_t); }
+inline constexpr size_t byteSize(const uint16_t&) noexcept { return sizeof(uint16_t); }
+inline constexpr size_t byteSize(const int32_t&) noexcept { return sizeof(int32_t); }
+inline constexpr size_t byteSize(const uint32_t&) noexcept { return sizeof(uint32_t); }
+inline constexpr size_t byteSize(const int64_t&) noexcept { return sizeof(int64_t); }
+inline constexpr size_t byteSize(const uint64_t&) noexcept { return sizeof(uint64_t); }
+inline constexpr size_t byteSize(const double&) noexcept { return sizeof(double); }
+inline constexpr size_t byteSize(const FederationHandle&) noexcept { return sizeof(FederationHandle); }
+inline constexpr size_t byteSize(const FederateHandle&) noexcept { return sizeof(FederateHandle); }
+inline constexpr size_t byteSize(const ObjectClassHandle&) noexcept { return sizeof(ObjectClassHandle); }
+inline constexpr size_t byteSize(const ObjectInstanceHandle&) noexcept { return sizeof(ObjectInstanceHandle); }
+inline constexpr size_t byteSize(const AttributeHandle&) noexcept { return sizeof(AttributeHandle); }
+inline constexpr size_t byteSize(const InteractionClassHandle&) noexcept { return sizeof(InteractionClassHandle); }
+inline constexpr size_t byteSize(const ParameterHandle&) noexcept { return sizeof(ParameterHandle); }
+inline constexpr size_t byteSize(const RegionHandle&) noexcept { return sizeof(RegionHandle); }
+inline constexpr size_t byteSize(const DimensionHandle&) noexcept { return sizeof(DimensionHandle); }
+inline constexpr size_t byteSize(const ModuleHandle&) noexcept { return sizeof(ModuleHandle); }
+inline size_t byteSize(const std::string& value) noexcept { return value.size() + sizeof(std::string::size_type); }
+inline size_t byteSize(const VariableLengthData& value) noexcept { return value.size() + 3 * sizeof(size_t); }
 //template<typename L, typename R> inline size_t byteSize(const std::pair<L, R>& value) 
 //{
 //  return byteSize(value.first) + byteSize(value.second);
