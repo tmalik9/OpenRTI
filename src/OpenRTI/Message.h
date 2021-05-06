@@ -492,7 +492,7 @@ typedef std::vector<FederateHandleBoolPair> FederateHandleBoolPairVector;
 
 class OPENRTI_API RangeBoundsValue {
 public:
-  RangeBoundsValue() noexcept = default;
+  RangeBoundsValue() = default;
   RangeBoundsValue(
     Unsigned lowerBound,
     Unsigned upperBound) noexcept
@@ -577,7 +577,7 @@ typedef std::pair<AttributeHandle, RegionValueList> AttributeHandleRegionValueLi
 
 class OPENRTI_API AttributeState {
 public:
-  AttributeState() noexcept = default;
+  AttributeState() = default;
   AttributeState(
     AttributeHandle attributeHandle,
     FederateHandle ownerFederate) noexcept
@@ -642,7 +642,7 @@ typedef std::vector<AttributeState> AttributeStateVector;
 
 class OPENRTI_API ParameterValue {
 public:
-  ParameterValue() noexcept = default;
+  ParameterValue() = default;
   ParameterValue(
     ParameterHandle parameterHandle,
     VariableLengthData value) noexcept
@@ -707,7 +707,7 @@ typedef std::vector<ParameterValue> ParameterValueVector;
 
 class OPENRTI_API AttributeValue {
 public:
-  AttributeValue() noexcept = default;
+  AttributeValue() = default;
   AttributeValue(
     AttributeHandle attributeHandle,
     VariableLengthData value) noexcept
@@ -780,7 +780,7 @@ typedef std::vector<FederateHandleRestoreStatusPair> FederateHandleRestoreStatus
 
 class OPENRTI_API FederationExecutionInformation {
 public:
-  FederationExecutionInformation() noexcept = default;
+  FederationExecutionInformation() = default;
   FederationExecutionInformation(
     String federationExecutionName,
     String logicalTimeFactoryName) noexcept
@@ -6022,7 +6022,7 @@ public:
   ConnectionLostMessage(ConnectionLostMessage&&) noexcept = default;
   virtual ~ConnectionLostMessage() noexcept = default;
   ConnectionLostMessage& operator=(const ConnectionLostMessage&) = default;
-  ConnectionLostMessage& operator=(ConnectionLostMessage&&) noexcept = default;
+  ConnectionLostMessage& operator=(ConnectionLostMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 1;
@@ -6063,7 +6063,7 @@ public:
   CreateFederationExecutionRequestMessage(CreateFederationExecutionRequestMessage&&) noexcept = default;
   virtual ~CreateFederationExecutionRequestMessage() noexcept = default;
   CreateFederationExecutionRequestMessage& operator=(const CreateFederationExecutionRequestMessage&) = default;
-  CreateFederationExecutionRequestMessage& operator=(CreateFederationExecutionRequestMessage&&) noexcept = default;
+  CreateFederationExecutionRequestMessage& operator=(CreateFederationExecutionRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 2;
@@ -6124,7 +6124,7 @@ public:
   CreateFederationExecutionRequest2Message(CreateFederationExecutionRequest2Message&&) noexcept = default;
   virtual ~CreateFederationExecutionRequest2Message() noexcept = default;
   CreateFederationExecutionRequest2Message& operator=(const CreateFederationExecutionRequest2Message&) = default;
-  CreateFederationExecutionRequest2Message& operator=(CreateFederationExecutionRequest2Message&&) noexcept = default;
+  CreateFederationExecutionRequest2Message& operator=(CreateFederationExecutionRequest2Message&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 104;
@@ -6185,7 +6185,7 @@ public:
   CreateFederationExecutionResponseMessage(CreateFederationExecutionResponseMessage&&) noexcept = default;
   virtual ~CreateFederationExecutionResponseMessage() noexcept = default;
   CreateFederationExecutionResponseMessage& operator=(const CreateFederationExecutionResponseMessage&) = default;
-  CreateFederationExecutionResponseMessage& operator=(CreateFederationExecutionResponseMessage&&) noexcept = default;
+  CreateFederationExecutionResponseMessage& operator=(CreateFederationExecutionResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 3;
@@ -6236,7 +6236,7 @@ public:
   DestroyFederationExecutionRequestMessage(DestroyFederationExecutionRequestMessage&&) noexcept = default;
   virtual ~DestroyFederationExecutionRequestMessage() noexcept = default;
   DestroyFederationExecutionRequestMessage& operator=(const DestroyFederationExecutionRequestMessage&) = default;
-  DestroyFederationExecutionRequestMessage& operator=(DestroyFederationExecutionRequestMessage&&) noexcept = default;
+  DestroyFederationExecutionRequestMessage& operator=(DestroyFederationExecutionRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 4;
@@ -6277,7 +6277,7 @@ public:
   DestroyFederationExecutionResponseMessage(DestroyFederationExecutionResponseMessage&&) noexcept = default;
   virtual ~DestroyFederationExecutionResponseMessage() noexcept = default;
   DestroyFederationExecutionResponseMessage& operator=(const DestroyFederationExecutionResponseMessage&) = default;
-  DestroyFederationExecutionResponseMessage& operator=(DestroyFederationExecutionResponseMessage&&) noexcept = default;
+  DestroyFederationExecutionResponseMessage& operator=(DestroyFederationExecutionResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 5;
@@ -6318,7 +6318,7 @@ public:
   EnumerateFederationExecutionsRequestMessage(EnumerateFederationExecutionsRequestMessage&&) noexcept = default;
   virtual ~EnumerateFederationExecutionsRequestMessage() noexcept = default;
   EnumerateFederationExecutionsRequestMessage& operator=(const EnumerateFederationExecutionsRequestMessage&) = default;
-  EnumerateFederationExecutionsRequestMessage& operator=(EnumerateFederationExecutionsRequestMessage&&) noexcept = default;
+  EnumerateFederationExecutionsRequestMessage& operator=(EnumerateFederationExecutionsRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 6;
@@ -6349,7 +6349,7 @@ public:
   EnumerateFederationExecutionsResponseMessage(EnumerateFederationExecutionsResponseMessage&&) noexcept = default;
   virtual ~EnumerateFederationExecutionsResponseMessage() noexcept = default;
   EnumerateFederationExecutionsResponseMessage& operator=(const EnumerateFederationExecutionsResponseMessage&) = default;
-  EnumerateFederationExecutionsResponseMessage& operator=(EnumerateFederationExecutionsResponseMessage&&) noexcept = default;
+  EnumerateFederationExecutionsResponseMessage& operator=(EnumerateFederationExecutionsResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 7;
@@ -6390,7 +6390,7 @@ public:
   InsertFederationExecutionMessage(InsertFederationExecutionMessage&&) noexcept = default;
   virtual ~InsertFederationExecutionMessage() noexcept = default;
   InsertFederationExecutionMessage& operator=(const InsertFederationExecutionMessage&) = default;
-  InsertFederationExecutionMessage& operator=(InsertFederationExecutionMessage&&) noexcept = default;
+  InsertFederationExecutionMessage& operator=(InsertFederationExecutionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 8;
@@ -6461,7 +6461,7 @@ public:
   ShutdownFederationExecutionMessage(ShutdownFederationExecutionMessage&&) noexcept = default;
   virtual ~ShutdownFederationExecutionMessage() noexcept = default;
   ShutdownFederationExecutionMessage& operator=(const ShutdownFederationExecutionMessage&) = default;
-  ShutdownFederationExecutionMessage& operator=(ShutdownFederationExecutionMessage&&) noexcept = default;
+  ShutdownFederationExecutionMessage& operator=(ShutdownFederationExecutionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 9;
@@ -6502,7 +6502,7 @@ public:
   EraseFederationExecutionMessage(EraseFederationExecutionMessage&&) noexcept = default;
   virtual ~EraseFederationExecutionMessage() noexcept = default;
   EraseFederationExecutionMessage& operator=(const EraseFederationExecutionMessage&) = default;
-  EraseFederationExecutionMessage& operator=(EraseFederationExecutionMessage&&) noexcept = default;
+  EraseFederationExecutionMessage& operator=(EraseFederationExecutionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 10;
@@ -6543,7 +6543,7 @@ public:
   ReleaseFederationHandleMessage(ReleaseFederationHandleMessage&&) noexcept = default;
   virtual ~ReleaseFederationHandleMessage() noexcept = default;
   ReleaseFederationHandleMessage& operator=(const ReleaseFederationHandleMessage&) = default;
-  ReleaseFederationHandleMessage& operator=(ReleaseFederationHandleMessage&&) noexcept = default;
+  ReleaseFederationHandleMessage& operator=(ReleaseFederationHandleMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 11;
@@ -6584,7 +6584,7 @@ public:
   InsertModulesMessage(InsertModulesMessage&&) noexcept = default;
   virtual ~InsertModulesMessage() noexcept = default;
   InsertModulesMessage& operator=(const InsertModulesMessage&) = default;
-  InsertModulesMessage& operator=(InsertModulesMessage&&) noexcept = default;
+  InsertModulesMessage& operator=(InsertModulesMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 12;
@@ -6635,7 +6635,7 @@ public:
   InsertModules2Message(InsertModules2Message&&) noexcept = default;
   virtual ~InsertModules2Message() noexcept = default;
   InsertModules2Message& operator=(const InsertModules2Message&) = default;
-  InsertModules2Message& operator=(InsertModules2Message&&) noexcept = default;
+  InsertModules2Message& operator=(InsertModules2Message&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 106;
@@ -6686,7 +6686,7 @@ public:
   JoinFederationExecutionRequestMessage(JoinFederationExecutionRequestMessage&&) noexcept = default;
   virtual ~JoinFederationExecutionRequestMessage() noexcept = default;
   JoinFederationExecutionRequestMessage& operator=(const JoinFederationExecutionRequestMessage&) = default;
-  JoinFederationExecutionRequestMessage& operator=(JoinFederationExecutionRequestMessage&&) noexcept = default;
+  JoinFederationExecutionRequestMessage& operator=(JoinFederationExecutionRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 13;
@@ -6777,7 +6777,7 @@ public:
   JoinFederationExecutionRequest2Message(JoinFederationExecutionRequest2Message&&) noexcept = default;
   virtual ~JoinFederationExecutionRequest2Message() noexcept = default;
   JoinFederationExecutionRequest2Message& operator=(const JoinFederationExecutionRequest2Message&) = default;
-  JoinFederationExecutionRequest2Message& operator=(JoinFederationExecutionRequest2Message&&) noexcept = default;
+  JoinFederationExecutionRequest2Message& operator=(JoinFederationExecutionRequest2Message&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 105;
@@ -6868,7 +6868,7 @@ public:
   JoinFederationExecutionResponseMessage(JoinFederationExecutionResponseMessage&&) noexcept = default;
   virtual ~JoinFederationExecutionResponseMessage() noexcept = default;
   JoinFederationExecutionResponseMessage& operator=(const JoinFederationExecutionResponseMessage&) = default;
-  JoinFederationExecutionResponseMessage& operator=(JoinFederationExecutionResponseMessage&&) noexcept = default;
+  JoinFederationExecutionResponseMessage& operator=(JoinFederationExecutionResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 14;
@@ -6959,7 +6959,7 @@ public:
   ResignFederationExecutionLeafRequestMessage(ResignFederationExecutionLeafRequestMessage&&) noexcept = default;
   virtual ~ResignFederationExecutionLeafRequestMessage() noexcept = default;
   ResignFederationExecutionLeafRequestMessage& operator=(const ResignFederationExecutionLeafRequestMessage&) = default;
-  ResignFederationExecutionLeafRequestMessage& operator=(ResignFederationExecutionLeafRequestMessage&&) noexcept = default;
+  ResignFederationExecutionLeafRequestMessage& operator=(ResignFederationExecutionLeafRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   virtual void out(std::ostream& os) const override;
@@ -7019,7 +7019,7 @@ public:
   ResignFederationExecutionRequestMessage(ResignFederationExecutionRequestMessage&&) noexcept = default;
   virtual ~ResignFederationExecutionRequestMessage() noexcept = default;
   ResignFederationExecutionRequestMessage& operator=(const ResignFederationExecutionRequestMessage&) = default;
-  ResignFederationExecutionRequestMessage& operator=(ResignFederationExecutionRequestMessage&&) noexcept = default;
+  ResignFederationExecutionRequestMessage& operator=(ResignFederationExecutionRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 15;
@@ -7070,7 +7070,7 @@ public:
   JoinFederateNotifyMessage(JoinFederateNotifyMessage&&) noexcept = default;
   virtual ~JoinFederateNotifyMessage() noexcept = default;
   JoinFederateNotifyMessage& operator=(const JoinFederateNotifyMessage&) = default;
-  JoinFederateNotifyMessage& operator=(JoinFederateNotifyMessage&&) noexcept = default;
+  JoinFederateNotifyMessage& operator=(JoinFederateNotifyMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 16;
@@ -7151,7 +7151,7 @@ public:
   ResignFederateNotifyMessage(ResignFederateNotifyMessage&&) noexcept = default;
   virtual ~ResignFederateNotifyMessage() noexcept = default;
   ResignFederateNotifyMessage& operator=(const ResignFederateNotifyMessage&) = default;
-  ResignFederateNotifyMessage& operator=(ResignFederateNotifyMessage&&) noexcept = default;
+  ResignFederateNotifyMessage& operator=(ResignFederateNotifyMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 17;
@@ -7202,7 +7202,7 @@ public:
   ChangeAutomaticResignDirectiveMessage(ChangeAutomaticResignDirectiveMessage&&) noexcept = default;
   virtual ~ChangeAutomaticResignDirectiveMessage() noexcept = default;
   ChangeAutomaticResignDirectiveMessage& operator=(const ChangeAutomaticResignDirectiveMessage&) = default;
-  ChangeAutomaticResignDirectiveMessage& operator=(ChangeAutomaticResignDirectiveMessage&&) noexcept = default;
+  ChangeAutomaticResignDirectiveMessage& operator=(ChangeAutomaticResignDirectiveMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 18;
@@ -7263,7 +7263,7 @@ public:
   RegisterFederationSynchronizationPointMessage(RegisterFederationSynchronizationPointMessage&&) noexcept = default;
   virtual ~RegisterFederationSynchronizationPointMessage() noexcept = default;
   RegisterFederationSynchronizationPointMessage& operator=(const RegisterFederationSynchronizationPointMessage&) = default;
-  RegisterFederationSynchronizationPointMessage& operator=(RegisterFederationSynchronizationPointMessage&&) noexcept = default;
+  RegisterFederationSynchronizationPointMessage& operator=(RegisterFederationSynchronizationPointMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 30;
@@ -7344,7 +7344,7 @@ public:
   RegisterFederationSynchronizationPointResponseMessage(RegisterFederationSynchronizationPointResponseMessage&&) noexcept = default;
   virtual ~RegisterFederationSynchronizationPointResponseMessage() noexcept = default;
   RegisterFederationSynchronizationPointResponseMessage& operator=(const RegisterFederationSynchronizationPointResponseMessage&) = default;
-  RegisterFederationSynchronizationPointResponseMessage& operator=(RegisterFederationSynchronizationPointResponseMessage&&) noexcept = default;
+  RegisterFederationSynchronizationPointResponseMessage& operator=(RegisterFederationSynchronizationPointResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 31;
@@ -7415,7 +7415,7 @@ public:
   AnnounceSynchronizationPointMessage(AnnounceSynchronizationPointMessage&&) noexcept = default;
   virtual ~AnnounceSynchronizationPointMessage() noexcept = default;
   AnnounceSynchronizationPointMessage& operator=(const AnnounceSynchronizationPointMessage&) = default;
-  AnnounceSynchronizationPointMessage& operator=(AnnounceSynchronizationPointMessage&&) noexcept = default;
+  AnnounceSynchronizationPointMessage& operator=(AnnounceSynchronizationPointMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 32;
@@ -7496,7 +7496,7 @@ public:
   SynchronizationPointAchievedMessage(SynchronizationPointAchievedMessage&&) noexcept = default;
   virtual ~SynchronizationPointAchievedMessage() noexcept = default;
   SynchronizationPointAchievedMessage& operator=(const SynchronizationPointAchievedMessage&) = default;
-  SynchronizationPointAchievedMessage& operator=(SynchronizationPointAchievedMessage&&) noexcept = default;
+  SynchronizationPointAchievedMessage& operator=(SynchronizationPointAchievedMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 33;
@@ -7557,7 +7557,7 @@ public:
   FederationSynchronizedMessage(FederationSynchronizedMessage&&) noexcept = default;
   virtual ~FederationSynchronizedMessage() noexcept = default;
   FederationSynchronizedMessage& operator=(const FederationSynchronizedMessage&) = default;
-  FederationSynchronizedMessage& operator=(FederationSynchronizedMessage&&) noexcept = default;
+  FederationSynchronizedMessage& operator=(FederationSynchronizedMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 34;
@@ -7618,7 +7618,7 @@ public:
   EnableTimeRegulationRequestMessage(EnableTimeRegulationRequestMessage&&) noexcept = default;
   virtual ~EnableTimeRegulationRequestMessage() noexcept = default;
   EnableTimeRegulationRequestMessage& operator=(const EnableTimeRegulationRequestMessage&) = default;
-  EnableTimeRegulationRequestMessage& operator=(EnableTimeRegulationRequestMessage&&) noexcept = default;
+  EnableTimeRegulationRequestMessage& operator=(EnableTimeRegulationRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 40;
@@ -7689,7 +7689,7 @@ public:
   EnableTimeRegulationResponseMessage(EnableTimeRegulationResponseMessage&&) noexcept = default;
   virtual ~EnableTimeRegulationResponseMessage() noexcept = default;
   EnableTimeRegulationResponseMessage& operator=(const EnableTimeRegulationResponseMessage&) = default;
-  EnableTimeRegulationResponseMessage& operator=(EnableTimeRegulationResponseMessage&&) noexcept = default;
+  EnableTimeRegulationResponseMessage& operator=(EnableTimeRegulationResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 41;
@@ -7770,7 +7770,7 @@ public:
   DisableTimeRegulationRequestMessage(DisableTimeRegulationRequestMessage&&) noexcept = default;
   virtual ~DisableTimeRegulationRequestMessage() noexcept = default;
   DisableTimeRegulationRequestMessage& operator=(const DisableTimeRegulationRequestMessage&) = default;
-  DisableTimeRegulationRequestMessage& operator=(DisableTimeRegulationRequestMessage&&) noexcept = default;
+  DisableTimeRegulationRequestMessage& operator=(DisableTimeRegulationRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 42;
@@ -7821,7 +7821,7 @@ public:
   EnableTimeConstrainedNotifyMessage(EnableTimeConstrainedNotifyMessage&&) noexcept = default;
   virtual ~EnableTimeConstrainedNotifyMessage() noexcept = default;
   EnableTimeConstrainedNotifyMessage& operator=(const EnableTimeConstrainedNotifyMessage&) = default;
-  EnableTimeConstrainedNotifyMessage& operator=(EnableTimeConstrainedNotifyMessage&&) noexcept = default;
+  EnableTimeConstrainedNotifyMessage& operator=(EnableTimeConstrainedNotifyMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 100;
@@ -7872,7 +7872,7 @@ public:
   DisableTimeConstrainedNotifyMessage(DisableTimeConstrainedNotifyMessage&&) noexcept = default;
   virtual ~DisableTimeConstrainedNotifyMessage() noexcept = default;
   DisableTimeConstrainedNotifyMessage& operator=(const DisableTimeConstrainedNotifyMessage&) = default;
-  DisableTimeConstrainedNotifyMessage& operator=(DisableTimeConstrainedNotifyMessage&&) noexcept = default;
+  DisableTimeConstrainedNotifyMessage& operator=(DisableTimeConstrainedNotifyMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 101;
@@ -7923,7 +7923,7 @@ public:
   CommitLowerBoundTimeStampMessage(CommitLowerBoundTimeStampMessage&&) noexcept = default;
   virtual ~CommitLowerBoundTimeStampMessage() noexcept = default;
   CommitLowerBoundTimeStampMessage& operator=(const CommitLowerBoundTimeStampMessage&) = default;
-  CommitLowerBoundTimeStampMessage& operator=(CommitLowerBoundTimeStampMessage&&) noexcept = default;
+  CommitLowerBoundTimeStampMessage& operator=(CommitLowerBoundTimeStampMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 43;
@@ -8004,7 +8004,7 @@ public:
   CommitLowerBoundTimeStampResponseMessage(CommitLowerBoundTimeStampResponseMessage&&) noexcept = default;
   virtual ~CommitLowerBoundTimeStampResponseMessage() noexcept = default;
   CommitLowerBoundTimeStampResponseMessage& operator=(const CommitLowerBoundTimeStampResponseMessage&) = default;
-  CommitLowerBoundTimeStampResponseMessage& operator=(CommitLowerBoundTimeStampResponseMessage&&) noexcept = default;
+  CommitLowerBoundTimeStampResponseMessage& operator=(CommitLowerBoundTimeStampResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 44;
@@ -8075,7 +8075,7 @@ public:
   LockedByNextMessageRequestMessage(LockedByNextMessageRequestMessage&&) noexcept = default;
   virtual ~LockedByNextMessageRequestMessage() noexcept = default;
   LockedByNextMessageRequestMessage& operator=(const LockedByNextMessageRequestMessage&) = default;
-  LockedByNextMessageRequestMessage& operator=(LockedByNextMessageRequestMessage&&) noexcept = default;
+  LockedByNextMessageRequestMessage& operator=(LockedByNextMessageRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 45;
@@ -8136,7 +8136,7 @@ public:
   TimeConstrainedEnabledMessage(TimeConstrainedEnabledMessage&&) noexcept = default;
   virtual ~TimeConstrainedEnabledMessage() noexcept = default;
   TimeConstrainedEnabledMessage& operator=(const TimeConstrainedEnabledMessage&) = default;
-  TimeConstrainedEnabledMessage& operator=(TimeConstrainedEnabledMessage&&) noexcept = default;
+  TimeConstrainedEnabledMessage& operator=(TimeConstrainedEnabledMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   virtual void out(std::ostream& os) const override;
@@ -8166,7 +8166,7 @@ public:
   TimeRegulationEnabledMessage(TimeRegulationEnabledMessage&&) noexcept = default;
   virtual ~TimeRegulationEnabledMessage() noexcept = default;
   TimeRegulationEnabledMessage& operator=(const TimeRegulationEnabledMessage&) = default;
-  TimeRegulationEnabledMessage& operator=(TimeRegulationEnabledMessage&&) noexcept = default;
+  TimeRegulationEnabledMessage& operator=(TimeRegulationEnabledMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   virtual void out(std::ostream& os) const override;
@@ -8196,7 +8196,7 @@ public:
   TimeAdvanceGrantedMessage(TimeAdvanceGrantedMessage&&) noexcept = default;
   virtual ~TimeAdvanceGrantedMessage() noexcept = default;
   TimeAdvanceGrantedMessage& operator=(const TimeAdvanceGrantedMessage&) = default;
-  TimeAdvanceGrantedMessage& operator=(TimeAdvanceGrantedMessage&&) noexcept = default;
+  TimeAdvanceGrantedMessage& operator=(TimeAdvanceGrantedMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   virtual void out(std::ostream& os) const override;
@@ -8226,7 +8226,7 @@ public:
   InsertRegionMessage(InsertRegionMessage&&) noexcept = default;
   virtual ~InsertRegionMessage() noexcept = default;
   InsertRegionMessage& operator=(const InsertRegionMessage&) = default;
-  InsertRegionMessage& operator=(InsertRegionMessage&&) noexcept = default;
+  InsertRegionMessage& operator=(InsertRegionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 46;
@@ -8277,7 +8277,7 @@ public:
   CommitRegionMessage(CommitRegionMessage&&) noexcept = default;
   virtual ~CommitRegionMessage() noexcept = default;
   CommitRegionMessage& operator=(const CommitRegionMessage&) = default;
-  CommitRegionMessage& operator=(CommitRegionMessage&&) noexcept = default;
+  CommitRegionMessage& operator=(CommitRegionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 47;
@@ -8328,7 +8328,7 @@ public:
   EraseRegionMessage(EraseRegionMessage&&) noexcept = default;
   virtual ~EraseRegionMessage() noexcept = default;
   EraseRegionMessage& operator=(const EraseRegionMessage&) = default;
-  EraseRegionMessage& operator=(EraseRegionMessage&&) noexcept = default;
+  EraseRegionMessage& operator=(EraseRegionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 48;
@@ -8379,7 +8379,7 @@ public:
   ChangeInteractionClassPublicationMessage(ChangeInteractionClassPublicationMessage&&) noexcept = default;
   virtual ~ChangeInteractionClassPublicationMessage() noexcept = default;
   ChangeInteractionClassPublicationMessage& operator=(const ChangeInteractionClassPublicationMessage&) = default;
-  ChangeInteractionClassPublicationMessage& operator=(ChangeInteractionClassPublicationMessage&&) noexcept = default;
+  ChangeInteractionClassPublicationMessage& operator=(ChangeInteractionClassPublicationMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 50;
@@ -8440,7 +8440,7 @@ public:
   ChangeObjectClassPublicationMessage(ChangeObjectClassPublicationMessage&&) noexcept = default;
   virtual ~ChangeObjectClassPublicationMessage() noexcept = default;
   ChangeObjectClassPublicationMessage& operator=(const ChangeObjectClassPublicationMessage&) = default;
-  ChangeObjectClassPublicationMessage& operator=(ChangeObjectClassPublicationMessage&&) noexcept = default;
+  ChangeObjectClassPublicationMessage& operator=(ChangeObjectClassPublicationMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 51;
@@ -8511,7 +8511,7 @@ public:
   ChangeInteractionClassSubscriptionMessage(ChangeInteractionClassSubscriptionMessage&&) noexcept = default;
   virtual ~ChangeInteractionClassSubscriptionMessage() noexcept = default;
   ChangeInteractionClassSubscriptionMessage& operator=(const ChangeInteractionClassSubscriptionMessage&) = default;
-  ChangeInteractionClassSubscriptionMessage& operator=(ChangeInteractionClassSubscriptionMessage&&) noexcept = default;
+  ChangeInteractionClassSubscriptionMessage& operator=(ChangeInteractionClassSubscriptionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 52;
@@ -8582,7 +8582,7 @@ public:
   ChangeObjectClassSubscriptionMessage(ChangeObjectClassSubscriptionMessage&&) noexcept = default;
   virtual ~ChangeObjectClassSubscriptionMessage() noexcept = default;
   ChangeObjectClassSubscriptionMessage& operator=(const ChangeObjectClassSubscriptionMessage&) = default;
-  ChangeObjectClassSubscriptionMessage& operator=(ChangeObjectClassSubscriptionMessage&&) noexcept = default;
+  ChangeObjectClassSubscriptionMessage& operator=(ChangeObjectClassSubscriptionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 53;
@@ -8653,7 +8653,7 @@ public:
   ChangeObjectInstanceSubscriptionMessage(ChangeObjectInstanceSubscriptionMessage&&) noexcept = default;
   virtual ~ChangeObjectInstanceSubscriptionMessage() noexcept = default;
   ChangeObjectInstanceSubscriptionMessage& operator=(const ChangeObjectInstanceSubscriptionMessage&) = default;
-  ChangeObjectInstanceSubscriptionMessage& operator=(ChangeObjectInstanceSubscriptionMessage&&) noexcept = default;
+  ChangeObjectInstanceSubscriptionMessage& operator=(ChangeObjectInstanceSubscriptionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 99;
@@ -8724,7 +8724,7 @@ public:
   RegistrationForObjectClassMessage(RegistrationForObjectClassMessage&&) noexcept = default;
   virtual ~RegistrationForObjectClassMessage() noexcept = default;
   RegistrationForObjectClassMessage& operator=(const RegistrationForObjectClassMessage&) = default;
-  RegistrationForObjectClassMessage& operator=(RegistrationForObjectClassMessage&&) noexcept = default;
+  RegistrationForObjectClassMessage& operator=(RegistrationForObjectClassMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   virtual void out(std::ostream& os) const override;
@@ -8774,7 +8774,7 @@ public:
   AttributesInScopeMessage(AttributesInScopeMessage&&) noexcept = default;
   virtual ~AttributesInScopeMessage() noexcept = default;
   AttributesInScopeMessage& operator=(const AttributesInScopeMessage&) = default;
-  AttributesInScopeMessage& operator=(AttributesInScopeMessage&&) noexcept = default;
+  AttributesInScopeMessage& operator=(AttributesInScopeMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   virtual void out(std::ostream& os) const override;
@@ -8836,7 +8836,7 @@ public:
   TurnUpdatesOnForInstanceMessage(TurnUpdatesOnForInstanceMessage&&) noexcept = default;
   virtual ~TurnUpdatesOnForInstanceMessage() noexcept = default;
   TurnUpdatesOnForInstanceMessage& operator=(const TurnUpdatesOnForInstanceMessage&) = default;
-  TurnUpdatesOnForInstanceMessage& operator=(TurnUpdatesOnForInstanceMessage&&) noexcept = default;
+  TurnUpdatesOnForInstanceMessage& operator=(TurnUpdatesOnForInstanceMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   virtual void out(std::ostream& os) const override;
@@ -8908,7 +8908,7 @@ public:
   TurnInteractionsOnMessage(TurnInteractionsOnMessage&&) noexcept = default;
   virtual ~TurnInteractionsOnMessage() noexcept = default;
   TurnInteractionsOnMessage& operator=(const TurnInteractionsOnMessage&) = default;
-  TurnInteractionsOnMessage& operator=(TurnInteractionsOnMessage&&) noexcept = default;
+  TurnInteractionsOnMessage& operator=(TurnInteractionsOnMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   virtual void out(std::ostream& os) const override;
@@ -8958,7 +8958,7 @@ public:
   InteractionMessage(InteractionMessage&&) noexcept = default;
   virtual ~InteractionMessage() noexcept = default;
   InteractionMessage& operator=(const InteractionMessage&) = default;
-  InteractionMessage& operator=(InteractionMessage&&) noexcept = default;
+  InteractionMessage& operator=(InteractionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 80;
@@ -9051,7 +9051,7 @@ public:
   TimeStampedInteractionMessage(TimeStampedInteractionMessage&&) noexcept = default;
   virtual ~TimeStampedInteractionMessage() noexcept = default;
   TimeStampedInteractionMessage& operator=(const TimeStampedInteractionMessage&) = default;
-  TimeStampedInteractionMessage& operator=(TimeStampedInteractionMessage&&) noexcept = default;
+  TimeStampedInteractionMessage& operator=(TimeStampedInteractionMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 81;
@@ -9174,7 +9174,7 @@ public:
   ObjectInstanceHandlesRequestMessage(ObjectInstanceHandlesRequestMessage&&) noexcept = default;
   virtual ~ObjectInstanceHandlesRequestMessage() noexcept = default;
   ObjectInstanceHandlesRequestMessage& operator=(const ObjectInstanceHandlesRequestMessage&) = default;
-  ObjectInstanceHandlesRequestMessage& operator=(ObjectInstanceHandlesRequestMessage&&) noexcept = default;
+  ObjectInstanceHandlesRequestMessage& operator=(ObjectInstanceHandlesRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 60;
@@ -9235,7 +9235,7 @@ public:
   ObjectInstanceHandlesResponseMessage(ObjectInstanceHandlesResponseMessage&&) noexcept = default;
   virtual ~ObjectInstanceHandlesResponseMessage() noexcept = default;
   ObjectInstanceHandlesResponseMessage& operator=(const ObjectInstanceHandlesResponseMessage&) = default;
-  ObjectInstanceHandlesResponseMessage& operator=(ObjectInstanceHandlesResponseMessage&&) noexcept = default;
+  ObjectInstanceHandlesResponseMessage& operator=(ObjectInstanceHandlesResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 61;
@@ -9296,7 +9296,7 @@ public:
   ReleaseMultipleObjectInstanceNameHandlePairsMessage(ReleaseMultipleObjectInstanceNameHandlePairsMessage&&) noexcept = default;
   virtual ~ReleaseMultipleObjectInstanceNameHandlePairsMessage() noexcept = default;
   ReleaseMultipleObjectInstanceNameHandlePairsMessage& operator=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage&) = default;
-  ReleaseMultipleObjectInstanceNameHandlePairsMessage& operator=(ReleaseMultipleObjectInstanceNameHandlePairsMessage&&) noexcept = default;
+  ReleaseMultipleObjectInstanceNameHandlePairsMessage& operator=(ReleaseMultipleObjectInstanceNameHandlePairsMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 62;
@@ -9347,7 +9347,7 @@ public:
   ReserveObjectInstanceNameRequestMessage(ReserveObjectInstanceNameRequestMessage&&) noexcept = default;
   virtual ~ReserveObjectInstanceNameRequestMessage() noexcept = default;
   ReserveObjectInstanceNameRequestMessage& operator=(const ReserveObjectInstanceNameRequestMessage&) = default;
-  ReserveObjectInstanceNameRequestMessage& operator=(ReserveObjectInstanceNameRequestMessage&&) noexcept = default;
+  ReserveObjectInstanceNameRequestMessage& operator=(ReserveObjectInstanceNameRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 63;
@@ -9418,7 +9418,7 @@ public:
   ReserveObjectInstanceNameResponseMessage(ReserveObjectInstanceNameResponseMessage&&) noexcept = default;
   virtual ~ReserveObjectInstanceNameResponseMessage() noexcept = default;
   ReserveObjectInstanceNameResponseMessage& operator=(const ReserveObjectInstanceNameResponseMessage&) = default;
-  ReserveObjectInstanceNameResponseMessage& operator=(ReserveObjectInstanceNameResponseMessage&&) noexcept = default;
+  ReserveObjectInstanceNameResponseMessage& operator=(ReserveObjectInstanceNameResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 64;
@@ -9489,7 +9489,7 @@ public:
   ReserveMultipleObjectInstanceNameRequestMessage(ReserveMultipleObjectInstanceNameRequestMessage&&) noexcept = default;
   virtual ~ReserveMultipleObjectInstanceNameRequestMessage() noexcept = default;
   ReserveMultipleObjectInstanceNameRequestMessage& operator=(const ReserveMultipleObjectInstanceNameRequestMessage&) = default;
-  ReserveMultipleObjectInstanceNameRequestMessage& operator=(ReserveMultipleObjectInstanceNameRequestMessage&&) noexcept = default;
+  ReserveMultipleObjectInstanceNameRequestMessage& operator=(ReserveMultipleObjectInstanceNameRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 65;
@@ -9550,7 +9550,7 @@ public:
   ReserveMultipleObjectInstanceNameResponseMessage(ReserveMultipleObjectInstanceNameResponseMessage&&) noexcept = default;
   virtual ~ReserveMultipleObjectInstanceNameResponseMessage() noexcept = default;
   ReserveMultipleObjectInstanceNameResponseMessage& operator=(const ReserveMultipleObjectInstanceNameResponseMessage&) = default;
-  ReserveMultipleObjectInstanceNameResponseMessage& operator=(ReserveMultipleObjectInstanceNameResponseMessage&&) noexcept = default;
+  ReserveMultipleObjectInstanceNameResponseMessage& operator=(ReserveMultipleObjectInstanceNameResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 66;
@@ -9621,7 +9621,7 @@ public:
   InsertObjectInstanceMessage(InsertObjectInstanceMessage&&) noexcept = default;
   virtual ~InsertObjectInstanceMessage() noexcept = default;
   InsertObjectInstanceMessage& operator=(const InsertObjectInstanceMessage&) = default;
-  InsertObjectInstanceMessage& operator=(InsertObjectInstanceMessage&&) noexcept = default;
+  InsertObjectInstanceMessage& operator=(InsertObjectInstanceMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 90;
@@ -9704,7 +9704,7 @@ public:
   DeleteObjectInstanceMessage(DeleteObjectInstanceMessage&&) noexcept = default;
   virtual ~DeleteObjectInstanceMessage() noexcept = default;
   DeleteObjectInstanceMessage& operator=(const DeleteObjectInstanceMessage&) = default;
-  DeleteObjectInstanceMessage& operator=(DeleteObjectInstanceMessage&&) noexcept = default;
+  DeleteObjectInstanceMessage& operator=(DeleteObjectInstanceMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 91;
@@ -9777,7 +9777,7 @@ public:
   TimeStampedDeleteObjectInstanceMessage(TimeStampedDeleteObjectInstanceMessage&&) noexcept = default;
   virtual ~TimeStampedDeleteObjectInstanceMessage() noexcept = default;
   TimeStampedDeleteObjectInstanceMessage& operator=(const TimeStampedDeleteObjectInstanceMessage&) = default;
-  TimeStampedDeleteObjectInstanceMessage& operator=(TimeStampedDeleteObjectInstanceMessage&&) noexcept = default;
+  TimeStampedDeleteObjectInstanceMessage& operator=(TimeStampedDeleteObjectInstanceMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 92;
@@ -9880,7 +9880,7 @@ public:
   AttributeUpdateMessage(AttributeUpdateMessage&&) noexcept = default;
   virtual ~AttributeUpdateMessage() noexcept = default;
   AttributeUpdateMessage& operator=(const AttributeUpdateMessage&) = default;
-  AttributeUpdateMessage& operator=(AttributeUpdateMessage&&) noexcept = default;
+  AttributeUpdateMessage& operator=(AttributeUpdateMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 94;
@@ -9975,7 +9975,7 @@ public:
   TimeStampedAttributeUpdateMessage(TimeStampedAttributeUpdateMessage&&) noexcept = default;
   virtual ~TimeStampedAttributeUpdateMessage() noexcept = default;
   TimeStampedAttributeUpdateMessage& operator=(const TimeStampedAttributeUpdateMessage&) = default;
-  TimeStampedAttributeUpdateMessage& operator=(TimeStampedAttributeUpdateMessage&&) noexcept = default;
+  TimeStampedAttributeUpdateMessage& operator=(TimeStampedAttributeUpdateMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 96;
@@ -10100,7 +10100,7 @@ public:
   RequestAttributeUpdateMessage(RequestAttributeUpdateMessage&&) noexcept = default;
   virtual ~RequestAttributeUpdateMessage() noexcept = default;
   RequestAttributeUpdateMessage& operator=(const RequestAttributeUpdateMessage&) = default;
-  RequestAttributeUpdateMessage& operator=(RequestAttributeUpdateMessage&&) noexcept = default;
+  RequestAttributeUpdateMessage& operator=(RequestAttributeUpdateMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 97;
@@ -10173,7 +10173,7 @@ public:
   RequestClassAttributeUpdateMessage(RequestClassAttributeUpdateMessage&&) noexcept = default;
   virtual ~RequestClassAttributeUpdateMessage() noexcept = default;
   RequestClassAttributeUpdateMessage& operator=(const RequestClassAttributeUpdateMessage&) = default;
-  RequestClassAttributeUpdateMessage& operator=(RequestClassAttributeUpdateMessage&&) noexcept = default;
+  RequestClassAttributeUpdateMessage& operator=(RequestClassAttributeUpdateMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 98;
@@ -10244,7 +10244,7 @@ public:
   QueryAttributeOwnershipRequestMessage(QueryAttributeOwnershipRequestMessage&&) noexcept = default;
   virtual ~QueryAttributeOwnershipRequestMessage() noexcept = default;
   QueryAttributeOwnershipRequestMessage& operator=(const QueryAttributeOwnershipRequestMessage&) = default;
-  QueryAttributeOwnershipRequestMessage& operator=(QueryAttributeOwnershipRequestMessage&&) noexcept = default;
+  QueryAttributeOwnershipRequestMessage& operator=(QueryAttributeOwnershipRequestMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 102;
@@ -10305,7 +10305,7 @@ public:
   QueryAttributeOwnershipResponseMessage(QueryAttributeOwnershipResponseMessage&&) noexcept = default;
   virtual ~QueryAttributeOwnershipResponseMessage() noexcept = default;
   QueryAttributeOwnershipResponseMessage& operator=(const QueryAttributeOwnershipResponseMessage&) = default;
-  QueryAttributeOwnershipResponseMessage& operator=(QueryAttributeOwnershipResponseMessage&&) noexcept = default;
+  QueryAttributeOwnershipResponseMessage& operator=(QueryAttributeOwnershipResponseMessage&&) = default;
 
   virtual const char* getTypeName() const noexcept override;
   static const int OpCode = 103;

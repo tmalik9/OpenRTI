@@ -925,7 +925,7 @@ class StructDataType(DataType):
             constValuePrefix = 'getConstImpl().'
         else:
             # default constructor
-            sourceStream.writeline('{name}()'.format(name = self.getName()) + ' noexcept = default;')
+            sourceStream.writeline('{name}()'.format(name = self.getName()) + ' = default;')
 
             fields = self.getNonConstFieldList()
             fieldCount = len(fields)
@@ -1344,7 +1344,7 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('{name}({name}&&) noexcept = default;'.format(name = self.getName()))
         sourceStream.writeline('virtual ~{name}() noexcept = default;'.format(name = self.getName()))
         sourceStream.writeline('{name}& operator=(const {name}&) = default;'.format(name = self.getName()))
-        sourceStream.writeline('{name}& operator=({name}&&) noexcept = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}& operator=({name}&&) = default;'.format(name = self.getName()))
 
         sourceStream.writeline()
         sourceStream.writeline('virtual const char* getTypeName() const noexcept override;')

@@ -154,8 +154,50 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="ALL_BUILD.vcxproj">
-      <Project>{4cebc18d-bb3c-378a-a973-5d4f86c6ad20}</Project>
+    <ProjectReference Include="tests\OpenRTI\abstimeout\abstimeout.vcxproj">
+      <Project>{dfe59484-71cd-4fca-853c-f427904a3ed1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\OpenRTI\InteractionFilters\InteractionFilters.vcxproj">
+      <Project>{bfd91164-25b0-4aeb-9764-d578590cb17d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\OpenRTI\network\socketaddress.vcxproj">
+      <Project>{cb5c64c0-dc18-3dba-82c4-a545c920800c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\OpenRTI\network\url.vcxproj">
+      <Project>{268054d2-69c7-3696-8dd5-2a8bce54b755}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\OpenRTI\threads\threads.vcxproj">
+      <Project>{239b98cc-6bb3-3948-a238-dbefe657fdcb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\codegen\codegen.vcxproj">
+      <Project>{6d9646e9-9655-4032-aff9-969bc6dd941b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\connect\connect-1516ev.vcxproj">
+      <Project>{782a589e-17bd-4b8d-8f49-6a3517f486a3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\encode\encode.vcxproj">
+      <Project>{4992f120-daf6-4a20-93d4-8919117622f7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\fddget\fddget-1516ev.vcxproj">
+      <Project>{f3fddd4b-f52b-3460-97ba-6bcba24fcdf4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\fddread\fddread-1516ev.vcxproj">
+      <Project>{5b1d8834-c8a0-46d8-91ab-0486703718e7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\link\link-1516ev.vcxproj">
+      <Project>{409e5602-a804-3428-a9a8-3ae9e95d04f8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\modules\modules-1516ev.vcxproj">
+      <Project>{3408918c-28a9-3393-8ec7-0bc04e177ad2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\objectinstance\objectinstance-1516ev.vcxproj">
+      <Project>{71055fb7-0d25-3edf-b09e-9b92830e49ca}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\objectinstance\objectname-1516ev.vcxproj">
+      <Project>{3cf2da46-651a-49c3-baf5-de82738b8ebd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="tests\rti1516ev\reconnect\reconnect-1516ev.vcxproj">
+      <Project>{54ac7146-bdda-4d09-970f-b6d309cf0891}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
