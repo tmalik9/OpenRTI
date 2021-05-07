@@ -142,7 +142,7 @@ if(OPENRTI_BUILD_SHARED)
     #  set_property(TARGET fedtime1516evStub APPEND PROPERTY STATIC_LIBRARY_FLAGS_DEBUG "/DEF /NAME:$<TARGET_FILE:fedtime1516ev>")
     # to get the final target file name as it is produced, but STATIC_LIBRARY_FLAGS does not evaluate generator expressions
     # So use different variants of CMAKE_<CONFIG>_POSTFIX
-    openrti_set_msvc_stub_dll_name(fedtime1516evStub fedtime1516ev)
+    set_target_properties(fedtime1516evStub PROPERTIES STATIC_LIBRARY_FLAGS "/DEF /NAME:fedtime1516ev${CMAKE_DEBUG_POSTFIX}.dll")
     openrti_target_link_private_libraries(rti1516ev fedtime1516evStub OpenRTI)
   elseif(MINGW OR CYGWIN)
     add_library(fedtime1516evStub STATIC ${LIB_FEDTIME1516EV_SOURCES})

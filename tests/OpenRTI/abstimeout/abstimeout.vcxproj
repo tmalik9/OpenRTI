@@ -23,7 +23,6 @@
     <ProjectGuid>{DFE59484-71CD-4FCA-853C-F427904A3ED1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>abstimeout</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
