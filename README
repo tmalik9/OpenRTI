@@ -12,7 +12,7 @@ The key features are:
 * In process RTI.
 * Server tree hierarchy.
 * Shortest path is in memory without copying data.
-* Only depends on a c++98 compiler/stl or newer.
+* Only depends on a c++11 compiler/stl or newer.
 
 
 Installation
@@ -56,8 +56,9 @@ and a usually included stl implementation.
 This aims to ease the installation and should keep potential collisions
 with respect to run time libraries possible required by the calling
 application at a bare minimum.
-OpenRTI requires at least an c++98 implementation, but can be compiled
-also with a c++11 compiler and stl library.
+OpenRTI requires at least an c++11 implementation, but can be compiled
+also with any c++ compiler and stl library with a newer standard.
+NOTE: for this version of OpenRTI c++98 will no longer be sufficient.
 
 OpenRTI can make use of additional components like zlib for on the wire
 compression, that is used if it is available. OpenRTI's on the wire

@@ -1,4 +1,25 @@
- OpenRTI-0.10.0 (development)
+  OpenRTI-2.0.0 (development)
+ ----------------------------
+ 
+ This is a derivative work / spin-off of the original OpenRTI project.
+ Several extensions & updates have been done:
+ * dumped c++98 compatibility in favor of C++11
+ * some extensions to the original RTI services:
+	* interaction subscriptions filtered by parameter values
+	* ability to let the RTI signal a given notification handle when callbacks are available
+	* unsubscribe object instance updates (after these have been discovered)
+ * partial MOM implementation
+ * HLA_IMMEDIATE callback model
+ * full multi-threading safety for in the API
+ * true protocol version checks with provisions for compatability
+ * simplified data type encoding infrastructure, the requirement to have data to be aligned 'on the wire' has been dropped
+ * uncounted bug corrections
+ * a code generator which will generate C++ classes from a FOM's data types definitions. The generated classes can be used to 
+   easily translate between application data objects and encodings to be used for attribute values or interaction parameters.
+Because this spin-off is no longer compatible to the HLA 1516e standard, the API has been put into a new namespace 
+(rti1516ev, as 'enhanced by vector GmbH').
+
+OpenRTI-0.10.0 (development)
  ----------------------------
  
  * Fix logical time interval implementation for rti1516{,e}.
