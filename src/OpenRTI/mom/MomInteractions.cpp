@@ -43,7 +43,7 @@ std::shared_ptr<MomFederate> MomInteractionHandler::getFederateFromParameters(co
   }
   else
   {
-    DebugPrintf("%s: invalid HLAfederate\n");
+    DebugPrintf("%s: invalid HLAfederate\n", __FUNCTION__);
     return std::shared_ptr<MomFederate>();
   }
 }

@@ -79,7 +79,7 @@ InternalAmbassador::~InternalAmbassador() noexcept
   }
   catch (Exception& e)
   {
-    DebugPrintf("%s: %S\n", e.getReason().c_str());
+    DebugPrintf("%s: %s\n", __FUNCTION__, e.getReason().c_str());
   }
   _connect.reset();
 }

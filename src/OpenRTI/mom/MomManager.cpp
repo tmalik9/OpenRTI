@@ -744,7 +744,7 @@ void MomManager::reflectAttributeValues(ObjectInstanceHandle theObject,
   }
   catch (const Exception& e)
   {
-    DebugPrintf("%s: SetAttributeValues on %s failed: %s\n", __FUNCTION__, e.what());
+    DebugPrintf("%s: SetAttributeValues failed: %s\n", __FUNCTION__, e.what());
   }
 }
 

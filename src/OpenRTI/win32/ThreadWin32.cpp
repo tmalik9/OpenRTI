@@ -78,7 +78,7 @@ struct OPENRTI_LOCAL Thread::PrivateData {
       decRef(&thread);
       return false;
     }
-#if (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
+#if defined(_WIN32_WINNT_WIN10) && (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
     if (!thread.getName().empty())
     {
       HRESULT r;

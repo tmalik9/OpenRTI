@@ -393,7 +393,7 @@ std::string
 Federate::ObjectClass::getAttributeDataType(const AttributeHandle& attributeHandle)
 {
   if (_attributeVector.size() <= attributeHandle.getHandle())
-    return 0;
+    return "";
   return _attributeVector[attributeHandle.getHandle()]->getDataType();
 }
 

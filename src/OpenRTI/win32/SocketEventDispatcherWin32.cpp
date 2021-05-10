@@ -76,15 +76,15 @@ struct SocketEventDispatcher::PrivateData
 
     static void DebugPrintSockets(const std::vector<SharedPtr<AbstractSocketEvent>>& sockets, const std::vector<HANDLE>& notificationEvents)
     {
-      DebugPrintf("%s: %d handles:\n", __FUNCTION__, notificationEvents.size());
+      DebugPrintf("%s: %d handles:\n", __FUNCTION__, static_cast<int>(notificationEvents.size()));
       for (size_t i = 0; i < notificationEvents.size(); i++)
       {
-        DebugPrintf("%s: notificationEvents[%d] = 0x%08x\n", __FUNCTION__, i, notificationEvents[i]);
+        DebugPrintf("%s: notificationEvents[%d] = %p\n", __FUNCTION__, static_cast<int>(i), notificationEvents[i]);
       }
-      DebugPrintf("%s: %d sockets:\n", __FUNCTION__, sockets.size());
+      DebugPrintf("%s: %d sockets:\n", __FUNCTION__, static_cast<int>(sockets.size()));
       for (size_t i = 0; i < sockets.size(); i++)
       {
-        DebugPrintf("%s: sockets[%d] = 0x%08x\n", __FUNCTION__, i, sockets[i]->getSocket()->_privateData->_socket);
+        DebugPrintf("%s: sockets[%d] = 0x%08x\n", __FUNCTION__, static_cast<int>(i), static_cast<uint32_t>(sockets[i]->getSocket()->_privateData->_socket));
       }
     }
 
@@ -194,7 +194,7 @@ struct SocketEventDispatcher::PrivateData
             MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
             (LPTSTR)&lpMsgBuf,
             0, NULL);
-          DebugPrintf("%s: WSAWaitForMultipleEvents failed: %S\n", __FUNCTION__, lpMsgBuf);
+          DebugPrintf("%s: WSAWaitForMultipleEvents failed: %S\n", __FUNCTION__, static_cast<const wchar_t*>(lpMsgBuf));
           LocalFree(lpMsgBuf);
           DebugPrintSockets(sockets, notificationEvents);
           retv = -1;
