@@ -4,15 +4,17 @@ artifactoryBuildInfo = Artifactory.newBuildInfo()
 def checkout() {
   stage("Checkout") {
     def checkoutResults = checkout scm
-    //echo '-----> checkout results:\n' + checkoutResults.toString()
-    env.isTag = checkoutResults.SVN_URL.contains('tags')
-    if (env.isTag == "true") {
-      env.tagNr = checkoutResults.SVN_URL.tokenize('/').last()
+    if (env.TAG_NAME) {
+      echo '----> Found TAG_NAME'
+      env.isTag = "true"
+      env.tagNr = env.TAG_NAME
+      echo '------> Tag Name:'
+      echo env.tagNr
     } else {
+      echo '----> No TAG_NAME'
+      env.isTag = "false"
       env.tagNr = "OFF"
     }
-    //echo '-----> env:\n' + sh(script: 'env|sort', returnStdout: true)
-    //echo "-----> Checkout: isTag ${env.isTag} tagNr ${env.tagNr}"
   }
 }
 
