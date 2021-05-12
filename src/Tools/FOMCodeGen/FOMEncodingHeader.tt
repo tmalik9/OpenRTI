@@ -28,7 +28,21 @@ namespace <#=namespacePart#> {
 <#
 foreach (var dataType in FOM.SortedDataTypes)
 {
-  if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
+  if (dataType is FOMParser.SimpleDataType && dataType.Generate)
+  {
+    var simpleDataType = dataType as FOMParser.SimpleDataType;
+#>
+// simple data type <#=simpleDataType.Name#>
+using <#=simpleDataType.Name#>Encoding=<#=simpleDataType.Representation.Encoding#>;
+<#}
+  else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
+  {
+    var enumeratedDataType = dataType as FOMParser.EnumeratedDataType;
+#>
+// enumerated data type <#=enumeratedDataType.Name#>
+using <#=enumeratedDataType.Name#>Encoding=<#=enumeratedDataType.Representation.Encoding#>;
+<#}
+  else if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
   {
     var fixedRecordDataType = dataType as FOMParser.FixedRecordDataType;
     if (dataType.Comment != null && dataType.Comment != "")
