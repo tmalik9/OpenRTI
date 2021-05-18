@@ -2074,6 +2074,36 @@ bool testTightBEEncoding()
   return true;
 }
 
+bool testOpaqueDataEncoding()
+{
+  std::vector<uint8_t> inputValues{
+    0x01, 0x02, 0x03, 0x04,
+    0x10, 0x20, 0x30, 0x40,
+  };
+  //uint8_t buffer[128];
+  //size_t bufferSize = sizeof(buffer);
+  //size_t offset = 0;
+  rti1516ev::HLAopaqueData opaqueDataEncoder1;
+  opaqueDataEncoder1.set(inputValues.data(), inputValues.size());
+  rti1516ev::VariableLengthData encodedData1 = opaqueDataEncoder1.encode();
+  rti1516ev::HLAopaqueData opaqueDataDecoder1;
+  opaqueDataDecoder1.decode(encodedData1);
+  if (gDebugPrint) std::cout << "values=" << inputValues << std::endl;
+  if (gDebugPrint) std::cout << "encodedData1=" << encodedData1 << std::endl;
+  std::vector<uint8_t> decodedValues;
+  decodedValues.assign(opaqueDataDecoder1.get(), opaqueDataDecoder1.get()+ opaqueDataDecoder1.dataLength());
+  if (gDebugPrint) std::cout << "decodedValues=" << decodedValues << std::endl;
+  if (decodedValues != inputValues)
+  {
+    std::cerr << "decoded data does not match initial array:" << std::endl;
+    if (gDebugPrint) std::cout << "values=" << inputValues << std::endl;
+    if (gDebugPrint) std::cout << "decodedValues=" << decodedValues << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -2276,6 +2306,9 @@ main(int argc, char* argv[])
   if (!testDataElementEncoding(HLAobjectClassHandleDataType))
     return EXIT_FAILURE;
   if (!testDataElementEncoding(HLAobjectInstanceHandleDataType))
+    return EXIT_FAILURE;
+
+  if (!testOpaqueDataEncoding())
     return EXIT_FAILURE;
   //Leaktest();
 
