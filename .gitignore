@@ -5,3 +5,12 @@
 *.res
 *.idb
 *.dll
+/build
+/Obj32
+/Obj64
+/out
+/.vs
+/bin
+*.vcxproj.user
+*.csproj.user
+/Testing
