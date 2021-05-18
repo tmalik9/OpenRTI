@@ -15,6 +15,62 @@ namespace FOMCodeGen
       public string Purpose { get; set; }
       public string Copyright { get; set; }
     }
+    public class Attribute
+    {
+      public Attribute(string name)
+      {
+        Name = name;
+      }
+      public string Name { get; set; }
+      public DataType DataType { get; set; }
+    }
+    public class ObjectClass
+    {
+      public ObjectClass(string name)
+      {
+        Name = name;
+        Attributes = new List<Attribute>();
+        ChildClasses = new List<ObjectClass>();
+      }
+      public string Name { get; set; }
+      public string QualifiedName
+      {
+        get
+        {
+          if (BaseClass == null)
+          {
+            return Name;
+          }
+          else
+          {
+            return BaseClass.QualifiedName + "." + Name;
+          }
+        }
+      }
+      public ObjectClass BaseClass { get; set; }
+      public List<ObjectClass> ChildClasses { get; set; }
+      public List<Attribute> Attributes { get; set; }
+    }
+    public class Parameter
+    {
+      public Parameter(string name)
+      {
+        Name = name;
+      }
+      public string Name { get; set; }
+      public DataType DataType { get; set; }
+    }
+    public class InteractionClass
+    {
+      public InteractionClass(string name)
+      {
+        Name = name;
+      }
+      public string Name { get; set; }
+      public InteractionClass BaseClass { get; set; }
+      public List<InteractionClass> ChildClasses { get; set; }
+      public List<Parameter> Parameters { get; set; }
+    }
     public class DataType : IComparable<DataType>
     {
       public DataType(string name)
@@ -100,9 +156,15 @@ namespace FOMCodeGen
     // exists in the OpenRTI API
     public class PredefinedType : DataType
     {
-      public PredefinedType(string name) : base(name)
+      public PredefinedType(string name, string include) : base(name)
       {
         _cppType = "rti1516ev::" + name;
+        _include = include;
+      }
+      public PredefinedType(string name, string include, string cppType) : base(name)
+      {
+        _cppType = cppType;
+        _include = include;
       }
       private string _cppType;
       public override string CPPType
@@ -113,6 +175,11 @@ namespace FOMCodeGen
       {
         get { return "rti1516ev::" + Name; }
       }
+      public string Include
+      {
+        get { return _include; }
+      }
+      private string _include;
     }
     // A SimpleDataType is basically a typedef to a BasicDataRepresentation
     public class SimpleDataType : DataType
@@ -323,13 +390,14 @@ namespace FOMCodeGen
       { "HLAunicodeString", "std::wstring" },
     };
 
-    private Dictionary<string, string> mPredefinedTypes = new Dictionary<string, string>()
+    private List<PredefinedType> mPredefinedTypes = new List<PredefinedType>()
     {
-      {"HLAopaqueData", "#include \"RTI/encoding/HLAopaqueData.h\"" },
-      {"HLAhandle", "#include \"RTI/encoding/HLAhandle.h\"" }
+      new PredefinedType("HLAopaqueData", "#include \"RTI/encoding/HLAopaqueData.h\"", "std::vector<uint8_t>"),
+      new PredefinedType("HLAhandle", "#include \"RTI/encoding/HLAhandle.h\"")
     };
 
     private HashSet<string> mPredefinedTypeIncludes = new HashSet<string>();
+
     public string PredefinedTypeIncludes
     {
       get
@@ -360,15 +428,21 @@ namespace FOMCodeGen
         return string.Join("\n", lines);
       }
     }
+    private List<ObjectClass> mObjectClasses = new List<ObjectClass>();
+    public List<ObjectClass> ObjectClasses
+    {
+      get { return mObjectClasses; }
+    }
     DataType GetDataType(string name)
     {
       if (DataTypes.ContainsKey(name))
       {
-        if (mPredefinedTypes.ContainsKey(name))
+        DataType result = DataTypes[name];
+        if (result is PredefinedType)
         {
-          mPredefinedTypeIncludes.Add(mPredefinedTypes[name]);
+          mPredefinedTypeIncludes.Add((result as PredefinedType).Include);
         }
-        return DataTypes[name];
+        return result;
       }
       else
       {
@@ -376,6 +450,18 @@ namespace FOMCodeGen
         mEncdodingForwardDeclarations.Add("class " + name + "Encoding;");
         return new UnresolvedDataType(name);
       }
+    }
+    bool IsBasicOrPredefinedType(string name)
+    {
+      if (DataTypes.ContainsKey(name))
+      {
+        DataType result = DataTypes[name];
+        if (result is PredefinedType || result is BasicDataRepresentation)
+        {
+          return true;
+        }
+      }
+      return false;
     }
     public static string FormatAsComment(string value, string prefix = "")
     {
@@ -406,6 +492,210 @@ namespace FOMCodeGen
       else
         return x.Index.CompareTo(y.Index);
     }
+    void ParseSimpleDataType(XmlElement simpleDataTypeNode, ref uint index)
+    {
+      string name = simpleDataTypeNode["name"].FirstChild.InnerText;
+      if (IsBasicOrPredefinedType(name))
+      {
+        System.Console.WriteLine("ignoring predefined type {0}", name);
+        return;
+      }
+      string representation = simpleDataTypeNode["representation"].FirstChild.InnerText;
+      var simpleType = new SimpleDataType(name, DataTypes[representation] as BasicDataRepresentation);
+      SortedDataTypes.Add(simpleType);
+      simpleType.Index = index++;
+      simpleType.Generate = (simpleDataTypeNode["nocode"] == null);
+      if (simpleDataTypeNode["semantics"] != null && simpleDataTypeNode["semantics"].FirstChild != null)
+        simpleType.Comment = simpleDataTypeNode["semantics"].FirstChild.InnerText;
+      DataTypes[name] = simpleType;
+    }
+    private void ParseEnumeratedDataType(XmlElement enumeratedDataTypeNode, ref uint index)
+    {
+      string name = enumeratedDataTypeNode["name"].FirstChild.InnerText;
+      if (IsBasicOrPredefinedType(name))
+      {
+        System.Console.WriteLine("ignoring predefined type {0}", name);
+        return;
+      }
+      string representation = enumeratedDataTypeNode["representation"].FirstChild.InnerText;
+      var enumeratedDataType = new EnumeratedDataType(name, DataTypes[representation] as BasicDataRepresentation);
+      foreach (XmlElement enumeratorNode in enumeratedDataTypeNode.SelectNodes("enumerator"))
+      {
+        string enumeratorName = enumeratorNode["name"].FirstChild.InnerText;
+        string enumeratorValue = enumeratorNode["value"].FirstChild.InnerText;
+        enumeratedDataType.Enumerators.Add(enumeratorName, new Enumerator(enumeratorName, enumeratorValue));
+      }
+      enumeratedDataType.Generate = (enumeratedDataTypeNode["nocode"] == null);
+      if (enumeratedDataTypeNode["semantics"] != null && enumeratedDataTypeNode["semantics"].FirstChild != null)
+        enumeratedDataType.Comment = enumeratedDataTypeNode["semantics"].FirstChild.InnerText;
+      DataTypes[name] = enumeratedDataType;
+      SortedDataTypes.Add(enumeratedDataType);
+      enumeratedDataType.Index = index++;
+
+    }
+    private void ParseArrayDataType(XmlElement arrayDataTypeNode, ref uint index)
+    {
+      string name = arrayDataTypeNode["name"].FirstChild.InnerText;
+      if (IsBasicOrPredefinedType(name))
+      {
+        System.Console.WriteLine("ignoring predefined type {0}", name);
+        return;
+      }
+      string dataType = arrayDataTypeNode["dataType"].FirstChild.InnerText;
+      string cardinality = arrayDataTypeNode["cardinality"].FirstChild.InnerText;
+      string encoding = arrayDataTypeNode["encoding"].FirstChild.InnerText;
+      string comment = null;
+      if (arrayDataTypeNode["semantics"] != null && arrayDataTypeNode["semantics"].FirstChild != null)
+        comment = arrayDataTypeNode["semantics"].FirstChild.InnerText;
+      bool generate = (arrayDataTypeNode["nocode"] == null);
+      if (encoding == "HLAvariableArray")
+      {
+        if (cardinality != "Dynamic")
+        {
+          throw new ApplicationException("array with encoding \"HLAvariableArray\" must specify cardinality \"Dynamic\"");
+        }
+        if (dataType == "HLAunicodeChar")
+        {
+          var simpleType = new SimpleDataType(name, DataTypes["HLAunicodeString"] as BasicDataRepresentation);
+          simpleType.Generate = generate;
+          DataTypes[name] = simpleType;
+          SortedDataTypes.Add(simpleType);
+          simpleType.Index = index++;
+        }
+        else
+        {
+          var arrayDataType = new VariableArrayDataType(name, GetDataType(dataType));
+          arrayDataType.Generate = generate;
+          arrayDataType.Comment = comment;
+          DataTypes[name] = arrayDataType;
+          SortedDataTypes.Add(arrayDataType);
+          arrayDataType.Index = index++;
+        }
+      }
+      else if (encoding == "HLAfixedArray")
+      {
+        int result = 0;
+        if (!int.TryParse(cardinality, out result))
+        {
+          throw new ApplicationException("array with encoding \"HLAfixedArray\" must specify integer cardinality");
+        }
+        var arrayDataType = new FixedArrayDataType(name, GetDataType(dataType), cardinality);
+        arrayDataType.Generate = (arrayDataTypeNode["nocode"] == null);
+        if (arrayDataTypeNode["semantics"] != null)
+          arrayDataType.Comment = arrayDataTypeNode["semantics"].FirstChild.InnerText;
+        DataTypes[name] = arrayDataType;
+        SortedDataTypes.Add(arrayDataType);
+        arrayDataType.Index = index++;
+      }
+      else
+      {
+        throw new ApplicationException("encoding must be either \"HLAfixedArray\" or \"HLAvariableArray\"");
+      }
+    }
+    private void ParseFixedRecordDataType(XmlElement fixedRecordDataTypeNode, ref uint index)
+    {
+      string name = fixedRecordDataTypeNode["name"].FirstChild.InnerText;
+      if (IsBasicOrPredefinedType(name))
+      {
+        return;
+      }
+      FixedRecordDataType includedFixedRecordType = null;
+      if (fixedRecordDataTypeNode["include"] != null)
+      {
+        includedFixedRecordType = DataTypes[fixedRecordDataTypeNode["include"].FirstChild.InnerText] as FixedRecordDataType;
+        includedFixedRecordType.HasChilds = true;
+      }
+
+      uint recordVersion = 0;
+      if (fixedRecordDataTypeNode["version"] != null)
+      {
+        string versionString = fixedRecordDataTypeNode["version"].FirstChild.InnerText;
+        if (!uint.TryParse(versionString, out recordVersion))
+        {
+          throw new ApplicationException("record version must be an integer: \"" + versionString + "\"");
+        }
+      }
+      else if (includedFixedRecordType != null)
+      {
+        recordVersion = includedFixedRecordType.Version;
+      }
+      var fixedRecordDataType = new FixedRecordDataType(name, recordVersion);
+      fixedRecordDataType.BaseClass = includedFixedRecordType;
+
+      foreach (XmlElement fieldNode in fixedRecordDataTypeNode.SelectNodes("field"))
+      {
+        string fieldName = fieldNode["name"].FirstChild.InnerText;
+        string fieldDataType = fieldNode["dataType"].FirstChild.InnerText;
+        uint fieldVersion = recordVersion;
+        if (fieldNode["version"] != null)
+        {
+          string versionString = fieldNode["version"].FirstChild.InnerText;
+          if (!uint.TryParse(versionString, out fieldVersion))
+          {
+            throw new ApplicationException("field version must be an integer: \"" + versionString + "\"");
+          }
+        }
+        var field = new FixedRecordField(fieldName, GetDataType(fieldDataType), fieldVersion);
+        if (fieldNode["semantics"] != null && fieldNode["semantics"].FirstChild != null)
+        {
+          field.Comment = fieldNode["semantics"].FirstChild.InnerText;
+        }
+        fixedRecordDataType.Fields.Add(field);
+      }
+      FixedRecordField previousField = null;
+      foreach (var field in fixedRecordDataType.Fields)
+      {
+        if (field.Version > fixedRecordDataType.Version)
+        {
+          throw new ApplicationException(string.Format("fixed record \"{0}\" version {1}, field \"{2}\" version {3}: field version must be lower or equal to record version",
+            fixedRecordDataType.Name, fixedRecordDataType.Version, field.Name, field.Version));
+        }
+        if (previousField != null && previousField.Version > field.Version)
+        {
+          throw new ApplicationException(string.Format("fixed record \"{0}\", field \"{1}\" version {2}: field version must be greater or equal to previous field \"{3}\" version {4}",
+            fixedRecordDataType.Name, field.Name, field.Version, previousField.Name, previousField.Version));
+        }
+        previousField = field;
+      }
+      fixedRecordDataType.Generate = (fixedRecordDataTypeNode["nocode"] == null);
+      if (fixedRecordDataTypeNode["semantics"] != null)
+      {
+        fixedRecordDataType.Comment = fixedRecordDataTypeNode["semantics"].FirstChild.InnerText;
+      }
+      DataTypes[name] = fixedRecordDataType;
+      SortedDataTypes.Add(fixedRecordDataType);
+      fixedRecordDataType.Index = index++;
+    }
+    void ParseObjectClasses(XmlElement objectClassNode, ObjectClass baseClass)
+    {
+      string name = objectClassNode["name"].FirstChild.InnerText;
+      ObjectClass objectClass = new ObjectClass(name);
+      objectClass.BaseClass = baseClass;
+      var attributeNodes = objectClassNode.SelectNodes("attribute");
+      System.Console.WriteLine("object class {0}", objectClass.QualifiedName);
+      mObjectClasses.Add(objectClass);
+      foreach (XmlElement attributeNode in attributeNodes)
+      {
+        string attributeName = attributeNode["name"].FirstChild.InnerText;
+        Attribute attribute = new Attribute(attributeName);
+        objectClass.Attributes.Add(attribute);
+        if (attributeNode["dataType"] != null)
+        {
+          DataType dataType = GetDataType(attributeNode["dataType"].FirstChild.InnerText);
+          System.Console.WriteLine("\tattribute {0} type {1}", attributeName, dataType.ToString());
+          attribute.DataType = dataType;
+        }
+        else
+        {
+          System.Console.WriteLine("\tattribute {0}", attributeName);
+        }
+      }
+      var childClassNodes = objectClassNode.SelectNodes("objectClass");
+      foreach (var childClass in childClassNodes)
+      {
+        ParseObjectClasses(childClass as XmlElement, objectClass);
+      }
+    }
     public FOMParser(string filename, string enclosingNamespace)
     {
       DataTypes = new Dictionary<string, DataType>();
@@ -415,9 +705,9 @@ namespace FOMCodeGen
       {
         DataTypes.Add(entry.Key, new BasicDataRepresentation(entry.Key, entry.Value));
       }
-      foreach (var entry in mPredefinedTypes)
+      foreach (var predefinedType in mPredefinedTypes)
       {
-        DataTypes.Add(entry.Key, new PredefinedType(entry.Key));
+        DataTypes.Add(predefinedType.Name, predefinedType);
       }
       Filename = filename;
       Namespace = enclosingNamespace.Split('.');
@@ -451,187 +741,30 @@ namespace FOMCodeGen
           ModelIdentification.Copyright = modelIdentificationNode["copyright"].FirstChild.InnerText;
         }
       }
+
       var simpleDataTypeNodes = doc.DocumentElement.SelectNodes("/objectModel/dataTypes/simpleDataTypes/simpleData");
       foreach (XmlElement simpleDataTypeNode in simpleDataTypeNodes)
       {
-        string name = simpleDataTypeNode["name"].FirstChild.InnerText;
-        if (mBasicDataRepresentations.ContainsKey(name) || mPredefinedTypes.ContainsKey(name))
-        {
-          System.Console.WriteLine("ignoring predefined type {0}", name);
-          continue;
-        }
-        string representation = simpleDataTypeNode["representation"].FirstChild.InnerText;
-        var simpleType = new SimpleDataType(name, DataTypes[representation] as BasicDataRepresentation);
-        SortedDataTypes.Add(simpleType);
-        simpleType.Index = index++;
-        simpleType.Generate = (simpleDataTypeNode["nocode"] == null);
-        if (simpleDataTypeNode["semantics"] != null && simpleDataTypeNode["semantics"].FirstChild != null)
-          simpleType.Comment = simpleDataTypeNode["semantics"].FirstChild.InnerText;
-        DataTypes[name] = simpleType;
+        ParseSimpleDataType(simpleDataTypeNode, ref index);
       }
 
       var enumeratedDataTypeNodes = doc.DocumentElement.SelectNodes("/objectModel/dataTypes/enumeratedDataTypes/enumeratedData");
       foreach (XmlElement enumeratedDataTypeNode in enumeratedDataTypeNodes)
       {
-        string name = enumeratedDataTypeNode["name"].FirstChild.InnerText;
-        if (mBasicDataRepresentations.ContainsKey(name) || mPredefinedTypes.ContainsKey(name))
-        {
-          System.Console.WriteLine("ignoring predefined type {0}", name);
-          continue;
-        }
-        string representation = enumeratedDataTypeNode["representation"].FirstChild.InnerText;
-        var enumeratedDataType = new EnumeratedDataType(name, DataTypes[representation] as BasicDataRepresentation);
-        foreach (XmlElement enumeratorNode in enumeratedDataTypeNode.SelectNodes("enumerator"))
-        {
-          string enumeratorName = enumeratorNode["name"].FirstChild.InnerText;
-          string enumeratorValue = enumeratorNode["value"].FirstChild.InnerText;
-          enumeratedDataType.Enumerators.Add(enumeratorName, new Enumerator(enumeratorName, enumeratorValue));
-        }
-        enumeratedDataType.Generate = (enumeratedDataTypeNode["nocode"] == null);
-        if (enumeratedDataTypeNode["semantics"] != null && enumeratedDataTypeNode["semantics"].FirstChild != null)
-          enumeratedDataType.Comment = enumeratedDataTypeNode["semantics"].FirstChild.InnerText;
-        DataTypes[name] = enumeratedDataType;
-        SortedDataTypes.Add(enumeratedDataType);
-        enumeratedDataType.Index = index++;
+        ParseEnumeratedDataType(enumeratedDataTypeNode, ref index);
       }
 
       var arrayDataTypeNodes = doc.DocumentElement.SelectNodes("/objectModel/dataTypes/arrayDataTypes/arrayData");
       foreach (XmlElement arrayDataTypeNode in arrayDataTypeNodes)
       {
-        string name = arrayDataTypeNode["name"].FirstChild.InnerText;
-        if (mBasicDataRepresentations.ContainsKey(name) || mPredefinedTypes.ContainsKey(name))
-        {
-          System.Console.WriteLine("ignoring predefined type {0}", name);
-          continue;
-        }
-        string dataType = arrayDataTypeNode["dataType"].FirstChild.InnerText;
-        string cardinality = arrayDataTypeNode["cardinality"].FirstChild.InnerText;
-        string encoding = arrayDataTypeNode["encoding"].FirstChild.InnerText;
-        string comment = null;
-        if (arrayDataTypeNode["semantics"] != null && arrayDataTypeNode["semantics"].FirstChild != null)
-          comment = arrayDataTypeNode["semantics"].FirstChild.InnerText;
-        bool generate = (arrayDataTypeNode["nocode"] == null);
-        if (encoding == "HLAvariableArray")
-        {
-          if (cardinality != "Dynamic")
-          {
-            throw new ApplicationException("array with encoding \"HLAvariableArray\" must specify cardinality \"Dynamic\"");
-          }
-          if (dataType == "HLAunicodeChar")
-          {
-            var simpleType = new SimpleDataType(name, DataTypes["HLAunicodeString"] as BasicDataRepresentation);
-            simpleType.Generate = generate;
-            DataTypes[name] = simpleType;
-            SortedDataTypes.Add(simpleType);
-            simpleType.Index = index++;
-          }
-          else
-          {
-            var arrayDataType = new VariableArrayDataType(name, GetDataType(dataType));
-            arrayDataType.Generate = generate;
-            arrayDataType.Comment = comment;
-            DataTypes[name] = arrayDataType;
-            SortedDataTypes.Add(arrayDataType);
-            arrayDataType.Index = index++;
-          }
-        }
-        else if (encoding == "HLAfixedArray")
-        {
-          int result = 0;
-          if (!int.TryParse(cardinality, out result))
-          {
-            throw new ApplicationException("array with encoding \"HLAfixedArray\" must specify integer cardinality");
-          }
-          var arrayDataType = new FixedArrayDataType(name, GetDataType(dataType), cardinality);
-          arrayDataType.Generate = (arrayDataTypeNode["nocode"] == null);
-          if (arrayDataTypeNode["semantics"] != null)
-            arrayDataType.Comment = arrayDataTypeNode["semantics"].FirstChild.InnerText;
-          DataTypes[name] = arrayDataType;
-          SortedDataTypes.Add(arrayDataType);
-          arrayDataType.Index = index++;
-        }
-        else
-        {
-          throw new ApplicationException("encoding must be either \"HLAfixedArray\" or \"HLAvariableArray\"");
-        }
+        ParseArrayDataType(arrayDataTypeNode, ref index);
       }
 
       var fixedRecordDataTypeNodes = doc.DocumentElement.SelectNodes("/objectModel/dataTypes/fixedRecordDataTypes/fixedRecordData");
       foreach (XmlElement fixedRecordDataTypeNode in fixedRecordDataTypeNodes)
       {
-        string name = fixedRecordDataTypeNode["name"].FirstChild.InnerText;
-        if (mBasicDataRepresentations.ContainsKey(name) || mPredefinedTypes.ContainsKey(name))
-        {
-          continue;
-        }
-        FixedRecordDataType includedFixedRecordType = null;
-        if (fixedRecordDataTypeNode["include"] != null)
-        {
-          includedFixedRecordType = DataTypes[fixedRecordDataTypeNode["include"].FirstChild.InnerText] as FixedRecordDataType;
-          includedFixedRecordType.HasChilds = true;
-        }
-
-        uint recordVersion = 0;
-        if (fixedRecordDataTypeNode["version"] != null)
-        {
-          string versionString = fixedRecordDataTypeNode["version"].FirstChild.InnerText;
-          if (!uint.TryParse(versionString, out recordVersion))
-          {
-            throw new ApplicationException("record version must be an integer: \"" + versionString + "\"");
-          }
-        }
-        else if (includedFixedRecordType != null)
-        {
-          recordVersion = includedFixedRecordType.Version;
-        }
-        var fixedRecordDataType = new FixedRecordDataType(name, recordVersion);
-        fixedRecordDataType.BaseClass = includedFixedRecordType;
-
-        foreach (XmlElement fieldNode in fixedRecordDataTypeNode.SelectNodes("field"))
-        {
-          string fieldName = fieldNode["name"].FirstChild.InnerText;
-          string fieldDataType = fieldNode["dataType"].FirstChild.InnerText;
-          uint fieldVersion = recordVersion;
-          if (fieldNode["version"] != null)
-          {
-            string versionString = fieldNode["version"].FirstChild.InnerText;
-            if (!uint.TryParse(versionString, out fieldVersion))
-            {
-              throw new ApplicationException("field version must be an integer: \"" + versionString + "\"");
-            }
-          }
-          var field = new FixedRecordField(fieldName, GetDataType(fieldDataType), fieldVersion);
-          if (fieldNode["semantics"] != null && fieldNode["semantics"].FirstChild != null)
-          {
-            field.Comment = fieldNode["semantics"].FirstChild.InnerText;
-          }
-          fixedRecordDataType.Fields.Add(field);
-        }
-        FixedRecordField previousField = null;
-        foreach (var field in fixedRecordDataType.Fields)
-        {
-          if (field.Version > fixedRecordDataType.Version)
-          {
-            throw new ApplicationException(string.Format("fixed record \"{0}\" version {1}, field \"{2}\" version {3}: field version must be lower or equal to record version",
-              fixedRecordDataType.Name, fixedRecordDataType.Version, field.Name, field.Version));
-          }
-          if (previousField != null && previousField.Version > field.Version)
-          {
-            throw new ApplicationException(string.Format("fixed record \"{0}\", field \"{1}\" version {2}: field version must be greater or equal to previous field \"{3}\" version {4}",
-              fixedRecordDataType.Name, field.Name, field.Version, previousField.Name, previousField.Version));
-          }
-          previousField = field;
-        }
-        fixedRecordDataType.Generate = (fixedRecordDataTypeNode["nocode"] == null);
-        if (fixedRecordDataTypeNode["semantics"] != null)
-        {
-          fixedRecordDataType.Comment = fixedRecordDataTypeNode["semantics"].FirstChild.InnerText;
-        }
-        DataTypes[name] = fixedRecordDataType;
-        SortedDataTypes.Add(fixedRecordDataType);
-        fixedRecordDataType.Index = index++;
+        ParseFixedRecordDataType(fixedRecordDataTypeNode, ref index);
       }
-
       foreach (DataType dataType in DataTypes.Values)
       {
         dataType.Resolve(DataTypes);
@@ -645,6 +778,16 @@ namespace FOMCodeGen
       {
         System.Console.WriteLine("{0} {1}", SortedDataTypes.IndexOf(dataType), dataType.Name);
       }
+
+      var objectClassNodes = doc.DocumentElement.SelectNodes("/objectModel/objects/objectClass");
+      if (objectClassNodes.Count != 1)
+      {
+        throw new ApplicationException(string.Format("unexpected FOM format: there should be exactly one objectClass root node, named \"HLAobjectRoot\""));
+      }
+      var objectRootNode = objectClassNodes.Item(0) as XmlElement;
+      ParseObjectClasses(objectRootNode, null);
+
     }
+
   }
 }
