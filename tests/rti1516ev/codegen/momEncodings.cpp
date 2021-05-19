@@ -1,5 +1,5 @@
 
-// Code automatically generated from D:\vfs\CANoe\release\15.2\Projects_Source\OpenRTI-rti1516ev\tests\rti1516ev\codegen\\mom.xml, do not edit
+// Code automatically generated from D:\vfs\OpenRTI-codegen\tests\rti1516ev\codegen\\mom.xml, do not edit
 
 #include <vector>
 #include <cstring>

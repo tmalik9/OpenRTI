@@ -133,11 +133,9 @@ public:
     _buffer.assign(inData, inData + dataSize);
   }
 
-  const Octet* get() const
+  const std::vector<Octet>& get() const
   {
-    if (_buffer.empty())
-      return 0;
-    return &_buffer.front();
+    return _buffer;
   }
 
   std::vector<Octet> _buffer;
@@ -258,7 +256,13 @@ HLAopaqueData::set(const Octet* inData, size_t dataSize)
   _impl->set(inData, dataSize);
 }
 
-const Octet*
+void
+HLAopaqueData::set(const std::vector<Octet>& inData)
+{
+  _impl->set(inData);
+}
+
+const std::vector<Octet>&
 HLAopaqueData::get() const
 {
   return _impl->get();
@@ -266,7 +270,14 @@ HLAopaqueData::get() const
 
 HLAopaqueData::operator const Octet*() const
 {
-  return _impl->get();
+  if (_impl->size() > 0)
+  {
+    return _impl->get().data();
+  }
+  else
+  {
+    return nullptr;
+  }
 }
 
 }

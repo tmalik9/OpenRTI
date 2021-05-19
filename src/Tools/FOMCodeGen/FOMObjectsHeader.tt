@@ -8,7 +8,14 @@
 #pragma once
 
 #include <vector>
+#include "RTI/Handle.h"
+#include "RTI/RTIambassador.h"
+#include "RTI/encoding/BasicDataElements.h"
+#include "RTI/encoding/HLAfixedRecord.h"
+#include "RTI/encoding/HLAfixedArray.h"
+#include "RTI/encoding/HLAvariableArray.h"
 <#=FOM.PredefinedTypeIncludes#>
+#include "<#=EncodingHeaderFilename#>"
 
 <#
 foreach (var namespacePart in FOM.Namespace)
@@ -20,6 +27,66 @@ namespace <#=namespacePart#> {
 foreach (var objectClass in FOM.ObjectClasses)
 {
 #>
+class <#=objectClass.Name#>;
+class <#=objectClass.Name#>ObjectClass
+{
+  public:
+<#
+  if (objectClass.BaseClass != null)
+  {
+#>
+    <#=objectClass.Name#>ObjectClass(rti1516ev::RTIambassador* rtiAmbassador, <#=objectClass.BaseClass.Name#>ObjectClass* baseClass);
+
+<# } else {#>
+    <#=objectClass.Name#>ObjectClass(rti1516ev::RTIambassador* rtiAmbassador);
+<# } #>
+<# 
+  foreach (var attribute in objectClass.Attributes)
+  {
+    if (attribute.DataType != null)
+    {
+#>    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
+    rti1516ev::AttributeHandle Get<#=attribute.Name#>AttributeHandle() const { return m<#=attribute.Name#>AttributeHandle; }
+<#  } else {
+#>    // attribute <#=attribute.Name#> : no data type
+<#  
+    } // if (attribute.DataType != null)
+  } // foreach (var attribute in objectClass.Attributes)
+#>
+    void Publish();
+    void Unpublish();
+    void Subscribe();
+    void Unsubscribe();
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    <#=objectClass.Name#>* GetObjectInstance(const std::wstring& instanceName);
+    <#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName);
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+<# if (objectClass.BaseClass != null) { #>
+    <#=objectClass.BaseClass.Name#>ObjectClass* mBaseClass;
+<# } #>
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+<# 
+  foreach (var attribute in objectClass.Attributes)
+  {
+    if (attribute.DataType != null)
+    {
+#>    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
+    rti1516ev::AttributeHandle m<#=attribute.Name#>AttributeHandle;
+<#  } else {
+#>    // attribute <#=attribute.Name#> : no data type
+<#  
+    } // if (attribute.DataType != null)
+  } // foreach (var attribute in objectClass.Attributes)
+#>
+  std::map<std::wstring, <#=objectClass.Name#>*> mObjectInstancesByName;
+};
+
 class <#=objectClass.Name#><#
   if (objectClass.BaseClass != null)
   {
@@ -29,9 +96,33 @@ class <#=objectClass.Name#><#
 
 <# } // if #>
 {
+<# 
+  string attributeBitsClass = "uint32_t";
+  string attributeBitsPostfix = "";
+  if (objectClass.Attributes.Count > 32)
+  {
+    attributeBitsClass = "uint64_t";
+    attributeBitsPostfix = "ull";
+  }
+#>
   public:
+    using AttributeBits = <#=attributeBitsClass#>;
+    static const <#=attributeBitsClass#> kNone = 0x0;
+<# 
+  ulong bit = 1;
+  foreach (var attribute in objectClass.Attributes)
+  {
+    if (attribute.DataType != null)
+    { #>
+    static const <#=attributeBitsClass#> k<#=attribute.Name#>Bit = 0x<#=bit.ToString("X")#><#=attributeBitsPostfix#>;
+<#    bit = bit << 1;
+    } // if (attribute.DataType != null)
+  } // foreach (var attribute in objectClass.Attributes)
+#>
+
     <#=objectClass.Name#>();
-    ~<#=objectClass.Name#>() = default;
+    <#=objectClass.Name#>(rti1516ev::RTIambassador* ambassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle);
+    ~<#=objectClass.Name#>();
     <#=objectClass.Name#>(const <#=objectClass.Name#>&) = delete;
     <#=objectClass.Name#>(<#=objectClass.Name#>&&) = delete;
     <#=objectClass.Name#>& operator=(const <#=objectClass.Name#>&) = delete;
@@ -43,7 +134,7 @@ class <#=objectClass.Name#><#
     if (attribute.DataType != null)
     {
 #>    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
-    <#=attribute.DataType.CPPType#> Get<#=attribute.Name#>() const;
+    <#=attribute.DataType.ReturnCppType#> Get<#=attribute.Name#>() const;
     void Set<#=attribute.Name#>(<#=attribute.DataType.CPPType#> newValue);
 <#  } else {
 #>    // attribute <#=attribute.Name#> : no data type
@@ -51,22 +142,52 @@ class <#=objectClass.Name#><#
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
 #>
+     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
+<# if (objectClass.HasValidAttributes) { #>
+     void reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+<# } #>
+     AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
   private:
+    // modified by last reflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    std::wstring mInstanceName;
+    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    <#=objectClass.Name#>ObjectClass* mObjectClass;
+    // Attribute value encoders
 <# 
   foreach (var attribute in objectClass.Attributes)
   {
     if (attribute.DataType != null)
     {
 #>    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
-    <#=attribute.DataType.Encoding#> m<#=attribute.Name#>Encoder;
+    <#=attribute.DataType.Encoding#> m<#=attribute.Name#>;
 <#  } else {
 #>    // attribute <#=attribute.Name#> : no data type
 <#  
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
-#>};
+#>
+};
 
 <# } // foreach (var objectClass in FOM.ObjectClasses) #> 
+
+class ClassRegistry
+{
+  public:
+<# foreach (var objectClass in FOM.ObjectClasses) { #>
+    <#=objectClass.Name#>ObjectClass* get<#=objectClass.Name#>ObjectClass() const { return m<#=objectClass.Name#>ObjectClass.get(); }
+<# } #>
+
+    void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
+
+  private:
+<# foreach (var objectClass in FOM.ObjectClasses) { #>
+    std::unique_ptr<<#=objectClass.Name#>ObjectClass> m<#=objectClass.Name#>ObjectClass;
+<# } #>
+}; // class ClassRegistry
 
 <#
 foreach (var namespacePart in FOM.Namespace)

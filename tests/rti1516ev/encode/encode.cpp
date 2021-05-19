@@ -618,7 +618,7 @@ equal(const rti1516ev::HLAopaqueData& left, const rti1516ev::HLAopaqueData& righ
 {
   if (left.dataLength() != right.dataLength())
     return false;
-  return 0 == std::memcmp(left.get(), right.get(), left.dataLength());
+  return 0 == std::memcmp(left.get().data(), right.get().data(), left.dataLength());
 }
 
 bool
@@ -2091,7 +2091,7 @@ bool testOpaqueDataEncoding()
   if (gDebugPrint) std::cout << "values=" << inputValues << std::endl;
   if (gDebugPrint) std::cout << "encodedData1=" << encodedData1 << std::endl;
   std::vector<uint8_t> decodedValues;
-  decodedValues.assign(opaqueDataDecoder1.get(), opaqueDataDecoder1.get()+ opaqueDataDecoder1.dataLength());
+  decodedValues = opaqueDataDecoder1.get();
   if (gDebugPrint) std::cout << "decodedValues=" << decodedValues << std::endl;
   if (decodedValues != inputValues)
   {

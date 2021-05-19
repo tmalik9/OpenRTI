@@ -16,6 +16,12 @@
     <ClCompile Include="momEncodings.cpp">
       <Filter>generated source files</Filter>
     </ClCompile>
+    <ClCompile Include="RTFederateEncodings.cpp">
+      <Filter>generated source files</Filter>
+    </ClCompile>
+    <ClCompile Include="RTFederateObjects.cpp">
+      <Filter>generated source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="momDataTypes.h">
@@ -24,8 +30,18 @@
     <ClInclude Include="momEncodings.h">
       <Filter>generated source files</Filter>
     </ClInclude>
+    <ClInclude Include="RTFederateDataTypes.h">
+      <Filter>generated source files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTFederateEncodings.h">
+      <Filter>generated source files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTFederateObjects.h">
+      <Filter>generated source files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mom.xml" />
+    <CustomBuild Include="RTFederate.xml" />
   </ItemGroup>
 </Project>

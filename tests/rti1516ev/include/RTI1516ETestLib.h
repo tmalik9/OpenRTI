@@ -768,6 +768,7 @@ public:
   {
   }
 
+  rti1516ev::RTIambassador* getRtiAmbassador() const { return _ambassador.get(); }
   void setUseDataUrlObjectModels(bool useDataUrlObjectModels)
   { _useDataUrlObjectModels = useDataUrlObjectModels; }
   bool getUseDataUrlObjectModels() const

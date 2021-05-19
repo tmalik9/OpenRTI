@@ -112,25 +112,52 @@
   <ItemGroup>
     <ClCompile Include="codegen.cpp" />
     <ClCompile Include="momEncodings.cpp" />
+    <ClCompile Include="RTFederateEncodings.cpp" />
+    <ClCompile Include="RTFederateObjects.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mom.xml">
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\mom.xml OpenRTI.Mom</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">generating code: mom.xml</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">momDataTypes.h;momEncodings.h</Outputs>
+      <Command>$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\mom.xml OpenRTI.Mom</Command>
+      <Message>generating code: mom.xml</Message>
+      <Outputs>momDataTypes.h;momEncodings.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">momDataTypes.h;momEncodings.h;momEncodings.cpp;momObjects.h;momObjects.cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">momDataTypes.h;momEncodings.h;momEncodings.cpp;momObjects.h;momObjects.cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">momDataTypes.h;momEncodings.h;momEncodings.cpp;momObjects.h;momObjects.cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">momDataTypes.h;momEncodings.h;momEncodings.cpp;momObjects.h;momObjects.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">generating code: %(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">generating code: %(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">generating code: %(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">generating code: %(Identity)</Message>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="momDataTypes.h" />
     <ClInclude Include="momEncodings.h" />
+    <ClInclude Include="RTFederateDataTypes.h" />
+    <ClInclude Include="RTFederateEncodings.h" />
+    <ClInclude Include="RTFederateObjects.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\OpenRTI\OpenRTI.vcxproj">
+      <Project>{1a1a66b8-408a-301f-aa77-dfd4708c8c6e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\rti1516ev\fedtime1516ev.vcxproj">
       <Project>{ac5b586d-f120-3715-bc9c-fc80dd945c84}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\rti1516ev\rti1516ev.vcxproj">
       <Project>{dee8a809-6531-30d3-9292-e70c38ed75fc}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="RTFederate.xml">
+      <Command>$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistributedSimulation.NRTFederateEncoding</Command>
+      <Outputs>%(Filename)DataTypes.h;%(Filename)Encodings.h;%(Filename)Encodings.cpp;%(Filename)Objects.h;%(Filename)Objects.cpp</Outputs>
+      <Message>generating %(Filename)DataTypes.h;%(Filename)Encodings.h;%(Filename)Encodings.cpp;%(Filename)Objects.h;%(Filename)Objects.cpp from %(Identity)</Message>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

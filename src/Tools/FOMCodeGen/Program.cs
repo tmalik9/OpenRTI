@@ -69,7 +69,7 @@ namespace FOMCodeGen
         String encodingsImplContent = encodingsImpl.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(encodingsImplFilename, encodingsImplContent);
 
-        FOMObjectsHeader objectsHeader = new FOMObjectsHeader(fom, objectsHeaderFilename);
+        FOMObjectsHeader objectsHeader = new FOMObjectsHeader(fom, objectsHeaderFilename, encodingsHeaderFilename);
         String objectsHeaderContent = objectsHeader.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(objectsHeaderFilename, objectsHeaderContent);
 

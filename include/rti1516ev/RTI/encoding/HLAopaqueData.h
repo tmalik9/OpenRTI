@@ -119,8 +119,9 @@ namespace rti1516ev
          const Octet* inData,
          size_t dataSize);
 
+      void set(const std::vector<Octet>& inData);
       // Return a reference to the contained array
-      virtual const Octet* get () const;
+      virtual const std::vector<Octet>& get () const;
 
       // Conversion operator to std::vector<Octet>
       // Value returned is from encoded data.

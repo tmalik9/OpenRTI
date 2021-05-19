@@ -50,6 +50,17 @@ namespace FOMCodeGen
       public ObjectClass BaseClass { get; set; }
       public List<ObjectClass> ChildClasses { get; set; }
       public List<Attribute> Attributes { get; set; }
+      public bool HasValidAttributes
+      {
+        get
+        {
+          foreach (var attribute in Attributes)
+          {
+            if (attribute.DataType != null) return true;
+          }
+          return false;
+        }
+      }
     }
     public class Parameter
     {
@@ -85,6 +96,8 @@ namespace FOMCodeGen
       {
         return false;
       }
+      // does the encoding class of this type have 'get/set' methods?
+      public virtual bool CanTranslateToCpp { get { return true; } }
       // The name of the data type, as specified in the FOM
       public string Name { get; set; }
       public uint Index { get; set; }
@@ -174,6 +187,14 @@ namespace FOMCodeGen
       public override string Encoding
       {
         get { return "rti1516ev::" + Name; }
+      }
+      public override bool CanTranslateToCpp
+      {
+        get {
+          if (Name == "HLAopaqueData")
+            return true;
+          return false;
+        }
       }
       public string Include
       {
@@ -672,7 +693,6 @@ namespace FOMCodeGen
       ObjectClass objectClass = new ObjectClass(name);
       objectClass.BaseClass = baseClass;
       var attributeNodes = objectClassNode.SelectNodes("attribute");
-      System.Console.WriteLine("object class {0}", objectClass.QualifiedName);
       mObjectClasses.Add(objectClass);
       foreach (XmlElement attributeNode in attributeNodes)
       {
@@ -682,12 +702,7 @@ namespace FOMCodeGen
         if (attributeNode["dataType"] != null)
         {
           DataType dataType = GetDataType(attributeNode["dataType"].FirstChild.InnerText);
-          System.Console.WriteLine("\tattribute {0} type {1}", attributeName, dataType.ToString());
           attribute.DataType = dataType;
-        }
-        else
-        {
-          System.Console.WriteLine("\tattribute {0}", attributeName);
         }
       }
       var childClassNodes = objectClassNode.SelectNodes("objectClass");

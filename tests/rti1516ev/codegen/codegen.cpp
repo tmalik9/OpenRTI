@@ -1,10 +1,19 @@
 
+#include <algorithm>
+#include <cstring>
+#include <string>
+#include <memory>
+
+#include <iostream>
+
 #include <iostream>
 
 #include "momDataTypes.h"
 #include "momEncodings.h"
 #include "../../../src/rti1516ev/HandleFactory.h"
 #include "RTI1516ETestLib.h"
+
+#include "RTFederateObjects.h"
 
 template<typename TInputIter>
 static inline std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercase = true, bool insert_spaces = false)
@@ -52,6 +61,8 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const rti1516ev::Vari
   }
   return os;
 }
+
+constexpr bool gDebugPrint = true;
 
 using namespace rti1516ev;
 bool testHLAhandleListEncoding()
@@ -116,11 +127,136 @@ bool testHLAobjectClassBasedCountsEncoding()
   return true;
 }
 
-int main(int /*argc*/, char* /*argv*/[])
+bool testRTFederate(int argc, char* argv[])
+{
+  OpenRTI::Options options(argc, argv);
+  std::wstring fomModule = L"RTFederate.xml";
+  std::wstring federationExecutionName = L"test";
+
+  std::vector<std::wstring> args;
+  while (options.next("F:O:")) {
+    switch (options.getOptChar()) {
+    case 'F':
+      federationExecutionName = OpenRTI::localeToUcs(options.getArgument());
+      break;
+    case 'O':
+      fomModule = OpenRTI::localeToUcs(options.getArgument());
+      break;
+    }
+  }
+  OpenRTI::RTI1516ESimpleAmbassador ambassador;
+  ambassador.setUseDataUrlObjectModels(false);
+
+  try
+  {
+    ambassador.connect(L"thread://");
+  }
+  catch (const rti1516ev::Exception& e)
+  {
+    std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return false;
+  }
+  // create, must work
+  try
+  {
+    ambassador.createFederationExecution(federationExecutionName, fomModule);
+  }
+  catch (const rti1516ev::Exception& e)
+  {
+    std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return false;
+  }
+
+  rti1516ev::FederateHandle federateHandle;
+
+  // join must work
+  try
+  {
+    federateHandle = ambassador.joinFederationExecution(L"federate", federationExecutionName);
+  }
+  catch (const rti1516ev::Exception& e)
+  {
+    std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return false;
+  }
+
+  NDistributedSimulation::NRTFederateEncoding::ClassRegistry classRegistry;
+  classRegistry.Initialize(ambassador.getRtiAmbassador());
+  classRegistry.getBusControllerCanObjectClass()->Publish();
+  classRegistry.getBusControllerCanObjectClass()->CreateObjectInstance(L"CAN1");
+
+  try
+  {
+    ambassador.resignFederationExecution(rti1516ev::NO_ACTION);
+  }
+  catch (const rti1516ev::Exception& e)
+  {
+    std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return false;
+  }
+
+  // destroy, must work
+  try
+  {
+    ambassador.destroyFederationExecution(federationExecutionName);
+  }
+  catch (const rti1516ev::Exception& e)
+  {
+    std::wcout << e.what() << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return false;
+  }
+
+  try
+  {
+    ambassador.shutdown();
+  }
+  catch (const rti1516ev::Exception& e)
+  {
+    std::wcout << e.what() << std::endl;
+    return false;
+  }
+  catch (...)
+  {
+    std::wcout << L"Unknown Exception!" << std::endl;
+    return false;
+  }
+  if (gDebugPrint) std::wcout << "all tests SUCCEEDED!" << std::endl;
+  return true;
+}
+
+int main(int argc, char* argv[])
 {
   if (!testHLAhandleListEncoding())
     return EXIT_FAILURE;
   if (!testHLAobjectClassBasedCountsEncoding())
     return EXIT_FAILURE;
+  if (!testRTFederate(argc, argv))
+    return EXIT_FAILURE;
+
 }
 
