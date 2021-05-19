@@ -92,12 +92,13 @@ void <#=objectClass.Name#>ObjectClass::Unsubscribe()
   }
 }
 
-void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, const std::wstring& theObjectInstanceName)
+void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle, const std::wstring& instanceName)
 {
-  auto iter = mObjectInstancesByName.find(theObjectInstanceName);
-  assert(iter == mObjectInstancesByName.end());
-  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(mRtiAmbassador, theObjectInstanceName, theObject);
-  mObjectInstancesByName.insert(std::make_pair(theObjectInstanceName, newObject));
+  assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
+  assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
+  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(mRtiAmbassador, instanceName, instanceHandle);
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
 
 void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
@@ -106,12 +107,26 @@ void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectIns
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
   mObjectInstancesByName.erase(iter);
+  mObjectInstancesByHandle.erase(theObject);
 }
 
 <#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
+{
+  auto iter = mObjectInstancesByHandle.find(instanceHandle);
+  if (iter != mObjectInstancesByHandle.end())
   {
     return iter->second;
   }
@@ -145,7 +160,7 @@ void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectIns
 
 <#=objectClass.Name#>::<#=objectClass.Name#>(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
   : mInstanceName(instanceName)
-  , mInstanceHandle(instanceHandle)
+  , mObjectInstanceHandle(instanceHandle)
   , mRtiAmbassador(rtiAmbassador)
 {
 }
@@ -178,6 +193,7 @@ void <#=objectClass.Name#>::Set<#=attribute.Name#>(<#=attribute.DataType.CPPType
 <# } else {#>
   m<#=attribute.Name#>Encoder = newValue;
 <# } #>
+  mDirty |= k<#=attribute.Name#>Bit;
 }
 
 <#  } else { #>
@@ -187,12 +203,33 @@ void <#=objectClass.Name#>::Set<#=attribute.Name#>(<#=attribute.DataType.CPPType
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
 #>
-rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::getChangedAttributes() const
+rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetAllAttributeValues() const
 {
   rti1516ev::AttributeHandleValueMap result;
   
 <# if (objectClass.BaseClass != null) { #>
-  result = <#=objectClass.BaseClass.Name#>::getChangedAttributes();
+  result = <#=objectClass.BaseClass.Name#>::GetAllAttributeValues();
+<# } #>
+<#
+  foreach (var attribute in objectClass.Attributes)
+  {
+    if (attribute.DataType != null)
+    {
+#>
+  result[mObjectClass->Get<#=attribute.Name#>AttributeHandle()] = m<#=attribute.Name#>.encode();
+<#
+    } // if
+  } // foreach
+#>
+  return result;
+}
+
+rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetModifiedAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  
+<# if (objectClass.BaseClass != null) { #>
+  result = <#=objectClass.BaseClass.Name#>::GetModifiedAttributeValues();
 <# } #>
 <#
   foreach (var attribute in objectClass.Attributes)
@@ -212,38 +249,75 @@ rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::getChangedAttributes()
 }
 
 <# if (objectClass.HasValidAttributes) { #>
-void <#=objectClass.Name#>::reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
+void <#=objectClass.Name#>::UpdateAllAttributeValues()
 {
+  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+}
+
+void <#=objectClass.Name#>::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+}
+
+void <#=objectClass.Name#>::UpdateModifiedAttributeValues()
+{
+  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  ClearDirtyBits();
+}
+
+void <#=objectClass.Name#>::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  ClearDirtyBits();
+}
+
+void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
+{
+<# if (objectClass.BaseClass != null && objectClass.BaseClass.HasValidAttributes) { #>
+  <#=objectClass.BaseClass.Name#>::ReflectAttributeValues(attributes);
+<# } #>
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
 <#
-  bool first = true;
+  {
+  bool firstInObjectInstanceReflectAttributeValues = true;
   foreach (var attribute in objectClass.Attributes)
   {
     if (attribute.DataType != null)
     {
 #>
-<# if (first)  {#>
+<# if (firstInObjectInstanceReflectAttributeValues)  {#>
     if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle())
 <# } else { #>
     else if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle())
 <# } #>
     {
+      m<#=attribute.Name#>.decode(attributeHandleValue.second);
       mLastUpdated |= k<#=attribute.Name#>Bit;
     }
 <#
-      first = false;
+      firstInObjectInstanceReflectAttributeValues = false;
     } // if
   } // foreach
+  }
 #>
   } // for (auto& attributeHandleValue : attributes)
-} // <#=objectClass.Name#>::reflectAttributeValues
-<# } #>
+} // <#=objectClass.Name#>::ReflectAttributeValues
+<# } // if (objectClass.HasValidAttributes) #>
 
 <# } // foreach (var objectClass in FOM.ObjectClasses) #> 
 
-void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
+ClassRegistry::ClassRegistry(rti1516ev::RTIambassador* rtiAmbassador)
+  : mRtiAmbassador(rtiAmbassador)
+{
+}
+
+void ClassRegistry::Initialize()
 {
 <# 
   foreach (var objectClass in FOM.ObjectClasses)
@@ -251,12 +325,79 @@ void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
     if (objectClass.BaseClass != null)
     {
 #>
-  m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(rtiAmbassador, get<#=objectClass.BaseClass.Name#>ObjectClass()));
+  m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(mRtiAmbassador, get<#=objectClass.BaseClass.Name#>ObjectClass()));
 <# } else { #>
-  m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(rtiAmbassador));
+  m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(mRtiAmbassador));
 <# } // if #>
 <# } // foreach #>
 } // Initialize
+
+void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
+{
+  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
+<# 
+  bool first = true;
+  foreach (var objectClass in FOM.ObjectClasses)
+  {
+#>
+<#  if (first) { #>
+  if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
+<# } else { #>
+  else if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
+<# } // if
+   first=false;
+#>
+  {
+    m<#=objectClass.Name#>ObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
+  }
+<# } // foreach #>
+}
+
+void ClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
+{
+  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
+<# 
+  bool firstInRemoveObjectInstance = true;
+  foreach (var objectClass in FOM.ObjectClasses)
+  {
+#>
+<#  if (firstInRemoveObjectInstance) { #>
+  if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
+<# } else { #>
+  else if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
+<# } // if
+   firstInRemoveObjectInstance=false;
+#>
+  {
+    m<#=objectClass.Name#>ObjectClass->RemoveObjectInstance(theObject);
+  }
+<# } // foreach #>
+}
+
+void ClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
+{
+  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
+<# 
+  bool firstInClassRegistryReflectAttributeValues = true;
+  foreach (var objectClass in FOM.ObjectClasses)
+  {
+    if (objectClass.HasValidAttributes)
+    {
+#>
+<#  if (firstInClassRegistryReflectAttributeValues) { #>
+  if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
+<# } else { #>
+  else if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
+<# } // if
+   firstInClassRegistryReflectAttributeValues = false;
+#>
+  {
+    m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject)->ReflectAttributeValues(attributes);
+  }
+<# } // if (objectClass.hasValidAttributes) #>
+
+<# } // foreach #>
+}
 
 <# foreach (var namespacePart in FOM.Namespace) { #>
 } // namespace <#=namespacePart#>

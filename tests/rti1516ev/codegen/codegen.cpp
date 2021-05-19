@@ -195,10 +195,13 @@ bool testRTFederate(int argc, char* argv[])
     return false;
   }
 
-  NDistributedSimulation::NRTFederateEncoding::ClassRegistry classRegistry;
-  classRegistry.Initialize(ambassador.getRtiAmbassador());
+  NDistributedSimulation::NRTFederateEncoding::ClassRegistry classRegistry(ambassador.getRtiAmbassador());
+  classRegistry.Initialize();
   classRegistry.getBusControllerCanObjectClass()->Publish();
-  classRegistry.getBusControllerCanObjectClass()->CreateObjectInstance(L"CAN1");
+  NDistributedSimulation::NRTFederateEncoding::BusControllerCan* busControllerCan = classRegistry.getBusControllerCanObjectClass()->CreateObjectInstance(L"CAN1");
+  busControllerCan->SetBaudRate(250000);
+  busControllerCan->SetOperationMode(NDistributedSimulation::NRTFederateEncoding::kCanOperationModeCan);
+  busControllerCan->UpdateModifiedAttributeValues();
 
   try
   {

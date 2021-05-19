@@ -14,6 +14,7 @@
 
 namespace NDistributedSimulation {
 namespace NRTFederateEncoding {
+
 class HLAobjectRoot;
 class HLAobjectRootObjectClass
 {
@@ -26,7 +27,9 @@ class HLAobjectRootObjectClass
     void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     HLAobjectRoot* GetObjectInstance(const std::wstring& instanceName);
+    HLAobjectRoot* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     HLAobjectRoot* CreateObjectInstance(const std::wstring& instanceName);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -37,6 +40,7 @@ class HLAobjectRootObjectClass
     // Attribute handles
     // attribute HLAprivilegeToDeleteObject : no data type
   std::map<std::wstring, HLAobjectRoot*> mObjectInstancesByName;
+  std::map<rti1516ev::ObjectInstanceHandle, HLAobjectRoot*> mObjectInstancesByHandle;
 };
 
 class HLAobjectRoot
@@ -54,15 +58,19 @@ class HLAobjectRoot
     HLAobjectRoot& operator=(HLAobjectRoot&&) = delete;
 
     // attribute HLAprivilegeToDeleteObject : no data type
-     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
+     rti1516ev::AttributeHandleValueMap HLAobjectRoot::GetAllAttributeValues() const;
+     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
      AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+
+  protected:
+
   private:
     // modified by last reflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
     HLAobjectRootObjectClass* mObjectClass;
     // Attribute value encoders
@@ -83,7 +91,9 @@ class SystemVariableObjectClass
     void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     SystemVariable* GetObjectInstance(const std::wstring& instanceName);
+    SystemVariable* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     SystemVariable* CreateObjectInstance(const std::wstring& instanceName);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -96,6 +106,7 @@ class SystemVariableObjectClass
     // attribute Value : HLAopaqueData
     rti1516ev::AttributeHandle mValueAttributeHandle;
   std::map<std::wstring, SystemVariable*> mObjectInstancesByName;
+  std::map<rti1516ev::ObjectInstanceHandle, SystemVariable*> mObjectInstancesByHandle;
 };
 
 class SystemVariable : public HLAobjectRoot
@@ -116,16 +127,28 @@ class SystemVariable : public HLAobjectRoot
     // attribute Value : HLAopaqueData
     std::vector<uint8_t> GetValue() const;
     void SetValue(std::vector<uint8_t> newValue);
-     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
-     void reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+     rti1516ev::AttributeHandleValueMap SystemVariable::GetAllAttributeValues() const;
+     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+     void UpdateAllAttributeValues();
+     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time);
+     void UpdateModifiedAttributeValues();
+     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time);
+     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
      AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+
+  protected:
+    void ClearDirtyBits()
+    {
+      mDirty = kNone;
+    }
+
   private:
     // modified by last reflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
     SystemVariableObjectClass* mObjectClass;
     // Attribute value encoders
@@ -147,7 +170,9 @@ class ValueEntityObjectClass
     void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     ValueEntity* GetObjectInstance(const std::wstring& instanceName);
+    ValueEntity* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     ValueEntity* CreateObjectInstance(const std::wstring& instanceName);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -160,6 +185,7 @@ class ValueEntityObjectClass
     // attribute Value : HLAopaqueData
     rti1516ev::AttributeHandle mValueAttributeHandle;
   std::map<std::wstring, ValueEntity*> mObjectInstancesByName;
+  std::map<rti1516ev::ObjectInstanceHandle, ValueEntity*> mObjectInstancesByHandle;
 };
 
 class ValueEntity : public HLAobjectRoot
@@ -180,16 +206,28 @@ class ValueEntity : public HLAobjectRoot
     // attribute Value : HLAopaqueData
     std::vector<uint8_t> GetValue() const;
     void SetValue(std::vector<uint8_t> newValue);
-     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
-     void reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+     rti1516ev::AttributeHandleValueMap ValueEntity::GetAllAttributeValues() const;
+     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+     void UpdateAllAttributeValues();
+     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time);
+     void UpdateModifiedAttributeValues();
+     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time);
+     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
      AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+
+  protected:
+    void ClearDirtyBits()
+    {
+      mDirty = kNone;
+    }
+
   private:
     // modified by last reflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
     ValueEntityObjectClass* mObjectClass;
     // Attribute value encoders
@@ -215,7 +253,9 @@ class DOMemberSourceObjectClass
     void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     DOMemberSource* GetObjectInstance(const std::wstring& instanceName);
+    DOMemberSource* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     DOMemberSource* CreateObjectInstance(const std::wstring& instanceName);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -232,6 +272,7 @@ class DOMemberSourceObjectClass
     // attribute DOSourceMemberDataBytes : HLAopaqueData
     rti1516ev::AttributeHandle mDOSourceMemberDataBytesAttributeHandle;
   std::map<std::wstring, DOMemberSource*> mObjectInstancesByName;
+  std::map<rti1516ev::ObjectInstanceHandle, DOMemberSource*> mObjectInstancesByHandle;
 };
 
 class DOMemberSource : public HLAobjectRoot
@@ -260,16 +301,28 @@ class DOMemberSource : public HLAobjectRoot
     // attribute DOSourceMemberDataBytes : HLAopaqueData
     std::vector<uint8_t> GetDOSourceMemberDataBytes() const;
     void SetDOSourceMemberDataBytes(std::vector<uint8_t> newValue);
-     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
-     void reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+     rti1516ev::AttributeHandleValueMap DOMemberSource::GetAllAttributeValues() const;
+     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+     void UpdateAllAttributeValues();
+     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time);
+     void UpdateModifiedAttributeValues();
+     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time);
+     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
      AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+
+  protected:
+    void ClearDirtyBits()
+    {
+      mDirty = kNone;
+    }
+
   private:
     // modified by last reflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
     DOMemberSourceObjectClass* mObjectClass;
     // Attribute value encoders
@@ -297,7 +350,9 @@ class DOMemberTargetObjectClass
     void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     DOMemberTarget* GetObjectInstance(const std::wstring& instanceName);
+    DOMemberTarget* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     DOMemberTarget* CreateObjectInstance(const std::wstring& instanceName);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -312,6 +367,7 @@ class DOMemberTargetObjectClass
     // attribute DOTargetMemberConnectionType : HLAASCIIstring
     rti1516ev::AttributeHandle mDOTargetMemberConnectionTypeAttributeHandle;
   std::map<std::wstring, DOMemberTarget*> mObjectInstancesByName;
+  std::map<rti1516ev::ObjectInstanceHandle, DOMemberTarget*> mObjectInstancesByHandle;
 };
 
 class DOMemberTarget : public HLAobjectRoot
@@ -336,16 +392,28 @@ class DOMemberTarget : public HLAobjectRoot
     // attribute DOTargetMemberConnectionType : HLAASCIIstring
     std::string GetDOTargetMemberConnectionType() const;
     void SetDOTargetMemberConnectionType(std::string newValue);
-     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
-     void reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+     rti1516ev::AttributeHandleValueMap DOMemberTarget::GetAllAttributeValues() const;
+     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+     void UpdateAllAttributeValues();
+     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time);
+     void UpdateModifiedAttributeValues();
+     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time);
+     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
      AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+
+  protected:
+    void ClearDirtyBits()
+    {
+      mDirty = kNone;
+    }
+
   private:
     // modified by last reflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
     DOMemberTargetObjectClass* mObjectClass;
     // Attribute value encoders
@@ -369,7 +437,9 @@ class BusManagementObjectClass
     void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     BusManagement* GetObjectInstance(const std::wstring& instanceName);
+    BusManagement* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     BusManagement* CreateObjectInstance(const std::wstring& instanceName);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -382,6 +452,7 @@ class BusManagementObjectClass
     // attribute NetworkID : HLAASCIIstring
     rti1516ev::AttributeHandle mNetworkIDAttributeHandle;
   std::map<std::wstring, BusManagement*> mObjectInstancesByName;
+  std::map<rti1516ev::ObjectInstanceHandle, BusManagement*> mObjectInstancesByHandle;
 };
 
 class BusManagement : public HLAobjectRoot
@@ -402,16 +473,28 @@ class BusManagement : public HLAobjectRoot
     // attribute NetworkID : HLAASCIIstring
     std::string GetNetworkID() const;
     void SetNetworkID(std::string newValue);
-     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
-     void reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+     rti1516ev::AttributeHandleValueMap BusManagement::GetAllAttributeValues() const;
+     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+     void UpdateAllAttributeValues();
+     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time);
+     void UpdateModifiedAttributeValues();
+     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time);
+     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
      AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+
+  protected:
+    void ClearDirtyBits()
+    {
+      mDirty = kNone;
+    }
+
   private:
     // modified by last reflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
     BusManagementObjectClass* mObjectClass;
     // Attribute value encoders
@@ -439,7 +522,9 @@ class BusManagementCanObjectClass
     void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     BusManagementCan* GetObjectInstance(const std::wstring& instanceName);
+    BusManagementCan* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     BusManagementCan* CreateObjectInstance(const std::wstring& instanceName);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -458,6 +543,7 @@ class BusManagementCanObjectClass
     // attribute SendMessagesAsRx : HLAboolean
     rti1516ev::AttributeHandle mSendMessagesAsRxAttributeHandle;
   std::map<std::wstring, BusManagementCan*> mObjectInstancesByName;
+  std::map<rti1516ev::ObjectInstanceHandle, BusManagementCan*> mObjectInstancesByHandle;
 };
 
 class BusManagementCan : public BusManagement
@@ -490,16 +576,29 @@ class BusManagementCan : public BusManagement
     // attribute SendMessagesAsRx : HLAboolean
     bool GetSendMessagesAsRx() const;
     void SetSendMessagesAsRx(bool newValue);
-     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
-     void reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+     rti1516ev::AttributeHandleValueMap BusManagementCan::GetAllAttributeValues() const;
+     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+     void UpdateAllAttributeValues();
+     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time);
+     void UpdateModifiedAttributeValues();
+     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time);
+     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
      AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+
+  protected:
+    void ClearDirtyBits()
+    {
+      BusManagement::ClearDirtyBits();
+      mDirty = kNone;
+    }
+
   private:
     // modified by last reflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
     BusManagementCanObjectClass* mObjectClass;
     // Attribute value encoders
@@ -529,7 +628,9 @@ class BusControllerObjectClass
     void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     BusController* GetObjectInstance(const std::wstring& instanceName);
+    BusController* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     BusController* CreateObjectInstance(const std::wstring& instanceName);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -544,6 +645,7 @@ class BusControllerObjectClass
     // attribute DeviceID : HLAASCIIstring
     rti1516ev::AttributeHandle mDeviceIDAttributeHandle;
   std::map<std::wstring, BusController*> mObjectInstancesByName;
+  std::map<rti1516ev::ObjectInstanceHandle, BusController*> mObjectInstancesByHandle;
 };
 
 class BusController : public HLAobjectRoot
@@ -568,16 +670,28 @@ class BusController : public HLAobjectRoot
     // attribute DeviceID : HLAASCIIstring
     std::string GetDeviceID() const;
     void SetDeviceID(std::string newValue);
-     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
-     void reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+     rti1516ev::AttributeHandleValueMap BusController::GetAllAttributeValues() const;
+     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+     void UpdateAllAttributeValues();
+     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time);
+     void UpdateModifiedAttributeValues();
+     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time);
+     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
      AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+
+  protected:
+    void ClearDirtyBits()
+    {
+      mDirty = kNone;
+    }
+
   private:
     // modified by last reflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
     BusControllerObjectClass* mObjectClass;
     // Attribute value encoders
@@ -617,7 +731,9 @@ class BusControllerCanObjectClass
     void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     BusControllerCan* GetObjectInstance(const std::wstring& instanceName);
+    BusControllerCan* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     BusControllerCan* CreateObjectInstance(const std::wstring& instanceName);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -646,6 +762,7 @@ class BusControllerCanObjectClass
     // attribute SamplingMode : CanSamplingMode
     rti1516ev::AttributeHandle mSamplingModeAttributeHandle;
   std::map<std::wstring, BusControllerCan*> mObjectInstancesByName;
+  std::map<rti1516ev::ObjectInstanceHandle, BusControllerCan*> mObjectInstancesByHandle;
 };
 
 class BusControllerCan : public BusController
@@ -698,16 +815,29 @@ class BusControllerCan : public BusController
     // attribute SamplingMode : CanSamplingMode
     CanSamplingMode GetSamplingMode() const;
     void SetSamplingMode(CanSamplingMode newValue);
-     rti1516ev::AttributeHandleValueMap getChangedAttributes() const; 
-     void reflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+     rti1516ev::AttributeHandleValueMap BusControllerCan::GetAllAttributeValues() const;
+     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+     void UpdateAllAttributeValues();
+     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time);
+     void UpdateModifiedAttributeValues();
+     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time);
+     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
      AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+
+  protected:
+    void ClearDirtyBits()
+    {
+      BusController::ClearDirtyBits();
+      mDirty = kNone;
+    }
+
   private:
     // modified by last reflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mInstanceHandle;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
     BusControllerCanObjectClass* mObjectClass;
     // Attribute value encoders
@@ -736,6 +866,7 @@ class BusControllerCan : public BusController
 class ClassRegistry
 {
   public:
+    ClassRegistry(rti1516ev::RTIambassador* rtiAmbassador);
     HLAobjectRootObjectClass* getHLAobjectRootObjectClass() const { return mHLAobjectRootObjectClass.get(); }
     SystemVariableObjectClass* getSystemVariableObjectClass() const { return mSystemVariableObjectClass.get(); }
     ValueEntityObjectClass* getValueEntityObjectClass() const { return mValueEntityObjectClass.get(); }
@@ -746,9 +877,14 @@ class ClassRegistry
     BusControllerObjectClass* getBusControllerObjectClass() const { return mBusControllerObjectClass.get(); }
     BusControllerCanObjectClass* getBusControllerCanObjectClass() const { return mBusControllerCanObjectClass.get(); }
 
-    void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
+    void Initialize();
+
+    void DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes);
 
   private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
     std::unique_ptr<HLAobjectRootObjectClass> mHLAobjectRootObjectClass;
     std::unique_ptr<SystemVariableObjectClass> mSystemVariableObjectClass;
     std::unique_ptr<ValueEntityObjectClass> mValueEntityObjectClass;
