@@ -8,7 +8,7 @@
 
 #include "RTFederateObjects.h"
 
-namespace NDistributedSimulation {
+namespace NDistSimIB {
 namespace NRTFederateEncoding {
 HLAobjectRootObjectClass::HLAobjectRootObjectClass(rti1516ev::RTIambassador* rtiAmbassador)
 {
@@ -21,7 +21,7 @@ void HLAobjectRootObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -40,8 +40,9 @@ void HLAobjectRootObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -59,7 +60,7 @@ void HLAobjectRootObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  HLAobjectRoot* newObject = new HLAobjectRoot(mRtiAmbassador, instanceName, instanceHandle);
+  HLAobjectRoot* newObject = new HLAobjectRoot(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -110,10 +111,22 @@ IHLAobjectRoot* HLAobjectRootObjectClass::CreateObjectInstance(const std::wstrin
   {
     throw rti1516ev::ObjectClassNotPublished(L"HLAobjectRoot");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  HLAobjectRoot* newObject = new HLAobjectRoot(mRtiAmbassador, instanceName, instanceHandle);
+  HLAobjectRoot* newObject = new HLAobjectRoot(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet HLAobjectRootObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  return result;
 }
 
 // object instances of type 'HLAobjectRoot'
@@ -121,15 +134,35 @@ HLAobjectRoot::HLAobjectRoot()
 {
 }
 
-HLAobjectRoot::HLAobjectRoot(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+HLAobjectRoot::HLAobjectRoot(HLAobjectRootObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+HLAobjectRoot::HLAobjectRoot(HLAobjectRootObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 HLAobjectRoot::~HLAobjectRoot()
 {
+}
+
+void HLAobjectRoot::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 // attribute HLAobjectRoot.HLAprivilegeToDeleteObject : no data type
@@ -161,7 +194,7 @@ void SystemVariableObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -180,8 +213,9 @@ void SystemVariableObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -199,7 +233,7 @@ void SystemVariableObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  SystemVariable* newObject = new SystemVariable(mRtiAmbassador, instanceName, instanceHandle);
+  SystemVariable* newObject = new SystemVariable(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -250,10 +284,23 @@ ISystemVariable* SystemVariableObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"SystemVariable");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  SystemVariable* newObject = new SystemVariable(mRtiAmbassador, instanceName, instanceHandle);
+  SystemVariable* newObject = new SystemVariable(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet SystemVariableObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetValueAttributeHandle());
+  return result;
 }
 
 // object instances of type 'SystemVariable'
@@ -261,15 +308,35 @@ SystemVariable::SystemVariable()
 {
 }
 
-SystemVariable::SystemVariable(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+SystemVariable::SystemVariable(SystemVariableObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+SystemVariable::SystemVariable(SystemVariableObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 SystemVariable::~SystemVariable()
 {
+}
+
+void SystemVariable::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 // attribute SystemVariable.HLAprivilegeToDeleteObject : no data type
@@ -305,28 +372,40 @@ rti1516ev::AttributeHandleValueMap SystemVariable::GetModifiedAttributeValues() 
 
 void SystemVariable::UpdateAllAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
 }
 
 void SystemVariable::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
 }
 
 void SystemVariable::UpdateModifiedAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
 }
 
 void SystemVariable::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
 }
 
 void SystemVariable::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
@@ -340,6 +419,21 @@ void SystemVariable::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
       mLastUpdated |= kValueBit;
     }
   } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // SystemVariable::ReflectAttributeValues
+
+void SystemVariable::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetValueAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mValue.encode()));
+      mDirty &= ~kValueBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // SystemVariable::ReflectAttributeValues
 
 uint32_t SystemVariable::RegisterUpdateCallback(UpdateCallbackType callback)
@@ -377,7 +471,7 @@ void ValueEntityObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -396,8 +490,9 @@ void ValueEntityObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -415,7 +510,7 @@ void ValueEntityObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHan
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  ValueEntity* newObject = new ValueEntity(mRtiAmbassador, instanceName, instanceHandle);
+  ValueEntity* newObject = new ValueEntity(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -466,10 +561,23 @@ IValueEntity* ValueEntityObjectClass::CreateObjectInstance(const std::wstring& i
   {
     throw rti1516ev::ObjectClassNotPublished(L"ValueEntity");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  ValueEntity* newObject = new ValueEntity(mRtiAmbassador, instanceName, instanceHandle);
+  ValueEntity* newObject = new ValueEntity(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet ValueEntityObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetValueAttributeHandle());
+  return result;
 }
 
 // object instances of type 'ValueEntity'
@@ -477,15 +585,35 @@ ValueEntity::ValueEntity()
 {
 }
 
-ValueEntity::ValueEntity(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+ValueEntity::ValueEntity(ValueEntityObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+ValueEntity::ValueEntity(ValueEntityObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 ValueEntity::~ValueEntity()
 {
+}
+
+void ValueEntity::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 // attribute ValueEntity.HLAprivilegeToDeleteObject : no data type
@@ -521,28 +649,40 @@ rti1516ev::AttributeHandleValueMap ValueEntity::GetModifiedAttributeValues() con
 
 void ValueEntity::UpdateAllAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
 }
 
 void ValueEntity::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
 }
 
 void ValueEntity::UpdateModifiedAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
 }
 
 void ValueEntity::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
 }
 
 void ValueEntity::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
@@ -556,6 +696,21 @@ void ValueEntity::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMa
       mLastUpdated |= kValueBit;
     }
   } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // ValueEntity::ReflectAttributeValues
+
+void ValueEntity::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetValueAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mValue.encode()));
+      mDirty &= ~kValueBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // ValueEntity::ReflectAttributeValues
 
 uint32_t ValueEntity::RegisterUpdateCallback(UpdateCallbackType callback)
@@ -597,7 +752,7 @@ void DOMemberSourceObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -616,8 +771,9 @@ void DOMemberSourceObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -635,7 +791,7 @@ void DOMemberSourceObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  DOMemberSource* newObject = new DOMemberSource(mRtiAmbassador, instanceName, instanceHandle);
+  DOMemberSource* newObject = new DOMemberSource(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -686,10 +842,25 @@ IDOMemberSource* DOMemberSourceObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberSource");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  DOMemberSource* newObject = new DOMemberSource(mRtiAmbassador, instanceName, instanceHandle);
+  DOMemberSource* newObject = new DOMemberSource(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet DOMemberSourceObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetDOSourceMemberNameAttributeHandle());
+  result.insert(GetDOSourceMemberConnectionTypeAttributeHandle());
+  result.insert(GetDOSourceMemberDataBytesAttributeHandle());
+  return result;
 }
 
 // object instances of type 'DOMemberSource'
@@ -697,15 +868,35 @@ DOMemberSource::DOMemberSource()
 {
 }
 
-DOMemberSource::DOMemberSource(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+DOMemberSource::DOMemberSource(DOMemberSourceObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+DOMemberSource::DOMemberSource(DOMemberSourceObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 DOMemberSource::~DOMemberSource()
 {
+}
+
+void DOMemberSource::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 // attribute DOMemberSource.HLAprivilegeToDeleteObject : no data type
@@ -775,28 +966,40 @@ rti1516ev::AttributeHandleValueMap DOMemberSource::GetModifiedAttributeValues() 
 
 void DOMemberSource::UpdateAllAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
 }
 
 void DOMemberSource::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
 }
 
 void DOMemberSource::UpdateModifiedAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
 }
 
 void DOMemberSource::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
 }
 
 void DOMemberSource::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
@@ -820,6 +1023,31 @@ void DOMemberSource::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
       mLastUpdated |= kDOSourceMemberDataBytesBit;
     }
   } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // DOMemberSource::ReflectAttributeValues
+
+void DOMemberSource::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetDOSourceMemberNameAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberName.encode()));
+      mDirty &= ~kDOSourceMemberNameBit;
+    }
+    else if (attributeHandle == mObjectClass->GetDOSourceMemberConnectionTypeAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberConnectionType.encode()));
+      mDirty &= ~kDOSourceMemberConnectionTypeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetDOSourceMemberDataBytesAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberDataBytes.encode()));
+      mDirty &= ~kDOSourceMemberDataBytesBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // DOMemberSource::ReflectAttributeValues
 
 uint32_t DOMemberSource::RegisterUpdateCallback(UpdateCallbackType callback)
@@ -859,7 +1087,7 @@ void DOMemberTargetObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -878,8 +1106,9 @@ void DOMemberTargetObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -897,7 +1126,7 @@ void DOMemberTargetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  DOMemberTarget* newObject = new DOMemberTarget(mRtiAmbassador, instanceName, instanceHandle);
+  DOMemberTarget* newObject = new DOMemberTarget(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -948,10 +1177,24 @@ IDOMemberTarget* DOMemberTargetObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberTarget");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  DOMemberTarget* newObject = new DOMemberTarget(mRtiAmbassador, instanceName, instanceHandle);
+  DOMemberTarget* newObject = new DOMemberTarget(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet DOMemberTargetObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetDOTargetMemberNameAttributeHandle());
+  result.insert(GetDOTargetMemberConnectionTypeAttributeHandle());
+  return result;
 }
 
 // object instances of type 'DOMemberTarget'
@@ -959,15 +1202,35 @@ DOMemberTarget::DOMemberTarget()
 {
 }
 
-DOMemberTarget::DOMemberTarget(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+DOMemberTarget::DOMemberTarget(DOMemberTargetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+DOMemberTarget::DOMemberTarget(DOMemberTargetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 DOMemberTarget::~DOMemberTarget()
 {
+}
+
+void DOMemberTarget::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 // attribute DOMemberTarget.HLAprivilegeToDeleteObject : no data type
@@ -1020,28 +1283,40 @@ rti1516ev::AttributeHandleValueMap DOMemberTarget::GetModifiedAttributeValues() 
 
 void DOMemberTarget::UpdateAllAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
 }
 
 void DOMemberTarget::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
 }
 
 void DOMemberTarget::UpdateModifiedAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
 }
 
 void DOMemberTarget::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
 }
 
 void DOMemberTarget::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
@@ -1060,6 +1335,26 @@ void DOMemberTarget::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
       mLastUpdated |= kDOTargetMemberConnectionTypeBit;
     }
   } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // DOMemberTarget::ReflectAttributeValues
+
+void DOMemberTarget::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetDOTargetMemberNameAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mDOTargetMemberName.encode()));
+      mDirty &= ~kDOTargetMemberNameBit;
+    }
+    else if (attributeHandle == mObjectClass->GetDOTargetMemberConnectionTypeAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mDOTargetMemberConnectionType.encode()));
+      mDirty &= ~kDOTargetMemberConnectionTypeBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // DOMemberTarget::ReflectAttributeValues
 
 uint32_t DOMemberTarget::RegisterUpdateCallback(UpdateCallbackType callback)
@@ -1097,7 +1392,7 @@ void BusManagementObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -1116,8 +1411,9 @@ void BusManagementObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -1135,7 +1431,7 @@ void BusManagementObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  BusManagement* newObject = new BusManagement(mRtiAmbassador, instanceName, instanceHandle);
+  BusManagement* newObject = new BusManagement(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -1186,10 +1482,23 @@ IBusManagement* BusManagementObjectClass::CreateObjectInstance(const std::wstrin
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusManagement");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  BusManagement* newObject = new BusManagement(mRtiAmbassador, instanceName, instanceHandle);
+  BusManagement* newObject = new BusManagement(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet BusManagementObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetNetworkIDAttributeHandle());
+  return result;
 }
 
 // object instances of type 'BusManagement'
@@ -1197,15 +1506,35 @@ BusManagement::BusManagement()
 {
 }
 
-BusManagement::BusManagement(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+BusManagement::BusManagement(BusManagementObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+BusManagement::BusManagement(BusManagementObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 BusManagement::~BusManagement()
 {
+}
+
+void BusManagement::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 // attribute BusManagement.HLAprivilegeToDeleteObject : no data type
@@ -1241,28 +1570,40 @@ rti1516ev::AttributeHandleValueMap BusManagement::GetModifiedAttributeValues() c
 
 void BusManagement::UpdateAllAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
 }
 
 void BusManagement::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
 }
 
 void BusManagement::UpdateModifiedAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
 }
 
 void BusManagement::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
 }
 
 void BusManagement::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
@@ -1276,6 +1617,20 @@ void BusManagement::ReflectAttributeValues(const rti1516ev::AttributeHandleValue
       mLastUpdated |= kNetworkIDBit;
     }
   } // for (auto& attributeHandleValue : attributes)
+} // BusManagement::ReflectAttributeValues
+
+void BusManagement::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+      mDirty &= ~kNetworkIDBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusManagement::ReflectAttributeValues
 
 
@@ -1299,7 +1654,7 @@ void BusManagementCanObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -1318,8 +1673,9 @@ void BusManagementCanObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -1337,7 +1693,7 @@ void BusManagementCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstan
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  BusManagementCan* newObject = new BusManagementCan(mRtiAmbassador, instanceName, instanceHandle);
+  BusManagementCan* newObject = new BusManagementCan(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -1388,10 +1744,27 @@ IBusManagementCan* BusManagementCanObjectClass::CreateObjectInstance(const std::
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementCan");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  BusManagementCan* newObject = new BusManagementCan(mRtiAmbassador, instanceName, instanceHandle);
+  BusManagementCan* newObject = new BusManagementCan(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet BusManagementCanObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetNetworkIDAttributeHandle());
+  result.insert(GetBusStateAttributeHandle());
+  result.insert(GetTxErrorCountAttributeHandle());
+  result.insert(GetRxErrorCountAttributeHandle());
+  result.insert(GetSendMessagesAsRxAttributeHandle());
+  return result;
 }
 
 // object instances of type 'BusManagementCan'
@@ -1399,15 +1772,35 @@ BusManagementCan::BusManagementCan()
 {
 }
 
-BusManagementCan::BusManagementCan(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+BusManagementCan::BusManagementCan(BusManagementCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+BusManagementCan::BusManagementCan(BusManagementCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 BusManagementCan::~BusManagementCan()
 {
+}
+
+void BusManagementCan::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 // attribute BusManagementCan.HLAprivilegeToDeleteObject : no data type
@@ -1507,28 +1900,40 @@ rti1516ev::AttributeHandleValueMap BusManagementCan::GetModifiedAttributeValues(
 
 void BusManagementCan::UpdateAllAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
 }
 
 void BusManagementCan::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
 }
 
 void BusManagementCan::UpdateModifiedAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
 }
 
 void BusManagementCan::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
 }
 
 void BusManagementCan::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
@@ -1557,6 +1962,36 @@ void BusManagementCan::ReflectAttributeValues(const rti1516ev::AttributeHandleVa
       mLastUpdated |= kSendMessagesAsRxBit;
     }
   } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // BusManagementCan::ReflectAttributeValues
+
+void BusManagementCan::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetBusStateAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mBusState.encode()));
+      mDirty &= ~kBusStateBit;
+    }
+    else if (attributeHandle == mObjectClass->GetTxErrorCountAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mTxErrorCount.encode()));
+      mDirty &= ~kTxErrorCountBit;
+    }
+    else if (attributeHandle == mObjectClass->GetRxErrorCountAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mRxErrorCount.encode()));
+      mDirty &= ~kRxErrorCountBit;
+    }
+    else if (attributeHandle == mObjectClass->GetSendMessagesAsRxAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mSendMessagesAsRx.encode()));
+      mDirty &= ~kSendMessagesAsRxBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusManagementCan::ReflectAttributeValues
 
 uint32_t BusManagementCan::RegisterUpdateCallback(UpdateCallbackType callback)
@@ -1596,7 +2031,7 @@ void BusControllerObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -1615,8 +2050,9 @@ void BusControllerObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -1634,7 +2070,7 @@ void BusControllerObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  BusController* newObject = new BusController(mRtiAmbassador, instanceName, instanceHandle);
+  BusController* newObject = new BusController(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -1685,10 +2121,24 @@ IBusController* BusControllerObjectClass::CreateObjectInstance(const std::wstrin
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusController");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  BusController* newObject = new BusController(mRtiAmbassador, instanceName, instanceHandle);
+  BusController* newObject = new BusController(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet BusControllerObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetNetworkIDAttributeHandle());
+  result.insert(GetDeviceIDAttributeHandle());
+  return result;
 }
 
 // object instances of type 'BusController'
@@ -1696,15 +2146,35 @@ BusController::BusController()
 {
 }
 
-BusController::BusController(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+BusController::BusController(BusControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+BusController::BusController(BusControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 BusController::~BusController()
 {
+}
+
+void BusController::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 // attribute BusController.HLAprivilegeToDeleteObject : no data type
@@ -1757,28 +2227,40 @@ rti1516ev::AttributeHandleValueMap BusController::GetModifiedAttributeValues() c
 
 void BusController::UpdateAllAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
 }
 
 void BusController::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
 }
 
 void BusController::UpdateModifiedAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
 }
 
 void BusController::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
 }
 
 void BusController::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
@@ -1797,6 +2279,25 @@ void BusController::ReflectAttributeValues(const rti1516ev::AttributeHandleValue
       mLastUpdated |= kDeviceIDBit;
     }
   } // for (auto& attributeHandleValue : attributes)
+} // BusController::ReflectAttributeValues
+
+void BusController::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+      mDirty &= ~kNetworkIDBit;
+    }
+    else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
+      mDirty &= ~kDeviceIDBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusController::ReflectAttributeValues
 
 
@@ -1830,7 +2331,7 @@ void BusControllerCanObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -1849,8 +2350,9 @@ void BusControllerCanObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -1868,7 +2370,7 @@ void BusControllerCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstan
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  BusControllerCan* newObject = new BusControllerCan(mRtiAmbassador, instanceName, instanceHandle);
+  BusControllerCan* newObject = new BusControllerCan(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -1919,10 +2421,33 @@ IBusControllerCan* BusControllerCanObjectClass::CreateObjectInstance(const std::
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerCan");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  BusControllerCan* newObject = new BusControllerCan(mRtiAmbassador, instanceName, instanceHandle);
+  BusControllerCan* newObject = new BusControllerCan(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet BusControllerCanObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetNetworkIDAttributeHandle());
+  result.insert(GetDeviceIDAttributeHandle());
+  result.insert(GetBaudRateAttributeHandle());
+  result.insert(GetDataBaudRateAttributeHandle());
+  result.insert(GetPreScalerAttributeHandle());
+  result.insert(GetOperationModeAttributeHandle());
+  result.insert(GetSync_SegAttributeHandle());
+  result.insert(GetProp_SegAttributeHandle());
+  result.insert(GetPhase_Seg1AttributeHandle());
+  result.insert(GetPhase_Seg2AttributeHandle());
+  result.insert(GetSamplingModeAttributeHandle());
+  return result;
 }
 
 // object instances of type 'BusControllerCan'
@@ -1930,15 +2455,35 @@ BusControllerCan::BusControllerCan()
 {
 }
 
-BusControllerCan::BusControllerCan(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+BusControllerCan::BusControllerCan(BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+BusControllerCan::BusControllerCan(BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 BusControllerCan::~BusControllerCan()
 {
+}
+
+void BusControllerCan::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 // attribute BusControllerCan.HLAprivilegeToDeleteObject : no data type
@@ -2136,28 +2681,40 @@ rti1516ev::AttributeHandleValueMap BusControllerCan::GetModifiedAttributeValues(
 
 void BusControllerCan::UpdateAllAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
 }
 
 void BusControllerCan::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
 }
 
 void BusControllerCan::UpdateModifiedAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
 }
 
 void BusControllerCan::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
 }
 
 void BusControllerCan::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
@@ -2211,6 +2768,61 @@ void BusControllerCan::ReflectAttributeValues(const rti1516ev::AttributeHandleVa
       mLastUpdated |= kSamplingModeBit;
     }
   } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // BusControllerCan::ReflectAttributeValues
+
+void BusControllerCan::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetBaudRateAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mBaudRate.encode()));
+      mDirty &= ~kBaudRateBit;
+    }
+    else if (attributeHandle == mObjectClass->GetDataBaudRateAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mDataBaudRate.encode()));
+      mDirty &= ~kDataBaudRateBit;
+    }
+    else if (attributeHandle == mObjectClass->GetPreScalerAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mPreScaler.encode()));
+      mDirty &= ~kPreScalerBit;
+    }
+    else if (attributeHandle == mObjectClass->GetOperationModeAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mOperationMode.encode()));
+      mDirty &= ~kOperationModeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetSync_SegAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mSync_Seg.encode()));
+      mDirty &= ~kSync_SegBit;
+    }
+    else if (attributeHandle == mObjectClass->GetProp_SegAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mProp_Seg.encode()));
+      mDirty &= ~kProp_SegBit;
+    }
+    else if (attributeHandle == mObjectClass->GetPhase_Seg1AttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mPhase_Seg1.encode()));
+      mDirty &= ~kPhase_Seg1Bit;
+    }
+    else if (attributeHandle == mObjectClass->GetPhase_Seg2AttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mPhase_Seg2.encode()));
+      mDirty &= ~kPhase_Seg2Bit;
+    }
+    else if (attributeHandle == mObjectClass->GetSamplingModeAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mSamplingMode.encode()));
+      mDirty &= ~kSamplingModeBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusControllerCan::ReflectAttributeValues
 
 uint32_t BusControllerCan::RegisterUpdateCallback(UpdateCallbackType callback)
@@ -2238,12 +2850,10 @@ void BusControllerCan::ExecuteUpdateCallbacks()
 
 ClassRegistry* ClassRegistry::sClassRegistry = nullptr;
 
-ClassRegistry::ClassRegistry(rti1516ev::RTIambassador* rtiAmbassador)
-  : mRtiAmbassador(rtiAmbassador)
+ClassRegistry::ClassRegistry()
 {
   assert(sClassRegistry == nullptr);
   sClassRegistry = this;
-  Initialize();
 }
 
 ClassRegistry::~ClassRegistry()
@@ -2251,8 +2861,9 @@ ClassRegistry::~ClassRegistry()
   sClassRegistry = nullptr;
 }
 
-void ClassRegistry::Initialize()
+void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 {
+  mRtiAmbassador = rtiAmbassador;
   mHLAobjectRootObjectClass = std::unique_ptr<HLAobjectRootObjectClass>(new HLAobjectRootObjectClass(mRtiAmbassador));
   mSystemVariableObjectClass = std::unique_ptr<SystemVariableObjectClass>(new SystemVariableObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
   mValueEntityObjectClass = std::unique_ptr<ValueEntityObjectClass>(new ValueEntityObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
@@ -2383,10 +2994,66 @@ void ClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theOb
   }
 }
 
+void ClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  if (theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
+  {
+    static_cast<SystemVariable*>(mSystemVariableObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
+  {
+    static_cast<ValueEntity*>(mValueEntityObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
+  {
+    static_cast<DOMemberSource*>(mDOMemberSourceObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
+  {
+    static_cast<DOMemberTarget*>(mDOMemberTargetObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
+  {
+    static_cast<BusManagement*>(mBusManagementObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
+  {
+    static_cast<BusManagementCan*>(mBusManagementCanObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
+  {
+    static_cast<BusController*>(mBusControllerObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
+  {
+    static_cast<BusControllerCan*>(mBusControllerCanObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+}
+
+void ClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
+{
+  mInstanceNameReservationCallbacks.insert(std::make_pair(theObjectInstanceName, completionCallback));
+  mRtiAmbassador->reserveObjectInstanceName(theObjectInstanceName);
+}
+
+void ClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
+{
+  auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
+  iter->second(true);
+  mInstanceNameReservationCallbacks.erase(iter);
+}
+
+void ClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
+{
+  auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
+  iter->second(false);
+  mInstanceNameReservationCallbacks.erase(iter);
+}
+
 IClassRegistry* GetClassRegistry()
 {
   return ClassRegistry::GetInstance();
 }
 
-} // namespace NDistributedSimulation
+} // namespace NDistSimIB
 } // namespace NRTFederateEncoding

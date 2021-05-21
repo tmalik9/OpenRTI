@@ -58,7 +58,7 @@ void <#=objectClass.Name#>ObjectClass::Publish()
 {
   if (!mPublished)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
     mPublished = true;
   }
@@ -77,8 +77,9 @@ void <#=objectClass.Name#>ObjectClass::Subscribe()
 {
   if (!mSubscribed)
   {
-    rti1516ev::AttributeHandleSet attributes;
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
     mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
     mSubscribed = true;
   }
 }
@@ -96,7 +97,7 @@ void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectI
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(mRtiAmbassador, instanceName, instanceHandle);
+  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(this, instanceName, mRtiAmbassador, instanceHandle);
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -147,10 +148,33 @@ I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(c
   {
     throw rti1516ev::ObjectClassNotPublished(L"<#=objectClass.Name#>");
   }
-  rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(mRtiAmbassador, instanceName, instanceHandle);
+  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(this, instanceName, mRtiAmbassador);
+  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->SetObjectInstanceHandle(instanceHandle);
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
+}
+
+rti1516ev::AttributeHandleSet <#=objectClass.Name#>ObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+<# 
+  foreach (var attribute in objectClass.AllAttributes)
+  {
+    if (attribute.DataType != null)
+    {
+#>
+  result.insert(Get<#=attribute.Name#>AttributeHandle());
+<#  
+    } // if (attribute.DataType != null)
+  } // foreach (var attribute in objectClass.Attributes)
+#>
+  return result;
 }
 
 // object instances of type '<#=objectClass.Name#>'
@@ -158,15 +182,35 @@ I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(c
 {
 }
 
-<#=objectClass.Name#>::<#=objectClass.Name#>(rti1516ev::RTIambassador* rtiAmbassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mInstanceName(instanceName)
-  , mObjectInstanceHandle(instanceHandle)
+<#=objectClass.Name#>::<#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+<#=objectClass.Name#>::<#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle(instanceHandle)
 {
 }
 
 <#=objectClass.Name#>::~<#=objectClass.Name#>()
 {
+}
+
+void <#=objectClass.Name#>::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  if (!mObjectInstanceHandle.isValid())
+  {
+    mObjectInstanceHandle = objectInstanceHandle;
+  }
+  else
+  {
+    throw std::logic_error("object instance handle already set");
+  }
 }
 
 <# 
@@ -243,28 +287,40 @@ rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetModifiedAttributeVa
 <# if (objectClass.HasValidAttributes) { #>
 void <#=objectClass.Name#>::UpdateAllAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
 }
 
 void <#=objectClass.Name#>::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
 }
 
 void <#=objectClass.Name#>::UpdateModifiedAttributeValues()
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
 }
 
 void <#=objectClass.Name#>::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
 {
-  rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
-  ClearDirtyBits();
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
 }
 
 void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
@@ -296,6 +352,41 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
   }
 #>
   } // for (auto& attributeHandleValue : attributes)
+<# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
+    ExecuteUpdateCallbacks();
+<# } #>
+} // <#=objectClass.Name#>::ReflectAttributeValues
+
+void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+<#
+  {
+  bool firstInObjectInstanceProvideAttributeValues = true;
+  foreach (var attribute in objectClass.Attributes)
+  {
+    if (attribute.DataType != null)
+    {
+#>
+<# if (firstInObjectInstanceProvideAttributeValues)  {#>
+    if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle())
+<# } else { #>
+    else if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle())
+<# } #>
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, m<#=attribute.Name#>.encode()));
+      mDirty &= ~k<#=attribute.Name#>Bit;
+    }
+<#
+      firstInObjectInstanceProvideAttributeValues = false;
+    } // if
+  } // foreach
+  }
+#>
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // <#=objectClass.Name#>::ReflectAttributeValues
 
 <# if (objectClass.ChildClasses.Count == 0) { #>
@@ -326,12 +417,10 @@ void <#=objectClass.Name#>::ExecuteUpdateCallbacks()
 
 ClassRegistry* ClassRegistry::sClassRegistry = nullptr;
 
-ClassRegistry::ClassRegistry(rti1516ev::RTIambassador* rtiAmbassador)
-  : mRtiAmbassador(rtiAmbassador)
+ClassRegistry::ClassRegistry()
 {
   assert(sClassRegistry == nullptr);
   sClassRegistry = this;
-  Initialize();
 }
 
 ClassRegistry::~ClassRegistry()
@@ -339,8 +428,9 @@ ClassRegistry::~ClassRegistry()
   sClassRegistry = nullptr;
 }
 
-void ClassRegistry::Initialize()
+void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 {
+  mRtiAmbassador = rtiAmbassador;
 <# 
   foreach (var objectClass in FOM.ObjectClasses)
   {
@@ -418,6 +508,49 @@ void ClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theOb
     } // if (objectClass.hasValidAttributes)
 } // foreach 
 #>
+}
+
+void ClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+<# 
+  bool firstInClassRegistryProvideAttributeValues = true;
+  foreach (var objectClass in FOM.ObjectClasses)
+  {
+    if (objectClass.HasValidAttributes)
+    { 
+      if (firstInClassRegistryProvideAttributeValues) { #>
+  if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
+<#    } else { #>
+  else if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
+<#    } // if
+      firstInClassRegistryProvideAttributeValues = false; #>
+  {
+    static_cast<<#=objectClass.Name#>*>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+<#  
+    } // if (objectClass.hasValidAttributes)
+} // foreach 
+#>
+}
+
+void ClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
+{
+  mInstanceNameReservationCallbacks.insert(std::make_pair(theObjectInstanceName, completionCallback));
+  mRtiAmbassador->reserveObjectInstanceName(theObjectInstanceName);
+}
+
+void ClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
+{
+  auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
+  iter->second(true);
+  mInstanceNameReservationCallbacks.erase(iter);
+}
+
+void ClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
+{
+  auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
+  iter->second(false);
+  mInstanceNameReservationCallbacks.erase(iter);
 }
 
 IClassRegistry* GetClassRegistry()

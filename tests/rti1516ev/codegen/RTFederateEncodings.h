@@ -14,7 +14,7 @@
 
 #include "RTFederateDataTypes.h"
 
-namespace NDistributedSimulation {
+namespace NDistSimIB {
 namespace NRTFederateEncoding {
 
 
@@ -414,6 +414,6 @@ class EthernetPacketErrorForwardedEncoding : public EthernetPacketErrorForwarded
     EthernetPacketDataEncoding mPacketData;
 }; // class EthernetPacketErrorForwardedEncoding
 
-} // namespace NDistributedSimulation
+} // namespace NDistSimIB
 } // namespace NRTFederateEncoding
 

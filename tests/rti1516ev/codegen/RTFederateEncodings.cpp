@@ -11,7 +11,7 @@
 #include "RTI/encoding/HLAopaqueData.h"
 #include "RTFederateEncodings.h"
 
-namespace NDistributedSimulation {
+namespace NDistSimIB {
 namespace NRTFederateEncoding {
 
 
@@ -1165,6 +1165,6 @@ bool EthernetPacketErrorForwardedEncoding::IsPacketDataAvailable() const
 {
   return (getVersion() >= 1);
 }
-} // namespace NDistributedSimulation
+} // namespace NDistSimIB
 } // namespace NRTFederateEncoding
 

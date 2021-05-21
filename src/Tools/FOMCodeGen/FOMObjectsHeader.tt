@@ -86,6 +86,7 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     I<#=objectClass.Name#>* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
@@ -118,14 +119,15 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
   public:
 
     <#=objectClass.Name#>();
-    <#=objectClass.Name#>(rti1516ev::RTIambassador* ambassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle);
+    <#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+    <#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador, rti1516ev::ObjectInstanceHandle instanceHandle);
     ~<#=objectClass.Name#>();
     <#=objectClass.Name#>(const <#=objectClass.Name#>&) = delete;
     <#=objectClass.Name#>(<#=objectClass.Name#>&&) = delete;
     <#=objectClass.Name#>& operator=(const <#=objectClass.Name#>&) = delete;
     <#=objectClass.Name#>& operator=(<#=objectClass.Name#>&&) = delete;
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
-
+    void SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle);
 <#
   foreach (var attribute in objectClass.AllAttributes)
   {
@@ -156,14 +158,12 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 <# if (objectClass.HasValidAttributes) { #>
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
 <# } #>
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
   private:
-<# if (objectClass.HasValidAttributes) { #>
-    void ClearDirtyBits()
-    {
-      mDirty = kNone;
-    }
+<# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
     void ExecuteUpdateCallbacks();
 <# } #>
     // modified by last reflectAttributeValues
@@ -200,21 +200,25 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 class ClassRegistry : public IClassRegistry
 {
   public:
-    ClassRegistry(rti1516ev::RTIambassador* rtiAmbassador);
+    ClassRegistry();
     ~ClassRegistry();
+    void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
+    static ClassRegistry* GetInstance() { return sClassRegistry; }
+
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
     I<#=objectClass.Name#>ObjectClass* get<#=objectClass.Name#>ObjectClass() const override { return m<#=objectClass.Name#>ObjectClass.get(); }
 <# } #>
 
-
     void DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes);
-    static ClassRegistry* GetInstance() { return sClassRegistry; }
-  private:
-    void Initialize();
+    void ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles);
+    void ObjectInstanceNameReservationSucceeded(std::wstring const & theObjectInstanceName);
+    void ObjectInstanceNameReservationFailed(std::wstring const & theObjectInstanceName);
+    void RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback);
 
   private:
+    std::map<std::wstring, std::function<void(bool)> > mInstanceNameReservationCallbacks;
     static ClassRegistry* sClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
 <# foreach (var objectClass in FOM.ObjectClasses) { #>

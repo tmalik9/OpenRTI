@@ -11,7 +11,7 @@
 #include <vector>
 #include "RTI/encoding/HLAopaqueData.h"
 
-namespace NDistributedSimulation {
+namespace NDistSimIB {
 namespace NRTFederateEncoding {
 
 
@@ -301,5 +301,5 @@ class EthernetPacketErrorForwarded : public EthernetPacketError
 }; // class EthernetPacketErrorForwarded
 
 
-} // namespace NDistributedSimulation
+} // namespace NDistSimIB
 } // namespace NRTFederateEncoding

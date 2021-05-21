@@ -158,6 +158,10 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistSimIB.NRTFederateEncoding</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistSimIB.NRTFederateEncoding</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistSimIB.NRTFederateEncoding</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistSimIB.NRTFederateEncoding</Command>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

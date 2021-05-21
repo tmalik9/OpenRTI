@@ -127,6 +127,30 @@ bool testHLAobjectClassBasedCountsEncoding()
   return true;
 }
 
+class RTFederateAmbassador : public OpenRTI::RTI1516ESimpleAmbassador
+{
+public:
+  RTFederateAmbassador() : OpenRTI::RTI1516ESimpleAmbassador() {}
+  virtual void objectInstanceNameReservationSucceeded(const std::wstring& name) override
+  {
+    classRegistry.ObjectInstanceNameReservationSucceeded(name);
+  }
+
+  virtual void objectInstanceNameReservationFailed(const std::wstring& name) override
+  {
+    classRegistry.ObjectInstanceNameReservationFailed(name);
+  }
+  void reflectAttributeValues(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
+    const rti1516ev::AttributeHandleValueMap& attributeHandleValueMap,
+    const rti1516ev::VariableLengthData& tag,
+    rti1516ev::OrderType, rti1516ev::TransportationType,
+    rti1516ev::SupplementalReflectInfo) override
+  {
+    classRegistry.ReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
+  }
+  NDistSimIB::NRTFederateEncoding::ClassRegistry classRegistry;
+};
+
 bool testRTFederate(int argc, char* argv[])
 {
   OpenRTI::Options options(argc, argv);
@@ -144,7 +168,7 @@ bool testRTFederate(int argc, char* argv[])
       break;
     }
   }
-  OpenRTI::RTI1516ESimpleAmbassador ambassador;
+  RTFederateAmbassador ambassador;
   ambassador.setUseDataUrlObjectModels(false);
 
   try
@@ -194,17 +218,28 @@ bool testRTFederate(int argc, char* argv[])
     std::wcout << L"Unknown Exception!" << std::endl;
     return false;
   }
-
-  NDistributedSimulation::NRTFederateEncoding::ClassRegistry classRegistry(ambassador.getRtiAmbassador());
-
-  classRegistry.getBusControllerCanObjectClass()->Publish();
-  NDistributedSimulation::NRTFederateEncoding::IBusControllerCan* busControllerCan = NDistributedSimulation::NRTFederateEncoding::GetClassRegistry()->getBusControllerCanObjectClass()->CreateObjectInstance(L"CAN1");
-  auto callbackToken = busControllerCan->RegisterUpdateCallback([](NDistributedSimulation::NRTFederateEncoding::IBusControllerCan* busControllerCan) {
+  ambassador.classRegistry.Initialize(ambassador.getRtiAmbassador());
+  ambassador.classRegistry.getBusControllerCanObjectClass()->Publish();
+  ambassador.classRegistry.getBusControllerCanObjectClass()->Subscribe();
+  NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan = NDistSimIB::NRTFederateEncoding::GetClassRegistry()->getBusControllerCanObjectClass()->CreateObjectInstance(L"CAN1");
+  while (!static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCan*>(busControllerCan)->IsValid())
+  {
+    ambassador.getRtiAmbassador()->evokeCallback(0.5);
+  }
+  std::wcout << L"busControllerCan is valid" << std::endl;
+  bool updateReceived = false;
+  auto callbackToken = busControllerCan->RegisterUpdateCallback([&updateReceived](NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan) {
     std::wcout << L"update received: " << busControllerCan->GetObjectInstanceName() << std::endl;
+    updateReceived = true;
   });
   busControllerCan->SetBaudRate(250000);
-  busControllerCan->SetOperationMode(NDistributedSimulation::NRTFederateEncoding::kCanOperationModeCan);
+  busControllerCan->SetOperationMode(NDistSimIB::NRTFederateEncoding::kCanOperationModeCan);
   busControllerCan->UpdateModifiedAttributeValues();
+  while (!updateReceived)
+  {
+    ambassador.getRtiAmbassador()->evokeCallback(0.5);
+  }
+
 
   busControllerCan->UnregisterUpdateCallback(callbackToken);
   try
