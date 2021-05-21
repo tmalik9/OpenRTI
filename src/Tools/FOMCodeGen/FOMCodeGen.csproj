@@ -107,6 +107,12 @@
       <DependentUpon>FOMEncodingImpl.tt</DependentUpon>
     </Compile>
     <Compile Include="FOMEncodingImplCode.cs" />
+    <Compile Include="FOMObjectInterfacesHeader.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FOMObjectInterfacesHeader.tt</DependentUpon>
+    </Compile>
+    <Compile Include="FOMObjectInterfacesHeaderCode.cs" />
     <Compile Include="FOMObjectsHeaderCode.cs" />
     <Compile Include="FOMObjectsImpl.cs">
       <AutoGen>True</AutoGen>
@@ -143,6 +149,10 @@
     <Content Include="FOMEncodingImpl.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>FOMEncodingImpl.cs</LastGenOutput>
+    </Content>
+    <Content Include="FOMObjectInterfacesHeader.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>FOMObjectInterfacesHeader.cs</LastGenOutput>
     </Content>
     <Content Include="FOMObjectsHeader.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>

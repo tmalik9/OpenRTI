@@ -135,6 +135,7 @@
     <ClInclude Include="momEncodings.h" />
     <ClInclude Include="RTFederateDataTypes.h" />
     <ClInclude Include="RTFederateEncodings.h" />
+    <ClInclude Include="RTFederateObjectInterfaces.h" />
     <ClInclude Include="RTFederateObjects.h" />
   </ItemGroup>
   <ItemGroup>

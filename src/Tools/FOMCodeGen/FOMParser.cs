@@ -50,6 +50,21 @@ namespace FOMCodeGen
       public ObjectClass BaseClass { get; set; }
       public List<ObjectClass> ChildClasses { get; set; }
       public List<Attribute> Attributes { get; set; }
+      public List<Attribute> AllAttributes
+      {
+        get
+        {
+          List<Attribute> allAttributes = new List<Attribute>();
+          if (BaseClass != null)
+          {
+            foreach (var attribute in BaseClass.AllAttributes)
+              allAttributes.Add(attribute);
+          }
+          foreach (var attribute in Attributes)
+            allAttributes.Add(attribute);
+          return allAttributes;
+        }
+      }
       public bool HasValidAttributes
       {
         get
@@ -692,8 +707,12 @@ namespace FOMCodeGen
       string name = objectClassNode["name"].FirstChild.InnerText;
       ObjectClass objectClass = new ObjectClass(name);
       objectClass.BaseClass = baseClass;
-      var attributeNodes = objectClassNode.SelectNodes("attribute");
       mObjectClasses.Add(objectClass);
+      if (objectClass.BaseClass != null)
+      {
+        objectClass.BaseClass.ChildClasses.Add(objectClass);
+      }
+      var attributeNodes = objectClassNode.SelectNodes("attribute");
       foreach (XmlElement attributeNode in attributeNodes)
       {
         string attributeName = attributeNode["name"].FirstChild.InnerText;

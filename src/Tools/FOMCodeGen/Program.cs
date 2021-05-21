@@ -47,11 +47,13 @@ namespace FOMCodeGen
         var encodingsHeaderFilename = System.IO.Path.Combine(outputDirectory, basename + "Encodings.h");
         var encodingsImplFilename = System.IO.Path.Combine(outputDirectory, basename + "Encodings.cpp");
         var dataTypesHeaderFilename = System.IO.Path.Combine(outputDirectory, basename + "DataTypes.h");
+        var objectInterfacesHeaderFilename = System.IO.Path.Combine(outputDirectory, basename + "ObjectInterfaces.h");
         var objectsHeaderFilename = System.IO.Path.Combine(outputDirectory, basename + "Objects.h");
         var objectsImplFilename = System.IO.Path.Combine(outputDirectory, basename + "Objects.cpp");
         System.Console.WriteLine("dataTypesHeaderFilename={0}", dataTypesHeaderFilename);
         System.Console.WriteLine("encodingsHeaderFilename={0}", encodingsHeaderFilename);
         System.Console.WriteLine("encodingsImplFilename={0}", encodingsImplFilename);
+        System.Console.WriteLine("objectInterfacesHeaderFilename={0}", objectInterfacesHeaderFilename);
         System.Console.WriteLine("objectsHeaderFilename={0}", objectsHeaderFilename);
         System.Console.WriteLine("objectsImplFilename={0}", objectsImplFilename);
         FOMParser fom = new FOMParser(filename, enclosingNamespace);
@@ -69,7 +71,11 @@ namespace FOMCodeGen
         String encodingsImplContent = encodingsImpl.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(encodingsImplFilename, encodingsImplContent);
 
-        FOMObjectsHeader objectsHeader = new FOMObjectsHeader(fom, objectsHeaderFilename, encodingsHeaderFilename);
+        FOMObjectInterfacesHeader objectInterfacesHeader = new FOMObjectInterfacesHeader(fom, objectInterfacesHeaderFilename, encodingsHeaderFilename);
+        String objectInterfacesHeaderContent = objectInterfacesHeader.TransformText();
+        if (!doDryRun) System.IO.File.WriteAllText(objectInterfacesHeaderFilename, objectInterfacesHeaderContent);
+
+        FOMObjectsHeader objectsHeader = new FOMObjectsHeader(fom, objectsHeaderFilename, objectInterfacesHeaderFilename, encodingsHeaderFilename);
         String objectsHeaderContent = objectsHeader.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(objectsHeaderFilename, objectsHeaderContent);
 

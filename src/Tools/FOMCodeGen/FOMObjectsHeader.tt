@@ -15,6 +15,7 @@
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
 <#=FOM.PredefinedTypeIncludes#>
+#include "<#=ObjectInterfacesHeaderFilename#>"
 #include "<#=EncodingHeaderFilename#>"
 
 <#
@@ -29,9 +30,18 @@ foreach (var objectClass in FOM.ObjectClasses)
 {
 #>
 class <#=objectClass.Name#>;
-class <#=objectClass.Name#>ObjectClass
+class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClass
 {
   public:
+    // I<#=objectClass.Name#>ObjectClass
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    I<#=objectClass.Name#>* GetObjectInstance(const std::wstring& instanceName) override;
+    I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName) override;
+
+    // internal
 <#
   if (objectClass.BaseClass != null)
   {
@@ -42,28 +52,40 @@ class <#=objectClass.Name#>ObjectClass
     <#=objectClass.Name#>ObjectClass(rti1516ev::RTIambassador* rtiAmbassador);
 <# } #>
 <# 
+  var baseClass = objectClass.BaseClass;
+  while (baseClass != null)
+  {
+    foreach (var attribute in baseClass.Attributes)
+    {
+      if (attribute.DataType != null)
+      { #>
+    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
+    rti1516ev::AttributeHandle Get<#=attribute.Name#>AttributeHandle() const { return mBaseClass->Get<#=attribute.Name#>AttributeHandle(); }
+<#    } else { #>
+    // attribute <#=attribute.Name#> : no data type
+<#
+      } // if (attribute.DataType != null)
+    } // foreach (var attribute in objectClass.Attributes)
+    baseClass = baseClass.BaseClass;
+  } // while (baseClass != null)
+#>
+<# 
   foreach (var attribute in objectClass.Attributes)
   {
     if (attribute.DataType != null)
-    {
-#>    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
+    { #>
+    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
     rti1516ev::AttributeHandle Get<#=attribute.Name#>AttributeHandle() const { return m<#=attribute.Name#>AttributeHandle; }
-<#  } else {
-#>    // attribute <#=attribute.Name#> : no data type
+<#  } else { #>
+    // attribute <#=attribute.Name#> : no data type
 <#  
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
 #>
-    void Publish();
-    void Unpublish();
-    void Subscribe();
-    void Unsubscribe();
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
-    <#=objectClass.Name#>* GetObjectInstance(const std::wstring& instanceName);
-    <#=objectClass.Name#>* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
-    <#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName);
+    I<#=objectClass.Name#>* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
@@ -87,42 +109,13 @@ class <#=objectClass.Name#>ObjectClass
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
 #>
-  std::map<std::wstring, <#=objectClass.Name#>*> mObjectInstancesByName;
-  std::map<rti1516ev::ObjectInstanceHandle, <#=objectClass.Name#>*> mObjectInstancesByHandle;
+    std::map<std::wstring, <#=objectClass.Name#>*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, <#=objectClass.Name#>*> mObjectInstancesByHandle;
 };
 
-class <#=objectClass.Name#><#
-  if (objectClass.BaseClass != null)
-  {
-#> : public <#=objectClass.BaseClass.Name#>
-<# } else {
-#>
-
-<# } // if #>
+class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 {
-<# 
-  string attributeBitsClass = "uint32_t";
-  string attributeBitsPostfix = "";
-  if (objectClass.Attributes.Count > 32)
-  {
-    attributeBitsClass = "uint64_t";
-    attributeBitsPostfix = "ull";
-  }
-#>
   public:
-    using AttributeBits = <#=attributeBitsClass#>;
-    static const <#=attributeBitsClass#> kNone = 0x0;
-<# 
-  ulong bit = 1;
-  foreach (var attribute in objectClass.Attributes)
-  {
-    if (attribute.DataType != null)
-    { #>
-    static const <#=attributeBitsClass#> k<#=attribute.Name#>Bit = 0x<#=bit.ToString("X")#><#=attributeBitsPostfix#>;
-<#    bit = bit << 1;
-    } // if (attribute.DataType != null)
-  } // foreach (var attribute in objectClass.Attributes)
-#>
 
     <#=objectClass.Name#>();
     <#=objectClass.Name#>(rti1516ev::RTIambassador* ambassador, const std::wstring& instanceName, rti1516ev::ObjectInstanceHandle instanceHandle);
@@ -131,55 +124,64 @@ class <#=objectClass.Name#><#
     <#=objectClass.Name#>(<#=objectClass.Name#>&&) = delete;
     <#=objectClass.Name#>& operator=(const <#=objectClass.Name#>&) = delete;
     <#=objectClass.Name#>& operator=(<#=objectClass.Name#>&&) = delete;
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
 
-<# 
-  foreach (var attribute in objectClass.Attributes)
+<#
+  foreach (var attribute in objectClass.AllAttributes)
   {
     if (attribute.DataType != null)
     {
 #>    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
-    <#=attribute.DataType.ReturnCppType#> Get<#=attribute.Name#>() const;
-    void Set<#=attribute.Name#>(<#=attribute.DataType.CPPType#> newValue);
-<#  } else {
-#>    // attribute <#=attribute.Name#> : no data type
-<#  
+    <#=attribute.DataType.ReturnCppType#> Get<#=attribute.Name#>() const override;
+    void Set<#=attribute.Name#>(<#=attribute.DataType.CPPType#> newValue) override;
+<#  } else { #>
+    // attribute <#=attribute.Name#> : no data type
+<#
     } // if (attribute.DataType != null)
-  } // foreach (var attribute in objectClass.Attributes)
+  } // foreach (var attribute in objectClass.AllAttributes)
 #>
-     rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetAllAttributeValues() const;
-     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    // I<#=objectClass.Name#>
 <# if (objectClass.HasValidAttributes) { #>
-     void UpdateAllAttributeValues();
-     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time);
-     void UpdateModifiedAttributeValues();
-     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time);
-     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
-<# } #>
-     AttributeBits getUpdatedAttributes() const { return mLastUpdated; }
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+<# if (objectClass.ChildClasses.Count == 0) { #>
+    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    void UnregisterUpdateCallback(uint32_t callbackToken) override;
+<# } // if (objectClass.ChildClasses.Count == 0) #>
+<# } // if (objectClass.HasValidAttributes) #>
 
-  protected:
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+<# if (objectClass.HasValidAttributes) { #>
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+<# } #>
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+  private:
 <# if (objectClass.HasValidAttributes) { #>
     void ClearDirtyBits()
     {
-<# if (objectClass.BaseClass != null && objectClass.BaseClass.HasValidAttributes) { #>
-      <#=objectClass.BaseClass.Name#>::ClearDirtyBits();
-<# } #>
       mDirty = kNone;
     }
+    void ExecuteUpdateCallbacks();
 <# } #>
-
-  private:
     // modified by last reflectAttributeValues
-    AttributeBits mLastUpdated = kNone;
-    // to be sent with next updateAttributes
-    AttributeBits mDirty = kNone;
+    <#=objectClass.Name#>ObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
-    <#=objectClass.Name#>ObjectClass* mObjectClass;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+<# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
+    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    uint32_t mLastCallbackToken = 0;
+<# } #>
     // Attribute value encoders
 <# 
-  foreach (var attribute in objectClass.Attributes)
+  foreach (var attribute in objectClass.AllAttributes)
   {
     if (attribute.DataType != null)
     {
@@ -195,21 +197,25 @@ class <#=objectClass.Name#><#
 
 <# } // foreach (var objectClass in FOM.ObjectClasses) #> 
 
-class ClassRegistry
+class ClassRegistry : public IClassRegistry
 {
   public:
     ClassRegistry(rti1516ev::RTIambassador* rtiAmbassador);
+    ~ClassRegistry();
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
-    <#=objectClass.Name#>ObjectClass* get<#=objectClass.Name#>ObjectClass() const { return m<#=objectClass.Name#>ObjectClass.get(); }
+    I<#=objectClass.Name#>ObjectClass* get<#=objectClass.Name#>ObjectClass() const override { return m<#=objectClass.Name#>ObjectClass.get(); }
 <# } #>
 
-    void Initialize();
 
     void DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes);
+    static ClassRegistry* GetInstance() { return sClassRegistry; }
+  private:
+    void Initialize();
 
   private:
+    static ClassRegistry* sClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
     std::unique_ptr<<#=objectClass.Name#>ObjectClass> m<#=objectClass.Name#>ObjectClass;

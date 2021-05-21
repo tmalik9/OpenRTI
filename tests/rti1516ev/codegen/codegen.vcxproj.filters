@@ -39,6 +39,9 @@
     <ClInclude Include="RTFederateObjects.h">
       <Filter>generated source files</Filter>
     </ClInclude>
+    <ClInclude Include="RTFederateObjectInterfaces.h">
+      <Filter>generated source files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mom.xml" />

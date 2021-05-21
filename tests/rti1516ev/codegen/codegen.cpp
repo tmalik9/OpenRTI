@@ -196,13 +196,17 @@ bool testRTFederate(int argc, char* argv[])
   }
 
   NDistributedSimulation::NRTFederateEncoding::ClassRegistry classRegistry(ambassador.getRtiAmbassador());
-  classRegistry.Initialize();
+
   classRegistry.getBusControllerCanObjectClass()->Publish();
-  NDistributedSimulation::NRTFederateEncoding::BusControllerCan* busControllerCan = classRegistry.getBusControllerCanObjectClass()->CreateObjectInstance(L"CAN1");
+  NDistributedSimulation::NRTFederateEncoding::IBusControllerCan* busControllerCan = NDistributedSimulation::NRTFederateEncoding::GetClassRegistry()->getBusControllerCanObjectClass()->CreateObjectInstance(L"CAN1");
+  auto callbackToken = busControllerCan->RegisterUpdateCallback([](NDistributedSimulation::NRTFederateEncoding::IBusControllerCan* busControllerCan) {
+    std::wcout << L"update received: " << busControllerCan->GetObjectInstanceName() << std::endl;
+  });
   busControllerCan->SetBaudRate(250000);
   busControllerCan->SetOperationMode(NDistributedSimulation::NRTFederateEncoding::kCanOperationModeCan);
   busControllerCan->UpdateModifiedAttributeValues();
 
+  busControllerCan->UnregisterUpdateCallback(callbackToken);
   try
   {
     ambassador.resignFederationExecution(rti1516ev::NO_ACTION);

@@ -110,7 +110,7 @@ void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectIns
   mObjectInstancesByHandle.erase(theObject);
 }
 
-<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::GetObjectInstance(const std::wstring& instanceName)
+I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
@@ -123,7 +123,7 @@ void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectIns
   }
 }
 
-<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
+I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
@@ -136,7 +136,7 @@ void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectIns
   }
 }
 
-<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName)
+I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
@@ -170,7 +170,7 @@ void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectIns
 }
 
 <# 
-  foreach (var attribute in objectClass.Attributes)
+  foreach (var attribute in objectClass.AllAttributes)
   {
     if (attribute.DataType != null)
     {
@@ -201,17 +201,13 @@ void <#=objectClass.Name#>::Set<#=attribute.Name#>(<#=attribute.DataType.CPPType
 
 <#  
     } // if (attribute.DataType != null)
-  } // foreach (var attribute in objectClass.Attributes)
+  } // foreach (var attribute in objectClass.AllAttributes)
 #>
 rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetAllAttributeValues() const
 {
   rti1516ev::AttributeHandleValueMap result;
-  
-<# if (objectClass.BaseClass != null) { #>
-  result = <#=objectClass.BaseClass.Name#>::GetAllAttributeValues();
-<# } #>
 <#
-  foreach (var attribute in objectClass.Attributes)
+  foreach (var attribute in objectClass.AllAttributes)
   {
     if (attribute.DataType != null)
     {
@@ -227,10 +223,6 @@ rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetAllAttributeValues(
 rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetModifiedAttributeValues() const
 {
   rti1516ev::AttributeHandleValueMap result;
-  
-<# if (objectClass.BaseClass != null) { #>
-  result = <#=objectClass.BaseClass.Name#>::GetModifiedAttributeValues();
-<# } #>
 <#
   foreach (var attribute in objectClass.Attributes)
   {
@@ -277,9 +269,6 @@ void <#=objectClass.Name#>::UpdateModifiedAttributeValues(const rti1516ev::Logic
 
 void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-<# if (objectClass.BaseClass != null && objectClass.BaseClass.HasValidAttributes) { #>
-  <#=objectClass.BaseClass.Name#>::ReflectAttributeValues(attributes);
-<# } #>
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -308,13 +297,46 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
 #>
   } // for (auto& attributeHandleValue : attributes)
 } // <#=objectClass.Name#>::ReflectAttributeValues
+
+<# if (objectClass.ChildClasses.Count == 0) { #>
+uint32_t <#=objectClass.Name#>::RegisterUpdateCallback(UpdateCallbackType callback)
+{
+  mLastCallbackToken++;
+  mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void <#=objectClass.Name#>::UnregisterUpdateCallback(uint32_t callbackToken)
+{
+  mUpdateCallbacks.erase(callbackToken);
+}
+
+void <#=objectClass.Name#>::ExecuteUpdateCallbacks()
+{
+  for (auto& callbackEntry : mUpdateCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(this);
+  }
+}
+<# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
 
 <# } // foreach (var objectClass in FOM.ObjectClasses) #> 
 
+ClassRegistry* ClassRegistry::sClassRegistry = nullptr;
+
 ClassRegistry::ClassRegistry(rti1516ev::RTIambassador* rtiAmbassador)
   : mRtiAmbassador(rtiAmbassador)
 {
+  assert(sClassRegistry == nullptr);
+  sClassRegistry = this;
+  Initialize();
+}
+
+ClassRegistry::~ClassRegistry()
+{
+  sClassRegistry = nullptr;
 }
 
 void ClassRegistry::Initialize()
@@ -325,7 +347,7 @@ void ClassRegistry::Initialize()
     if (objectClass.BaseClass != null)
     {
 #>
-  m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(mRtiAmbassador, get<#=objectClass.BaseClass.Name#>ObjectClass()));
+  m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(mRtiAmbassador, m<#=objectClass.BaseClass.Name#>ObjectClass.get()));
 <# } else { #>
   m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(mRtiAmbassador));
 <# } // if #>
@@ -382,21 +404,25 @@ void ClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theOb
   foreach (var objectClass in FOM.ObjectClasses)
   {
     if (objectClass.HasValidAttributes)
-    {
-#>
-<#  if (firstInClassRegistryReflectAttributeValues) { #>
+    { 
+      if (firstInClassRegistryReflectAttributeValues) { #>
   if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<# } else { #>
+<#    } else { #>
   else if (theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<# } // if
-   firstInClassRegistryReflectAttributeValues = false;
-#>
+<#    } // if
+      firstInClassRegistryReflectAttributeValues = false; #>
   {
-    m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject)->ReflectAttributeValues(attributes);
+    static_cast<<#=objectClass.Name#>*>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-<# } // if (objectClass.hasValidAttributes) #>
+<#  
+    } // if (objectClass.hasValidAttributes)
+} // foreach 
+#>
+}
 
-<# } // foreach #>
+IClassRegistry* GetClassRegistry()
+{
+  return ClassRegistry::GetInstance();
 }
 
 <# foreach (var namespacePart in FOM.Namespace) { #>
