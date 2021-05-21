@@ -219,9 +219,10 @@ bool testRTFederate(int argc, char* argv[])
     return false;
   }
   ambassador.classRegistry.Initialize(ambassador.getRtiAmbassador());
-  ambassador.classRegistry.getBusControllerCanObjectClass()->Publish();
-  ambassador.classRegistry.getBusControllerCanObjectClass()->Subscribe();
-  NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan = NDistSimIB::NRTFederateEncoding::GetClassRegistry()->getBusControllerCanObjectClass()->CreateObjectInstance(L"CAN1");
+  auto* busControllerObjectClass = ambassador.classRegistry.getBusControllerCanObjectClass();
+  busControllerObjectClass->Publish();
+  busControllerObjectClass->Subscribe();
+  NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan = busControllerObjectClass->CreateObjectInstance(L"CAN1");
   while (!static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCan*>(busControllerCan)->IsValid())
   {
     ambassador.getRtiAmbassador()->evokeCallback(0.5);
@@ -230,10 +231,14 @@ bool testRTFederate(int argc, char* argv[])
   bool updateReceived = false;
   auto callbackToken = busControllerCan->RegisterUpdateCallback([&updateReceived](NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan) {
     std::wcout << L"update received: " << busControllerCan->GetObjectInstanceName() << std::endl;
+    if (busControllerCan->GetUpdatedAttributes() & NDistSimIB::NRTFederateEncoding::IBusControllerCan::kBaudRateBit)
+      std::wcout << L"  BaudRate = " << busControllerCan->GetBaudRate() << std::endl;
+    if (busControllerCan->GetUpdatedAttributes() & NDistSimIB::NRTFederateEncoding::IBusControllerCan::kOperationModeBit)
+      std::wcout << L"  OperationMode = " << busControllerCan->GetOperationMode() << std::endl;
     updateReceived = true;
   });
   busControllerCan->SetBaudRate(250000);
-  busControllerCan->SetOperationMode(NDistSimIB::NRTFederateEncoding::kCanOperationModeCan);
+  busControllerCan->SetOperationMode(NDistSimIB::NRTFederateEncoding::kCanOperationModeCanFD);
   busControllerCan->UpdateModifiedAttributeValues();
   while (!updateReceived)
   {
