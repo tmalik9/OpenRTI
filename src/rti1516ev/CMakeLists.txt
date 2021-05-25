@@ -38,6 +38,7 @@ set(RTI1516EV_PUBLIC_ENCODING_HEADERS
         ${RTI1516EV_HEADER_PATH}/RTI/encoding/EncodingConfig.h
         ${RTI1516EV_HEADER_PATH}/RTI/encoding/HLAfixedArray.h
         ${RTI1516EV_HEADER_PATH}/RTI/encoding/HLAfixedRecord.h
+        ${RTI1516EV_HEADER_PATH}/RTI/encoding/HLAhandle.h
         ${RTI1516EV_HEADER_PATH}/RTI/encoding/HLAopaqueData.h
         ${RTI1516EV_HEADER_PATH}/RTI/encoding/HLAvariableArray.h
         ${RTI1516EV_HEADER_PATH}/RTI/encoding/HLAvariantRecord.h

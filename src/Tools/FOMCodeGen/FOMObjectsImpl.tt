@@ -97,7 +97,9 @@ void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectI
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(this, instanceName, mRtiAmbassador, instanceHandle);
+  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -107,6 +109,8 @@ void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectIns
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -152,7 +156,8 @@ I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(c
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -189,27 +194,13 @@ rti1516ev::AttributeHandleSet <#=objectClass.Name#>ObjectClass::GetAllAttributeH
 {
 }
 
-<#=objectClass.Name#>::<#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 <#=objectClass.Name#>::~<#=objectClass.Name#>()
 {
-}
-
-void <#=objectClass.Name#>::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 

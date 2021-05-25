@@ -38,7 +38,6 @@ class IHLAobjectRoot
 
     virtual std::wstring GetObjectInstanceName() const = 0;
     // attribute HLAprivilegeToDeleteObject : no data type
-    virtual AttributeBits GetUpdatedAttributes() const = 0;
 };
 
 class ISystemVariable;
@@ -65,7 +64,6 @@ class ISystemVariable : public IHLAobjectRoot
     ISystemVariable& operator=(const ISystemVariable&) = delete;
     ISystemVariable& operator=(ISystemVariable&&) = delete;
 
-    virtual std::wstring GetObjectInstanceName() const = 0;
     // attribute Value : HLAopaqueData
     virtual std::vector<uint8_t> GetValue() const = 0;
     virtual void SetValue(std::vector<uint8_t> newValue) = 0;
@@ -73,10 +71,10 @@ class ISystemVariable : public IHLAobjectRoot
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
     virtual void UpdateModifiedAttributeValues() = 0;
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual AttributeBits GetUpdatedAttributes() const = 0;
     using UpdateCallbackType = std::function<void(ISystemVariable*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
-    virtual AttributeBits GetUpdatedAttributes() const = 0;
 };
 
 class IValueEntity;
@@ -103,7 +101,6 @@ class IValueEntity : public IHLAobjectRoot
     IValueEntity& operator=(const IValueEntity&) = delete;
     IValueEntity& operator=(IValueEntity&&) = delete;
 
-    virtual std::wstring GetObjectInstanceName() const = 0;
     // attribute Value : HLAopaqueData
     virtual std::vector<uint8_t> GetValue() const = 0;
     virtual void SetValue(std::vector<uint8_t> newValue) = 0;
@@ -111,10 +108,10 @@ class IValueEntity : public IHLAobjectRoot
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
     virtual void UpdateModifiedAttributeValues() = 0;
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual AttributeBits GetUpdatedAttributes() const = 0;
     using UpdateCallbackType = std::function<void(IValueEntity*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
-    virtual AttributeBits GetUpdatedAttributes() const = 0;
 };
 
 class IDOMemberSource;
@@ -143,7 +140,6 @@ class IDOMemberSource : public IHLAobjectRoot
     IDOMemberSource& operator=(const IDOMemberSource&) = delete;
     IDOMemberSource& operator=(IDOMemberSource&&) = delete;
 
-    virtual std::wstring GetObjectInstanceName() const = 0;
     // attribute DOSourceMemberName : HLAASCIIstring
     virtual std::string GetDOSourceMemberName() const = 0;
     virtual void SetDOSourceMemberName(std::string newValue) = 0;
@@ -157,10 +153,10 @@ class IDOMemberSource : public IHLAobjectRoot
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
     virtual void UpdateModifiedAttributeValues() = 0;
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual AttributeBits GetUpdatedAttributes() const = 0;
     using UpdateCallbackType = std::function<void(IDOMemberSource*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
-    virtual AttributeBits GetUpdatedAttributes() const = 0;
 };
 
 class IDOMemberTarget;
@@ -188,7 +184,6 @@ class IDOMemberTarget : public IHLAobjectRoot
     IDOMemberTarget& operator=(const IDOMemberTarget&) = delete;
     IDOMemberTarget& operator=(IDOMemberTarget&&) = delete;
 
-    virtual std::wstring GetObjectInstanceName() const = 0;
     // attribute DOTargetMemberName : HLAASCIIstring
     virtual std::string GetDOTargetMemberName() const = 0;
     virtual void SetDOTargetMemberName(std::string newValue) = 0;
@@ -199,10 +194,10 @@ class IDOMemberTarget : public IHLAobjectRoot
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
     virtual void UpdateModifiedAttributeValues() = 0;
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual AttributeBits GetUpdatedAttributes() const = 0;
     using UpdateCallbackType = std::function<void(IDOMemberTarget*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
-    virtual AttributeBits GetUpdatedAttributes() const = 0;
 };
 
 class IBusManagement;
@@ -229,7 +224,6 @@ class IBusManagement : public IHLAobjectRoot
     IBusManagement& operator=(const IBusManagement&) = delete;
     IBusManagement& operator=(IBusManagement&&) = delete;
 
-    virtual std::wstring GetObjectInstanceName() const = 0;
     // attribute NetworkID : HLAASCIIstring
     virtual std::string GetNetworkID() const = 0;
     virtual void SetNetworkID(std::string newValue) = 0;
@@ -267,7 +261,6 @@ class IBusManagementCan : public IBusManagement
     IBusManagementCan& operator=(const IBusManagementCan&) = delete;
     IBusManagementCan& operator=(IBusManagementCan&&) = delete;
 
-    virtual std::wstring GetObjectInstanceName() const = 0;
     // attribute BusState : CanBusState
     virtual CanBusState GetBusState() const = 0;
     virtual void SetBusState(CanBusState newValue) = 0;
@@ -280,14 +273,9 @@ class IBusManagementCan : public IBusManagement
     // attribute SendMessagesAsRx : HLAboolean
     virtual bool GetSendMessagesAsRx() const = 0;
     virtual void SetSendMessagesAsRx(bool newValue) = 0;
-    virtual void UpdateAllAttributeValues() = 0;
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
-    virtual void UpdateModifiedAttributeValues() = 0;
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
     using UpdateCallbackType = std::function<void(IBusManagementCan*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
-    virtual AttributeBits GetUpdatedAttributes() const = 0;
 };
 
 class IBusController;
@@ -315,7 +303,6 @@ class IBusController : public IHLAobjectRoot
     IBusController& operator=(const IBusController&) = delete;
     IBusController& operator=(IBusController&&) = delete;
 
-    virtual std::wstring GetObjectInstanceName() const = 0;
     // attribute NetworkID : HLAASCIIstring
     virtual std::string GetNetworkID() const = 0;
     virtual void SetNetworkID(std::string newValue) = 0;
@@ -361,7 +348,6 @@ class IBusControllerCan : public IBusController
     IBusControllerCan& operator=(const IBusControllerCan&) = delete;
     IBusControllerCan& operator=(IBusControllerCan&&) = delete;
 
-    virtual std::wstring GetObjectInstanceName() const = 0;
     // attribute BaudRate : HLAinteger32LE
     virtual int32_t GetBaudRate() const = 0;
     virtual void SetBaudRate(int32_t newValue) = 0;
@@ -389,14 +375,9 @@ class IBusControllerCan : public IBusController
     // attribute SamplingMode : CanSamplingMode
     virtual CanSamplingMode GetSamplingMode() const = 0;
     virtual void SetSamplingMode(CanSamplingMode newValue) = 0;
-    virtual void UpdateAllAttributeValues() = 0;
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
-    virtual void UpdateModifiedAttributeValues() = 0;
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
     using UpdateCallbackType = std::function<void(IBusControllerCan*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
-    virtual AttributeBits GetUpdatedAttributes() const = 0;
 };
 
 

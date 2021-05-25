@@ -127,7 +127,7 @@ bool testHLAobjectClassBasedCountsEncoding()
   return true;
 }
 
-class RTFederateAmbassador : public OpenRTI::RTI1516ESimpleAmbassador
+class OPENRTI_LOCAL RTFederateAmbassador : public OpenRTI::RTI1516ESimpleAmbassador
 {
 public:
   RTFederateAmbassador() : OpenRTI::RTI1516ESimpleAmbassador() {}

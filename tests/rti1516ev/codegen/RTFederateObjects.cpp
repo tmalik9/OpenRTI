@@ -60,7 +60,9 @@ void HLAobjectRootObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  HLAobjectRoot* newObject = new HLAobjectRoot(this, instanceName, mRtiAmbassador, instanceHandle);
+  HLAobjectRoot* newObject = new HLAobjectRoot(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -70,6 +72,8 @@ void HLAobjectRootObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHan
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -115,7 +119,8 @@ IHLAobjectRoot* HLAobjectRootObjectClass::CreateObjectInstance(const std::wstrin
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -141,27 +146,13 @@ HLAobjectRoot::HLAobjectRoot(HLAobjectRootObjectClass* objectClass, const std::w
 {
 }
 
-HLAobjectRoot::HLAobjectRoot(HLAobjectRootObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 HLAobjectRoot::~HLAobjectRoot()
 {
-}
-
-void HLAobjectRoot::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 
@@ -233,7 +224,9 @@ void SystemVariableObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  SystemVariable* newObject = new SystemVariable(this, instanceName, mRtiAmbassador, instanceHandle);
+  SystemVariable* newObject = new SystemVariable(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -243,6 +236,8 @@ void SystemVariableObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHa
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -288,7 +283,8 @@ ISystemVariable* SystemVariableObjectClass::CreateObjectInstance(const std::wstr
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -315,27 +311,13 @@ SystemVariable::SystemVariable(SystemVariableObjectClass* objectClass, const std
 {
 }
 
-SystemVariable::SystemVariable(SystemVariableObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 SystemVariable::~SystemVariable()
 {
-}
-
-void SystemVariable::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 
@@ -510,7 +492,9 @@ void ValueEntityObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHan
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  ValueEntity* newObject = new ValueEntity(this, instanceName, mRtiAmbassador, instanceHandle);
+  ValueEntity* newObject = new ValueEntity(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -520,6 +504,8 @@ void ValueEntityObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandl
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -565,7 +551,8 @@ IValueEntity* ValueEntityObjectClass::CreateObjectInstance(const std::wstring& i
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -592,27 +579,13 @@ ValueEntity::ValueEntity(ValueEntityObjectClass* objectClass, const std::wstring
 {
 }
 
-ValueEntity::ValueEntity(ValueEntityObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 ValueEntity::~ValueEntity()
 {
-}
-
-void ValueEntity::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 
@@ -791,7 +764,9 @@ void DOMemberSourceObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  DOMemberSource* newObject = new DOMemberSource(this, instanceName, mRtiAmbassador, instanceHandle);
+  DOMemberSource* newObject = new DOMemberSource(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -801,6 +776,8 @@ void DOMemberSourceObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHa
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -846,7 +823,8 @@ IDOMemberSource* DOMemberSourceObjectClass::CreateObjectInstance(const std::wstr
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -875,27 +853,13 @@ DOMemberSource::DOMemberSource(DOMemberSourceObjectClass* objectClass, const std
 {
 }
 
-DOMemberSource::DOMemberSource(DOMemberSourceObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 DOMemberSource::~DOMemberSource()
 {
-}
-
-void DOMemberSource::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 
@@ -1126,7 +1090,9 @@ void DOMemberTargetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  DOMemberTarget* newObject = new DOMemberTarget(this, instanceName, mRtiAmbassador, instanceHandle);
+  DOMemberTarget* newObject = new DOMemberTarget(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -1136,6 +1102,8 @@ void DOMemberTargetObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHa
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -1181,7 +1149,8 @@ IDOMemberTarget* DOMemberTargetObjectClass::CreateObjectInstance(const std::wstr
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -1209,27 +1178,13 @@ DOMemberTarget::DOMemberTarget(DOMemberTargetObjectClass* objectClass, const std
 {
 }
 
-DOMemberTarget::DOMemberTarget(DOMemberTargetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 DOMemberTarget::~DOMemberTarget()
 {
-}
-
-void DOMemberTarget::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 
@@ -1431,7 +1386,9 @@ void BusManagementObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  BusManagement* newObject = new BusManagement(this, instanceName, mRtiAmbassador, instanceHandle);
+  BusManagement* newObject = new BusManagement(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -1441,6 +1398,8 @@ void BusManagementObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHan
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -1486,7 +1445,8 @@ IBusManagement* BusManagementObjectClass::CreateObjectInstance(const std::wstrin
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -1513,27 +1473,13 @@ BusManagement::BusManagement(BusManagementObjectClass* objectClass, const std::w
 {
 }
 
-BusManagement::BusManagement(BusManagementObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 BusManagement::~BusManagement()
 {
-}
-
-void BusManagement::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 
@@ -1693,7 +1639,9 @@ void BusManagementCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstan
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  BusManagementCan* newObject = new BusManagementCan(this, instanceName, mRtiAmbassador, instanceHandle);
+  BusManagementCan* newObject = new BusManagementCan(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -1703,6 +1651,8 @@ void BusManagementCanObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstance
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -1748,7 +1698,8 @@ IBusManagementCan* BusManagementCanObjectClass::CreateObjectInstance(const std::
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -1779,27 +1730,13 @@ BusManagementCan::BusManagementCan(BusManagementCanObjectClass* objectClass, con
 {
 }
 
-BusManagementCan::BusManagementCan(BusManagementCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 BusManagementCan::~BusManagementCan()
 {
-}
-
-void BusManagementCan::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 
@@ -2070,7 +2007,9 @@ void BusControllerObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  BusController* newObject = new BusController(this, instanceName, mRtiAmbassador, instanceHandle);
+  BusController* newObject = new BusController(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -2080,6 +2019,8 @@ void BusControllerObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHan
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -2125,7 +2066,8 @@ IBusController* BusControllerObjectClass::CreateObjectInstance(const std::wstrin
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -2153,27 +2095,13 @@ BusController::BusController(BusControllerObjectClass* objectClass, const std::w
 {
 }
 
-BusController::BusController(BusControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 BusController::~BusController()
 {
-}
-
-void BusController::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 
@@ -2370,7 +2298,9 @@ void BusControllerCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstan
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
-  BusControllerCan* newObject = new BusControllerCan(this, instanceName, mRtiAmbassador, instanceHandle);
+  BusControllerCan* newObject = new BusControllerCan(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
 }
@@ -2380,6 +2310,8 @@ void BusControllerCanObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstance
   std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
   auto iter = mObjectInstancesByName.find(instanceName);
   assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   mObjectInstancesByName.erase(iter);
   mObjectInstancesByHandle.erase(theObject);
 }
@@ -2425,7 +2357,8 @@ IBusControllerCan* BusControllerCanObjectClass::CreateObjectInstance(const std::
   ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
-      newObject->SetObjectInstanceHandle(instanceHandle);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
       mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
     }
   });
@@ -2462,27 +2395,13 @@ BusControllerCan::BusControllerCan(BusControllerCanObjectClass* objectClass, con
 {
 }
 
-BusControllerCan::BusControllerCan(BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador, rti1516ev::ObjectInstanceHandle instanceHandle)
-  : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
-  , mObjectInstanceHandle(instanceHandle)
-{
-}
-
 BusControllerCan::~BusControllerCan()
 {
-}
-
-void BusControllerCan::SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
-{
-  if (!mObjectInstanceHandle.isValid())
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mObjectInstanceHandle = objectInstanceHandle;
-  }
-  else
-  {
-    throw std::logic_error("object instance handle already set");
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
   }
 }
 

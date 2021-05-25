@@ -34,6 +34,8 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
 {
   public:
     // I<#=objectClass.Name#>ObjectClass
+    <#=objectClass.Name#>ObjectClass() = default;
+    virtual ~<#=objectClass.Name#>ObjectClass() = default;
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -118,16 +120,13 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 {
   public:
 
-    <#=objectClass.Name#>();
-    <#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
-    <#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador, rti1516ev::ObjectInstanceHandle instanceHandle);
-    ~<#=objectClass.Name#>();
+    virtual ~<#=objectClass.Name#>();
     <#=objectClass.Name#>(const <#=objectClass.Name#>&) = delete;
     <#=objectClass.Name#>(<#=objectClass.Name#>&&) = delete;
     <#=objectClass.Name#>& operator=(const <#=objectClass.Name#>&) = delete;
     <#=objectClass.Name#>& operator=(<#=objectClass.Name#>&&) = delete;
+    I<#=objectClass.Name#>ObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
-    void SetObjectInstanceHandle(rti1516ev::ObjectInstanceHandle objectInstanceHandle);
 <#
   foreach (var attribute in objectClass.AllAttributes)
   {
@@ -148,6 +147,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
 <# if (objectClass.ChildClasses.Count == 0) { #>
     uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
@@ -160,21 +160,28 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
 <# } #>
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
   private:
+    friend class <#=objectClass.Name#>ObjectClass;
+
+    <#=objectClass.Name#>();
+    <#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
     void ExecuteUpdateCallbacks();
 <# } #>
-    // modified by last reflectAttributeValues
     <#=objectClass.Name#>ObjectClass* mObjectClass;
     std::wstring mInstanceName;
-    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+<# if (objectClass.HasValidAttributes) { #>
     // modified by ReflectAttributeValues
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
+<# } #>
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
     std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;

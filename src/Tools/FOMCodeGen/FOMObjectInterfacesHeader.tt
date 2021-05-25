@@ -87,7 +87,9 @@ class I<#=objectClass.Name#><#
     I<#=objectClass.Name#>& operator=(const I<#=objectClass.Name#>&) = delete;
     I<#=objectClass.Name#>& operator=(I<#=objectClass.Name#>&&) = delete;
 
+<# if (objectClass.BaseClass == null)  {#>
     virtual std::wstring GetObjectInstanceName() const = 0;
+<# } #>
 <# 
   foreach (var attribute in objectClass.Attributes)
   {
@@ -103,17 +105,19 @@ class I<#=objectClass.Name#><#
   } // foreach (var attribute in objectClass.Attributes)
 #>
 <# if (objectClass.HasValidAttributes) { #>
+<# if (objectClass.BaseClass != null && !objectClass.BaseClass.HasValidAttributes) { #>
     virtual void UpdateAllAttributeValues() = 0;
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
     virtual void UpdateModifiedAttributeValues() = 0;
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual AttributeBits GetUpdatedAttributes() const = 0;
+<# } #>
 <# if (objectClass.ChildClasses.Count == 0) { #>
     using UpdateCallbackType = std::function<void(I<#=objectClass.Name#>*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
-    virtual AttributeBits GetUpdatedAttributes() const = 0;
 };
 
 <# } // foreach (var objectClass in FOM.ObjectClasses) #>
