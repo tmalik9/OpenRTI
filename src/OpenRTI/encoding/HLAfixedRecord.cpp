@@ -43,16 +43,10 @@ public:
   HLAfixedRecordImplementation(const HLAfixedRecordImplementation& rhs)
     : _version(rhs._version)
   {
-    try {
-      _dataElementVector.reserve(rhs._dataElementVector.size());
-      for (auto& element : rhs._dataElementVector)
-        _dataElementVector.push_back(std::make_pair(element.first->clone().release(), true));
-      _dataElementVersions = rhs._dataElementVersions;
-    }
-    catch (...)
-    {
-      DebugPrintf("%s failed\n", __FUNCTION__);
-    }
+    _dataElementVector.reserve(rhs._dataElementVector.size());
+    for (auto& element : rhs._dataElementVector)
+      _dataElementVector.push_back(std::make_pair(element.first->clone().release(), true));
+    _dataElementVersions = rhs._dataElementVersions;
   }
   ~HLAfixedRecordImplementation() noexcept
   {

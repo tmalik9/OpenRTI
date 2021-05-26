@@ -151,6 +151,15 @@ public:
       return _protoType->isSameTypeAs(*(rhs._dataElementVector.front().first));
     }
   }
+
+  void resize(size_t length)
+  {
+    _dataElementVector.resize(length);
+  }
+  void clear()
+  {
+    _dataElementVector.clear();
+  }
   // bool 'second' specifies whether the DataElement pointed is owned by this instance.
   typedef std::vector<std::pair<DataElement*, bool>> DataElementVector;
   DataElementVector _dataElementVector;
@@ -286,6 +295,17 @@ DataElement const&
 HLAfixedArray::operator [](size_t index) const
 {
   return _impl->get(index);
+}
+
+
+void HLAfixedArray::resize(size_t length)
+{
+  _impl->resize(length);
+}
+
+void HLAfixedArray::clear()
+{
+  _impl->clear();
 }
 
 }

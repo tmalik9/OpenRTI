@@ -22,6 +22,7 @@
 
 #include "VariableLengthData.h"
 #include "DataElement.h"
+#include "Encoding.h"
 
 #include <cstring>
 #include <vector>
@@ -33,6 +34,8 @@ namespace OpenRTI
 
 class OPENRTI_LOCAL HLAopaqueDataImplementation {
 public:
+  using ImplType = std::vector<uint8_t>;
+
   HLAopaqueDataImplementation()
   {
   }
@@ -56,37 +59,53 @@ public:
     _buffer(rhs._buffer)
   {
   }
-  
+
   ~HLAopaqueDataImplementation() noexcept
   {
   }
 
-  void encodeInto(std::vector<Octet>& buffer) const
+  size_t decodedSize(const Octet* buffer, size_t bufferSize, size_t index)
   {
-    buffer.insert(buffer.end(), _buffer.begin(), _buffer.end());
+    if (bufferSize < index + 4)
+      throw EncoderException("Insufficient buffer size for decoding!");
+    uint32_t length;
+    decodeFromBE32(buffer, bufferSize, index, length);
+    return length;
   }
 
-  size_t decodeFrom(std::vector<Octet> const & buffer, size_t index)
+  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
   {
-    std::vector<Octet>::const_iterator i = buffer.begin();
-    std::advance(i, index);
-    _buffer.clear();
-    _buffer.insert(_buffer.end(), i, buffer.end());
-    return buffer.size();
-  }
-
-  size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
-  {
+#ifdef _DEBUG
+    if (bufferSize < offset + getEncodedLength())
+      throw EncoderException("buffer to small: bufferSize=" + std::to_string(bufferSize) + " offset=" + std::to_string(offset) + " encodedLength=" + std::to_string(getEncodedLength()));
+#endif
+    size_t length = _buffer.size();
+    if (0xffffffffu < length)
+      throw EncoderException("HLAopaqueData::encodeInto(): array size is too big to encode!");
+    offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<uint32_t>(length));
     memcpy(buffer + offset, _buffer.data(), _buffer.size());
     return offset + _buffer.size();
   }
 
   size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   {
-    const Octet* i = buffer + index;
-    _buffer.clear();
-    _buffer.insert(_buffer.end(), i, buffer + bufferSize);
-    return bufferSize;
+    if (bufferSize < index + 4u)
+      throw EncoderException("Insufficient buffer size for decoding!");
+    uint32_t length;
+    index = decodeFromBE32(buffer, bufferSize, index, length);
+    _buffer.resize(length);
+    memcpy(_buffer.data(), buffer + index, length);
+    return index + length;
+  }
+
+  size_t getEncodedLength() const
+  {
+    return 4u + _buffer.size();
+  }
+
+  size_t size() const
+  {
+    return _buffer.size();
   }
 
   void setDataPointer(Octet** inData, size_t /*bufferSize*/, size_t dataSize)
@@ -102,6 +121,11 @@ public:
     //inData = 0;
   }
 
+  void set(const std::vector<uint8_t>& newValue)
+  {
+    _buffer = newValue;
+  }
+
   void set(const Octet* inData, size_t dataSize)
   {
     _buffer.reserve(dataSize);
@@ -110,11 +134,9 @@ public:
     _buffer.assign(inData, inData + dataSize);
   }
 
-  const Octet* get() const
+  const std::vector<Octet>& get() const
   {
-    if (_buffer.empty())
-      return 0;
-    return &_buffer.front();
+    return _buffer;
   }
 
   std::vector<Octet> _buffer;
@@ -161,18 +183,19 @@ HLAopaqueData::encode () const
 }
 
 void
-HLAopaqueData::encode(VariableLengthData& inData) const
+HLAopaqueData::encode(VariableLengthData& outData) const
 {
-  std::vector<Octet> buffer;
-  buffer.reserve(getEncodedLength());
-  encodeInto(buffer);
-  if (buffer.size() > 0) inData.setData(&buffer.front(), buffer.size());
+  outData.resize(getEncodedLength());
+  _impl->encodeInto(static_cast<Octet*>(outData.data()), outData.size(), 0);
 }
 
 void
 HLAopaqueData::encodeInto(std::vector<Octet>& buffer) const
 {
-  _impl->encodeInto(buffer);
+  size_t offset = buffer.size();
+  size_t encodedLength = getEncodedLength();
+  buffer.resize(offset + encodedLength);
+  _impl->encodeInto(static_cast<Octet*>(buffer.data()) + offset, encodedLength, offset);
 }
 
 
@@ -201,7 +224,7 @@ size_t HLAopaqueData::decodeFrom(const Octet* buffer, size_t bufferSize, size_t 
 size_t
 HLAopaqueData::getEncodedLength() const
 {
-  return _impl->_buffer.size();
+  return _impl->getEncodedLength();
 }
 
 unsigned int
@@ -234,7 +257,13 @@ HLAopaqueData::set(const Octet* inData, size_t dataSize)
   _impl->set(inData, dataSize);
 }
 
-const Octet*
+void
+HLAopaqueData::set(const std::vector<Octet>& inData)
+{
+  _impl->set(inData);
+}
+
+const std::vector<Octet>&
 HLAopaqueData::get() const
 {
   return _impl->get();
@@ -242,7 +271,14 @@ HLAopaqueData::get() const
 
 HLAopaqueData::operator const Octet*() const
 {
-  return _impl->get();
+  if (_impl->size() > 0)
+  {
+    return _impl->get().data();
+  }
+  else
+  {
+    return nullptr;
+  }
 }
 
 }

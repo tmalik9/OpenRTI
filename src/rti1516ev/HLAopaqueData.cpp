@@ -59,7 +59,8 @@ public:
     _buffer(rhs._buffer)
   {
   }
-  ~HLAopaqueDataImplementation()
+
+  ~HLAopaqueDataImplementation() noexcept
   {
   }
 
@@ -107,7 +108,7 @@ public:
     return _buffer.size();
   }
 
-  void setDataPointer(Octet** inData, size_t bufferSize, size_t dataSize)
+  void setDataPointer(Octet** inData, size_t /*bufferSize*/, size_t dataSize)
   {
     // FIXME no clue if this is right!!
     if (!dataSize) {
@@ -115,12 +116,12 @@ public:
     } else {
       set(*inData, dataSize);
     }
-    if (*inData)
-      delete *inData;
-    inData = 0;
+    //if (*inData)
+    //  delete *inData;
+    //inData = 0;
   }
 
-  void set(const std::vector<uint8_t> newValue)
+  void set(const std::vector<uint8_t>& newValue)
   {
     _buffer = newValue;
   }
