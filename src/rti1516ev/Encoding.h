@@ -253,4 +253,13 @@ static inline size_t encodeIntoBE32Compressed(Octet* buffer, size_t bufferSize, 
   return encodeCompressed<uint32_t>(buffer, bufferSize, offset, value);
 }
 
+class HLAencodingImplementationBase
+{
+  public:
+    virtual ~HLAencodingImplementationBase() {}
+    virtual HLAencodingImplementationBase* clone() const = 0;
+    virtual size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const = 0;
+    virtual size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t offset) = 0;
+};
+
 }

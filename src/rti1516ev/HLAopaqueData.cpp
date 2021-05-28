@@ -32,7 +32,7 @@
 namespace rti1516ev
 {
 
-class OPENRTI_LOCAL HLAopaqueDataImplementation {
+class OPENRTI_LOCAL HLAopaqueDataImplementation : public HLAencodingImplementationBase {
 public:
   using ImplType = std::vector<uint8_t>;
 
@@ -96,6 +96,11 @@ public:
     _buffer.resize(length);
     memcpy(_buffer.data(), buffer + index, length);
     return index + length;
+  }
+
+  HLAencodingImplementationBase* clone() const override
+  {
+    return new HLAopaqueDataImplementation(*this);
   }
 
   size_t getEncodedLength() const

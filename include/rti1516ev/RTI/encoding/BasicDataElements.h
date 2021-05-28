@@ -20,6 +20,10 @@
 
 namespace rti1516ev
 {
+
+// Base class for all encoder implementations. Not part of the public API.
+class HLAencodingImplementationBase;
+
 // The following macro is used to define each of the encoding helper
 // classes for basic C++ datatypes, e.g. HLAinteger16LE, HLAunicodeString,
 // etc. Each kind of encoding helper contains the same set of operators
@@ -29,7 +33,7 @@ namespace rti1516ev
 // When used with a reference, the encoding and decoding is performed using
 // the referenced instance of the native type.
 
-#define DEFINE_ENCODING_HELPER_CLASS(EncodableDataType, SimpleDataType)       \
+#define DEFINE_ENCODING_HELPER_CLASS(EncodableDataType, DataType)             \
                                                                               \
 /* Forward declaration for the RTI-internal class used to implement        */ \
 /* a specific kind of encoding helper                                      */ \
@@ -38,7 +42,7 @@ class EncodableDataType##Implementation;                                      \
 class RTI_EXPORT EncodableDataType : public rti1516ev::DataElement             \
 {                                                                             \
 public:                                                                       \
-                                                                              \
+   using SimpleDataType = DataType;                                           \
    /* Constructor: Default                                                 */ \
    /* Uses internal memory.                                                */ \
    EncodableDataType();                                                       \
@@ -117,8 +121,9 @@ public:                                                                       \
    /* valid for the lifetime of this object or until this object acquires  */ \
    /* new memory through this call.                                        */ \
    /* Null pointer results in an exception.                                */ \
-   virtual void setDataPointer (                                              \
-      SimpleDataType* inData);                                               \
+   virtual void setDataPointer (SimpleDataType* inData);                      \
+                                                                              \
+   virtual SimpleDataType* getDataPointer();                                  \
                                                                               \
    /* Set the value to be encoded.                                         */ \
    /* If this element uses external memory, the memory will be modified.   */ \

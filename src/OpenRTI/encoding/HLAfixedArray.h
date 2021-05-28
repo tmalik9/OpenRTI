@@ -125,11 +125,10 @@ namespace OpenRTI
    private:
 
       // Default Constructor not allowed
-      HLAfixedArray ();
+      HLAfixedArray() = delete;
 
       // Assignment Operator not allowed
-      HLAfixedArray& operator=(
-         HLAfixedArray const & rhs);
+      HLAfixedArray& operator=(HLAfixedArray const & rhs) = delete;
 
    protected:
 

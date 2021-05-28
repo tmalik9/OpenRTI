@@ -29,10 +29,6 @@
 namespace OpenRTI
 {
 
-
-// This is fake as it currently only supports federate handles.
-// It should be reworked to support all kinds of handles
-// 1
 class OPENRTI_API HLAhandle : public DataElement
 {
   enum HandleKind {

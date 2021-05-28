@@ -1484,6 +1484,71 @@ bool testFixedArrayOfUnicodeStringEncoding()
   return true;
 }
 
+template<class BasicTypeEncoding>
+bool testFixedArrayOfBasicTypeEncoding(typename BasicTypeEncoding::SimpleDataType data[4])
+{
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+  if (gDebugPrint) std::wcout << L"testing fixed array of " << typeid(BasicTypeEncoding).name() << std::endl;
+  if (gDebugPrint) std::cout << "=======================================================" << std::endl;
+
+  std::cout << "encode from data owned by array/decode into data owned by array" << std::endl;
+  rti1516ev::HLAfixedArray arrayEncoder1{ BasicTypeEncoding(), 4 };
+  for (int i = 0; i < 4; i++)
+  {
+    arrayEncoder1.set(i, BasicTypeEncoding(data[i]));
+  }
+  rti1516ev::VariableLengthData encodedData1 = arrayEncoder1.encode();
+  std::cout << "encodedData1=" << encodedData1 << std::endl;
+
+  rti1516ev::HLAfixedArray arrayDecoder1{ BasicTypeEncoding(), 4 };
+  arrayDecoder1.decode(encodedData1);
+  for (int i = 0; i < 4; i++)
+  {
+    std::wcout << "arrayDecoder1.get(" << i << ")).get()=" << std::hex << static_cast<const BasicTypeEncoding&>(arrayDecoder1.get(i)).get() << std::endl;
+    if (static_cast<const BasicTypeEncoding&>(arrayDecoder1.get(i)).get() != data[i])
+      return false;
+  }
+
+  std::cout << "encode from external data/decode into data owned by array" << std::endl;
+  BasicTypeEncoding integerEncoder[4];
+  rti1516ev::HLAfixedArray arrayEncoder2{ BasicTypeEncoding(), 4 };
+  for (int i = 0; i < 4; i++)
+  {
+    integerEncoder[i].setDataPointer(&data[i]);
+    arrayEncoder2.setElementPointer(i, &integerEncoder[i]);
+  }
+  rti1516ev::VariableLengthData encodedData2 = arrayEncoder1.encode();
+  std::cout << "encodedData2=" << encodedData2 << std::endl;
+
+  rti1516ev::HLAfixedArray arrayDecoder2{ BasicTypeEncoding(), 4 };
+  arrayDecoder2.decode(encodedData2);
+  for (int i = 0; i < 4; i++)
+  {
+    std::wcout << "arrayDecoder2.get(" << i << ").get()=" << std::hex << static_cast<const BasicTypeEncoding&>(arrayDecoder1.get(i)).get() << std::endl;
+    if (static_cast<const BasicTypeEncoding&>(arrayDecoder2.get(i)).get() != data[i])
+      return false;
+  }
+
+  std::cout << "decode into external data, using encoded data from last step" << std::endl;
+  typename BasicTypeEncoding::SimpleDataType decodedData[] = { 0, 0, 0, 0 };
+  BasicTypeEncoding integerDecoder[4];
+  rti1516ev::HLAfixedArray arrayDecoder3{ BasicTypeEncoding(), 4 };
+  for (int i = 0; i < 4; i++)
+  {
+    integerDecoder[i].setDataPointer(&decodedData[i]);
+    arrayDecoder3.setElementPointer(i, &integerDecoder[i]);
+  }
+  arrayDecoder3.decode(encodedData2);
+  for (int i = 0; i < 4; i++)
+  {
+    std::wcout << "decodedData[" << i << "]=" << std::hex << decodedData[i] << std::endl;
+    if (decodedData[i] != data[i])
+      return false;
+  }
+  std::cout << "fixed array of " << typeid(BasicTypeEncoding).name() << " OK" << std::endl;
+  return true;
+}
+
 bool testVariableArrayOfUnicodeStringEncoding()
 {
   if (gDebugPrint) std::cout << "=======================================================" << std::endl;
@@ -2238,6 +2303,37 @@ main(int argc, char* argv[])
   if (!testDataElementEncoding(StructAlign2DataType))
     return EXIT_FAILURE;
 
+  uint8_t bytes[] = { 0x02, 0x08, 0x20, 0x80 };
+  if (!testFixedArrayOfBasicTypeEncoding<rti1516ev::HLAoctet>(bytes))
+    return EXIT_FAILURE;
+
+  if (!testFixedArrayOfBasicTypeEncoding<rti1516ev::HLAbyte>(bytes))
+    return EXIT_FAILURE;
+
+  int16_t words[] = { 0x0202, 0x0808, 0x2020, 0x7fff };
+  if (!testFixedArrayOfBasicTypeEncoding<rti1516ev::HLAinteger16LE>(words))
+    return EXIT_FAILURE;
+
+  if (!testFixedArrayOfBasicTypeEncoding<rti1516ev::HLAinteger16BE>(words))
+    return EXIT_FAILURE;
+
+  int32_t dwords[] = { 0x02020202, 0x08080808, 0x20202020, 0x7fffffff };
+  if (!testFixedArrayOfBasicTypeEncoding<rti1516ev::HLAinteger32LE>(dwords))
+    return EXIT_FAILURE;
+
+  if (!testFixedArrayOfBasicTypeEncoding<rti1516ev::HLAinteger32BE>(dwords))
+    return EXIT_FAILURE;
+
+  int64_t qwords[] = { 0x0202020202020202, 0x0808080808080808, 0x2020202020202020, 0x7fffffffffffffff };
+  if (!testFixedArrayOfBasicTypeEncoding<rti1516ev::HLAinteger64LE>(qwords))
+    return EXIT_FAILURE;
+
+  if (!testFixedArrayOfBasicTypeEncoding<rti1516ev::HLAinteger64BE>(qwords))
+    return EXIT_FAILURE;
+
+  if (!testFixedArrayOfUnicodeStringEncoding())
+    return EXIT_FAILURE;
+
   if (!testFixedArrayOfASCIIStringEncoding())
     return EXIT_FAILURE;
 
@@ -2249,7 +2345,6 @@ main(int argc, char* argv[])
 
   if (!testVariableArrayOfUnicodeStringEncoding())
     return EXIT_FAILURE;
-
   if (!testDataPointerEncoding())
     return EXIT_FAILURE;
 
@@ -2301,6 +2396,7 @@ main(int argc, char* argv[])
   rti1516ev::InteractionClassHandle interactionClass1 = ambassador.getInteractionClassHandle(L"HLAinteractionRoot.InteractionClass1");
   if (!testInteractionClassHandleEncodings(ambassador, interactionClass1))
     return EXIT_FAILURE;
+
   if (!testDataElementEncoding(HLAfederateHandleDataType))
     return EXIT_FAILURE;
   if (!testDataElementEncoding(HLAobjectClassHandleDataType))
@@ -2357,6 +2453,7 @@ main(int argc, char* argv[])
     std::wcout << L"Unknown Exception!" << std::endl;
     return EXIT_FAILURE;
   }
+
   if (gDebugPrint) std::wcout << "all tests SUCCEEDED!" << std::endl;
   return EXIT_SUCCESS;
 }

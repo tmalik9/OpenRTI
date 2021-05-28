@@ -34,7 +34,7 @@
 
 namespace rti1516ev {
 
-class OPENRTI_LOCAL HLAvariableArrayImplementation {
+class OPENRTI_LOCAL HLAvariableArrayImplementation : public HLAencodingImplementationBase {
 public:
   HLAvariableArrayImplementation(const DataElement& protoType)
   {
@@ -109,6 +109,11 @@ public:
     return index;
   }
 
+  HLAencodingImplementationBase* clone() const override
+  {
+    return new HLAvariableArrayImplementation(*this);
+  }
+
   size_t getEncodedLength() const
   {
     size_t length = 4u;
@@ -122,8 +127,7 @@ public:
     return std::max(_protoType->getOctetBoundary(), 4u);
   }
 
-  size_t size () const
-  { return _dataElementVector.size(); }
+  size_t size () const { return _dataElementVector.size(); }
 
   size_t decodedSize(const Octet* buffer, size_t bufferSize, size_t index)
   {

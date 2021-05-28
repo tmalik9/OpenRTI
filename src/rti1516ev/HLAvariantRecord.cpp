@@ -32,7 +32,7 @@
 namespace rti1516ev
 {
 
-class OPENRTI_LOCAL HLAvariantRecordImplementation {
+class OPENRTI_LOCAL HLAvariantRecordImplementation : public HLAencodingImplementationBase {
 public:
   HLAvariantRecordImplementation(DataElement const& discriminantPrototype) :
     _octetBoundary(0)
@@ -53,9 +53,14 @@ public:
     /* FIXME */
   }
 
-  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset)
+  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
   {
     return offset;
+  }
+
+  HLAencodingImplementationBase* clone() const override
+  {
+    return new HLAvariantRecordImplementation(*this);
   }
 
   size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)

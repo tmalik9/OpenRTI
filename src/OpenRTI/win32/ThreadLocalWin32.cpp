@@ -41,7 +41,7 @@ struct OPENRTI_LOCAL AbstractThreadLocal::_Provider : public Referenced {
   ~_Provider() noexcept;
   _Provider& operator=(const _Provider&) = delete;
   _Provider& operator=(_Provider&&) = default;
-  static SharedPtr<AbstractThreadLocal::_Provider>& GetInstance();
+  static AbstractThreadLocal::_Provider& GetInstance();
 
   unsigned getNextIndex();
 
@@ -64,9 +64,9 @@ AbstractThreadLocal::_Provider::~_Provider() noexcept
   _key = TLS_OUT_OF_INDEXES;
 }
 
-SharedPtr<AbstractThreadLocal::_Provider>& AbstractThreadLocal::_Provider::GetInstance()
+AbstractThreadLocal::_Provider& AbstractThreadLocal::_Provider::GetInstance()
 {
-  static SharedPtr<AbstractThreadLocal::_Provider> _instance = MakeShared<AbstractThreadLocal::_Provider>();
+  static AbstractThreadLocal::_Provider _instance;
   return _instance;
 }
 
@@ -120,9 +120,8 @@ AbstractThreadLocal::_AbstractData::~_AbstractData()
 AbstractThreadLocal::AbstractThreadLocal() :
   _index(~0u)
 {
-  SharedPtr<_Provider> instance = _Provider::GetInstance();
-  if (instance.valid())
-    _index = instance->getNextIndex();
+  _Provider& instance = _Provider::GetInstance();
+  _index = instance.getNextIndex();
 }
 
 AbstractThreadLocal::~AbstractThreadLocal()
@@ -132,27 +131,23 @@ AbstractThreadLocal::~AbstractThreadLocal()
 AbstractThreadLocal::_AbstractData*
 AbstractThreadLocal::_get()
 {
-  SharedPtr<_Provider> instance = _Provider::GetInstance();
-  if (!instance.valid())
-    return 0;
-  return instance->getData(_index);
+  _Provider& instance = _Provider::GetInstance();
+  return instance.getData(_index);
 }
 
 void
 AbstractThreadLocal::_set(AbstractThreadLocal::_AbstractData* abstractThreadLocal)
 {
-  SharedPtr<_Provider> instance = _Provider::GetInstance();
-  if (!instance.valid())
-    return;
+  _Provider& instance = _Provider::GetInstance();
   if (_index == ~0u)
     return;
-  instance->setData(_index, abstractThreadLocal);
+  instance.setData(_index, abstractThreadLocal);
 }
 
 
 void AbstractThreadLocal::shutdown()
 {
-  _Provider::GetInstance().reset();
+  //_Provider::GetInstance().reset();
 }
 
 } // namespace OpenRTI

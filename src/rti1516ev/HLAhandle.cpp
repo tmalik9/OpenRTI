@@ -13,50 +13,64 @@
 
 namespace rti1516ev {
 
-class HLAhandle::Implementation : public OpenRTI::HLAhandle
+class HLAhandle::Implementation : public HLAencodingImplementationBase
 {
   public:
-    Implementation(const OpenRTI::HLAhandle& ref) : OpenRTI::HLAhandle(ref) {}
-    Implementation() : OpenRTI::HLAhandle() {}
+    Implementation(const Implementation& ref) : mInternalHandle(ref.mInternalHandle) {}
+    Implementation(const OpenRTI::HLAhandle& ref) : mInternalHandle(ref) {}
+    Implementation() : mInternalHandle() {}
+    size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+    {
+      return mInternalHandle.encodeInto(buffer, bufferSize, offset);
+    }
+    size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t offset)
+    {
+      return mInternalHandle.decodeFrom(buffer, bufferSize, offset);
+    }
+    HLAencodingImplementationBase* clone() const
+    {
+      return new Implementation(*this);
+    }
+    OpenRTI::HLAhandle mInternalHandle;
 };
 
-HLAhandle::HLAhandle() : mImpl()
+HLAhandle::HLAhandle() : _impl()
 {
-  mImpl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation());
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation());
 }
 
-HLAhandle::HLAhandle(const HLAhandle& ref) : mImpl()
+HLAhandle::HLAhandle(const HLAhandle& ref) : _impl()
 {
-  mImpl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref.mImpl.get()));
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref._impl.get()));
 }
 
-HLAhandle::HLAhandle(const FederateHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
-{
-  set(handle);
-}
-
-HLAhandle::HLAhandle(const ObjectClassHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
+HLAhandle::HLAhandle(const FederateHandle& handle) : _impl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
 
-HLAhandle::HLAhandle(const ObjectInstanceHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
+HLAhandle::HLAhandle(const ObjectClassHandle& handle) : _impl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
 
-HLAhandle::HLAhandle(const AttributeHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
+HLAhandle::HLAhandle(const ObjectInstanceHandle& handle) : _impl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
+{
+  set(handle);
+}
+
+HLAhandle::HLAhandle(const AttributeHandle& handle) : _impl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
 
 
-HLAhandle::HLAhandle(const InteractionClassHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
+HLAhandle::HLAhandle(const InteractionClassHandle& handle) : _impl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
 
-HLAhandle::HLAhandle(const ParameterHandle& handle) : mImpl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
+HLAhandle::HLAhandle(const ParameterHandle& handle) : _impl(std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation()))
 {
   set(handle);
 }
@@ -67,49 +81,49 @@ HLAhandle::~HLAhandle() noexcept
 
 HLAhandle& HLAhandle::operator=(const HLAhandle& ref)
 {
-  mImpl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref.mImpl.get()));
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref._impl.get()));
   return *this;
 }
 
 FederateHandle HLAhandle::getFederateHandle() const
 {
   FederateHandle rti1516eHandle;
-  FederateHandleFriend::copy(rti1516eHandle,  mImpl->getFederateHandle());
+  FederateHandleFriend::copy(rti1516eHandle,  _impl->mInternalHandle.getFederateHandle());
   return rti1516eHandle;
 }
 
 ObjectClassHandle HLAhandle::getObjectClassHandle() const
 {
   ObjectClassHandle rti1516eHandle;
-  ObjectClassHandleFriend::copy(rti1516eHandle,  mImpl->getObjectClassHandle());
+  ObjectClassHandleFriend::copy(rti1516eHandle,  _impl->mInternalHandle.getObjectClassHandle());
   return rti1516eHandle;
 }
 
 ObjectInstanceHandle HLAhandle::getObjectInstanceHandle() const
 {
   ObjectInstanceHandle rti1516eHandle;
-  ObjectInstanceHandleFriend::copy(rti1516eHandle,  mImpl->getObjectInstanceHandle());
+  ObjectInstanceHandleFriend::copy(rti1516eHandle,  _impl->mInternalHandle.getObjectInstanceHandle());
   return rti1516eHandle;
 }
 
 AttributeHandle HLAhandle::getAttributeHandle() const
 {
   AttributeHandle rti1516eHandle;
-  AttributeHandleFriend::copy(rti1516eHandle,  mImpl->getAttributeHandle());
+  AttributeHandleFriend::copy(rti1516eHandle,  _impl->mInternalHandle.getAttributeHandle());
   return rti1516eHandle;
 }
 
 InteractionClassHandle HLAhandle::getInteractionClassHandle() const
 {
   InteractionClassHandle rti1516eHandle;
-  InteractionClassHandleFriend::copy(rti1516eHandle,  mImpl->getInteractionClassHandle());
+  InteractionClassHandleFriend::copy(rti1516eHandle,  _impl->mInternalHandle.getInteractionClassHandle());
   return rti1516eHandle;
 }
 
 ParameterHandle HLAhandle::getParameterHandle() const
 {
   ParameterHandle rti1516eHandle;
-  ParameterHandleFriend::copy(rti1516eHandle,  mImpl->getParameterHandle());
+  ParameterHandleFriend::copy(rti1516eHandle,  _impl->mInternalHandle.getParameterHandle());
   return rti1516eHandle;
 }
 
@@ -117,42 +131,42 @@ void HLAhandle::set(FederateHandle handle)
 {
   OpenRTI::FederateHandle nativeHandle;
   FederateHandleFriend::copy(nativeHandle, handle);
-  mImpl->set(nativeHandle);
+  _impl->mInternalHandle.set(nativeHandle);
 }
 
 void HLAhandle::set(ObjectClassHandle handle)
 {
   OpenRTI::ObjectClassHandle nativeHandle;
   ObjectClassHandleFriend::copy(nativeHandle, handle);
-  mImpl->set(nativeHandle);
+  _impl->mInternalHandle.set(nativeHandle);
 }
 
 void HLAhandle::set(ObjectInstanceHandle handle)
 {
   OpenRTI::ObjectInstanceHandle nativeHandle;
   ObjectInstanceHandleFriend::copy(nativeHandle, handle);
-  mImpl->set(nativeHandle);
+  _impl->mInternalHandle.set(nativeHandle);
 }
 
 void HLAhandle::set(AttributeHandle handle)
 {
   OpenRTI::AttributeHandle nativeHandle;
   AttributeHandleFriend::copy(nativeHandle, handle);
-  mImpl->set(nativeHandle);
+  _impl->mInternalHandle.set(nativeHandle);
 }
 
 void HLAhandle::set(InteractionClassHandle handle)
 {
   OpenRTI::InteractionClassHandle nativeHandle;
   InteractionClassHandleFriend::copy(nativeHandle, handle);
-  mImpl->set(nativeHandle);
+  _impl->mInternalHandle.set(nativeHandle);
 }
 
 void HLAhandle::set(ParameterHandle handle)
 {
   OpenRTI::ParameterHandle nativeHandle;
   ParameterHandleFriend::copy(nativeHandle, handle);
-  mImpl->set(nativeHandle);
+  _impl->mInternalHandle.set(nativeHandle);
 }
 
 VariableLengthData HLAhandle::encode() const
@@ -165,25 +179,25 @@ VariableLengthData HLAhandle::encode() const
 void HLAhandle::encode(VariableLengthData& outData) const
 {
   OpenRTI::VariableLengthData data;
-  mImpl->encode(data);
+  _impl->mInternalHandle.encode(data);
   outData = VariableLengthDataFriend::create(data);
 }
 
 void HLAhandle::encodeInto(std::vector<Octet>& buffer) const
 {
-  mImpl->encodeInto(buffer);
+  _impl->mInternalHandle.encodeInto(buffer);
 }
 
 size_t HLAhandle::encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
 {
-  return mImpl->encodeInto(buffer, bufferSize, offset);
+  return _impl->encodeInto(buffer, bufferSize, offset);
 }
 
 void HLAhandle::decode(VariableLengthData const& inData)
 {
   try
   {
-    mImpl->decode(OpenRTI::VariableLengthData(rti1516ev::VariableLengthDataFriend::readPointer(inData)));
+    _impl->mInternalHandle.decode(OpenRTI::VariableLengthData(rti1516ev::VariableLengthDataFriend::readPointer(inData)));
   }
   catch (const OpenRTI::EncoderException& e)
   {
@@ -195,7 +209,7 @@ size_t HLAhandle::decodeFrom(std::vector<Octet> const& buffer, size_t index)
 {
   try
   {
-    return mImpl->decodeFrom(buffer, index);
+    return _impl->mInternalHandle.decodeFrom(buffer, index);
   }
   catch (const OpenRTI::EncoderException& e)
   {
@@ -207,7 +221,7 @@ size_t HLAhandle::decodeFrom(const Octet* buffer, size_t bufferSize, size_t inde
 {
   try
   {
-    return mImpl->decodeFrom(buffer, bufferSize, index);
+    return _impl->decodeFrom(buffer, bufferSize, index);
   }
   catch (const OpenRTI::EncoderException& e)
   {
@@ -217,12 +231,12 @@ size_t HLAhandle::decodeFrom(const Octet* buffer, size_t bufferSize, size_t inde
 
 size_t HLAhandle::getEncodedLength() const
 {
-  return mImpl->getEncodedLength();
+  return _impl->mInternalHandle.getEncodedLength();
 }
 
 unsigned int HLAhandle::getOctetBoundary() const
 {
-  return mImpl->getOctetBoundary();
+  return _impl->mInternalHandle.getOctetBoundary();
 }
 
 }

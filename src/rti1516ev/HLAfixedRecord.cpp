@@ -34,7 +34,7 @@ namespace rti1516ev
 
 typedef std::vector<std::pair<DataElement*, bool>> DataElementVector;
 
-class OPENRTI_LOCAL HLAfixedRecordImplementation {
+class OPENRTI_LOCAL HLAfixedRecordImplementation : public HLAencodingImplementationBase {
 public:
   HLAfixedRecordImplementation(uint32_t version)
     : _version(version)
@@ -56,7 +56,7 @@ public:
     }
   }
 
-  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset)
+  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
   {
 #ifdef _DEBUG
     if (bufferSize < offset + getEncodedLength())
@@ -72,7 +72,7 @@ public:
     return offset;
   }
 
-  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t startIndex)
+  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t startIndex) override
   {
     uint32_t byteLength;
     size_t index = startIndex;
@@ -83,6 +83,11 @@ public:
       index = i->first->decodeFrom(buffer, bufferSize, index);
     }
     return index;
+  }
+
+  HLAencodingImplementationBase* clone() const override
+  {
+    return new HLAfixedRecordImplementation(*this);
   }
 
   size_t getEncodedLength() const

@@ -62,6 +62,7 @@
 #undef EXPERIMENTAL_NO_LBTS_RESPONSE_MESSAGE
 
 #define OPENRTI_USE_DEBUG_NEW
+#define _CRTDBG_MAP_ALLOC
 //#undef OPENRTI_USE_DEBUG_NEW
 #define _QUOTE(x)       # x
 #define QUOTE(x)        _QUOTE(x)

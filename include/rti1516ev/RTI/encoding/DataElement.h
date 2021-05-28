@@ -23,7 +23,7 @@ namespace rti1516ev
 {
    // Forward Declarations
    class VariableLengthData;
-
+   class HLAencodingImplementationBase;
    // Interface provided by all HLA data elements.
    class RTI_EXPORT DataElement
    {
@@ -74,7 +74,6 @@ namespace rti1516ev
       // Provides mechanism to map DataElement discriminants to variants
       // in VariantRecord.
       virtual Integer64 hash() const;
-
    };
 }
 

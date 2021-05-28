@@ -39,7 +39,8 @@ namespace rti1516ev
 
 #define IMPLEMENT_ENCODING_HELPER_CLASS(EncodableDataType, SimpleDataType, encoder) \
                                                                         \
-class OPENRTI_LOCAL EncodableDataType##Implementation {                 \
+class OPENRTI_LOCAL EncodableDataType##Implementation                   \
+  : public HLAencodingImplementationBase {                              \
 public:                                                                 \
   EncodableDataType##Implementation() :                                 \
     _value()                                                            \
@@ -84,11 +85,18 @@ public:                                                                 \
     _valuePointer = inData;                                             \
   }                                                                     \
                                                                         \
+  SimpleDataType* getDataPointer()                                      \
+  {                                                                     \
+    return _valuePointer;                                               \
+  }                                                                     \
+                                                                        \
   const SimpleDataType& get() const                                     \
   {                                                                     \
     return *_valuePointer;                                              \
   }                                                                     \
-                                                                        \
+  EncodableDataType##Implementation* clone() const override {           \
+    return new EncodableDataType##Implementation();                     \
+  }                                                                     \
   SimpleDataType _value;                                                \
   SimpleDataType* _valuePointer;                                        \
 };                                                                      \
@@ -205,6 +213,12 @@ void                                                                    \
 EncodableDataType::setDataPointer(SimpleDataType* inData)               \
 {                                                                       \
   _impl->setDataPointer(inData);                                        \
+}                                                                       \
+                                                                        \
+SimpleDataType*                                                         \
+EncodableDataType::getDataPointer()                                     \
+{                                                                       \
+  return _impl->getDataPointer();                                       \
 }                                                                       \
                                                                         \
 void                                                                    \
