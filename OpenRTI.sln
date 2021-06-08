@@ -133,6 +133,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "abstimeout", "tests\OpenRTI
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImmediateCallbackFederate-1516ev", "tests\rti1516ev\testfed\ImmediateCallbackFederate\ImmediateCallbackFederate1516ev.vcxproj", "{470EA8F4-2DA5-4D86-8FDB-BF03D4D07578}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TR_TC_Responder-1516ev", "tests\rti1516ev\testfed\TR_TC_Responder\TR_TC_Responder1516ev.vcxproj", "{24881B4F-74DB-409C-A213-DE8A35BB31ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug All|Win32 = Debug All|Win32
@@ -505,6 +507,22 @@ Global
 		{470EA8F4-2DA5-4D86-8FDB-BF03D4D07578}.Release All|x64.Build.0 = Release|x64
 		{470EA8F4-2DA5-4D86-8FDB-BF03D4D07578}.Release|Win32.ActiveCfg = Release|Win32
 		{470EA8F4-2DA5-4D86-8FDB-BF03D4D07578}.Release|x64.ActiveCfg = Release|x64
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug All|Win32.ActiveCfg = Debug|Win32
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug All|Win32.Build.0 = Debug|Win32
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug All|x64.ActiveCfg = Debug|x64
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug All|x64.Build.0 = Debug|x64
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug|Win32.ActiveCfg = Debug|Win32
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug|Win32.Build.0 = Debug|Win32
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug|x64.ActiveCfg = Debug|x64
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug|x64.Build.0 = Debug|x64
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release All|Win32.ActiveCfg = Release|Win32
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release All|Win32.Build.0 = Release|Win32
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release All|x64.ActiveCfg = Release|x64
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release All|x64.Build.0 = Release|x64
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release|Win32.ActiveCfg = Release|Win32
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release|Win32.Build.0 = Release|Win32
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release|x64.ActiveCfg = Release|x64
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -535,9 +553,10 @@ Global
 		{6D9646E9-9655-4032-AFF9-969BC6DD941B} = {C06666B1-53E9-40DC-A7C2-22123791AA32}
 		{DFE59484-71CD-4FCA-853C-F427904A3ED1} = {C007F7FB-94FD-4294-899D-5B1FAF53C8E3}
 		{470EA8F4-2DA5-4D86-8FDB-BF03D4D07578} = {C06666B1-53E9-40DC-A7C2-22123791AA32}
+		{24881B4F-74DB-409C-A213-DE8A35BB31ED} = {C06666B1-53E9-40DC-A7C2-22123791AA32}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		VisualSVNWorkingCopyRoot = .
 		SolutionGuid = {6CCC775F-F456-34F4-B339-8B27EB672AAC}
+		VisualSVNWorkingCopyRoot = .
 	EndGlobalSection
 EndGlobal

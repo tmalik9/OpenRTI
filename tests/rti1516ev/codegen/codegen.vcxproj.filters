@@ -22,6 +22,9 @@
     <ClCompile Include="RTFederateObjects.cpp">
       <Filter>generated source files</Filter>
     </ClCompile>
+    <ClCompile Include="RTFederateInteractions.cpp">
+      <Filter>generated source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="momDataTypes.h">
@@ -40,6 +43,12 @@
       <Filter>generated source files</Filter>
     </ClInclude>
     <ClInclude Include="RTFederateObjectInterfaces.h">
+      <Filter>generated source files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTFederateInteractionInterfaces.h">
+      <Filter>generated source files</Filter>
+    </ClInclude>
+    <ClInclude Include="RTFederateInteractions.h">
       <Filter>generated source files</Filter>
     </ClInclude>
   </ItemGroup>

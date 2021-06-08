@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "RTI/encoding/HLAopaqueData.h"
+#include "RTI/encoding/HLAhandle.h"
 #include "RTFederateEncodings.h"
 
 namespace NDistSimIB {

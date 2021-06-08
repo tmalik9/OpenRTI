@@ -635,6 +635,8 @@ public:
 
   std::wstring getParameterDataType(rti1516ev::InteractionClassHandle interactionClassHandle, rti1516ev::ParameterHandle paramterHandle) override;
   std::wstring getAttributeDataType(rti1516ev::ObjectClassHandle rti1516ObjectClassHandle, rti1516ev::AttributeHandle rti1516AttributeHandle) override;
+  void allowPendingTimeInNextMessageRequest() override;
+  void disallowPendingTimeInNextMessageRequest() override;
 private:
   class RTI1516EAmbassadorInterface;
   RTI1516EAmbassadorInterface* _ambassadorInterface;

@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   // create and run the federate
   try {
     federate = new TimeRegulatingFederate();
-    federate->join(rtiAddress, federateName, fomPath, federationName, true, false);
+    federate->join(rtiAddress, federateName, fomPath, federationName, true, true);
     federate->run(std::chrono::milliseconds(10));
     federate->disconnect();
   }

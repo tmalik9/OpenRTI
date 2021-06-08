@@ -739,7 +739,7 @@ namespace rti1516ev
 
       // Vector extensions
       virtual void setNotificationHandle(RTInotificationHandle* h) = 0;
-      
+
       virtual void unsubscribeObjectInstance(ObjectInstanceHandle theClass) = 0;
       virtual void subscribeInteractionClassWithFilter(InteractionClassHandle theClass, const ParameterHandleValueMap& filterValues, bool active = true) = 0;
       virtual void unsubscribeInteractionClassWithFilter(InteractionClassHandle theClass, const ParameterHandleValueMap& filterValues) = 0;
@@ -755,6 +755,9 @@ namespace rti1516ev
 
       virtual std::wstring getParameterDataType(rti1516ev::InteractionClassHandle interactionClassHandle, rti1516ev::ParameterHandle paramterHandle) = 0;
       virtual std::wstring getAttributeDataType(rti1516ev::ObjectClassHandle objectClassHandle, rti1516ev::AttributeHandle attributeHandle) = 0;
+
+      virtual void allowPendingTimeInNextMessageRequest() = 0;
+      virtual void disallowPendingTimeInNextMessageRequest() = 0;
 };
 }
 

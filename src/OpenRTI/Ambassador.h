@@ -2431,6 +2431,42 @@ public:
     _timeManagement->setAsynchronousDeliveryEnabled(false);
   }
 
+  void allowPendingTimeInNextMessageRequest()
+    // throw (AsynchronousDeliveryAlreadyEnabled,
+    //        FederateNotExecutionMember,
+    //        SaveInProgress,
+    //        RestoreInProgress,
+    //        NotConnected,
+    //        RTIinternalError)
+  {
+    if (!isConnected())
+      throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
+    if (!_timeManagement.valid())
+      throw FederateNotExecutionMember();
+    if (_timeManagement->getAsynchronousDeliveryEnabled())
+      throw AsynchronousDeliveryAlreadyEnabled();
+    _timeManagement->setAllowPendingTimeInNextMessageRequest(true);
+  }
+
+  void disallowPendingTimeInNextMessageRequest()
+    // throw (AsynchronousDeliveryAlreadyDisabled,
+    //        FederateNotExecutionMember,
+    //        SaveInProgress,
+    //        RestoreInProgress,
+    //        NotConnected,
+    //        RTIinternalError)
+  {
+    if (!isConnected())
+      throw NotConnected();
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
+    if (!_timeManagement.valid())
+      throw FederateNotExecutionMember();
+    if (!_timeManagement->getAsynchronousDeliveryEnabled())
+      throw AsynchronousDeliveryAlreadyDisabled();
+    _timeManagement->setAllowPendingTimeInNextMessageRequest(false);
+  }
+
   bool queryGALT(NativeLogicalTime& logicalTime)
     // throw (FederateNotExecutionMember,
     //        SaveInProgress,

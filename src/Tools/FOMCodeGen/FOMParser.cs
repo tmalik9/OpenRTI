@@ -91,11 +91,53 @@ namespace FOMCodeGen
       public InteractionClass(string name)
       {
         Name = name;
+        Parameters = new List<Parameter>();
+        ChildClasses = new List<InteractionClass>();
       }
       public string Name { get; set; }
+      public string QualifiedName
+      {
+        get
+        {
+          if (BaseClass == null)
+          {
+            return Name;
+          }
+          else
+          {
+            return BaseClass.QualifiedName + "." + Name;
+          }
+        }
+      }
       public InteractionClass BaseClass { get; set; }
       public List<InteractionClass> ChildClasses { get; set; }
       public List<Parameter> Parameters { get; set; }
+      public List<Parameter> AllParameters
+      {
+        get
+        {
+          List<Parameter> allParameters = new List<Parameter>();
+          if (BaseClass != null)
+          {
+            foreach (var parameter in BaseClass.AllParameters)
+              allParameters.Add(parameter);
+          }
+          foreach (var parameter in Parameters)
+            allParameters.Add(parameter);
+          return allParameters;
+        }
+      }
+      public bool HasValidParameters
+      {
+        get
+        {
+          foreach (var parameter in Parameters)
+          {
+            if (parameter.DataType != null) return true;
+          }
+          return false;
+        }
+      }
     }
     public class DataType : IComparable<DataType>
     {
@@ -464,11 +506,19 @@ namespace FOMCodeGen
         return string.Join("\n", lines);
       }
     }
+
     private List<ObjectClass> mObjectClasses = new List<ObjectClass>();
     public List<ObjectClass> ObjectClasses
     {
       get { return mObjectClasses; }
     }
+
+    private List<InteractionClass> mInteractionClasses = new List<InteractionClass>();
+    public List<InteractionClass> InteractionClasses
+    {
+      get { return mInteractionClasses; }
+    }
+
     DataType GetDataType(string name)
     {
       if (DataTypes.ContainsKey(name))
@@ -730,6 +780,35 @@ namespace FOMCodeGen
         ParseObjectClasses(childClass as XmlElement, objectClass);
       }
     }
+    void ParseInteractionClasses(XmlElement interactionClassNode, InteractionClass baseClass)
+    {
+      string name = interactionClassNode["name"].FirstChild.InnerText;
+      InteractionClass interactionClass = new InteractionClass(name);
+      interactionClass.BaseClass = baseClass;
+      mInteractionClasses.Add(interactionClass);
+      System.Console.WriteLine("InteractionClass {0}", interactionClass.Name);
+      if (interactionClass.BaseClass != null)
+      {
+        interactionClass.BaseClass.ChildClasses.Add(interactionClass);
+      }
+      var parameterNodes = interactionClassNode.SelectNodes("parameter");
+      foreach (XmlElement parameterNode in parameterNodes)
+      {
+        string attributeName = parameterNode["name"].FirstChild.InnerText;
+        Parameter parameter = new Parameter(attributeName);
+        interactionClass.Parameters.Add(parameter);
+        if (parameterNode["dataType"] != null)
+        {
+          DataType dataType = GetDataType(parameterNode["dataType"].FirstChild.InnerText);
+          parameter.DataType = dataType;
+        }
+      }
+      var childClassNodes = interactionClassNode.SelectNodes("interactionClass");
+      foreach (var childClass in childClassNodes)
+      {
+        ParseInteractionClasses(childClass as XmlElement, interactionClass);
+      }
+    }
     public FOMParser(string filename, string enclosingNamespace)
     {
       DataTypes = new Dictionary<string, DataType>();
@@ -821,6 +900,13 @@ namespace FOMCodeGen
       var objectRootNode = objectClassNodes.Item(0) as XmlElement;
       ParseObjectClasses(objectRootNode, null);
 
+      var interactionClassNodes = doc.DocumentElement.SelectNodes("/objectModel/interactions/interactionClass");
+      if (interactionClassNodes.Count != 1)
+      {
+        throw new ApplicationException(string.Format("unexpected FOM format: there should be exactly one interactionClass root node, named \"HLAinteractionRoot\""));
+      }
+      var interactionRootNode = interactionClassNodes.Item(0) as XmlElement;
+      ParseInteractionClasses(interactionRootNode, null);
     }
 
   }

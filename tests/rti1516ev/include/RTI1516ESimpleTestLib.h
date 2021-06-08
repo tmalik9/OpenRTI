@@ -10,6 +10,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+#include "RTI/time/HLAfloat64Time.h"
 
 using namespace rti1516ev;
 
@@ -68,6 +69,7 @@ class SimpleTestFederate : public NullFederateAmbassador
 
     void waitForUser(const std::string& tag);
     void advanceTime(double timestep);
+    void nextMessageRequest(double requestTime);
     double getFederateTime() const;
     double getLbts() const;
 
@@ -191,6 +193,13 @@ class SimpleTestFederate : public NullFederateAmbassador
       SupplementalRemoveInfo theRemoveInfo) override;
 
     void setPrintVerbose(bool newValue) { _printVerbose = newValue; }
+
+    double convertTime(LogicalTime const& theTime)
+    {
+      HLAfloat64Time castedTime = (HLAfloat64Time)theTime;
+      return castedTime.getTime();
+    }
+
 
   protected:
     std::chrono::milliseconds getStepDuration() const { return stepDuration; }

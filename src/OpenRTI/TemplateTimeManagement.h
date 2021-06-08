@@ -114,19 +114,42 @@ public:
   bool logicalTimeAlreadyPassed(const NativeLogicalTime& logicalTime, std::string& reason) override
   {
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnabled() || _committedOutboundLowerBoundTimeStamp <= _toLogicalTime(_outboundLowerBoundTimeStamp));
-    if (_outboundLowerBoundTimeStamp.second) {
-      if (logicalTime <= _logicalTimeFactory.getLogicalTime(_outboundLowerBoundTimeStamp.first)) {
-        reason = logicalTimeToString(logicalTime) + " <= " + logicalTimeToString(_logicalTimeFactory.getLogicalTime(_outboundLowerBoundTimeStamp.first));
-        return true;
-      } else {
-        return false;
+    DebugPrintf("%s: %d\n", __FUNCTION__, getIsAnyNextMessageMode());
+    if (_allowPendingTimeInNextMessageRequest && getIsAnyNextMessageMode())
+    {
+      if (_pendingLogicalTime.second) {
+        if (logicalTime <= _logicalTimeFactory.getLogicalTime(_pendingLogicalTime.first)) {
+          reason = logicalTimeToString(logicalTime) + " <= " + logicalTimeToString(_logicalTimeFactory.getLogicalTime(_pendingLogicalTime.first));
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+      else {
+        if (logicalTime < _logicalTimeFactory.getLogicalTime(_pendingLogicalTime.first)) {
+          reason = logicalTimeToString(logicalTime) + " < " + logicalTimeToString(_logicalTimeFactory.getLogicalTime(_pendingLogicalTime.first));
+          return true;
+        }
+        else {
+          return false;
+        }
       }
     } else {
-      if (logicalTime < _logicalTimeFactory.getLogicalTime(_outboundLowerBoundTimeStamp.first)) {
-        reason = logicalTimeToString(logicalTime) + " < " + logicalTimeToString(_logicalTimeFactory.getLogicalTime(_outboundLowerBoundTimeStamp.first));
-        return true;
+      if (_outboundLowerBoundTimeStamp.second) {
+        if (logicalTime <= _logicalTimeFactory.getLogicalTime(_outboundLowerBoundTimeStamp.first)) {
+          reason = logicalTimeToString(logicalTime) + " <= " + logicalTimeToString(_logicalTimeFactory.getLogicalTime(_outboundLowerBoundTimeStamp.first));
+          return true;
+        } else {
+          return false;
+        }
       } else {
-        return false;
+        if (logicalTime < _logicalTimeFactory.getLogicalTime(_outboundLowerBoundTimeStamp.first)) {
+          reason = logicalTimeToString(logicalTime) + " < " + logicalTimeToString(_logicalTimeFactory.getLogicalTime(_outboundLowerBoundTimeStamp.first));
+          return true;
+        } else {
+          return false;
+        }
       }
     }
   }
@@ -654,7 +677,7 @@ public:
   {
     // Timestamp of received message is smaller than GALT. This is normally an error, because other federates guaranteed 
     // not to send messages older than the time they committed to.
-    // Would happen if all other federates sent a CommitLowerBoundTimeStamp message, an s.o. sent a message older than this.
+    // Would happen if all other federates sent a CommitLowerBoundTimeStamp message, and s.o. sent a message older than this.
     // In case the (local) federate is queuing the message to itself, this is allowed, except the local federate already committed a time advance (checked below).
     if (!loopback && InternalTimeManagement::getTimeConstrainedEnabled() && canAdvanceTo(LogicalTimePair(logicalTime, 1))) {
         DebugPrintf("TM::%s: illegal TSO message: T=%s GALT=%s\n", __func__,
@@ -825,7 +848,7 @@ public:
 
       OpenRTIAssert(!InternalTimeManagement::getTimeConstrainedEnabled() || _logicalTimeMessageListMap.empty() || _pendingLogicalTime.first <= _logicalTimeMessageListMap.begin()->first.first);
 
-      if (allowNextMessage && getIsSaveToAdvanceToNextMessage()) {
+      if (allowNextMessage && getIsSafeToAdvanceToNextMessage()) {
         if (canAdvanceToNextMessage(LogicalTimePair(_pendingLogicalTime.first, 0))) {
           _timeAdvanceToBeScheduled = false;
           SharedPtr<TimeAdvanceGrantedMessage> message = MakeShared<TimeAdvanceGrantedMessage>();
@@ -887,11 +910,11 @@ public:
     return _federateLowerBoundMap.getLockedByNextMessage(_commitId);
   }
 #endif
-  bool getIsSaveToAdvanceToNextMessage() const
+  bool getIsSafeToAdvanceToNextMessage() const
   {
     if (!InternalTimeManagement::getIsAnyNextMessageMode())
       return false;
-    return _federateLowerBoundMap.getIsSaveToAdvanceToNextMessage(_commitId);
+    return _federateLowerBoundMap.getIsSafeToAdvanceToNextMessage(_commitId);
   }
 
   void _sendCommitLowerBoundTimeStampIfChanged(InternalAmbassador& ambassador, const LogicalTimePair& logicalTimePair, LowerBoundTimeStampCommitType commitType)

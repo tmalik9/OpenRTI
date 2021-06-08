@@ -5,6 +5,7 @@
 #include <cassert>
 
 #include "RTI/encoding/HLAopaqueData.h"
+#include "RTI/encoding/HLAhandle.h"
 
 #include "RTFederateObjects.h"
 

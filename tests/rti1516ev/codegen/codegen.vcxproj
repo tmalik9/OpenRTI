@@ -113,6 +113,7 @@
     <ClCompile Include="codegen.cpp" />
     <ClCompile Include="momEncodings.cpp" />
     <ClCompile Include="RTFederateEncodings.cpp" />
+    <ClCompile Include="RTFederateInteractions.cpp" />
     <ClCompile Include="RTFederateObjects.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -135,6 +136,8 @@
     <ClInclude Include="momEncodings.h" />
     <ClInclude Include="RTFederateDataTypes.h" />
     <ClInclude Include="RTFederateEncodings.h" />
+    <ClInclude Include="RTFederateInteractionInterfaces.h" />
+    <ClInclude Include="RTFederateInteractions.h" />
     <ClInclude Include="RTFederateObjectInterfaces.h" />
     <ClInclude Include="RTFederateObjects.h" />
   </ItemGroup>
@@ -152,8 +155,8 @@
   <ItemGroup>
     <CustomBuild Include="RTFederate.xml">
       <Command>$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistributedSimulation.NRTFederateEncoding</Command>
-      <Outputs>%(Filename)DataTypes.h;%(Filename)Encodings.h;%(Filename)Encodings.cpp;%(Filename)Objects.h;%(Filename)Objects.cpp</Outputs>
-      <Message>generating %(Filename)DataTypes.h;%(Filename)Encodings.h;%(Filename)Encodings.cpp;%(Filename)Objects.h;%(Filename)Objects.cpp from %(Identity)</Message>
+      <Outputs>%(Filename)DataTypes.h;%(Filename)Encodings.h;%(Filename)Encodings.cpp;%(Filename)ObjectInterfaces.h;%(Filename)Objects.h;%(Filename)Objects.cpp;%(Filename)InteractionInterfaces.h;%(Filename)Interactions.h;%(Filename)Interactions.cpp</Outputs>
+      <Message>generating %(Filename)DataTypes.h;%(Filename)Encodings.h;%(Filename)Encodings.cpp;%(Filename)ObjectInterfaces.h;%(Filename)Objects.h;%(Filename)Objects.cpp;%(Filename)InteractionInterfaces.h;%(Filename)Interactions.h;%(Filename)Interactions.cpp from %(Identity)</Message>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>

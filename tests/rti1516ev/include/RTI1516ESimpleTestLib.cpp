@@ -33,12 +33,6 @@ std::wostream& operator<<(std::wostream& os, OrderType orderType)
   return os;
 }
 
-double convertTime(LogicalTime const& theTime)
-{
-  HLAfloat64Time castedTime = (HLAfloat64Time)theTime;
-  return castedTime.getTime();
-}
-
 using std::to_string;
 using std::to_wstring;
 
@@ -143,7 +137,7 @@ SimpleTestFederate::SimpleTestFederate()
 #endif
 
   federateTime      = 0.0;
-  federateLookahead = 1.0;
+  federateLookahead = 0.1;
   isRegulating  = false;
   isConstrained = false;
   isAdvancing   = false;
@@ -384,6 +378,45 @@ void SimpleTestFederate::advanceTime(double timestep)
       case WAIT_ABANDONED:
         printf("%s: TID=%d: abandoned\n", __FUNCTION__, ::GetCurrentThreadId());
         break;
+    }
+#else
+    mRtiAmb->evokeCallback(0.1);
+#endif
+  }
+  //printf("%0.6f %s: new time=%f\n",  federateTime, __FUNCTION__, federateTime);
+}
+
+void SimpleTestFederate::nextMessageRequest(double requestTime)
+{
+  printf("%s: current=%f request=%0.6f\n", __FUNCTION__, federateTime, requestTime);
+  /// request the advance
+  isAdvancing = true;
+  HLAfloat64Time newTime(requestTime);
+  mRtiAmb->nextMessageRequest(newTime);
+  federateTime = requestTime;
+  /// wait for the time advance to be granted. ticking will tell the
+  /// LRC to start delivering callbacks to the federate
+  while (isAdvancing && !_done)
+  {
+#ifdef _WIN32
+    DWORD waitResult = WaitForSingleObject(mHandle->mHandle, 200);
+    switch (waitResult)
+    {
+    case WAIT_OBJECT_0:
+      //printf("%s: TID=%d: handle triggered\n", __FUNCTION__, ::GetCurrentThreadId());
+      while (mRtiAmb->evokeCallback(0))
+        ;
+      break;
+    case WAIT_TIMEOUT:
+      printf("%s: TID=%d: timeout\n", __FUNCTION__, ::GetCurrentThreadId());
+      //mRtiAmb->evokeCallback(1.0);
+      break;
+    case WAIT_FAILED:
+      printf("%s: TID=%d: failed\n", __FUNCTION__, ::GetCurrentThreadId());
+      break;
+    case WAIT_ABANDONED:
+      printf("%s: TID=%d: abandoned\n", __FUNCTION__, ::GetCurrentThreadId());
+      break;
     }
 #else
     mRtiAmb->evokeCallback(0.1);

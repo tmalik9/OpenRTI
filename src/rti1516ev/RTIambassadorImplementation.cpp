@@ -3855,6 +3855,64 @@ RTIambassadorImplementation::disableAsynchronousDelivery()
   }
 }
 
+void
+RTIambassadorImplementation::allowPendingTimeInNextMessageRequest()
+{
+  try {
+    _ambassadorInterface->allowPendingTimeInNextMessageRequest();
+  }
+  catch (const OpenRTI::AsynchronousDeliveryAlreadyEnabled& e) {
+    throw rti1516ev::AsynchronousDeliveryAlreadyEnabled(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const OpenRTI::FederateNotExecutionMember& e) {
+    throw rti1516ev::FederateNotExecutionMember(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const OpenRTI::SaveInProgress& e) {
+    throw rti1516ev::SaveInProgress(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const OpenRTI::RestoreInProgress& e) {
+    throw rti1516ev::RestoreInProgress(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const OpenRTI::NotConnected& e) {
+    throw rti1516ev::NotConnected(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const std::exception& e) {
+    throw rti1516ev::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (...) {
+    throw rti1516ev::RTIinternalError(L"Unknown internal error!");
+  }
+}
+
+void
+RTIambassadorImplementation::disallowPendingTimeInNextMessageRequest()
+{
+  try {
+    _ambassadorInterface->disallowPendingTimeInNextMessageRequest();
+  }
+  catch (const OpenRTI::AsynchronousDeliveryAlreadyDisabled& e) {
+    throw rti1516ev::AsynchronousDeliveryAlreadyDisabled(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const OpenRTI::FederateNotExecutionMember& e) {
+    throw rti1516ev::FederateNotExecutionMember(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const OpenRTI::SaveInProgress& e) {
+    throw rti1516ev::SaveInProgress(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const OpenRTI::RestoreInProgress& e) {
+    throw rti1516ev::RestoreInProgress(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const OpenRTI::NotConnected& e) {
+    throw rti1516ev::NotConnected(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (const std::exception& e) {
+    throw rti1516ev::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
+  }
+  catch (...) {
+    throw rti1516ev::RTIinternalError(L"Unknown internal error!");
+  }
+}
+
 bool
 RTIambassadorImplementation::queryGALT(rti1516ev::LogicalTime& logicalTime)
 {

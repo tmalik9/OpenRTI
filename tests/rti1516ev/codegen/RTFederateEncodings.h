@@ -11,6 +11,7 @@
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
 #include "RTI/encoding/HLAopaqueData.h"
+#include "RTI/encoding/HLAhandle.h"
 
 #include "RTFederateDataTypes.h"
 

@@ -233,7 +233,7 @@ public:
 #endif
 
   // O(n)
-  bool getIsSaveToAdvanceToNextMessage(const Unsigned& commitId) const
+  bool getIsSafeToAdvanceToNextMessage(const Unsigned& commitId) const
   {
     ScopeLock lock(_mutex);
     if (!getConstrainedByNextMessage())

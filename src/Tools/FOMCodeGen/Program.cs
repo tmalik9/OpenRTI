@@ -50,12 +50,18 @@ namespace FOMCodeGen
         var objectInterfacesHeaderFilename = System.IO.Path.Combine(outputDirectory, basename + "ObjectInterfaces.h");
         var objectsHeaderFilename = System.IO.Path.Combine(outputDirectory, basename + "Objects.h");
         var objectsImplFilename = System.IO.Path.Combine(outputDirectory, basename + "Objects.cpp");
+        var interactionInterfacesHeaderFilename = System.IO.Path.Combine(outputDirectory, basename + "InteractionInterfaces.h");
+        var interactionsHeaderFilename = System.IO.Path.Combine(outputDirectory, basename + "Interactions.h");
+        var interactionsImplFilename = System.IO.Path.Combine(outputDirectory, basename + "Interactions.cpp");
         System.Console.WriteLine("dataTypesHeaderFilename={0}", dataTypesHeaderFilename);
         System.Console.WriteLine("encodingsHeaderFilename={0}", encodingsHeaderFilename);
         System.Console.WriteLine("encodingsImplFilename={0}", encodingsImplFilename);
         System.Console.WriteLine("objectInterfacesHeaderFilename={0}", objectInterfacesHeaderFilename);
         System.Console.WriteLine("objectsHeaderFilename={0}", objectsHeaderFilename);
         System.Console.WriteLine("objectsImplFilename={0}", objectsImplFilename);
+        System.Console.WriteLine("interactionInterfacesHeaderFilename={0}", interactionInterfacesHeaderFilename);
+        System.Console.WriteLine("interactionsHeaderFilename={0}", interactionsHeaderFilename);
+        System.Console.WriteLine("interactionsImplFilename={0}", interactionsImplFilename);
         FOMParser fom = new FOMParser(filename, enclosingNamespace);
         fom.UsePrecompiledHeaders = usePrecompiledHeaders;
 
@@ -82,6 +88,18 @@ namespace FOMCodeGen
         FOMObjectsImpl objectsImpl = new FOMObjectsImpl(fom, objectsHeaderFilename);
         String objectsImplContent = objectsImpl.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(objectsImplFilename, objectsImplContent);
+
+        FOMInteractionInterfacesHeader interactionInterfacesHeader = new FOMInteractionInterfacesHeader(fom, interactionInterfacesHeaderFilename, encodingsHeaderFilename);
+        String interactionInterfacesHeaderContent = interactionInterfacesHeader.TransformText();
+        if (!doDryRun) System.IO.File.WriteAllText(interactionInterfacesHeaderFilename, interactionInterfacesHeaderContent);
+
+        FOMInteractionsHeader interactionsHeader = new FOMInteractionsHeader(fom, interactionsHeaderFilename, interactionInterfacesHeaderFilename, encodingsHeaderFilename);
+        String interactionsHeaderContent = interactionsHeader.TransformText();
+        if (!doDryRun) System.IO.File.WriteAllText(interactionsHeaderFilename, interactionsHeaderContent);
+
+        FOMInteractionsImpl interactionsImpl = new FOMInteractionsImpl(fom, interactionsHeaderFilename);
+        String interactionsImplContent = interactionsImpl.TransformText();
+        if (!doDryRun) System.IO.File.WriteAllText(interactionsImplFilename, interactionsImplContent);
       }
       catch (Exception e)
       {

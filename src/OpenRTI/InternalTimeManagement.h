@@ -90,13 +90,23 @@ public:
   { return _timeAdvanceMode == TimeAdvanceRequest || _timeAdvanceMode == TimeAdvanceRequestAvailable; }
   bool getIsAnyAvailableMode() const
   { return _timeAdvanceMode == TimeAdvanceRequestAvailable || _timeAdvanceMode == NextMessageRequestAvailable || _timeAdvanceMode == FlushQueueRequest; }
-  bool getIsAnyNextMessageMode() const
-  { return _timeAdvanceMode == NextMessageRequest || _timeAdvanceMode == NextMessageRequestAvailable; }
+  bool getIsAnyNextMessageMode() const {
+    return _timeAdvanceMode == NextMessageRequest || _timeAdvanceMode == NextMessageRequestAvailable;
+  }
 
-  bool getAsynchronousDeliveryEnabled() const
-  { return _asynchronousDeliveryEnabled; }
-  void setAsynchronousDeliveryEnabled(bool asynchronousDeliveryEnabled)
-  { _asynchronousDeliveryEnabled = asynchronousDeliveryEnabled; }
+  bool getAsynchronousDeliveryEnabled() const {
+    return _asynchronousDeliveryEnabled;
+  }
+  void setAsynchronousDeliveryEnabled(bool asynchronousDeliveryEnabled) {
+    _asynchronousDeliveryEnabled = asynchronousDeliveryEnabled;
+  }
+
+  bool getAllowPendingTimeInNextMessageRequest() const {
+    return _allowPendingTimeInNextMessageRequest;
+  }
+  void setAllowPendingTimeInNextMessageRequest(bool allowPendingTimeInNextMessageRequest) {
+    _allowPendingTimeInNextMessageRequest = allowPendingTimeInNextMessageRequest;
+  }
 
   OrderType getTimeStampOrderDelivery(OrderType orderType) const
   {
@@ -131,6 +141,7 @@ protected:
   TimeConstrainedMode _timeConstrainedMode;
   TimeAdvanceMode _timeAdvanceMode;
   bool _asynchronousDeliveryEnabled;
+  bool _allowPendingTimeInNextMessageRequest;
   // Serial number for message retraction
   uint32_t _messageRetractionSerial;
 };
