@@ -13,6 +13,11 @@
 #include <cassert>
 
 <#=FOM.PredefinedTypeIncludes#>
+<# if (FOM.IsFloatTime) { #>
+#include "RTI/time/HLAfloat64Time.h"
+<#} else {#>
+#include "RTI/time/HLAinteger64Time.h"
+<#}#>
 
 #include "<#=InteractionsHeaderFilename#>"
 
@@ -113,18 +118,80 @@ void <#=interactionClass.Name#>InteractionClass::send(<#=interactionClass.CppPar
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
-void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
+void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&<#if (interactionClass.HasValidParameters) {#> parameters <#}#>)
 {
+<#
+  List<string> callArguments = new List<string>();
+  foreach (var parameter in interactionClass.AllParameters) {
+    if (parameter.DataType != null) {
+      callArguments.Add(parameter.DataType.CppGetter(parameter.Name + "Decoder"));
+#>
+  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Decoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator <#=parameter.Name#>Iter = parameters.find(Get<#=parameter.Name#>ParameterHandle());
+  if (<#=parameter.Name#>Iter != parameters.end())
+  {
+    <#=parameter.Name#>Decoder.decode(<#=parameter.Name#>Iter->second);
+  }
+<#  
+    } // if (parameter.DataType != null)
+  } // foreach (var parameter in interactionClass.Parameters)
+#>
+  for (auto& entry : _receiveCallbacks) {
+    auto& callback = entry.second;
+    callback(<#=string.Join(", ", callArguments)#>);
+  }
+}
+
+void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&<#if (interactionClass.HasValidParameters) {#> parameters <#}#>, const rti1516ev::LogicalTime& time, rti1516ev::OrderType /*receivedOrder*/)
+{
+<#
+{
+  List<string> callArgumentsWithTime = new List<string>();
+  foreach (var parameter in interactionClass.AllParameters) {
+    if (parameter.DataType != null) {
+      callArgumentsWithTime.Add(parameter.DataType.CppGetter(parameter.Name + "Decoder"));
+#>
+  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Decoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator <#=parameter.Name#>Iter = parameters.find(Get<#=parameter.Name#>ParameterHandle());
+  if (<#=parameter.Name#>Iter != parameters.end())
+  {
+    <#=parameter.Name#>Decoder.decode(<#=parameter.Name#>Iter->second);
+  }
+<#  
+    } // if (parameter.DataType != null)
+  } // foreach (var parameter in interactionClass.Parameters)
+#>
+  for (auto& entry : _receiveCallbacksWithTime) {
+    auto& callback = entry.second;
+<#    if (callArgumentsWithTime.Count > 0) { #>
+    callback(<#=string.Join(", ", callArgumentsWithTime)#>, <#=FOM.GetLogicalTimeCast("time")#>);
+<#    } else {#>
+    callback(<#=FOM.GetLogicalTimeCast("time")#>);
+<#    }#>
+<#}#>
+  }
+}
+
+uint32_t <#=interactionClass.Name#>InteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+{
+  uint32_t key = _receiveCallbacksNextKey++;
+  _receiveCallbacks.insert(std::make_pair(key, callback));
+  return key;
+}
+
+uint32_t <#=interactionClass.Name#>InteractionClass::RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback)
+{
+  uint32_t key = _receiveCallbacksWithTimeNextKey++;
+  _receiveCallbacksWithTime.insert(std::make_pair(key, callback));
+  return key;
 }
 
 rti1516ev::ParameterHandleSet <#=interactionClass.Name#>InteractionClass::GetAllParameterHandles()
 {
   rti1516ev::ParameterHandleSet result;
 <# 
-  foreach (var parameter in interactionClass.AllParameters)
-  {
-    if (parameter.DataType != null)
-    {
+  foreach (var parameter in interactionClass.AllParameters) {
+    if (parameter.DataType != null) {
 #>
   result.insert(Get<#=parameter.Name#>ParameterHandle());
 <#  

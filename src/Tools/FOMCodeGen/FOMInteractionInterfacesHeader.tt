@@ -33,6 +33,10 @@ class I<#=interactionClass.Name#>InteractionClass
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual void send(<#=interactionClass.CppParameterList#>) = 0;
+    using ReceiveCallback = std::function<void(<#=interactionClass.CppParameterList#>)>;
+    using ReceiveCallbackWithTime = std::function<void(<#=interactionClass.CppParameterList#><# if (interactionClass.Parameters.Count > 0) {#>, <#}#>int64_t time)>;
+    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
 <# } // foreach (var interactionClass in FOM.InteractionClasses) #>

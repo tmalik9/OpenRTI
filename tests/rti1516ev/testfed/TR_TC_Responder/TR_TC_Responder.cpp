@@ -46,7 +46,7 @@ void ResponderFederate::initializeSimulation()
 {
   //InitializeObjects();
   InitializeInteraction();
-  //mRtiAmb->allowPendingTimeInNextMessageRequest();
+  mRtiAmb->allowPendingTimeInNextMessageRequest();
 
 #ifdef _WIN32
   setNotificationHandle();

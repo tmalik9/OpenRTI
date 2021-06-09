@@ -44,6 +44,9 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
 <#
   if (interactionClass.BaseClass != null)
   {
@@ -108,6 +111,10 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
+    std::map<uint32_t, ReceiveCallback> _receiveCallbacks;
+    uint32_t _receiveCallbacksNextKey = 0;
+    std::map<uint32_t, ReceiveCallbackWithTime> _receiveCallbacksWithTime;
+    uint32_t _receiveCallbacksWithTimeNextKey = 0;
 };
 
 

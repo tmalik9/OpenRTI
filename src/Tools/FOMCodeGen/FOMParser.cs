@@ -167,6 +167,9 @@ namespace FOMCodeGen
       }
       // does the encoding class of this type have 'get/set' methods?
       public virtual bool CanTranslateToCpp { get { return true; } }
+      public virtual string CppGetter(string var) {
+        return var + ".get()";
+      }
       // The name of the data type, as specified in the FOM
       public string Name { get; set; }
       public uint Index { get; set; }
@@ -299,6 +302,12 @@ namespace FOMCodeGen
           return false;
         }
       }
+      public override string CppGetter(string var)
+      {
+        if (Name == "HLAopaqueData")
+          return base.CppGetter(var);
+        return var;
+      }
       public string Include
       {
         get { return _include; }
@@ -351,6 +360,10 @@ namespace FOMCodeGen
       public override string Encoding
       {
         get { return Representation.Encoding; }
+      }
+      public override string CppGetter(string var)
+      {
+        return "static_cast<" + Name + ">(" + var + ".get())";
       }
     }
     // An array data type, one of HLAfixedArray or HLAvariableArray.
@@ -488,6 +501,10 @@ namespace FOMCodeGen
         }
         return false;
       }
+      public override string CppGetter(string var)
+      {
+        return var;
+      }
     }
 
     public class UnresolvedDataType : DataType
@@ -575,7 +592,14 @@ namespace FOMCodeGen
     {
       get { return mInteractionClasses; }
     }
-
+    public bool IsFloatTime { get; set; }
+    public string GetLogicalTimeCast(string param)
+    {
+      if (IsFloatTime)
+        return "static_cast<const rti1516ev::HLAfloat64Time&>(" + param + ").getTime()";
+      else
+        return "static_cast<const rti1516ev::HLAinteger64Time&>(" + param + ").getTime()";
+    }
     DataType GetDataType(string name)
     {
       if (DataTypes.ContainsKey(name))
@@ -814,6 +838,7 @@ namespace FOMCodeGen
       string name = objectClassNode["name"].FirstChild.InnerText;
       ObjectClass objectClass = new ObjectClass(name);
       objectClass.BaseClass = baseClass;
+      System.Console.WriteLine("ObjectClass {0}", objectClass.Name);
       mObjectClasses.Add(objectClass);
       if (objectClass.BaseClass != null)
       {
@@ -870,6 +895,7 @@ namespace FOMCodeGen
     {
       DataTypes = new Dictionary<string, DataType>();
       SortedDataTypes = new List<DataType>();
+      IsFloatTime = false;
       uint index = 0;
       foreach (var entry in mBasicDataRepresentations)
       {
