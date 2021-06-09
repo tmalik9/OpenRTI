@@ -204,13 +204,13 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 
 <# } // foreach (var objectClass in FOM.ObjectClasses) #> 
 
-class ClassRegistry : public IClassRegistry
+class ObjectClassRegistry : public IObjectClassRegistry
 {
   public:
-    ClassRegistry();
-    ~ClassRegistry();
+    ObjectClassRegistry();
+    ~ObjectClassRegistry();
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
-    static ClassRegistry* GetInstance() { return sClassRegistry; }
+    static ObjectClassRegistry* GetInstance() { return sClassRegistry; }
 
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
     I<#=objectClass.Name#>ObjectClass* get<#=objectClass.Name#>ObjectClass() const override { return m<#=objectClass.Name#>ObjectClass.get(); }
@@ -226,12 +226,12 @@ class ClassRegistry : public IClassRegistry
 
   private:
     std::map<std::wstring, std::function<void(bool)> > mInstanceNameReservationCallbacks;
-    static ClassRegistry* sClassRegistry;
+    static ObjectClassRegistry* sClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
     std::unique_ptr<<#=objectClass.Name#>ObjectClass> m<#=objectClass.Name#>ObjectClass;
 <# } #>
-}; // class ClassRegistry
+}; // class ObjectClassRegistry
 
 <#
 foreach (var namespacePart in FOM.Namespace)

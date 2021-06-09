@@ -133,12 +133,12 @@ public:
   RTFederateAmbassador() : OpenRTI::RTI1516ESimpleAmbassador() {}
   virtual void objectInstanceNameReservationSucceeded(const std::wstring& name) override
   {
-    classRegistry.ObjectInstanceNameReservationSucceeded(name);
+    objectClassRegistry.ObjectInstanceNameReservationSucceeded(name);
   }
 
   virtual void objectInstanceNameReservationFailed(const std::wstring& name) override
   {
-    classRegistry.ObjectInstanceNameReservationFailed(name);
+    objectClassRegistry.ObjectInstanceNameReservationFailed(name);
   }
   void reflectAttributeValues(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
     const rti1516ev::AttributeHandleValueMap& attributeHandleValueMap,
@@ -146,9 +146,9 @@ public:
     rti1516ev::OrderType, rti1516ev::TransportationType,
     rti1516ev::SupplementalReflectInfo) override
   {
-    classRegistry.ReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
+    objectClassRegistry.ReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
   }
-  NDistSimIB::NRTFederateEncoding::ClassRegistry classRegistry;
+  NDistSimIB::NRTFederateEncoding::ObjectClassRegistry objectClassRegistry;
 };
 
 bool testRTFederate(int argc, char* argv[])
@@ -218,8 +218,8 @@ bool testRTFederate(int argc, char* argv[])
     std::wcout << L"Unknown Exception!" << std::endl;
     return false;
   }
-  ambassador.classRegistry.Initialize(ambassador.getRtiAmbassador());
-  auto* busControllerObjectClass = ambassador.classRegistry.getBusControllerCanObjectClass();
+  ambassador.objectClassRegistry.Initialize(ambassador.getRtiAmbassador());
+  auto* busControllerObjectClass = ambassador.objectClassRegistry.getBusControllerCanObjectClass();
   busControllerObjectClass->Publish();
   busControllerObjectClass->Subscribe();
   NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan = busControllerObjectClass->CreateObjectInstance(L"CAN1");

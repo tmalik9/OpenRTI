@@ -122,17 +122,17 @@ class I<#=objectClass.Name#><#
 
 <# } // foreach (var objectClass in FOM.ObjectClasses) #>
 
-class IClassRegistry
+class IObjectClassRegistry
 {
   public:
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
     virtual I<#=objectClass.Name#>ObjectClass* get<#=objectClass.Name#>ObjectClass() const = 0;
 <# } #>
   protected:
-    virtual ~IClassRegistry() {}
-}; // class ClassRegistry
+    virtual ~IObjectClassRegistry() {}
+}; // class IObjectClassRegistry
 
-IClassRegistry* GetClassRegistry();
+IObjectClassRegistry* GetClassRegistry();
 
 <#
 foreach (var namespacePart in FOM.Namespace)

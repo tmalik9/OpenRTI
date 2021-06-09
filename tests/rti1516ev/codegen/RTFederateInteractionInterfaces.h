@@ -20,6 +20,7 @@ class IHLAinteractionRootInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send() = 0;
 };
 
 class IMeasurementInit;
@@ -30,6 +31,7 @@ class IMeasurementInitInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(const std::vector<uint8_t>& Dummy) = 0;
 };
 
 class IMeasurementStop;
@@ -40,6 +42,7 @@ class IMeasurementStopInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(const std::wstring& NextFederationSuffix) = 0;
 };
 
 class IKeyEvent;
@@ -50,6 +53,7 @@ class IKeyEventInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(int32_t KeyCode) = 0;
 };
 
 class ITextLog;
@@ -60,6 +64,7 @@ class ITextLogInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(const std::wstring& Sender, const std::wstring& Text) = 0;
 };
 
 class IDOMemberTransmitData;
@@ -70,6 +75,7 @@ class IDOMemberTransmitDataInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(rti1516ev::HLAhandle ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) = 0;
 };
 
 class ISystemVariableUpdate;
@@ -80,6 +86,7 @@ class ISystemVariableUpdateInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged) = 0;
 };
 
 class ISystemVariableModification;
@@ -90,6 +97,7 @@ class ISystemVariableModificationInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(const std::vector<uint8_t>& Value) = 0;
 };
 
 class IValueEntityUpdate;
@@ -100,6 +108,7 @@ class IValueEntityUpdateInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value) = 0;
 };
 
 class IBusMessage;
@@ -110,6 +119,7 @@ class IBusMessageInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver) = 0;
 };
 
 class IEthPacket;
@@ -120,6 +130,7 @@ class IEthPacketInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame) = 0;
 };
 
 class IEthPacketError;
@@ -130,6 +141,7 @@ class IEthPacketErrorInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame) = 0;
 };
 
 class IEthPacketErrorForwarded;
@@ -140,6 +152,7 @@ class IEthPacketErrorForwardedInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame) = 0;
 };
 
 class IEthForwardedPacket;
@@ -150,6 +163,7 @@ class IEthForwardedPacketInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame) = 0;
 };
 
 class IEthStatus;
@@ -160,6 +174,7 @@ class IEthStatusInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame) = 0;
 };
 
 class ICANMessage;
@@ -170,6 +185,7 @@ class ICANMessageInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame) = 0;
 };
 
 class ICANErrorFrame;
@@ -180,6 +196,7 @@ class ICANErrorFrameInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame) = 0;
 };
 
 class IPythonCommand;
@@ -190,6 +207,7 @@ class IPythonCommandInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
+    virtual void send(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID) = 0;
 };
 
 

@@ -28,6 +28,7 @@ class HLAinteractionRootInteractionClass : public IHLAinteractionRootInteraction
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send() override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -54,6 +55,7 @@ class MeasurementInitInteractionClass : public IMeasurementInitInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(const std::vector<uint8_t>& Dummy) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -86,6 +88,7 @@ class MeasurementStopInteractionClass : public IMeasurementStopInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(const std::wstring& NextFederationSuffix) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -118,6 +121,7 @@ class KeyEventInteractionClass : public IKeyEventInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(int32_t KeyCode) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -150,6 +154,7 @@ class TextLogInteractionClass : public ITextLogInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(const std::wstring& Sender, const std::wstring& Text) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -186,6 +191,7 @@ class DOMemberTransmitDataInteractionClass : public IDOMemberTransmitDataInterac
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(rti1516ev::HLAhandle ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -226,6 +232,7 @@ class SystemVariableUpdateInteractionClass : public ISystemVariableUpdateInterac
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -270,6 +277,7 @@ class SystemVariableModificationInteractionClass : public ISystemVariableModific
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(const std::vector<uint8_t>& Value) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -302,6 +310,7 @@ class ValueEntityUpdateInteractionClass : public IValueEntityUpdateInteractionCl
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -338,6 +347,7 @@ class BusMessageInteractionClass : public IBusMessageInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -390,6 +400,7 @@ class EthPacketInteractionClass : public IEthPacketInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -434,6 +445,7 @@ class EthPacketErrorInteractionClass : public IEthPacketErrorInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -478,6 +490,7 @@ class EthPacketErrorForwardedInteractionClass : public IEthPacketErrorForwardedI
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -522,6 +535,7 @@ class EthForwardedPacketInteractionClass : public IEthForwardedPacketInteraction
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -566,6 +580,7 @@ class EthStatusInteractionClass : public IEthStatusInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -610,6 +625,7 @@ class CANMessageInteractionClass : public ICANMessageInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -658,6 +674,7 @@ class CANErrorFrameInteractionClass : public ICANErrorFrameInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -702,6 +719,7 @@ class PythonCommandInteractionClass : public IPythonCommandInteractionClass
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);

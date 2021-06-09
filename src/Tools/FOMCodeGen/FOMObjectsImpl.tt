@@ -153,7 +153,7 @@ I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(c
     throw rti1516ev::ObjectClassNotPublished(L"<#=objectClass.Name#>");
   }
   <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -406,20 +406,20 @@ void <#=objectClass.Name#>::ExecuteUpdateCallbacks()
 
 <# } // foreach (var objectClass in FOM.ObjectClasses) #> 
 
-ClassRegistry* ClassRegistry::sClassRegistry = nullptr;
+ObjectClassRegistry* ObjectClassRegistry::sClassRegistry = nullptr;
 
-ClassRegistry::ClassRegistry()
+ObjectClassRegistry::ObjectClassRegistry()
 {
   assert(sClassRegistry == nullptr);
   sClassRegistry = this;
 }
 
-ClassRegistry::~ClassRegistry()
+ObjectClassRegistry::~ObjectClassRegistry()
 {
   sClassRegistry = nullptr;
 }
 
-void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
+void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 {
   mRtiAmbassador = rtiAmbassador;
 <# 
@@ -435,7 +435,7 @@ void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 <# } // foreach #>
 } // Initialize
 
-void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
+void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
@@ -456,7 +456,7 @@ void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theOb
 <# } // foreach #>
 }
 
-void ClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
+void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
@@ -477,7 +477,7 @@ void ClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObje
 <# } // foreach #>
 }
 
-void ClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
+void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
@@ -501,7 +501,7 @@ void ClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theOb
 #>
 }
 
-void ClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles)
+void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles)
 {
 <# 
   bool firstInClassRegistryProvideAttributeValues = true;
@@ -524,29 +524,29 @@ void ClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjec
 #>
 }
 
-void ClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
+void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
 {
   mInstanceNameReservationCallbacks.insert(std::make_pair(theObjectInstanceName, completionCallback));
   mRtiAmbassador->reserveObjectInstanceName(theObjectInstanceName);
 }
 
-void ClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
+void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
 {
   auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
   iter->second(true);
   mInstanceNameReservationCallbacks.erase(iter);
 }
 
-void ClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
+void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
 {
   auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
   iter->second(false);
   mInstanceNameReservationCallbacks.erase(iter);
 }
 
-IClassRegistry* GetClassRegistry()
+IObjectClassRegistry* GetClassRegistry()
 {
-  return ClassRegistry::GetInstance();
+  return ObjectClassRegistry::GetInstance();
 }
 
 <# foreach (var namespacePart in FOM.Namespace) { #>

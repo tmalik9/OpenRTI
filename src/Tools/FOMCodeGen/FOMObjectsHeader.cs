@@ -817,10 +817,17 @@ foreach (var objectClass in FOM.ObjectClasses)
             
             #line default
             #line hidden
-            this.Write(" \r\n\r\nclass ClassRegistry : public IClassRegistry\r\n{\r\n  public:\r\n    ClassRegistry" +
-                    "();\r\n    ~ClassRegistry();\r\n    void Initialize(rti1516ev::RTIambassador* rtiAmb" +
-                    "assador);\r\n    static ClassRegistry* GetInstance() { return sClassRegistry; }\r\n\r" +
-                    "\n");
+            this.Write(@" 
+
+class ObjectClassRegistry : public IObjectClassRegistry
+{
+  public:
+    ObjectClassRegistry();
+    ~ObjectClassRegistry();
+    void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
+    static ObjectClassRegistry* GetInstance() { return sClassRegistry; }
+
+");
             
             #line 215 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  foreach (var objectClass in FOM.ObjectClasses) { 
@@ -866,7 +873,7 @@ foreach (var objectClass in FOM.ObjectClasses)
 
   private:
     std::map<std::wstring, std::function<void(bool)> > mInstanceNameReservationCallbacks;
-    static ClassRegistry* sClassRegistry;
+    static ObjectClassRegistry* sClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
 ");
             
@@ -896,7 +903,7 @@ foreach (var objectClass in FOM.ObjectClasses)
             
             #line default
             #line hidden
-            this.Write("}; // class ClassRegistry\r\n\r\n");
+            this.Write("}; // class ObjectClassRegistry\r\n\r\n");
             
             #line 236 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
 

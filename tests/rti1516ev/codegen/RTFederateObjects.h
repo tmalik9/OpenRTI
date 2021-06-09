@@ -976,13 +976,13 @@ class BusControllerCan : public IBusControllerCan
 
  
 
-class ClassRegistry : public IClassRegistry
+class ObjectClassRegistry : public IObjectClassRegistry
 {
   public:
-    ClassRegistry();
-    ~ClassRegistry();
+    ObjectClassRegistry();
+    ~ObjectClassRegistry();
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
-    static ClassRegistry* GetInstance() { return sClassRegistry; }
+    static ObjectClassRegistry* GetInstance() { return sClassRegistry; }
 
     IHLAobjectRootObjectClass* getHLAobjectRootObjectClass() const override { return mHLAobjectRootObjectClass.get(); }
     ISystemVariableObjectClass* getSystemVariableObjectClass() const override { return mSystemVariableObjectClass.get(); }
@@ -1004,7 +1004,7 @@ class ClassRegistry : public IClassRegistry
 
   private:
     std::map<std::wstring, std::function<void(bool)> > mInstanceNameReservationCallbacks;
-    static ClassRegistry* sClassRegistry;
+    static ObjectClassRegistry* sClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     std::unique_ptr<HLAobjectRootObjectClass> mHLAobjectRootObjectClass;
     std::unique_ptr<SystemVariableObjectClass> mSystemVariableObjectClass;
@@ -1015,7 +1015,7 @@ class ClassRegistry : public IClassRegistry
     std::unique_ptr<BusManagementCanObjectClass> mBusManagementCanObjectClass;
     std::unique_ptr<BusControllerObjectClass> mBusControllerObjectClass;
     std::unique_ptr<BusControllerCanObjectClass> mBusControllerCanObjectClass;
-}; // class ClassRegistry
+}; // class ObjectClassRegistry
 
 } // namespace NDistSimIB
 } // namespace NRTFederateEncoding

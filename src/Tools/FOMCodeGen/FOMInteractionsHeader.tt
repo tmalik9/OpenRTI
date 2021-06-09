@@ -40,6 +40,7 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
+    void send(<#=interactionClass.CppParameterList#>) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);

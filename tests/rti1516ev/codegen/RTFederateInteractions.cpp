@@ -54,6 +54,12 @@ void HLAinteractionRootInteractionClass::Unsubscribe()
   }
 }
 
+void HLAinteractionRootInteractionClass::send()
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
 void HLAinteractionRootInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
 {
 }
@@ -109,6 +115,14 @@ void MeasurementInitInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void MeasurementInitInteractionClass::send(const std::vector<uint8_t>& Dummy)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAopaqueData DummyEncoder(Dummy);
+  parameters.insert(std::make_pair(GetDummyParameterHandle(), DummyEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void MeasurementInitInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
@@ -169,6 +183,14 @@ void MeasurementStopInteractionClass::Unsubscribe()
   }
 }
 
+void MeasurementStopInteractionClass::send(const std::wstring& NextFederationSuffix)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAunicodeString NextFederationSuffixEncoder(NextFederationSuffix);
+  parameters.insert(std::make_pair(GetNextFederationSuffixParameterHandle(), NextFederationSuffixEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
 void MeasurementStopInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
 {
 }
@@ -225,6 +247,14 @@ void KeyEventInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void KeyEventInteractionClass::send(int32_t KeyCode)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAinteger32LE KeyCodeEncoder(KeyCode);
+  parameters.insert(std::make_pair(GetKeyCodeParameterHandle(), KeyCodeEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void KeyEventInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
@@ -285,6 +315,16 @@ void TextLogInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void TextLogInteractionClass::send(const std::wstring& Sender, const std::wstring& Text)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAunicodeString SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAunicodeString TextEncoder(Text);
+  parameters.insert(std::make_pair(GetTextParameterHandle(), TextEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void TextLogInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
@@ -348,6 +388,18 @@ void DOMemberTransmitDataInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void DOMemberTransmitDataInteractionClass::send(rti1516ev::HLAhandle ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAhandle ObjInstanceHandleEncoder(ObjInstanceHandle);
+  parameters.insert(std::make_pair(GetObjInstanceHandleParameterHandle(), ObjInstanceHandleEncoder.encode()));
+  rti1516ev::HLAASCIIstring ConnectionTypeEncoder(ConnectionType);
+  parameters.insert(std::make_pair(GetConnectionTypeParameterHandle(), ConnectionTypeEncoder.encode()));
+  rti1516ev::HLAopaqueData DataBytesEncoder(DataBytes);
+  parameters.insert(std::make_pair(GetDataBytesParameterHandle(), DataBytesEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void DOMemberTransmitDataInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
@@ -416,6 +468,20 @@ void SystemVariableUpdateInteractionClass::Unsubscribe()
   }
 }
 
+void SystemVariableUpdateInteractionClass::send(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAASCIIstring IdEncoder(Id);
+  parameters.insert(std::make_pair(GetIdParameterHandle(), IdEncoder.encode()));
+  rti1516ev::HLAopaqueData ValueEncoder(Value);
+  parameters.insert(std::make_pair(GetValueParameterHandle(), ValueEncoder.encode()));
+  rti1516ev::HLAinteger32LE ClientEncoder(Client);
+  parameters.insert(std::make_pair(GetClientParameterHandle(), ClientEncoder.encode()));
+  rti1516ev::HLAboolean HasChangedEncoder(HasChanged);
+  parameters.insert(std::make_pair(GetHasChangedParameterHandle(), HasChangedEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
 void SystemVariableUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
 {
 }
@@ -477,6 +543,14 @@ void SystemVariableModificationInteractionClass::Unsubscribe()
   }
 }
 
+void SystemVariableModificationInteractionClass::send(const std::vector<uint8_t>& Value)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAopaqueData ValueEncoder(Value);
+  parameters.insert(std::make_pair(GetValueParameterHandle(), ValueEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
 void SystemVariableModificationInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
 {
 }
@@ -535,6 +609,16 @@ void ValueEntityUpdateInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void ValueEntityUpdateInteractionClass::send(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAopaqueData IdEncoder(Id);
+  parameters.insert(std::make_pair(GetIdParameterHandle(), IdEncoder.encode()));
+  rti1516ev::HLAopaqueData ValueEncoder(Value);
+  parameters.insert(std::make_pair(GetValueParameterHandle(), ValueEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void ValueEntityUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
@@ -606,6 +690,24 @@ void BusMessageInteractionClass::Unsubscribe()
   }
 }
 
+void BusMessageInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
 void BusMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
 {
 }
@@ -667,6 +769,26 @@ void EthPacketInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void EthPacketInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  const EthernetPacketEncoding& FrameEncoder = static_cast<const EthernetPacketEncoding&>(Frame);
+  parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
@@ -733,6 +855,26 @@ void EthPacketErrorInteractionClass::Unsubscribe()
   }
 }
 
+void EthPacketErrorInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  const EthernetPacketErrorEncoding& FrameEncoder = static_cast<const EthernetPacketErrorEncoding&>(Frame);
+  parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
 void EthPacketErrorInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
 {
 }
@@ -795,6 +937,26 @@ void EthPacketErrorForwardedInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void EthPacketErrorForwardedInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  const EthernetPacketErrorForwardedEncoding& FrameEncoder = static_cast<const EthernetPacketErrorForwardedEncoding&>(Frame);
+  parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void EthPacketErrorForwardedInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
@@ -861,6 +1023,26 @@ void EthForwardedPacketInteractionClass::Unsubscribe()
   }
 }
 
+void EthForwardedPacketInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  const EthernetPacketForwardedEncoding& FrameEncoder = static_cast<const EthernetPacketForwardedEncoding&>(Frame);
+  parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
 void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
 {
 }
@@ -923,6 +1105,26 @@ void EthStatusInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void EthStatusInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  const EthernetStatusEncoding& FrameEncoder = static_cast<const EthernetStatusEncoding&>(Frame);
+  parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
@@ -991,6 +1193,28 @@ void CANMessageInteractionClass::Unsubscribe()
   }
 }
 
+void CANMessageInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  rti1516ev::HLAinteger32LE IdEncoder(Id);
+  parameters.insert(std::make_pair(GetIdParameterHandle(), IdEncoder.encode()));
+  const CANFrameEncoding& FrameEncoder = static_cast<const CANFrameEncoding&>(Frame);
+  parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
 void CANMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
 {
 }
@@ -1054,6 +1278,26 @@ void CANErrorFrameInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void CANErrorFrameInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  rti1516ev::HLAopaqueData FrameEncoder(Frame);
+  parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void CANErrorFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
@@ -1122,6 +1366,18 @@ void PythonCommandInteractionClass::Unsubscribe()
     mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
     mSubscribed = false;
   }
+}
+
+void PythonCommandInteractionClass::send(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAopaqueData CodeEncoder(Code);
+  parameters.insert(std::make_pair(GetCodeParameterHandle(), CodeEncoder.encode()));
+  rti1516ev::HLAopaqueData TargetEncoder(Target);
+  parameters.insert(std::make_pair(GetTargetParameterHandle(), TargetEncoder.encode()));
+  rti1516ev::HLAopaqueData RefIDEncoder(RefID);
+  parameters.insert(std::make_pair(GetRefIDParameterHandle(), RefIDEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
 void PythonCommandInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)

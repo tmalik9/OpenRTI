@@ -91,6 +91,28 @@ void <#=interactionClass.Name#>InteractionClass::Unsubscribe()
   }
 }
 
+void <#=interactionClass.Name#>InteractionClass::send(<#=interactionClass.CppParameterList#>)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+<# 
+  foreach (var parameter in interactionClass.AllParameters)
+  {
+    if (parameter.DataType != null)
+    {
+      if (parameter.DataType is FOMParser.ArrayDataType || parameter.DataType is FOMParser.FixedRecordDataType)
+      {#>
+  const <#=parameter.DataType.Encoding#>& <#=parameter.Name#>Encoder = static_cast<const <#=parameter.DataType.Encoding#>&>(<#=parameter.Name#>);
+<#    } else { #>
+  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(<#=parameter.Name#>);
+<#    } #>
+  parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
+<#  
+    } // if (parameter.DataType != null)
+  } // foreach (var parameter in interactionClass.Parameters)
+#>
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
 void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & /*parameters*/)
 {
 }

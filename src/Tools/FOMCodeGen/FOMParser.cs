@@ -127,6 +127,18 @@ namespace FOMCodeGen
           return allParameters;
         }
       }
+      public string CppParameterList
+      {
+        get
+        {
+          List<string> parameters = new List<string>();
+          foreach (var parameter in AllParameters)
+          {
+            parameters.Add(parameter.DataType.ParameterCppType + " " + parameter.Name);
+          }
+          return string.Join(", ", parameters);
+        }
+      }
       public bool HasValidParameters
       {
         get
@@ -217,6 +229,19 @@ namespace FOMCodeGen
       {
         get { return _cppType; }
       }
+      public override string ParameterCppType
+      {
+        get {
+          if (Name == "HLAASCIIstring" || Name == "HLAunicodeString")
+          {
+            return "const " + CPPType + "&";
+          }
+          else
+          {
+            return CPPType;
+          }
+        }
+      }
       public override string Encoding
       {
         get { return "rti1516ev::" + Name; }
@@ -230,16 +255,37 @@ namespace FOMCodeGen
       {
         _cppType = "rti1516ev::" + name;
         _include = include;
+        _passByReference = false;
       }
       public PredefinedType(string name, string include, string cppType) : base(name)
       {
         _cppType = cppType;
         _include = include;
+        _passByReference = false;
+      }
+      public PredefinedType(string name, string include, string cppType, bool passByReference) : base(name)
+      {
+        _cppType = cppType;
+        _include = include;
+        _passByReference = passByReference;
       }
       private string _cppType;
       public override string CPPType
       {
         get { return _cppType; }
+      }
+      public override string ParameterCppType
+      {
+        get {
+          if (_passByReference)
+          {
+            return "const " + CPPType + "&";
+          }
+          else
+          {
+            return _cppType;
+          }
+        }
       }
       public override string Encoding
       {
@@ -258,6 +304,12 @@ namespace FOMCodeGen
         get { return _include; }
       }
       private string _include;
+
+      public bool PassByReference
+      {
+        get { return _passByReference; }
+      }
+      private bool _passByReference;
     }
     // A SimpleDataType is basically a typedef to a BasicDataRepresentation
     public class SimpleDataType : DataType
@@ -388,6 +440,11 @@ namespace FOMCodeGen
         Version = version;
         HasChilds = false;
       }
+      public override string ParameterCppType
+      {
+        get { return "const " + CPPType + "&"; }
+      }
+
       public uint Version { get; set; }
       public List<FixedRecordField> Fields { get; set; }
       public List<FixedRecordField> AllFields
@@ -470,7 +527,7 @@ namespace FOMCodeGen
 
     private List<PredefinedType> mPredefinedTypes = new List<PredefinedType>()
     {
-      new PredefinedType("HLAopaqueData", "#include \"RTI/encoding/HLAopaqueData.h\"", "std::vector<uint8_t>"),
+      new PredefinedType("HLAopaqueData", "#include \"RTI/encoding/HLAopaqueData.h\"", "std::vector<uint8_t>", true),
       new PredefinedType("HLAhandle", "#include \"RTI/encoding/HLAhandle.h\"")
     };
 

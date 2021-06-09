@@ -142,17 +142,20 @@ foreach (var interactionClass in FOM.InteractionClasses)
             
             #line default
             #line hidden
-            this.Write(@"InteractionClass() = default;
-    void Publish() override;
-    void Unpublish() override;
-    void Subscribe() override;
-    void Unsubscribe() override;
-    // internal
-    rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-");
+            this.Write("InteractionClass() = default;\r\n    void Publish() override;\r\n    void Unpublish()" +
+                    " override;\r\n    void Subscribe() override;\r\n    void Unsubscribe() override;\r\n  " +
+                    "  void send(");
             
-            #line 46 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 43 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.CppParameterList));
+            
+            #line default
+            #line hidden
+            this.Write(") override;\r\n    // internal\r\n    rti1516ev::InteractionClassHandle GetInteractio" +
+                    "nClassHandle() const { return mInteractionClassHandle; }\r\n    void ReceiveIntera" +
+                    "ction(const rti1516ev::ParameterHandleValueMap & parameters);\r\n");
+            
+            #line 47 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
 
   if (interactionClass.BaseClass != null)
   {
@@ -162,41 +165,41 @@ foreach (var interactionClass in FOM.InteractionClasses)
             #line hidden
             this.Write("    ");
             
-            #line 50 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 51 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass(rti1516ev::RTIambassador* rtiAmbassador, ");
             
-            #line 50 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 51 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.BaseClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass* baseClass);\r\n\r\n");
             
-            #line 52 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 53 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  } else {
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 53 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 54 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass(rti1516ev::RTIambassador* rtiAmbassador);\r\n");
             
-            #line 54 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 55 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 55 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 56 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  
   var baseClass = interactionClass.BaseClass;
   while (baseClass != null)
@@ -210,49 +213,49 @@ foreach (var interactionClass in FOM.InteractionClasses)
             #line hidden
             this.Write("    // parameter ");
             
-            #line 63 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 64 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 63 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 64 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n    rti1516ev::ParameterHandle Get");
             
-            #line 64 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 65 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write("ParameterHandle() const { return mBaseClass->Get");
             
-            #line 64 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 65 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write("ParameterHandle(); }\r\n");
             
-            #line 65 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 66 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
     } else { 
             
             #line default
             #line hidden
             this.Write("    // parameter ");
             
-            #line 66 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 67 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write(" : no data type\r\n");
             
-            #line 67 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 68 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
 
       } // if (parameter.DataType != null)
     } // foreach (var parameter in interactionClass.Parameters)
@@ -263,7 +266,7 @@ foreach (var interactionClass in FOM.InteractionClasses)
             #line default
             #line hidden
             
-            #line 73 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 74 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  
   foreach (var parameter in interactionClass.Parameters)
   {
@@ -274,49 +277,49 @@ foreach (var interactionClass in FOM.InteractionClasses)
             #line hidden
             this.Write("    // parameter ");
             
-            #line 78 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 79 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 78 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 79 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n    rti1516ev::ParameterHandle Get");
             
-            #line 79 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 80 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write("ParameterHandle() const { return m");
             
-            #line 79 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 80 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write("ParameterHandle; }\r\n");
             
-            #line 80 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 81 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
   } else { 
             
             #line default
             #line hidden
             this.Write("    // parameter ");
             
-            #line 81 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 82 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write(" : no data type\r\n");
             
-            #line 82 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 83 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
   
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
@@ -328,21 +331,21 @@ foreach (var interactionClass in FOM.InteractionClasses)
                     "516ev::RTIambassador* mRtiAmbassador;\r\n    // interaction class handle\r\n    rti1" +
                     "516ev::InteractionClassHandle mInteractionClassHandle;\r\n");
             
-            #line 91 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 92 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  if (interactionClass.BaseClass != null) { 
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 92 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 93 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.BaseClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass* mBaseClass;\r\n");
             
-            #line 93 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 94 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  } 
             
             #line default
@@ -350,7 +353,7 @@ foreach (var interactionClass in FOM.InteractionClasses)
             this.Write("    bool mPublished = false;\r\n    bool mSubscribed = false;\r\n    // Parameter han" +
                     "dles\r\n");
             
-            #line 97 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 98 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  
   foreach (var parameter in interactionClass.Parameters)
   {
@@ -362,28 +365,28 @@ foreach (var interactionClass in FOM.InteractionClasses)
             #line hidden
             this.Write("    // parameter ");
             
-            #line 102 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 103 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 102 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 103 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n    rti1516ev::ParameterHandle m");
             
-            #line 103 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 104 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write("ParameterHandle;\r\n");
             
-            #line 104 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 105 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
   } else {
 
             
@@ -391,14 +394,14 @@ foreach (var interactionClass in FOM.InteractionClasses)
             #line hidden
             this.Write("    // parameter ");
             
-            #line 105 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 106 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Name));
             
             #line default
             #line hidden
             this.Write(" : no data type\r\n");
             
-            #line 106 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 107 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
   
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
@@ -408,7 +411,7 @@ foreach (var interactionClass in FOM.InteractionClasses)
             #line hidden
             this.Write("};\r\n\r\n\r\n");
             
-            #line 113 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 114 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  } // foreach (var interactionClass in FOM.InteractionClasses) 
             
             #line default
@@ -425,35 +428,35 @@ class InteractionClassRegistry : public IInteractionClassRegistry
 
 ");
             
-            #line 123 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 124 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  foreach (var interactionClass in FOM.InteractionClasses) { 
             
             #line default
             #line hidden
             this.Write("    I");
             
-            #line 124 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 125 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass* get");
             
-            #line 124 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 125 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass() const override { return m");
             
-            #line 124 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 125 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass.get(); }\r\n");
             
-            #line 125 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 126 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  } 
             
             #line default
@@ -463,35 +466,35 @@ class InteractionClassRegistry : public IInteractionClassRegistry
                     " InteractionClassRegistry* sClassRegistry;\r\n    rti1516ev::RTIambassador* mRtiAm" +
                     "bassador;\r\n");
             
-            #line 132 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 133 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  foreach (var interactionClass in FOM.InteractionClasses) { 
             
             #line default
             #line hidden
             this.Write("    std::unique_ptr<");
             
-            #line 133 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 134 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass> m");
             
-            #line 133 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 134 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass;\r\n");
             
-            #line 134 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 135 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("}; // class InteractionClassRegistry\r\n\r\n");
             
-            #line 137 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 138 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
 
 foreach (var namespacePart in FOM.Namespace)
 {
@@ -501,14 +504,14 @@ foreach (var namespacePart in FOM.Namespace)
             #line hidden
             this.Write("} // namespace ");
             
-            #line 141 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 142 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 142 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 143 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
   } 
             
             #line default

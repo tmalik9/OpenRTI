@@ -38,6 +38,8 @@ namespace rti1516ev
          const Octet* inData,
          size_t dataSize);
 
+      HLAopaqueData(const std::vector<Octet>& inData);
+
       // Constructor: Use external memory with buffer and data of given lengths.
       // This instance changes or reflects changes to contents of external memory.
       // Changes to external memory are reflected in subsequent encodings.

@@ -117,7 +117,7 @@ IHLAobjectRoot* HLAobjectRootObjectClass::CreateObjectInstance(const std::wstrin
     throw rti1516ev::ObjectClassNotPublished(L"HLAobjectRoot");
   }
   HLAobjectRoot* newObject = new HLAobjectRoot(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -281,7 +281,7 @@ ISystemVariable* SystemVariableObjectClass::CreateObjectInstance(const std::wstr
     throw rti1516ev::ObjectClassNotPublished(L"SystemVariable");
   }
   SystemVariable* newObject = new SystemVariable(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -549,7 +549,7 @@ IValueEntity* ValueEntityObjectClass::CreateObjectInstance(const std::wstring& i
     throw rti1516ev::ObjectClassNotPublished(L"ValueEntity");
   }
   ValueEntity* newObject = new ValueEntity(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -821,7 +821,7 @@ IDOMemberSource* DOMemberSourceObjectClass::CreateObjectInstance(const std::wstr
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberSource");
   }
   DOMemberSource* newObject = new DOMemberSource(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -1147,7 +1147,7 @@ IDOMemberTarget* DOMemberTargetObjectClass::CreateObjectInstance(const std::wstr
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberTarget");
   }
   DOMemberTarget* newObject = new DOMemberTarget(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -1443,7 +1443,7 @@ IBusManagement* BusManagementObjectClass::CreateObjectInstance(const std::wstrin
     throw rti1516ev::ObjectClassNotPublished(L"BusManagement");
   }
   BusManagement* newObject = new BusManagement(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -1696,7 +1696,7 @@ IBusManagementCan* BusManagementCanObjectClass::CreateObjectInstance(const std::
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementCan");
   }
   BusManagementCan* newObject = new BusManagementCan(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -2064,7 +2064,7 @@ IBusController* BusControllerObjectClass::CreateObjectInstance(const std::wstrin
     throw rti1516ev::ObjectClassNotPublished(L"BusController");
   }
   BusController* newObject = new BusController(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -2355,7 +2355,7 @@ IBusControllerCan* BusControllerCanObjectClass::CreateObjectInstance(const std::
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerCan");
   }
   BusControllerCan* newObject = new BusControllerCan(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -2768,20 +2768,20 @@ void BusControllerCan::ExecuteUpdateCallbacks()
 
  
 
-ClassRegistry* ClassRegistry::sClassRegistry = nullptr;
+ObjectClassRegistry* ObjectClassRegistry::sClassRegistry = nullptr;
 
-ClassRegistry::ClassRegistry()
+ObjectClassRegistry::ObjectClassRegistry()
 {
   assert(sClassRegistry == nullptr);
   sClassRegistry = this;
 }
 
-ClassRegistry::~ClassRegistry()
+ObjectClassRegistry::~ObjectClassRegistry()
 {
   sClassRegistry = nullptr;
 }
 
-void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
+void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 {
   mRtiAmbassador = rtiAmbassador;
   mHLAobjectRootObjectClass = std::unique_ptr<HLAobjectRootObjectClass>(new HLAobjectRootObjectClass(mRtiAmbassador));
@@ -2795,7 +2795,7 @@ void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
   mBusControllerCanObjectClass = std::unique_ptr<BusControllerCanObjectClass>(new BusControllerCanObjectClass(mRtiAmbassador, mBusControllerObjectClass.get()));
 } // Initialize
 
-void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
+void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
   if (theObjectClass == mHLAobjectRootObjectClass->GetObjectClassHandle())
@@ -2836,7 +2836,7 @@ void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theOb
   }
 }
 
-void ClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
+void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
   if (theObjectClass == mHLAobjectRootObjectClass->GetObjectClassHandle())
@@ -2877,7 +2877,7 @@ void ClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObje
   }
 }
 
-void ClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
+void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
   if (theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
@@ -2914,7 +2914,7 @@ void ClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theOb
   }
 }
 
-void ClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles)
+void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles)
 {
   if (theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
@@ -2950,29 +2950,29 @@ void ClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjec
   }
 }
 
-void ClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
+void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
 {
   mInstanceNameReservationCallbacks.insert(std::make_pair(theObjectInstanceName, completionCallback));
   mRtiAmbassador->reserveObjectInstanceName(theObjectInstanceName);
 }
 
-void ClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
+void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
 {
   auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
   iter->second(true);
   mInstanceNameReservationCallbacks.erase(iter);
 }
 
-void ClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
+void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
 {
   auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
   iter->second(false);
   mInstanceNameReservationCallbacks.erase(iter);
 }
 
-IClassRegistry* GetClassRegistry()
+IObjectClassRegistry* GetClassRegistry()
 {
-  return ClassRegistry::GetInstance();
+  return ObjectClassRegistry::GetInstance();
 }
 
 } // namespace NDistSimIB

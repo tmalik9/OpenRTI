@@ -382,7 +382,7 @@ class IBusControllerCan : public IBusController
 };
 
 
-class IClassRegistry
+class IObjectClassRegistry
 {
   public:
     virtual IHLAobjectRootObjectClass* getHLAobjectRootObjectClass() const = 0;
@@ -395,10 +395,10 @@ class IClassRegistry
     virtual IBusControllerObjectClass* getBusControllerObjectClass() const = 0;
     virtual IBusControllerCanObjectClass* getBusControllerCanObjectClass() const = 0;
   protected:
-    virtual ~IClassRegistry() {}
-}; // class ClassRegistry
+    virtual ~IObjectClassRegistry() {}
+}; // class IObjectClassRegistry
 
-IClassRegistry* GetClassRegistry();
+IObjectClassRegistry* GetClassRegistry();
 
 } // namespace NDistSimIB
 } // namespace NRTFederateEncoding

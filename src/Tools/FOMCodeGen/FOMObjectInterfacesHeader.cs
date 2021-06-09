@@ -479,7 +479,7 @@ foreach (var objectClass in FOM.ObjectClasses)
             
             #line default
             #line hidden
-            this.Write("\r\nclass IClassRegistry\r\n{\r\n  public:\r\n");
+            this.Write("\r\nclass IObjectClassRegistry\r\n{\r\n  public:\r\n");
             
             #line 128 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  foreach (var objectClass in FOM.ObjectClasses) { 
@@ -507,8 +507,8 @@ foreach (var objectClass in FOM.ObjectClasses)
             
             #line default
             #line hidden
-            this.Write("  protected:\r\n    virtual ~IClassRegistry() {}\r\n}; // class ClassRegistry\r\n\r\nICla" +
-                    "ssRegistry* GetClassRegistry();\r\n\r\n");
+            this.Write("  protected:\r\n    virtual ~IObjectClassRegistry() {}\r\n}; // class IObjectClassReg" +
+                    "istry\r\n\r\nIObjectClassRegistry* GetClassRegistry();\r\n\r\n");
             
             #line 137 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
 

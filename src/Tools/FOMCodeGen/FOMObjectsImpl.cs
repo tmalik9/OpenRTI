@@ -429,7 +429,7 @@ I");
             #line default
             #line hidden
             this.Write(@"(this, instanceName, mRtiAmbassador);
-  ClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -1161,20 +1161,20 @@ void ");
             #line hidden
             this.Write(@" 
 
-ClassRegistry* ClassRegistry::sClassRegistry = nullptr;
+ObjectClassRegistry* ObjectClassRegistry::sClassRegistry = nullptr;
 
-ClassRegistry::ClassRegistry()
+ObjectClassRegistry::ObjectClassRegistry()
 {
   assert(sClassRegistry == nullptr);
   sClassRegistry = this;
 }
 
-ClassRegistry::~ClassRegistry()
+ObjectClassRegistry::~ObjectClassRegistry()
 {
   sClassRegistry = nullptr;
 }
 
-void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
+void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 {
   mRtiAmbassador = rtiAmbassador;
 ");
@@ -1260,7 +1260,7 @@ void ClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
             #line hidden
             this.Write(@"} // Initialize
 
-void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
+void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 ");
@@ -1324,9 +1324,9 @@ void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theOb
             
             #line default
             #line hidden
-            this.Write("}\r\n\r\nvoid ClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle the" +
-                    "Object)\r\n{\r\n  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getK" +
-                    "nownObjectClassHandle(theObject);\r\n");
+            this.Write("}\r\n\r\nvoid ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHand" +
+                    "le theObject)\r\n{\r\n  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador" +
+                    "->getKnownObjectClassHandle(theObject);\r\n");
             
             #line 462 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
@@ -1387,10 +1387,12 @@ void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theOb
             
             #line default
             #line hidden
-            this.Write("}\r\n\r\nvoid ClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle t" +
-                    "heObject, const rti1516ev::AttributeHandleValueMap & attributes)\r\n{\r\n  rti1516ev" +
-                    "::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(t" +
-                    "heObject);\r\n");
+            this.Write(@"}
+
+void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
+{
+  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
+");
             
             #line 483 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
@@ -1457,9 +1459,9 @@ void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theOb
             
             #line default
             #line hidden
-            this.Write("}\r\n\r\nvoid ClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theO" +
-                    "bjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::Attribut" +
-                    "eHandleSet& attributeHandles)\r\n{\r\n");
+            this.Write("}\r\n\r\nvoid ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandl" +
+                    "e theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::At" +
+                    "tributeHandleSet& attributeHandles)\r\n{\r\n");
             
             #line 506 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
@@ -1528,29 +1530,29 @@ void ClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theOb
             #line hidden
             this.Write(@"}
 
-void ClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
+void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
 {
   mInstanceNameReservationCallbacks.insert(std::make_pair(theObjectInstanceName, completionCallback));
   mRtiAmbassador->reserveObjectInstanceName(theObjectInstanceName);
 }
 
-void ClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
+void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
 {
   auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
   iter->second(true);
   mInstanceNameReservationCallbacks.erase(iter);
 }
 
-void ClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
+void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
 {
   auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
   iter->second(false);
   mInstanceNameReservationCallbacks.erase(iter);
 }
 
-IClassRegistry* GetClassRegistry()
+IObjectClassRegistry* GetClassRegistry()
 {
-  return ClassRegistry::GetInstance();
+  return ObjectClassRegistry::GetInstance();
 }
 
 ");

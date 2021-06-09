@@ -43,6 +43,10 @@ public:
     _buffer(inData, inData + dataSize)
   {
   }
+  HLAopaqueDataImplementation(const std::vector<Octet>& inData) :
+    _buffer(inData)
+  {
+  }
   HLAopaqueDataImplementation(Octet** inData, size_t bufferSize, size_t dataSize)
   {
     // FIXME no clue if this is right!!
@@ -152,8 +156,13 @@ HLAopaqueData::HLAopaqueData() :
 {
 }
 
-HLAopaqueData::HLAopaqueData(const Octet* inData, size_t dataSize) :
-  _impl(new HLAopaqueDataImplementation(inData, dataSize))
+HLAopaqueData::HLAopaqueData(const Octet* inData, size_t dataSize)
+  : _impl(new HLAopaqueDataImplementation(inData, dataSize))
+{
+}
+
+HLAopaqueData::HLAopaqueData(const std::vector<Octet>& inData)
+  : _impl(new HLAopaqueDataImplementation(inData))
 {
 }
 
