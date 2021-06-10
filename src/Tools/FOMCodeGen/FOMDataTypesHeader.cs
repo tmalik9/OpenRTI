@@ -173,7 +173,7 @@ foreach (var namespacePart in FOM.Namespace)
             
             #line 39 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
-foreach (var dataType in FOM.SortedDataTypes)
+foreach (var dataType in FOM.DataTypes)
 {
   if (dataType is FOMParser.SimpleDataType && dataType.Generate)
   {

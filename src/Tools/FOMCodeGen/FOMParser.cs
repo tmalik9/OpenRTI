@@ -162,7 +162,7 @@ namespace FOMCodeGen
       {
         Name = name;
       }
-      public virtual bool Resolve(Dictionary<string, DataType> dataTypes)
+      public virtual bool Resolve(List<DataType> dataTypes)
       {
         return true;
       }
@@ -435,11 +435,11 @@ namespace FOMCodeGen
         DataType = dataType;
       }
       public DataType DataType { get; set; }
-      public override bool Resolve(Dictionary<string, DataType> dataTypes)
+      public override bool Resolve(List<DataType> dataTypes)
       {
         if (DataType is UnresolvedDataType)
         {
-          DataType = dataTypes[DataType.Name];
+          DataType = dataTypes.Find(dataType => dataType.Name == DataType.Name);
         }
         return true;
       }
@@ -540,13 +540,13 @@ namespace FOMCodeGen
       }
       public FixedRecordDataType BaseClass { get; set; }
       public bool HasChilds { get; set; }
-      public override bool Resolve(Dictionary<string, DataType> dataTypes)
+      public override bool Resolve(List<DataType> dataTypes)
       {
         foreach (var field in Fields)
         {
           if (field.DataType is UnresolvedDataType)
           {
-            field.DataType = dataTypes[field.DataType.Name];
+            field.DataType = dataTypes.Find(dataType => dataType.Name == field.DataType.Name);
           }
         }
         return true;
@@ -576,8 +576,7 @@ namespace FOMCodeGen
       {
       }
     }
-    public Dictionary<string, DataType> DataTypes { get; set; }
-    public List<DataType> SortedDataTypes { get; set; }
+    public List<DataType> DataTypes { get; set; }
     public string Filename { get; set; }
     public string[] Namespace { get; set; }
     public bool UsePrecompiledHeaders { get; set; }
@@ -680,29 +679,33 @@ namespace FOMCodeGen
       else
         return "static_cast<const rti1516ev::HLAinteger64Time&>(" + param + ").getTime()";
     }
-    DataType GetDataType(string name)
+    DataType GetDataType(string name, bool replaceWithUnresolved=true)
     {
-      if (DataTypes.ContainsKey(name))
+      DataType result = DataTypes.Find(dataType => dataType.Name == name);
+      if (result != null)
       {
-        DataType result = DataTypes[name];
         if (result is PredefinedType)
         {
           mPredefinedTypeIncludes.Add((result as PredefinedType).Include);
         }
         return result;
       }
-      else
+      else if (replaceWithUnresolved)
       {
         mDataTypeForwardDeclarations.Add("class " + name + ";");
         mEncodingForwardDeclarations.Add("class " + name + "Encoding;");
         return new UnresolvedDataType(name);
       }
+      else
+      {
+        return null;
+      }
     }
     bool IsBasicOrPredefinedType(string name)
     {
-      if (DataTypes.ContainsKey(name))
+      DataType result = DataTypes.Find(dataType => dataType.Name == name);
+      if (result != null)
       {
-        DataType result = DataTypes[name];
         if (result is PredefinedType || result is BasicDataRepresentation)
         {
           return true;
@@ -726,10 +729,11 @@ namespace FOMCodeGen
       }
       return result;
     }
+    // Compare data types according to dependency/usage:
+    // If x is using y, y must be defined first.
+    // If y is using x, x must be defined first.
     public int CompareDataTypes(DataType x, DataType y)
     {
-      //if (x.IsUsing(y))
-      //  return -1;
       // type y depends on/is using type x => x is smaller than y, because x must be defined before y is defined
       if (y.IsUsing(x))
         return -1;
@@ -737,6 +741,7 @@ namespace FOMCodeGen
       else if (x.IsUsing(y))
         return 1;
       else
+        // if the types are independent, leave order intact.
         return x.Index.CompareTo(y.Index);
     }
     void ParseSimpleDataType(XmlElement simpleDataTypeNode, ref uint index)
@@ -748,13 +753,13 @@ namespace FOMCodeGen
         return;
       }
       string representation = simpleDataTypeNode["representation"].FirstChild.InnerText;
-      var simpleType = new SimpleDataType(name, DataTypes[representation] as BasicDataRepresentation);
-      SortedDataTypes.Add(simpleType);
+      var representationType = GetDataType(representation) as BasicDataRepresentation;
+      var simpleType = new SimpleDataType(name, representationType);
       simpleType.Index = index++;
       simpleType.Generate = (simpleDataTypeNode["nocode"] == null);
       if (simpleDataTypeNode["semantics"] != null && simpleDataTypeNode["semantics"].FirstChild != null)
         simpleType.Comment = simpleDataTypeNode["semantics"].FirstChild.InnerText;
-      DataTypes[name] = simpleType;
+      DataTypes.Add(simpleType);
     }
     private void ParseEnumeratedDataType(XmlElement enumeratedDataTypeNode, ref uint index)
     {
@@ -765,7 +770,8 @@ namespace FOMCodeGen
         return;
       }
       string representation = enumeratedDataTypeNode["representation"].FirstChild.InnerText;
-      var enumeratedDataType = new EnumeratedDataType(name, DataTypes[representation] as BasicDataRepresentation);
+      var representationType = GetDataType(representation) as BasicDataRepresentation;
+      var enumeratedDataType = new EnumeratedDataType(name, representationType);
       foreach (XmlElement enumeratorNode in enumeratedDataTypeNode.SelectNodes("enumerator"))
       {
         string enumeratorName = enumeratorNode["name"].FirstChild.InnerText;
@@ -775,8 +781,7 @@ namespace FOMCodeGen
       enumeratedDataType.Generate = (enumeratedDataTypeNode["nocode"] == null);
       if (enumeratedDataTypeNode["semantics"] != null && enumeratedDataTypeNode["semantics"].FirstChild != null)
         enumeratedDataType.Comment = enumeratedDataTypeNode["semantics"].FirstChild.InnerText;
-      DataTypes[name] = enumeratedDataType;
-      SortedDataTypes.Add(enumeratedDataType);
+      DataTypes.Add(enumeratedDataType);
       enumeratedDataType.Index = index++;
 
     }
@@ -803,10 +808,9 @@ namespace FOMCodeGen
         }
         if (dataType == "HLAunicodeChar")
         {
-          var simpleType = new SimpleDataType(name, DataTypes["HLAunicodeString"] as BasicDataRepresentation);
+          var simpleType = new SimpleDataType(name, GetDataType("HLAunicodeString") as BasicDataRepresentation);
           simpleType.Generate = generate;
-          DataTypes[name] = simpleType;
-          SortedDataTypes.Add(simpleType);
+          DataTypes.Add(simpleType);
           simpleType.Index = index++;
         }
         else
@@ -814,8 +818,7 @@ namespace FOMCodeGen
           var arrayDataType = new VariableArrayDataType(name, GetDataType(dataType));
           arrayDataType.Generate = generate;
           arrayDataType.Comment = comment;
-          DataTypes[name] = arrayDataType;
-          SortedDataTypes.Add(arrayDataType);
+          DataTypes.Add(arrayDataType);
           arrayDataType.Index = index++;
         }
       }
@@ -830,8 +833,7 @@ namespace FOMCodeGen
         arrayDataType.Generate = (arrayDataTypeNode["nocode"] == null);
         if (arrayDataTypeNode["semantics"] != null)
           arrayDataType.Comment = arrayDataTypeNode["semantics"].FirstChild.InnerText;
-        DataTypes[name] = arrayDataType;
-        SortedDataTypes.Add(arrayDataType);
+        DataTypes.Add(arrayDataType);
         arrayDataType.Index = index++;
       }
       else
@@ -849,7 +851,7 @@ namespace FOMCodeGen
       FixedRecordDataType includedFixedRecordType = null;
       if (fixedRecordDataTypeNode["include"] != null)
       {
-        includedFixedRecordType = DataTypes[fixedRecordDataTypeNode["include"].FirstChild.InnerText] as FixedRecordDataType;
+        includedFixedRecordType = GetDataType(fixedRecordDataTypeNode["include"].FirstChild.InnerText) as FixedRecordDataType;
         includedFixedRecordType.HasChilds = true;
       }
 
@@ -909,8 +911,7 @@ namespace FOMCodeGen
       {
         fixedRecordDataType.Comment = fixedRecordDataTypeNode["semantics"].FirstChild.InnerText;
       }
-      DataTypes[name] = fixedRecordDataType;
-      SortedDataTypes.Add(fixedRecordDataType);
+      DataTypes.Add(fixedRecordDataType);
       fixedRecordDataType.Index = index++;
     }
     void ParseObjectClasses(XmlElement objectClassNode, ObjectClass baseClass)
@@ -1005,17 +1006,16 @@ namespace FOMCodeGen
     }
     public FOMParser(string filename, string enclosingNamespace)
     {
-      DataTypes = new Dictionary<string, DataType>();
-      SortedDataTypes = new List<DataType>();
+      DataTypes = new List<DataType>();
       IsFloatTime = false;
       uint index = 0;
       foreach (var entry in mBasicDataRepresentations)
       {
-        DataTypes.Add(entry.Key, new BasicDataRepresentation(entry.Key, entry.Value));
+        DataTypes.Add(new BasicDataRepresentation(entry.Key, entry.Value));
       }
       foreach (var predefinedType in mPredefinedTypes)
       {
-        DataTypes.Add(predefinedType.Name, predefinedType);
+        DataTypes.Add(predefinedType);
       }
       Filename = filename;
       Namespace = enclosingNamespace.Split('.');
@@ -1073,18 +1073,18 @@ namespace FOMCodeGen
       {
         ParseFixedRecordDataType(fixedRecordDataTypeNode, ref index);
       }
-      foreach (DataType dataType in DataTypes.Values)
+      foreach (DataType dataType in DataTypes)
       {
         dataType.Resolve(DataTypes);
       }
-      foreach (DataType dataType in SortedDataTypes)
+      foreach (DataType dataType in DataTypes)
       {
-        System.Console.WriteLine("{0} {1}", SortedDataTypes.IndexOf(dataType), dataType.Name);
+        System.Console.WriteLine("{0} {1}", DataTypes.IndexOf(dataType), dataType.Name);
       }
-      SortedDataTypes.Sort(this.CompareDataTypes);
-      foreach (DataType dataType in SortedDataTypes)
+      DataTypes.Sort(this.CompareDataTypes);
+      foreach (DataType dataType in DataTypes)
       {
-        System.Console.WriteLine("{0} {1}", SortedDataTypes.IndexOf(dataType), dataType.Name);
+        System.Console.WriteLine("{0} {1}", DataTypes.IndexOf(dataType), dataType.Name);
       }
 
       var objectClassNodes = doc.DocumentElement.SelectNodes("/objectModel/objects/objectClass");

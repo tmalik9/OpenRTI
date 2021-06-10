@@ -26,7 +26,7 @@ namespace <#=namespacePart#> {
 <#=FOM.EncodingForwardDeclarations#>
 
 <#
-foreach (var dataType in FOM.SortedDataTypes)
+foreach (var dataType in FOM.DataTypes)
 {
   if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
   {
