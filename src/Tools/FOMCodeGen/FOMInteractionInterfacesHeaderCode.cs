@@ -8,12 +8,14 @@
   {
     FOMParser FOM { get; set; }
     string InteractionInterfacesHeaderFilename { get; set; }
-    string EncodingHeaderFilename { get; set; }
-    public FOMInteractionInterfacesHeader(FOMParser fom, string interactionInterfacesHeaderFilename, string encodingHeaderFilename)
+    string DataTypesHeaderFilename { get; set; }
+    string ObjectInterfacesHeaderFilename { get; set; }
+    public FOMInteractionInterfacesHeader(FOMParser fom, string interactionInterfacesHeaderFilename, string objectInterfacesHeaderFilename, string dataTypesHeaderFilename)
     {
       FOM = fom;
       InteractionInterfacesHeaderFilename = System.IO.Path.GetFileName(interactionInterfacesHeaderFilename);
-      EncodingHeaderFilename = System.IO.Path.GetFileName(encodingHeaderFilename);
+      ObjectInterfacesHeaderFilename = System.IO.Path.GetFileName(objectInterfacesHeaderFilename);
+      DataTypesHeaderFilename = System.IO.Path.GetFileName(dataTypesHeaderFilename);
     }
   }
   }

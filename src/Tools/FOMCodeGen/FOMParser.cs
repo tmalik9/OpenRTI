@@ -24,6 +24,7 @@ namespace FOMCodeGen
       public string Name { get; set; }
       public DataType DataType { get; set; }
     }
+
     public class ObjectClass
     {
       public ObjectClass(string name)
@@ -77,6 +78,7 @@ namespace FOMCodeGen
         }
       }
     }
+
     public class Parameter
     {
       public Parameter(string name)
@@ -86,6 +88,7 @@ namespace FOMCodeGen
       public string Name { get; set; }
       public DataType DataType { get; set; }
     }
+    public enum Order { Receive, Timestamp };
     public class InteractionClass
     {
       public InteractionClass(string name)
@@ -93,8 +96,10 @@ namespace FOMCodeGen
         Name = name;
         Parameters = new List<Parameter>();
         ChildClasses = new List<InteractionClass>();
+        Order = Order.Receive;
       }
       public string Name { get; set; }
+      public Order Order { get; set; }
       public string QualifiedName
       {
         get
@@ -619,23 +624,23 @@ namespace FOMCodeGen
       }
     }
 
-    private HashSet<string> mForwardDeclarations = new HashSet<string>();
-    private HashSet<string> mEncdodingForwardDeclarations = new HashSet<string>();
-    public string ForwardDeclarations
+    private HashSet<string> mDataTypeForwardDeclarations = new HashSet<string>();
+    public string DataTypeForwardDeclarations
     {
       get
       {
-        string[] lines = new string[mForwardDeclarations.Count];
-        mForwardDeclarations.CopyTo(lines);
+        string[] lines = new string[mDataTypeForwardDeclarations.Count];
+        mDataTypeForwardDeclarations.CopyTo(lines);
         return string.Join("\n", lines);
       }
     }
+    private HashSet<string> mEncodingForwardDeclarations = new HashSet<string>();
     public string EncodingForwardDeclarations
     {
       get
       {
-        string[] lines = new string[mEncdodingForwardDeclarations.Count];
-        mEncdodingForwardDeclarations.CopyTo(lines);
+        string[] lines = new string[mEncodingForwardDeclarations.Count];
+        mEncodingForwardDeclarations.CopyTo(lines);
         return string.Join("\n", lines);
       }
     }
@@ -652,6 +657,22 @@ namespace FOMCodeGen
       get { return mInteractionClasses; }
     }
     public bool IsFloatTime { get; set; }
+    public string NativeTimeType
+    {
+      get
+      {
+        if (IsFloatTime) return "double";
+        else return "int64_t";
+      }
+    }
+    public string LogicalTimeType
+    {
+      get
+      {
+        if (IsFloatTime) return "rti1516ev::HLAfloat64Time";
+        else return "rti1516ev::HLAinteger64Time";
+      }
+    }
     public string GetLogicalTimeCast(string param)
     {
       if (IsFloatTime)
@@ -672,8 +693,8 @@ namespace FOMCodeGen
       }
       else
       {
-        mForwardDeclarations.Add("class " + name + ";");
-        mEncdodingForwardDeclarations.Add("class " + name + "Encoding;");
+        mDataTypeForwardDeclarations.Add("class " + name + ";");
+        mEncodingForwardDeclarations.Add("class " + name + "Encoding;");
         return new UnresolvedDataType(name);
       }
     }
@@ -928,6 +949,19 @@ namespace FOMCodeGen
       interactionClass.BaseClass = baseClass;
       mInteractionClasses.Add(interactionClass);
       System.Console.WriteLine("InteractionClass {0}", interactionClass.Name);
+      if (interactionClassNode["order"] != null)
+      {
+        string order = interactionClassNode["order"].FirstChild.InnerText;
+        if (order.Equals("timestamp", StringComparison.OrdinalIgnoreCase))
+        {
+          interactionClass.Order = Order.Timestamp;
+        }
+        else if (order.Equals("receive", StringComparison.OrdinalIgnoreCase))
+        {
+          interactionClass.Order = Order.Receive;
+        }
+      }
+
       if (interactionClass.BaseClass != null)
       {
         interactionClass.BaseClass.ChildClasses.Add(interactionClass);
@@ -950,12 +984,14 @@ namespace FOMCodeGen
             if (objectClass != null)
             {
               dataType = new ObjectInstanceHandleType(objectClass);
+              /*
               string objectClassInterface = "I" + objectClassName;
               string forwardDeclaration = "class " + objectClassInterface + ";";
-              if (!mForwardDeclarations.Contains(forwardDeclaration))
+              if (!mDataTypeForwardDeclarations.Contains(forwardDeclaration))
               {
-                mForwardDeclarations.Add(forwardDeclaration);
+                mDataTypeForwardDeclarations.Add(forwardDeclaration);
               }
+              */
             }
           }
           parameter.DataType = dataType;

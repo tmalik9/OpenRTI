@@ -15,7 +15,7 @@
 namespace NDistSimIB {
 namespace NRTFederateEncoding {
 
-class IDOMemberSource;
+
 
 typedef int64_t VTimeNS;
 

@@ -10,6 +10,7 @@
 
 #include <vector>
 #include "RTI/encoding/HLAhandle.h"
+#include "RTI/encoding/HLAopaqueData.h"
 
 namespace OpenRTI {
 namespace Mom {

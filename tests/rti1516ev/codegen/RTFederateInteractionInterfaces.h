@@ -7,7 +7,8 @@
 
 #include "RTI/encoding/HLAopaqueData.h"
 #include "RTI/encoding/HLAhandle.h"
-#include "RTFederateEncodings.h"
+#include "RTFederateDataTypes.h"
+#include "RTFederateObjectInterfaces.h"
 
 namespace NDistSimIB {
 namespace NRTFederateEncoding {
@@ -21,8 +22,10 @@ class IHLAinteractionRootInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send() = 0;
     using ReceiveCallback = std::function<void()>;
-    using ReceiveCallbackWithTime = std::function<void(int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -35,9 +38,8 @@ class IMeasurementInitInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(const std::vector<uint8_t>& Dummy) = 0;
     using ReceiveCallback = std::function<void(const std::vector<uint8_t>& Dummy)>;
-    using ReceiveCallbackWithTime = std::function<void(const std::vector<uint8_t>& Dummy, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
-    virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
+    // Order is Receive, send/receive w. timestamps omitted
 };
 
 class IMeasurementStopInteractionClass
@@ -49,8 +51,10 @@ class IMeasurementStopInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(const std::wstring& NextFederationSuffix) = 0;
     using ReceiveCallback = std::function<void(const std::wstring& NextFederationSuffix)>;
-    using ReceiveCallbackWithTime = std::function<void(const std::wstring& NextFederationSuffix, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(const std::wstring& NextFederationSuffix, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(const std::wstring& NextFederationSuffix, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -63,8 +67,10 @@ class IKeyEventInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(int32_t KeyCode) = 0;
     using ReceiveCallback = std::function<void(int32_t KeyCode)>;
-    using ReceiveCallbackWithTime = std::function<void(int32_t KeyCode, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(int32_t KeyCode, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(int32_t KeyCode, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -77,8 +83,10 @@ class ITextLogInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(const std::wstring& Sender, const std::wstring& Text) = 0;
     using ReceiveCallback = std::function<void(const std::wstring& Sender, const std::wstring& Text)>;
-    using ReceiveCallbackWithTime = std::function<void(const std::wstring& Sender, const std::wstring& Text, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(const std::wstring& Sender, const std::wstring& Text, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(const std::wstring& Sender, const std::wstring& Text, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -91,8 +99,10 @@ class IDOMemberTransmitDataInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) = 0;
     using ReceiveCallback = std::function<void(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes)>;
-    using ReceiveCallbackWithTime = std::function<void(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -105,8 +115,10 @@ class ISystemVariableUpdateInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged) = 0;
     using ReceiveCallback = std::function<void(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged)>;
-    using ReceiveCallbackWithTime = std::function<void(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -119,8 +131,10 @@ class ISystemVariableModificationInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(const std::vector<uint8_t>& Value) = 0;
     using ReceiveCallback = std::function<void(const std::vector<uint8_t>& Value)>;
-    using ReceiveCallbackWithTime = std::function<void(const std::vector<uint8_t>& Value, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(const std::vector<uint8_t>& Value, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(const std::vector<uint8_t>& Value, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -133,8 +147,10 @@ class IValueEntityUpdateInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value) = 0;
     using ReceiveCallback = std::function<void(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value)>;
-    using ReceiveCallbackWithTime = std::function<void(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -147,8 +163,10 @@ class IBusMessageInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver) = 0;
     using ReceiveCallback = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver)>;
-    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -161,8 +179,10 @@ class IEthPacketInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame) = 0;
     using ReceiveCallback = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame)>;
-    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -175,8 +195,10 @@ class IEthPacketErrorInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame) = 0;
     using ReceiveCallback = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame)>;
-    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -189,8 +211,10 @@ class IEthPacketErrorForwardedInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame) = 0;
     using ReceiveCallback = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame)>;
-    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -203,8 +227,10 @@ class IEthForwardedPacketInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame) = 0;
     using ReceiveCallback = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame)>;
-    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -217,8 +243,10 @@ class IEthStatusInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame) = 0;
     using ReceiveCallback = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame)>;
-    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -231,8 +259,10 @@ class ICANMessageInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame) = 0;
     using ReceiveCallback = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame)>;
-    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -245,8 +275,10 @@ class ICANErrorFrameInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame) = 0;
     using ReceiveCallback = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame)>;
-    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
@@ -259,8 +291,10 @@ class IPythonCommandInteractionClass
     virtual void Unsubscribe() = 0;
     virtual void send(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID) = 0;
     using ReceiveCallback = std::function<void(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID)>;
-    using ReceiveCallbackWithTime = std::function<void(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID, int64_t time)>;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 

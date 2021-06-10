@@ -34,7 +34,7 @@ foreach (var namespacePart in FOM.Namespace)
 namespace <#=namespacePart#> {
 <#  } #>
 
-<#=FOM.ForwardDeclarations#>
+<#=FOM.DataTypeForwardDeclarations#>
 
 <#
 foreach (var dataType in FOM.SortedDataTypes)

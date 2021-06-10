@@ -29,12 +29,14 @@ class HLAinteractionRootInteractionClass : public IHLAinteractionRootInteraction
     void Subscribe() override;
     void Unsubscribe() override;
     void send() override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     HLAinteractionRootInteractionClass(rti1516ev::RTIambassador* rtiAmbassador);
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
@@ -63,14 +65,12 @@ class MeasurementInitInteractionClass : public IMeasurementInitInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(const std::vector<uint8_t>& Dummy) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     MeasurementInitInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter Dummy : HLAopaqueData
     rti1516ev::ParameterHandle GetDummyParameterHandle() const { return mDummyParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
@@ -86,8 +86,6 @@ class MeasurementInitInteractionClass : public IMeasurementInitInteractionClass
     rti1516ev::ParameterHandle mDummyParameterHandle;
     std::map<uint32_t, ReceiveCallback> _receiveCallbacks;
     uint32_t _receiveCallbacksNextKey = 0;
-    std::map<uint32_t, ReceiveCallbackWithTime> _receiveCallbacksWithTime;
-    uint32_t _receiveCallbacksWithTimeNextKey = 0;
 };
 
 
@@ -103,14 +101,15 @@ class MeasurementStopInteractionClass : public IMeasurementStopInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(const std::wstring& NextFederationSuffix) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(const std::wstring& NextFederationSuffix, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     MeasurementStopInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter NextFederationSuffix : HLAunicodeString
     rti1516ev::ParameterHandle GetNextFederationSuffixParameterHandle() const { return mNextFederationSuffixParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
@@ -143,14 +142,15 @@ class KeyEventInteractionClass : public IKeyEventInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(int32_t KeyCode) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(int32_t KeyCode, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     KeyEventInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter KeyCode : HLAinteger32LE
     rti1516ev::ParameterHandle GetKeyCodeParameterHandle() const { return mKeyCodeParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
@@ -183,14 +183,15 @@ class TextLogInteractionClass : public ITextLogInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(const std::wstring& Sender, const std::wstring& Text) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(const std::wstring& Sender, const std::wstring& Text, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     TextLogInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter Sender : HLAunicodeString
     rti1516ev::ParameterHandle GetSenderParameterHandle() const { return mSenderParameterHandle; }
     // parameter Text : HLAunicodeString
@@ -227,14 +228,15 @@ class DOMemberTransmitDataInteractionClass : public IDOMemberTransmitDataInterac
     void Subscribe() override;
     void Unsubscribe() override;
     void send(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     DOMemberTransmitDataInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter ObjInstanceHandle : HLAobjectInstanceHandle.DOMemberSource
     rti1516ev::ParameterHandle GetObjInstanceHandleParameterHandle() const { return mObjInstanceHandleParameterHandle; }
     // parameter ConnectionType : HLAASCIIstring
@@ -275,14 +277,15 @@ class SystemVariableUpdateInteractionClass : public ISystemVariableUpdateInterac
     void Subscribe() override;
     void Unsubscribe() override;
     void send(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(const std::string& Id, const std::vector<uint8_t>& Value, int32_t Client, bool HasChanged, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     SystemVariableUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter Id : HLAASCIIstring
     rti1516ev::ParameterHandle GetIdParameterHandle() const { return mIdParameterHandle; }
     // parameter Value : HLAopaqueData
@@ -327,14 +330,15 @@ class SystemVariableModificationInteractionClass : public ISystemVariableModific
     void Subscribe() override;
     void Unsubscribe() override;
     void send(const std::vector<uint8_t>& Value) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(const std::vector<uint8_t>& Value, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     SystemVariableModificationInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter Value : HLAopaqueData
     rti1516ev::ParameterHandle GetValueParameterHandle() const { return mValueParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
@@ -367,14 +371,15 @@ class ValueEntityUpdateInteractionClass : public IValueEntityUpdateInteractionCl
     void Subscribe() override;
     void Unsubscribe() override;
     void send(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(const std::vector<uint8_t>& Id, const std::vector<uint8_t>& Value, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     ValueEntityUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter Id : HLAopaqueData
     rti1516ev::ParameterHandle GetIdParameterHandle() const { return mIdParameterHandle; }
     // parameter Value : HLAopaqueData
@@ -411,14 +416,15 @@ class BusMessageInteractionClass : public IBusMessageInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     BusMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mIsRequestParameterHandle; }
     // parameter ChannelName : HLAASCIIstring
@@ -471,14 +477,15 @@ class EthPacketInteractionClass : public IEthPacketInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     EthPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
-
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -523,14 +530,15 @@ class EthPacketErrorInteractionClass : public IEthPacketErrorInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketError& Frame, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     EthPacketErrorInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
-
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -575,14 +583,15 @@ class EthPacketErrorForwardedInteractionClass : public IEthPacketErrorForwardedI
     void Subscribe() override;
     void Unsubscribe() override;
     void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketErrorForwarded& Frame, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     EthPacketErrorForwardedInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
-
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -627,14 +636,15 @@ class EthForwardedPacketInteractionClass : public IEthForwardedPacketInteraction
     void Subscribe() override;
     void Unsubscribe() override;
     void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     EthForwardedPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
-
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -679,14 +689,15 @@ class EthStatusInteractionClass : public IEthStatusInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     EthStatusInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
-
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -731,14 +742,15 @@ class CANMessageInteractionClass : public ICANMessageInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const CANFrame& Frame, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     CANMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
-
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -787,14 +799,15 @@ class CANErrorFrameInteractionClass : public ICANErrorFrameInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const std::vector<uint8_t>& Frame, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     CANErrorFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
-
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -839,14 +852,15 @@ class PythonCommandInteractionClass : public IPythonCommandInteractionClass
     void Subscribe() override;
     void Unsubscribe() override;
     void send(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(const std::vector<uint8_t>& Code, const std::vector<uint8_t>& Target, const std::vector<uint8_t>& RefID, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     PythonCommandInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
-
     // parameter Code : HLAopaqueData
     rti1516ev::ParameterHandle GetCodeParameterHandle() const { return mCodeParameterHandle; }
     // parameter Target : HLAopaqueData

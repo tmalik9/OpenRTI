@@ -18,17 +18,11 @@
 #include "<#=InteractionInterfacesHeaderFilename#>"
 #include "<#=EncodingHeaderFilename#>"
 
-<#
-foreach (var namespacePart in FOM.Namespace)
-{
-#>
+<# foreach (var namespacePart in FOM.Namespace) { #>
 namespace <#=namespacePart#> {
 <# } #>
 
-<# 
-foreach (var interactionClass in FOM.InteractionClasses)
-{
-#>
+<# foreach (var interactionClass in FOM.InteractionClasses) { #>
 class <#=interactionClass.Name#>;
 class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.Name#>InteractionClass
 {
@@ -41,21 +35,21 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     void Subscribe() override;
     void Unsubscribe() override;
     void send(<#=interactionClass.CppParameterList#>) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+<#   if (interactionClass.Order == FOMParser.Order.Timestamp) { #>
+    void sendWithTime(<#=interactionClass.CppParameterList#><# if (interactionClass.Parameters.Count > 0) {#>, <#}#><#=FOM.NativeTimeType#> time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+<#   } // if (interactionClass.Order == FOM.Order.Timestamp) #>
+
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
-    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
-<#
-  if (interactionClass.BaseClass != null)
-  {
-#>
+<#   if (interactionClass.BaseClass != null) { #>
     <#=interactionClass.Name#>InteractionClass(rti1516ev::RTIambassador* rtiAmbassador, <#=interactionClass.BaseClass.Name#>InteractionClass* baseClass);
-
-<# } else {#>
+<#   } else {#>
     <#=interactionClass.Name#>InteractionClass(rti1516ev::RTIambassador* rtiAmbassador);
-<# } #>
+<#   } // if (interactionClass.BaseClass != null) #>
 <# 
   var baseClass = interactionClass.BaseClass;
   while (baseClass != null)
@@ -113,8 +107,10 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
 #>
     std::map<uint32_t, ReceiveCallback> _receiveCallbacks;
     uint32_t _receiveCallbacksNextKey = 0;
+<#   if (interactionClass.Order == FOMParser.Order.Timestamp) { #>
     std::map<uint32_t, ReceiveCallbackWithTime> _receiveCallbacksWithTime;
     uint32_t _receiveCallbacksWithTimeNextKey = 0;
+<#   } // if (interactionClass.Order == FOM.Order.Timestamp) #>
 };
 
 

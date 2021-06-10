@@ -3,288 +3,783 @@
 #pragma once
 
 #include <vector>
+#include "RTI/Handle.h"
+#include "RTI/RTIambassador.h"
+#include "RTI/encoding/BasicDataElements.h"
+#include "RTI/encoding/HLAfixedRecord.h"
+#include "RTI/encoding/HLAfixedArray.h"
+#include "RTI/encoding/HLAvariableArray.h"
 #include "RTI/encoding/HLAhandle.h"
+#include "RTI/encoding/HLAopaqueData.h"
+#include "momObjectInterfaces.h"
+#include "momEncodings.h"
 
 namespace OpenRTI {
 namespace Mom {
-class HLAobjectRoot
+
+class HLAobjectRoot;
+class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
 {
   public:
-    HLAobjectRoot();
-    ~HLAobjectRoot() = default;
+    // IHLAobjectRootObjectClass
+    HLAobjectRootObjectClass() = default;
+    virtual ~HLAobjectRootObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IHLAobjectRoot* GetObjectInstance(const std::wstring& instanceName) override;
+    IHLAobjectRoot* CreateObjectInstance(const std::wstring& instanceName) override;
+
+    // internal
+    HLAobjectRootObjectClass(rti1516ev::RTIambassador* rtiAmbassador);
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    rti1516ev::AttributeHandle GetHLAprivilegeToDeleteObjectAttributeHandle() const { return mHLAprivilegeToDeleteObjectAttributeHandle; }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IHLAobjectRoot* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    rti1516ev::AttributeHandle mHLAprivilegeToDeleteObjectAttributeHandle;
+    std::map<std::wstring, HLAobjectRoot*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, HLAobjectRoot*> mObjectInstancesByHandle;
+};
+
+class HLAobjectRoot : public IHLAobjectRoot
+{
+  public:
+
+    virtual ~HLAobjectRoot();
     HLAobjectRoot(const HLAobjectRoot&) = delete;
     HLAobjectRoot(HLAobjectRoot&&) = delete;
     HLAobjectRoot& operator=(const HLAobjectRoot&) = delete;
     HLAobjectRoot& operator=(HLAobjectRoot&&) = delete;
+    IHLAobjectRootObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    const std::vector<uint8_t>& GetHLAprivilegeToDeleteObject() const override;
+    void SetHLAprivilegeToDeleteObject(std::vector<uint8_t> newValue) override;
+    // IHLAobjectRoot
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
 
-    // attribute HLAprivilegeToDeleteObject : HLAtoken
-    std::vector<uint8_t> GetHLAprivilegeToDeleteObject() const;
-    void SetHLAprivilegeToDeleteObject(std::vector<uint8_t> newValue);
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
   private:
+    friend class HLAobjectRootObjectClass;
+
+    HLAobjectRoot();
+    HLAobjectRoot(HLAobjectRootObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    HLAobjectRootObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : HLAtoken
-    HLAtokenEncoding mHLAprivilegeToDeleteObjectEncoder;
+    HLAtokenEncoding mHLAprivilegeToDeleteObject;
 };
 
-class HLAmanager : public HLAobjectRoot
+class HLAmanager;
+class HLAmanagerObjectClass : public IHLAmanagerObjectClass
 {
   public:
-    HLAmanager();
-    ~HLAmanager() = default;
+    // IHLAmanagerObjectClass
+    HLAmanagerObjectClass() = default;
+    virtual ~HLAmanagerObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IHLAmanager* GetObjectInstance(const std::wstring& instanceName) override;
+    IHLAmanager* CreateObjectInstance(const std::wstring& instanceName) override;
+
+    // internal
+    HLAmanagerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
+
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    rti1516ev::AttributeHandle GetHLAprivilegeToDeleteObjectAttributeHandle() const { return mBaseClass->GetHLAprivilegeToDeleteObjectAttributeHandle(); }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IHLAmanager* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    HLAobjectRootObjectClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    std::map<std::wstring, HLAmanager*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, HLAmanager*> mObjectInstancesByHandle;
+};
+
+class HLAmanager : public IHLAmanager
+{
+  public:
+
+    virtual ~HLAmanager();
     HLAmanager(const HLAmanager&) = delete;
     HLAmanager(HLAmanager&&) = delete;
     HLAmanager& operator=(const HLAmanager&) = delete;
     HLAmanager& operator=(HLAmanager&&) = delete;
+    IHLAmanagerObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    const std::vector<uint8_t>& GetHLAprivilegeToDeleteObject() const override;
+    void SetHLAprivilegeToDeleteObject(std::vector<uint8_t> newValue) override;
+    // IHLAmanager
 
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
   private:
+    friend class HLAmanagerObjectClass;
+
+    HLAmanager();
+    HLAmanager(HLAmanagerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    HLAmanagerObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // Attribute value encoders
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    HLAtokenEncoding mHLAprivilegeToDeleteObject;
 };
 
-class HLAfederate : public HLAmanager
+class HLAfederate;
+class HLAfederateObjectClass : public IHLAfederateObjectClass
 {
   public:
-    HLAfederate();
-    ~HLAfederate() = default;
+    // IHLAfederateObjectClass
+    HLAfederateObjectClass() = default;
+    virtual ~HLAfederateObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IHLAfederate* GetObjectInstance(const std::wstring& instanceName) override;
+    IHLAfederate* CreateObjectInstance(const std::wstring& instanceName) override;
+
+    // internal
+    HLAfederateObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAmanagerObjectClass* baseClass);
+
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    rti1516ev::AttributeHandle GetHLAprivilegeToDeleteObjectAttributeHandle() const { return mBaseClass->GetHLAprivilegeToDeleteObjectAttributeHandle(); }
+    // attribute HLAfederateHandle : HLAhandle
+    rti1516ev::AttributeHandle GetHLAfederateHandleAttributeHandle() const { return mHLAfederateHandleAttributeHandle; }
+    // attribute HLAfederateName : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLAfederateNameAttributeHandle() const { return mHLAfederateNameAttributeHandle; }
+    // attribute HLAfederateType : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLAfederateTypeAttributeHandle() const { return mHLAfederateTypeAttributeHandle; }
+    // attribute HLAfederateHost : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLAfederateHostAttributeHandle() const { return mHLAfederateHostAttributeHandle; }
+    // attribute HLARTIversion : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLARTIversionAttributeHandle() const { return mHLARTIversionAttributeHandle; }
+    // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
+    rti1516ev::AttributeHandle GetHLAFOMmoduleDesignatorListAttributeHandle() const { return mHLAFOMmoduleDesignatorListAttributeHandle; }
+    // attribute HLAtimeConstrained : HLAboolean
+    rti1516ev::AttributeHandle GetHLAtimeConstrainedAttributeHandle() const { return mHLAtimeConstrainedAttributeHandle; }
+    // attribute HLAtimeRegulating : HLAboolean
+    rti1516ev::AttributeHandle GetHLAtimeRegulatingAttributeHandle() const { return mHLAtimeRegulatingAttributeHandle; }
+    // attribute HLAasynchronousDelivery : HLAboolean
+    rti1516ev::AttributeHandle GetHLAasynchronousDeliveryAttributeHandle() const { return mHLAasynchronousDeliveryAttributeHandle; }
+    // attribute HLAfederateState : HLAfederateState
+    rti1516ev::AttributeHandle GetHLAfederateStateAttributeHandle() const { return mHLAfederateStateAttributeHandle; }
+    // attribute HLAtimeManagerState : HLAtimeState
+    rti1516ev::AttributeHandle GetHLAtimeManagerStateAttributeHandle() const { return mHLAtimeManagerStateAttributeHandle; }
+    // attribute HLAlogicalTime : HLAlogicalTime
+    rti1516ev::AttributeHandle GetHLAlogicalTimeAttributeHandle() const { return mHLAlogicalTimeAttributeHandle; }
+    // attribute HLAlookahead : HLAtimeInterval
+    rti1516ev::AttributeHandle GetHLAlookaheadAttributeHandle() const { return mHLAlookaheadAttributeHandle; }
+    // attribute HLAGALT : HLAlogicalTime
+    rti1516ev::AttributeHandle GetHLAGALTAttributeHandle() const { return mHLAGALTAttributeHandle; }
+    // attribute HLALITS : HLAlogicalTime
+    rti1516ev::AttributeHandle GetHLALITSAttributeHandle() const { return mHLALITSAttributeHandle; }
+    // attribute HLAROlength : HLAcount
+    rti1516ev::AttributeHandle GetHLAROlengthAttributeHandle() const { return mHLAROlengthAttributeHandle; }
+    // attribute HLATSOlength : HLAcount
+    rti1516ev::AttributeHandle GetHLATSOlengthAttributeHandle() const { return mHLATSOlengthAttributeHandle; }
+    // attribute HLAreflectionsReceived : HLAcount
+    rti1516ev::AttributeHandle GetHLAreflectionsReceivedAttributeHandle() const { return mHLAreflectionsReceivedAttributeHandle; }
+    // attribute HLAupdatesSent : HLAcount
+    rti1516ev::AttributeHandle GetHLAupdatesSentAttributeHandle() const { return mHLAupdatesSentAttributeHandle; }
+    // attribute HLAinteractionsReceived : HLAcount
+    rti1516ev::AttributeHandle GetHLAinteractionsReceivedAttributeHandle() const { return mHLAinteractionsReceivedAttributeHandle; }
+    // attribute HLAinteractionsSent : HLAcount
+    rti1516ev::AttributeHandle GetHLAinteractionsSentAttributeHandle() const { return mHLAinteractionsSentAttributeHandle; }
+    // attribute HLAobjectInstancesThatCanBeDeleted : HLAcount
+    rti1516ev::AttributeHandle GetHLAobjectInstancesThatCanBeDeletedAttributeHandle() const { return mHLAobjectInstancesThatCanBeDeletedAttributeHandle; }
+    // attribute HLAobjectInstancesUpdated : HLAcount
+    rti1516ev::AttributeHandle GetHLAobjectInstancesUpdatedAttributeHandle() const { return mHLAobjectInstancesUpdatedAttributeHandle; }
+    // attribute HLAobjectInstancesReflected : HLAcount
+    rti1516ev::AttributeHandle GetHLAobjectInstancesReflectedAttributeHandle() const { return mHLAobjectInstancesReflectedAttributeHandle; }
+    // attribute HLAobjectInstancesDeleted : HLAcount
+    rti1516ev::AttributeHandle GetHLAobjectInstancesDeletedAttributeHandle() const { return mHLAobjectInstancesDeletedAttributeHandle; }
+    // attribute HLAobjectInstancesRemoved : HLAcount
+    rti1516ev::AttributeHandle GetHLAobjectInstancesRemovedAttributeHandle() const { return mHLAobjectInstancesRemovedAttributeHandle; }
+    // attribute HLAobjectInstancesRegistered : HLAcount
+    rti1516ev::AttributeHandle GetHLAobjectInstancesRegisteredAttributeHandle() const { return mHLAobjectInstancesRegisteredAttributeHandle; }
+    // attribute HLAobjectInstancesDiscovered : HLAcount
+    rti1516ev::AttributeHandle GetHLAobjectInstancesDiscoveredAttributeHandle() const { return mHLAobjectInstancesDiscoveredAttributeHandle; }
+    // attribute HLAtimeGrantedTime : HLAmsec
+    rti1516ev::AttributeHandle GetHLAtimeGrantedTimeAttributeHandle() const { return mHLAtimeGrantedTimeAttributeHandle; }
+    // attribute HLAtimeAdvancingTime : HLAmsec
+    rti1516ev::AttributeHandle GetHLAtimeAdvancingTimeAttributeHandle() const { return mHLAtimeAdvancingTimeAttributeHandle; }
+    // attribute HLAconveyRegionDesignatorSets : HLAswitch
+    rti1516ev::AttributeHandle GetHLAconveyRegionDesignatorSetsAttributeHandle() const { return mHLAconveyRegionDesignatorSetsAttributeHandle; }
+    // attribute HLAconveyProducingFederate : HLAswitch
+    rti1516ev::AttributeHandle GetHLAconveyProducingFederateAttributeHandle() const { return mHLAconveyProducingFederateAttributeHandle; }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IHLAfederate* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    HLAmanagerObjectClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    // attribute HLAfederateHandle : HLAhandle
+    rti1516ev::AttributeHandle mHLAfederateHandleAttributeHandle;
+    // attribute HLAfederateName : HLAunicodeString
+    rti1516ev::AttributeHandle mHLAfederateNameAttributeHandle;
+    // attribute HLAfederateType : HLAunicodeString
+    rti1516ev::AttributeHandle mHLAfederateTypeAttributeHandle;
+    // attribute HLAfederateHost : HLAunicodeString
+    rti1516ev::AttributeHandle mHLAfederateHostAttributeHandle;
+    // attribute HLARTIversion : HLAunicodeString
+    rti1516ev::AttributeHandle mHLARTIversionAttributeHandle;
+    // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
+    rti1516ev::AttributeHandle mHLAFOMmoduleDesignatorListAttributeHandle;
+    // attribute HLAtimeConstrained : HLAboolean
+    rti1516ev::AttributeHandle mHLAtimeConstrainedAttributeHandle;
+    // attribute HLAtimeRegulating : HLAboolean
+    rti1516ev::AttributeHandle mHLAtimeRegulatingAttributeHandle;
+    // attribute HLAasynchronousDelivery : HLAboolean
+    rti1516ev::AttributeHandle mHLAasynchronousDeliveryAttributeHandle;
+    // attribute HLAfederateState : HLAfederateState
+    rti1516ev::AttributeHandle mHLAfederateStateAttributeHandle;
+    // attribute HLAtimeManagerState : HLAtimeState
+    rti1516ev::AttributeHandle mHLAtimeManagerStateAttributeHandle;
+    // attribute HLAlogicalTime : HLAlogicalTime
+    rti1516ev::AttributeHandle mHLAlogicalTimeAttributeHandle;
+    // attribute HLAlookahead : HLAtimeInterval
+    rti1516ev::AttributeHandle mHLAlookaheadAttributeHandle;
+    // attribute HLAGALT : HLAlogicalTime
+    rti1516ev::AttributeHandle mHLAGALTAttributeHandle;
+    // attribute HLALITS : HLAlogicalTime
+    rti1516ev::AttributeHandle mHLALITSAttributeHandle;
+    // attribute HLAROlength : HLAcount
+    rti1516ev::AttributeHandle mHLAROlengthAttributeHandle;
+    // attribute HLATSOlength : HLAcount
+    rti1516ev::AttributeHandle mHLATSOlengthAttributeHandle;
+    // attribute HLAreflectionsReceived : HLAcount
+    rti1516ev::AttributeHandle mHLAreflectionsReceivedAttributeHandle;
+    // attribute HLAupdatesSent : HLAcount
+    rti1516ev::AttributeHandle mHLAupdatesSentAttributeHandle;
+    // attribute HLAinteractionsReceived : HLAcount
+    rti1516ev::AttributeHandle mHLAinteractionsReceivedAttributeHandle;
+    // attribute HLAinteractionsSent : HLAcount
+    rti1516ev::AttributeHandle mHLAinteractionsSentAttributeHandle;
+    // attribute HLAobjectInstancesThatCanBeDeleted : HLAcount
+    rti1516ev::AttributeHandle mHLAobjectInstancesThatCanBeDeletedAttributeHandle;
+    // attribute HLAobjectInstancesUpdated : HLAcount
+    rti1516ev::AttributeHandle mHLAobjectInstancesUpdatedAttributeHandle;
+    // attribute HLAobjectInstancesReflected : HLAcount
+    rti1516ev::AttributeHandle mHLAobjectInstancesReflectedAttributeHandle;
+    // attribute HLAobjectInstancesDeleted : HLAcount
+    rti1516ev::AttributeHandle mHLAobjectInstancesDeletedAttributeHandle;
+    // attribute HLAobjectInstancesRemoved : HLAcount
+    rti1516ev::AttributeHandle mHLAobjectInstancesRemovedAttributeHandle;
+    // attribute HLAobjectInstancesRegistered : HLAcount
+    rti1516ev::AttributeHandle mHLAobjectInstancesRegisteredAttributeHandle;
+    // attribute HLAobjectInstancesDiscovered : HLAcount
+    rti1516ev::AttributeHandle mHLAobjectInstancesDiscoveredAttributeHandle;
+    // attribute HLAtimeGrantedTime : HLAmsec
+    rti1516ev::AttributeHandle mHLAtimeGrantedTimeAttributeHandle;
+    // attribute HLAtimeAdvancingTime : HLAmsec
+    rti1516ev::AttributeHandle mHLAtimeAdvancingTimeAttributeHandle;
+    // attribute HLAconveyRegionDesignatorSets : HLAswitch
+    rti1516ev::AttributeHandle mHLAconveyRegionDesignatorSetsAttributeHandle;
+    // attribute HLAconveyProducingFederate : HLAswitch
+    rti1516ev::AttributeHandle mHLAconveyProducingFederateAttributeHandle;
+    std::map<std::wstring, HLAfederate*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, HLAfederate*> mObjectInstancesByHandle;
+};
+
+class HLAfederate : public IHLAfederate
+{
+  public:
+
+    virtual ~HLAfederate();
     HLAfederate(const HLAfederate&) = delete;
     HLAfederate(HLAfederate&&) = delete;
     HLAfederate& operator=(const HLAfederate&) = delete;
     HLAfederate& operator=(HLAfederate&&) = delete;
+    IHLAfederateObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    const std::vector<uint8_t>& GetHLAprivilegeToDeleteObject() const override;
+    void SetHLAprivilegeToDeleteObject(std::vector<uint8_t> newValue) override;
+    // attribute HLAfederateHandle : HLAhandle
+    rti1516ev::HLAhandle GetHLAfederateHandle() const override;
+    void SetHLAfederateHandle(rti1516ev::HLAhandle newValue) override;
+    // attribute HLAfederateName : HLAunicodeString
+    std::wstring GetHLAfederateName() const override;
+    void SetHLAfederateName(std::wstring newValue) override;
+    // attribute HLAfederateType : HLAunicodeString
+    std::wstring GetHLAfederateType() const override;
+    void SetHLAfederateType(std::wstring newValue) override;
+    // attribute HLAfederateHost : HLAunicodeString
+    std::wstring GetHLAfederateHost() const override;
+    void SetHLAfederateHost(std::wstring newValue) override;
+    // attribute HLARTIversion : HLAunicodeString
+    std::wstring GetHLARTIversion() const override;
+    void SetHLARTIversion(std::wstring newValue) override;
+    // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
+    const std::vector<std::wstring>& GetHLAFOMmoduleDesignatorList() const override;
+    void SetHLAFOMmoduleDesignatorList(std::vector<std::wstring> newValue) override;
+    // attribute HLAtimeConstrained : HLAboolean
+    bool GetHLAtimeConstrained() const override;
+    void SetHLAtimeConstrained(bool newValue) override;
+    // attribute HLAtimeRegulating : HLAboolean
+    bool GetHLAtimeRegulating() const override;
+    void SetHLAtimeRegulating(bool newValue) override;
+    // attribute HLAasynchronousDelivery : HLAboolean
+    bool GetHLAasynchronousDelivery() const override;
+    void SetHLAasynchronousDelivery(bool newValue) override;
+    // attribute HLAfederateState : HLAfederateState
+    HLAfederateState GetHLAfederateState() const override;
+    void SetHLAfederateState(HLAfederateState newValue) override;
+    // attribute HLAtimeManagerState : HLAtimeState
+    HLAtimeState GetHLAtimeManagerState() const override;
+    void SetHLAtimeManagerState(HLAtimeState newValue) override;
+    // attribute HLAlogicalTime : HLAlogicalTime
+    const std::vector<uint8_t>& GetHLAlogicalTime() const override;
+    void SetHLAlogicalTime(std::vector<uint8_t> newValue) override;
+    // attribute HLAlookahead : HLAtimeInterval
+    const std::vector<uint8_t>& GetHLAlookahead() const override;
+    void SetHLAlookahead(std::vector<uint8_t> newValue) override;
+    // attribute HLAGALT : HLAlogicalTime
+    const std::vector<uint8_t>& GetHLAGALT() const override;
+    void SetHLAGALT(std::vector<uint8_t> newValue) override;
+    // attribute HLALITS : HLAlogicalTime
+    const std::vector<uint8_t>& GetHLALITS() const override;
+    void SetHLALITS(std::vector<uint8_t> newValue) override;
+    // attribute HLAROlength : HLAcount
+    HLAcount GetHLAROlength() const override;
+    void SetHLAROlength(HLAcount newValue) override;
+    // attribute HLATSOlength : HLAcount
+    HLAcount GetHLATSOlength() const override;
+    void SetHLATSOlength(HLAcount newValue) override;
+    // attribute HLAreflectionsReceived : HLAcount
+    HLAcount GetHLAreflectionsReceived() const override;
+    void SetHLAreflectionsReceived(HLAcount newValue) override;
+    // attribute HLAupdatesSent : HLAcount
+    HLAcount GetHLAupdatesSent() const override;
+    void SetHLAupdatesSent(HLAcount newValue) override;
+    // attribute HLAinteractionsReceived : HLAcount
+    HLAcount GetHLAinteractionsReceived() const override;
+    void SetHLAinteractionsReceived(HLAcount newValue) override;
+    // attribute HLAinteractionsSent : HLAcount
+    HLAcount GetHLAinteractionsSent() const override;
+    void SetHLAinteractionsSent(HLAcount newValue) override;
+    // attribute HLAobjectInstancesThatCanBeDeleted : HLAcount
+    HLAcount GetHLAobjectInstancesThatCanBeDeleted() const override;
+    void SetHLAobjectInstancesThatCanBeDeleted(HLAcount newValue) override;
+    // attribute HLAobjectInstancesUpdated : HLAcount
+    HLAcount GetHLAobjectInstancesUpdated() const override;
+    void SetHLAobjectInstancesUpdated(HLAcount newValue) override;
+    // attribute HLAobjectInstancesReflected : HLAcount
+    HLAcount GetHLAobjectInstancesReflected() const override;
+    void SetHLAobjectInstancesReflected(HLAcount newValue) override;
+    // attribute HLAobjectInstancesDeleted : HLAcount
+    HLAcount GetHLAobjectInstancesDeleted() const override;
+    void SetHLAobjectInstancesDeleted(HLAcount newValue) override;
+    // attribute HLAobjectInstancesRemoved : HLAcount
+    HLAcount GetHLAobjectInstancesRemoved() const override;
+    void SetHLAobjectInstancesRemoved(HLAcount newValue) override;
+    // attribute HLAobjectInstancesRegistered : HLAcount
+    HLAcount GetHLAobjectInstancesRegistered() const override;
+    void SetHLAobjectInstancesRegistered(HLAcount newValue) override;
+    // attribute HLAobjectInstancesDiscovered : HLAcount
+    HLAcount GetHLAobjectInstancesDiscovered() const override;
+    void SetHLAobjectInstancesDiscovered(HLAcount newValue) override;
+    // attribute HLAtimeGrantedTime : HLAmsec
+    HLAmsec GetHLAtimeGrantedTime() const override;
+    void SetHLAtimeGrantedTime(HLAmsec newValue) override;
+    // attribute HLAtimeAdvancingTime : HLAmsec
+    HLAmsec GetHLAtimeAdvancingTime() const override;
+    void SetHLAtimeAdvancingTime(HLAmsec newValue) override;
+    // attribute HLAconveyRegionDesignatorSets : HLAswitch
+    HLAswitch GetHLAconveyRegionDesignatorSets() const override;
+    void SetHLAconveyRegionDesignatorSets(HLAswitch newValue) override;
+    // attribute HLAconveyProducingFederate : HLAswitch
+    HLAswitch GetHLAconveyProducingFederate() const override;
+    void SetHLAconveyProducingFederate(HLAswitch newValue) override;
+    // IHLAfederate
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    void UnregisterUpdateCallback(uint32_t callbackToken) override;
 
-    // attribute HLAfederateHandle : HLAhandle
-    rti1516ev::HLAhandle GetHLAfederateHandle() const;
-    void SetHLAfederateHandle(rti1516ev::HLAhandle newValue);
-    // attribute HLAfederateName : HLAunicodeString
-    std::wstring GetHLAfederateName() const;
-    void SetHLAfederateName(std::wstring newValue);
-    // attribute HLAfederateType : HLAunicodeString
-    std::wstring GetHLAfederateType() const;
-    void SetHLAfederateType(std::wstring newValue);
-    // attribute HLAfederateHost : HLAunicodeString
-    std::wstring GetHLAfederateHost() const;
-    void SetHLAfederateHost(std::wstring newValue);
-    // attribute HLARTIversion : HLAunicodeString
-    std::wstring GetHLARTIversion() const;
-    void SetHLARTIversion(std::wstring newValue);
-    // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
-    std::vector<std::wstring> GetHLAFOMmoduleDesignatorList() const;
-    void SetHLAFOMmoduleDesignatorList(std::vector<std::wstring> newValue);
-    // attribute HLAtimeConstrained : HLAboolean
-    bool GetHLAtimeConstrained() const;
-    void SetHLAtimeConstrained(bool newValue);
-    // attribute HLAtimeRegulating : HLAboolean
-    bool GetHLAtimeRegulating() const;
-    void SetHLAtimeRegulating(bool newValue);
-    // attribute HLAasynchronousDelivery : HLAboolean
-    bool GetHLAasynchronousDelivery() const;
-    void SetHLAasynchronousDelivery(bool newValue);
-    // attribute HLAfederateState : HLAfederateState
-    HLAfederateState GetHLAfederateState() const;
-    void SetHLAfederateState(HLAfederateState newValue);
-    // attribute HLAtimeManagerState : HLAtimeState
-    HLAtimeState GetHLAtimeManagerState() const;
-    void SetHLAtimeManagerState(HLAtimeState newValue);
-    // attribute HLAlogicalTime : HLAlogicalTime
-    std::vector<uint8_t> GetHLAlogicalTime() const;
-    void SetHLAlogicalTime(std::vector<uint8_t> newValue);
-    // attribute HLAlookahead : HLAtimeInterval
-    std::vector<uint8_t> GetHLAlookahead() const;
-    void SetHLAlookahead(std::vector<uint8_t> newValue);
-    // attribute HLAGALT : HLAlogicalTime
-    std::vector<uint8_t> GetHLAGALT() const;
-    void SetHLAGALT(std::vector<uint8_t> newValue);
-    // attribute HLALITS : HLAlogicalTime
-    std::vector<uint8_t> GetHLALITS() const;
-    void SetHLALITS(std::vector<uint8_t> newValue);
-    // attribute HLAROlength : HLAcount
-    HLAcount GetHLAROlength() const;
-    void SetHLAROlength(HLAcount newValue);
-    // attribute HLATSOlength : HLAcount
-    HLAcount GetHLATSOlength() const;
-    void SetHLATSOlength(HLAcount newValue);
-    // attribute HLAreflectionsReceived : HLAcount
-    HLAcount GetHLAreflectionsReceived() const;
-    void SetHLAreflectionsReceived(HLAcount newValue);
-    // attribute HLAupdatesSent : HLAcount
-    HLAcount GetHLAupdatesSent() const;
-    void SetHLAupdatesSent(HLAcount newValue);
-    // attribute HLAinteractionsReceived : HLAcount
-    HLAcount GetHLAinteractionsReceived() const;
-    void SetHLAinteractionsReceived(HLAcount newValue);
-    // attribute HLAinteractionsSent : HLAcount
-    HLAcount GetHLAinteractionsSent() const;
-    void SetHLAinteractionsSent(HLAcount newValue);
-    // attribute HLAobjectInstancesThatCanBeDeleted : HLAcount
-    HLAcount GetHLAobjectInstancesThatCanBeDeleted() const;
-    void SetHLAobjectInstancesThatCanBeDeleted(HLAcount newValue);
-    // attribute HLAobjectInstancesUpdated : HLAcount
-    HLAcount GetHLAobjectInstancesUpdated() const;
-    void SetHLAobjectInstancesUpdated(HLAcount newValue);
-    // attribute HLAobjectInstancesReflected : HLAcount
-    HLAcount GetHLAobjectInstancesReflected() const;
-    void SetHLAobjectInstancesReflected(HLAcount newValue);
-    // attribute HLAobjectInstancesDeleted : HLAcount
-    HLAcount GetHLAobjectInstancesDeleted() const;
-    void SetHLAobjectInstancesDeleted(HLAcount newValue);
-    // attribute HLAobjectInstancesRemoved : HLAcount
-    HLAcount GetHLAobjectInstancesRemoved() const;
-    void SetHLAobjectInstancesRemoved(HLAcount newValue);
-    // attribute HLAobjectInstancesRegistered : HLAcount
-    HLAcount GetHLAobjectInstancesRegistered() const;
-    void SetHLAobjectInstancesRegistered(HLAcount newValue);
-    // attribute HLAobjectInstancesDiscovered : HLAcount
-    HLAcount GetHLAobjectInstancesDiscovered() const;
-    void SetHLAobjectInstancesDiscovered(HLAcount newValue);
-    // attribute HLAtimeGrantedTime : HLAmsec
-    HLAmsec GetHLAtimeGrantedTime() const;
-    void SetHLAtimeGrantedTime(HLAmsec newValue);
-    // attribute HLAtimeAdvancingTime : HLAmsec
-    HLAmsec GetHLAtimeAdvancingTime() const;
-    void SetHLAtimeAdvancingTime(HLAmsec newValue);
-    // attribute HLAconveyRegionDesignatorSets : HLAswitch
-    HLAswitch GetHLAconveyRegionDesignatorSets() const;
-    void SetHLAconveyRegionDesignatorSets(HLAswitch newValue);
-    // attribute HLAconveyProducingFederate : HLAswitch
-    HLAswitch GetHLAconveyProducingFederate() const;
-    void SetHLAconveyProducingFederate(HLAswitch newValue);
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
   private:
+    friend class HLAfederateObjectClass;
+
+    HLAfederate();
+    HLAfederate(HLAfederateObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    void ExecuteUpdateCallbacks();
+    HLAfederateObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    uint32_t mLastCallbackToken = 0;
+    // Attribute value encoders
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    HLAtokenEncoding mHLAprivilegeToDeleteObject;
     // attribute HLAfederateHandle : HLAhandle
-    rti1516ev::HLAhandle mHLAfederateHandleEncoder;
+    rti1516ev::HLAhandle mHLAfederateHandle;
     // attribute HLAfederateName : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLAfederateNameEncoder;
+    rti1516ev::HLAunicodeString mHLAfederateName;
     // attribute HLAfederateType : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLAfederateTypeEncoder;
+    rti1516ev::HLAunicodeString mHLAfederateType;
     // attribute HLAfederateHost : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLAfederateHostEncoder;
+    rti1516ev::HLAunicodeString mHLAfederateHost;
     // attribute HLARTIversion : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLARTIversionEncoder;
+    rti1516ev::HLAunicodeString mHLARTIversion;
     // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
-    HLAmoduleDesignatorListEncoding mHLAFOMmoduleDesignatorListEncoder;
+    HLAmoduleDesignatorListEncoding mHLAFOMmoduleDesignatorList;
     // attribute HLAtimeConstrained : HLAboolean
-    rti1516ev::HLAboolean mHLAtimeConstrainedEncoder;
+    rti1516ev::HLAboolean mHLAtimeConstrained;
     // attribute HLAtimeRegulating : HLAboolean
-    rti1516ev::HLAboolean mHLAtimeRegulatingEncoder;
+    rti1516ev::HLAboolean mHLAtimeRegulating;
     // attribute HLAasynchronousDelivery : HLAboolean
-    rti1516ev::HLAboolean mHLAasynchronousDeliveryEncoder;
+    rti1516ev::HLAboolean mHLAasynchronousDelivery;
     // attribute HLAfederateState : HLAfederateState
-    rti1516ev::HLAinteger32BE mHLAfederateStateEncoder;
+    rti1516ev::HLAinteger32BE mHLAfederateState;
     // attribute HLAtimeManagerState : HLAtimeState
-    rti1516ev::HLAinteger32BE mHLAtimeManagerStateEncoder;
+    rti1516ev::HLAinteger32BE mHLAtimeManagerState;
     // attribute HLAlogicalTime : HLAlogicalTime
-    HLAlogicalTimeEncoding mHLAlogicalTimeEncoder;
+    HLAlogicalTimeEncoding mHLAlogicalTime;
     // attribute HLAlookahead : HLAtimeInterval
-    HLAtimeIntervalEncoding mHLAlookaheadEncoder;
+    HLAtimeIntervalEncoding mHLAlookahead;
     // attribute HLAGALT : HLAlogicalTime
-    HLAlogicalTimeEncoding mHLAGALTEncoder;
+    HLAlogicalTimeEncoding mHLAGALT;
     // attribute HLALITS : HLAlogicalTime
-    HLAlogicalTimeEncoding mHLALITSEncoder;
+    HLAlogicalTimeEncoding mHLALITS;
     // attribute HLAROlength : HLAcount
-    rti1516ev::HLAinteger32BE mHLAROlengthEncoder;
+    rti1516ev::HLAinteger32BE mHLAROlength;
     // attribute HLATSOlength : HLAcount
-    rti1516ev::HLAinteger32BE mHLATSOlengthEncoder;
+    rti1516ev::HLAinteger32BE mHLATSOlength;
     // attribute HLAreflectionsReceived : HLAcount
-    rti1516ev::HLAinteger32BE mHLAreflectionsReceivedEncoder;
+    rti1516ev::HLAinteger32BE mHLAreflectionsReceived;
     // attribute HLAupdatesSent : HLAcount
-    rti1516ev::HLAinteger32BE mHLAupdatesSentEncoder;
+    rti1516ev::HLAinteger32BE mHLAupdatesSent;
     // attribute HLAinteractionsReceived : HLAcount
-    rti1516ev::HLAinteger32BE mHLAinteractionsReceivedEncoder;
+    rti1516ev::HLAinteger32BE mHLAinteractionsReceived;
     // attribute HLAinteractionsSent : HLAcount
-    rti1516ev::HLAinteger32BE mHLAinteractionsSentEncoder;
+    rti1516ev::HLAinteger32BE mHLAinteractionsSent;
     // attribute HLAobjectInstancesThatCanBeDeleted : HLAcount
-    rti1516ev::HLAinteger32BE mHLAobjectInstancesThatCanBeDeletedEncoder;
+    rti1516ev::HLAinteger32BE mHLAobjectInstancesThatCanBeDeleted;
     // attribute HLAobjectInstancesUpdated : HLAcount
-    rti1516ev::HLAinteger32BE mHLAobjectInstancesUpdatedEncoder;
+    rti1516ev::HLAinteger32BE mHLAobjectInstancesUpdated;
     // attribute HLAobjectInstancesReflected : HLAcount
-    rti1516ev::HLAinteger32BE mHLAobjectInstancesReflectedEncoder;
+    rti1516ev::HLAinteger32BE mHLAobjectInstancesReflected;
     // attribute HLAobjectInstancesDeleted : HLAcount
-    rti1516ev::HLAinteger32BE mHLAobjectInstancesDeletedEncoder;
+    rti1516ev::HLAinteger32BE mHLAobjectInstancesDeleted;
     // attribute HLAobjectInstancesRemoved : HLAcount
-    rti1516ev::HLAinteger32BE mHLAobjectInstancesRemovedEncoder;
+    rti1516ev::HLAinteger32BE mHLAobjectInstancesRemoved;
     // attribute HLAobjectInstancesRegistered : HLAcount
-    rti1516ev::HLAinteger32BE mHLAobjectInstancesRegisteredEncoder;
+    rti1516ev::HLAinteger32BE mHLAobjectInstancesRegistered;
     // attribute HLAobjectInstancesDiscovered : HLAcount
-    rti1516ev::HLAinteger32BE mHLAobjectInstancesDiscoveredEncoder;
+    rti1516ev::HLAinteger32BE mHLAobjectInstancesDiscovered;
     // attribute HLAtimeGrantedTime : HLAmsec
-    rti1516ev::HLAinteger32BE mHLAtimeGrantedTimeEncoder;
+    rti1516ev::HLAinteger32BE mHLAtimeGrantedTime;
     // attribute HLAtimeAdvancingTime : HLAmsec
-    rti1516ev::HLAinteger32BE mHLAtimeAdvancingTimeEncoder;
+    rti1516ev::HLAinteger32BE mHLAtimeAdvancingTime;
     // attribute HLAconveyRegionDesignatorSets : HLAswitch
-    rti1516ev::HLAinteger32BE mHLAconveyRegionDesignatorSetsEncoder;
+    rti1516ev::HLAinteger32BE mHLAconveyRegionDesignatorSets;
     // attribute HLAconveyProducingFederate : HLAswitch
-    rti1516ev::HLAinteger32BE mHLAconveyProducingFederateEncoder;
+    rti1516ev::HLAinteger32BE mHLAconveyProducingFederate;
 };
 
-class HLAfederation : public HLAmanager
+class HLAfederation;
+class HLAfederationObjectClass : public IHLAfederationObjectClass
 {
   public:
-    HLAfederation();
-    ~HLAfederation() = default;
+    // IHLAfederationObjectClass
+    HLAfederationObjectClass() = default;
+    virtual ~HLAfederationObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IHLAfederation* GetObjectInstance(const std::wstring& instanceName) override;
+    IHLAfederation* CreateObjectInstance(const std::wstring& instanceName) override;
+
+    // internal
+    HLAfederationObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAmanagerObjectClass* baseClass);
+
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    rti1516ev::AttributeHandle GetHLAprivilegeToDeleteObjectAttributeHandle() const { return mBaseClass->GetHLAprivilegeToDeleteObjectAttributeHandle(); }
+    // attribute HLAfederationName : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLAfederationNameAttributeHandle() const { return mHLAfederationNameAttributeHandle; }
+    // attribute HLAfederatesInFederation : HLAhandleList
+    rti1516ev::AttributeHandle GetHLAfederatesInFederationAttributeHandle() const { return mHLAfederatesInFederationAttributeHandle; }
+    // attribute HLARTIversion : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLARTIversionAttributeHandle() const { return mHLARTIversionAttributeHandle; }
+    // attribute HLAMIMdesignator : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLAMIMdesignatorAttributeHandle() const { return mHLAMIMdesignatorAttributeHandle; }
+    // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
+    rti1516ev::AttributeHandle GetHLAFOMmoduleDesignatorListAttributeHandle() const { return mHLAFOMmoduleDesignatorListAttributeHandle; }
+    // attribute HLAcurrentFDD : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLAcurrentFDDAttributeHandle() const { return mHLAcurrentFDDAttributeHandle; }
+    // attribute HLAtimeImplementationName : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLAtimeImplementationNameAttributeHandle() const { return mHLAtimeImplementationNameAttributeHandle; }
+    // attribute HLAlastSaveName : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLAlastSaveNameAttributeHandle() const { return mHLAlastSaveNameAttributeHandle; }
+    // attribute HLAlastSaveTime : HLAlogicalTime
+    rti1516ev::AttributeHandle GetHLAlastSaveTimeAttributeHandle() const { return mHLAlastSaveTimeAttributeHandle; }
+    // attribute HLAnextSaveName : HLAunicodeString
+    rti1516ev::AttributeHandle GetHLAnextSaveNameAttributeHandle() const { return mHLAnextSaveNameAttributeHandle; }
+    // attribute HLAnextSaveTime : HLAlogicalTime
+    rti1516ev::AttributeHandle GetHLAnextSaveTimeAttributeHandle() const { return mHLAnextSaveTimeAttributeHandle; }
+    // attribute HLAautoProvide : HLAswitch
+    rti1516ev::AttributeHandle GetHLAautoProvideAttributeHandle() const { return mHLAautoProvideAttributeHandle; }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IHLAfederation* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    HLAmanagerObjectClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    // attribute HLAfederationName : HLAunicodeString
+    rti1516ev::AttributeHandle mHLAfederationNameAttributeHandle;
+    // attribute HLAfederatesInFederation : HLAhandleList
+    rti1516ev::AttributeHandle mHLAfederatesInFederationAttributeHandle;
+    // attribute HLARTIversion : HLAunicodeString
+    rti1516ev::AttributeHandle mHLARTIversionAttributeHandle;
+    // attribute HLAMIMdesignator : HLAunicodeString
+    rti1516ev::AttributeHandle mHLAMIMdesignatorAttributeHandle;
+    // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
+    rti1516ev::AttributeHandle mHLAFOMmoduleDesignatorListAttributeHandle;
+    // attribute HLAcurrentFDD : HLAunicodeString
+    rti1516ev::AttributeHandle mHLAcurrentFDDAttributeHandle;
+    // attribute HLAtimeImplementationName : HLAunicodeString
+    rti1516ev::AttributeHandle mHLAtimeImplementationNameAttributeHandle;
+    // attribute HLAlastSaveName : HLAunicodeString
+    rti1516ev::AttributeHandle mHLAlastSaveNameAttributeHandle;
+    // attribute HLAlastSaveTime : HLAlogicalTime
+    rti1516ev::AttributeHandle mHLAlastSaveTimeAttributeHandle;
+    // attribute HLAnextSaveName : HLAunicodeString
+    rti1516ev::AttributeHandle mHLAnextSaveNameAttributeHandle;
+    // attribute HLAnextSaveTime : HLAlogicalTime
+    rti1516ev::AttributeHandle mHLAnextSaveTimeAttributeHandle;
+    // attribute HLAautoProvide : HLAswitch
+    rti1516ev::AttributeHandle mHLAautoProvideAttributeHandle;
+    std::map<std::wstring, HLAfederation*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, HLAfederation*> mObjectInstancesByHandle;
+};
+
+class HLAfederation : public IHLAfederation
+{
+  public:
+
+    virtual ~HLAfederation();
     HLAfederation(const HLAfederation&) = delete;
     HLAfederation(HLAfederation&&) = delete;
     HLAfederation& operator=(const HLAfederation&) = delete;
     HLAfederation& operator=(HLAfederation&&) = delete;
+    IHLAfederationObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    const std::vector<uint8_t>& GetHLAprivilegeToDeleteObject() const override;
+    void SetHLAprivilegeToDeleteObject(std::vector<uint8_t> newValue) override;
+    // attribute HLAfederationName : HLAunicodeString
+    std::wstring GetHLAfederationName() const override;
+    void SetHLAfederationName(std::wstring newValue) override;
+    // attribute HLAfederatesInFederation : HLAhandleList
+    const std::vector<rti1516ev::HLAhandle>& GetHLAfederatesInFederation() const override;
+    void SetHLAfederatesInFederation(std::vector<rti1516ev::HLAhandle> newValue) override;
+    // attribute HLARTIversion : HLAunicodeString
+    std::wstring GetHLARTIversion() const override;
+    void SetHLARTIversion(std::wstring newValue) override;
+    // attribute HLAMIMdesignator : HLAunicodeString
+    std::wstring GetHLAMIMdesignator() const override;
+    void SetHLAMIMdesignator(std::wstring newValue) override;
+    // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
+    const std::vector<std::wstring>& GetHLAFOMmoduleDesignatorList() const override;
+    void SetHLAFOMmoduleDesignatorList(std::vector<std::wstring> newValue) override;
+    // attribute HLAcurrentFDD : HLAunicodeString
+    std::wstring GetHLAcurrentFDD() const override;
+    void SetHLAcurrentFDD(std::wstring newValue) override;
+    // attribute HLAtimeImplementationName : HLAunicodeString
+    std::wstring GetHLAtimeImplementationName() const override;
+    void SetHLAtimeImplementationName(std::wstring newValue) override;
+    // attribute HLAlastSaveName : HLAunicodeString
+    std::wstring GetHLAlastSaveName() const override;
+    void SetHLAlastSaveName(std::wstring newValue) override;
+    // attribute HLAlastSaveTime : HLAlogicalTime
+    const std::vector<uint8_t>& GetHLAlastSaveTime() const override;
+    void SetHLAlastSaveTime(std::vector<uint8_t> newValue) override;
+    // attribute HLAnextSaveName : HLAunicodeString
+    std::wstring GetHLAnextSaveName() const override;
+    void SetHLAnextSaveName(std::wstring newValue) override;
+    // attribute HLAnextSaveTime : HLAlogicalTime
+    const std::vector<uint8_t>& GetHLAnextSaveTime() const override;
+    void SetHLAnextSaveTime(std::vector<uint8_t> newValue) override;
+    // attribute HLAautoProvide : HLAswitch
+    HLAswitch GetHLAautoProvide() const override;
+    void SetHLAautoProvide(HLAswitch newValue) override;
+    // IHLAfederation
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    void UnregisterUpdateCallback(uint32_t callbackToken) override;
 
-    // attribute HLAfederationName : HLAunicodeString
-    std::wstring GetHLAfederationName() const;
-    void SetHLAfederationName(std::wstring newValue);
-    // attribute HLAfederatesInFederation : HLAhandleList
-    std::vector<rti1516ev::HLAhandle> GetHLAfederatesInFederation() const;
-    void SetHLAfederatesInFederation(std::vector<rti1516ev::HLAhandle> newValue);
-    // attribute HLARTIversion : HLAunicodeString
-    std::wstring GetHLARTIversion() const;
-    void SetHLARTIversion(std::wstring newValue);
-    // attribute HLAMIMdesignator : HLAunicodeString
-    std::wstring GetHLAMIMdesignator() const;
-    void SetHLAMIMdesignator(std::wstring newValue);
-    // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
-    std::vector<std::wstring> GetHLAFOMmoduleDesignatorList() const;
-    void SetHLAFOMmoduleDesignatorList(std::vector<std::wstring> newValue);
-    // attribute HLAcurrentFDD : HLAunicodeString
-    std::wstring GetHLAcurrentFDD() const;
-    void SetHLAcurrentFDD(std::wstring newValue);
-    // attribute HLAtimeImplementationName : HLAunicodeString
-    std::wstring GetHLAtimeImplementationName() const;
-    void SetHLAtimeImplementationName(std::wstring newValue);
-    // attribute HLAlastSaveName : HLAunicodeString
-    std::wstring GetHLAlastSaveName() const;
-    void SetHLAlastSaveName(std::wstring newValue);
-    // attribute HLAlastSaveTime : HLAlogicalTime
-    std::vector<uint8_t> GetHLAlastSaveTime() const;
-    void SetHLAlastSaveTime(std::vector<uint8_t> newValue);
-    // attribute HLAnextSaveName : HLAunicodeString
-    std::wstring GetHLAnextSaveName() const;
-    void SetHLAnextSaveName(std::wstring newValue);
-    // attribute HLAnextSaveTime : HLAlogicalTime
-    std::vector<uint8_t> GetHLAnextSaveTime() const;
-    void SetHLAnextSaveTime(std::vector<uint8_t> newValue);
-    // attribute HLAautoProvide : HLAswitch
-    HLAswitch GetHLAautoProvide() const;
-    void SetHLAautoProvide(HLAswitch newValue);
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
   private:
+    friend class HLAfederationObjectClass;
+
+    HLAfederation();
+    HLAfederation(HLAfederationObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    void ExecuteUpdateCallbacks();
+    HLAfederationObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    uint32_t mLastCallbackToken = 0;
+    // Attribute value encoders
+    // attribute HLAprivilegeToDeleteObject : HLAtoken
+    HLAtokenEncoding mHLAprivilegeToDeleteObject;
     // attribute HLAfederationName : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLAfederationNameEncoder;
+    rti1516ev::HLAunicodeString mHLAfederationName;
     // attribute HLAfederatesInFederation : HLAhandleList
-    HLAhandleListEncoding mHLAfederatesInFederationEncoder;
+    HLAhandleListEncoding mHLAfederatesInFederation;
     // attribute HLARTIversion : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLARTIversionEncoder;
+    rti1516ev::HLAunicodeString mHLARTIversion;
     // attribute HLAMIMdesignator : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLAMIMdesignatorEncoder;
+    rti1516ev::HLAunicodeString mHLAMIMdesignator;
     // attribute HLAFOMmoduleDesignatorList : HLAmoduleDesignatorList
-    HLAmoduleDesignatorListEncoding mHLAFOMmoduleDesignatorListEncoder;
+    HLAmoduleDesignatorListEncoding mHLAFOMmoduleDesignatorList;
     // attribute HLAcurrentFDD : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLAcurrentFDDEncoder;
+    rti1516ev::HLAunicodeString mHLAcurrentFDD;
     // attribute HLAtimeImplementationName : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLAtimeImplementationNameEncoder;
+    rti1516ev::HLAunicodeString mHLAtimeImplementationName;
     // attribute HLAlastSaveName : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLAlastSaveNameEncoder;
+    rti1516ev::HLAunicodeString mHLAlastSaveName;
     // attribute HLAlastSaveTime : HLAlogicalTime
-    HLAlogicalTimeEncoding mHLAlastSaveTimeEncoder;
+    HLAlogicalTimeEncoding mHLAlastSaveTime;
     // attribute HLAnextSaveName : HLAunicodeString
-    rti1516ev::HLAunicodeString mHLAnextSaveNameEncoder;
+    rti1516ev::HLAunicodeString mHLAnextSaveName;
     // attribute HLAnextSaveTime : HLAlogicalTime
-    HLAlogicalTimeEncoding mHLAnextSaveTimeEncoder;
+    HLAlogicalTimeEncoding mHLAnextSaveTime;
     // attribute HLAautoProvide : HLAswitch
-    rti1516ev::HLAinteger32BE mHLAautoProvideEncoder;
+    rti1516ev::HLAinteger32BE mHLAautoProvide;
 };
 
  
+
+class ObjectClassRegistry : public IObjectClassRegistry
+{
+  public:
+    ObjectClassRegistry();
+    ~ObjectClassRegistry();
+    void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
+    static ObjectClassRegistry* GetInstance() { return sClassRegistry; }
+
+    IHLAobjectRootObjectClass* GetHLAobjectRootObjectClass() const override { return mHLAobjectRootObjectClass.get(); }
+    IHLAmanagerObjectClass* GetHLAmanagerObjectClass() const override { return mHLAmanagerObjectClass.get(); }
+    IHLAfederateObjectClass* GetHLAfederateObjectClass() const override { return mHLAfederateObjectClass.get(); }
+    IHLAfederationObjectClass* GetHLAfederationObjectClass() const override { return mHLAfederationObjectClass.get(); }
+
+    void DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes);
+    void ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles);
+    void ObjectInstanceNameReservationSucceeded(std::wstring const & theObjectInstanceName);
+    void ObjectInstanceNameReservationFailed(std::wstring const & theObjectInstanceName);
+    void RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback);
+
+  private:
+    std::map<std::wstring, std::function<void(bool)> > mInstanceNameReservationCallbacks;
+    static ObjectClassRegistry* sClassRegistry;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    std::unique_ptr<HLAobjectRootObjectClass> mHLAobjectRootObjectClass;
+    std::unique_ptr<HLAmanagerObjectClass> mHLAmanagerObjectClass;
+    std::unique_ptr<HLAfederateObjectClass> mHLAfederateObjectClass;
+    std::unique_ptr<HLAfederationObjectClass> mHLAfederationObjectClass;
+}; // class ObjectClassRegistry
 
 } // namespace OpenRTI
 } // namespace Mom

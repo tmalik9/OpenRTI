@@ -9,6 +9,7 @@
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
 #include "RTI/encoding/HLAhandle.h"
+#include "RTI/encoding/HLAopaqueData.h"
 #include "momEncodings.h"
 
 namespace OpenRTI {

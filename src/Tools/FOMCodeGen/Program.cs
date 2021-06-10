@@ -89,7 +89,7 @@ namespace FOMCodeGen
         String objectsImplContent = objectsImpl.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(objectsImplFilename, objectsImplContent);
 
-        FOMInteractionInterfacesHeader interactionInterfacesHeader = new FOMInteractionInterfacesHeader(fom, interactionInterfacesHeaderFilename, encodingsHeaderFilename);
+        FOMInteractionInterfacesHeader interactionInterfacesHeader = new FOMInteractionInterfacesHeader(fom, interactionInterfacesHeaderFilename, objectInterfacesHeaderFilename, dataTypesHeaderFilename);
         String interactionInterfacesHeaderContent = interactionInterfacesHeader.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(interactionInterfacesHeaderFilename, interactionInterfacesHeaderContent);
 
