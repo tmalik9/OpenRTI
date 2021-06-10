@@ -247,7 +247,7 @@ EncodableDataType::operator SimpleDataType() const                      \
 
 // 8 bit values
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAASCIIchar, char,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (index >= bufferSize)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -255,7 +255,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const override
 {
   *(buffer + offset) = *_valuePointer;
   return offset + 1;
@@ -279,7 +279,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAboolean, bool,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (index >= bufferSize)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -287,7 +287,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t /*bufferSize*/, size_t offset) const override
 {
   *(buffer + offset) = *_valuePointer;
   return offset + 1;
@@ -312,7 +312,7 @@ Integer64 hash() const
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAbyte, Octet,
 
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (index >= bufferSize)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -320,7 +320,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   *(buffer + offset) = *_valuePointer;
   return offset + 1;
@@ -344,7 +344,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAoctet, Octet,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (index >= bufferSize)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -352,7 +352,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 1;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   *(buffer + offset) = *_valuePointer;
   return offset + 1;
@@ -378,7 +378,7 @@ Integer64 hash() const
 
 // > 8 bit values, fixed endianess
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAunicodeChar, wchar_t,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -388,7 +388,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   return encodeIntoBE16(buffer, bufferSize, offset, uint16_t(*_valuePointer));
 }
@@ -413,7 +413,7 @@ Integer64 hash() const
 
 // > 8 bit values, both endianess
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger16BE, Integer16,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -423,7 +423,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   return encodeIntoBE16(buffer, bufferSize, offset, uint16_t(*_valuePointer));
 }
@@ -446,7 +446,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger16LE, Integer16,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override 
 {
   if (bufferSize < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -456,7 +456,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   return encodeIntoLE16(buffer, bufferSize, offset, uint16_t(*_valuePointer));
 }
@@ -479,7 +479,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger32BE, Integer32,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 4)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -489,7 +489,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   return encodeIntoBE32(buffer, bufferSize, offset, uint32_t(*_valuePointer));
 }
@@ -513,7 +513,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger32LE, Integer32,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 4)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -523,7 +523,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   return encodeIntoLE32(buffer, bufferSize, offset, uint32_t(*_valuePointer));
 }
@@ -546,7 +546,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger64BE, Integer64,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 8)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -556,7 +556,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   return encodeIntoBE64(buffer, bufferSize, offset, uint64_t(*_valuePointer));
 }
@@ -579,7 +579,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAinteger64LE, Integer64,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 8)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -589,7 +589,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   return encodeIntoLE64(buffer, bufferSize, offset, uint64_t(*_valuePointer));
 }
@@ -613,7 +613,7 @@ Integer64 hash() const
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAoctetPairBE, OctetPair,
 
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -622,7 +622,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 2;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   auto* p = buffer + offset;
   *p++ = _valuePointer->first;
@@ -649,7 +649,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAoctetPairLE, OctetPair,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 2)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -658,7 +658,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index + 2;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   auto* p = buffer + offset;
   *p++ = _valuePointer->second;
@@ -686,7 +686,7 @@ Integer64 hash() const
 
 // float, > 8 bit values, both endianess
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAfloat32BE, float,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 4)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -699,7 +699,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   union {
     uint32_t u;
@@ -733,7 +733,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAfloat32LE, float,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 4)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -746,7 +746,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   union {
     uint32_t u;
@@ -779,7 +779,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAfloat64BE, double,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 8)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -792,7 +792,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   union {
     uint64_t u;
@@ -826,7 +826,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAfloat64LE, double,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 8)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -839,7 +839,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   union {
     uint64_t u;
@@ -874,7 +874,7 @@ Integer64 hash() const
 
 // Array values
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAASCIIstring, std::string,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 4)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -894,7 +894,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   size_t length = _valuePointer->size();
   if (std::numeric_limits<uint32_t>::max() < length)
@@ -925,7 +925,7 @@ Integer64 hash() const
 }
 )
 IMPLEMENT_ENCODING_HELPER_CLASS(HLAunicodeString, std::wstring,
-size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
 {
   if (bufferSize < index + 4)
     throw EncoderException(L"Insufficient buffer size for decoding!");
@@ -950,7 +950,7 @@ size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
   return index;
 }
 
-size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
 {
   size_t length = _valuePointer->size();
   if (std::numeric_limits<uint32_t>::max() < length)

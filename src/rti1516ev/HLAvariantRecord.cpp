@@ -53,7 +53,7 @@ public:
     /* FIXME */
   }
 
-  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
   {
     return offset;
   }
@@ -63,7 +63,7 @@ public:
     return new HLAvariantRecordImplementation(*this);
   }
 
-  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
   {
     /* FIXME */
     return index;

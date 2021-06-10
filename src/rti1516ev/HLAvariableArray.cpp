@@ -62,7 +62,7 @@ public:
     _protoType = nullptr;
   }
 
-  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
   {
 #ifdef _DEBUG
     if (bufferSize < offset + getEncodedLength())
@@ -81,7 +81,7 @@ public:
     return offset;
   }
 
-  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index)
+  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
   {
     if (bufferSize < index + 4)
       throw EncoderException(L"Insufficient buffer size for decoding!");

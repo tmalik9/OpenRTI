@@ -63,7 +63,7 @@ class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAfixedArra
         _dataElementPointerVector[i] = &_dataElementVector[i];
       }
     }
-    HLAfixedArrayOfBasicTypeImplementation(const HLAfixedArrayImplementation& rhs) {
+    HLAfixedArrayOfBasicTypeImplementation(const HLAfixedArrayOfBasicTypeImplementation& rhs) {
       _protoType = std::unique_ptr<BasicTypeEncoding>(new BasicTypeEncoding());
       size_t length = rhs.size();
       _dataVector.resize(length);
@@ -78,13 +78,14 @@ class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAfixedArra
       _protoType.reset();
     }
 
-    const DataElement* getPrototype() const { return _protoType.get(); }
+    const DataElement* getPrototype() const override { return _protoType.get(); }
 
-    size_t getEncodedLength() const {
+    size_t getEncodedLength() const override {
       return _protoType->getEncodedLength() * _dataElementVector.size();
     }
 
-    size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const {
+    size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const  override 
+    {
 #ifdef _DEBUG
       if (bufferSize < offset + getEncodedLength())
         throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
@@ -95,7 +96,8 @@ class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAfixedArra
       return offset;
     }
 
-    size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t offset) {
+    size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t offset) override
+    {
       for (size_t i = 0; i < _dataElementPointerVector.size(); ++i) {
         offset = _dataElementPointerVector[i]->decodeFrom(buffer, bufferSize, offset);
       }
@@ -106,7 +108,7 @@ class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAfixedArra
       return new HLAfixedArrayOfBasicTypeImplementation(size());
     }
 
-    unsigned int getOctetBoundary() const {
+    unsigned int getOctetBoundary() const override {
       return _protoType->getOctetBoundary();
     }
 
@@ -114,7 +116,7 @@ class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAfixedArra
       return _protoType->isSameTypeAs(*(rhs.getPrototype()));
     }
 
-    size_t size() const {
+    size_t size() const override {
       return _dataVector.size();
     }
 
@@ -160,12 +162,12 @@ class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAfixedArra
       return *_dataElementPointerVector[index];
     }
 
-    void resize(size_t length) {
+    void resize(size_t length) override {
       _dataElementVector.resize(length);
       _dataVector.resize(length);
     }
 
-    void clear() {
+    void clear() override {
       _dataElementVector.clear();
       _dataVector.clear();
     }
@@ -206,7 +208,7 @@ class OPENRTI_LOCAL HLAfixedArrayImplementation : public HLAfixedArrayImplementa
       _protoType = 0;
     }
 
-    const DataElement* getPrototype() const { return _protoType; }
+    const DataElement* getPrototype() const override { return _protoType; }
 
     size_t getEncodedLength() const override {
       size_t length = 0;
@@ -279,7 +281,7 @@ class OPENRTI_LOCAL HLAfixedArrayImplementation : public HLAfixedArrayImplementa
       return *(_dataElementVector[index].first);
     }
 
-    bool isSameTypeAs(const HLAfixedArrayImplementationBase& rhs) const {
+    bool isSameTypeAs(const HLAfixedArrayImplementationBase& rhs) const override {
       auto* ref = dynamic_cast<const HLAfixedArrayImplementation*>(&rhs);
       if (_dataElementVector.empty()) {
         return ref->_dataElementVector.empty();

@@ -1,4 +1,4 @@
-add_executable(codegen codegen.cpp momEncodings.cpp RTFederateEncodings.cpp RTFederateObjects.cpp)
+add_executable(codegen codegen.cpp momEncodings.cpp RTFederateEncodings.cpp RTFederateObjects.cpp RTFederateInteractions.cpp)
 if (UNIX)
 target_link_libraries(codegen rti1516ev fedtime1516ev OpenRTI -lpthread)
 else()

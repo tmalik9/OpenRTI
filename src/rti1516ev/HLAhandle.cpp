@@ -19,15 +19,15 @@ class HLAhandle::Implementation : public HLAencodingImplementationBase
     Implementation(const Implementation& ref) : mInternalHandle(ref.mInternalHandle) {}
     Implementation(const OpenRTI::HLAhandle& ref) : mInternalHandle(ref) {}
     Implementation() : mInternalHandle() {}
-    size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const
+    size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
     {
       return mInternalHandle.encodeInto(buffer, bufferSize, offset);
     }
-    size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t offset)
+    size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t offset) override
     {
       return mInternalHandle.decodeFrom(buffer, bufferSize, offset);
     }
-    HLAencodingImplementationBase* clone() const
+    HLAencodingImplementationBase* clone() const override
     {
       return new Implementation(*this);
     }

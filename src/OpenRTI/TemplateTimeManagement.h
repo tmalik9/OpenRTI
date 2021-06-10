@@ -114,7 +114,7 @@ public:
   bool logicalTimeAlreadyPassed(const NativeLogicalTime& logicalTime, std::string& reason) override
   {
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnabled() || _committedOutboundLowerBoundTimeStamp <= _toLogicalTime(_outboundLowerBoundTimeStamp));
-    if (_allowPendingTimeInNextMessageRequest && getIsAnyNextMessageMode())
+    if (InternalTimeManagement::_allowPendingTimeInNextMessageRequest && InternalTimeManagement::getIsAnyNextMessageMode())
     {
       if (_pendingLogicalTime.second) {
         if (logicalTime <= _logicalTimeFactory.getLogicalTime(_pendingLogicalTime.first)) {
