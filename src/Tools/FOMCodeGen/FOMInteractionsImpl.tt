@@ -20,6 +20,7 @@
 <#}#>
 
 #include "<#=InteractionsHeaderFilename#>"
+#include "<#=ObjectsHeaderFilename#>"
 
 <#
 foreach (var namespacePart in FOM.Namespace)
@@ -107,6 +108,14 @@ void <#=interactionClass.Name#>InteractionClass::send(<#=interactionClass.CppPar
       if (parameter.DataType is FOMParser.ArrayDataType || parameter.DataType is FOMParser.FixedRecordDataType)
       {#>
   const <#=parameter.DataType.Encoding#>& <#=parameter.Name#>Encoder = static_cast<const <#=parameter.DataType.Encoding#>&>(<#=parameter.Name#>);
+<#    } else if (parameter.DataType is FOMParser.ObjectInstanceHandleType) {
+        var objectInstanceHandle = parameter.DataType as FOMParser.ObjectInstanceHandleType;
+        if (objectInstanceHandle.ObjectClass != null)
+        { #>
+  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(static_cast<<#=objectInstanceHandle.ObjectClass.Name#>*>(<#=parameter.Name#>)->GetObjectInstanceHandle());
+<#      } else { #>
+  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(<#=parameter.Name#>);
+<#      } #>
 <#    } else { #>
   <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(<#=parameter.Name#>);
 <#    } #>

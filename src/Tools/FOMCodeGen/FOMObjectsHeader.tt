@@ -127,6 +127,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     <#=objectClass.Name#>& operator=(<#=objectClass.Name#>&&) = delete;
     I<#=objectClass.Name#>ObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
 <#
   foreach (var attribute in objectClass.AllAttributes)
   {
@@ -213,7 +214,7 @@ class ObjectClassRegistry : public IObjectClassRegistry
     static ObjectClassRegistry* GetInstance() { return sClassRegistry; }
 
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
-    I<#=objectClass.Name#>ObjectClass* get<#=objectClass.Name#>ObjectClass() const override { return m<#=objectClass.Name#>ObjectClass.get(); }
+    I<#=objectClass.Name#>ObjectClass* Get<#=objectClass.Name#>ObjectClass() const override { return m<#=objectClass.Name#>ObjectClass.get(); }
 <# } #>
 
     void DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);

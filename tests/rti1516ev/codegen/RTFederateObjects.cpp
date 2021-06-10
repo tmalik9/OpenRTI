@@ -2970,7 +2970,7 @@ void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring
   mInstanceNameReservationCallbacks.erase(iter);
 }
 
-IObjectClassRegistry* GetClassRegistry()
+IObjectClassRegistry* GetObjectClassRegistry()
 {
   return ObjectClassRegistry::GetInstance();
 }

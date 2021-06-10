@@ -126,13 +126,13 @@ class IObjectClassRegistry
 {
   public:
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
-    virtual I<#=objectClass.Name#>ObjectClass* get<#=objectClass.Name#>ObjectClass() const = 0;
+    virtual I<#=objectClass.Name#>ObjectClass* Get<#=objectClass.Name#>ObjectClass() const = 0;
 <# } #>
   protected:
     virtual ~IObjectClassRegistry() {}
 }; // class IObjectClassRegistry
 
-IObjectClassRegistry* GetClassRegistry();
+IObjectClassRegistry* GetObjectClassRegistry();
 
 <#
 foreach (var namespacePart in FOM.Namespace)

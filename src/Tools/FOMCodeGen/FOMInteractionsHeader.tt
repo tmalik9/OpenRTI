@@ -129,7 +129,7 @@ class InteractionClassRegistry : public IInteractionClassRegistry
     static InteractionClassRegistry* GetInstance() { return sClassRegistry; }
 
 <# foreach (var interactionClass in FOM.InteractionClasses) { #>
-    I<#=interactionClass.Name#>InteractionClass* get<#=interactionClass.Name#>InteractionClass() const override { return m<#=interactionClass.Name#>InteractionClass.get(); }
+    I<#=interactionClass.Name#>InteractionClass* Get<#=interactionClass.Name#>InteractionClass() const override { return m<#=interactionClass.Name#>InteractionClass.get(); }
 <# } #>
 
     void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters);

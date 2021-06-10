@@ -237,7 +237,7 @@
         <sharing>PublishSubscribe</sharing>
         <parameter>
           <name>ObjInstanceHandle</name>
-          <dataType>HLAhandle</dataType>
+          <dataType class="DOMemberSource">HLAobjectInstanceHandle</dataType>
         </parameter>
         <parameter>
           <name>ConnectionType</name>

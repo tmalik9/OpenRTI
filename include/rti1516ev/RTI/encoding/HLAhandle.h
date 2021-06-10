@@ -63,9 +63,105 @@ class RTI_EXPORT HLAhandle : public DataElement
     size_t getEncodedLength() const override;
     unsigned int getOctetBoundary() const override;
 
-  private:
+  protected:
     class Implementation;
     std::unique_ptr<Implementation> _impl;
+};
+
+class RTI_EXPORT HLAfederateHandle : public HLAhandle
+{
+  public:
+    HLAfederateHandle() = default;
+    HLAfederateHandle(const HLAfederateHandle& ref) = default;
+    HLAfederateHandle(const FederateHandle& handle);
+    ~HLAfederateHandle() noexcept = default;
+    HLAfederateHandle& operator=(const HLAfederateHandle& ref);
+    void set(FederateHandle handle) {
+      HLAhandle::set(handle);
+    }
+    FederateHandle get() const {
+      return HLAhandle::getFederateHandle();
+    }
+};
+
+class RTI_EXPORT HLAobjectClassHandle : public HLAhandle
+{
+  public:
+    HLAobjectClassHandle() = default;
+    HLAobjectClassHandle(const HLAobjectClassHandle& ref) = default;
+    HLAobjectClassHandle(const ObjectClassHandle& handle) : HLAhandle(handle) {}
+    ~HLAobjectClassHandle() noexcept = default;
+    HLAobjectClassHandle& operator=(const HLAobjectClassHandle& ref);
+    void set(ObjectClassHandle handle) {
+      HLAhandle::set(handle);
+    }
+    ObjectClassHandle get() const {
+      return HLAhandle::getObjectClassHandle();
+    }
+};
+
+class RTI_EXPORT HLAobjectInstanceHandle : public HLAhandle
+{
+  public:
+    HLAobjectInstanceHandle() = default;
+    HLAobjectInstanceHandle(const HLAobjectInstanceHandle& ref) = default;
+    HLAobjectInstanceHandle(const ObjectInstanceHandle& handle) : HLAhandle(handle) {}
+    ~HLAobjectInstanceHandle() noexcept = default;
+    HLAobjectInstanceHandle& operator=(const HLAobjectInstanceHandle& ref);
+    void set(ObjectInstanceHandle handle) {
+      HLAhandle::set(handle);
+    }
+    ObjectInstanceHandle get() const {
+      return HLAhandle::getObjectInstanceHandle();
+    }
+};
+
+class RTI_EXPORT HLAattributeHandle : public HLAhandle
+{
+  public:
+    HLAattributeHandle() = default;
+    HLAattributeHandle(const HLAattributeHandle& ref) = default;
+    HLAattributeHandle(const AttributeHandle& handle) : HLAhandle(handle) {}
+    ~HLAattributeHandle() noexcept = default;
+    HLAattributeHandle& operator=(const HLAattributeHandle& ref);
+    void set(AttributeHandle handle) {
+      HLAhandle::set(handle);
+    }
+    AttributeHandle get() const {
+      return HLAhandle::getAttributeHandle();
+    }
+};
+
+class RTI_EXPORT HLAinteractionClassHandle : public HLAhandle
+{
+public:
+  HLAinteractionClassHandle() = default;
+  HLAinteractionClassHandle(const HLAinteractionClassHandle& ref) = default;
+  HLAinteractionClassHandle(const InteractionClassHandle& handle) : HLAhandle(handle) {}
+  ~HLAinteractionClassHandle() noexcept = default;
+  HLAinteractionClassHandle& operator=(const HLAinteractionClassHandle& ref);
+  void set(InteractionClassHandle handle) {
+    HLAhandle::set(handle);
+  }
+  InteractionClassHandle get() const {
+    return HLAhandle::getInteractionClassHandle();
+  }
+};
+
+class RTI_EXPORT HLAparameterHandle : public HLAhandle
+{
+public:
+  HLAparameterHandle() = default;
+  HLAparameterHandle(const HLAparameterHandle& ref) = default;
+  HLAparameterHandle(const InteractionClassHandle& handle) : HLAhandle(handle) {}
+  ~HLAparameterHandle() noexcept = default;
+  HLAparameterHandle& operator=(const HLAparameterHandle& ref);
+  void set(ParameterHandle handle) {
+    HLAhandle::set(handle);
+  }
+  ParameterHandle get() const {
+    return HLAhandle::getParameterHandle();
+  }
 };
 
 }

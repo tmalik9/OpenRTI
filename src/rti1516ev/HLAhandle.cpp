@@ -239,4 +239,39 @@ unsigned int HLAhandle::getOctetBoundary() const
   return _impl->mInternalHandle.getOctetBoundary();
 }
 
+rti1516ev::HLAfederateHandle& HLAfederateHandle::operator=(const HLAfederateHandle& ref)
+{
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref._impl.get()));
+  return *this;
+}
+rti1516ev::HLAobjectClassHandle& HLAobjectClassHandle::operator=(const HLAobjectClassHandle& ref)
+{
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref._impl.get()));
+  return *this;
+}
+
+rti1516ev::HLAobjectInstanceHandle& HLAobjectInstanceHandle::operator=(const HLAobjectInstanceHandle& ref)
+{
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref._impl.get()));
+  return *this;
+}
+
+rti1516ev::HLAattributeHandle& HLAattributeHandle::operator=(const HLAattributeHandle& ref)
+{
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref._impl.get()));
+  return *this;
+}
+
+rti1516ev::HLAinteractionClassHandle& HLAinteractionClassHandle::operator=(const HLAinteractionClassHandle& ref)
+{
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref._impl.get()));
+  return *this;
+}
+
+rti1516ev::HLAparameterHandle& HLAparameterHandle::operator=(const HLAparameterHandle& ref)
+{
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*ref._impl.get()));
+  return *this;
+}
+
 }

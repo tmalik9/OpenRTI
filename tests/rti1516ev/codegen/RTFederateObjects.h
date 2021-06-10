@@ -62,6 +62,7 @@ class HLAobjectRoot : public IHLAobjectRoot
     HLAobjectRoot& operator=(HLAobjectRoot&&) = delete;
     IHLAobjectRootObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
     // IHLAobjectRoot
 
@@ -134,6 +135,7 @@ class SystemVariable : public ISystemVariable
     SystemVariable& operator=(SystemVariable&&) = delete;
     ISystemVariableObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute Value : HLAopaqueData
     std::vector<uint8_t> GetValue() const override;
@@ -227,6 +229,7 @@ class ValueEntity : public IValueEntity
     ValueEntity& operator=(ValueEntity&&) = delete;
     IValueEntityObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute Value : HLAopaqueData
     std::vector<uint8_t> GetValue() const override;
@@ -328,6 +331,7 @@ class DOMemberSource : public IDOMemberSource
     DOMemberSource& operator=(DOMemberSource&&) = delete;
     IDOMemberSourceObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute DOSourceMemberName : HLAASCIIstring
     std::string GetDOSourceMemberName() const override;
@@ -435,6 +439,7 @@ class DOMemberTarget : public IDOMemberTarget
     DOMemberTarget& operator=(DOMemberTarget&&) = delete;
     IDOMemberTargetObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute DOTargetMemberName : HLAASCIIstring
     std::string GetDOTargetMemberName() const override;
@@ -533,6 +538,7 @@ class BusManagement : public IBusManagement
     BusManagement& operator=(BusManagement&&) = delete;
     IBusManagementObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
     std::string GetNetworkID() const override;
@@ -635,6 +641,7 @@ class BusManagementCan : public IBusManagementCan
     BusManagementCan& operator=(BusManagementCan&&) = delete;
     IBusManagementCanObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
     std::string GetNetworkID() const override;
@@ -752,6 +759,7 @@ class BusController : public IBusController
     BusController& operator=(BusController&&) = delete;
     IBusControllerObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
     std::string GetNetworkID() const override;
@@ -881,6 +889,7 @@ class BusControllerCan : public IBusControllerCan
     BusControllerCan& operator=(BusControllerCan&&) = delete;
     IBusControllerCanObjectClass* GetObjectClass() const { return mObjectClass; }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
     std::string GetNetworkID() const override;
@@ -984,15 +993,15 @@ class ObjectClassRegistry : public IObjectClassRegistry
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
     static ObjectClassRegistry* GetInstance() { return sClassRegistry; }
 
-    IHLAobjectRootObjectClass* getHLAobjectRootObjectClass() const override { return mHLAobjectRootObjectClass.get(); }
-    ISystemVariableObjectClass* getSystemVariableObjectClass() const override { return mSystemVariableObjectClass.get(); }
-    IValueEntityObjectClass* getValueEntityObjectClass() const override { return mValueEntityObjectClass.get(); }
-    IDOMemberSourceObjectClass* getDOMemberSourceObjectClass() const override { return mDOMemberSourceObjectClass.get(); }
-    IDOMemberTargetObjectClass* getDOMemberTargetObjectClass() const override { return mDOMemberTargetObjectClass.get(); }
-    IBusManagementObjectClass* getBusManagementObjectClass() const override { return mBusManagementObjectClass.get(); }
-    IBusManagementCanObjectClass* getBusManagementCanObjectClass() const override { return mBusManagementCanObjectClass.get(); }
-    IBusControllerObjectClass* getBusControllerObjectClass() const override { return mBusControllerObjectClass.get(); }
-    IBusControllerCanObjectClass* getBusControllerCanObjectClass() const override { return mBusControllerCanObjectClass.get(); }
+    IHLAobjectRootObjectClass* GetHLAobjectRootObjectClass() const override { return mHLAobjectRootObjectClass.get(); }
+    ISystemVariableObjectClass* GetSystemVariableObjectClass() const override { return mSystemVariableObjectClass.get(); }
+    IValueEntityObjectClass* GetValueEntityObjectClass() const override { return mValueEntityObjectClass.get(); }
+    IDOMemberSourceObjectClass* GetDOMemberSourceObjectClass() const override { return mDOMemberSourceObjectClass.get(); }
+    IDOMemberTargetObjectClass* GetDOMemberTargetObjectClass() const override { return mDOMemberTargetObjectClass.get(); }
+    IBusManagementObjectClass* GetBusManagementObjectClass() const override { return mBusManagementObjectClass.get(); }
+    IBusManagementCanObjectClass* GetBusManagementCanObjectClass() const override { return mBusManagementCanObjectClass.get(); }
+    IBusControllerObjectClass* GetBusControllerObjectClass() const override { return mBusControllerObjectClass.get(); }
+    IBusControllerCanObjectClass* GetBusControllerCanObjectClass() const override { return mBusControllerCanObjectClass.get(); }
 
     void DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);

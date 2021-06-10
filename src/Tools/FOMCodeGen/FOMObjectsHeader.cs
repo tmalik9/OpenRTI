@@ -527,9 +527,11 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line default
             #line hidden
             this.Write("ObjectClass* GetObjectClass() const { return mObjectClass; }\r\n    std::wstring Ge" +
-                    "tObjectInstanceName() const override { return mInstanceName; }\r\n");
+                    "tObjectInstanceName() const override { return mInstanceName; }\r\n    rti1516ev::O" +
+                    "bjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHand" +
+                    "le; }\r\n");
             
-            #line 130 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 131 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
 
   foreach (var attribute in objectClass.AllAttributes)
   {
@@ -541,63 +543,63 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line hidden
             this.Write("    // attribute ");
             
-            #line 135 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 136 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 135 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 136 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n    ");
             
-            #line 136 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 137 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" Get");
             
-            #line 136 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 137 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("() const override;\r\n    void Set");
             
-            #line 137 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 138 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 137 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 138 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write(" newValue) override;\r\n");
             
-            #line 138 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 139 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
   } else { 
             
             #line default
             #line hidden
             this.Write("    // attribute ");
             
-            #line 139 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 140 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : no data type\r\n");
             
-            #line 140 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 141 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
 
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.AllAttributes)
@@ -607,14 +609,14 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line hidden
             this.Write("    // I");
             
-            #line 144 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 145 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 145 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 146 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  if (objectClass.HasValidAttributes) { 
             
             #line default
@@ -626,7 +628,7 @@ foreach (var objectClass in FOM.ObjectClasses)
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
 ");
             
-            #line 151 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 152 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  if (objectClass.ChildClasses.Count == 0) { 
             
             #line default
@@ -634,13 +636,13 @@ foreach (var objectClass in FOM.ObjectClasses)
             this.Write("    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;\r\n    v" +
                     "oid UnregisterUpdateCallback(uint32_t callbackToken) override;\r\n");
             
-            #line 154 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 155 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } // if (objectClass.ChildClasses.Count == 0) 
             
             #line default
             #line hidden
             
-            #line 155 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 156 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } // if (objectClass.HasValidAttributes) 
             
             #line default
@@ -648,7 +650,7 @@ foreach (var objectClass in FOM.ObjectClasses)
             this.Write("\r\n    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;\r\n    rti1" +
                     "516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;\r\n");
             
-            #line 159 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 160 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  if (objectClass.HasValidAttributes) { 
             
             #line default
@@ -657,7 +659,7 @@ foreach (var objectClass in FOM.ObjectClasses)
                     "tes);\r\n    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attr" +
                     "ibutes);\r\n");
             
-            #line 162 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 163 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } 
             
             #line default
@@ -665,28 +667,28 @@ foreach (var objectClass in FOM.ObjectClasses)
             this.Write("    bool IsValid() const { return mObjectInstanceHandle.isValid(); }\r\n    bool Is" +
                     "Owner() const { return mIsOwner; }\r\n  private:\r\n    friend class ");
             
-            #line 166 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 167 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass;\r\n\r\n    ");
             
-            #line 168 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 169 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("();\r\n    ");
             
-            #line 169 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 170 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 169 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 170 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -694,21 +696,21 @@ foreach (var objectClass in FOM.ObjectClasses)
             this.Write("ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassa" +
                     "dor* ambassador);\r\n\r\n");
             
-            #line 171 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 172 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { 
             
             #line default
             #line hidden
             this.Write("    void ExecuteUpdateCallbacks();\r\n");
             
-            #line 173 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 174 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 174 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 175 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -717,7 +719,7 @@ foreach (var objectClass in FOM.ObjectClasses)
                     "bassador* mRtiAmbassador;\r\n    rti1516ev::ObjectInstanceHandle mObjectInstanceHa" +
                     "ndle;\r\n    bool mIsOwner = false;\r\n");
             
-            #line 179 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 180 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  if (objectClass.HasValidAttributes) { 
             
             #line default
@@ -726,13 +728,13 @@ foreach (var objectClass in FOM.ObjectClasses)
                     ";\r\n    // to be sent with next updateAttributes\r\n    AttributeBits mDirty = kNon" +
                     "e;\r\n");
             
-            #line 184 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 185 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 185 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 186 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { 
             
             #line default
@@ -740,14 +742,14 @@ foreach (var objectClass in FOM.ObjectClasses)
             this.Write("    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;\r\n    uint32_t mLastC" +
                     "allbackToken = 0;\r\n");
             
-            #line 188 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 189 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    // Attribute value encoders\r\n");
             
-            #line 190 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 191 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  
   foreach (var attribute in objectClass.AllAttributes)
   {
@@ -759,35 +761,35 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line hidden
             this.Write("    // attribute ");
             
-            #line 195 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 196 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 195 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 196 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n    ");
             
-            #line 196 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 197 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write(" m");
             
-            #line 196 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 197 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 197 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 198 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
   } else {
 
             
@@ -795,14 +797,14 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line hidden
             this.Write("    // attribute ");
             
-            #line 198 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 199 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : no data type\r\n");
             
-            #line 199 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 200 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
   
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
@@ -812,7 +814,7 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line hidden
             this.Write("};\r\n\r\n");
             
-            #line 205 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 206 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } // foreach (var objectClass in FOM.ObjectClasses) 
             
             #line default
@@ -829,35 +831,35 @@ class ObjectClassRegistry : public IObjectClassRegistry
 
 ");
             
-            #line 215 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 216 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  foreach (var objectClass in FOM.ObjectClasses) { 
             
             #line default
             #line hidden
             this.Write("    I");
             
-            #line 216 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 217 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
-            this.Write("ObjectClass* get");
+            this.Write("ObjectClass* Get");
             
-            #line 216 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 217 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass() const override { return m");
             
-            #line 216 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 217 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass.get(); }\r\n");
             
-            #line 217 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 218 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } 
             
             #line default
@@ -877,35 +879,35 @@ class ObjectClassRegistry : public IObjectClassRegistry
     rti1516ev::RTIambassador* mRtiAmbassador;
 ");
             
-            #line 231 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 232 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  foreach (var objectClass in FOM.ObjectClasses) { 
             
             #line default
             #line hidden
             this.Write("    std::unique_ptr<");
             
-            #line 232 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 233 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass> m");
             
-            #line 232 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 233 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass;\r\n");
             
-            #line 233 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 234 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("}; // class ObjectClassRegistry\r\n\r\n");
             
-            #line 236 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 237 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
 
 foreach (var namespacePart in FOM.Namespace)
 {
@@ -915,14 +917,14 @@ foreach (var namespacePart in FOM.Namespace)
             #line hidden
             this.Write("} // namespace ");
             
-            #line 240 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 241 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 241 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 242 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
   } 
             
             #line default

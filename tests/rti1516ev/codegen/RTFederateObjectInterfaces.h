@@ -385,20 +385,20 @@ class IBusControllerCan : public IBusController
 class IObjectClassRegistry
 {
   public:
-    virtual IHLAobjectRootObjectClass* getHLAobjectRootObjectClass() const = 0;
-    virtual ISystemVariableObjectClass* getSystemVariableObjectClass() const = 0;
-    virtual IValueEntityObjectClass* getValueEntityObjectClass() const = 0;
-    virtual IDOMemberSourceObjectClass* getDOMemberSourceObjectClass() const = 0;
-    virtual IDOMemberTargetObjectClass* getDOMemberTargetObjectClass() const = 0;
-    virtual IBusManagementObjectClass* getBusManagementObjectClass() const = 0;
-    virtual IBusManagementCanObjectClass* getBusManagementCanObjectClass() const = 0;
-    virtual IBusControllerObjectClass* getBusControllerObjectClass() const = 0;
-    virtual IBusControllerCanObjectClass* getBusControllerCanObjectClass() const = 0;
+    virtual IHLAobjectRootObjectClass* GetHLAobjectRootObjectClass() const = 0;
+    virtual ISystemVariableObjectClass* GetSystemVariableObjectClass() const = 0;
+    virtual IValueEntityObjectClass* GetValueEntityObjectClass() const = 0;
+    virtual IDOMemberSourceObjectClass* GetDOMemberSourceObjectClass() const = 0;
+    virtual IDOMemberTargetObjectClass* GetDOMemberTargetObjectClass() const = 0;
+    virtual IBusManagementObjectClass* GetBusManagementObjectClass() const = 0;
+    virtual IBusManagementCanObjectClass* GetBusManagementCanObjectClass() const = 0;
+    virtual IBusControllerObjectClass* GetBusControllerObjectClass() const = 0;
+    virtual IBusControllerCanObjectClass* GetBusControllerCanObjectClass() const = 0;
   protected:
     virtual ~IObjectClassRegistry() {}
 }; // class IObjectClassRegistry
 
-IObjectClassRegistry* GetClassRegistry();
+IObjectClassRegistry* GetObjectClassRegistry();
 
 } // namespace NDistSimIB
 } // namespace NRTFederateEncoding

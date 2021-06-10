@@ -493,7 +493,7 @@ foreach (var objectClass in FOM.ObjectClasses)
             
             #line default
             #line hidden
-            this.Write("ObjectClass* get");
+            this.Write("ObjectClass* Get");
             
             #line 129 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
@@ -508,7 +508,7 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line default
             #line hidden
             this.Write("  protected:\r\n    virtual ~IObjectClassRegistry() {}\r\n}; // class IObjectClassReg" +
-                    "istry\r\n\r\nIObjectClassRegistry* GetClassRegistry();\r\n\r\n");
+                    "istry\r\n\r\nIObjectClassRegistry* GetObjectClassRegistry();\r\n\r\n");
             
             #line 137 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
 

@@ -447,7 +447,7 @@ class InteractionClassRegistry : public IInteractionClassRegistry
             
             #line default
             #line hidden
-            this.Write("InteractionClass* get");
+            this.Write("InteractionClass* Get");
             
             #line 132 "D:\vfs\OpenRTI-codegen\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));

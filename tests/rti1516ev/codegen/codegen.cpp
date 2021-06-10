@@ -14,6 +14,7 @@
 #include "RTI1516ETestLib.h"
 
 #include "RTFederateObjects.h"
+#include "RTFederateInteractions.h"
 
 template<typename TInputIter>
 static inline std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercase = true, bool insert_spaces = false)
@@ -149,6 +150,7 @@ public:
     objectClassRegistry.ReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
   }
   NDistSimIB::NRTFederateEncoding::ObjectClassRegistry objectClassRegistry;
+  NDistSimIB::NRTFederateEncoding::InteractionClassRegistry interactionClassRegistry;
 };
 
 bool testRTFederate(int argc, char* argv[])
@@ -219,7 +221,17 @@ bool testRTFederate(int argc, char* argv[])
     return false;
   }
   ambassador.objectClassRegistry.Initialize(ambassador.getRtiAmbassador());
-  auto* busControllerObjectClass = ambassador.objectClassRegistry.getBusControllerCanObjectClass();
+  ambassador.interactionClassRegistry.Initialize(ambassador.getRtiAmbassador());
+
+  auto* canMessageInteractionClass = ambassador.interactionClassRegistry.GetCANMessageInteractionClass();
+  canMessageInteractionClass->RegisterReceiveCallback([](bool IsRequest, const std::string& ChannelName, NDistSimIB::NRTFederateEncoding::BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const NDistSimIB::NRTFederateEncoding::CANFrame& Frame)
+  {
+  });
+  canMessageInteractionClass->Publish();
+  canMessageInteractionClass->Subscribe();
+  NDistSimIB::NRTFederateEncoding::CANFrameEncoding canFrame;
+  canMessageInteractionClass->send(false, "CAN1", NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), HLAhandle(ObjectInstanceHandle()), HLAhandle(ObjectInstanceHandle()), 0x100, canFrame);
+  auto* busControllerObjectClass = ambassador.objectClassRegistry.GetBusControllerCanObjectClass();
   busControllerObjectClass->Publish();
   busControllerObjectClass->Subscribe();
   NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan = busControllerObjectClass->CreateObjectInstance(L"CAN1");
@@ -244,6 +256,7 @@ bool testRTFederate(int argc, char* argv[])
   {
     ambassador.getRtiAmbassador()->evokeCallback(0.5);
   }
+
 
 
   busControllerCan->UnregisterUpdateCallback(callbackToken);

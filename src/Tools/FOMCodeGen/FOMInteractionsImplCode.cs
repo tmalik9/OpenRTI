@@ -8,10 +8,12 @@
   {
     FOMParser FOM { get; set; }
     string InteractionsHeaderFilename { get; set; }
-    public FOMInteractionsImpl(FOMParser fom, string objectsHeaderFilename)
+    string ObjectsHeaderFilename { get; set; }
+    public FOMInteractionsImpl(FOMParser fom, string interactionsHeaderFilename, string objectsHeaderFilename)
     {
       FOM = fom;
-      InteractionsHeaderFilename = System.IO.Path.GetFileName(objectsHeaderFilename);
+      InteractionsHeaderFilename = System.IO.Path.GetFileName(interactionsHeaderFilename);
+      ObjectsHeaderFilename = System.IO.Path.GetFileName(objectsHeaderFilename);
     }
   }
   }

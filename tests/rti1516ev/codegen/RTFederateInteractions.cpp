@@ -9,6 +9,7 @@
 #include "RTI/time/HLAinteger64Time.h"
 
 #include "RTFederateInteractions.h"
+#include "RTFederateObjects.h"
 
 namespace NDistSimIB {
 namespace NRTFederateEncoding {
@@ -536,7 +537,7 @@ DOMemberTransmitDataInteractionClass::DOMemberTransmitDataInteractionClass(rti15
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.DOMemberTransmitData");
-  // parameter ObjInstanceHandle : HLAhandle
+  // parameter ObjInstanceHandle : HLAobjectInstanceHandle.DOMemberSource
   mObjInstanceHandleParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"ObjInstanceHandle");
   // parameter ConnectionType : HLAASCIIstring
   mConnectionTypeParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"ConnectionType");
@@ -581,10 +582,10 @@ void DOMemberTransmitDataInteractionClass::Unsubscribe()
   }
 }
 
-void DOMemberTransmitDataInteractionClass::send(rti1516ev::HLAhandle ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes)
+void DOMemberTransmitDataInteractionClass::send(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes)
 {
   rti1516ev::ParameterHandleValueMap parameters;
-  rti1516ev::HLAhandle ObjInstanceHandleEncoder(ObjInstanceHandle);
+  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleEncoder(static_cast<DOMemberSource*>(ObjInstanceHandle)->GetObjectInstanceHandle());
   parameters.insert(std::make_pair(GetObjInstanceHandleParameterHandle(), ObjInstanceHandleEncoder.encode()));
   rti1516ev::HLAASCIIstring ConnectionTypeEncoder(ConnectionType);
   parameters.insert(std::make_pair(GetConnectionTypeParameterHandle(), ConnectionTypeEncoder.encode()));
@@ -595,7 +596,7 @@ void DOMemberTransmitDataInteractionClass::send(rti1516ev::HLAhandle ObjInstance
 
 void DOMemberTransmitDataInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
 {
-  rti1516ev::HLAhandle ObjInstanceHandleDecoder;
+  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleDecoder;
   rti1516ev::ParameterHandleValueMap::const_iterator ObjInstanceHandleIter = parameters.find(GetObjInstanceHandleParameterHandle());
   if (ObjInstanceHandleIter != parameters.end())
   {
@@ -615,13 +616,13 @@ void DOMemberTransmitDataInteractionClass::ReceiveInteraction(const rti1516ev::P
   }
   for (auto& entry : _receiveCallbacks) {
     auto& callback = entry.second;
-    callback(ObjInstanceHandleDecoder, ConnectionTypeDecoder.get(), DataBytesDecoder.get());
+    callback(static_cast<DOMemberSourceObjectClass*>(ObjectClassRegistry::GetInstance()->GetDOMemberSourceObjectClass())->GetObjectInstance(ObjInstanceHandleDecoder.get()), ConnectionTypeDecoder.get(), DataBytesDecoder.get());
   }
 }
 
 void DOMemberTransmitDataInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, rti1516ev::OrderType /*receivedOrder*/)
 {
-  rti1516ev::HLAhandle ObjInstanceHandleDecoder;
+  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleDecoder;
   rti1516ev::ParameterHandleValueMap::const_iterator ObjInstanceHandleIter = parameters.find(GetObjInstanceHandleParameterHandle());
   if (ObjInstanceHandleIter != parameters.end())
   {
@@ -641,7 +642,7 @@ void DOMemberTransmitDataInteractionClass::ReceiveInteraction(const rti1516ev::P
   }
   for (auto& entry : _receiveCallbacksWithTime) {
     auto& callback = entry.second;
-    callback(ObjInstanceHandleDecoder, ConnectionTypeDecoder.get(), DataBytesDecoder.get(), static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
+    callback(static_cast<DOMemberSourceObjectClass*>(ObjectClassRegistry::GetInstance()->GetDOMemberSourceObjectClass())->GetObjectInstance(ObjInstanceHandleDecoder.get()), ConnectionTypeDecoder.get(), DataBytesDecoder.get(), static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
   }
 }
 

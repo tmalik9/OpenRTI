@@ -24,7 +24,6 @@ namespace <#=namespacePart#> {
 foreach (var interactionClass in FOM.InteractionClasses)
 {
 #>
-class I<#=interactionClass.Name#>;
 class I<#=interactionClass.Name#>InteractionClass
 {
   public:
@@ -45,7 +44,7 @@ class IInteractionClassRegistry
 {
   public:
 <# foreach (var interactionClass in FOM.InteractionClasses) { #>
-    virtual I<#=interactionClass.Name#>InteractionClass* get<#=interactionClass.Name#>InteractionClass() const = 0;
+    virtual I<#=interactionClass.Name#>InteractionClass* Get<#=interactionClass.Name#>InteractionClass() const = 0;
 <# } #>
   protected:
     virtual ~IInteractionClassRegistry() {}

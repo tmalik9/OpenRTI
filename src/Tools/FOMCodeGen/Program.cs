@@ -93,11 +93,11 @@ namespace FOMCodeGen
         String interactionInterfacesHeaderContent = interactionInterfacesHeader.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(interactionInterfacesHeaderFilename, interactionInterfacesHeaderContent);
 
-        FOMInteractionsHeader interactionsHeader = new FOMInteractionsHeader(fom, interactionsHeaderFilename, interactionInterfacesHeaderFilename, encodingsHeaderFilename);
+        FOMInteractionsHeader interactionsHeader = new FOMInteractionsHeader(fom, interactionsHeaderFilename, interactionInterfacesHeaderFilename, objectsHeaderFilename, encodingsHeaderFilename);
         String interactionsHeaderContent = interactionsHeader.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(interactionsHeaderFilename, interactionsHeaderContent);
 
-        FOMInteractionsImpl interactionsImpl = new FOMInteractionsImpl(fom, interactionsHeaderFilename);
+        FOMInteractionsImpl interactionsImpl = new FOMInteractionsImpl(fom, interactionsHeaderFilename, objectsHeaderFilename);
         String interactionsImplContent = interactionsImpl.TransformText();
         if (!doDryRun) System.IO.File.WriteAllText(interactionsImplFilename, interactionsImplContent);
       }

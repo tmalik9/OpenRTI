@@ -226,7 +226,7 @@ class DOMemberTransmitDataInteractionClass : public IDOMemberTransmitDataInterac
     void Unpublish() override;
     void Subscribe() override;
     void Unsubscribe() override;
-    void send(rti1516ev::HLAhandle ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) override;
+    void send(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) override;
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -235,7 +235,7 @@ class DOMemberTransmitDataInteractionClass : public IDOMemberTransmitDataInterac
     uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
     DOMemberTransmitDataInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
 
-    // parameter ObjInstanceHandle : HLAhandle
+    // parameter ObjInstanceHandle : HLAobjectInstanceHandle.DOMemberSource
     rti1516ev::ParameterHandle GetObjInstanceHandleParameterHandle() const { return mObjInstanceHandleParameterHandle; }
     // parameter ConnectionType : HLAASCIIstring
     rti1516ev::ParameterHandle GetConnectionTypeParameterHandle() const { return mConnectionTypeParameterHandle; }
@@ -250,7 +250,7 @@ class DOMemberTransmitDataInteractionClass : public IDOMemberTransmitDataInterac
     bool mPublished = false;
     bool mSubscribed = false;
     // Parameter handles
-    // parameter ObjInstanceHandle : HLAhandle
+    // parameter ObjInstanceHandle : HLAobjectInstanceHandle.DOMemberSource
     rti1516ev::ParameterHandle mObjInstanceHandleParameterHandle;
     // parameter ConnectionType : HLAASCIIstring
     rti1516ev::ParameterHandle mConnectionTypeParameterHandle;
@@ -885,24 +885,24 @@ class InteractionClassRegistry : public IInteractionClassRegistry
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
     static InteractionClassRegistry* GetInstance() { return sClassRegistry; }
 
-    IHLAinteractionRootInteractionClass* getHLAinteractionRootInteractionClass() const override { return mHLAinteractionRootInteractionClass.get(); }
-    IMeasurementInitInteractionClass* getMeasurementInitInteractionClass() const override { return mMeasurementInitInteractionClass.get(); }
-    IMeasurementStopInteractionClass* getMeasurementStopInteractionClass() const override { return mMeasurementStopInteractionClass.get(); }
-    IKeyEventInteractionClass* getKeyEventInteractionClass() const override { return mKeyEventInteractionClass.get(); }
-    ITextLogInteractionClass* getTextLogInteractionClass() const override { return mTextLogInteractionClass.get(); }
-    IDOMemberTransmitDataInteractionClass* getDOMemberTransmitDataInteractionClass() const override { return mDOMemberTransmitDataInteractionClass.get(); }
-    ISystemVariableUpdateInteractionClass* getSystemVariableUpdateInteractionClass() const override { return mSystemVariableUpdateInteractionClass.get(); }
-    ISystemVariableModificationInteractionClass* getSystemVariableModificationInteractionClass() const override { return mSystemVariableModificationInteractionClass.get(); }
-    IValueEntityUpdateInteractionClass* getValueEntityUpdateInteractionClass() const override { return mValueEntityUpdateInteractionClass.get(); }
-    IBusMessageInteractionClass* getBusMessageInteractionClass() const override { return mBusMessageInteractionClass.get(); }
-    IEthPacketInteractionClass* getEthPacketInteractionClass() const override { return mEthPacketInteractionClass.get(); }
-    IEthPacketErrorInteractionClass* getEthPacketErrorInteractionClass() const override { return mEthPacketErrorInteractionClass.get(); }
-    IEthPacketErrorForwardedInteractionClass* getEthPacketErrorForwardedInteractionClass() const override { return mEthPacketErrorForwardedInteractionClass.get(); }
-    IEthForwardedPacketInteractionClass* getEthForwardedPacketInteractionClass() const override { return mEthForwardedPacketInteractionClass.get(); }
-    IEthStatusInteractionClass* getEthStatusInteractionClass() const override { return mEthStatusInteractionClass.get(); }
-    ICANMessageInteractionClass* getCANMessageInteractionClass() const override { return mCANMessageInteractionClass.get(); }
-    ICANErrorFrameInteractionClass* getCANErrorFrameInteractionClass() const override { return mCANErrorFrameInteractionClass.get(); }
-    IPythonCommandInteractionClass* getPythonCommandInteractionClass() const override { return mPythonCommandInteractionClass.get(); }
+    IHLAinteractionRootInteractionClass* GetHLAinteractionRootInteractionClass() const override { return mHLAinteractionRootInteractionClass.get(); }
+    IMeasurementInitInteractionClass* GetMeasurementInitInteractionClass() const override { return mMeasurementInitInteractionClass.get(); }
+    IMeasurementStopInteractionClass* GetMeasurementStopInteractionClass() const override { return mMeasurementStopInteractionClass.get(); }
+    IKeyEventInteractionClass* GetKeyEventInteractionClass() const override { return mKeyEventInteractionClass.get(); }
+    ITextLogInteractionClass* GetTextLogInteractionClass() const override { return mTextLogInteractionClass.get(); }
+    IDOMemberTransmitDataInteractionClass* GetDOMemberTransmitDataInteractionClass() const override { return mDOMemberTransmitDataInteractionClass.get(); }
+    ISystemVariableUpdateInteractionClass* GetSystemVariableUpdateInteractionClass() const override { return mSystemVariableUpdateInteractionClass.get(); }
+    ISystemVariableModificationInteractionClass* GetSystemVariableModificationInteractionClass() const override { return mSystemVariableModificationInteractionClass.get(); }
+    IValueEntityUpdateInteractionClass* GetValueEntityUpdateInteractionClass() const override { return mValueEntityUpdateInteractionClass.get(); }
+    IBusMessageInteractionClass* GetBusMessageInteractionClass() const override { return mBusMessageInteractionClass.get(); }
+    IEthPacketInteractionClass* GetEthPacketInteractionClass() const override { return mEthPacketInteractionClass.get(); }
+    IEthPacketErrorInteractionClass* GetEthPacketErrorInteractionClass() const override { return mEthPacketErrorInteractionClass.get(); }
+    IEthPacketErrorForwardedInteractionClass* GetEthPacketErrorForwardedInteractionClass() const override { return mEthPacketErrorForwardedInteractionClass.get(); }
+    IEthForwardedPacketInteractionClass* GetEthForwardedPacketInteractionClass() const override { return mEthForwardedPacketInteractionClass.get(); }
+    IEthStatusInteractionClass* GetEthStatusInteractionClass() const override { return mEthStatusInteractionClass.get(); }
+    ICANMessageInteractionClass* GetCANMessageInteractionClass() const override { return mCANMessageInteractionClass.get(); }
+    ICANErrorFrameInteractionClass* GetCANErrorFrameInteractionClass() const override { return mCANErrorFrameInteractionClass.get(); }
+    IPythonCommandInteractionClass* GetPythonCommandInteractionClass() const override { return mPythonCommandInteractionClass.get(); }
 
     void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters);
 

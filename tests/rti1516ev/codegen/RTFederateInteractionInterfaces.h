@@ -12,7 +12,6 @@
 namespace NDistSimIB {
 namespace NRTFederateEncoding {
 
-class IHLAinteractionRoot;
 class IHLAinteractionRootInteractionClass
 {
   public:
@@ -27,7 +26,6 @@ class IHLAinteractionRootInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IMeasurementInit;
 class IMeasurementInitInteractionClass
 {
   public:
@@ -42,7 +40,6 @@ class IMeasurementInitInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IMeasurementStop;
 class IMeasurementStopInteractionClass
 {
   public:
@@ -57,7 +54,6 @@ class IMeasurementStopInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IKeyEvent;
 class IKeyEventInteractionClass
 {
   public:
@@ -72,7 +68,6 @@ class IKeyEventInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class ITextLog;
 class ITextLogInteractionClass
 {
   public:
@@ -87,7 +82,6 @@ class ITextLogInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IDOMemberTransmitData;
 class IDOMemberTransmitDataInteractionClass
 {
   public:
@@ -95,14 +89,13 @@ class IDOMemberTransmitDataInteractionClass
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
-    virtual void send(rti1516ev::HLAhandle ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) = 0;
-    using ReceiveCallback = std::function<void(rti1516ev::HLAhandle ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes)>;
-    using ReceiveCallbackWithTime = std::function<void(rti1516ev::HLAhandle ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time)>;
+    virtual void send(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) = 0;
+    using ReceiveCallback = std::function<void(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes)>;
+    using ReceiveCallbackWithTime = std::function<void(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class ISystemVariableUpdate;
 class ISystemVariableUpdateInteractionClass
 {
   public:
@@ -117,7 +110,6 @@ class ISystemVariableUpdateInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class ISystemVariableModification;
 class ISystemVariableModificationInteractionClass
 {
   public:
@@ -132,7 +124,6 @@ class ISystemVariableModificationInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IValueEntityUpdate;
 class IValueEntityUpdateInteractionClass
 {
   public:
@@ -147,7 +138,6 @@ class IValueEntityUpdateInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IBusMessage;
 class IBusMessageInteractionClass
 {
   public:
@@ -162,7 +152,6 @@ class IBusMessageInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IEthPacket;
 class IEthPacketInteractionClass
 {
   public:
@@ -177,7 +166,6 @@ class IEthPacketInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IEthPacketError;
 class IEthPacketErrorInteractionClass
 {
   public:
@@ -192,7 +180,6 @@ class IEthPacketErrorInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IEthPacketErrorForwarded;
 class IEthPacketErrorForwardedInteractionClass
 {
   public:
@@ -207,7 +194,6 @@ class IEthPacketErrorForwardedInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IEthForwardedPacket;
 class IEthForwardedPacketInteractionClass
 {
   public:
@@ -222,7 +208,6 @@ class IEthForwardedPacketInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IEthStatus;
 class IEthStatusInteractionClass
 {
   public:
@@ -237,7 +222,6 @@ class IEthStatusInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class ICANMessage;
 class ICANMessageInteractionClass
 {
   public:
@@ -252,7 +236,6 @@ class ICANMessageInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class ICANErrorFrame;
 class ICANErrorFrameInteractionClass
 {
   public:
@@ -267,7 +250,6 @@ class ICANErrorFrameInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
-class IPythonCommand;
 class IPythonCommandInteractionClass
 {
   public:
@@ -286,24 +268,24 @@ class IPythonCommandInteractionClass
 class IInteractionClassRegistry
 {
   public:
-    virtual IHLAinteractionRootInteractionClass* getHLAinteractionRootInteractionClass() const = 0;
-    virtual IMeasurementInitInteractionClass* getMeasurementInitInteractionClass() const = 0;
-    virtual IMeasurementStopInteractionClass* getMeasurementStopInteractionClass() const = 0;
-    virtual IKeyEventInteractionClass* getKeyEventInteractionClass() const = 0;
-    virtual ITextLogInteractionClass* getTextLogInteractionClass() const = 0;
-    virtual IDOMemberTransmitDataInteractionClass* getDOMemberTransmitDataInteractionClass() const = 0;
-    virtual ISystemVariableUpdateInteractionClass* getSystemVariableUpdateInteractionClass() const = 0;
-    virtual ISystemVariableModificationInteractionClass* getSystemVariableModificationInteractionClass() const = 0;
-    virtual IValueEntityUpdateInteractionClass* getValueEntityUpdateInteractionClass() const = 0;
-    virtual IBusMessageInteractionClass* getBusMessageInteractionClass() const = 0;
-    virtual IEthPacketInteractionClass* getEthPacketInteractionClass() const = 0;
-    virtual IEthPacketErrorInteractionClass* getEthPacketErrorInteractionClass() const = 0;
-    virtual IEthPacketErrorForwardedInteractionClass* getEthPacketErrorForwardedInteractionClass() const = 0;
-    virtual IEthForwardedPacketInteractionClass* getEthForwardedPacketInteractionClass() const = 0;
-    virtual IEthStatusInteractionClass* getEthStatusInteractionClass() const = 0;
-    virtual ICANMessageInteractionClass* getCANMessageInteractionClass() const = 0;
-    virtual ICANErrorFrameInteractionClass* getCANErrorFrameInteractionClass() const = 0;
-    virtual IPythonCommandInteractionClass* getPythonCommandInteractionClass() const = 0;
+    virtual IHLAinteractionRootInteractionClass* GetHLAinteractionRootInteractionClass() const = 0;
+    virtual IMeasurementInitInteractionClass* GetMeasurementInitInteractionClass() const = 0;
+    virtual IMeasurementStopInteractionClass* GetMeasurementStopInteractionClass() const = 0;
+    virtual IKeyEventInteractionClass* GetKeyEventInteractionClass() const = 0;
+    virtual ITextLogInteractionClass* GetTextLogInteractionClass() const = 0;
+    virtual IDOMemberTransmitDataInteractionClass* GetDOMemberTransmitDataInteractionClass() const = 0;
+    virtual ISystemVariableUpdateInteractionClass* GetSystemVariableUpdateInteractionClass() const = 0;
+    virtual ISystemVariableModificationInteractionClass* GetSystemVariableModificationInteractionClass() const = 0;
+    virtual IValueEntityUpdateInteractionClass* GetValueEntityUpdateInteractionClass() const = 0;
+    virtual IBusMessageInteractionClass* GetBusMessageInteractionClass() const = 0;
+    virtual IEthPacketInteractionClass* GetEthPacketInteractionClass() const = 0;
+    virtual IEthPacketErrorInteractionClass* GetEthPacketErrorInteractionClass() const = 0;
+    virtual IEthPacketErrorForwardedInteractionClass* GetEthPacketErrorForwardedInteractionClass() const = 0;
+    virtual IEthForwardedPacketInteractionClass* GetEthForwardedPacketInteractionClass() const = 0;
+    virtual IEthStatusInteractionClass* GetEthStatusInteractionClass() const = 0;
+    virtual ICANMessageInteractionClass* GetCANMessageInteractionClass() const = 0;
+    virtual ICANErrorFrameInteractionClass* GetCANErrorFrameInteractionClass() const = 0;
+    virtual IPythonCommandInteractionClass* GetPythonCommandInteractionClass() const = 0;
   protected:
     virtual ~IInteractionClassRegistry() {}
 }; // class IInteractionClassRegistry

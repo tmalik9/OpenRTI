@@ -167,6 +167,7 @@ namespace FOMCodeGen
       }
       // does the encoding class of this type have 'get/set' methods?
       public virtual bool CanTranslateToCpp { get { return true; } }
+      // Translate encoder type to native type. Used to pass a interaction parameter into the registered callback.
       public virtual string CppGetter(string var) {
         return var + ".get()";
       }
@@ -286,7 +287,7 @@ namespace FOMCodeGen
           }
           else
           {
-            return _cppType;
+            return CPPType;
           }
         }
       }
@@ -302,6 +303,7 @@ namespace FOMCodeGen
           return false;
         }
       }
+      // Translate encoder type to native type. Used to pass a interaction parameter into the registered callback.
       public override string CppGetter(string var)
       {
         if (Name == "HLAopaqueData")
@@ -320,6 +322,58 @@ namespace FOMCodeGen
       }
       private bool _passByReference;
     }
+    public class ObjectInstanceHandleType : PredefinedType
+    {
+      public ObjectInstanceHandleType() : base("HLAobjectInstanceHandle", "#include \"RTI/encoding/HLAhandle.h\"", "rti1516ev::ObjectInstanceHandle")
+      {
+      }
+      public ObjectInstanceHandleType(ObjectClass objectClass) 
+        : base("HLAobjectInstanceHandle" + "." + objectClass.Name, "#include \"RTI/encoding/HLAhandle.h\"", "rti1516ev::ObjectInstanceHandle")
+      {
+        ObjectClass = objectClass;
+      }
+      public override bool CanTranslateToCpp
+      {
+        get
+        {
+          return true;
+        }
+      }
+      public override string ParameterCppType
+      {
+        get {
+          if (ObjectClass != null)
+            return "I" + ObjectClass.Name + "*";
+          else
+            return "rti1516ev::ObjectInstanceHandle";
+        }
+      }
+      public override string CPPType
+      {
+        get {
+          if (ObjectClass != null)
+            return ObjectClass.Name + "*";
+          else
+            return "rti1516ev::ObjectInstanceHandle";
+        }
+      }
+      public override string Encoding
+      {
+        get { return "rti1516ev::HLAobjectInstanceHandle"; }
+      }
+      // Translate encoder type to native type. Used to pass a interaction parameter into the registered callback.
+      public override string CppGetter(string var)
+      {
+        if (ObjectClass != null)
+          return "static_cast<" + ObjectClass.Name + "ObjectClass*>(ObjectClassRegistry::GetInstance()->Get" + ObjectClass.Name + "ObjectClass())->GetObjectInstance(" + var + ".get())";
+        else
+          // no object class given - just pass in the object instance handle
+          return var + ".get()";
+      }
+      public string ObjectClassName { get; set; }
+      public ObjectClass ObjectClass { get; set; }
+    }
+
     // A SimpleDataType is basically a typedef to a BasicDataRepresentation
     public class SimpleDataType : DataType
     {
@@ -361,6 +415,8 @@ namespace FOMCodeGen
       {
         get { return Representation.Encoding; }
       }
+      // Translate encoder type to native type. Used to pass a interaction parameter into the registered callback.
+      // enumerated types must be casted from the integral type into the enumerated type.
       public override string CppGetter(string var)
       {
         return "static_cast<" + Name + ">(" + var + ".get())";
@@ -501,6 +557,8 @@ namespace FOMCodeGen
         }
         return false;
       }
+      // Translate encoder type to native type. Used to pass a interaction parameter into the registered callback.
+      // Fixed records always shall be passed directly (by reference).
       public override string CppGetter(string var)
       {
         return var;
@@ -545,7 +603,8 @@ namespace FOMCodeGen
     private List<PredefinedType> mPredefinedTypes = new List<PredefinedType>()
     {
       new PredefinedType("HLAopaqueData", "#include \"RTI/encoding/HLAopaqueData.h\"", "std::vector<uint8_t>", true),
-      new PredefinedType("HLAhandle", "#include \"RTI/encoding/HLAhandle.h\"")
+      new PredefinedType("HLAhandle", "#include \"RTI/encoding/HLAhandle.h\""),
+      new ObjectInstanceHandleType()
     };
 
     private HashSet<string> mPredefinedTypeIncludes = new HashSet<string>();
@@ -879,9 +938,26 @@ namespace FOMCodeGen
         string attributeName = parameterNode["name"].FirstChild.InnerText;
         Parameter parameter = new Parameter(attributeName);
         interactionClass.Parameters.Add(parameter);
-        if (parameterNode["dataType"] != null)
+        XmlElement dataTypeElement = parameterNode["dataType"];
+        if (dataTypeElement != null)
         {
-          DataType dataType = GetDataType(parameterNode["dataType"].FirstChild.InnerText);
+          DataType dataType = GetDataType(dataTypeElement.FirstChild.InnerText);
+          string dataTypeElementClassAttribute = dataTypeElement.GetAttribute("class");
+          if (dataType is ObjectInstanceHandleType && dataTypeElementClassAttribute != null)
+          {
+            string objectClassName = dataTypeElementClassAttribute;
+            var objectClass = mObjectClasses.Find(x => x.Name == objectClassName);
+            if (objectClass != null)
+            {
+              dataType = new ObjectInstanceHandleType(objectClass);
+              string objectClassInterface = "I" + objectClassName;
+              string forwardDeclaration = "class " + objectClassInterface + ";";
+              if (!mForwardDeclarations.Contains(forwardDeclaration))
+              {
+                mForwardDeclarations.Add(forwardDeclaration);
+              }
+            }
+          }
           parameter.DataType = dataType;
         }
       }
