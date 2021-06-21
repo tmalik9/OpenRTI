@@ -46,6 +46,7 @@ void ResponderFederate::initializeSimulation()
 {
   //InitializeObjects();
   InitializeInteraction();
+  mRtiAmb->enableAsynchronousDelivery();
   mRtiAmb->allowPendingTimeInNextMessageRequest();
 
 #ifdef _WIN32
@@ -126,6 +127,8 @@ void ResponderFederate::cleanupSimulation()
   {
     deleteObject(myPublishedObject);
     printf("Deleted Object, handle=%ls", myPublishedObject.toString().c_str());
+    mRtiAmb->disableAsynchronousDelivery();
+    mRtiAmb->disallowPendingTimeInNextMessageRequest();
   }
 }
 

@@ -90,6 +90,8 @@ RTI_EXCEPTION(MessageError) // Inconsistent messages reaching a server
 RTI_EXCEPTION(AlreadyConnected)
 RTI_EXCEPTION(AsynchronousDeliveryAlreadyDisabled)
 RTI_EXCEPTION(AsynchronousDeliveryAlreadyEnabled)
+RTI_EXCEPTION(AllowPendingTimeInNextMessageRequestAlreadyDisabled)
+RTI_EXCEPTION(AllowPendingTimeInNextMessageRequestAlreadyEnabled)
 RTI_EXCEPTION(AttributeAcquisitionWasNotCanceled)
 RTI_EXCEPTION(AttributeAcquisitionWasNotRequested)
 RTI_EXCEPTION(AttributeAlreadyBeingAcquired)
