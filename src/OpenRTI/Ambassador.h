@@ -2444,8 +2444,8 @@ public:
     OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
-    if (_timeManagement->getAsynchronousDeliveryEnabled())
-      throw AsynchronousDeliveryAlreadyEnabled();
+    if (_timeManagement->getAllowPendingTimeInNextMessageRequest())
+      throw AllowPendingTimeInNextMessageRequestAlreadyEnabled();
     _timeManagement->setAllowPendingTimeInNextMessageRequest(true);
   }
 
@@ -2462,8 +2462,8 @@ public:
     OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     if (!_timeManagement.valid())
       throw FederateNotExecutionMember();
-    if (!_timeManagement->getAsynchronousDeliveryEnabled())
-      throw AsynchronousDeliveryAlreadyDisabled();
+    if (!_timeManagement->getAllowPendingTimeInNextMessageRequest())
+      throw AllowPendingTimeInNextMessageRequestAlreadyDisabled();
     _timeManagement->setAllowPendingTimeInNextMessageRequest(false);
   }
 
