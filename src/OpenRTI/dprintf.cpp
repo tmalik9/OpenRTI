@@ -9,9 +9,11 @@
 #include "dprintf.h"
 #include <iostream>
 
-bool sEnableDebugPrintf = true;
-bool sDebugToConsole = false;
-void DebugPrintf(__format_string const char* fmt, ...)
+namespace OpenRTI {
+
+OPENRTI_API bool sEnableDebugPrintf = true;
+OPENRTI_API bool sDebugToConsole = false;
+OPENRTI_API void DebugPrintf(__format_string const char* fmt, ...)
 {
 #ifndef linux
   if (sEnableDebugPrintf)
@@ -55,7 +57,7 @@ void DebugPrintf(__format_string const char* fmt, ...)
 #endif
 }
 
-std::string string_vprintf(const char* fmt, va_list args)
+OPENRTI_API std::string string_vprintf(const char* fmt, va_list args)
 {
 #ifndef linux
   int bufsiz = _vscprintf(fmt, args) + 1;
@@ -69,7 +71,7 @@ std::string string_vprintf(const char* fmt, va_list args)
 #endif
 }
 
-std::string string_printf(__format_string const char* fmt, ...)
+OPENRTI_API std::string string_printf(__format_string const char* fmt, ...)
 {
 #ifndef linux
   va_list args;
@@ -85,3 +87,5 @@ std::string string_printf(__format_string const char* fmt, ...)
   return "";
 #endif
 }
+
+} // namespace OpenRTI

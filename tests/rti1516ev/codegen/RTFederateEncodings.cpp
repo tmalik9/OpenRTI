@@ -1,5 +1,5 @@
 
-// Code automatically generated from D:\vfs\OpenRTI-codegen\tests\rti1516ev\codegen\\RTFederate.xml, do not edit
+// Code automatically generated from RTFederate.xml, do not edit
 
 #include <vector>
 #include <cstring>

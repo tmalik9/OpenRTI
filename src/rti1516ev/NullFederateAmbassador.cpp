@@ -24,6 +24,7 @@
 namespace rti1516ev
 {
 
+using OpenRTI::DebugPrintf;
 
 NullFederateAmbassador::NullFederateAmbassador()
 {

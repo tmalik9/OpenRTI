@@ -63,8 +63,6 @@ set(LIB_RTI1516EV_SOURCES
         RTI1516Einteger64TimeFactory.h
         RTIambassadorImplementation.h
         VariableLengthDataImplementation.h
-        ../OpenRTI/dprintf.cpp
-        ../OpenRTI/dprintf.h
         BasicDataElements.cpp
         DataElement.cpp
         EncodingExceptions.cpp

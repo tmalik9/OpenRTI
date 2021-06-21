@@ -121,7 +121,6 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\OpenRTI\dprintf.cpp" />
     <ClCompile Include="BasicDataElements.cpp" />
     <ClCompile Include="DataElement.cpp" />
     <ClCompile Include="EncodingExceptions.cpp" />
@@ -196,7 +195,6 @@
     <ClInclude Include="..\..\include\rti1516ev\RTI\time\HLAinteger64TimeFactory.h" />
     <ClInclude Include="..\..\include\rti1516ev\RTI\Typedefs.h" />
     <ClInclude Include="..\..\include\rti1516ev\RTI\VariableLengthData.h" />
-    <ClInclude Include="..\OpenRTI\dprintf.h" />
     <ClInclude Include="Encoding.h" />
     <ClInclude Include="HandleFactory.h" />
     <ClInclude Include="HandleImplementation.h" />

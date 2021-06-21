@@ -25,17 +25,18 @@
 #include <string>
 #include <vector>
 
-#include <Condition.h>
-#include <Clock.h>
-#include <Options.h>
-#include <Referenced.h>
-#include <ScopeLock.h>
-#include <ScopeUnlock.h>
-#include <NetworkServer.h>
-#include <Rand.h>
-#include <SharedPtr.h>
-#include <StringUtils.h>
-#include <Thread.h>
+#include "Condition.h"
+#include "Clock.h"
+#include "Options.h"
+#include "Referenced.h"
+#include "ScopeLock.h"
+#include "ScopeUnlock.h"
+#include "NetworkServer.h"
+#include "Rand.h"
+#include "SharedPtr.h"
+#include "StringUtils.h"
+#include "Thread.h"
+#include "dprintf.h"
 
 #if !defined(_WIN32)
 #include <sys/time.h>
@@ -415,7 +416,7 @@ public:
   };
 
   RTITest(int argc, const char* const argv[], bool disjointFederations) :
-    _optionString("A:C:F:JM:O:S:"),
+    _optionString("A:C:F:JM:O:S:v"),
     _options(argc, argv),
     _federationExecution(L"FederationExecution"),
     _numServers(1),
@@ -463,6 +464,10 @@ public:
       return true;
     case 'J':
       _joinOnce = true;
+      return true;
+    case 'v':
+      sEnableDebugPrintf = true;
+      sDebugToConsole = true;
       return true;
     case '\0':
       _globalArgumentList.push_back(localeToUcs(argument));

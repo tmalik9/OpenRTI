@@ -88,9 +88,6 @@
     <ClCompile Include="Version.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\OpenRTI\dprintf.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BasicDataElements.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -229,9 +226,6 @@
     </ClInclude>
     <ClInclude Include="..\..\include\rti1516ev\RTI\time\HLAinteger64TimeFactory.h">
       <Filter>Header Files\time</Filter>
-    </ClInclude>
-    <ClInclude Include="..\OpenRTI\dprintf.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\rti1516ev\RTI\encoding\HLAhandle.h">
       <Filter>Header Files\encoding</Filter>

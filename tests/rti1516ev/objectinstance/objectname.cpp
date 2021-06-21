@@ -23,10 +23,10 @@
 #include <vector>
 #include <iostream>
 
-#include <Options.h>
-#include <StringUtils.h>
+#include "Options.h"
+#include "StringUtils.h"
 
-#include <RTI1516ETestLib.h>
+#include "RTI1516ETestLib.h"
 
 namespace OpenRTI {
 

@@ -111,7 +111,7 @@ void ManagerFederate::initialize(const std::string& address, const std::string& 
     std::string emptyFomModule = std::string("data:text/plain,") + emptyFOM;
 
     mRtiAmb->createFederationExecution(mFederationName, to_wstring(emptyFomModule), to_wstring(timeImplName));
-    DebugPrintf("Created Federation\n");
+    OpenRTI::DebugPrintf("Created Federation\n");
   }
   catch (FederationExecutionAlreadyExists exists)
   {

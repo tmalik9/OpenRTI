@@ -19,8 +19,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Not fully supported for all operating systems, but currently
 # the only way to make the circular link reference work on android.
-set(OPENRTI_BUILD_SHARED TRUE CACHE BOOL "Build libraries as shared library.")
-mark_as_advanced(OPENRTI_BUILD_SHARED)
+option(OPENRTI_BUILD_SHARED "Build libraries as shared library." ON)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINUX TRUE)

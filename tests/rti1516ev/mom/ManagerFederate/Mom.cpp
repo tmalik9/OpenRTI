@@ -673,7 +673,7 @@ Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::attribute(std::wstring name, s
   }
   catch (const rti1516ev::NameNotFound& e)
   {
-    DebugPrintf("%s: attribute %s not found: %S", __FUNCTION__, name.c_str(), e.what().c_str());
+    OpenRTI::DebugPrintf("%s: attribute %s not found: %S", __FUNCTION__, name.c_str(), e.what().c_str());
     throw;
   }
   catch (const rti1516ev::Exception& e)
@@ -702,7 +702,7 @@ Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::interaction(std::wstring name)
   }
   catch (const rti1516ev::NameNotFound& e)
   {
-    DebugPrintf("%s: interaction class %S not found: %S", __FUNCTION__, name.c_str(), e.what().c_str());
+    OpenRTI::DebugPrintf("%s: interaction class %S not found: %S", __FUNCTION__, name.c_str(), e.what().c_str());
     throw;
   }
   catch (const rti1516ev::Exception& e)
@@ -731,8 +731,8 @@ Mom::MomTreeNodeBuilder& Mom::MomTreeNodeBuilder::parameter(std::wstring name, s
   }
   catch (const rti1516ev::NameNotFound& e)
   {
-    DebugPrintf("%s: parameter %s not found: %S", __FUNCTION__, name.c_str(), e.what().c_str());
-    DebugPrintf("%s:  in interaction class %S\n", __FUNCTION__, mRtiAmb->getInteractionClassName(mContextStack.front()->interactionClassHandle).c_str());
+    OpenRTI::DebugPrintf("%s: parameter %s not found: %S", __FUNCTION__, name.c_str(), e.what().c_str());
+    OpenRTI::DebugPrintf("%s:  in interaction class %S\n", __FUNCTION__, mRtiAmb->getInteractionClassName(mContextStack.front()->interactionClassHandle).c_str());
     throw;
   }
   catch (const rti1516ev::Exception& e)
