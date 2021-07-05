@@ -20,6 +20,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # Not fully supported for all operating systems, but currently
 # the only way to make the circular link reference work on android.
 option(OPENRTI_BUILD_SHARED "Build libraries as shared library." ON)
+option(OPENRTI_EXCLUDE_INSTALL "Exclude CMake install()" OFF)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINUX TRUE)
@@ -206,25 +207,28 @@ else()
   message("OpenRTI: Building without tests")
 endif()
 
-include(CMakePackageConfigHelpers)
+if (NOT OPENRTI_EXCLUDE_INSTALL)
 
-configure_package_config_file(
-    "OpenRTIConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
-    PATH_VARS CMAKE_INSTALL_INCLUDEDIR
-)
+    include(CMakePackageConfigHelpers)
 
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
-    VERSION "${OPENRTI_VERSION}"
-    COMPATIBILITY SameMajorVersion
-)
+    configure_package_config_file(
+        "OpenRTIConfig.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
+        INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
+        PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+    )
 
-install(
-    FILES "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
-          "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
-)
+    write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
+        VERSION "${OPENRTI_VERSION}"
+        COMPATIBILITY SameMajorVersion
+    )
 
-install(EXPORT OpenRTITargets DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI")
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
+    )
+
+    install(EXPORT OpenRTITargets DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI")
+endif()
