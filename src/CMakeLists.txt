@@ -1,5 +1,9 @@
-# Just for propper recursion
-add_subdirectory(OpenRTI)
+option(OPENRTI_EXCLUDE_FROM_ALL "Exclude CMake install()" OFF)
+if (OPENRTI_EXCLUDE_FROM_ALL)
+	add_subdirectory(OpenRTI EXCLUDE_FROM_ALL)
+else()
+	add_subdirectory(OpenRTI)
+endif()
 
 option(OPENRTI_BUILD_RTINODE "Build the rtinode" ON)
 if (OPENRTI_BUILD_RTINODE)
@@ -11,4 +15,8 @@ if (OPENRTI_BUILD_TOOLS)
 	add_subdirectory(Tools)
 endif()
 
-add_subdirectory(rti1516ev)
+if (OPENRTI_EXCLUDE_FROM_ALL)
+	add_subdirectory(rti1516ev EXCLUDE_FROM_ALL)
+else()
+	add_subdirectory(rti1516ev)
+endif()
