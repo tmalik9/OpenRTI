@@ -42,6 +42,9 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     void Unsubscribe() override;
     I<#=objectClass.Name#>* GetObjectInstance(const std::wstring& instanceName) override;
     I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(I<#=objectClass.Name#>* newObjectInstance);
 
     // internal
 <#
@@ -114,6 +117,9 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
 #>
     std::map<std::wstring, <#=objectClass.Name#>*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, <#=objectClass.Name#>*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class <#=objectClass.Name#> : public I<#=objectClass.Name#>
@@ -149,13 +155,17 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
 <# if (objectClass.ChildClasses.Count == 0) { #>
     uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 <# if (objectClass.HasValidAttributes) { #>
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);

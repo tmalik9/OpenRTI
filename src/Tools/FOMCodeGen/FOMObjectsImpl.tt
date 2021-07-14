@@ -182,6 +182,27 @@ rti1516ev::AttributeHandleSet <#=objectClass.Name#>ObjectClass::GetAllAttributeH
   return result;
 }
 
+uint32_t <#=objectClass.Name#>ObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void <#=objectClass.Name#>ObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void <#=objectClass.Name#>ObjectClass::ExecuteDiscoverCallbacks(I<#=objectClass.Name#>* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
 // object instances of type '<#=objectClass.Name#>'
 <#=objectClass.Name#>::<#=objectClass.Name#>()
 {
@@ -347,6 +368,43 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
     ExecuteUpdateCallbacks();
 <# } #>
 } // <#=objectClass.Name#>::ReflectAttributeValues
+
+void <#=objectClass.Name#>::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+<#
+  foreach (var attribute in objectClass.Attributes)
+  {
+    if (attribute.DataType != null)
+    {
+#>
+  if ((mLastUpdated & k<#=attribute.Name#>Bit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->Get<#=attribute.Name#>AttributeHandle());
+  }
+<#
+    } // if
+  } // foreach
+#>
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void <#=objectClass.Name#>::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+<#
+  foreach (var attribute in objectClass.Attributes)
+  {
+    if (attribute.DataType != null)
+    {
+#>
+  requestAttributes.insert(mObjectClass->Get<#=attribute.Name#>AttributeHandle());
+<#
+    } // if
+  } // foreach
+#>
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
 
 void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {

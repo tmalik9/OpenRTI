@@ -16,12 +16,15 @@ class IHLAobjectRoot;
 class IHLAobjectRootObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(IHLAobjectRoot*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual IHLAobjectRoot* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IHLAobjectRoot* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class IHLAobjectRoot
@@ -45,12 +48,15 @@ class ISystemVariable;
 class ISystemVariableObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(ISystemVariable*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual ISystemVariable* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual ISystemVariable* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class ISystemVariable : public IHLAobjectRoot
@@ -68,11 +74,20 @@ class ISystemVariable : public IHLAobjectRoot
     // attribute Value : HLAopaqueData
     virtual std::vector<uint8_t> GetValue() const = 0;
     virtual void SetValue(std::vector<uint8_t> newValue) = 0;
+    // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
+    // send all attribute values, as TSO message
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
+    // send attribute values which have been modified since last call, as TSO message
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
+    // request attribute values which haven't been updated in last reflectAttributeValues
+    virtual void RequestAttributeValues() = 0;
+    // request all attribute values
+    virtual void RequestAllAttributeValues() = 0;
     using UpdateCallbackType = std::function<void(ISystemVariable*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
@@ -82,12 +97,15 @@ class IValueEntity;
 class IValueEntityObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(IValueEntity*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual IValueEntity* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IValueEntity* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class IValueEntity : public IHLAobjectRoot
@@ -105,11 +123,20 @@ class IValueEntity : public IHLAobjectRoot
     // attribute Value : HLAopaqueData
     virtual std::vector<uint8_t> GetValue() const = 0;
     virtual void SetValue(std::vector<uint8_t> newValue) = 0;
+    // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
+    // send all attribute values, as TSO message
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
+    // send attribute values which have been modified since last call, as TSO message
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
+    // request attribute values which haven't been updated in last reflectAttributeValues
+    virtual void RequestAttributeValues() = 0;
+    // request all attribute values
+    virtual void RequestAllAttributeValues() = 0;
     using UpdateCallbackType = std::function<void(IValueEntity*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
@@ -119,12 +146,15 @@ class IDOMemberSource;
 class IDOMemberSourceObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(IDOMemberSource*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual IDOMemberSource* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IDOMemberSource* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class IDOMemberSource : public IHLAobjectRoot
@@ -150,11 +180,20 @@ class IDOMemberSource : public IHLAobjectRoot
     // attribute DOSourceMemberDataBytes : HLAopaqueData
     virtual std::vector<uint8_t> GetDOSourceMemberDataBytes() const = 0;
     virtual void SetDOSourceMemberDataBytes(std::vector<uint8_t> newValue) = 0;
+    // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
+    // send all attribute values, as TSO message
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
+    // send attribute values which have been modified since last call, as TSO message
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
+    // request attribute values which haven't been updated in last reflectAttributeValues
+    virtual void RequestAttributeValues() = 0;
+    // request all attribute values
+    virtual void RequestAllAttributeValues() = 0;
     using UpdateCallbackType = std::function<void(IDOMemberSource*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
@@ -164,12 +203,15 @@ class IDOMemberTarget;
 class IDOMemberTargetObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(IDOMemberTarget*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual IDOMemberTarget* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IDOMemberTarget* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class IDOMemberTarget : public IHLAobjectRoot
@@ -191,11 +233,20 @@ class IDOMemberTarget : public IHLAobjectRoot
     // attribute DOTargetMemberConnectionType : HLAASCIIstring
     virtual std::string GetDOTargetMemberConnectionType() const = 0;
     virtual void SetDOTargetMemberConnectionType(std::string newValue) = 0;
+    // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
+    // send all attribute values, as TSO message
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
+    // send attribute values which have been modified since last call, as TSO message
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
+    // request attribute values which haven't been updated in last reflectAttributeValues
+    virtual void RequestAttributeValues() = 0;
+    // request all attribute values
+    virtual void RequestAllAttributeValues() = 0;
     using UpdateCallbackType = std::function<void(IDOMemberTarget*)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
@@ -205,12 +256,15 @@ class IBusManagement;
 class IBusManagementObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(IBusManagement*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusManagement* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusManagement* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusManagement : public IHLAobjectRoot
@@ -228,23 +282,35 @@ class IBusManagement : public IHLAobjectRoot
     // attribute NetworkID : HLAASCIIstring
     virtual std::string GetNetworkID() const = 0;
     virtual void SetNetworkID(std::string newValue) = 0;
+    // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
+    // send all attribute values, as TSO message
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
+    // send attribute values which have been modified since last call, as TSO message
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
+    // request attribute values which haven't been updated in last reflectAttributeValues
+    virtual void RequestAttributeValues() = 0;
+    // request all attribute values
+    virtual void RequestAllAttributeValues() = 0;
 };
 
 class IBusManagementCan;
 class IBusManagementCanObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(IBusManagementCan*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusManagementCan* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusManagementCan* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusManagementCan : public IBusManagement
@@ -283,12 +349,15 @@ class IBusController;
 class IBusControllerObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(IBusController*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusController* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusController* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusController : public IHLAobjectRoot
@@ -310,23 +379,35 @@ class IBusController : public IHLAobjectRoot
     // attribute DeviceID : HLAASCIIstring
     virtual std::string GetDeviceID() const = 0;
     virtual void SetDeviceID(std::string newValue) = 0;
+    // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
+    // send all attribute values, as TSO message
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
+    // send attribute values which have been modified since last call, as TSO message
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
+    // request attribute values which haven't been updated in last reflectAttributeValues
+    virtual void RequestAttributeValues() = 0;
+    // request all attribute values
+    virtual void RequestAllAttributeValues() = 0;
 };
 
 class IBusControllerCan;
 class IBusControllerCanObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(IBusControllerCan*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusControllerCan* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusControllerCan* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusControllerCan : public IBusController

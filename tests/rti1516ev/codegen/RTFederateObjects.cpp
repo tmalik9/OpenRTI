@@ -135,6 +135,27 @@ rti1516ev::AttributeHandleSet HLAobjectRootObjectClass::GetAllAttributeHandles()
   return result;
 }
 
+uint32_t HLAobjectRootObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void HLAobjectRootObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void HLAobjectRootObjectClass::ExecuteDiscoverCallbacks(IHLAobjectRoot* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
 // object instances of type 'HLAobjectRoot'
 HLAobjectRoot::HLAobjectRoot()
 {
@@ -300,6 +321,27 @@ rti1516ev::AttributeHandleSet SystemVariableObjectClass::GetAllAttributeHandles(
   return result;
 }
 
+uint32_t SystemVariableObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void SystemVariableObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void SystemVariableObjectClass::ExecuteDiscoverCallbacks(ISystemVariable* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
 // object instances of type 'SystemVariable'
 SystemVariable::SystemVariable()
 {
@@ -404,6 +446,23 @@ void SystemVariable::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
   } // for (auto& attributeHandleValue : attributes)
     ExecuteUpdateCallbacks();
 } // SystemVariable::ReflectAttributeValues
+
+void SystemVariable::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kValueBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetValueAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void SystemVariable::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetValueAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
 
 void SystemVariable::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
@@ -568,6 +627,27 @@ rti1516ev::AttributeHandleSet ValueEntityObjectClass::GetAllAttributeHandles()
   return result;
 }
 
+uint32_t ValueEntityObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void ValueEntityObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void ValueEntityObjectClass::ExecuteDiscoverCallbacks(IValueEntity* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
 // object instances of type 'ValueEntity'
 ValueEntity::ValueEntity()
 {
@@ -672,6 +752,23 @@ void ValueEntity::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMa
   } // for (auto& attributeHandleValue : attributes)
     ExecuteUpdateCallbacks();
 } // ValueEntity::ReflectAttributeValues
+
+void ValueEntity::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kValueBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetValueAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void ValueEntity::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetValueAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
 
 void ValueEntity::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
@@ -842,6 +939,27 @@ rti1516ev::AttributeHandleSet DOMemberSourceObjectClass::GetAllAttributeHandles(
   return result;
 }
 
+uint32_t DOMemberSourceObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void DOMemberSourceObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void DOMemberSourceObjectClass::ExecuteDiscoverCallbacks(IDOMemberSource* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
 // object instances of type 'DOMemberSource'
 DOMemberSource::DOMemberSource()
 {
@@ -990,6 +1108,33 @@ void DOMemberSource::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
   } // for (auto& attributeHandleValue : attributes)
     ExecuteUpdateCallbacks();
 } // DOMemberSource::ReflectAttributeValues
+
+void DOMemberSource::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kDOSourceMemberNameBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetDOSourceMemberNameAttributeHandle());
+  }
+  if ((mLastUpdated & kDOSourceMemberConnectionTypeBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetDOSourceMemberConnectionTypeAttributeHandle());
+  }
+  if ((mLastUpdated & kDOSourceMemberDataBytesBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetDOSourceMemberDataBytesAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void DOMemberSource::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetDOSourceMemberNameAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetDOSourceMemberConnectionTypeAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetDOSourceMemberDataBytesAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
 
 void DOMemberSource::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
@@ -1167,6 +1312,27 @@ rti1516ev::AttributeHandleSet DOMemberTargetObjectClass::GetAllAttributeHandles(
   return result;
 }
 
+uint32_t DOMemberTargetObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void DOMemberTargetObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void DOMemberTargetObjectClass::ExecuteDiscoverCallbacks(IDOMemberTarget* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
 // object instances of type 'DOMemberTarget'
 DOMemberTarget::DOMemberTarget()
 {
@@ -1293,6 +1459,28 @@ void DOMemberTarget::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
   } // for (auto& attributeHandleValue : attributes)
     ExecuteUpdateCallbacks();
 } // DOMemberTarget::ReflectAttributeValues
+
+void DOMemberTarget::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kDOTargetMemberNameBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetDOTargetMemberNameAttributeHandle());
+  }
+  if ((mLastUpdated & kDOTargetMemberConnectionTypeBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetDOTargetMemberConnectionTypeAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void DOMemberTarget::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetDOTargetMemberNameAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetDOTargetMemberConnectionTypeAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
 
 void DOMemberTarget::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
@@ -1462,6 +1650,27 @@ rti1516ev::AttributeHandleSet BusManagementObjectClass::GetAllAttributeHandles()
   return result;
 }
 
+uint32_t BusManagementObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void BusManagementObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void BusManagementObjectClass::ExecuteDiscoverCallbacks(IBusManagement* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
 // object instances of type 'BusManagement'
 BusManagement::BusManagement()
 {
@@ -1565,6 +1774,23 @@ void BusManagement::ReflectAttributeValues(const rti1516ev::AttributeHandleValue
     }
   } // for (auto& attributeHandleValue : attributes)
 } // BusManagement::ReflectAttributeValues
+
+void BusManagement::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kNetworkIDBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void BusManagement::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
 
 void BusManagement::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
@@ -1717,6 +1943,27 @@ rti1516ev::AttributeHandleSet BusManagementCanObjectClass::GetAllAttributeHandle
   result.insert(GetRxErrorCountAttributeHandle());
   result.insert(GetSendMessagesAsRxAttributeHandle());
   return result;
+}
+
+uint32_t BusManagementCanObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void BusManagementCanObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void BusManagementCanObjectClass::ExecuteDiscoverCallbacks(IBusManagementCan* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
 }
 
 // object instances of type 'BusManagementCan'
@@ -1903,6 +2150,38 @@ void BusManagementCan::ReflectAttributeValues(const rti1516ev::AttributeHandleVa
     ExecuteUpdateCallbacks();
 } // BusManagementCan::ReflectAttributeValues
 
+void BusManagementCan::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kBusStateBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetBusStateAttributeHandle());
+  }
+  if ((mLastUpdated & kTxErrorCountBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetTxErrorCountAttributeHandle());
+  }
+  if ((mLastUpdated & kRxErrorCountBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetRxErrorCountAttributeHandle());
+  }
+  if ((mLastUpdated & kSendMessagesAsRxBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetSendMessagesAsRxAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void BusManagementCan::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetBusStateAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetTxErrorCountAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetRxErrorCountAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetSendMessagesAsRxAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
 void BusManagementCan::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
   rti1516ev::AttributeHandleValueMap updateAttributes;
@@ -2084,6 +2363,27 @@ rti1516ev::AttributeHandleSet BusControllerObjectClass::GetAllAttributeHandles()
   return result;
 }
 
+uint32_t BusControllerObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void BusControllerObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void BusControllerObjectClass::ExecuteDiscoverCallbacks(IBusController* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
 // object instances of type 'BusController'
 BusController::BusController()
 {
@@ -2209,6 +2509,28 @@ void BusController::ReflectAttributeValues(const rti1516ev::AttributeHandleValue
     }
   } // for (auto& attributeHandleValue : attributes)
 } // BusController::ReflectAttributeValues
+
+void BusController::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kNetworkIDBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+  }
+  if ((mLastUpdated & kDeviceIDBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void BusController::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
 
 void BusController::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
@@ -2382,6 +2704,27 @@ rti1516ev::AttributeHandleSet BusControllerCanObjectClass::GetAllAttributeHandle
   result.insert(GetPhase_Seg2AttributeHandle());
   result.insert(GetSamplingModeAttributeHandle());
   return result;
+}
+
+uint32_t BusControllerCanObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void BusControllerCanObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void BusControllerCanObjectClass::ExecuteDiscoverCallbacks(IBusControllerCan* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
 }
 
 // object instances of type 'BusControllerCan'
@@ -2690,6 +3033,63 @@ void BusControllerCan::ReflectAttributeValues(const rti1516ev::AttributeHandleVa
   } // for (auto& attributeHandleValue : attributes)
     ExecuteUpdateCallbacks();
 } // BusControllerCan::ReflectAttributeValues
+
+void BusControllerCan::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kBaudRateBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetBaudRateAttributeHandle());
+  }
+  if ((mLastUpdated & kDataBaudRateBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetDataBaudRateAttributeHandle());
+  }
+  if ((mLastUpdated & kPreScalerBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetPreScalerAttributeHandle());
+  }
+  if ((mLastUpdated & kOperationModeBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetOperationModeAttributeHandle());
+  }
+  if ((mLastUpdated & kSync_SegBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetSync_SegAttributeHandle());
+  }
+  if ((mLastUpdated & kProp_SegBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetProp_SegAttributeHandle());
+  }
+  if ((mLastUpdated & kPhase_Seg1Bit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetPhase_Seg1AttributeHandle());
+  }
+  if ((mLastUpdated & kPhase_Seg2Bit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetPhase_Seg2AttributeHandle());
+  }
+  if ((mLastUpdated & kSamplingModeBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetSamplingModeAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void BusControllerCan::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetBaudRateAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetDataBaudRateAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetPreScalerAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetOperationModeAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetSync_SegAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetProp_SegAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetPhase_Seg1AttributeHandle());
+  requestAttributes.insert(mObjectClass->GetPhase_Seg2AttributeHandle());
+  requestAttributes.insert(mObjectClass->GetSamplingModeAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
 
 void BusControllerCan::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {

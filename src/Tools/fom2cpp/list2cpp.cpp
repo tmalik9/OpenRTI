@@ -35,7 +35,7 @@ std::string OutputList::escapeSequence(const std::string& s)
       temp += "\\";
       temp += s[i];
     }
-    else
+    else if (s[i] != '\n' && s[i] != '\r')
     {
       temp += s[i];
     }
@@ -73,7 +73,7 @@ bool OutputList::addFile(std::string name)
   file.open(name, std::ios::in);
   if (!file.is_open())
   {
-    std::cerr << "Error: could not open file...\n";
+    std::cerr << "Error: could not open file..." << std::endl;
     return false;
   }
   addStream(file);
@@ -107,7 +107,7 @@ bool OutputList::outputToFile(std::string filename, std::string varname)
   file.open(filename, std::ios::out);
   if (!file.is_open())
   {
-    std::cerr << "Error: could not open output file...\n";
+    std::cerr << "Error: could not open output file..." << std::endl;
     return false;
   }
   outputToFile(file, varname);
@@ -117,15 +117,15 @@ bool OutputList::outputToFile(std::string filename, std::string varname)
 
 void OutputList::outputToFileAsChar(std::ostream& file, std::string varname)
 {
-  file << "\n#pragma once\n";
-  file << "\nstatic const char *" << varname << " = \n";
+  file << std::endl << "#pragma once" << std::endl;
+  file << std::endl << "static const char *" << varname << " = " << std::endl;
   for (std::size_t i = 0; i < size(); ++i)
   {
     file << "  \"" << items[i] << "\"";
-    if (i < size() - 1) file << "\n";
+    if (i < size() - 1) file << std::endl;
   }
 
-  file << ";\n";
+  file << ";" << std::endl;
 }
 
 }

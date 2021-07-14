@@ -28,12 +28,15 @@ class I<#=objectClass.Name#>;
 class I<#=objectClass.Name#>ObjectClass
 {
   public:
+    using DiscoverCallbackType = std::function<void(I<#=objectClass.Name#>*)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe() = 0;
     virtual void Unsubscribe() = 0;
     virtual I<#=objectClass.Name#>* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
 };
 
 class I<#=objectClass.Name#><#
@@ -106,11 +109,20 @@ class I<#=objectClass.Name#><#
 #>
 <# if (objectClass.HasValidAttributes) { #>
 <# if (objectClass.BaseClass != null && !objectClass.BaseClass.HasValidAttributes) { #>
+    // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
+    // send all attribute values, as TSO message
     virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
+    // send attribute values which have been modified since last call, as TSO message
     virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
+    // request attribute values which haven't been updated in last reflectAttributeValues
+    virtual void RequestAttributeValues() = 0;
+    // request all attribute values
+    virtual void RequestAllAttributeValues() = 0;
 <# } #>
 <# if (objectClass.ChildClasses.Count == 0) { #>
     using UpdateCallbackType = std::function<void(I<#=objectClass.Name#>*)>;

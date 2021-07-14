@@ -30,6 +30,9 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
     void Unsubscribe() override;
     IHLAobjectRoot* GetObjectInstance(const std::wstring& instanceName) override;
     IHLAobjectRoot* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IHLAobjectRoot* newObjectInstance);
 
     // internal
     HLAobjectRootObjectClass(rti1516ev::RTIambassador* rtiAmbassador);
@@ -49,6 +52,9 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
     // attribute HLAprivilegeToDeleteObject : no data type
     std::map<std::wstring, HLAobjectRoot*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, HLAobjectRoot*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class HLAobjectRoot : public IHLAobjectRoot
@@ -66,7 +72,9 @@ class HLAobjectRoot : public IHLAobjectRoot
     // attribute HLAprivilegeToDeleteObject : no data type
     // IHLAobjectRoot
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     bool IsValid() const { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const { return mIsOwner; }
@@ -98,6 +106,9 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     void Unsubscribe() override;
     ISystemVariable* GetObjectInstance(const std::wstring& instanceName) override;
     ISystemVariable* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(ISystemVariable* newObjectInstance);
 
     // internal
     SystemVariableObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
@@ -122,6 +133,9 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     rti1516ev::AttributeHandle mValueAttributeHandle;
     std::map<std::wstring, SystemVariable*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, SystemVariable*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class SystemVariable : public ISystemVariable
@@ -146,10 +160,14 @@ class SystemVariable : public ISystemVariable
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -192,6 +210,9 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     void Unsubscribe() override;
     IValueEntity* GetObjectInstance(const std::wstring& instanceName) override;
     IValueEntity* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IValueEntity* newObjectInstance);
 
     // internal
     ValueEntityObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
@@ -216,6 +237,9 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     rti1516ev::AttributeHandle mValueAttributeHandle;
     std::map<std::wstring, ValueEntity*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, ValueEntity*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class ValueEntity : public IValueEntity
@@ -240,10 +264,14 @@ class ValueEntity : public IValueEntity
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -286,6 +314,9 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     void Unsubscribe() override;
     IDOMemberSource* GetObjectInstance(const std::wstring& instanceName) override;
     IDOMemberSource* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IDOMemberSource* newObjectInstance);
 
     // internal
     DOMemberSourceObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
@@ -318,6 +349,9 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     rti1516ev::AttributeHandle mDOSourceMemberDataBytesAttributeHandle;
     std::map<std::wstring, DOMemberSource*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, DOMemberSource*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class DOMemberSource : public IDOMemberSource
@@ -348,10 +382,14 @@ class DOMemberSource : public IDOMemberSource
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -398,6 +436,9 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     void Unsubscribe() override;
     IDOMemberTarget* GetObjectInstance(const std::wstring& instanceName) override;
     IDOMemberTarget* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IDOMemberTarget* newObjectInstance);
 
     // internal
     DOMemberTargetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
@@ -426,6 +467,9 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     rti1516ev::AttributeHandle mDOTargetMemberConnectionTypeAttributeHandle;
     std::map<std::wstring, DOMemberTarget*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, DOMemberTarget*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class DOMemberTarget : public IDOMemberTarget
@@ -453,10 +497,14 @@ class DOMemberTarget : public IDOMemberTarget
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -501,6 +549,9 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     void Unsubscribe() override;
     IBusManagement* GetObjectInstance(const std::wstring& instanceName) override;
     IBusManagement* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IBusManagement* newObjectInstance);
 
     // internal
     BusManagementObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
@@ -525,6 +576,9 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     rti1516ev::AttributeHandle mNetworkIDAttributeHandle;
     std::map<std::wstring, BusManagement*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusManagement*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class BusManagement : public IBusManagement
@@ -549,8 +603,12 @@ class BusManagement : public IBusManagement
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -590,6 +648,9 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     void Unsubscribe() override;
     IBusManagementCan* GetObjectInstance(const std::wstring& instanceName) override;
     IBusManagementCan* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IBusManagementCan* newObjectInstance);
 
     // internal
     BusManagementCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass);
@@ -628,6 +689,9 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     rti1516ev::AttributeHandle mSendMessagesAsRxAttributeHandle;
     std::map<std::wstring, BusManagementCan*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusManagementCan*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class BusManagementCan : public IBusManagementCan
@@ -664,10 +728,14 @@ class BusManagementCan : public IBusManagementCan
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -718,6 +786,9 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     void Unsubscribe() override;
     IBusController* GetObjectInstance(const std::wstring& instanceName) override;
     IBusController* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IBusController* newObjectInstance);
 
     // internal
     BusControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
@@ -746,6 +817,9 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     rti1516ev::AttributeHandle mDeviceIDAttributeHandle;
     std::map<std::wstring, BusController*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusController*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class BusController : public IBusController
@@ -773,8 +847,12 @@ class BusController : public IBusController
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -816,6 +894,9 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     void Unsubscribe() override;
     IBusControllerCan* GetObjectInstance(const std::wstring& instanceName) override;
     IBusControllerCan* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IBusControllerCan* newObjectInstance);
 
     // internal
     BusControllerCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass);
@@ -876,6 +957,9 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     rti1516ev::AttributeHandle mSamplingModeAttributeHandle;
     std::map<std::wstring, BusControllerCan*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusControllerCan*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
 };
 
 class BusControllerCan : public IBusControllerCan
@@ -930,10 +1014,14 @@ class BusControllerCan : public IBusControllerCan
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
 
+    // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
