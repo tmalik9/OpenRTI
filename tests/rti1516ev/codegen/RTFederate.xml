@@ -106,6 +106,43 @@
             <transportation>HLAreliable</transportation>
           </attribute>
         </objectClass>
+        <objectClass>
+          <name>BusManagementEthernet</name>
+          <attribute>
+            <name>PortName</name>
+            <dataType>HLAASCIIstring</dataType>
+            <order>TimeStamp</order>
+            <transportation>HLAreliable</transportation>
+          </attribute>
+          <attribute>
+            <name>SendMessagesAsRx</name>
+            <dataType>HLAboolean</dataType>
+            <order>TimeStamp</order>
+            <transportation>HLAreliable</transportation>
+          </attribute>
+        </objectClass>
+        <objectClass><name>FlexRayCluster</name>
+          <attribute><name>gColdstartAttempts</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gCycleCountMax</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdActionPointOffset</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdDynamicSlotIdlePhase</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdMiniSlot</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdMiniSlotActionPointOffset</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdStaticSlot</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdSymbolWindow</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdSymbolWindowActionPointOffset</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdTSSTransmitter</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdWakeupTxActive</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gdWakeupTxIdle</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gListenNoise</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gMacroPerCycle</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gMaxWithoutClockCorrectionFatal</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gMaxWithoutClockCorrectionPassive</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gNumberOfMiniSlots</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gNumberOfStaticSlots</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gPayloadLengthStatic</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>gSyncFrameIDCountMax</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        </objectClass>
       </objectClass>
       <objectClass>
         <name>BusController</name>
@@ -178,6 +215,64 @@
             <transportation>HLAreliable</transportation>
           </attribute>
         </objectClass>
+        <objectClass>
+          <name>BusControllerEthernet</name>
+          <attribute>
+            <name>PortName</name>
+            <dataType>HLAASCIIstring</dataType>
+            <order>TimeStamp</order>
+            <transportation>HLAreliable</transportation>
+          </attribute>
+        </objectClass>
+        <objectClass><name>FlexRayControllerStatus</name>
+          <attribute><name>PocState</name><dataType>FlexRayPocState</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>chiHaltRequest</name><dataType>HLAboolean</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>coldstartNoise</name><dataType>HLAboolean</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>freeze</name><dataType>HLAboolean</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>chiReadyRequest</name><dataType>HLAboolean</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>errorMode</name><dataType>FlexRayErrorModeType</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>slotMode</name><dataType>FlexRaySlotModeType</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>startupState</name><dataType>FlexRayStartupStateType</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>wakeupStatus</name><dataType>FlexRayWakeupStatusType</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        </objectClass>
+        <objectClass><name>FlexRayController</name>
+          <attribute><name>PocRequest</name><dataType>FlexRayPocState</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>ChiCommand</name><dataType>FlexRayChiCommand</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pAllowHaltDueToClock</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pAllowPassiveToActive</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pChannels</name><dataType>FlexRayChannel</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pClusterDriftDamping</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pdAcceptedStartupRange</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pdListenTimeout</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pKeySlotId</name><dataType>HLAinteger16LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pKeySlotOnlyEnabled</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pKeySlotUsedForStartup</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pKeySlotUsedForSync</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pLatestTx</name><dataType>HLAinteger16LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pMacroInitialOffsetA</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pMacroInitialOffsetB</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pMicroInitialOffsetA</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pMicroInitialOffsetB</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pMicroPerCycle</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pOffsetCorrectionOut</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pOffsetCorrectionStart</name><dataType>HLAinteger16LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pRateCorrectionOut</name><dataType>HLAinteger32LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pWakeupChannel</name><dataType>FlexRayChannel</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pWakeupPattern</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pdMicrotick</name><dataType>FlexRayClockPeriod</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+          <attribute><name>pSamplesPerMicrotick</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        </objectClass>
+      </objectClass>
+      <objectClass><name>FlexRaySendBuffer</name>
+        <attribute><name>Sender</name><dataType>HLAhandle</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>TransmissionMode</name><dataType>FlexRayTransmissionMode</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>Payload</name><dataType>FlexRayPayload</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>CycleOffset</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>CycleRepetition</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>SlotId</name><dataType>HLAinteger16LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>Channel</name><dataType>FlexRayChannel</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>PPIndicator</name><dataType>HLAboolean</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>HeaderCRC</name><dataType>HLAinteger16LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
       </objectClass>
     </objectClass>
   </objects>
@@ -228,24 +323,6 @@
         <parameter>
           <name>Text</name>
           <dataType>HLAunicodeString</dataType>
-        </parameter>
-      </interactionClass>
-      <interactionClass>
-        <name>DOMemberTransmitData</name>
-        <order>TimeStamp</order>
-        <transportation>HLAreliable</transportation>
-        <sharing>PublishSubscribe</sharing>
-        <parameter>
-          <name>ObjInstanceHandle</name>
-          <dataType class="DOMemberSource">HLAobjectInstanceHandle</dataType>
-        </parameter>
-        <parameter>
-          <name>ConnectionType</name>
-          <dataType>HLAASCIIstring</dataType>
-        </parameter>
-        <parameter>
-          <name>DataBytes</name>
-          <dataType>HLAopaqueData</dataType>
         </parameter>
       </interactionClass>
       <interactionClass>
@@ -331,6 +408,10 @@
             <name>Frame</name>
             <dataType>EthernetPacket</dataType>
           </parameter>
+          <parameter>
+            <name>PortName</name>
+            <dataType>HLAASCIIstring</dataType>
+          </parameter>
         </interactionClass>
         <interactionClass>
           <name>EthPacketError</name>
@@ -361,6 +442,10 @@
             <name>Frame</name>
             <dataType>EthernetPacketForwarded</dataType>
           </parameter>
+          <parameter>
+            <name>PortName</name>
+            <dataType>HLAASCIIstring</dataType>
+          </parameter>
         </interactionClass>
         <interactionClass>
           <name>EthStatus</name>
@@ -370,6 +455,10 @@
           <parameter>
             <name>Frame</name>
             <dataType>EthernetStatus</dataType>
+          </parameter>
+          <parameter>
+            <name>PortName</name>
+            <dataType>HLAASCIIstring</dataType>
           </parameter>
         </interactionClass>
         <interactionClass>
@@ -395,6 +484,28 @@
             <name>Frame</name>
             <dataType>HLAopaqueData</dataType>
           </parameter>
+        </interactionClass>
+        <interactionClass><name>FlexRaySymbol</name>
+          <order>TimeStamp</order>
+          <transportation>HLAreliable</transportation>
+          <sharing>PublishSubscribe</sharing>
+          <parameter><name>SymbolPattern</name><dataType>FlexRaySymbolPattern</dataType></parameter>
+          <parameter><name>FlexRayChannel</name><dataType>FlexRayChannel</dataType></parameter>
+        </interactionClass>
+        <interactionClass><name>FlexRayCycleStart</name>
+          <order>TimeStamp</order>
+          <transportation>HLAreliable</transportation>
+          <sharing>PublishSubscribe</sharing>
+          <parameter><name>Cycle</name><dataType>HLAoctet</dataType></parameter>
+        </interactionClass>
+        <interactionClass><name>FlexRayFrame</name>
+          <order>TimeStamp</order>
+          <transportation>HLAreliable</transportation>
+          <sharing>PublishSubscribe</sharing>
+          <parameter><name>FrameID</name><dataType>HLAinteger16LE</dataType></parameter>
+          <parameter><name>PayloadPreambleIndicator</name><dataType>HLAboolean</dataType></parameter>
+          <parameter><name>Header</name><dataType>FlexRayHeader</dataType></parameter>
+          <parameter><name>Payload</name><dataType>FlexRayPayload</dataType></parameter>
         </interactionClass>
       </interactionClass>
       <interactionClass>
@@ -425,7 +536,7 @@
         <units>ns</units>
         <resolution>NA</resolution>
         <accuracy>NA</accuracy>
-        <semantics></semantics>
+        <semantics/>
       </simpleData>
       <simpleData>
         <name>VMessageId</name>
@@ -433,7 +544,7 @@
         <units>ns</units>
         <resolution>NA</resolution>
         <accuracy>NA</accuracy>
-        <semantics></semantics>
+        <semantics/>
       </simpleData>
     </simpleDataTypes>
     <enumeratedDataTypes>
@@ -707,6 +818,86 @@ kLinkError     = 4  // Link is in error state (e.g. auto-negotiation failed)
           <value>2</value>
         </enumerator>
       </enumeratedData>
+      <enumeratedData><name>FlexRayChannel</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>None</name><value>0</value></enumerator>
+        <enumerator><name>A</name><value>1</value></enumerator>
+        <enumerator><name>B</name><value>2</value></enumerator>
+        <enumerator><name>AB</name><value>3</value></enumerator>
+      </enumeratedData>
+      <enumeratedData><name>FlexRaySymbolPattern</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>CAS</name><value>0</value></enumerator>
+        <enumerator><name>WUP</name><value>1</value></enumerator>
+        <enumerator><name>WUDOP</name><value>2</value></enumerator>
+      </enumeratedData>
+      <enumeratedData><name>FlexRayChiCommand</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>RUN</name><value>0</value></enumerator>
+        <enumerator><name>DEFERRED_HALT</name><value>1</value></enumerator>
+        <enumerator><name>FREEZE</name><value>2</value></enumerator>
+        <enumerator><name>ALLOW_COLDSTART</name><value>3</value></enumerator>
+        <enumerator><name>ALL_SLOTS</name><value>4</value></enumerator>
+        <enumerator><name>WAKEUP</name><value>5</value></enumerator>
+      </enumeratedData>
+      <enumeratedData><name>FlexRayTransmissionMode</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>SingleShot</name><value>0</value></enumerator>
+        <enumerator><name>Continuous</name><value>1</value></enumerator>
+      </enumeratedData>
+      <enumeratedData><name>FlexRayPocState</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>DefaultConfig</name><value>0</value></enumerator>
+        <enumerator><name>Config</name><value>1</value></enumerator>
+        <enumerator><name>Ready</name><value>2</value></enumerator>
+        <enumerator><name>Startup</name><value>3</value></enumerator>
+        <enumerator><name>Wakeup</name><value>4</value></enumerator>
+        <enumerator><name>NormalActive</name><value>5</value></enumerator>
+        <enumerator><name>NormalPassive</name><value>6</value></enumerator>
+        <enumerator><name>Halt</name><value>7</value></enumerator>
+      </enumeratedData>
+      <enumeratedData><name>FlexRaySlotModeType</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>KeySlot</name><value>0</value></enumerator>
+        <enumerator><name>AllPending</name><value>1</value></enumerator>
+        <enumerator><name>All</name><value>2</value></enumerator>
+      </enumeratedData>
+      <enumeratedData><name>FlexRayErrorModeType</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>Active</name><value>0</value></enumerator>
+        <enumerator><name>Passive</name><value>1</value></enumerator>
+        <enumerator><name>CommHalt</name><value>2</value></enumerator>
+      </enumeratedData>
+      <enumeratedData><name>FlexRayStartupStateType</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>Undefined</name><value>0</value></enumerator>
+        <enumerator><name>ColdStartListen</name><value>1</value></enumerator>
+        <enumerator><name>IntegrationColdstartCheck</name><value>2</value></enumerator>
+        <enumerator><name>ColdStartJoin</name><value>3</value></enumerator>
+        <enumerator><name>ColdStartCollisionResolution</name><value>4</value></enumerator>
+        <enumerator><name>ColdStartConsistencyCheck</name><value>5</value></enumerator>
+        <enumerator><name>IntegrationListen</name><value>6</value></enumerator>
+        <enumerator><name>InitializeSchedule</name><value>7</value></enumerator>
+        <enumerator><name>IntegrationConsistencyCheck</name><value>8</value></enumerator>
+        <enumerator><name>ColdStartGap</name><value>9</value></enumerator>
+        <enumerator><name>ExternalStartup</name><value>10</value></enumerator>
+      </enumeratedData>
+      <enumeratedData><name>FlexRayWakeupStatusType</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>Undefined</name><value>0</value></enumerator>
+        <enumerator><name>ReceivedHeader</name><value>1</value></enumerator>
+        <enumerator><name>ReceivedWup</name><value>2</value></enumerator>
+        <enumerator><name>CollisionHeader</name><value>3</value></enumerator>
+        <enumerator><name>CollisionWup</name><value>4</value></enumerator>
+        <enumerator><name>CollisionUnknown</name><value>5</value></enumerator>
+        <enumerator><name>Transmitted</name><value>6</value></enumerator>
+      </enumeratedData>
+      <enumeratedData><name>FlexRayClockPeriod</name>
+        <representation>HLAoctet</representation>
+        <enumerator><name>T12_5NS</name><value>1</value></enumerator>
+        <enumerator><name>T25NS</name><value>2</value></enumerator>
+        <enumerator><name>T50NS</name><value>3</value></enumerator>
+      </enumeratedData>
     </enumeratedDataTypes>
     <arrayDataTypes>
       <arrayData>
@@ -728,6 +919,13 @@ a distinct member field of the CANFrame.
 Bytes carried in a Ethernet Packet. The data is variable-sized and carries the
 actual number of bytes used.
         </semantics>
+      </arrayData>
+      <arrayData>
+        <name>FlexRayPayloadData</name>
+        <dataType>HLAbyte</dataType>
+        <cardinality>Dynamic</cardinality>
+        <encoding>HLAvariableArray</encoding>
+        <semantics>Bytes carried in a FlexRay Frame. The data is variable-sized and carries the actual number of bytes used.</semantics>
       </arrayData>
     </arrayDataTypes>
     <fixedRecordDataTypes>
@@ -773,13 +971,13 @@ actual number of bytes used.
           <name>Id</name>
           <version>1</version>
           <dataType>VMessageId</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>Flags</name>
           <version>1</version>
           <dataType>HLAinteger32LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>DataLength</name>
@@ -797,7 +995,7 @@ actual number of bytes used.
           <name>FrameLengthNS</name>
           <version>1</version>
           <dataType>HLAinteger32LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>BitCount</name>
@@ -837,7 +1035,7 @@ actual number of bytes used.
         <field>
           <name>BusType</name>
           <dataType>HLAinteger16LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>HardwareChannel</name>
@@ -848,47 +1046,47 @@ actual number of bytes used.
         <field>
           <name>LinkStatus</name>
           <dataType>LinkStatus</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>Bitrate</name>
           <dataType>HLAinteger32LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>EthernetPhy</name>
           <dataType>EthernetPhy</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>Duplex</name>
           <dataType>Duplex</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>MdiType</name>
           <dataType>MdiType</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>Connector</name>
           <dataType>Connector</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>ClockMode</name>
           <dataType>ClockMode</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>BrPair</name>
           <dataType>BrPair</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>DeviceOperationMode</name>
           <dataType>HLAinteger32LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
       </fixedRecordData>
       <fixedRecordData>
@@ -900,7 +1098,7 @@ actual number of bytes used.
         <field>
           <name>BusType</name>
           <dataType>HLAinteger16LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>HardwareChannel</name>
@@ -910,17 +1108,17 @@ actual number of bytes used.
         <field>
           <name>FrameDuration</name>
           <dataType>VTimeNS</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>EthernetChecksum</name>
           <dataType>HLAinteger32LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>PacketData</name>
           <dataType>EthernetPacketData</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
       </fixedRecordData>
       <fixedRecordData>
@@ -935,7 +1133,7 @@ actual number of bytes used.
         <field>
           <name>BusType</name>
           <dataType>HLAinteger16LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>HardwareChannel</name>
@@ -945,28 +1143,59 @@ actual number of bytes used.
         <field>
           <name>FrameDuration</name>
           <dataType>VTimeNS</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>ErrorCode</name>
           <dataType>HLAinteger32LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>EthernetChecksum</name>
           <dataType>HLAinteger32LE</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
         <field>
           <name>PacketData</name>
           <dataType>EthernetPacketData</dataType>
-          <semantics></semantics>
+          <semantics/>
         </field>
       </fixedRecordData>
       <fixedRecordData>
         <name>EthernetPacketErrorForwarded</name>
         <version>1</version>
         <include>EthernetPacketError</include>
+      </fixedRecordData>
+      <fixedRecordData>
+        <name>FlexRayPayload</name>
+        <version>1</version>
+        <encoding>HLAfixedRecord</encoding>
+        <semantics>Payload of FlexRay Frame</semantics>
+        <include>BusMessage</include>
+        <field><name>PayloadData</name><version>1</version><dataType>FlexRayPayloadData</dataType><semantics/></field>
+        <field><name>PayloadValid</name><version>1</version><dataType>HLAboolean</dataType><semantics/></field>
+      </fixedRecordData>
+      <fixedRecordData>
+        <name>FlexRayHeader</name>
+        <version>1</version>
+        <encoding>HLAfixedRecord</encoding>
+        <semantics>Header of FlexRay Frame</semantics>
+        <field><name>SuFindicator</name><version>1</version><dataType>HLAboolean</dataType><semantics/></field>
+        <field><name>SyFIndicator</name><version>1</version><dataType>HLAboolean</dataType><semantics/></field>
+        <field><name>NFIndicator</name><version>1</version><dataType>HLAboolean</dataType><semantics/></field>
+        <field><name>PPIndicator</name><version>1</version><dataType>HLAboolean</dataType><semantics/></field>
+        <field><name>FrameID</name><version>1</version><dataType>HLAinteger16LE</dataType><semantics/></field>
+        <field><name>payloadLength</name><version>1</version><dataType>HLAoctet</dataType><semantics/></field>
+        <field><name>HeaderCRC</name><version>1</version><dataType>HLAinteger16LE</dataType><semantics/></field>
+        <field><name>Cycle</name><version>1</version><dataType>HLAoctet</dataType><semantics/></field>
+      </fixedRecordData>
+      <fixedRecordData>
+        <name>FlexRayFrame</name>
+        <version>1</version>
+        <encoding>HLAfixedRecord</encoding>
+        <semantics>FlexRay Frame</semantics>
+        <!--<include>FlexRayHeader</include>-->
+        <include>FlexRayPayload</include>
       </fixedRecordData>
     </fixedRecordDataTypes>
     <variantRecordDataTypes/>

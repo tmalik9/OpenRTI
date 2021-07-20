@@ -545,156 +545,6 @@ rti1516ev::ParameterHandleSet TextLogInteractionClass::GetAllParameterHandles()
   return result;
 }
 
-// object class type 'DOMemberTransmitData'
-DOMemberTransmitDataInteractionClass::DOMemberTransmitDataInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
-{
-  mRtiAmbassador = rtiAmbassador;
-  mBaseClass = baseClass;
-  mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.DOMemberTransmitData");
-  // parameter ObjInstanceHandle : HLAobjectInstanceHandle.DOMemberSource
-  mObjInstanceHandleParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"ObjInstanceHandle");
-  // parameter ConnectionType : HLAASCIIstring
-  mConnectionTypeParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"ConnectionType");
-  // parameter DataBytes : HLAopaqueData
-  mDataBytesParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"DataBytes");
-}
-
-void DOMemberTransmitDataInteractionClass::Publish()
-{
-  if (!mPublished)
-  {
-    mRtiAmbassador->publishInteractionClass(mInteractionClassHandle);
-    mPublished = true;
-  }
-}
-
-void DOMemberTransmitDataInteractionClass::Unpublish()
-{
-  if (mPublished)
-  {
-    mRtiAmbassador->unpublishInteractionClass(mInteractionClassHandle);
-    mPublished = false;
-  }
-}
-
-void DOMemberTransmitDataInteractionClass::Subscribe()
-{
-  if (!mSubscribed)
-  {
-    mRtiAmbassador->subscribeInteractionClass(mInteractionClassHandle);
-    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, true);
-    mSubscribed = true;
-  }
-}
-
-void DOMemberTransmitDataInteractionClass::Unsubscribe()
-{
-  if (mSubscribed)
-  {
-    mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
-    mSubscribed = false;
-  }
-}
-
-void DOMemberTransmitDataInteractionClass::send(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes)
-{
-  rti1516ev::ParameterHandleValueMap parameters;
-  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleEncoder(static_cast<DOMemberSource*>(ObjInstanceHandle)->GetObjectInstanceHandle());
-  parameters.insert(std::make_pair(GetObjInstanceHandleParameterHandle(), ObjInstanceHandleEncoder.encode()));
-  rti1516ev::HLAASCIIstring ConnectionTypeEncoder(ConnectionType);
-  parameters.insert(std::make_pair(GetConnectionTypeParameterHandle(), ConnectionTypeEncoder.encode()));
-  rti1516ev::HLAopaqueData DataBytesEncoder(DataBytes);
-  parameters.insert(std::make_pair(GetDataBytesParameterHandle(), DataBytesEncoder.encode()));
-  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
-}
-
-void DOMemberTransmitDataInteractionClass::sendWithTime(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time)
-{
-  rti1516ev::ParameterHandleValueMap parameters;
-  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleEncoder(static_cast<DOMemberSource*>(ObjInstanceHandle)->GetObjectInstanceHandle());
-  parameters.insert(std::make_pair(GetObjInstanceHandleParameterHandle(), ObjInstanceHandleEncoder.encode()));
-  rti1516ev::HLAASCIIstring ConnectionTypeEncoder(ConnectionType);
-  parameters.insert(std::make_pair(GetConnectionTypeParameterHandle(), ConnectionTypeEncoder.encode()));
-  rti1516ev::HLAopaqueData DataBytesEncoder(DataBytes);
-  parameters.insert(std::make_pair(GetDataBytesParameterHandle(), DataBytesEncoder.encode()));
-  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), rti1516ev::HLAinteger64Time(time));
-}
-
-void DOMemberTransmitDataInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
-{
-  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleDecoder;
-  rti1516ev::ParameterHandleValueMap::const_iterator ObjInstanceHandleIter = parameters.find(GetObjInstanceHandleParameterHandle());
-  if (ObjInstanceHandleIter != parameters.end())
-  {
-    ObjInstanceHandleDecoder.decode(ObjInstanceHandleIter->second);
-  }
-  rti1516ev::HLAASCIIstring ConnectionTypeDecoder;
-  rti1516ev::ParameterHandleValueMap::const_iterator ConnectionTypeIter = parameters.find(GetConnectionTypeParameterHandle());
-  if (ConnectionTypeIter != parameters.end())
-  {
-    ConnectionTypeDecoder.decode(ConnectionTypeIter->second);
-  }
-  rti1516ev::HLAopaqueData DataBytesDecoder;
-  rti1516ev::ParameterHandleValueMap::const_iterator DataBytesIter = parameters.find(GetDataBytesParameterHandle());
-  if (DataBytesIter != parameters.end())
-  {
-    DataBytesDecoder.decode(DataBytesIter->second);
-  }
-  for (auto& entry : _receiveCallbacks) {
-    auto& callback = entry.second;
-    callback(static_cast<DOMemberSourceObjectClass*>(ObjectClassRegistry::GetInstance()->GetDOMemberSourceObjectClass())->GetObjectInstance(ObjInstanceHandleDecoder.get()), ConnectionTypeDecoder.get(), DataBytesDecoder.get());
-  }
-}
-
-void DOMemberTransmitDataInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, rti1516ev::OrderType /*receivedOrder*/)
-{
-  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleDecoder;
-  rti1516ev::ParameterHandleValueMap::const_iterator ObjInstanceHandleIter = parameters.find(GetObjInstanceHandleParameterHandle());
-  if (ObjInstanceHandleIter != parameters.end())
-  {
-    ObjInstanceHandleDecoder.decode(ObjInstanceHandleIter->second);
-  }
-  rti1516ev::HLAASCIIstring ConnectionTypeDecoder;
-  rti1516ev::ParameterHandleValueMap::const_iterator ConnectionTypeIter = parameters.find(GetConnectionTypeParameterHandle());
-  if (ConnectionTypeIter != parameters.end())
-  {
-    ConnectionTypeDecoder.decode(ConnectionTypeIter->second);
-  }
-  rti1516ev::HLAopaqueData DataBytesDecoder;
-  rti1516ev::ParameterHandleValueMap::const_iterator DataBytesIter = parameters.find(GetDataBytesParameterHandle());
-  if (DataBytesIter != parameters.end())
-  {
-    DataBytesDecoder.decode(DataBytesIter->second);
-  }
-  for (auto& entry : _receiveCallbacksWithTime) {
-    auto& callback = entry.second;
-    callback(static_cast<DOMemberSourceObjectClass*>(ObjectClassRegistry::GetInstance()->GetDOMemberSourceObjectClass())->GetObjectInstance(ObjInstanceHandleDecoder.get()), ConnectionTypeDecoder.get(), DataBytesDecoder.get(), static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
-  }
-}
-
-uint32_t DOMemberTransmitDataInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
-{
-  uint32_t key = _receiveCallbacksNextKey++;
-  _receiveCallbacks.insert(std::make_pair(key, callback));
-  return key;
-}
-
-uint32_t DOMemberTransmitDataInteractionClass::RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback)
-{
-  uint32_t key = _receiveCallbacksWithTimeNextKey++;
-  _receiveCallbacksWithTime.insert(std::make_pair(key, callback));
-  return key;
-}
-
-rti1516ev::ParameterHandleSet DOMemberTransmitDataInteractionClass::GetAllParameterHandles()
-{
-  rti1516ev::ParameterHandleSet result;
-  result.insert(GetObjInstanceHandleParameterHandle());
-  result.insert(GetConnectionTypeParameterHandle());
-  result.insert(GetDataBytesParameterHandle());
-  return result;
-}
-
 // object class type 'SystemVariableUpdate'
 SystemVariableUpdateInteractionClass::SystemVariableUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
 {
@@ -1171,7 +1021,7 @@ void BusMessageInteractionClass::send(bool IsRequest, const std::string& Channel
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -1189,7 +1039,7 @@ void BusMessageInteractionClass::sendWithTime(bool IsRequest, const std::string&
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -1322,6 +1172,8 @@ EthPacketInteractionClass::EthPacketInteractionClass(rti1516ev::RTIambassador* r
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.EthPacket");
   // parameter Frame : EthernetPacket
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
+  // parameter PortName : HLAASCIIstring
+  mPortNameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"PortName");
 }
 
 void EthPacketInteractionClass::Publish()
@@ -1361,14 +1213,14 @@ void EthPacketInteractionClass::Unsubscribe()
   }
 }
 
-void EthPacketInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame)
+void EthPacketInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame, const std::string& PortName)
 {
   rti1516ev::ParameterHandleValueMap parameters;
   rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -1378,17 +1230,19 @@ void EthPacketInteractionClass::send(bool IsRequest, const std::string& ChannelN
   parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   const EthernetPacketEncoding& FrameEncoder = static_cast<const EthernetPacketEncoding&>(Frame);
   parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  rti1516ev::HLAASCIIstring PortNameEncoder(PortName);
+  parameters.insert(std::make_pair(GetPortNameParameterHandle(), PortNameEncoder.encode()));
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
-void EthPacketInteractionClass::sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame, int64_t time)
+void EthPacketInteractionClass::sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacket& Frame, const std::string& PortName, int64_t time)
 {
   rti1516ev::ParameterHandleValueMap parameters;
   rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -1398,6 +1252,8 @@ void EthPacketInteractionClass::sendWithTime(bool IsRequest, const std::string& 
   parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   const EthernetPacketEncoding& FrameEncoder = static_cast<const EthernetPacketEncoding&>(Frame);
   parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  rti1516ev::HLAASCIIstring PortNameEncoder(PortName);
+  parameters.insert(std::make_pair(GetPortNameParameterHandle(), PortNameEncoder.encode()));
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), rti1516ev::HLAinteger64Time(time));
 }
 
@@ -1445,9 +1301,15 @@ void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   {
     FrameDecoder.decode(FrameIter->second);
   }
+  rti1516ev::HLAASCIIstring PortNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PortNameIter = parameters.find(GetPortNameParameterHandle());
+  if (PortNameIter != parameters.end())
+  {
+    PortNameDecoder.decode(PortNameIter->second);
+  }
   for (auto& entry : _receiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder);
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder, PortNameDecoder.get());
   }
 }
 
@@ -1495,9 +1357,15 @@ void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   {
     FrameDecoder.decode(FrameIter->second);
   }
+  rti1516ev::HLAASCIIstring PortNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PortNameIter = parameters.find(GetPortNameParameterHandle());
+  if (PortNameIter != parameters.end())
+  {
+    PortNameDecoder.decode(PortNameIter->second);
+  }
   for (auto& entry : _receiveCallbacksWithTime) {
     auto& callback = entry.second;
-    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder, PortNameDecoder.get(), static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
   }
 }
 
@@ -1525,6 +1393,7 @@ rti1516ev::ParameterHandleSet EthPacketInteractionClass::GetAllParameterHandles(
   result.insert(GetSenderParameterHandle());
   result.insert(GetReceiverParameterHandle());
   result.insert(GetFrameParameterHandle());
+  result.insert(GetPortNameParameterHandle());
   return result;
 }
 
@@ -1582,7 +1451,7 @@ void EthPacketErrorInteractionClass::send(bool IsRequest, const std::string& Cha
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -1602,7 +1471,7 @@ void EthPacketErrorInteractionClass::sendWithTime(bool IsRequest, const std::str
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -1796,7 +1665,7 @@ void EthPacketErrorForwardedInteractionClass::send(bool IsRequest, const std::st
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -1816,7 +1685,7 @@ void EthPacketErrorForwardedInteractionClass::sendWithTime(bool IsRequest, const
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -1964,6 +1833,8 @@ EthForwardedPacketInteractionClass::EthForwardedPacketInteractionClass(rti1516ev
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.EthForwardedPacket");
   // parameter Frame : EthernetPacketForwarded
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
+  // parameter PortName : HLAASCIIstring
+  mPortNameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"PortName");
 }
 
 void EthForwardedPacketInteractionClass::Publish()
@@ -2003,14 +1874,14 @@ void EthForwardedPacketInteractionClass::Unsubscribe()
   }
 }
 
-void EthForwardedPacketInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame)
+void EthForwardedPacketInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame, const std::string& PortName)
 {
   rti1516ev::ParameterHandleValueMap parameters;
   rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -2020,17 +1891,19 @@ void EthForwardedPacketInteractionClass::send(bool IsRequest, const std::string&
   parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   const EthernetPacketForwardedEncoding& FrameEncoder = static_cast<const EthernetPacketForwardedEncoding&>(Frame);
   parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  rti1516ev::HLAASCIIstring PortNameEncoder(PortName);
+  parameters.insert(std::make_pair(GetPortNameParameterHandle(), PortNameEncoder.encode()));
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
-void EthForwardedPacketInteractionClass::sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame, int64_t time)
+void EthForwardedPacketInteractionClass::sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetPacketForwarded& Frame, const std::string& PortName, int64_t time)
 {
   rti1516ev::ParameterHandleValueMap parameters;
   rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -2040,6 +1913,8 @@ void EthForwardedPacketInteractionClass::sendWithTime(bool IsRequest, const std:
   parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   const EthernetPacketForwardedEncoding& FrameEncoder = static_cast<const EthernetPacketForwardedEncoding&>(Frame);
   parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  rti1516ev::HLAASCIIstring PortNameEncoder(PortName);
+  parameters.insert(std::make_pair(GetPortNameParameterHandle(), PortNameEncoder.encode()));
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), rti1516ev::HLAinteger64Time(time));
 }
 
@@ -2087,9 +1962,15 @@ void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::Par
   {
     FrameDecoder.decode(FrameIter->second);
   }
+  rti1516ev::HLAASCIIstring PortNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PortNameIter = parameters.find(GetPortNameParameterHandle());
+  if (PortNameIter != parameters.end())
+  {
+    PortNameDecoder.decode(PortNameIter->second);
+  }
   for (auto& entry : _receiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder);
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder, PortNameDecoder.get());
   }
 }
 
@@ -2137,9 +2018,15 @@ void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::Par
   {
     FrameDecoder.decode(FrameIter->second);
   }
+  rti1516ev::HLAASCIIstring PortNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PortNameIter = parameters.find(GetPortNameParameterHandle());
+  if (PortNameIter != parameters.end())
+  {
+    PortNameDecoder.decode(PortNameIter->second);
+  }
   for (auto& entry : _receiveCallbacksWithTime) {
     auto& callback = entry.second;
-    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder, PortNameDecoder.get(), static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
   }
 }
 
@@ -2167,6 +2054,7 @@ rti1516ev::ParameterHandleSet EthForwardedPacketInteractionClass::GetAllParamete
   result.insert(GetSenderParameterHandle());
   result.insert(GetReceiverParameterHandle());
   result.insert(GetFrameParameterHandle());
+  result.insert(GetPortNameParameterHandle());
   return result;
 }
 
@@ -2178,6 +2066,8 @@ EthStatusInteractionClass::EthStatusInteractionClass(rti1516ev::RTIambassador* r
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.EthStatus");
   // parameter Frame : EthernetStatus
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
+  // parameter PortName : HLAASCIIstring
+  mPortNameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"PortName");
 }
 
 void EthStatusInteractionClass::Publish()
@@ -2217,14 +2107,14 @@ void EthStatusInteractionClass::Unsubscribe()
   }
 }
 
-void EthStatusInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame)
+void EthStatusInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame, const std::string& PortName)
 {
   rti1516ev::ParameterHandleValueMap parameters;
   rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -2234,17 +2124,19 @@ void EthStatusInteractionClass::send(bool IsRequest, const std::string& ChannelN
   parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   const EthernetStatusEncoding& FrameEncoder = static_cast<const EthernetStatusEncoding&>(Frame);
   parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  rti1516ev::HLAASCIIstring PortNameEncoder(PortName);
+  parameters.insert(std::make_pair(GetPortNameParameterHandle(), PortNameEncoder.encode()));
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
-void EthStatusInteractionClass::sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame, int64_t time)
+void EthStatusInteractionClass::sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, const EthernetStatus& Frame, const std::string& PortName, int64_t time)
 {
   rti1516ev::ParameterHandleValueMap parameters;
   rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -2254,6 +2146,8 @@ void EthStatusInteractionClass::sendWithTime(bool IsRequest, const std::string& 
   parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   const EthernetStatusEncoding& FrameEncoder = static_cast<const EthernetStatusEncoding&>(Frame);
   parameters.insert(std::make_pair(GetFrameParameterHandle(), FrameEncoder.encode()));
+  rti1516ev::HLAASCIIstring PortNameEncoder(PortName);
+  parameters.insert(std::make_pair(GetPortNameParameterHandle(), PortNameEncoder.encode()));
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), rti1516ev::HLAinteger64Time(time));
 }
 
@@ -2301,9 +2195,15 @@ void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   {
     FrameDecoder.decode(FrameIter->second);
   }
+  rti1516ev::HLAASCIIstring PortNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PortNameIter = parameters.find(GetPortNameParameterHandle());
+  if (PortNameIter != parameters.end())
+  {
+    PortNameDecoder.decode(PortNameIter->second);
+  }
   for (auto& entry : _receiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder);
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder, PortNameDecoder.get());
   }
 }
 
@@ -2351,9 +2251,15 @@ void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   {
     FrameDecoder.decode(FrameIter->second);
   }
+  rti1516ev::HLAASCIIstring PortNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PortNameIter = parameters.find(GetPortNameParameterHandle());
+  if (PortNameIter != parameters.end())
+  {
+    PortNameDecoder.decode(PortNameIter->second);
+  }
   for (auto& entry : _receiveCallbacksWithTime) {
     auto& callback = entry.second;
-    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameDecoder, PortNameDecoder.get(), static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
   }
 }
 
@@ -2381,6 +2287,7 @@ rti1516ev::ParameterHandleSet EthStatusInteractionClass::GetAllParameterHandles(
   result.insert(GetSenderParameterHandle());
   result.insert(GetReceiverParameterHandle());
   result.insert(GetFrameParameterHandle());
+  result.insert(GetPortNameParameterHandle());
   return result;
 }
 
@@ -2440,7 +2347,7 @@ void CANMessageInteractionClass::send(bool IsRequest, const std::string& Channel
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -2462,7 +2369,7 @@ void CANMessageInteractionClass::sendWithTime(bool IsRequest, const std::string&
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -2671,7 +2578,7 @@ void CANErrorFrameInteractionClass::send(bool IsRequest, const std::string& Chan
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -2691,7 +2598,7 @@ void CANErrorFrameInteractionClass::sendWithTime(bool IsRequest, const std::stri
   parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
   rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
   parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
-  rti1516ev::HLAinteger32LE BusTypeEncoder(BusType);
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
   parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
   rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
   parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
@@ -2828,6 +2735,724 @@ rti1516ev::ParameterHandleSet CANErrorFrameInteractionClass::GetAllParameterHand
   result.insert(GetSenderParameterHandle());
   result.insert(GetReceiverParameterHandle());
   result.insert(GetFrameParameterHandle());
+  return result;
+}
+
+// object class type 'FlexRaySymbol'
+FlexRaySymbolInteractionClass::FlexRaySymbolInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+{
+  mRtiAmbassador = rtiAmbassador;
+  mBaseClass = baseClass;
+  mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.FlexRaySymbol");
+  // parameter SymbolPattern : FlexRaySymbolPattern
+  mSymbolPatternParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"SymbolPattern");
+  // parameter FlexRayChannel : FlexRayChannel
+  mFlexRayChannelParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"FlexRayChannel");
+}
+
+void FlexRaySymbolInteractionClass::Publish()
+{
+  if (!mPublished)
+  {
+    mRtiAmbassador->publishInteractionClass(mInteractionClassHandle);
+    mPublished = true;
+  }
+}
+
+void FlexRaySymbolInteractionClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishInteractionClass(mInteractionClassHandle);
+    mPublished = false;
+  }
+}
+
+void FlexRaySymbolInteractionClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    mRtiAmbassador->subscribeInteractionClass(mInteractionClassHandle);
+    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void FlexRaySymbolInteractionClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void FlexRaySymbolInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, FlexRaySymbolPattern SymbolPattern, FlexRayChannel FlexRayChannel)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  rti1516ev::HLAoctet SymbolPatternEncoder(static_cast<uint8_t>(SymbolPattern));
+  parameters.insert(std::make_pair(GetSymbolPatternParameterHandle(), SymbolPatternEncoder.encode()));
+  rti1516ev::HLAoctet FlexRayChannelEncoder(static_cast<uint8_t>(FlexRayChannel));
+  parameters.insert(std::make_pair(GetFlexRayChannelParameterHandle(), FlexRayChannelEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
+void FlexRaySymbolInteractionClass::sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, FlexRaySymbolPattern SymbolPattern, FlexRayChannel FlexRayChannel, int64_t time)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  rti1516ev::HLAoctet SymbolPatternEncoder(static_cast<uint8_t>(SymbolPattern));
+  parameters.insert(std::make_pair(GetSymbolPatternParameterHandle(), SymbolPatternEncoder.encode()));
+  rti1516ev::HLAoctet FlexRayChannelEncoder(static_cast<uint8_t>(FlexRayChannel));
+  parameters.insert(std::make_pair(GetFlexRayChannelParameterHandle(), FlexRayChannelEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), rti1516ev::HLAinteger64Time(time));
+}
+
+void FlexRaySymbolInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+{
+  rti1516ev::HLAboolean IsRequestDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator IsRequestIter = parameters.find(GetIsRequestParameterHandle());
+  if (IsRequestIter != parameters.end())
+  {
+    IsRequestDecoder.decode(IsRequestIter->second);
+  }
+  rti1516ev::HLAASCIIstring ChannelNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ChannelNameIter = parameters.find(GetChannelNameParameterHandle());
+  if (ChannelNameIter != parameters.end())
+  {
+    ChannelNameDecoder.decode(ChannelNameIter->second);
+  }
+  rti1516ev::HLAinteger32LE BusTypeDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator BusTypeIter = parameters.find(GetBusTypeParameterHandle());
+  if (BusTypeIter != parameters.end())
+  {
+    BusTypeDecoder.decode(BusTypeIter->second);
+  }
+  rti1516ev::HLAhandle RequestingFederateDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator RequestingFederateIter = parameters.find(GetRequestingFederateParameterHandle());
+  if (RequestingFederateIter != parameters.end())
+  {
+    RequestingFederateDecoder.decode(RequestingFederateIter->second);
+  }
+  rti1516ev::HLAhandle SenderDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator SenderIter = parameters.find(GetSenderParameterHandle());
+  if (SenderIter != parameters.end())
+  {
+    SenderDecoder.decode(SenderIter->second);
+  }
+  rti1516ev::HLAhandle ReceiverDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ReceiverIter = parameters.find(GetReceiverParameterHandle());
+  if (ReceiverIter != parameters.end())
+  {
+    ReceiverDecoder.decode(ReceiverIter->second);
+  }
+  rti1516ev::HLAoctet SymbolPatternDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator SymbolPatternIter = parameters.find(GetSymbolPatternParameterHandle());
+  if (SymbolPatternIter != parameters.end())
+  {
+    SymbolPatternDecoder.decode(SymbolPatternIter->second);
+  }
+  rti1516ev::HLAoctet FlexRayChannelDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator FlexRayChannelIter = parameters.find(GetFlexRayChannelParameterHandle());
+  if (FlexRayChannelIter != parameters.end())
+  {
+    FlexRayChannelDecoder.decode(FlexRayChannelIter->second);
+  }
+  for (auto& entry : _receiveCallbacks) {
+    auto& callback = entry.second;
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, static_cast<FlexRaySymbolPattern>(SymbolPatternDecoder.get()), static_cast<FlexRayChannel>(FlexRayChannelDecoder.get()));
+  }
+}
+
+void FlexRaySymbolInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, rti1516ev::OrderType /*receivedOrder*/)
+{
+  rti1516ev::HLAboolean IsRequestDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator IsRequestIter = parameters.find(GetIsRequestParameterHandle());
+  if (IsRequestIter != parameters.end())
+  {
+    IsRequestDecoder.decode(IsRequestIter->second);
+  }
+  rti1516ev::HLAASCIIstring ChannelNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ChannelNameIter = parameters.find(GetChannelNameParameterHandle());
+  if (ChannelNameIter != parameters.end())
+  {
+    ChannelNameDecoder.decode(ChannelNameIter->second);
+  }
+  rti1516ev::HLAinteger32LE BusTypeDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator BusTypeIter = parameters.find(GetBusTypeParameterHandle());
+  if (BusTypeIter != parameters.end())
+  {
+    BusTypeDecoder.decode(BusTypeIter->second);
+  }
+  rti1516ev::HLAhandle RequestingFederateDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator RequestingFederateIter = parameters.find(GetRequestingFederateParameterHandle());
+  if (RequestingFederateIter != parameters.end())
+  {
+    RequestingFederateDecoder.decode(RequestingFederateIter->second);
+  }
+  rti1516ev::HLAhandle SenderDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator SenderIter = parameters.find(GetSenderParameterHandle());
+  if (SenderIter != parameters.end())
+  {
+    SenderDecoder.decode(SenderIter->second);
+  }
+  rti1516ev::HLAhandle ReceiverDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ReceiverIter = parameters.find(GetReceiverParameterHandle());
+  if (ReceiverIter != parameters.end())
+  {
+    ReceiverDecoder.decode(ReceiverIter->second);
+  }
+  rti1516ev::HLAoctet SymbolPatternDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator SymbolPatternIter = parameters.find(GetSymbolPatternParameterHandle());
+  if (SymbolPatternIter != parameters.end())
+  {
+    SymbolPatternDecoder.decode(SymbolPatternIter->second);
+  }
+  rti1516ev::HLAoctet FlexRayChannelDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator FlexRayChannelIter = parameters.find(GetFlexRayChannelParameterHandle());
+  if (FlexRayChannelIter != parameters.end())
+  {
+    FlexRayChannelDecoder.decode(FlexRayChannelIter->second);
+  }
+  for (auto& entry : _receiveCallbacksWithTime) {
+    auto& callback = entry.second;
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, static_cast<FlexRaySymbolPattern>(SymbolPatternDecoder.get()), static_cast<FlexRayChannel>(FlexRayChannelDecoder.get()), static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
+  }
+}
+
+uint32_t FlexRaySymbolInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+{
+  uint32_t key = _receiveCallbacksNextKey++;
+  _receiveCallbacks.insert(std::make_pair(key, callback));
+  return key;
+}
+
+uint32_t FlexRaySymbolInteractionClass::RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback)
+{
+  uint32_t key = _receiveCallbacksWithTimeNextKey++;
+  _receiveCallbacksWithTime.insert(std::make_pair(key, callback));
+  return key;
+}
+
+rti1516ev::ParameterHandleSet FlexRaySymbolInteractionClass::GetAllParameterHandles()
+{
+  rti1516ev::ParameterHandleSet result;
+  result.insert(GetIsRequestParameterHandle());
+  result.insert(GetChannelNameParameterHandle());
+  result.insert(GetBusTypeParameterHandle());
+  result.insert(GetRequestingFederateParameterHandle());
+  result.insert(GetSenderParameterHandle());
+  result.insert(GetReceiverParameterHandle());
+  result.insert(GetSymbolPatternParameterHandle());
+  result.insert(GetFlexRayChannelParameterHandle());
+  return result;
+}
+
+// object class type 'FlexRayCycleStart'
+FlexRayCycleStartInteractionClass::FlexRayCycleStartInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+{
+  mRtiAmbassador = rtiAmbassador;
+  mBaseClass = baseClass;
+  mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.FlexRayCycleStart");
+  // parameter Cycle : HLAoctet
+  mCycleParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Cycle");
+}
+
+void FlexRayCycleStartInteractionClass::Publish()
+{
+  if (!mPublished)
+  {
+    mRtiAmbassador->publishInteractionClass(mInteractionClassHandle);
+    mPublished = true;
+  }
+}
+
+void FlexRayCycleStartInteractionClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishInteractionClass(mInteractionClassHandle);
+    mPublished = false;
+  }
+}
+
+void FlexRayCycleStartInteractionClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    mRtiAmbassador->subscribeInteractionClass(mInteractionClassHandle);
+    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void FlexRayCycleStartInteractionClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void FlexRayCycleStartInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, uint8_t Cycle)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  rti1516ev::HLAoctet CycleEncoder(Cycle);
+  parameters.insert(std::make_pair(GetCycleParameterHandle(), CycleEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
+void FlexRayCycleStartInteractionClass::sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, uint8_t Cycle, int64_t time)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  rti1516ev::HLAoctet CycleEncoder(Cycle);
+  parameters.insert(std::make_pair(GetCycleParameterHandle(), CycleEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), rti1516ev::HLAinteger64Time(time));
+}
+
+void FlexRayCycleStartInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+{
+  rti1516ev::HLAboolean IsRequestDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator IsRequestIter = parameters.find(GetIsRequestParameterHandle());
+  if (IsRequestIter != parameters.end())
+  {
+    IsRequestDecoder.decode(IsRequestIter->second);
+  }
+  rti1516ev::HLAASCIIstring ChannelNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ChannelNameIter = parameters.find(GetChannelNameParameterHandle());
+  if (ChannelNameIter != parameters.end())
+  {
+    ChannelNameDecoder.decode(ChannelNameIter->second);
+  }
+  rti1516ev::HLAinteger32LE BusTypeDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator BusTypeIter = parameters.find(GetBusTypeParameterHandle());
+  if (BusTypeIter != parameters.end())
+  {
+    BusTypeDecoder.decode(BusTypeIter->second);
+  }
+  rti1516ev::HLAhandle RequestingFederateDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator RequestingFederateIter = parameters.find(GetRequestingFederateParameterHandle());
+  if (RequestingFederateIter != parameters.end())
+  {
+    RequestingFederateDecoder.decode(RequestingFederateIter->second);
+  }
+  rti1516ev::HLAhandle SenderDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator SenderIter = parameters.find(GetSenderParameterHandle());
+  if (SenderIter != parameters.end())
+  {
+    SenderDecoder.decode(SenderIter->second);
+  }
+  rti1516ev::HLAhandle ReceiverDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ReceiverIter = parameters.find(GetReceiverParameterHandle());
+  if (ReceiverIter != parameters.end())
+  {
+    ReceiverDecoder.decode(ReceiverIter->second);
+  }
+  rti1516ev::HLAoctet CycleDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator CycleIter = parameters.find(GetCycleParameterHandle());
+  if (CycleIter != parameters.end())
+  {
+    CycleDecoder.decode(CycleIter->second);
+  }
+  for (auto& entry : _receiveCallbacks) {
+    auto& callback = entry.second;
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, CycleDecoder.get());
+  }
+}
+
+void FlexRayCycleStartInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, rti1516ev::OrderType /*receivedOrder*/)
+{
+  rti1516ev::HLAboolean IsRequestDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator IsRequestIter = parameters.find(GetIsRequestParameterHandle());
+  if (IsRequestIter != parameters.end())
+  {
+    IsRequestDecoder.decode(IsRequestIter->second);
+  }
+  rti1516ev::HLAASCIIstring ChannelNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ChannelNameIter = parameters.find(GetChannelNameParameterHandle());
+  if (ChannelNameIter != parameters.end())
+  {
+    ChannelNameDecoder.decode(ChannelNameIter->second);
+  }
+  rti1516ev::HLAinteger32LE BusTypeDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator BusTypeIter = parameters.find(GetBusTypeParameterHandle());
+  if (BusTypeIter != parameters.end())
+  {
+    BusTypeDecoder.decode(BusTypeIter->second);
+  }
+  rti1516ev::HLAhandle RequestingFederateDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator RequestingFederateIter = parameters.find(GetRequestingFederateParameterHandle());
+  if (RequestingFederateIter != parameters.end())
+  {
+    RequestingFederateDecoder.decode(RequestingFederateIter->second);
+  }
+  rti1516ev::HLAhandle SenderDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator SenderIter = parameters.find(GetSenderParameterHandle());
+  if (SenderIter != parameters.end())
+  {
+    SenderDecoder.decode(SenderIter->second);
+  }
+  rti1516ev::HLAhandle ReceiverDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ReceiverIter = parameters.find(GetReceiverParameterHandle());
+  if (ReceiverIter != parameters.end())
+  {
+    ReceiverDecoder.decode(ReceiverIter->second);
+  }
+  rti1516ev::HLAoctet CycleDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator CycleIter = parameters.find(GetCycleParameterHandle());
+  if (CycleIter != parameters.end())
+  {
+    CycleDecoder.decode(CycleIter->second);
+  }
+  for (auto& entry : _receiveCallbacksWithTime) {
+    auto& callback = entry.second;
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, CycleDecoder.get(), static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
+  }
+}
+
+uint32_t FlexRayCycleStartInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+{
+  uint32_t key = _receiveCallbacksNextKey++;
+  _receiveCallbacks.insert(std::make_pair(key, callback));
+  return key;
+}
+
+uint32_t FlexRayCycleStartInteractionClass::RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback)
+{
+  uint32_t key = _receiveCallbacksWithTimeNextKey++;
+  _receiveCallbacksWithTime.insert(std::make_pair(key, callback));
+  return key;
+}
+
+rti1516ev::ParameterHandleSet FlexRayCycleStartInteractionClass::GetAllParameterHandles()
+{
+  rti1516ev::ParameterHandleSet result;
+  result.insert(GetIsRequestParameterHandle());
+  result.insert(GetChannelNameParameterHandle());
+  result.insert(GetBusTypeParameterHandle());
+  result.insert(GetRequestingFederateParameterHandle());
+  result.insert(GetSenderParameterHandle());
+  result.insert(GetReceiverParameterHandle());
+  result.insert(GetCycleParameterHandle());
+  return result;
+}
+
+// object class type 'FlexRayFrame'
+FlexRayFrameInteractionClass::FlexRayFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+{
+  mRtiAmbassador = rtiAmbassador;
+  mBaseClass = baseClass;
+  mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.FlexRayFrame");
+  // parameter FrameID : HLAinteger16LE
+  mFrameIDParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"FrameID");
+  // parameter PayloadPreambleIndicator : HLAboolean
+  mPayloadPreambleIndicatorParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"PayloadPreambleIndicator");
+  // parameter Header : FlexRayHeader
+  mHeaderParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Header");
+  // parameter Payload : FlexRayPayload
+  mPayloadParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Payload");
+}
+
+void FlexRayFrameInteractionClass::Publish()
+{
+  if (!mPublished)
+  {
+    mRtiAmbassador->publishInteractionClass(mInteractionClassHandle);
+    mPublished = true;
+  }
+}
+
+void FlexRayFrameInteractionClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishInteractionClass(mInteractionClassHandle);
+    mPublished = false;
+  }
+}
+
+void FlexRayFrameInteractionClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    mRtiAmbassador->subscribeInteractionClass(mInteractionClassHandle);
+    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void FlexRayFrameInteractionClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void FlexRayFrameInteractionClass::send(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int16_t FrameID, bool PayloadPreambleIndicator, const FlexRayHeader& Header, const FlexRayPayload& Payload)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  rti1516ev::HLAinteger16LE FrameIDEncoder(FrameID);
+  parameters.insert(std::make_pair(GetFrameIDParameterHandle(), FrameIDEncoder.encode()));
+  rti1516ev::HLAboolean PayloadPreambleIndicatorEncoder(PayloadPreambleIndicator);
+  parameters.insert(std::make_pair(GetPayloadPreambleIndicatorParameterHandle(), PayloadPreambleIndicatorEncoder.encode()));
+  const FlexRayHeaderEncoding& HeaderEncoder = static_cast<const FlexRayHeaderEncoding&>(Header);
+  parameters.insert(std::make_pair(GetHeaderParameterHandle(), HeaderEncoder.encode()));
+  const FlexRayPayloadEncoding& PayloadEncoder = static_cast<const FlexRayPayloadEncoding&>(Payload);
+  parameters.insert(std::make_pair(GetPayloadParameterHandle(), PayloadEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
+void FlexRayFrameInteractionClass::sendWithTime(bool IsRequest, const std::string& ChannelName, BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int16_t FrameID, bool PayloadPreambleIndicator, const FlexRayHeader& Header, const FlexRayPayload& Payload, int64_t time)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAboolean IsRequestEncoder(IsRequest);
+  parameters.insert(std::make_pair(GetIsRequestParameterHandle(), IsRequestEncoder.encode()));
+  rti1516ev::HLAASCIIstring ChannelNameEncoder(ChannelName);
+  parameters.insert(std::make_pair(GetChannelNameParameterHandle(), ChannelNameEncoder.encode()));
+  rti1516ev::HLAinteger32LE BusTypeEncoder(static_cast<int32_t>(BusType));
+  parameters.insert(std::make_pair(GetBusTypeParameterHandle(), BusTypeEncoder.encode()));
+  rti1516ev::HLAhandle RequestingFederateEncoder(RequestingFederate);
+  parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
+  rti1516ev::HLAhandle SenderEncoder(Sender);
+  parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
+  rti1516ev::HLAhandle ReceiverEncoder(Receiver);
+  parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
+  rti1516ev::HLAinteger16LE FrameIDEncoder(FrameID);
+  parameters.insert(std::make_pair(GetFrameIDParameterHandle(), FrameIDEncoder.encode()));
+  rti1516ev::HLAboolean PayloadPreambleIndicatorEncoder(PayloadPreambleIndicator);
+  parameters.insert(std::make_pair(GetPayloadPreambleIndicatorParameterHandle(), PayloadPreambleIndicatorEncoder.encode()));
+  const FlexRayHeaderEncoding& HeaderEncoder = static_cast<const FlexRayHeaderEncoding&>(Header);
+  parameters.insert(std::make_pair(GetHeaderParameterHandle(), HeaderEncoder.encode()));
+  const FlexRayPayloadEncoding& PayloadEncoder = static_cast<const FlexRayPayloadEncoding&>(Payload);
+  parameters.insert(std::make_pair(GetPayloadParameterHandle(), PayloadEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), rti1516ev::HLAinteger64Time(time));
+}
+
+void FlexRayFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+{
+  rti1516ev::HLAboolean IsRequestDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator IsRequestIter = parameters.find(GetIsRequestParameterHandle());
+  if (IsRequestIter != parameters.end())
+  {
+    IsRequestDecoder.decode(IsRequestIter->second);
+  }
+  rti1516ev::HLAASCIIstring ChannelNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ChannelNameIter = parameters.find(GetChannelNameParameterHandle());
+  if (ChannelNameIter != parameters.end())
+  {
+    ChannelNameDecoder.decode(ChannelNameIter->second);
+  }
+  rti1516ev::HLAinteger32LE BusTypeDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator BusTypeIter = parameters.find(GetBusTypeParameterHandle());
+  if (BusTypeIter != parameters.end())
+  {
+    BusTypeDecoder.decode(BusTypeIter->second);
+  }
+  rti1516ev::HLAhandle RequestingFederateDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator RequestingFederateIter = parameters.find(GetRequestingFederateParameterHandle());
+  if (RequestingFederateIter != parameters.end())
+  {
+    RequestingFederateDecoder.decode(RequestingFederateIter->second);
+  }
+  rti1516ev::HLAhandle SenderDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator SenderIter = parameters.find(GetSenderParameterHandle());
+  if (SenderIter != parameters.end())
+  {
+    SenderDecoder.decode(SenderIter->second);
+  }
+  rti1516ev::HLAhandle ReceiverDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ReceiverIter = parameters.find(GetReceiverParameterHandle());
+  if (ReceiverIter != parameters.end())
+  {
+    ReceiverDecoder.decode(ReceiverIter->second);
+  }
+  rti1516ev::HLAinteger16LE FrameIDDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator FrameIDIter = parameters.find(GetFrameIDParameterHandle());
+  if (FrameIDIter != parameters.end())
+  {
+    FrameIDDecoder.decode(FrameIDIter->second);
+  }
+  rti1516ev::HLAboolean PayloadPreambleIndicatorDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PayloadPreambleIndicatorIter = parameters.find(GetPayloadPreambleIndicatorParameterHandle());
+  if (PayloadPreambleIndicatorIter != parameters.end())
+  {
+    PayloadPreambleIndicatorDecoder.decode(PayloadPreambleIndicatorIter->second);
+  }
+  FlexRayHeaderEncoding HeaderDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator HeaderIter = parameters.find(GetHeaderParameterHandle());
+  if (HeaderIter != parameters.end())
+  {
+    HeaderDecoder.decode(HeaderIter->second);
+  }
+  FlexRayPayloadEncoding PayloadDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PayloadIter = parameters.find(GetPayloadParameterHandle());
+  if (PayloadIter != parameters.end())
+  {
+    PayloadDecoder.decode(PayloadIter->second);
+  }
+  for (auto& entry : _receiveCallbacks) {
+    auto& callback = entry.second;
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameIDDecoder.get(), PayloadPreambleIndicatorDecoder.get(), HeaderDecoder, PayloadDecoder);
+  }
+}
+
+void FlexRayFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, rti1516ev::OrderType /*receivedOrder*/)
+{
+  rti1516ev::HLAboolean IsRequestDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator IsRequestIter = parameters.find(GetIsRequestParameterHandle());
+  if (IsRequestIter != parameters.end())
+  {
+    IsRequestDecoder.decode(IsRequestIter->second);
+  }
+  rti1516ev::HLAASCIIstring ChannelNameDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ChannelNameIter = parameters.find(GetChannelNameParameterHandle());
+  if (ChannelNameIter != parameters.end())
+  {
+    ChannelNameDecoder.decode(ChannelNameIter->second);
+  }
+  rti1516ev::HLAinteger32LE BusTypeDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator BusTypeIter = parameters.find(GetBusTypeParameterHandle());
+  if (BusTypeIter != parameters.end())
+  {
+    BusTypeDecoder.decode(BusTypeIter->second);
+  }
+  rti1516ev::HLAhandle RequestingFederateDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator RequestingFederateIter = parameters.find(GetRequestingFederateParameterHandle());
+  if (RequestingFederateIter != parameters.end())
+  {
+    RequestingFederateDecoder.decode(RequestingFederateIter->second);
+  }
+  rti1516ev::HLAhandle SenderDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator SenderIter = parameters.find(GetSenderParameterHandle());
+  if (SenderIter != parameters.end())
+  {
+    SenderDecoder.decode(SenderIter->second);
+  }
+  rti1516ev::HLAhandle ReceiverDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ReceiverIter = parameters.find(GetReceiverParameterHandle());
+  if (ReceiverIter != parameters.end())
+  {
+    ReceiverDecoder.decode(ReceiverIter->second);
+  }
+  rti1516ev::HLAinteger16LE FrameIDDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator FrameIDIter = parameters.find(GetFrameIDParameterHandle());
+  if (FrameIDIter != parameters.end())
+  {
+    FrameIDDecoder.decode(FrameIDIter->second);
+  }
+  rti1516ev::HLAboolean PayloadPreambleIndicatorDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PayloadPreambleIndicatorIter = parameters.find(GetPayloadPreambleIndicatorParameterHandle());
+  if (PayloadPreambleIndicatorIter != parameters.end())
+  {
+    PayloadPreambleIndicatorDecoder.decode(PayloadPreambleIndicatorIter->second);
+  }
+  FlexRayHeaderEncoding HeaderDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator HeaderIter = parameters.find(GetHeaderParameterHandle());
+  if (HeaderIter != parameters.end())
+  {
+    HeaderDecoder.decode(HeaderIter->second);
+  }
+  FlexRayPayloadEncoding PayloadDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator PayloadIter = parameters.find(GetPayloadParameterHandle());
+  if (PayloadIter != parameters.end())
+  {
+    PayloadDecoder.decode(PayloadIter->second);
+  }
+  for (auto& entry : _receiveCallbacksWithTime) {
+    auto& callback = entry.second;
+    callback(IsRequestDecoder.get(), ChannelNameDecoder.get(), static_cast<BusType>(BusTypeDecoder.get()), RequestingFederateDecoder, SenderDecoder, ReceiverDecoder, FrameIDDecoder.get(), PayloadPreambleIndicatorDecoder.get(), HeaderDecoder, PayloadDecoder, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
+  }
+}
+
+uint32_t FlexRayFrameInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+{
+  uint32_t key = _receiveCallbacksNextKey++;
+  _receiveCallbacks.insert(std::make_pair(key, callback));
+  return key;
+}
+
+uint32_t FlexRayFrameInteractionClass::RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback)
+{
+  uint32_t key = _receiveCallbacksWithTimeNextKey++;
+  _receiveCallbacksWithTime.insert(std::make_pair(key, callback));
+  return key;
+}
+
+rti1516ev::ParameterHandleSet FlexRayFrameInteractionClass::GetAllParameterHandles()
+{
+  rti1516ev::ParameterHandleSet result;
+  result.insert(GetIsRequestParameterHandle());
+  result.insert(GetChannelNameParameterHandle());
+  result.insert(GetBusTypeParameterHandle());
+  result.insert(GetRequestingFederateParameterHandle());
+  result.insert(GetSenderParameterHandle());
+  result.insert(GetReceiverParameterHandle());
+  result.insert(GetFrameIDParameterHandle());
+  result.insert(GetPayloadPreambleIndicatorParameterHandle());
+  result.insert(GetHeaderParameterHandle());
+  result.insert(GetPayloadParameterHandle());
   return result;
 }
 
@@ -3004,7 +3629,6 @@ void InteractionClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassado
   mMeasurementStopInteractionClass = std::unique_ptr<MeasurementStopInteractionClass>(new MeasurementStopInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
   mKeyEventInteractionClass = std::unique_ptr<KeyEventInteractionClass>(new KeyEventInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
   mTextLogInteractionClass = std::unique_ptr<TextLogInteractionClass>(new TextLogInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
-  mDOMemberTransmitDataInteractionClass = std::unique_ptr<DOMemberTransmitDataInteractionClass>(new DOMemberTransmitDataInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
   mSystemVariableUpdateInteractionClass = std::unique_ptr<SystemVariableUpdateInteractionClass>(new SystemVariableUpdateInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
   mSystemVariableModificationInteractionClass = std::unique_ptr<SystemVariableModificationInteractionClass>(new SystemVariableModificationInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
   mValueEntityUpdateInteractionClass = std::unique_ptr<ValueEntityUpdateInteractionClass>(new ValueEntityUpdateInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
@@ -3016,6 +3640,9 @@ void InteractionClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassado
   mEthStatusInteractionClass = std::unique_ptr<EthStatusInteractionClass>(new EthStatusInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
   mCANMessageInteractionClass = std::unique_ptr<CANMessageInteractionClass>(new CANMessageInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
   mCANErrorFrameInteractionClass = std::unique_ptr<CANErrorFrameInteractionClass>(new CANErrorFrameInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
+  mFlexRaySymbolInteractionClass = std::unique_ptr<FlexRaySymbolInteractionClass>(new FlexRaySymbolInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
+  mFlexRayCycleStartInteractionClass = std::unique_ptr<FlexRayCycleStartInteractionClass>(new FlexRayCycleStartInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
+  mFlexRayFrameInteractionClass = std::unique_ptr<FlexRayFrameInteractionClass>(new FlexRayFrameInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
   mPythonCommandInteractionClass = std::unique_ptr<PythonCommandInteractionClass>(new PythonCommandInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
 } // Initialize
 
@@ -3036,10 +3663,6 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   else if (theInteractionClass == mTextLogInteractionClass->GetInteractionClassHandle())
   {
     mTextLogInteractionClass->ReceiveInteraction(parameters);
-  }
-  else if (theInteractionClass == mDOMemberTransmitDataInteractionClass->GetInteractionClassHandle())
-  {
-    mDOMemberTransmitDataInteractionClass->ReceiveInteraction(parameters);
   }
   else if (theInteractionClass == mSystemVariableUpdateInteractionClass->GetInteractionClassHandle())
   {
@@ -3084,6 +3707,18 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   else if (theInteractionClass == mCANErrorFrameInteractionClass->GetInteractionClassHandle())
   {
     mCANErrorFrameInteractionClass->ReceiveInteraction(parameters);
+  }
+  else if (theInteractionClass == mFlexRaySymbolInteractionClass->GetInteractionClassHandle())
+  {
+    mFlexRaySymbolInteractionClass->ReceiveInteraction(parameters);
+  }
+  else if (theInteractionClass == mFlexRayCycleStartInteractionClass->GetInteractionClassHandle())
+  {
+    mFlexRayCycleStartInteractionClass->ReceiveInteraction(parameters);
+  }
+  else if (theInteractionClass == mFlexRayFrameInteractionClass->GetInteractionClassHandle())
+  {
+    mFlexRayFrameInteractionClass->ReceiveInteraction(parameters);
   }
   else if (theInteractionClass == mPythonCommandInteractionClass->GetInteractionClassHandle())
   {

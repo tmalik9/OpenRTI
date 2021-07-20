@@ -49,15 +49,32 @@ foreach (var dataType in FOM.DataTypes)
 <#=dataType.Name#>Encoding::~<#=dataType.Name#>Encoding()
 {
 }
+
+<#=fixedRecordDataType.Encoding#>& <#=dataType.Name#>Encoding::operator=(const <#=dataType.Name#>& ref)
+{
+  if (this != &ref)
+  {
+<# foreach (var field in fixedRecordDataType.AllFields) { #>
+  Set<#=field.Name#>(ref.Get<#=field.Name#>());
+<#  } #>
+  }
+  return *this;
+}
+
 uint32_t <#=dataType.Name#>Encoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 <# foreach (var field in fixedRecordDataType.AllFields) { #>
 void <#=dataType.Name#>Encoding::Set<#=field.Name#>(<#=field.DataType.ParameterCppType#> value)
 {
-<#  if (field.DataType is FOMParser.BasicDataRepresentation || field.DataType is FOMParser.SimpleDataType || field.DataType is FOMParser.ArrayDataType)
-    { #>
-      m<#=field.Name#>.set(value);
+<#  if (field.DataType is FOMParser.BasicDataRepresentation || field.DataType is FOMParser.SimpleDataType || field.DataType is FOMParser.ArrayDataType) { #>
+  m<#=field.Name#>.set(value);
+<#  } else if (field.DataType is FOMParser.EnumeratedDataType) {
+      var enumeratedDataType = field.DataType as FOMParser.EnumeratedDataType;
+#>
+  // <#=field.DataType#>
+  m<#=field.Name#> = static_cast<<#=enumeratedDataType.Representation.CPPType#>>(value);
 <#  } else { #>
-      m<#=field.Name#> = value;
+  // <#=field.DataType#> <#=field.DataType.Name#> 
+  m<#=field.Name#> = value;
 <#  } #>
 }
 <# if (field.DataType is FOMParser.ArrayDataType) {

@@ -104,21 +104,8 @@ void <#=interactionClass.Name#>InteractionClass::send(<#=interactionClass.CppPar
   foreach (var parameter in interactionClass.AllParameters)
   {
     if (parameter.DataType != null)
-    {
-      if (parameter.DataType is FOMParser.ArrayDataType || parameter.DataType is FOMParser.FixedRecordDataType)
-      {#>
-  const <#=parameter.DataType.Encoding#>& <#=parameter.Name#>Encoder = static_cast<const <#=parameter.DataType.Encoding#>&>(<#=parameter.Name#>);
-<#    } else if (parameter.DataType is FOMParser.ObjectInstanceHandleType) {
-        var objectInstanceHandle = parameter.DataType as FOMParser.ObjectInstanceHandleType;
-        if (objectInstanceHandle.ObjectClass != null)
-        { #>
-  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(static_cast<<#=objectInstanceHandle.ObjectClass.Name#>*>(<#=parameter.Name#>)->GetObjectInstanceHandle());
-<#      } else { #>
-  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(<#=parameter.Name#>);
-<#      } #>
-<#    } else { #>
-  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(<#=parameter.Name#>);
-<#    } #>
+    { #>
+  <#= parameter.ToEncoderExpression() #>
   parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
 <#  
     } // if (parameter.DataType != null)
@@ -135,21 +122,8 @@ void <#=interactionClass.Name#>InteractionClass::sendWithTime(<#=interactionClas
   foreach (var parameter in interactionClass.AllParameters)
   {
     if (parameter.DataType != null)
-    {
-      if (parameter.DataType is FOMParser.ArrayDataType || parameter.DataType is FOMParser.FixedRecordDataType)
-      {#>
-  const <#=parameter.DataType.Encoding#>& <#=parameter.Name#>Encoder = static_cast<const <#=parameter.DataType.Encoding#>&>(<#=parameter.Name#>);
-<#    } else if (parameter.DataType is FOMParser.ObjectInstanceHandleType) {
-        var objectInstanceHandle = parameter.DataType as FOMParser.ObjectInstanceHandleType;
-        if (objectInstanceHandle.ObjectClass != null)
-        { #>
-  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(static_cast<<#=objectInstanceHandle.ObjectClass.Name#>*>(<#=parameter.Name#>)->GetObjectInstanceHandle());
-<#      } else { #>
-  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(<#=parameter.Name#>);
-<#      } #>
-<#    } else { #>
-  <#=parameter.DataType.Encoding#> <#=parameter.Name#>Encoder(<#=parameter.Name#>);
-<#    } #>
+    { #>
+  <#= parameter.ToEncoderExpression() #>
   parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
 <#  
     } // if (parameter.DataType != null)

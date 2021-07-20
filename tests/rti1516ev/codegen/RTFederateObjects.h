@@ -153,7 +153,7 @@ class SystemVariable : public ISystemVariable
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute Value : HLAopaqueData
     std::vector<uint8_t> GetValue() const override;
-    void SetValue(std::vector<uint8_t> newValue) override;
+    void SetValue(const std::vector<uint8_t>& newValue) override;
     // ISystemVariable
     void UpdateAllAttributeValues() override;
     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
@@ -257,7 +257,7 @@ class ValueEntity : public IValueEntity
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute Value : HLAopaqueData
     std::vector<uint8_t> GetValue() const override;
-    void SetValue(std::vector<uint8_t> newValue) override;
+    void SetValue(const std::vector<uint8_t>& newValue) override;
     // IValueEntity
     void UpdateAllAttributeValues() override;
     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
@@ -369,13 +369,13 @@ class DOMemberSource : public IDOMemberSource
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute DOSourceMemberName : HLAASCIIstring
     std::string GetDOSourceMemberName() const override;
-    void SetDOSourceMemberName(std::string newValue) override;
+    void SetDOSourceMemberName(const std::string& newValue) override;
     // attribute DOSourceMemberConnectionType : HLAASCIIstring
     std::string GetDOSourceMemberConnectionType() const override;
-    void SetDOSourceMemberConnectionType(std::string newValue) override;
+    void SetDOSourceMemberConnectionType(const std::string& newValue) override;
     // attribute DOSourceMemberDataBytes : HLAopaqueData
     std::vector<uint8_t> GetDOSourceMemberDataBytes() const override;
-    void SetDOSourceMemberDataBytes(std::vector<uint8_t> newValue) override;
+    void SetDOSourceMemberDataBytes(const std::vector<uint8_t>& newValue) override;
     // IDOMemberSource
     void UpdateAllAttributeValues() override;
     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
@@ -487,10 +487,10 @@ class DOMemberTarget : public IDOMemberTarget
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute DOTargetMemberName : HLAASCIIstring
     std::string GetDOTargetMemberName() const override;
-    void SetDOTargetMemberName(std::string newValue) override;
+    void SetDOTargetMemberName(const std::string& newValue) override;
     // attribute DOTargetMemberConnectionType : HLAASCIIstring
     std::string GetDOTargetMemberConnectionType() const override;
-    void SetDOTargetMemberConnectionType(std::string newValue) override;
+    void SetDOTargetMemberConnectionType(const std::string& newValue) override;
     // IDOMemberTarget
     void UpdateAllAttributeValues() override;
     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
@@ -596,7 +596,7 @@ class BusManagement : public IBusManagement
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
     std::string GetNetworkID() const override;
-    void SetNetworkID(std::string newValue) override;
+    void SetNetworkID(const std::string& newValue) override;
     // IBusManagement
     void UpdateAllAttributeValues() override;
     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
@@ -709,7 +709,7 @@ class BusManagementCan : public IBusManagementCan
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
     std::string GetNetworkID() const override;
-    void SetNetworkID(std::string newValue) override;
+    void SetNetworkID(const std::string& newValue) override;
     // attribute BusState : CanBusState
     CanBusState GetBusState() const override;
     void SetBusState(CanBusState newValue) override;
@@ -771,6 +771,408 @@ class BusManagementCan : public IBusManagementCan
     rti1516ev::HLAinteger32LE mRxErrorCount;
     // attribute SendMessagesAsRx : HLAboolean
     rti1516ev::HLAboolean mSendMessagesAsRx;
+};
+
+class BusManagementEthernet;
+class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClass
+{
+  public:
+    // IBusManagementEthernetObjectClass
+    BusManagementEthernetObjectClass() = default;
+    virtual ~BusManagementEthernetObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IBusManagementEthernet* GetObjectInstance(const std::wstring& instanceName) override;
+    IBusManagementEthernet* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IBusManagementEthernet* newObjectInstance);
+
+    // internal
+    BusManagementEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass);
+
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute PortName : HLAASCIIstring
+    rti1516ev::AttributeHandle GetPortNameAttributeHandle() const { return mPortNameAttributeHandle; }
+    // attribute SendMessagesAsRx : HLAboolean
+    rti1516ev::AttributeHandle GetSendMessagesAsRxAttributeHandle() const { return mSendMessagesAsRxAttributeHandle; }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IBusManagementEthernet* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    BusManagementObjectClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    // attribute PortName : HLAASCIIstring
+    rti1516ev::AttributeHandle mPortNameAttributeHandle;
+    // attribute SendMessagesAsRx : HLAboolean
+    rti1516ev::AttributeHandle mSendMessagesAsRxAttributeHandle;
+    std::map<std::wstring, BusManagementEthernet*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, BusManagementEthernet*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
+};
+
+class BusManagementEthernet : public IBusManagementEthernet
+{
+  public:
+
+    virtual ~BusManagementEthernet();
+    BusManagementEthernet(const BusManagementEthernet&) = delete;
+    BusManagementEthernet(BusManagementEthernet&&) = delete;
+    BusManagementEthernet& operator=(const BusManagementEthernet&) = delete;
+    BusManagementEthernet& operator=(BusManagementEthernet&&) = delete;
+    IBusManagementEthernetObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    std::string GetNetworkID() const override;
+    void SetNetworkID(const std::string& newValue) override;
+    // attribute PortName : HLAASCIIstring
+    std::string GetPortName() const override;
+    void SetPortName(const std::string& newValue) override;
+    // attribute SendMessagesAsRx : HLAboolean
+    bool GetSendMessagesAsRx() const override;
+    void SetSendMessagesAsRx(bool newValue) override;
+    // IBusManagementEthernet
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
+    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    void UnregisterUpdateCallback(uint32_t callbackToken) override;
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
+  private:
+    friend class BusManagementEthernetObjectClass;
+
+    BusManagementEthernet();
+    BusManagementEthernet(BusManagementEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    void ExecuteUpdateCallbacks();
+    BusManagementEthernetObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    uint32_t mLastCallbackToken = 0;
+    // Attribute value encoders
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mNetworkID;
+    // attribute PortName : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mPortName;
+    // attribute SendMessagesAsRx : HLAboolean
+    rti1516ev::HLAboolean mSendMessagesAsRx;
+};
+
+class FlexRayCluster;
+class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
+{
+  public:
+    // IFlexRayClusterObjectClass
+    FlexRayClusterObjectClass() = default;
+    virtual ~FlexRayClusterObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IFlexRayCluster* GetObjectInstance(const std::wstring& instanceName) override;
+    IFlexRayCluster* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IFlexRayCluster* newObjectInstance);
+
+    // internal
+    FlexRayClusterObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass);
+
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute gColdstartAttempts : HLAoctet
+    rti1516ev::AttributeHandle GetgColdstartAttemptsAttributeHandle() const { return mgColdstartAttemptsAttributeHandle; }
+    // attribute gCycleCountMax : HLAoctet
+    rti1516ev::AttributeHandle GetgCycleCountMaxAttributeHandle() const { return mgCycleCountMaxAttributeHandle; }
+    // attribute gdActionPointOffset : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdActionPointOffsetAttributeHandle() const { return mgdActionPointOffsetAttributeHandle; }
+    // attribute gdDynamicSlotIdlePhase : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdDynamicSlotIdlePhaseAttributeHandle() const { return mgdDynamicSlotIdlePhaseAttributeHandle; }
+    // attribute gdMiniSlot : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdMiniSlotAttributeHandle() const { return mgdMiniSlotAttributeHandle; }
+    // attribute gdMiniSlotActionPointOffset : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdMiniSlotActionPointOffsetAttributeHandle() const { return mgdMiniSlotActionPointOffsetAttributeHandle; }
+    // attribute gdStaticSlot : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdStaticSlotAttributeHandle() const { return mgdStaticSlotAttributeHandle; }
+    // attribute gdSymbolWindow : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdSymbolWindowAttributeHandle() const { return mgdSymbolWindowAttributeHandle; }
+    // attribute gdSymbolWindowActionPointOffset : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdSymbolWindowActionPointOffsetAttributeHandle() const { return mgdSymbolWindowActionPointOffsetAttributeHandle; }
+    // attribute gdTSSTransmitter : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdTSSTransmitterAttributeHandle() const { return mgdTSSTransmitterAttributeHandle; }
+    // attribute gdWakeupTxActive : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdWakeupTxActiveAttributeHandle() const { return mgdWakeupTxActiveAttributeHandle; }
+    // attribute gdWakeupTxIdle : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgdWakeupTxIdleAttributeHandle() const { return mgdWakeupTxIdleAttributeHandle; }
+    // attribute gListenNoise : HLAoctet
+    rti1516ev::AttributeHandle GetgListenNoiseAttributeHandle() const { return mgListenNoiseAttributeHandle; }
+    // attribute gMacroPerCycle : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgMacroPerCycleAttributeHandle() const { return mgMacroPerCycleAttributeHandle; }
+    // attribute gMaxWithoutClockCorrectionFatal : HLAoctet
+    rti1516ev::AttributeHandle GetgMaxWithoutClockCorrectionFatalAttributeHandle() const { return mgMaxWithoutClockCorrectionFatalAttributeHandle; }
+    // attribute gMaxWithoutClockCorrectionPassive : HLAoctet
+    rti1516ev::AttributeHandle GetgMaxWithoutClockCorrectionPassiveAttributeHandle() const { return mgMaxWithoutClockCorrectionPassiveAttributeHandle; }
+    // attribute gNumberOfMiniSlots : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgNumberOfMiniSlotsAttributeHandle() const { return mgNumberOfMiniSlotsAttributeHandle; }
+    // attribute gNumberOfStaticSlots : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgNumberOfStaticSlotsAttributeHandle() const { return mgNumberOfStaticSlotsAttributeHandle; }
+    // attribute gPayloadLengthStatic : HLAinteger32LE
+    rti1516ev::AttributeHandle GetgPayloadLengthStaticAttributeHandle() const { return mgPayloadLengthStaticAttributeHandle; }
+    // attribute gSyncFrameIDCountMax : HLAoctet
+    rti1516ev::AttributeHandle GetgSyncFrameIDCountMaxAttributeHandle() const { return mgSyncFrameIDCountMaxAttributeHandle; }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IFlexRayCluster* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    BusManagementObjectClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    // attribute gColdstartAttempts : HLAoctet
+    rti1516ev::AttributeHandle mgColdstartAttemptsAttributeHandle;
+    // attribute gCycleCountMax : HLAoctet
+    rti1516ev::AttributeHandle mgCycleCountMaxAttributeHandle;
+    // attribute gdActionPointOffset : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdActionPointOffsetAttributeHandle;
+    // attribute gdDynamicSlotIdlePhase : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdDynamicSlotIdlePhaseAttributeHandle;
+    // attribute gdMiniSlot : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdMiniSlotAttributeHandle;
+    // attribute gdMiniSlotActionPointOffset : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdMiniSlotActionPointOffsetAttributeHandle;
+    // attribute gdStaticSlot : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdStaticSlotAttributeHandle;
+    // attribute gdSymbolWindow : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdSymbolWindowAttributeHandle;
+    // attribute gdSymbolWindowActionPointOffset : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdSymbolWindowActionPointOffsetAttributeHandle;
+    // attribute gdTSSTransmitter : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdTSSTransmitterAttributeHandle;
+    // attribute gdWakeupTxActive : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdWakeupTxActiveAttributeHandle;
+    // attribute gdWakeupTxIdle : HLAinteger32LE
+    rti1516ev::AttributeHandle mgdWakeupTxIdleAttributeHandle;
+    // attribute gListenNoise : HLAoctet
+    rti1516ev::AttributeHandle mgListenNoiseAttributeHandle;
+    // attribute gMacroPerCycle : HLAinteger32LE
+    rti1516ev::AttributeHandle mgMacroPerCycleAttributeHandle;
+    // attribute gMaxWithoutClockCorrectionFatal : HLAoctet
+    rti1516ev::AttributeHandle mgMaxWithoutClockCorrectionFatalAttributeHandle;
+    // attribute gMaxWithoutClockCorrectionPassive : HLAoctet
+    rti1516ev::AttributeHandle mgMaxWithoutClockCorrectionPassiveAttributeHandle;
+    // attribute gNumberOfMiniSlots : HLAinteger32LE
+    rti1516ev::AttributeHandle mgNumberOfMiniSlotsAttributeHandle;
+    // attribute gNumberOfStaticSlots : HLAinteger32LE
+    rti1516ev::AttributeHandle mgNumberOfStaticSlotsAttributeHandle;
+    // attribute gPayloadLengthStatic : HLAinteger32LE
+    rti1516ev::AttributeHandle mgPayloadLengthStaticAttributeHandle;
+    // attribute gSyncFrameIDCountMax : HLAoctet
+    rti1516ev::AttributeHandle mgSyncFrameIDCountMaxAttributeHandle;
+    std::map<std::wstring, FlexRayCluster*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, FlexRayCluster*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
+};
+
+class FlexRayCluster : public IFlexRayCluster
+{
+  public:
+
+    virtual ~FlexRayCluster();
+    FlexRayCluster(const FlexRayCluster&) = delete;
+    FlexRayCluster(FlexRayCluster&&) = delete;
+    FlexRayCluster& operator=(const FlexRayCluster&) = delete;
+    FlexRayCluster& operator=(FlexRayCluster&&) = delete;
+    IFlexRayClusterObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    std::string GetNetworkID() const override;
+    void SetNetworkID(const std::string& newValue) override;
+    // attribute gColdstartAttempts : HLAoctet
+    uint8_t GetgColdstartAttempts() const override;
+    void SetgColdstartAttempts(uint8_t newValue) override;
+    // attribute gCycleCountMax : HLAoctet
+    uint8_t GetgCycleCountMax() const override;
+    void SetgCycleCountMax(uint8_t newValue) override;
+    // attribute gdActionPointOffset : HLAinteger32LE
+    int32_t GetgdActionPointOffset() const override;
+    void SetgdActionPointOffset(int32_t newValue) override;
+    // attribute gdDynamicSlotIdlePhase : HLAinteger32LE
+    int32_t GetgdDynamicSlotIdlePhase() const override;
+    void SetgdDynamicSlotIdlePhase(int32_t newValue) override;
+    // attribute gdMiniSlot : HLAinteger32LE
+    int32_t GetgdMiniSlot() const override;
+    void SetgdMiniSlot(int32_t newValue) override;
+    // attribute gdMiniSlotActionPointOffset : HLAinteger32LE
+    int32_t GetgdMiniSlotActionPointOffset() const override;
+    void SetgdMiniSlotActionPointOffset(int32_t newValue) override;
+    // attribute gdStaticSlot : HLAinteger32LE
+    int32_t GetgdStaticSlot() const override;
+    void SetgdStaticSlot(int32_t newValue) override;
+    // attribute gdSymbolWindow : HLAinteger32LE
+    int32_t GetgdSymbolWindow() const override;
+    void SetgdSymbolWindow(int32_t newValue) override;
+    // attribute gdSymbolWindowActionPointOffset : HLAinteger32LE
+    int32_t GetgdSymbolWindowActionPointOffset() const override;
+    void SetgdSymbolWindowActionPointOffset(int32_t newValue) override;
+    // attribute gdTSSTransmitter : HLAinteger32LE
+    int32_t GetgdTSSTransmitter() const override;
+    void SetgdTSSTransmitter(int32_t newValue) override;
+    // attribute gdWakeupTxActive : HLAinteger32LE
+    int32_t GetgdWakeupTxActive() const override;
+    void SetgdWakeupTxActive(int32_t newValue) override;
+    // attribute gdWakeupTxIdle : HLAinteger32LE
+    int32_t GetgdWakeupTxIdle() const override;
+    void SetgdWakeupTxIdle(int32_t newValue) override;
+    // attribute gListenNoise : HLAoctet
+    uint8_t GetgListenNoise() const override;
+    void SetgListenNoise(uint8_t newValue) override;
+    // attribute gMacroPerCycle : HLAinteger32LE
+    int32_t GetgMacroPerCycle() const override;
+    void SetgMacroPerCycle(int32_t newValue) override;
+    // attribute gMaxWithoutClockCorrectionFatal : HLAoctet
+    uint8_t GetgMaxWithoutClockCorrectionFatal() const override;
+    void SetgMaxWithoutClockCorrectionFatal(uint8_t newValue) override;
+    // attribute gMaxWithoutClockCorrectionPassive : HLAoctet
+    uint8_t GetgMaxWithoutClockCorrectionPassive() const override;
+    void SetgMaxWithoutClockCorrectionPassive(uint8_t newValue) override;
+    // attribute gNumberOfMiniSlots : HLAinteger32LE
+    int32_t GetgNumberOfMiniSlots() const override;
+    void SetgNumberOfMiniSlots(int32_t newValue) override;
+    // attribute gNumberOfStaticSlots : HLAinteger32LE
+    int32_t GetgNumberOfStaticSlots() const override;
+    void SetgNumberOfStaticSlots(int32_t newValue) override;
+    // attribute gPayloadLengthStatic : HLAinteger32LE
+    int32_t GetgPayloadLengthStatic() const override;
+    void SetgPayloadLengthStatic(int32_t newValue) override;
+    // attribute gSyncFrameIDCountMax : HLAoctet
+    uint8_t GetgSyncFrameIDCountMax() const override;
+    void SetgSyncFrameIDCountMax(uint8_t newValue) override;
+    // IFlexRayCluster
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
+    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    void UnregisterUpdateCallback(uint32_t callbackToken) override;
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
+  private:
+    friend class FlexRayClusterObjectClass;
+
+    FlexRayCluster();
+    FlexRayCluster(FlexRayClusterObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    void ExecuteUpdateCallbacks();
+    FlexRayClusterObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    uint32_t mLastCallbackToken = 0;
+    // Attribute value encoders
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mNetworkID;
+    // attribute gColdstartAttempts : HLAoctet
+    rti1516ev::HLAoctet mgColdstartAttempts;
+    // attribute gCycleCountMax : HLAoctet
+    rti1516ev::HLAoctet mgCycleCountMax;
+    // attribute gdActionPointOffset : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdActionPointOffset;
+    // attribute gdDynamicSlotIdlePhase : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdDynamicSlotIdlePhase;
+    // attribute gdMiniSlot : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdMiniSlot;
+    // attribute gdMiniSlotActionPointOffset : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdMiniSlotActionPointOffset;
+    // attribute gdStaticSlot : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdStaticSlot;
+    // attribute gdSymbolWindow : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdSymbolWindow;
+    // attribute gdSymbolWindowActionPointOffset : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdSymbolWindowActionPointOffset;
+    // attribute gdTSSTransmitter : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdTSSTransmitter;
+    // attribute gdWakeupTxActive : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdWakeupTxActive;
+    // attribute gdWakeupTxIdle : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgdWakeupTxIdle;
+    // attribute gListenNoise : HLAoctet
+    rti1516ev::HLAoctet mgListenNoise;
+    // attribute gMacroPerCycle : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgMacroPerCycle;
+    // attribute gMaxWithoutClockCorrectionFatal : HLAoctet
+    rti1516ev::HLAoctet mgMaxWithoutClockCorrectionFatal;
+    // attribute gMaxWithoutClockCorrectionPassive : HLAoctet
+    rti1516ev::HLAoctet mgMaxWithoutClockCorrectionPassive;
+    // attribute gNumberOfMiniSlots : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgNumberOfMiniSlots;
+    // attribute gNumberOfStaticSlots : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgNumberOfStaticSlots;
+    // attribute gPayloadLengthStatic : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mgPayloadLengthStatic;
+    // attribute gSyncFrameIDCountMax : HLAoctet
+    rti1516ev::HLAoctet mgSyncFrameIDCountMax;
 };
 
 class BusController;
@@ -837,10 +1239,10 @@ class BusController : public IBusController
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
     std::string GetNetworkID() const override;
-    void SetNetworkID(std::string newValue) override;
+    void SetNetworkID(const std::string& newValue) override;
     // attribute DeviceID : HLAASCIIstring
     std::string GetDeviceID() const override;
-    void SetDeviceID(std::string newValue) override;
+    void SetDeviceID(const std::string& newValue) override;
     // IBusController
     void UpdateAllAttributeValues() override;
     void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
@@ -977,10 +1379,10 @@ class BusControllerCan : public IBusControllerCan
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
     std::string GetNetworkID() const override;
-    void SetNetworkID(std::string newValue) override;
+    void SetNetworkID(const std::string& newValue) override;
     // attribute DeviceID : HLAASCIIstring
     std::string GetDeviceID() const override;
-    void SetDeviceID(std::string newValue) override;
+    void SetDeviceID(const std::string& newValue) override;
     // attribute BaudRate : HLAinteger32LE
     int32_t GetBaudRate() const override;
     void SetBaudRate(int32_t newValue) override;
@@ -1071,6 +1473,824 @@ class BusControllerCan : public IBusControllerCan
     rti1516ev::HLAinteger32LE mSamplingMode;
 };
 
+class BusControllerEthernet;
+class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClass
+{
+  public:
+    // IBusControllerEthernetObjectClass
+    BusControllerEthernetObjectClass() = default;
+    virtual ~BusControllerEthernetObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IBusControllerEthernet* GetObjectInstance(const std::wstring& instanceName) override;
+    IBusControllerEthernet* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IBusControllerEthernet* newObjectInstance);
+
+    // internal
+    BusControllerEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass);
+
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
+    // attribute DeviceID : HLAASCIIstring
+    rti1516ev::AttributeHandle GetDeviceIDAttributeHandle() const { return mBaseClass->GetDeviceIDAttributeHandle(); }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute PortName : HLAASCIIstring
+    rti1516ev::AttributeHandle GetPortNameAttributeHandle() const { return mPortNameAttributeHandle; }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IBusControllerEthernet* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    BusControllerObjectClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    // attribute PortName : HLAASCIIstring
+    rti1516ev::AttributeHandle mPortNameAttributeHandle;
+    std::map<std::wstring, BusControllerEthernet*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, BusControllerEthernet*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
+};
+
+class BusControllerEthernet : public IBusControllerEthernet
+{
+  public:
+
+    virtual ~BusControllerEthernet();
+    BusControllerEthernet(const BusControllerEthernet&) = delete;
+    BusControllerEthernet(BusControllerEthernet&&) = delete;
+    BusControllerEthernet& operator=(const BusControllerEthernet&) = delete;
+    BusControllerEthernet& operator=(BusControllerEthernet&&) = delete;
+    IBusControllerEthernetObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    std::string GetNetworkID() const override;
+    void SetNetworkID(const std::string& newValue) override;
+    // attribute DeviceID : HLAASCIIstring
+    std::string GetDeviceID() const override;
+    void SetDeviceID(const std::string& newValue) override;
+    // attribute PortName : HLAASCIIstring
+    std::string GetPortName() const override;
+    void SetPortName(const std::string& newValue) override;
+    // IBusControllerEthernet
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
+    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    void UnregisterUpdateCallback(uint32_t callbackToken) override;
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
+  private:
+    friend class BusControllerEthernetObjectClass;
+
+    BusControllerEthernet();
+    BusControllerEthernet(BusControllerEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    void ExecuteUpdateCallbacks();
+    BusControllerEthernetObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    uint32_t mLastCallbackToken = 0;
+    // Attribute value encoders
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mNetworkID;
+    // attribute DeviceID : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mDeviceID;
+    // attribute PortName : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mPortName;
+};
+
+class FlexRayControllerStatus;
+class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObjectClass
+{
+  public:
+    // IFlexRayControllerStatusObjectClass
+    FlexRayControllerStatusObjectClass() = default;
+    virtual ~FlexRayControllerStatusObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IFlexRayControllerStatus* GetObjectInstance(const std::wstring& instanceName) override;
+    IFlexRayControllerStatus* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IFlexRayControllerStatus* newObjectInstance);
+
+    // internal
+    FlexRayControllerStatusObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass);
+
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
+    // attribute DeviceID : HLAASCIIstring
+    rti1516ev::AttributeHandle GetDeviceIDAttributeHandle() const { return mBaseClass->GetDeviceIDAttributeHandle(); }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute PocState : FlexRayPocState
+    rti1516ev::AttributeHandle GetPocStateAttributeHandle() const { return mPocStateAttributeHandle; }
+    // attribute chiHaltRequest : HLAboolean
+    rti1516ev::AttributeHandle GetchiHaltRequestAttributeHandle() const { return mchiHaltRequestAttributeHandle; }
+    // attribute coldstartNoise : HLAboolean
+    rti1516ev::AttributeHandle GetcoldstartNoiseAttributeHandle() const { return mcoldstartNoiseAttributeHandle; }
+    // attribute freeze : HLAboolean
+    rti1516ev::AttributeHandle GetfreezeAttributeHandle() const { return mfreezeAttributeHandle; }
+    // attribute chiReadyRequest : HLAboolean
+    rti1516ev::AttributeHandle GetchiReadyRequestAttributeHandle() const { return mchiReadyRequestAttributeHandle; }
+    // attribute errorMode : FlexRayErrorModeType
+    rti1516ev::AttributeHandle GeterrorModeAttributeHandle() const { return merrorModeAttributeHandle; }
+    // attribute slotMode : FlexRaySlotModeType
+    rti1516ev::AttributeHandle GetslotModeAttributeHandle() const { return mslotModeAttributeHandle; }
+    // attribute startupState : FlexRayStartupStateType
+    rti1516ev::AttributeHandle GetstartupStateAttributeHandle() const { return mstartupStateAttributeHandle; }
+    // attribute wakeupStatus : FlexRayWakeupStatusType
+    rti1516ev::AttributeHandle GetwakeupStatusAttributeHandle() const { return mwakeupStatusAttributeHandle; }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IFlexRayControllerStatus* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    BusControllerObjectClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    // attribute PocState : FlexRayPocState
+    rti1516ev::AttributeHandle mPocStateAttributeHandle;
+    // attribute chiHaltRequest : HLAboolean
+    rti1516ev::AttributeHandle mchiHaltRequestAttributeHandle;
+    // attribute coldstartNoise : HLAboolean
+    rti1516ev::AttributeHandle mcoldstartNoiseAttributeHandle;
+    // attribute freeze : HLAboolean
+    rti1516ev::AttributeHandle mfreezeAttributeHandle;
+    // attribute chiReadyRequest : HLAboolean
+    rti1516ev::AttributeHandle mchiReadyRequestAttributeHandle;
+    // attribute errorMode : FlexRayErrorModeType
+    rti1516ev::AttributeHandle merrorModeAttributeHandle;
+    // attribute slotMode : FlexRaySlotModeType
+    rti1516ev::AttributeHandle mslotModeAttributeHandle;
+    // attribute startupState : FlexRayStartupStateType
+    rti1516ev::AttributeHandle mstartupStateAttributeHandle;
+    // attribute wakeupStatus : FlexRayWakeupStatusType
+    rti1516ev::AttributeHandle mwakeupStatusAttributeHandle;
+    std::map<std::wstring, FlexRayControllerStatus*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, FlexRayControllerStatus*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
+};
+
+class FlexRayControllerStatus : public IFlexRayControllerStatus
+{
+  public:
+
+    virtual ~FlexRayControllerStatus();
+    FlexRayControllerStatus(const FlexRayControllerStatus&) = delete;
+    FlexRayControllerStatus(FlexRayControllerStatus&&) = delete;
+    FlexRayControllerStatus& operator=(const FlexRayControllerStatus&) = delete;
+    FlexRayControllerStatus& operator=(FlexRayControllerStatus&&) = delete;
+    IFlexRayControllerStatusObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    std::string GetNetworkID() const override;
+    void SetNetworkID(const std::string& newValue) override;
+    // attribute DeviceID : HLAASCIIstring
+    std::string GetDeviceID() const override;
+    void SetDeviceID(const std::string& newValue) override;
+    // attribute PocState : FlexRayPocState
+    FlexRayPocState GetPocState() const override;
+    void SetPocState(FlexRayPocState newValue) override;
+    // attribute chiHaltRequest : HLAboolean
+    bool GetchiHaltRequest() const override;
+    void SetchiHaltRequest(bool newValue) override;
+    // attribute coldstartNoise : HLAboolean
+    bool GetcoldstartNoise() const override;
+    void SetcoldstartNoise(bool newValue) override;
+    // attribute freeze : HLAboolean
+    bool Getfreeze() const override;
+    void Setfreeze(bool newValue) override;
+    // attribute chiReadyRequest : HLAboolean
+    bool GetchiReadyRequest() const override;
+    void SetchiReadyRequest(bool newValue) override;
+    // attribute errorMode : FlexRayErrorModeType
+    FlexRayErrorModeType GeterrorMode() const override;
+    void SeterrorMode(FlexRayErrorModeType newValue) override;
+    // attribute slotMode : FlexRaySlotModeType
+    FlexRaySlotModeType GetslotMode() const override;
+    void SetslotMode(FlexRaySlotModeType newValue) override;
+    // attribute startupState : FlexRayStartupStateType
+    FlexRayStartupStateType GetstartupState() const override;
+    void SetstartupState(FlexRayStartupStateType newValue) override;
+    // attribute wakeupStatus : FlexRayWakeupStatusType
+    FlexRayWakeupStatusType GetwakeupStatus() const override;
+    void SetwakeupStatus(FlexRayWakeupStatusType newValue) override;
+    // IFlexRayControllerStatus
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
+    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    void UnregisterUpdateCallback(uint32_t callbackToken) override;
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
+  private:
+    friend class FlexRayControllerStatusObjectClass;
+
+    FlexRayControllerStatus();
+    FlexRayControllerStatus(FlexRayControllerStatusObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    void ExecuteUpdateCallbacks();
+    FlexRayControllerStatusObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    uint32_t mLastCallbackToken = 0;
+    // Attribute value encoders
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mNetworkID;
+    // attribute DeviceID : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mDeviceID;
+    // attribute PocState : FlexRayPocState
+    rti1516ev::HLAoctet mPocState;
+    // attribute chiHaltRequest : HLAboolean
+    rti1516ev::HLAboolean mchiHaltRequest;
+    // attribute coldstartNoise : HLAboolean
+    rti1516ev::HLAboolean mcoldstartNoise;
+    // attribute freeze : HLAboolean
+    rti1516ev::HLAboolean mfreeze;
+    // attribute chiReadyRequest : HLAboolean
+    rti1516ev::HLAboolean mchiReadyRequest;
+    // attribute errorMode : FlexRayErrorModeType
+    rti1516ev::HLAoctet merrorMode;
+    // attribute slotMode : FlexRaySlotModeType
+    rti1516ev::HLAoctet mslotMode;
+    // attribute startupState : FlexRayStartupStateType
+    rti1516ev::HLAoctet mstartupState;
+    // attribute wakeupStatus : FlexRayWakeupStatusType
+    rti1516ev::HLAoctet mwakeupStatus;
+};
+
+class FlexRayController;
+class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
+{
+  public:
+    // IFlexRayControllerObjectClass
+    FlexRayControllerObjectClass() = default;
+    virtual ~FlexRayControllerObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IFlexRayController* GetObjectInstance(const std::wstring& instanceName) override;
+    IFlexRayController* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IFlexRayController* newObjectInstance);
+
+    // internal
+    FlexRayControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass);
+
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
+    // attribute DeviceID : HLAASCIIstring
+    rti1516ev::AttributeHandle GetDeviceIDAttributeHandle() const { return mBaseClass->GetDeviceIDAttributeHandle(); }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute PocRequest : FlexRayPocState
+    rti1516ev::AttributeHandle GetPocRequestAttributeHandle() const { return mPocRequestAttributeHandle; }
+    // attribute ChiCommand : FlexRayChiCommand
+    rti1516ev::AttributeHandle GetChiCommandAttributeHandle() const { return mChiCommandAttributeHandle; }
+    // attribute pAllowHaltDueToClock : HLAoctet
+    rti1516ev::AttributeHandle GetpAllowHaltDueToClockAttributeHandle() const { return mpAllowHaltDueToClockAttributeHandle; }
+    // attribute pAllowPassiveToActive : HLAoctet
+    rti1516ev::AttributeHandle GetpAllowPassiveToActiveAttributeHandle() const { return mpAllowPassiveToActiveAttributeHandle; }
+    // attribute pChannels : FlexRayChannel
+    rti1516ev::AttributeHandle GetpChannelsAttributeHandle() const { return mpChannelsAttributeHandle; }
+    // attribute pClusterDriftDamping : HLAoctet
+    rti1516ev::AttributeHandle GetpClusterDriftDampingAttributeHandle() const { return mpClusterDriftDampingAttributeHandle; }
+    // attribute pdAcceptedStartupRange : HLAinteger32LE
+    rti1516ev::AttributeHandle GetpdAcceptedStartupRangeAttributeHandle() const { return mpdAcceptedStartupRangeAttributeHandle; }
+    // attribute pdListenTimeout : HLAinteger32LE
+    rti1516ev::AttributeHandle GetpdListenTimeoutAttributeHandle() const { return mpdListenTimeoutAttributeHandle; }
+    // attribute pKeySlotId : HLAinteger16LE
+    rti1516ev::AttributeHandle GetpKeySlotIdAttributeHandle() const { return mpKeySlotIdAttributeHandle; }
+    // attribute pKeySlotOnlyEnabled : HLAoctet
+    rti1516ev::AttributeHandle GetpKeySlotOnlyEnabledAttributeHandle() const { return mpKeySlotOnlyEnabledAttributeHandle; }
+    // attribute pKeySlotUsedForStartup : HLAoctet
+    rti1516ev::AttributeHandle GetpKeySlotUsedForStartupAttributeHandle() const { return mpKeySlotUsedForStartupAttributeHandle; }
+    // attribute pKeySlotUsedForSync : HLAoctet
+    rti1516ev::AttributeHandle GetpKeySlotUsedForSyncAttributeHandle() const { return mpKeySlotUsedForSyncAttributeHandle; }
+    // attribute pLatestTx : HLAinteger16LE
+    rti1516ev::AttributeHandle GetpLatestTxAttributeHandle() const { return mpLatestTxAttributeHandle; }
+    // attribute pMacroInitialOffsetA : HLAoctet
+    rti1516ev::AttributeHandle GetpMacroInitialOffsetAAttributeHandle() const { return mpMacroInitialOffsetAAttributeHandle; }
+    // attribute pMacroInitialOffsetB : HLAoctet
+    rti1516ev::AttributeHandle GetpMacroInitialOffsetBAttributeHandle() const { return mpMacroInitialOffsetBAttributeHandle; }
+    // attribute pMicroInitialOffsetA : HLAinteger32LE
+    rti1516ev::AttributeHandle GetpMicroInitialOffsetAAttributeHandle() const { return mpMicroInitialOffsetAAttributeHandle; }
+    // attribute pMicroInitialOffsetB : HLAinteger32LE
+    rti1516ev::AttributeHandle GetpMicroInitialOffsetBAttributeHandle() const { return mpMicroInitialOffsetBAttributeHandle; }
+    // attribute pMicroPerCycle : HLAinteger32LE
+    rti1516ev::AttributeHandle GetpMicroPerCycleAttributeHandle() const { return mpMicroPerCycleAttributeHandle; }
+    // attribute pOffsetCorrectionOut : HLAinteger32LE
+    rti1516ev::AttributeHandle GetpOffsetCorrectionOutAttributeHandle() const { return mpOffsetCorrectionOutAttributeHandle; }
+    // attribute pOffsetCorrectionStart : HLAinteger16LE
+    rti1516ev::AttributeHandle GetpOffsetCorrectionStartAttributeHandle() const { return mpOffsetCorrectionStartAttributeHandle; }
+    // attribute pRateCorrectionOut : HLAinteger32LE
+    rti1516ev::AttributeHandle GetpRateCorrectionOutAttributeHandle() const { return mpRateCorrectionOutAttributeHandle; }
+    // attribute pWakeupChannel : FlexRayChannel
+    rti1516ev::AttributeHandle GetpWakeupChannelAttributeHandle() const { return mpWakeupChannelAttributeHandle; }
+    // attribute pWakeupPattern : HLAoctet
+    rti1516ev::AttributeHandle GetpWakeupPatternAttributeHandle() const { return mpWakeupPatternAttributeHandle; }
+    // attribute pdMicrotick : FlexRayClockPeriod
+    rti1516ev::AttributeHandle GetpdMicrotickAttributeHandle() const { return mpdMicrotickAttributeHandle; }
+    // attribute pSamplesPerMicrotick : HLAoctet
+    rti1516ev::AttributeHandle GetpSamplesPerMicrotickAttributeHandle() const { return mpSamplesPerMicrotickAttributeHandle; }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IFlexRayController* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    BusControllerObjectClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    // attribute PocRequest : FlexRayPocState
+    rti1516ev::AttributeHandle mPocRequestAttributeHandle;
+    // attribute ChiCommand : FlexRayChiCommand
+    rti1516ev::AttributeHandle mChiCommandAttributeHandle;
+    // attribute pAllowHaltDueToClock : HLAoctet
+    rti1516ev::AttributeHandle mpAllowHaltDueToClockAttributeHandle;
+    // attribute pAllowPassiveToActive : HLAoctet
+    rti1516ev::AttributeHandle mpAllowPassiveToActiveAttributeHandle;
+    // attribute pChannels : FlexRayChannel
+    rti1516ev::AttributeHandle mpChannelsAttributeHandle;
+    // attribute pClusterDriftDamping : HLAoctet
+    rti1516ev::AttributeHandle mpClusterDriftDampingAttributeHandle;
+    // attribute pdAcceptedStartupRange : HLAinteger32LE
+    rti1516ev::AttributeHandle mpdAcceptedStartupRangeAttributeHandle;
+    // attribute pdListenTimeout : HLAinteger32LE
+    rti1516ev::AttributeHandle mpdListenTimeoutAttributeHandle;
+    // attribute pKeySlotId : HLAinteger16LE
+    rti1516ev::AttributeHandle mpKeySlotIdAttributeHandle;
+    // attribute pKeySlotOnlyEnabled : HLAoctet
+    rti1516ev::AttributeHandle mpKeySlotOnlyEnabledAttributeHandle;
+    // attribute pKeySlotUsedForStartup : HLAoctet
+    rti1516ev::AttributeHandle mpKeySlotUsedForStartupAttributeHandle;
+    // attribute pKeySlotUsedForSync : HLAoctet
+    rti1516ev::AttributeHandle mpKeySlotUsedForSyncAttributeHandle;
+    // attribute pLatestTx : HLAinteger16LE
+    rti1516ev::AttributeHandle mpLatestTxAttributeHandle;
+    // attribute pMacroInitialOffsetA : HLAoctet
+    rti1516ev::AttributeHandle mpMacroInitialOffsetAAttributeHandle;
+    // attribute pMacroInitialOffsetB : HLAoctet
+    rti1516ev::AttributeHandle mpMacroInitialOffsetBAttributeHandle;
+    // attribute pMicroInitialOffsetA : HLAinteger32LE
+    rti1516ev::AttributeHandle mpMicroInitialOffsetAAttributeHandle;
+    // attribute pMicroInitialOffsetB : HLAinteger32LE
+    rti1516ev::AttributeHandle mpMicroInitialOffsetBAttributeHandle;
+    // attribute pMicroPerCycle : HLAinteger32LE
+    rti1516ev::AttributeHandle mpMicroPerCycleAttributeHandle;
+    // attribute pOffsetCorrectionOut : HLAinteger32LE
+    rti1516ev::AttributeHandle mpOffsetCorrectionOutAttributeHandle;
+    // attribute pOffsetCorrectionStart : HLAinteger16LE
+    rti1516ev::AttributeHandle mpOffsetCorrectionStartAttributeHandle;
+    // attribute pRateCorrectionOut : HLAinteger32LE
+    rti1516ev::AttributeHandle mpRateCorrectionOutAttributeHandle;
+    // attribute pWakeupChannel : FlexRayChannel
+    rti1516ev::AttributeHandle mpWakeupChannelAttributeHandle;
+    // attribute pWakeupPattern : HLAoctet
+    rti1516ev::AttributeHandle mpWakeupPatternAttributeHandle;
+    // attribute pdMicrotick : FlexRayClockPeriod
+    rti1516ev::AttributeHandle mpdMicrotickAttributeHandle;
+    // attribute pSamplesPerMicrotick : HLAoctet
+    rti1516ev::AttributeHandle mpSamplesPerMicrotickAttributeHandle;
+    std::map<std::wstring, FlexRayController*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, FlexRayController*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
+};
+
+class FlexRayController : public IFlexRayController
+{
+  public:
+
+    virtual ~FlexRayController();
+    FlexRayController(const FlexRayController&) = delete;
+    FlexRayController(FlexRayController&&) = delete;
+    FlexRayController& operator=(const FlexRayController&) = delete;
+    FlexRayController& operator=(FlexRayController&&) = delete;
+    IFlexRayControllerObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    std::string GetNetworkID() const override;
+    void SetNetworkID(const std::string& newValue) override;
+    // attribute DeviceID : HLAASCIIstring
+    std::string GetDeviceID() const override;
+    void SetDeviceID(const std::string& newValue) override;
+    // attribute PocRequest : FlexRayPocState
+    FlexRayPocState GetPocRequest() const override;
+    void SetPocRequest(FlexRayPocState newValue) override;
+    // attribute ChiCommand : FlexRayChiCommand
+    FlexRayChiCommand GetChiCommand() const override;
+    void SetChiCommand(FlexRayChiCommand newValue) override;
+    // attribute pAllowHaltDueToClock : HLAoctet
+    uint8_t GetpAllowHaltDueToClock() const override;
+    void SetpAllowHaltDueToClock(uint8_t newValue) override;
+    // attribute pAllowPassiveToActive : HLAoctet
+    uint8_t GetpAllowPassiveToActive() const override;
+    void SetpAllowPassiveToActive(uint8_t newValue) override;
+    // attribute pChannels : FlexRayChannel
+    FlexRayChannel GetpChannels() const override;
+    void SetpChannels(FlexRayChannel newValue) override;
+    // attribute pClusterDriftDamping : HLAoctet
+    uint8_t GetpClusterDriftDamping() const override;
+    void SetpClusterDriftDamping(uint8_t newValue) override;
+    // attribute pdAcceptedStartupRange : HLAinteger32LE
+    int32_t GetpdAcceptedStartupRange() const override;
+    void SetpdAcceptedStartupRange(int32_t newValue) override;
+    // attribute pdListenTimeout : HLAinteger32LE
+    int32_t GetpdListenTimeout() const override;
+    void SetpdListenTimeout(int32_t newValue) override;
+    // attribute pKeySlotId : HLAinteger16LE
+    int16_t GetpKeySlotId() const override;
+    void SetpKeySlotId(int16_t newValue) override;
+    // attribute pKeySlotOnlyEnabled : HLAoctet
+    uint8_t GetpKeySlotOnlyEnabled() const override;
+    void SetpKeySlotOnlyEnabled(uint8_t newValue) override;
+    // attribute pKeySlotUsedForStartup : HLAoctet
+    uint8_t GetpKeySlotUsedForStartup() const override;
+    void SetpKeySlotUsedForStartup(uint8_t newValue) override;
+    // attribute pKeySlotUsedForSync : HLAoctet
+    uint8_t GetpKeySlotUsedForSync() const override;
+    void SetpKeySlotUsedForSync(uint8_t newValue) override;
+    // attribute pLatestTx : HLAinteger16LE
+    int16_t GetpLatestTx() const override;
+    void SetpLatestTx(int16_t newValue) override;
+    // attribute pMacroInitialOffsetA : HLAoctet
+    uint8_t GetpMacroInitialOffsetA() const override;
+    void SetpMacroInitialOffsetA(uint8_t newValue) override;
+    // attribute pMacroInitialOffsetB : HLAoctet
+    uint8_t GetpMacroInitialOffsetB() const override;
+    void SetpMacroInitialOffsetB(uint8_t newValue) override;
+    // attribute pMicroInitialOffsetA : HLAinteger32LE
+    int32_t GetpMicroInitialOffsetA() const override;
+    void SetpMicroInitialOffsetA(int32_t newValue) override;
+    // attribute pMicroInitialOffsetB : HLAinteger32LE
+    int32_t GetpMicroInitialOffsetB() const override;
+    void SetpMicroInitialOffsetB(int32_t newValue) override;
+    // attribute pMicroPerCycle : HLAinteger32LE
+    int32_t GetpMicroPerCycle() const override;
+    void SetpMicroPerCycle(int32_t newValue) override;
+    // attribute pOffsetCorrectionOut : HLAinteger32LE
+    int32_t GetpOffsetCorrectionOut() const override;
+    void SetpOffsetCorrectionOut(int32_t newValue) override;
+    // attribute pOffsetCorrectionStart : HLAinteger16LE
+    int16_t GetpOffsetCorrectionStart() const override;
+    void SetpOffsetCorrectionStart(int16_t newValue) override;
+    // attribute pRateCorrectionOut : HLAinteger32LE
+    int32_t GetpRateCorrectionOut() const override;
+    void SetpRateCorrectionOut(int32_t newValue) override;
+    // attribute pWakeupChannel : FlexRayChannel
+    FlexRayChannel GetpWakeupChannel() const override;
+    void SetpWakeupChannel(FlexRayChannel newValue) override;
+    // attribute pWakeupPattern : HLAoctet
+    uint8_t GetpWakeupPattern() const override;
+    void SetpWakeupPattern(uint8_t newValue) override;
+    // attribute pdMicrotick : FlexRayClockPeriod
+    FlexRayClockPeriod GetpdMicrotick() const override;
+    void SetpdMicrotick(FlexRayClockPeriod newValue) override;
+    // attribute pSamplesPerMicrotick : HLAoctet
+    uint8_t GetpSamplesPerMicrotick() const override;
+    void SetpSamplesPerMicrotick(uint8_t newValue) override;
+    // IFlexRayController
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
+    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    void UnregisterUpdateCallback(uint32_t callbackToken) override;
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
+  private:
+    friend class FlexRayControllerObjectClass;
+
+    FlexRayController();
+    FlexRayController(FlexRayControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    void ExecuteUpdateCallbacks();
+    FlexRayControllerObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    uint32_t mLastCallbackToken = 0;
+    // Attribute value encoders
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute NetworkID : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mNetworkID;
+    // attribute DeviceID : HLAASCIIstring
+    rti1516ev::HLAASCIIstring mDeviceID;
+    // attribute PocRequest : FlexRayPocState
+    rti1516ev::HLAoctet mPocRequest;
+    // attribute ChiCommand : FlexRayChiCommand
+    rti1516ev::HLAoctet mChiCommand;
+    // attribute pAllowHaltDueToClock : HLAoctet
+    rti1516ev::HLAoctet mpAllowHaltDueToClock;
+    // attribute pAllowPassiveToActive : HLAoctet
+    rti1516ev::HLAoctet mpAllowPassiveToActive;
+    // attribute pChannels : FlexRayChannel
+    rti1516ev::HLAoctet mpChannels;
+    // attribute pClusterDriftDamping : HLAoctet
+    rti1516ev::HLAoctet mpClusterDriftDamping;
+    // attribute pdAcceptedStartupRange : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mpdAcceptedStartupRange;
+    // attribute pdListenTimeout : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mpdListenTimeout;
+    // attribute pKeySlotId : HLAinteger16LE
+    rti1516ev::HLAinteger16LE mpKeySlotId;
+    // attribute pKeySlotOnlyEnabled : HLAoctet
+    rti1516ev::HLAoctet mpKeySlotOnlyEnabled;
+    // attribute pKeySlotUsedForStartup : HLAoctet
+    rti1516ev::HLAoctet mpKeySlotUsedForStartup;
+    // attribute pKeySlotUsedForSync : HLAoctet
+    rti1516ev::HLAoctet mpKeySlotUsedForSync;
+    // attribute pLatestTx : HLAinteger16LE
+    rti1516ev::HLAinteger16LE mpLatestTx;
+    // attribute pMacroInitialOffsetA : HLAoctet
+    rti1516ev::HLAoctet mpMacroInitialOffsetA;
+    // attribute pMacroInitialOffsetB : HLAoctet
+    rti1516ev::HLAoctet mpMacroInitialOffsetB;
+    // attribute pMicroInitialOffsetA : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mpMicroInitialOffsetA;
+    // attribute pMicroInitialOffsetB : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mpMicroInitialOffsetB;
+    // attribute pMicroPerCycle : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mpMicroPerCycle;
+    // attribute pOffsetCorrectionOut : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mpOffsetCorrectionOut;
+    // attribute pOffsetCorrectionStart : HLAinteger16LE
+    rti1516ev::HLAinteger16LE mpOffsetCorrectionStart;
+    // attribute pRateCorrectionOut : HLAinteger32LE
+    rti1516ev::HLAinteger32LE mpRateCorrectionOut;
+    // attribute pWakeupChannel : FlexRayChannel
+    rti1516ev::HLAoctet mpWakeupChannel;
+    // attribute pWakeupPattern : HLAoctet
+    rti1516ev::HLAoctet mpWakeupPattern;
+    // attribute pdMicrotick : FlexRayClockPeriod
+    rti1516ev::HLAoctet mpdMicrotick;
+    // attribute pSamplesPerMicrotick : HLAoctet
+    rti1516ev::HLAoctet mpSamplesPerMicrotick;
+};
+
+class FlexRaySendBuffer;
+class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
+{
+  public:
+    // IFlexRaySendBufferObjectClass
+    FlexRaySendBufferObjectClass() = default;
+    virtual ~FlexRaySendBufferObjectClass() = default;
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    IFlexRaySendBuffer* GetObjectInstance(const std::wstring& instanceName) override;
+    IFlexRaySendBuffer* CreateObjectInstance(const std::wstring& instanceName) override;
+    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
+    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverCallbacks(IFlexRaySendBuffer* newObjectInstance);
+
+    // internal
+    FlexRaySendBufferObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
+
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute Sender : HLAhandle
+    rti1516ev::AttributeHandle GetSenderAttributeHandle() const { return mSenderAttributeHandle; }
+    // attribute TransmissionMode : FlexRayTransmissionMode
+    rti1516ev::AttributeHandle GetTransmissionModeAttributeHandle() const { return mTransmissionModeAttributeHandle; }
+    // attribute Payload : FlexRayPayload
+    rti1516ev::AttributeHandle GetPayloadAttributeHandle() const { return mPayloadAttributeHandle; }
+    // attribute CycleOffset : HLAoctet
+    rti1516ev::AttributeHandle GetCycleOffsetAttributeHandle() const { return mCycleOffsetAttributeHandle; }
+    // attribute CycleRepetition : HLAoctet
+    rti1516ev::AttributeHandle GetCycleRepetitionAttributeHandle() const { return mCycleRepetitionAttributeHandle; }
+    // attribute SlotId : HLAinteger16LE
+    rti1516ev::AttributeHandle GetSlotIdAttributeHandle() const { return mSlotIdAttributeHandle; }
+    // attribute Channel : FlexRayChannel
+    rti1516ev::AttributeHandle GetChannelAttributeHandle() const { return mChannelAttributeHandle; }
+    // attribute PPIndicator : HLAboolean
+    rti1516ev::AttributeHandle GetPPIndicatorAttributeHandle() const { return mPPIndicatorAttributeHandle; }
+    // attribute HeaderCRC : HLAinteger16LE
+    rti1516ev::AttributeHandle GetHeaderCRCAttributeHandle() const { return mHeaderCRCAttributeHandle; }
+    void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
+    void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
+    rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
+    IFlexRaySendBuffer* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+  private:
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // object class handle
+    rti1516ev::ObjectClassHandle mObjectClassHandle;
+    HLAobjectRootObjectClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Attribute handles
+    // attribute Sender : HLAhandle
+    rti1516ev::AttributeHandle mSenderAttributeHandle;
+    // attribute TransmissionMode : FlexRayTransmissionMode
+    rti1516ev::AttributeHandle mTransmissionModeAttributeHandle;
+    // attribute Payload : FlexRayPayload
+    rti1516ev::AttributeHandle mPayloadAttributeHandle;
+    // attribute CycleOffset : HLAoctet
+    rti1516ev::AttributeHandle mCycleOffsetAttributeHandle;
+    // attribute CycleRepetition : HLAoctet
+    rti1516ev::AttributeHandle mCycleRepetitionAttributeHandle;
+    // attribute SlotId : HLAinteger16LE
+    rti1516ev::AttributeHandle mSlotIdAttributeHandle;
+    // attribute Channel : FlexRayChannel
+    rti1516ev::AttributeHandle mChannelAttributeHandle;
+    // attribute PPIndicator : HLAboolean
+    rti1516ev::AttributeHandle mPPIndicatorAttributeHandle;
+    // attribute HeaderCRC : HLAinteger16LE
+    rti1516ev::AttributeHandle mHeaderCRCAttributeHandle;
+    std::map<std::wstring, FlexRaySendBuffer*> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, FlexRaySendBuffer*> mObjectInstancesByHandle;
+
+    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
+    uint32_t mLastCallbackToken = 0;
+};
+
+class FlexRaySendBuffer : public IFlexRaySendBuffer
+{
+  public:
+
+    virtual ~FlexRaySendBuffer();
+    FlexRaySendBuffer(const FlexRaySendBuffer&) = delete;
+    FlexRaySendBuffer(FlexRaySendBuffer&&) = delete;
+    FlexRaySendBuffer& operator=(const FlexRaySendBuffer&) = delete;
+    FlexRaySendBuffer& operator=(FlexRaySendBuffer&&) = delete;
+    IFlexRaySendBufferObjectClass* GetObjectClass() const { return mObjectClass; }
+    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute Sender : HLAhandle
+    rti1516ev::HLAhandle GetSender() const override;
+    void SetSender(rti1516ev::HLAhandle newValue) override;
+    // attribute TransmissionMode : FlexRayTransmissionMode
+    FlexRayTransmissionMode GetTransmissionMode() const override;
+    void SetTransmissionMode(FlexRayTransmissionMode newValue) override;
+    // attribute Payload : FlexRayPayload
+    const FlexRayPayload& GetPayload() const override;
+    void SetPayload(const FlexRayPayload& newValue) override;
+    // attribute CycleOffset : HLAoctet
+    uint8_t GetCycleOffset() const override;
+    void SetCycleOffset(uint8_t newValue) override;
+    // attribute CycleRepetition : HLAoctet
+    uint8_t GetCycleRepetition() const override;
+    void SetCycleRepetition(uint8_t newValue) override;
+    // attribute SlotId : HLAinteger16LE
+    int16_t GetSlotId() const override;
+    void SetSlotId(int16_t newValue) override;
+    // attribute Channel : FlexRayChannel
+    FlexRayChannel GetChannel() const override;
+    void SetChannel(FlexRayChannel newValue) override;
+    // attribute PPIndicator : HLAboolean
+    bool GetPPIndicator() const override;
+    void SetPPIndicator(bool newValue) override;
+    // attribute HeaderCRC : HLAinteger16LE
+    int16_t GetHeaderCRC() const override;
+    void SetHeaderCRC(int16_t newValue) override;
+    // IFlexRaySendBuffer
+    void UpdateAllAttributeValues() override;
+    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues() override;
+    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    void RequestAttributeValues() override;
+    void RequestAllAttributeValues() override;
+    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    void UnregisterUpdateCallback(uint32_t callbackToken) override;
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const { return mIsOwner; }
+  private:
+    friend class FlexRaySendBufferObjectClass;
+
+    FlexRaySendBuffer();
+    FlexRaySendBuffer(FlexRaySendBufferObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
+
+    void ExecuteUpdateCallbacks();
+    FlexRaySendBufferObjectClass* mObjectClass;
+    std::wstring mInstanceName;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
+    bool mIsOwner = false;
+    // modified by ReflectAttributeValues
+    AttributeBits mLastUpdated = kNone;
+    // to be sent with next updateAttributes
+    AttributeBits mDirty = kNone;
+    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    uint32_t mLastCallbackToken = 0;
+    // Attribute value encoders
+    // attribute HLAprivilegeToDeleteObject : no data type
+    // attribute Sender : HLAhandle
+    rti1516ev::HLAhandle mSender;
+    // attribute TransmissionMode : FlexRayTransmissionMode
+    rti1516ev::HLAoctet mTransmissionMode;
+    // attribute Payload : FlexRayPayload
+    FlexRayPayloadEncoding mPayload;
+    // attribute CycleOffset : HLAoctet
+    rti1516ev::HLAoctet mCycleOffset;
+    // attribute CycleRepetition : HLAoctet
+    rti1516ev::HLAoctet mCycleRepetition;
+    // attribute SlotId : HLAinteger16LE
+    rti1516ev::HLAinteger16LE mSlotId;
+    // attribute Channel : FlexRayChannel
+    rti1516ev::HLAoctet mChannel;
+    // attribute PPIndicator : HLAboolean
+    rti1516ev::HLAboolean mPPIndicator;
+    // attribute HeaderCRC : HLAinteger16LE
+    rti1516ev::HLAinteger16LE mHeaderCRC;
+};
+
  
 
 class ObjectClassRegistry : public IObjectClassRegistry
@@ -1088,8 +2308,14 @@ class ObjectClassRegistry : public IObjectClassRegistry
     IDOMemberTargetObjectClass* GetDOMemberTargetObjectClass() const override { return mDOMemberTargetObjectClass.get(); }
     IBusManagementObjectClass* GetBusManagementObjectClass() const override { return mBusManagementObjectClass.get(); }
     IBusManagementCanObjectClass* GetBusManagementCanObjectClass() const override { return mBusManagementCanObjectClass.get(); }
+    IBusManagementEthernetObjectClass* GetBusManagementEthernetObjectClass() const override { return mBusManagementEthernetObjectClass.get(); }
+    IFlexRayClusterObjectClass* GetFlexRayClusterObjectClass() const override { return mFlexRayClusterObjectClass.get(); }
     IBusControllerObjectClass* GetBusControllerObjectClass() const override { return mBusControllerObjectClass.get(); }
     IBusControllerCanObjectClass* GetBusControllerCanObjectClass() const override { return mBusControllerCanObjectClass.get(); }
+    IBusControllerEthernetObjectClass* GetBusControllerEthernetObjectClass() const override { return mBusControllerEthernetObjectClass.get(); }
+    IFlexRayControllerStatusObjectClass* GetFlexRayControllerStatusObjectClass() const override { return mFlexRayControllerStatusObjectClass.get(); }
+    IFlexRayControllerObjectClass* GetFlexRayControllerObjectClass() const override { return mFlexRayControllerObjectClass.get(); }
+    IFlexRaySendBufferObjectClass* GetFlexRaySendBufferObjectClass() const override { return mFlexRaySendBufferObjectClass.get(); }
 
     void DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
@@ -1110,8 +2336,14 @@ class ObjectClassRegistry : public IObjectClassRegistry
     std::unique_ptr<DOMemberTargetObjectClass> mDOMemberTargetObjectClass;
     std::unique_ptr<BusManagementObjectClass> mBusManagementObjectClass;
     std::unique_ptr<BusManagementCanObjectClass> mBusManagementCanObjectClass;
+    std::unique_ptr<BusManagementEthernetObjectClass> mBusManagementEthernetObjectClass;
+    std::unique_ptr<FlexRayClusterObjectClass> mFlexRayClusterObjectClass;
     std::unique_ptr<BusControllerObjectClass> mBusControllerObjectClass;
     std::unique_ptr<BusControllerCanObjectClass> mBusControllerCanObjectClass;
+    std::unique_ptr<BusControllerEthernetObjectClass> mBusControllerEthernetObjectClass;
+    std::unique_ptr<FlexRayControllerStatusObjectClass> mFlexRayControllerStatusObjectClass;
+    std::unique_ptr<FlexRayControllerObjectClass> mFlexRayControllerObjectClass;
+    std::unique_ptr<FlexRaySendBufferObjectClass> mFlexRaySendBufferObjectClass;
 }; // class ObjectClassRegistry
 
 } // namespace NDistSimIB

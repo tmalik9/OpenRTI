@@ -233,22 +233,13 @@ void <#=objectClass.Name#>ObjectClass::ExecuteDiscoverCallbacks(I<#=objectClass.
 #>// attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
 <#=attribute.DataType.ReturnCppType#> <#=objectClass.Name#>::Get<#=attribute.Name#>() const
 {
-<# if (attribute.DataType is FOMParser.EnumeratedDataType) { #>
-  return static_cast<<#=attribute.DataType.CPPType#>>(m<#=attribute.Name#>.get());
-<# } else if (attribute.DataType.CanTranslateToCpp) { #>
-  return m<#=attribute.Name#>.get();
-<# } else {#>
-  return m<#=attribute.Name#>Encoder;
-<# } #>
+  return <#=attribute.DataType.CppGetter("m" + attribute.Name)#>;
 }
 
-void <#=objectClass.Name#>::Set<#=attribute.Name#>(<#=attribute.DataType.CPPType#> newValue)
+void <#=objectClass.Name#>::Set<#=attribute.Name#>(<#=attribute.DataType.ParameterCppType#> newValue)
 {
-<# if (attribute.DataType.CanTranslateToCpp) { #>
-  m<#=attribute.Name#>.set(newValue);
-<# } else {#>
-  m<#=attribute.Name#>Encoder = newValue;
-<# } #>
+  // CanTranslateToCpp=<#= attribute.DataType.CanTranslateToCpp #>
+  <#=attribute.DataType.CppSetter("m" + attribute.Name, "newValue")#>;
   mDirty |= k<#=attribute.Name#>Bit;
 }
 

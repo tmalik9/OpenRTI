@@ -250,7 +250,7 @@ bool testRTFederate(int argc, char* argv[])
     updateReceived = true;
   });
   busControllerCan->SetBaudRate(250000);
-  busControllerCan->SetOperationMode(NDistSimIB::NRTFederateEncoding::kCanOperationModeCanFD);
+  busControllerCan->SetOperationMode(NDistSimIB::NRTFederateEncoding::CanOperationMode::kCanOperationModeCanFD);
   busControllerCan->UpdateModifiedAttributeValues();
   while (!updateReceived)
   {

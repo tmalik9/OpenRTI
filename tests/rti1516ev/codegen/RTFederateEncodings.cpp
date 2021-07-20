@@ -119,6 +119,64 @@ void EthernetPacketDataEncoding::update()
   }
 }
 
+// Bytes carried in a FlexRay Frame. The data is variable-sized and carries the actual number of bytes used.
+// variable array of simple type HLAbyte
+FlexRayPayloadDataEncoding::FlexRayPayloadDataEncoding()
+  : HLAvariableArray(rti1516ev::HLAbyte())
+  , mData()
+{
+}
+FlexRayPayloadDataEncoding::FlexRayPayloadDataEncoding(const std::vector<uint8_t>& data)
+  : HLAvariableArray(rti1516ev::HLAbyte())
+  , mData(data)
+{
+  update();
+}
+void FlexRayPayloadDataEncoding::set(const std::vector<uint8_t>& data)
+{
+  if (mData.size() != data.size()) {
+    mData = data;
+    update();
+  } else {
+    memcpy(mData.data(), data.data(), mData.size());
+  }
+}
+void FlexRayPayloadDataEncoding::set(const uint8_t* data, size_t size)
+{
+  if (mData.size() != size) {
+    mData.resize(size);
+    update();
+  }
+  memcpy(mData.data(), data, size);
+}
+const std::vector<uint8_t>& FlexRayPayloadDataEncoding::get() const { return mData; }
+void FlexRayPayloadDataEncoding::resize(size_t size)
+{
+  mData.resize(size);
+  update();
+}
+// resize buffer and encoder array before actually decoding 
+size_t FlexRayPayloadDataEncoding::decodeFrom(const rti1516ev::Octet* buffer, size_t bufferSize, size_t index)
+{
+  size_t newSize = decodedSize(buffer, bufferSize, index);
+  resize(newSize);
+  return HLAvariableArray::decodeFrom(buffer, bufferSize, index);
+}
+void FlexRayPayloadDataEncoding::update()
+{
+  size_t size = mData.size();
+  mEncoding.resize(size);
+  for (size_t i=0; i<size; i++)
+  {
+    mEncoding[i].setDataPointer(&mData.data()[i]);
+    if (i < HLAvariableArray::size()) {
+      setElementPointer(i, &mEncoding[i]);
+    } else {
+      addElementPointer(&mEncoding[i]);
+    }
+  }
+}
+
 // CAN Frame
 CANFrameEncoding::CANFrameEncoding() : rti1516ev::HLAfixedRecord(1)
 {
@@ -136,10 +194,29 @@ CANFrameEncoding::CANFrameEncoding() : rti1516ev::HLAfixedRecord(1)
 CANFrameEncoding::~CANFrameEncoding()
 {
 }
+
+CANFrameEncoding& CANFrameEncoding::operator=(const CANFrame& ref)
+{
+  if (this != &ref)
+  {
+  SetClientIndex(ref.GetClientIndex());
+  SetDir(ref.GetDir());
+  SetOriginalTimeStamp(ref.GetOriginalTimeStamp());
+  SetSimulated(ref.GetSimulated());
+  SetId(ref.GetId());
+  SetFlags(ref.GetFlags());
+  SetDataLength(ref.GetDataLength());
+  SetData(ref.GetData());
+  SetFrameLengthNS(ref.GetFrameLengthNS());
+  SetBitCount(ref.GetBitCount());
+  }
+  return *this;
+}
+
 uint32_t CANFrameEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void CANFrameEncoding::SetClientIndex(int16_t value)
 {
-      mClientIndex.set(value);
+  mClientIndex.set(value);
 }
 int16_t CANFrameEncoding::GetClientIndex() const
 {
@@ -151,7 +228,8 @@ bool CANFrameEncoding::IsClientIndexAvailable() const
 }
 void CANFrameEncoding::SetDir(DirMask value)
 {
-      mDir = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mDir = static_cast<uint8_t>(value);
 }
 DirMask CANFrameEncoding::GetDir() const
 {
@@ -163,7 +241,7 @@ bool CANFrameEncoding::IsDirAvailable() const
 }
 void CANFrameEncoding::SetOriginalTimeStamp(VTimeNS value)
 {
-      mOriginalTimeStamp.set(value);
+  mOriginalTimeStamp.set(value);
 }
 VTimeNS CANFrameEncoding::GetOriginalTimeStamp() const
 {
@@ -175,7 +253,8 @@ bool CANFrameEncoding::IsOriginalTimeStampAvailable() const
 }
 void CANFrameEncoding::SetSimulated(SimulatedFlag value)
 {
-      mSimulated = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mSimulated = static_cast<uint8_t>(value);
 }
 SimulatedFlag CANFrameEncoding::GetSimulated() const
 {
@@ -187,7 +266,7 @@ bool CANFrameEncoding::IsSimulatedAvailable() const
 }
 void CANFrameEncoding::SetId(VMessageId value)
 {
-      mId.set(value);
+  mId.set(value);
 }
 VMessageId CANFrameEncoding::GetId() const
 {
@@ -203,7 +282,7 @@ bool CANFrameEncoding::IsIdAvailable() const
 }
 void CANFrameEncoding::SetFlags(int32_t value)
 {
-      mFlags.set(value);
+  mFlags.set(value);
 }
 int32_t CANFrameEncoding::GetFlags() const
 {
@@ -219,7 +298,7 @@ bool CANFrameEncoding::IsFlagsAvailable() const
 }
 void CANFrameEncoding::SetDataLength(uint8_t value)
 {
-      mDataLength.set(value);
+  mDataLength.set(value);
 }
 uint8_t CANFrameEncoding::GetDataLength() const
 {
@@ -235,7 +314,7 @@ bool CANFrameEncoding::IsDataLengthAvailable() const
 }
 void CANFrameEncoding::SetData(const std::vector<uint8_t>& value)
 {
-      mData.set(value);
+  mData.set(value);
 }
 void CANFrameEncoding::SetData(const uint8_t* value, size_t size)
 {
@@ -255,7 +334,7 @@ bool CANFrameEncoding::IsDataAvailable() const
 }
 void CANFrameEncoding::SetFrameLengthNS(int32_t value)
 {
-      mFrameLengthNS.set(value);
+  mFrameLengthNS.set(value);
 }
 int32_t CANFrameEncoding::GetFrameLengthNS() const
 {
@@ -271,7 +350,7 @@ bool CANFrameEncoding::IsFrameLengthNSAvailable() const
 }
 void CANFrameEncoding::SetBitCount(int16_t value)
 {
-      mBitCount.set(value);
+  mBitCount.set(value);
 }
 int16_t CANFrameEncoding::GetBitCount() const
 {
@@ -295,10 +374,22 @@ CANErrorFrameEncoding::CANErrorFrameEncoding() : rti1516ev::HLAfixedRecord(1)
 CANErrorFrameEncoding::~CANErrorFrameEncoding()
 {
 }
+
+CANErrorFrameEncoding& CANErrorFrameEncoding::operator=(const CANErrorFrame& ref)
+{
+  if (this != &ref)
+  {
+  SetErrorBitPosition(ref.GetErrorBitPosition());
+  SetFrameLengthNS(ref.GetFrameLengthNS());
+  SetClientIndex(ref.GetClientIndex());
+  }
+  return *this;
+}
+
 uint32_t CANErrorFrameEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void CANErrorFrameEncoding::SetErrorBitPosition(int16_t value)
 {
-      mErrorBitPosition.set(value);
+  mErrorBitPosition.set(value);
 }
 int16_t CANErrorFrameEncoding::GetErrorBitPosition() const
 {
@@ -314,7 +405,7 @@ bool CANErrorFrameEncoding::IsErrorBitPositionAvailable() const
 }
 void CANErrorFrameEncoding::SetFrameLengthNS(int32_t value)
 {
-      mFrameLengthNS.set(value);
+  mFrameLengthNS.set(value);
 }
 int32_t CANErrorFrameEncoding::GetFrameLengthNS() const
 {
@@ -330,7 +421,7 @@ bool CANErrorFrameEncoding::IsFrameLengthNSAvailable() const
 }
 void CANErrorFrameEncoding::SetClientIndex(int16_t value)
 {
-      mClientIndex.set(value);
+  mClientIndex.set(value);
 }
 int16_t CANErrorFrameEncoding::GetClientIndex() const
 {
@@ -362,10 +453,30 @@ EthernetStatusEncoding::EthernetStatusEncoding() : rti1516ev::HLAfixedRecord(1)
 EthernetStatusEncoding::~EthernetStatusEncoding()
 {
 }
+
+EthernetStatusEncoding& EthernetStatusEncoding::operator=(const EthernetStatus& ref)
+{
+  if (this != &ref)
+  {
+  SetBusType(ref.GetBusType());
+  SetHardwareChannel(ref.GetHardwareChannel());
+  SetLinkStatus(ref.GetLinkStatus());
+  SetBitrate(ref.GetBitrate());
+  SetEthernetPhy(ref.GetEthernetPhy());
+  SetDuplex(ref.GetDuplex());
+  SetMdiType(ref.GetMdiType());
+  SetConnector(ref.GetConnector());
+  SetClockMode(ref.GetClockMode());
+  SetBrPair(ref.GetBrPair());
+  SetDeviceOperationMode(ref.GetDeviceOperationMode());
+  }
+  return *this;
+}
+
 uint32_t EthernetStatusEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void EthernetStatusEncoding::SetBusType(int16_t value)
 {
-      mBusType.set(value);
+  mBusType.set(value);
 }
 int16_t EthernetStatusEncoding::GetBusType() const
 {
@@ -381,7 +492,7 @@ bool EthernetStatusEncoding::IsBusTypeAvailable() const
 }
 void EthernetStatusEncoding::SetHardwareChannel(int64_t value)
 {
-      mHardwareChannel.set(value);
+  mHardwareChannel.set(value);
 }
 int64_t EthernetStatusEncoding::GetHardwareChannel() const
 {
@@ -397,7 +508,8 @@ bool EthernetStatusEncoding::IsHardwareChannelAvailable() const
 }
 void EthernetStatusEncoding::SetLinkStatus(LinkStatus value)
 {
-      mLinkStatus = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mLinkStatus = static_cast<int32_t>(value);
 }
 LinkStatus EthernetStatusEncoding::GetLinkStatus() const
 {
@@ -413,7 +525,7 @@ bool EthernetStatusEncoding::IsLinkStatusAvailable() const
 }
 void EthernetStatusEncoding::SetBitrate(int32_t value)
 {
-      mBitrate.set(value);
+  mBitrate.set(value);
 }
 int32_t EthernetStatusEncoding::GetBitrate() const
 {
@@ -429,7 +541,8 @@ bool EthernetStatusEncoding::IsBitrateAvailable() const
 }
 void EthernetStatusEncoding::SetEthernetPhy(EthernetPhy value)
 {
-      mEthernetPhy = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mEthernetPhy = static_cast<int32_t>(value);
 }
 EthernetPhy EthernetStatusEncoding::GetEthernetPhy() const
 {
@@ -445,7 +558,8 @@ bool EthernetStatusEncoding::IsEthernetPhyAvailable() const
 }
 void EthernetStatusEncoding::SetDuplex(Duplex value)
 {
-      mDuplex = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mDuplex = static_cast<int32_t>(value);
 }
 Duplex EthernetStatusEncoding::GetDuplex() const
 {
@@ -461,7 +575,8 @@ bool EthernetStatusEncoding::IsDuplexAvailable() const
 }
 void EthernetStatusEncoding::SetMdiType(MdiType value)
 {
-      mMdiType = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mMdiType = static_cast<int32_t>(value);
 }
 MdiType EthernetStatusEncoding::GetMdiType() const
 {
@@ -477,7 +592,8 @@ bool EthernetStatusEncoding::IsMdiTypeAvailable() const
 }
 void EthernetStatusEncoding::SetConnector(Connector value)
 {
-      mConnector = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mConnector = static_cast<int32_t>(value);
 }
 Connector EthernetStatusEncoding::GetConnector() const
 {
@@ -493,7 +609,8 @@ bool EthernetStatusEncoding::IsConnectorAvailable() const
 }
 void EthernetStatusEncoding::SetClockMode(ClockMode value)
 {
-      mClockMode = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mClockMode = static_cast<int32_t>(value);
 }
 ClockMode EthernetStatusEncoding::GetClockMode() const
 {
@@ -509,7 +626,8 @@ bool EthernetStatusEncoding::IsClockModeAvailable() const
 }
 void EthernetStatusEncoding::SetBrPair(BrPair value)
 {
-      mBrPair = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mBrPair = static_cast<int32_t>(value);
 }
 BrPair EthernetStatusEncoding::GetBrPair() const
 {
@@ -525,7 +643,7 @@ bool EthernetStatusEncoding::IsBrPairAvailable() const
 }
 void EthernetStatusEncoding::SetDeviceOperationMode(int32_t value)
 {
-      mDeviceOperationMode.set(value);
+  mDeviceOperationMode.set(value);
 }
 int32_t EthernetStatusEncoding::GetDeviceOperationMode() const
 {
@@ -555,10 +673,28 @@ EthernetPacketEncoding::EthernetPacketEncoding() : rti1516ev::HLAfixedRecord(1)
 EthernetPacketEncoding::~EthernetPacketEncoding()
 {
 }
+
+EthernetPacketEncoding& EthernetPacketEncoding::operator=(const EthernetPacket& ref)
+{
+  if (this != &ref)
+  {
+  SetClientIndex(ref.GetClientIndex());
+  SetDir(ref.GetDir());
+  SetOriginalTimeStamp(ref.GetOriginalTimeStamp());
+  SetSimulated(ref.GetSimulated());
+  SetBusType(ref.GetBusType());
+  SetHardwareChannel(ref.GetHardwareChannel());
+  SetFrameDuration(ref.GetFrameDuration());
+  SetEthernetChecksum(ref.GetEthernetChecksum());
+  SetPacketData(ref.GetPacketData());
+  }
+  return *this;
+}
+
 uint32_t EthernetPacketEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void EthernetPacketEncoding::SetClientIndex(int16_t value)
 {
-      mClientIndex.set(value);
+  mClientIndex.set(value);
 }
 int16_t EthernetPacketEncoding::GetClientIndex() const
 {
@@ -570,7 +706,8 @@ bool EthernetPacketEncoding::IsClientIndexAvailable() const
 }
 void EthernetPacketEncoding::SetDir(DirMask value)
 {
-      mDir = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mDir = static_cast<uint8_t>(value);
 }
 DirMask EthernetPacketEncoding::GetDir() const
 {
@@ -582,7 +719,7 @@ bool EthernetPacketEncoding::IsDirAvailable() const
 }
 void EthernetPacketEncoding::SetOriginalTimeStamp(VTimeNS value)
 {
-      mOriginalTimeStamp.set(value);
+  mOriginalTimeStamp.set(value);
 }
 VTimeNS EthernetPacketEncoding::GetOriginalTimeStamp() const
 {
@@ -594,7 +731,8 @@ bool EthernetPacketEncoding::IsOriginalTimeStampAvailable() const
 }
 void EthernetPacketEncoding::SetSimulated(SimulatedFlag value)
 {
-      mSimulated = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mSimulated = static_cast<uint8_t>(value);
 }
 SimulatedFlag EthernetPacketEncoding::GetSimulated() const
 {
@@ -606,7 +744,7 @@ bool EthernetPacketEncoding::IsSimulatedAvailable() const
 }
 void EthernetPacketEncoding::SetBusType(int16_t value)
 {
-      mBusType.set(value);
+  mBusType.set(value);
 }
 int16_t EthernetPacketEncoding::GetBusType() const
 {
@@ -622,7 +760,7 @@ bool EthernetPacketEncoding::IsBusTypeAvailable() const
 }
 void EthernetPacketEncoding::SetHardwareChannel(int64_t value)
 {
-      mHardwareChannel.set(value);
+  mHardwareChannel.set(value);
 }
 int64_t EthernetPacketEncoding::GetHardwareChannel() const
 {
@@ -638,7 +776,7 @@ bool EthernetPacketEncoding::IsHardwareChannelAvailable() const
 }
 void EthernetPacketEncoding::SetFrameDuration(VTimeNS value)
 {
-      mFrameDuration.set(value);
+  mFrameDuration.set(value);
 }
 VTimeNS EthernetPacketEncoding::GetFrameDuration() const
 {
@@ -654,7 +792,7 @@ bool EthernetPacketEncoding::IsFrameDurationAvailable() const
 }
 void EthernetPacketEncoding::SetEthernetChecksum(int32_t value)
 {
-      mEthernetChecksum.set(value);
+  mEthernetChecksum.set(value);
 }
 int32_t EthernetPacketEncoding::GetEthernetChecksum() const
 {
@@ -670,7 +808,7 @@ bool EthernetPacketEncoding::IsEthernetChecksumAvailable() const
 }
 void EthernetPacketEncoding::SetPacketData(const std::vector<uint8_t>& value)
 {
-      mPacketData.set(value);
+  mPacketData.set(value);
 }
 void EthernetPacketEncoding::SetPacketData(const uint8_t* value, size_t size)
 {
@@ -703,10 +841,28 @@ EthernetPacketForwardedEncoding::EthernetPacketForwardedEncoding() : rti1516ev::
 EthernetPacketForwardedEncoding::~EthernetPacketForwardedEncoding()
 {
 }
+
+EthernetPacketForwardedEncoding& EthernetPacketForwardedEncoding::operator=(const EthernetPacketForwarded& ref)
+{
+  if (this != &ref)
+  {
+  SetClientIndex(ref.GetClientIndex());
+  SetDir(ref.GetDir());
+  SetOriginalTimeStamp(ref.GetOriginalTimeStamp());
+  SetSimulated(ref.GetSimulated());
+  SetBusType(ref.GetBusType());
+  SetHardwareChannel(ref.GetHardwareChannel());
+  SetFrameDuration(ref.GetFrameDuration());
+  SetEthernetChecksum(ref.GetEthernetChecksum());
+  SetPacketData(ref.GetPacketData());
+  }
+  return *this;
+}
+
 uint32_t EthernetPacketForwardedEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void EthernetPacketForwardedEncoding::SetClientIndex(int16_t value)
 {
-      mClientIndex.set(value);
+  mClientIndex.set(value);
 }
 int16_t EthernetPacketForwardedEncoding::GetClientIndex() const
 {
@@ -718,7 +874,8 @@ bool EthernetPacketForwardedEncoding::IsClientIndexAvailable() const
 }
 void EthernetPacketForwardedEncoding::SetDir(DirMask value)
 {
-      mDir = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mDir = static_cast<uint8_t>(value);
 }
 DirMask EthernetPacketForwardedEncoding::GetDir() const
 {
@@ -730,7 +887,7 @@ bool EthernetPacketForwardedEncoding::IsDirAvailable() const
 }
 void EthernetPacketForwardedEncoding::SetOriginalTimeStamp(VTimeNS value)
 {
-      mOriginalTimeStamp.set(value);
+  mOriginalTimeStamp.set(value);
 }
 VTimeNS EthernetPacketForwardedEncoding::GetOriginalTimeStamp() const
 {
@@ -742,7 +899,8 @@ bool EthernetPacketForwardedEncoding::IsOriginalTimeStampAvailable() const
 }
 void EthernetPacketForwardedEncoding::SetSimulated(SimulatedFlag value)
 {
-      mSimulated = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mSimulated = static_cast<uint8_t>(value);
 }
 SimulatedFlag EthernetPacketForwardedEncoding::GetSimulated() const
 {
@@ -754,7 +912,7 @@ bool EthernetPacketForwardedEncoding::IsSimulatedAvailable() const
 }
 void EthernetPacketForwardedEncoding::SetBusType(int16_t value)
 {
-      mBusType.set(value);
+  mBusType.set(value);
 }
 int16_t EthernetPacketForwardedEncoding::GetBusType() const
 {
@@ -770,7 +928,7 @@ bool EthernetPacketForwardedEncoding::IsBusTypeAvailable() const
 }
 void EthernetPacketForwardedEncoding::SetHardwareChannel(int64_t value)
 {
-      mHardwareChannel.set(value);
+  mHardwareChannel.set(value);
 }
 int64_t EthernetPacketForwardedEncoding::GetHardwareChannel() const
 {
@@ -786,7 +944,7 @@ bool EthernetPacketForwardedEncoding::IsHardwareChannelAvailable() const
 }
 void EthernetPacketForwardedEncoding::SetFrameDuration(VTimeNS value)
 {
-      mFrameDuration.set(value);
+  mFrameDuration.set(value);
 }
 VTimeNS EthernetPacketForwardedEncoding::GetFrameDuration() const
 {
@@ -802,7 +960,7 @@ bool EthernetPacketForwardedEncoding::IsFrameDurationAvailable() const
 }
 void EthernetPacketForwardedEncoding::SetEthernetChecksum(int32_t value)
 {
-      mEthernetChecksum.set(value);
+  mEthernetChecksum.set(value);
 }
 int32_t EthernetPacketForwardedEncoding::GetEthernetChecksum() const
 {
@@ -818,7 +976,7 @@ bool EthernetPacketForwardedEncoding::IsEthernetChecksumAvailable() const
 }
 void EthernetPacketForwardedEncoding::SetPacketData(const std::vector<uint8_t>& value)
 {
-      mPacketData.set(value);
+  mPacketData.set(value);
 }
 void EthernetPacketForwardedEncoding::SetPacketData(const uint8_t* value, size_t size)
 {
@@ -852,10 +1010,29 @@ EthernetPacketErrorEncoding::EthernetPacketErrorEncoding() : rti1516ev::HLAfixed
 EthernetPacketErrorEncoding::~EthernetPacketErrorEncoding()
 {
 }
+
+EthernetPacketErrorEncoding& EthernetPacketErrorEncoding::operator=(const EthernetPacketError& ref)
+{
+  if (this != &ref)
+  {
+  SetClientIndex(ref.GetClientIndex());
+  SetDir(ref.GetDir());
+  SetOriginalTimeStamp(ref.GetOriginalTimeStamp());
+  SetSimulated(ref.GetSimulated());
+  SetBusType(ref.GetBusType());
+  SetHardwareChannel(ref.GetHardwareChannel());
+  SetFrameDuration(ref.GetFrameDuration());
+  SetErrorCode(ref.GetErrorCode());
+  SetEthernetChecksum(ref.GetEthernetChecksum());
+  SetPacketData(ref.GetPacketData());
+  }
+  return *this;
+}
+
 uint32_t EthernetPacketErrorEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void EthernetPacketErrorEncoding::SetClientIndex(int16_t value)
 {
-      mClientIndex.set(value);
+  mClientIndex.set(value);
 }
 int16_t EthernetPacketErrorEncoding::GetClientIndex() const
 {
@@ -867,7 +1044,8 @@ bool EthernetPacketErrorEncoding::IsClientIndexAvailable() const
 }
 void EthernetPacketErrorEncoding::SetDir(DirMask value)
 {
-      mDir = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mDir = static_cast<uint8_t>(value);
 }
 DirMask EthernetPacketErrorEncoding::GetDir() const
 {
@@ -879,7 +1057,7 @@ bool EthernetPacketErrorEncoding::IsDirAvailable() const
 }
 void EthernetPacketErrorEncoding::SetOriginalTimeStamp(VTimeNS value)
 {
-      mOriginalTimeStamp.set(value);
+  mOriginalTimeStamp.set(value);
 }
 VTimeNS EthernetPacketErrorEncoding::GetOriginalTimeStamp() const
 {
@@ -891,7 +1069,8 @@ bool EthernetPacketErrorEncoding::IsOriginalTimeStampAvailable() const
 }
 void EthernetPacketErrorEncoding::SetSimulated(SimulatedFlag value)
 {
-      mSimulated = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mSimulated = static_cast<uint8_t>(value);
 }
 SimulatedFlag EthernetPacketErrorEncoding::GetSimulated() const
 {
@@ -903,7 +1082,7 @@ bool EthernetPacketErrorEncoding::IsSimulatedAvailable() const
 }
 void EthernetPacketErrorEncoding::SetBusType(int16_t value)
 {
-      mBusType.set(value);
+  mBusType.set(value);
 }
 int16_t EthernetPacketErrorEncoding::GetBusType() const
 {
@@ -919,7 +1098,7 @@ bool EthernetPacketErrorEncoding::IsBusTypeAvailable() const
 }
 void EthernetPacketErrorEncoding::SetHardwareChannel(int64_t value)
 {
-      mHardwareChannel.set(value);
+  mHardwareChannel.set(value);
 }
 int64_t EthernetPacketErrorEncoding::GetHardwareChannel() const
 {
@@ -935,7 +1114,7 @@ bool EthernetPacketErrorEncoding::IsHardwareChannelAvailable() const
 }
 void EthernetPacketErrorEncoding::SetFrameDuration(VTimeNS value)
 {
-      mFrameDuration.set(value);
+  mFrameDuration.set(value);
 }
 VTimeNS EthernetPacketErrorEncoding::GetFrameDuration() const
 {
@@ -951,7 +1130,7 @@ bool EthernetPacketErrorEncoding::IsFrameDurationAvailable() const
 }
 void EthernetPacketErrorEncoding::SetErrorCode(int32_t value)
 {
-      mErrorCode.set(value);
+  mErrorCode.set(value);
 }
 int32_t EthernetPacketErrorEncoding::GetErrorCode() const
 {
@@ -967,7 +1146,7 @@ bool EthernetPacketErrorEncoding::IsErrorCodeAvailable() const
 }
 void EthernetPacketErrorEncoding::SetEthernetChecksum(int32_t value)
 {
-      mEthernetChecksum.set(value);
+  mEthernetChecksum.set(value);
 }
 int32_t EthernetPacketErrorEncoding::GetEthernetChecksum() const
 {
@@ -983,7 +1162,7 @@ bool EthernetPacketErrorEncoding::IsEthernetChecksumAvailable() const
 }
 void EthernetPacketErrorEncoding::SetPacketData(const std::vector<uint8_t>& value)
 {
-      mPacketData.set(value);
+  mPacketData.set(value);
 }
 void EthernetPacketErrorEncoding::SetPacketData(const uint8_t* value, size_t size)
 {
@@ -1017,10 +1196,29 @@ EthernetPacketErrorForwardedEncoding::EthernetPacketErrorForwardedEncoding() : r
 EthernetPacketErrorForwardedEncoding::~EthernetPacketErrorForwardedEncoding()
 {
 }
+
+EthernetPacketErrorForwardedEncoding& EthernetPacketErrorForwardedEncoding::operator=(const EthernetPacketErrorForwarded& ref)
+{
+  if (this != &ref)
+  {
+  SetClientIndex(ref.GetClientIndex());
+  SetDir(ref.GetDir());
+  SetOriginalTimeStamp(ref.GetOriginalTimeStamp());
+  SetSimulated(ref.GetSimulated());
+  SetBusType(ref.GetBusType());
+  SetHardwareChannel(ref.GetHardwareChannel());
+  SetFrameDuration(ref.GetFrameDuration());
+  SetErrorCode(ref.GetErrorCode());
+  SetEthernetChecksum(ref.GetEthernetChecksum());
+  SetPacketData(ref.GetPacketData());
+  }
+  return *this;
+}
+
 uint32_t EthernetPacketErrorForwardedEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void EthernetPacketErrorForwardedEncoding::SetClientIndex(int16_t value)
 {
-      mClientIndex.set(value);
+  mClientIndex.set(value);
 }
 int16_t EthernetPacketErrorForwardedEncoding::GetClientIndex() const
 {
@@ -1032,7 +1230,8 @@ bool EthernetPacketErrorForwardedEncoding::IsClientIndexAvailable() const
 }
 void EthernetPacketErrorForwardedEncoding::SetDir(DirMask value)
 {
-      mDir = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mDir = static_cast<uint8_t>(value);
 }
 DirMask EthernetPacketErrorForwardedEncoding::GetDir() const
 {
@@ -1044,7 +1243,7 @@ bool EthernetPacketErrorForwardedEncoding::IsDirAvailable() const
 }
 void EthernetPacketErrorForwardedEncoding::SetOriginalTimeStamp(VTimeNS value)
 {
-      mOriginalTimeStamp.set(value);
+  mOriginalTimeStamp.set(value);
 }
 VTimeNS EthernetPacketErrorForwardedEncoding::GetOriginalTimeStamp() const
 {
@@ -1056,7 +1255,8 @@ bool EthernetPacketErrorForwardedEncoding::IsOriginalTimeStampAvailable() const
 }
 void EthernetPacketErrorForwardedEncoding::SetSimulated(SimulatedFlag value)
 {
-      mSimulated = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mSimulated = static_cast<uint8_t>(value);
 }
 SimulatedFlag EthernetPacketErrorForwardedEncoding::GetSimulated() const
 {
@@ -1068,7 +1268,7 @@ bool EthernetPacketErrorForwardedEncoding::IsSimulatedAvailable() const
 }
 void EthernetPacketErrorForwardedEncoding::SetBusType(int16_t value)
 {
-      mBusType.set(value);
+  mBusType.set(value);
 }
 int16_t EthernetPacketErrorForwardedEncoding::GetBusType() const
 {
@@ -1084,7 +1284,7 @@ bool EthernetPacketErrorForwardedEncoding::IsBusTypeAvailable() const
 }
 void EthernetPacketErrorForwardedEncoding::SetHardwareChannel(int64_t value)
 {
-      mHardwareChannel.set(value);
+  mHardwareChannel.set(value);
 }
 int64_t EthernetPacketErrorForwardedEncoding::GetHardwareChannel() const
 {
@@ -1100,7 +1300,7 @@ bool EthernetPacketErrorForwardedEncoding::IsHardwareChannelAvailable() const
 }
 void EthernetPacketErrorForwardedEncoding::SetFrameDuration(VTimeNS value)
 {
-      mFrameDuration.set(value);
+  mFrameDuration.set(value);
 }
 VTimeNS EthernetPacketErrorForwardedEncoding::GetFrameDuration() const
 {
@@ -1116,7 +1316,7 @@ bool EthernetPacketErrorForwardedEncoding::IsFrameDurationAvailable() const
 }
 void EthernetPacketErrorForwardedEncoding::SetErrorCode(int32_t value)
 {
-      mErrorCode.set(value);
+  mErrorCode.set(value);
 }
 int32_t EthernetPacketErrorForwardedEncoding::GetErrorCode() const
 {
@@ -1132,7 +1332,7 @@ bool EthernetPacketErrorForwardedEncoding::IsErrorCodeAvailable() const
 }
 void EthernetPacketErrorForwardedEncoding::SetEthernetChecksum(int32_t value)
 {
-      mEthernetChecksum.set(value);
+  mEthernetChecksum.set(value);
 }
 int32_t EthernetPacketErrorForwardedEncoding::GetEthernetChecksum() const
 {
@@ -1148,7 +1348,7 @@ bool EthernetPacketErrorForwardedEncoding::IsEthernetChecksumAvailable() const
 }
 void EthernetPacketErrorForwardedEncoding::SetPacketData(const std::vector<uint8_t>& value)
 {
-      mPacketData.set(value);
+  mPacketData.set(value);
 }
 void EthernetPacketErrorForwardedEncoding::SetPacketData(const uint8_t* value, size_t size)
 {
@@ -1163,6 +1363,397 @@ const std::vector<uint8_t>& EthernetPacketErrorForwardedEncoding::GetPacketData(
   return mPacketData.get();
 }
 bool EthernetPacketErrorForwardedEncoding::IsPacketDataAvailable() const
+{
+  return (getVersion() >= 1);
+}
+// Payload of FlexRay Frame
+FlexRayPayloadEncoding::FlexRayPayloadEncoding() : rti1516ev::HLAfixedRecord(1)
+{
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mClientIndex, 0);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mDir, 0);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mOriginalTimeStamp, 0);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mSimulated, 0);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mPayloadData, 1);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mPayloadValid, 1);
+}
+FlexRayPayloadEncoding::~FlexRayPayloadEncoding()
+{
+}
+
+FlexRayPayloadEncoding& FlexRayPayloadEncoding::operator=(const FlexRayPayload& ref)
+{
+  if (this != &ref)
+  {
+  SetClientIndex(ref.GetClientIndex());
+  SetDir(ref.GetDir());
+  SetOriginalTimeStamp(ref.GetOriginalTimeStamp());
+  SetSimulated(ref.GetSimulated());
+  SetPayloadData(ref.GetPayloadData());
+  SetPayloadValid(ref.GetPayloadValid());
+  }
+  return *this;
+}
+
+uint32_t FlexRayPayloadEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
+void FlexRayPayloadEncoding::SetClientIndex(int16_t value)
+{
+  mClientIndex.set(value);
+}
+int16_t FlexRayPayloadEncoding::GetClientIndex() const
+{
+  return mClientIndex.get();
+}
+bool FlexRayPayloadEncoding::IsClientIndexAvailable() const
+{
+  return true;
+}
+void FlexRayPayloadEncoding::SetDir(DirMask value)
+{
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mDir = static_cast<uint8_t>(value);
+}
+DirMask FlexRayPayloadEncoding::GetDir() const
+{
+  return static_cast<DirMask>(mDir.get());
+}
+bool FlexRayPayloadEncoding::IsDirAvailable() const
+{
+  return true;
+}
+void FlexRayPayloadEncoding::SetOriginalTimeStamp(VTimeNS value)
+{
+  mOriginalTimeStamp.set(value);
+}
+VTimeNS FlexRayPayloadEncoding::GetOriginalTimeStamp() const
+{
+  return mOriginalTimeStamp.get();
+}
+bool FlexRayPayloadEncoding::IsOriginalTimeStampAvailable() const
+{
+  return true;
+}
+void FlexRayPayloadEncoding::SetSimulated(SimulatedFlag value)
+{
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mSimulated = static_cast<uint8_t>(value);
+}
+SimulatedFlag FlexRayPayloadEncoding::GetSimulated() const
+{
+  return static_cast<SimulatedFlag>(mSimulated.get());
+}
+bool FlexRayPayloadEncoding::IsSimulatedAvailable() const
+{
+  return true;
+}
+void FlexRayPayloadEncoding::SetPayloadData(const std::vector<uint8_t>& value)
+{
+  mPayloadData.set(value);
+}
+void FlexRayPayloadEncoding::SetPayloadData(const uint8_t* value, size_t size)
+{
+	mPayloadData.set(value, size);
+}
+const std::vector<uint8_t>& FlexRayPayloadEncoding::GetPayloadData() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"PayloadData\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mPayloadData.get();
+}
+bool FlexRayPayloadEncoding::IsPayloadDataAvailable() const
+{
+  return (getVersion() >= 1);
+}
+void FlexRayPayloadEncoding::SetPayloadValid(bool value)
+{
+  mPayloadValid.set(value);
+}
+bool FlexRayPayloadEncoding::GetPayloadValid() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"PayloadValid\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mPayloadValid.get();
+}
+bool FlexRayPayloadEncoding::IsPayloadValidAvailable() const
+{
+  return (getVersion() >= 1);
+}
+// Header of FlexRay Frame
+FlexRayHeaderEncoding::FlexRayHeaderEncoding() : rti1516ev::HLAfixedRecord(1)
+{
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mSuFindicator, 1);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mSyFIndicator, 1);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mNFIndicator, 1);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mPPIndicator, 1);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mFrameID, 1);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mpayloadLength, 1);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mHeaderCRC, 1);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mCycle, 1);
+}
+FlexRayHeaderEncoding::~FlexRayHeaderEncoding()
+{
+}
+
+FlexRayHeaderEncoding& FlexRayHeaderEncoding::operator=(const FlexRayHeader& ref)
+{
+  if (this != &ref)
+  {
+  SetSuFindicator(ref.GetSuFindicator());
+  SetSyFIndicator(ref.GetSyFIndicator());
+  SetNFIndicator(ref.GetNFIndicator());
+  SetPPIndicator(ref.GetPPIndicator());
+  SetFrameID(ref.GetFrameID());
+  SetpayloadLength(ref.GetpayloadLength());
+  SetHeaderCRC(ref.GetHeaderCRC());
+  SetCycle(ref.GetCycle());
+  }
+  return *this;
+}
+
+uint32_t FlexRayHeaderEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
+void FlexRayHeaderEncoding::SetSuFindicator(bool value)
+{
+  mSuFindicator.set(value);
+}
+bool FlexRayHeaderEncoding::GetSuFindicator() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"SuFindicator\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mSuFindicator.get();
+}
+bool FlexRayHeaderEncoding::IsSuFindicatorAvailable() const
+{
+  return (getVersion() >= 1);
+}
+void FlexRayHeaderEncoding::SetSyFIndicator(bool value)
+{
+  mSyFIndicator.set(value);
+}
+bool FlexRayHeaderEncoding::GetSyFIndicator() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"SyFIndicator\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mSyFIndicator.get();
+}
+bool FlexRayHeaderEncoding::IsSyFIndicatorAvailable() const
+{
+  return (getVersion() >= 1);
+}
+void FlexRayHeaderEncoding::SetNFIndicator(bool value)
+{
+  mNFIndicator.set(value);
+}
+bool FlexRayHeaderEncoding::GetNFIndicator() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"NFIndicator\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mNFIndicator.get();
+}
+bool FlexRayHeaderEncoding::IsNFIndicatorAvailable() const
+{
+  return (getVersion() >= 1);
+}
+void FlexRayHeaderEncoding::SetPPIndicator(bool value)
+{
+  mPPIndicator.set(value);
+}
+bool FlexRayHeaderEncoding::GetPPIndicator() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"PPIndicator\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mPPIndicator.get();
+}
+bool FlexRayHeaderEncoding::IsPPIndicatorAvailable() const
+{
+  return (getVersion() >= 1);
+}
+void FlexRayHeaderEncoding::SetFrameID(int16_t value)
+{
+  mFrameID.set(value);
+}
+int16_t FlexRayHeaderEncoding::GetFrameID() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"FrameID\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mFrameID.get();
+}
+bool FlexRayHeaderEncoding::IsFrameIDAvailable() const
+{
+  return (getVersion() >= 1);
+}
+void FlexRayHeaderEncoding::SetpayloadLength(uint8_t value)
+{
+  mpayloadLength.set(value);
+}
+uint8_t FlexRayHeaderEncoding::GetpayloadLength() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"payloadLength\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mpayloadLength.get();
+}
+bool FlexRayHeaderEncoding::IspayloadLengthAvailable() const
+{
+  return (getVersion() >= 1);
+}
+void FlexRayHeaderEncoding::SetHeaderCRC(int16_t value)
+{
+  mHeaderCRC.set(value);
+}
+int16_t FlexRayHeaderEncoding::GetHeaderCRC() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"HeaderCRC\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mHeaderCRC.get();
+}
+bool FlexRayHeaderEncoding::IsHeaderCRCAvailable() const
+{
+  return (getVersion() >= 1);
+}
+void FlexRayHeaderEncoding::SetCycle(uint8_t value)
+{
+  mCycle.set(value);
+}
+uint8_t FlexRayHeaderEncoding::GetCycle() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"Cycle\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mCycle.get();
+}
+bool FlexRayHeaderEncoding::IsCycleAvailable() const
+{
+  return (getVersion() >= 1);
+}
+// FlexRay Frame
+FlexRayFrameEncoding::FlexRayFrameEncoding() : rti1516ev::HLAfixedRecord(1)
+{
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mClientIndex, 0);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mDir, 0);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mOriginalTimeStamp, 0);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mSimulated, 0);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mPayloadData, 1);
+  rti1516ev::HLAfixedRecord::appendElementPointer(&mPayloadValid, 1);
+}
+FlexRayFrameEncoding::~FlexRayFrameEncoding()
+{
+}
+
+FlexRayFrameEncoding& FlexRayFrameEncoding::operator=(const FlexRayFrame& ref)
+{
+  if (this != &ref)
+  {
+  SetClientIndex(ref.GetClientIndex());
+  SetDir(ref.GetDir());
+  SetOriginalTimeStamp(ref.GetOriginalTimeStamp());
+  SetSimulated(ref.GetSimulated());
+  SetPayloadData(ref.GetPayloadData());
+  SetPayloadValid(ref.GetPayloadValid());
+  }
+  return *this;
+}
+
+uint32_t FlexRayFrameEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
+void FlexRayFrameEncoding::SetClientIndex(int16_t value)
+{
+  mClientIndex.set(value);
+}
+int16_t FlexRayFrameEncoding::GetClientIndex() const
+{
+  return mClientIndex.get();
+}
+bool FlexRayFrameEncoding::IsClientIndexAvailable() const
+{
+  return true;
+}
+void FlexRayFrameEncoding::SetDir(DirMask value)
+{
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mDir = static_cast<uint8_t>(value);
+}
+DirMask FlexRayFrameEncoding::GetDir() const
+{
+  return static_cast<DirMask>(mDir.get());
+}
+bool FlexRayFrameEncoding::IsDirAvailable() const
+{
+  return true;
+}
+void FlexRayFrameEncoding::SetOriginalTimeStamp(VTimeNS value)
+{
+  mOriginalTimeStamp.set(value);
+}
+VTimeNS FlexRayFrameEncoding::GetOriginalTimeStamp() const
+{
+  return mOriginalTimeStamp.get();
+}
+bool FlexRayFrameEncoding::IsOriginalTimeStampAvailable() const
+{
+  return true;
+}
+void FlexRayFrameEncoding::SetSimulated(SimulatedFlag value)
+{
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mSimulated = static_cast<uint8_t>(value);
+}
+SimulatedFlag FlexRayFrameEncoding::GetSimulated() const
+{
+  return static_cast<SimulatedFlag>(mSimulated.get());
+}
+bool FlexRayFrameEncoding::IsSimulatedAvailable() const
+{
+  return true;
+}
+void FlexRayFrameEncoding::SetPayloadData(const std::vector<uint8_t>& value)
+{
+  mPayloadData.set(value);
+}
+void FlexRayFrameEncoding::SetPayloadData(const uint8_t* value, size_t size)
+{
+	mPayloadData.set(value, size);
+}
+const std::vector<uint8_t>& FlexRayFrameEncoding::GetPayloadData() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"PayloadData\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mPayloadData.get();
+}
+bool FlexRayFrameEncoding::IsPayloadDataAvailable() const
+{
+  return (getVersion() >= 1);
+}
+void FlexRayFrameEncoding::SetPayloadValid(bool value)
+{
+  mPayloadValid.set(value);
+}
+bool FlexRayFrameEncoding::GetPayloadValid() const
+{
+  if (getVersion() < 1)
+  {
+    throw rti1516ev::EncoderException(L"field \"PayloadValid\" is not available in decoded record version " + std::to_wstring(getVersion()));
+  }
+  return mPayloadValid.get();
+}
+bool FlexRayFrameEncoding::IsPayloadValidAvailable() const
 {
   return (getVersion() >= 1);
 }

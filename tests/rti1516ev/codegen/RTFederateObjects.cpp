@@ -372,8 +372,9 @@ std::vector<uint8_t> SystemVariable::GetValue() const
   return mValue.get();
 }
 
-void SystemVariable::SetValue(std::vector<uint8_t> newValue)
+void SystemVariable::SetValue(const std::vector<uint8_t>& newValue)
 {
+  // CanTranslateToCpp=True
   mValue.set(newValue);
   mDirty |= kValueBit;
 }
@@ -678,8 +679,9 @@ std::vector<uint8_t> ValueEntity::GetValue() const
   return mValue.get();
 }
 
-void ValueEntity::SetValue(std::vector<uint8_t> newValue)
+void ValueEntity::SetValue(const std::vector<uint8_t>& newValue)
 {
+  // CanTranslateToCpp=True
   mValue.set(newValue);
   mDirty |= kValueBit;
 }
@@ -990,8 +992,9 @@ std::string DOMemberSource::GetDOSourceMemberName() const
   return mDOSourceMemberName.get();
 }
 
-void DOMemberSource::SetDOSourceMemberName(std::string newValue)
+void DOMemberSource::SetDOSourceMemberName(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mDOSourceMemberName.set(newValue);
   mDirty |= kDOSourceMemberNameBit;
 }
@@ -1002,8 +1005,9 @@ std::string DOMemberSource::GetDOSourceMemberConnectionType() const
   return mDOSourceMemberConnectionType.get();
 }
 
-void DOMemberSource::SetDOSourceMemberConnectionType(std::string newValue)
+void DOMemberSource::SetDOSourceMemberConnectionType(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mDOSourceMemberConnectionType.set(newValue);
   mDirty |= kDOSourceMemberConnectionTypeBit;
 }
@@ -1014,8 +1018,9 @@ std::vector<uint8_t> DOMemberSource::GetDOSourceMemberDataBytes() const
   return mDOSourceMemberDataBytes.get();
 }
 
-void DOMemberSource::SetDOSourceMemberDataBytes(std::vector<uint8_t> newValue)
+void DOMemberSource::SetDOSourceMemberDataBytes(const std::vector<uint8_t>& newValue)
 {
+  // CanTranslateToCpp=True
   mDOSourceMemberDataBytes.set(newValue);
   mDirty |= kDOSourceMemberDataBytesBit;
 }
@@ -1363,8 +1368,9 @@ std::string DOMemberTarget::GetDOTargetMemberName() const
   return mDOTargetMemberName.get();
 }
 
-void DOMemberTarget::SetDOTargetMemberName(std::string newValue)
+void DOMemberTarget::SetDOTargetMemberName(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mDOTargetMemberName.set(newValue);
   mDirty |= kDOTargetMemberNameBit;
 }
@@ -1375,8 +1381,9 @@ std::string DOMemberTarget::GetDOTargetMemberConnectionType() const
   return mDOTargetMemberConnectionType.get();
 }
 
-void DOMemberTarget::SetDOTargetMemberConnectionType(std::string newValue)
+void DOMemberTarget::SetDOTargetMemberConnectionType(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mDOTargetMemberConnectionType.set(newValue);
   mDirty |= kDOTargetMemberConnectionTypeBit;
 }
@@ -1701,8 +1708,9 @@ std::string BusManagement::GetNetworkID() const
   return mNetworkID.get();
 }
 
-void BusManagement::SetNetworkID(std::string newValue)
+void BusManagement::SetNetworkID(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
 }
@@ -1996,8 +2004,9 @@ std::string BusManagementCan::GetNetworkID() const
   return mNetworkID.get();
 }
 
-void BusManagementCan::SetNetworkID(std::string newValue)
+void BusManagementCan::SetNetworkID(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
 }
@@ -2010,7 +2019,8 @@ CanBusState BusManagementCan::GetBusState() const
 
 void BusManagementCan::SetBusState(CanBusState newValue)
 {
-  mBusState.set(newValue);
+  // CanTranslateToCpp=True
+  mBusState.set(static_cast<int32_t>(newValue));
   mDirty |= kBusStateBit;
 }
 
@@ -2022,6 +2032,7 @@ int32_t BusManagementCan::GetTxErrorCount() const
 
 void BusManagementCan::SetTxErrorCount(int32_t newValue)
 {
+  // CanTranslateToCpp=True
   mTxErrorCount.set(newValue);
   mDirty |= kTxErrorCountBit;
 }
@@ -2034,6 +2045,7 @@ int32_t BusManagementCan::GetRxErrorCount() const
 
 void BusManagementCan::SetRxErrorCount(int32_t newValue)
 {
+  // CanTranslateToCpp=True
   mRxErrorCount.set(newValue);
   mDirty |= kRxErrorCountBit;
 }
@@ -2046,6 +2058,7 @@ bool BusManagementCan::GetSendMessagesAsRx() const
 
 void BusManagementCan::SetSendMessagesAsRx(bool newValue)
 {
+  // CanTranslateToCpp=True
   mSendMessagesAsRx.set(newValue);
   mDirty |= kSendMessagesAsRxBit;
 }
@@ -2224,6 +2237,1370 @@ void BusManagementCan::UnregisterUpdateCallback(uint32_t callbackToken)
 }
 
 void BusManagementCan::ExecuteUpdateCallbacks()
+{
+  for (auto& callbackEntry : mUpdateCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(this);
+  }
+}
+
+// object class type 'BusManagementEthernet'
+BusManagementEthernetObjectClass::BusManagementEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass)
+{
+  mRtiAmbassador = rtiAmbassador;
+  mBaseClass = baseClass;
+  mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusManagement.BusManagementEthernet");
+  // attribute PortName : HLAASCIIstring
+  mPortNameAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"PortName");
+  // attribute SendMessagesAsRx : HLAboolean
+  mSendMessagesAsRxAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"SendMessagesAsRx");
+}
+
+void BusManagementEthernetObjectClass::Publish()
+{
+  if (!mPublished)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
+    mPublished = true;
+  }
+}
+
+void BusManagementEthernetObjectClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishObjectClass(mObjectClassHandle);
+    mPublished = false;
+  }
+}
+
+void BusManagementEthernetObjectClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void BusManagementEthernetObjectClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeObjectClass(mObjectClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void BusManagementEthernetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle, const std::wstring& instanceName)
+{
+  assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
+  assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
+  BusManagementEthernet* newObject = new BusManagementEthernet(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+}
+
+void BusManagementEthernetObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
+{
+  std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
+  auto iter = mObjectInstancesByName.find(instanceName);
+  assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+  mObjectInstancesByName.erase(iter);
+  mObjectInstancesByHandle.erase(theObject);
+}
+
+IBusManagementEthernet* BusManagementEthernetObjectClass::GetObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IBusManagementEthernet* BusManagementEthernetObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
+{
+  auto iter = mObjectInstancesByHandle.find(instanceHandle);
+  if (iter != mObjectInstancesByHandle.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IBusManagementEthernet* BusManagementEthernetObjectClass::CreateObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    throw rti1516ev::ObjectClassNotPublished(L"BusManagementEthernet");
+  }
+  BusManagementEthernet* newObject = new BusManagementEthernet(this, instanceName, mRtiAmbassador);
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  return newObject;
+}
+
+rti1516ev::AttributeHandleSet BusManagementEthernetObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetNetworkIDAttributeHandle());
+  result.insert(GetPortNameAttributeHandle());
+  result.insert(GetSendMessagesAsRxAttributeHandle());
+  return result;
+}
+
+uint32_t BusManagementEthernetObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void BusManagementEthernetObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void BusManagementEthernetObjectClass::ExecuteDiscoverCallbacks(IBusManagementEthernet* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
+// object instances of type 'BusManagementEthernet'
+BusManagementEthernet::BusManagementEthernet()
+{
+}
+
+BusManagementEthernet::BusManagementEthernet(BusManagementEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+BusManagementEthernet::~BusManagementEthernet()
+{
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
+  {
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
+  }
+}
+
+// attribute BusManagementEthernet.HLAprivilegeToDeleteObject : no data type
+
+// attribute NetworkID : HLAASCIIstring
+std::string BusManagementEthernet::GetNetworkID() const
+{
+  return mNetworkID.get();
+}
+
+void BusManagementEthernet::SetNetworkID(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mNetworkID.set(newValue);
+  mDirty |= kNetworkIDBit;
+}
+
+// attribute PortName : HLAASCIIstring
+std::string BusManagementEthernet::GetPortName() const
+{
+  return mPortName.get();
+}
+
+void BusManagementEthernet::SetPortName(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mPortName.set(newValue);
+  mDirty |= kPortNameBit;
+}
+
+// attribute SendMessagesAsRx : HLAboolean
+bool BusManagementEthernet::GetSendMessagesAsRx() const
+{
+  return mSendMessagesAsRx.get();
+}
+
+void BusManagementEthernet::SetSendMessagesAsRx(bool newValue)
+{
+  // CanTranslateToCpp=True
+  mSendMessagesAsRx.set(newValue);
+  mDirty |= kSendMessagesAsRxBit;
+}
+
+rti1516ev::AttributeHandleValueMap BusManagementEthernet::GetAllAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  result[mObjectClass->GetNetworkIDAttributeHandle()] = mNetworkID.encode();
+  result[mObjectClass->GetPortNameAttributeHandle()] = mPortName.encode();
+  result[mObjectClass->GetSendMessagesAsRxAttributeHandle()] = mSendMessagesAsRx.encode();
+  return result;
+}
+
+rti1516ev::AttributeHandleValueMap BusManagementEthernet::GetModifiedAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  if (mDirty & kPortNameBit)
+  {
+    result[mObjectClass->GetPortNameAttributeHandle()] = mPortName.encode();
+  }
+  if (mDirty & kSendMessagesAsRxBit)
+  {
+    result[mObjectClass->GetSendMessagesAsRxAttributeHandle()] = mSendMessagesAsRx.encode();
+  }
+  return result;
+}
+
+void BusManagementEthernet::UpdateAllAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
+}
+
+void BusManagementEthernet::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
+}
+
+void BusManagementEthernet::UpdateModifiedAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
+}
+
+void BusManagementEthernet::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
+}
+
+void BusManagementEthernet::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
+{
+  for (auto& attributeHandleValue : attributes)
+  {
+    rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
+    if (attributeHandle == mObjectClass->GetPortNameAttributeHandle())
+    {
+      mPortName.decode(attributeHandleValue.second);
+      mLastUpdated |= kPortNameBit;
+    }
+    else if (attributeHandle == mObjectClass->GetSendMessagesAsRxAttributeHandle())
+    {
+      mSendMessagesAsRx.decode(attributeHandleValue.second);
+      mLastUpdated |= kSendMessagesAsRxBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // BusManagementEthernet::ReflectAttributeValues
+
+void BusManagementEthernet::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kPortNameBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetPortNameAttributeHandle());
+  }
+  if ((mLastUpdated & kSendMessagesAsRxBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetSendMessagesAsRxAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void BusManagementEthernet::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetPortNameAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetSendMessagesAsRxAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void BusManagementEthernet::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetPortNameAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mPortName.encode()));
+      mDirty &= ~kPortNameBit;
+    }
+    else if (attributeHandle == mObjectClass->GetSendMessagesAsRxAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mSendMessagesAsRx.encode()));
+      mDirty &= ~kSendMessagesAsRxBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
+} // BusManagementEthernet::ReflectAttributeValues
+
+uint32_t BusManagementEthernet::RegisterUpdateCallback(UpdateCallbackType callback)
+{
+  mLastCallbackToken++;
+  mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void BusManagementEthernet::UnregisterUpdateCallback(uint32_t callbackToken)
+{
+  mUpdateCallbacks.erase(callbackToken);
+}
+
+void BusManagementEthernet::ExecuteUpdateCallbacks()
+{
+  for (auto& callbackEntry : mUpdateCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(this);
+  }
+}
+
+// object class type 'FlexRayCluster'
+FlexRayClusterObjectClass::FlexRayClusterObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass)
+{
+  mRtiAmbassador = rtiAmbassador;
+  mBaseClass = baseClass;
+  mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusManagement.FlexRayCluster");
+  // attribute gColdstartAttempts : HLAoctet
+  mgColdstartAttemptsAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gColdstartAttempts");
+  // attribute gCycleCountMax : HLAoctet
+  mgCycleCountMaxAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gCycleCountMax");
+  // attribute gdActionPointOffset : HLAinteger32LE
+  mgdActionPointOffsetAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdActionPointOffset");
+  // attribute gdDynamicSlotIdlePhase : HLAinteger32LE
+  mgdDynamicSlotIdlePhaseAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdDynamicSlotIdlePhase");
+  // attribute gdMiniSlot : HLAinteger32LE
+  mgdMiniSlotAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdMiniSlot");
+  // attribute gdMiniSlotActionPointOffset : HLAinteger32LE
+  mgdMiniSlotActionPointOffsetAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdMiniSlotActionPointOffset");
+  // attribute gdStaticSlot : HLAinteger32LE
+  mgdStaticSlotAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdStaticSlot");
+  // attribute gdSymbolWindow : HLAinteger32LE
+  mgdSymbolWindowAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdSymbolWindow");
+  // attribute gdSymbolWindowActionPointOffset : HLAinteger32LE
+  mgdSymbolWindowActionPointOffsetAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdSymbolWindowActionPointOffset");
+  // attribute gdTSSTransmitter : HLAinteger32LE
+  mgdTSSTransmitterAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdTSSTransmitter");
+  // attribute gdWakeupTxActive : HLAinteger32LE
+  mgdWakeupTxActiveAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdWakeupTxActive");
+  // attribute gdWakeupTxIdle : HLAinteger32LE
+  mgdWakeupTxIdleAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gdWakeupTxIdle");
+  // attribute gListenNoise : HLAoctet
+  mgListenNoiseAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gListenNoise");
+  // attribute gMacroPerCycle : HLAinteger32LE
+  mgMacroPerCycleAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gMacroPerCycle");
+  // attribute gMaxWithoutClockCorrectionFatal : HLAoctet
+  mgMaxWithoutClockCorrectionFatalAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gMaxWithoutClockCorrectionFatal");
+  // attribute gMaxWithoutClockCorrectionPassive : HLAoctet
+  mgMaxWithoutClockCorrectionPassiveAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gMaxWithoutClockCorrectionPassive");
+  // attribute gNumberOfMiniSlots : HLAinteger32LE
+  mgNumberOfMiniSlotsAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gNumberOfMiniSlots");
+  // attribute gNumberOfStaticSlots : HLAinteger32LE
+  mgNumberOfStaticSlotsAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gNumberOfStaticSlots");
+  // attribute gPayloadLengthStatic : HLAinteger32LE
+  mgPayloadLengthStaticAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gPayloadLengthStatic");
+  // attribute gSyncFrameIDCountMax : HLAoctet
+  mgSyncFrameIDCountMaxAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gSyncFrameIDCountMax");
+}
+
+void FlexRayClusterObjectClass::Publish()
+{
+  if (!mPublished)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
+    mPublished = true;
+  }
+}
+
+void FlexRayClusterObjectClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishObjectClass(mObjectClassHandle);
+    mPublished = false;
+  }
+}
+
+void FlexRayClusterObjectClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void FlexRayClusterObjectClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeObjectClass(mObjectClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void FlexRayClusterObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle, const std::wstring& instanceName)
+{
+  assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
+  assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
+  FlexRayCluster* newObject = new FlexRayCluster(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+}
+
+void FlexRayClusterObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
+{
+  std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
+  auto iter = mObjectInstancesByName.find(instanceName);
+  assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+  mObjectInstancesByName.erase(iter);
+  mObjectInstancesByHandle.erase(theObject);
+}
+
+IFlexRayCluster* FlexRayClusterObjectClass::GetObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IFlexRayCluster* FlexRayClusterObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
+{
+  auto iter = mObjectInstancesByHandle.find(instanceHandle);
+  if (iter != mObjectInstancesByHandle.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IFlexRayCluster* FlexRayClusterObjectClass::CreateObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    throw rti1516ev::ObjectClassNotPublished(L"FlexRayCluster");
+  }
+  FlexRayCluster* newObject = new FlexRayCluster(this, instanceName, mRtiAmbassador);
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  return newObject;
+}
+
+rti1516ev::AttributeHandleSet FlexRayClusterObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetNetworkIDAttributeHandle());
+  result.insert(GetgColdstartAttemptsAttributeHandle());
+  result.insert(GetgCycleCountMaxAttributeHandle());
+  result.insert(GetgdActionPointOffsetAttributeHandle());
+  result.insert(GetgdDynamicSlotIdlePhaseAttributeHandle());
+  result.insert(GetgdMiniSlotAttributeHandle());
+  result.insert(GetgdMiniSlotActionPointOffsetAttributeHandle());
+  result.insert(GetgdStaticSlotAttributeHandle());
+  result.insert(GetgdSymbolWindowAttributeHandle());
+  result.insert(GetgdSymbolWindowActionPointOffsetAttributeHandle());
+  result.insert(GetgdTSSTransmitterAttributeHandle());
+  result.insert(GetgdWakeupTxActiveAttributeHandle());
+  result.insert(GetgdWakeupTxIdleAttributeHandle());
+  result.insert(GetgListenNoiseAttributeHandle());
+  result.insert(GetgMacroPerCycleAttributeHandle());
+  result.insert(GetgMaxWithoutClockCorrectionFatalAttributeHandle());
+  result.insert(GetgMaxWithoutClockCorrectionPassiveAttributeHandle());
+  result.insert(GetgNumberOfMiniSlotsAttributeHandle());
+  result.insert(GetgNumberOfStaticSlotsAttributeHandle());
+  result.insert(GetgPayloadLengthStaticAttributeHandle());
+  result.insert(GetgSyncFrameIDCountMaxAttributeHandle());
+  return result;
+}
+
+uint32_t FlexRayClusterObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void FlexRayClusterObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void FlexRayClusterObjectClass::ExecuteDiscoverCallbacks(IFlexRayCluster* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
+// object instances of type 'FlexRayCluster'
+FlexRayCluster::FlexRayCluster()
+{
+}
+
+FlexRayCluster::FlexRayCluster(FlexRayClusterObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+FlexRayCluster::~FlexRayCluster()
+{
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
+  {
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
+  }
+}
+
+// attribute FlexRayCluster.HLAprivilegeToDeleteObject : no data type
+
+// attribute NetworkID : HLAASCIIstring
+std::string FlexRayCluster::GetNetworkID() const
+{
+  return mNetworkID.get();
+}
+
+void FlexRayCluster::SetNetworkID(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mNetworkID.set(newValue);
+  mDirty |= kNetworkIDBit;
+}
+
+// attribute gColdstartAttempts : HLAoctet
+uint8_t FlexRayCluster::GetgColdstartAttempts() const
+{
+  return mgColdstartAttempts.get();
+}
+
+void FlexRayCluster::SetgColdstartAttempts(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgColdstartAttempts.set(newValue);
+  mDirty |= kgColdstartAttemptsBit;
+}
+
+// attribute gCycleCountMax : HLAoctet
+uint8_t FlexRayCluster::GetgCycleCountMax() const
+{
+  return mgCycleCountMax.get();
+}
+
+void FlexRayCluster::SetgCycleCountMax(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgCycleCountMax.set(newValue);
+  mDirty |= kgCycleCountMaxBit;
+}
+
+// attribute gdActionPointOffset : HLAinteger32LE
+int32_t FlexRayCluster::GetgdActionPointOffset() const
+{
+  return mgdActionPointOffset.get();
+}
+
+void FlexRayCluster::SetgdActionPointOffset(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdActionPointOffset.set(newValue);
+  mDirty |= kgdActionPointOffsetBit;
+}
+
+// attribute gdDynamicSlotIdlePhase : HLAinteger32LE
+int32_t FlexRayCluster::GetgdDynamicSlotIdlePhase() const
+{
+  return mgdDynamicSlotIdlePhase.get();
+}
+
+void FlexRayCluster::SetgdDynamicSlotIdlePhase(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdDynamicSlotIdlePhase.set(newValue);
+  mDirty |= kgdDynamicSlotIdlePhaseBit;
+}
+
+// attribute gdMiniSlot : HLAinteger32LE
+int32_t FlexRayCluster::GetgdMiniSlot() const
+{
+  return mgdMiniSlot.get();
+}
+
+void FlexRayCluster::SetgdMiniSlot(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdMiniSlot.set(newValue);
+  mDirty |= kgdMiniSlotBit;
+}
+
+// attribute gdMiniSlotActionPointOffset : HLAinteger32LE
+int32_t FlexRayCluster::GetgdMiniSlotActionPointOffset() const
+{
+  return mgdMiniSlotActionPointOffset.get();
+}
+
+void FlexRayCluster::SetgdMiniSlotActionPointOffset(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdMiniSlotActionPointOffset.set(newValue);
+  mDirty |= kgdMiniSlotActionPointOffsetBit;
+}
+
+// attribute gdStaticSlot : HLAinteger32LE
+int32_t FlexRayCluster::GetgdStaticSlot() const
+{
+  return mgdStaticSlot.get();
+}
+
+void FlexRayCluster::SetgdStaticSlot(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdStaticSlot.set(newValue);
+  mDirty |= kgdStaticSlotBit;
+}
+
+// attribute gdSymbolWindow : HLAinteger32LE
+int32_t FlexRayCluster::GetgdSymbolWindow() const
+{
+  return mgdSymbolWindow.get();
+}
+
+void FlexRayCluster::SetgdSymbolWindow(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdSymbolWindow.set(newValue);
+  mDirty |= kgdSymbolWindowBit;
+}
+
+// attribute gdSymbolWindowActionPointOffset : HLAinteger32LE
+int32_t FlexRayCluster::GetgdSymbolWindowActionPointOffset() const
+{
+  return mgdSymbolWindowActionPointOffset.get();
+}
+
+void FlexRayCluster::SetgdSymbolWindowActionPointOffset(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdSymbolWindowActionPointOffset.set(newValue);
+  mDirty |= kgdSymbolWindowActionPointOffsetBit;
+}
+
+// attribute gdTSSTransmitter : HLAinteger32LE
+int32_t FlexRayCluster::GetgdTSSTransmitter() const
+{
+  return mgdTSSTransmitter.get();
+}
+
+void FlexRayCluster::SetgdTSSTransmitter(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdTSSTransmitter.set(newValue);
+  mDirty |= kgdTSSTransmitterBit;
+}
+
+// attribute gdWakeupTxActive : HLAinteger32LE
+int32_t FlexRayCluster::GetgdWakeupTxActive() const
+{
+  return mgdWakeupTxActive.get();
+}
+
+void FlexRayCluster::SetgdWakeupTxActive(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdWakeupTxActive.set(newValue);
+  mDirty |= kgdWakeupTxActiveBit;
+}
+
+// attribute gdWakeupTxIdle : HLAinteger32LE
+int32_t FlexRayCluster::GetgdWakeupTxIdle() const
+{
+  return mgdWakeupTxIdle.get();
+}
+
+void FlexRayCluster::SetgdWakeupTxIdle(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgdWakeupTxIdle.set(newValue);
+  mDirty |= kgdWakeupTxIdleBit;
+}
+
+// attribute gListenNoise : HLAoctet
+uint8_t FlexRayCluster::GetgListenNoise() const
+{
+  return mgListenNoise.get();
+}
+
+void FlexRayCluster::SetgListenNoise(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgListenNoise.set(newValue);
+  mDirty |= kgListenNoiseBit;
+}
+
+// attribute gMacroPerCycle : HLAinteger32LE
+int32_t FlexRayCluster::GetgMacroPerCycle() const
+{
+  return mgMacroPerCycle.get();
+}
+
+void FlexRayCluster::SetgMacroPerCycle(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgMacroPerCycle.set(newValue);
+  mDirty |= kgMacroPerCycleBit;
+}
+
+// attribute gMaxWithoutClockCorrectionFatal : HLAoctet
+uint8_t FlexRayCluster::GetgMaxWithoutClockCorrectionFatal() const
+{
+  return mgMaxWithoutClockCorrectionFatal.get();
+}
+
+void FlexRayCluster::SetgMaxWithoutClockCorrectionFatal(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgMaxWithoutClockCorrectionFatal.set(newValue);
+  mDirty |= kgMaxWithoutClockCorrectionFatalBit;
+}
+
+// attribute gMaxWithoutClockCorrectionPassive : HLAoctet
+uint8_t FlexRayCluster::GetgMaxWithoutClockCorrectionPassive() const
+{
+  return mgMaxWithoutClockCorrectionPassive.get();
+}
+
+void FlexRayCluster::SetgMaxWithoutClockCorrectionPassive(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgMaxWithoutClockCorrectionPassive.set(newValue);
+  mDirty |= kgMaxWithoutClockCorrectionPassiveBit;
+}
+
+// attribute gNumberOfMiniSlots : HLAinteger32LE
+int32_t FlexRayCluster::GetgNumberOfMiniSlots() const
+{
+  return mgNumberOfMiniSlots.get();
+}
+
+void FlexRayCluster::SetgNumberOfMiniSlots(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgNumberOfMiniSlots.set(newValue);
+  mDirty |= kgNumberOfMiniSlotsBit;
+}
+
+// attribute gNumberOfStaticSlots : HLAinteger32LE
+int32_t FlexRayCluster::GetgNumberOfStaticSlots() const
+{
+  return mgNumberOfStaticSlots.get();
+}
+
+void FlexRayCluster::SetgNumberOfStaticSlots(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgNumberOfStaticSlots.set(newValue);
+  mDirty |= kgNumberOfStaticSlotsBit;
+}
+
+// attribute gPayloadLengthStatic : HLAinteger32LE
+int32_t FlexRayCluster::GetgPayloadLengthStatic() const
+{
+  return mgPayloadLengthStatic.get();
+}
+
+void FlexRayCluster::SetgPayloadLengthStatic(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgPayloadLengthStatic.set(newValue);
+  mDirty |= kgPayloadLengthStaticBit;
+}
+
+// attribute gSyncFrameIDCountMax : HLAoctet
+uint8_t FlexRayCluster::GetgSyncFrameIDCountMax() const
+{
+  return mgSyncFrameIDCountMax.get();
+}
+
+void FlexRayCluster::SetgSyncFrameIDCountMax(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mgSyncFrameIDCountMax.set(newValue);
+  mDirty |= kgSyncFrameIDCountMaxBit;
+}
+
+rti1516ev::AttributeHandleValueMap FlexRayCluster::GetAllAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  result[mObjectClass->GetNetworkIDAttributeHandle()] = mNetworkID.encode();
+  result[mObjectClass->GetgColdstartAttemptsAttributeHandle()] = mgColdstartAttempts.encode();
+  result[mObjectClass->GetgCycleCountMaxAttributeHandle()] = mgCycleCountMax.encode();
+  result[mObjectClass->GetgdActionPointOffsetAttributeHandle()] = mgdActionPointOffset.encode();
+  result[mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle()] = mgdDynamicSlotIdlePhase.encode();
+  result[mObjectClass->GetgdMiniSlotAttributeHandle()] = mgdMiniSlot.encode();
+  result[mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle()] = mgdMiniSlotActionPointOffset.encode();
+  result[mObjectClass->GetgdStaticSlotAttributeHandle()] = mgdStaticSlot.encode();
+  result[mObjectClass->GetgdSymbolWindowAttributeHandle()] = mgdSymbolWindow.encode();
+  result[mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle()] = mgdSymbolWindowActionPointOffset.encode();
+  result[mObjectClass->GetgdTSSTransmitterAttributeHandle()] = mgdTSSTransmitter.encode();
+  result[mObjectClass->GetgdWakeupTxActiveAttributeHandle()] = mgdWakeupTxActive.encode();
+  result[mObjectClass->GetgdWakeupTxIdleAttributeHandle()] = mgdWakeupTxIdle.encode();
+  result[mObjectClass->GetgListenNoiseAttributeHandle()] = mgListenNoise.encode();
+  result[mObjectClass->GetgMacroPerCycleAttributeHandle()] = mgMacroPerCycle.encode();
+  result[mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle()] = mgMaxWithoutClockCorrectionFatal.encode();
+  result[mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle()] = mgMaxWithoutClockCorrectionPassive.encode();
+  result[mObjectClass->GetgNumberOfMiniSlotsAttributeHandle()] = mgNumberOfMiniSlots.encode();
+  result[mObjectClass->GetgNumberOfStaticSlotsAttributeHandle()] = mgNumberOfStaticSlots.encode();
+  result[mObjectClass->GetgPayloadLengthStaticAttributeHandle()] = mgPayloadLengthStatic.encode();
+  result[mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle()] = mgSyncFrameIDCountMax.encode();
+  return result;
+}
+
+rti1516ev::AttributeHandleValueMap FlexRayCluster::GetModifiedAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  if (mDirty & kgColdstartAttemptsBit)
+  {
+    result[mObjectClass->GetgColdstartAttemptsAttributeHandle()] = mgColdstartAttempts.encode();
+  }
+  if (mDirty & kgCycleCountMaxBit)
+  {
+    result[mObjectClass->GetgCycleCountMaxAttributeHandle()] = mgCycleCountMax.encode();
+  }
+  if (mDirty & kgdActionPointOffsetBit)
+  {
+    result[mObjectClass->GetgdActionPointOffsetAttributeHandle()] = mgdActionPointOffset.encode();
+  }
+  if (mDirty & kgdDynamicSlotIdlePhaseBit)
+  {
+    result[mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle()] = mgdDynamicSlotIdlePhase.encode();
+  }
+  if (mDirty & kgdMiniSlotBit)
+  {
+    result[mObjectClass->GetgdMiniSlotAttributeHandle()] = mgdMiniSlot.encode();
+  }
+  if (mDirty & kgdMiniSlotActionPointOffsetBit)
+  {
+    result[mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle()] = mgdMiniSlotActionPointOffset.encode();
+  }
+  if (mDirty & kgdStaticSlotBit)
+  {
+    result[mObjectClass->GetgdStaticSlotAttributeHandle()] = mgdStaticSlot.encode();
+  }
+  if (mDirty & kgdSymbolWindowBit)
+  {
+    result[mObjectClass->GetgdSymbolWindowAttributeHandle()] = mgdSymbolWindow.encode();
+  }
+  if (mDirty & kgdSymbolWindowActionPointOffsetBit)
+  {
+    result[mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle()] = mgdSymbolWindowActionPointOffset.encode();
+  }
+  if (mDirty & kgdTSSTransmitterBit)
+  {
+    result[mObjectClass->GetgdTSSTransmitterAttributeHandle()] = mgdTSSTransmitter.encode();
+  }
+  if (mDirty & kgdWakeupTxActiveBit)
+  {
+    result[mObjectClass->GetgdWakeupTxActiveAttributeHandle()] = mgdWakeupTxActive.encode();
+  }
+  if (mDirty & kgdWakeupTxIdleBit)
+  {
+    result[mObjectClass->GetgdWakeupTxIdleAttributeHandle()] = mgdWakeupTxIdle.encode();
+  }
+  if (mDirty & kgListenNoiseBit)
+  {
+    result[mObjectClass->GetgListenNoiseAttributeHandle()] = mgListenNoise.encode();
+  }
+  if (mDirty & kgMacroPerCycleBit)
+  {
+    result[mObjectClass->GetgMacroPerCycleAttributeHandle()] = mgMacroPerCycle.encode();
+  }
+  if (mDirty & kgMaxWithoutClockCorrectionFatalBit)
+  {
+    result[mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle()] = mgMaxWithoutClockCorrectionFatal.encode();
+  }
+  if (mDirty & kgMaxWithoutClockCorrectionPassiveBit)
+  {
+    result[mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle()] = mgMaxWithoutClockCorrectionPassive.encode();
+  }
+  if (mDirty & kgNumberOfMiniSlotsBit)
+  {
+    result[mObjectClass->GetgNumberOfMiniSlotsAttributeHandle()] = mgNumberOfMiniSlots.encode();
+  }
+  if (mDirty & kgNumberOfStaticSlotsBit)
+  {
+    result[mObjectClass->GetgNumberOfStaticSlotsAttributeHandle()] = mgNumberOfStaticSlots.encode();
+  }
+  if (mDirty & kgPayloadLengthStaticBit)
+  {
+    result[mObjectClass->GetgPayloadLengthStaticAttributeHandle()] = mgPayloadLengthStatic.encode();
+  }
+  if (mDirty & kgSyncFrameIDCountMaxBit)
+  {
+    result[mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle()] = mgSyncFrameIDCountMax.encode();
+  }
+  return result;
+}
+
+void FlexRayCluster::UpdateAllAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
+}
+
+void FlexRayCluster::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
+}
+
+void FlexRayCluster::UpdateModifiedAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
+}
+
+void FlexRayCluster::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
+}
+
+void FlexRayCluster::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
+{
+  for (auto& attributeHandleValue : attributes)
+  {
+    rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
+    if (attributeHandle == mObjectClass->GetgColdstartAttemptsAttributeHandle())
+    {
+      mgColdstartAttempts.decode(attributeHandleValue.second);
+      mLastUpdated |= kgColdstartAttemptsBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgCycleCountMaxAttributeHandle())
+    {
+      mgCycleCountMax.decode(attributeHandleValue.second);
+      mLastUpdated |= kgCycleCountMaxBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdActionPointOffsetAttributeHandle())
+    {
+      mgdActionPointOffset.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdActionPointOffsetBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle())
+    {
+      mgdDynamicSlotIdlePhase.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdDynamicSlotIdlePhaseBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdMiniSlotAttributeHandle())
+    {
+      mgdMiniSlot.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdMiniSlotBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle())
+    {
+      mgdMiniSlotActionPointOffset.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdMiniSlotActionPointOffsetBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdStaticSlotAttributeHandle())
+    {
+      mgdStaticSlot.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdStaticSlotBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdSymbolWindowAttributeHandle())
+    {
+      mgdSymbolWindow.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdSymbolWindowBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle())
+    {
+      mgdSymbolWindowActionPointOffset.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdSymbolWindowActionPointOffsetBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdTSSTransmitterAttributeHandle())
+    {
+      mgdTSSTransmitter.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdTSSTransmitterBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdWakeupTxActiveAttributeHandle())
+    {
+      mgdWakeupTxActive.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdWakeupTxActiveBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdWakeupTxIdleAttributeHandle())
+    {
+      mgdWakeupTxIdle.decode(attributeHandleValue.second);
+      mLastUpdated |= kgdWakeupTxIdleBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgListenNoiseAttributeHandle())
+    {
+      mgListenNoise.decode(attributeHandleValue.second);
+      mLastUpdated |= kgListenNoiseBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgMacroPerCycleAttributeHandle())
+    {
+      mgMacroPerCycle.decode(attributeHandleValue.second);
+      mLastUpdated |= kgMacroPerCycleBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle())
+    {
+      mgMaxWithoutClockCorrectionFatal.decode(attributeHandleValue.second);
+      mLastUpdated |= kgMaxWithoutClockCorrectionFatalBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle())
+    {
+      mgMaxWithoutClockCorrectionPassive.decode(attributeHandleValue.second);
+      mLastUpdated |= kgMaxWithoutClockCorrectionPassiveBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgNumberOfMiniSlotsAttributeHandle())
+    {
+      mgNumberOfMiniSlots.decode(attributeHandleValue.second);
+      mLastUpdated |= kgNumberOfMiniSlotsBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgNumberOfStaticSlotsAttributeHandle())
+    {
+      mgNumberOfStaticSlots.decode(attributeHandleValue.second);
+      mLastUpdated |= kgNumberOfStaticSlotsBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgPayloadLengthStaticAttributeHandle())
+    {
+      mgPayloadLengthStatic.decode(attributeHandleValue.second);
+      mLastUpdated |= kgPayloadLengthStaticBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle())
+    {
+      mgSyncFrameIDCountMax.decode(attributeHandleValue.second);
+      mLastUpdated |= kgSyncFrameIDCountMaxBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // FlexRayCluster::ReflectAttributeValues
+
+void FlexRayCluster::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kgColdstartAttemptsBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgColdstartAttemptsAttributeHandle());
+  }
+  if ((mLastUpdated & kgCycleCountMaxBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgCycleCountMaxAttributeHandle());
+  }
+  if ((mLastUpdated & kgdActionPointOffsetBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdActionPointOffsetAttributeHandle());
+  }
+  if ((mLastUpdated & kgdDynamicSlotIdlePhaseBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle());
+  }
+  if ((mLastUpdated & kgdMiniSlotBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdMiniSlotAttributeHandle());
+  }
+  if ((mLastUpdated & kgdMiniSlotActionPointOffsetBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle());
+  }
+  if ((mLastUpdated & kgdStaticSlotBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdStaticSlotAttributeHandle());
+  }
+  if ((mLastUpdated & kgdSymbolWindowBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdSymbolWindowAttributeHandle());
+  }
+  if ((mLastUpdated & kgdSymbolWindowActionPointOffsetBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle());
+  }
+  if ((mLastUpdated & kgdTSSTransmitterBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdTSSTransmitterAttributeHandle());
+  }
+  if ((mLastUpdated & kgdWakeupTxActiveBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdWakeupTxActiveAttributeHandle());
+  }
+  if ((mLastUpdated & kgdWakeupTxIdleBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgdWakeupTxIdleAttributeHandle());
+  }
+  if ((mLastUpdated & kgListenNoiseBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgListenNoiseAttributeHandle());
+  }
+  if ((mLastUpdated & kgMacroPerCycleBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgMacroPerCycleAttributeHandle());
+  }
+  if ((mLastUpdated & kgMaxWithoutClockCorrectionFatalBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle());
+  }
+  if ((mLastUpdated & kgMaxWithoutClockCorrectionPassiveBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle());
+  }
+  if ((mLastUpdated & kgNumberOfMiniSlotsBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgNumberOfMiniSlotsAttributeHandle());
+  }
+  if ((mLastUpdated & kgNumberOfStaticSlotsBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgNumberOfStaticSlotsAttributeHandle());
+  }
+  if ((mLastUpdated & kgPayloadLengthStaticBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgPayloadLengthStaticAttributeHandle());
+  }
+  if ((mLastUpdated & kgSyncFrameIDCountMaxBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void FlexRayCluster::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetgColdstartAttemptsAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgCycleCountMaxAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdActionPointOffsetAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdMiniSlotAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdStaticSlotAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdSymbolWindowAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdTSSTransmitterAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdWakeupTxActiveAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgdWakeupTxIdleAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgListenNoiseAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgMacroPerCycleAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgNumberOfMiniSlotsAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgNumberOfStaticSlotsAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgPayloadLengthStaticAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void FlexRayCluster::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetgColdstartAttemptsAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgColdstartAttempts.encode()));
+      mDirty &= ~kgColdstartAttemptsBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgCycleCountMaxAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgCycleCountMax.encode()));
+      mDirty &= ~kgCycleCountMaxBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdActionPointOffsetAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdActionPointOffset.encode()));
+      mDirty &= ~kgdActionPointOffsetBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdDynamicSlotIdlePhase.encode()));
+      mDirty &= ~kgdDynamicSlotIdlePhaseBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdMiniSlotAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdMiniSlot.encode()));
+      mDirty &= ~kgdMiniSlotBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdMiniSlotActionPointOffset.encode()));
+      mDirty &= ~kgdMiniSlotActionPointOffsetBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdStaticSlotAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdStaticSlot.encode()));
+      mDirty &= ~kgdStaticSlotBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdSymbolWindowAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdSymbolWindow.encode()));
+      mDirty &= ~kgdSymbolWindowBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdSymbolWindowActionPointOffset.encode()));
+      mDirty &= ~kgdSymbolWindowActionPointOffsetBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdTSSTransmitterAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdTSSTransmitter.encode()));
+      mDirty &= ~kgdTSSTransmitterBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdWakeupTxActiveAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdWakeupTxActive.encode()));
+      mDirty &= ~kgdWakeupTxActiveBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgdWakeupTxIdleAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgdWakeupTxIdle.encode()));
+      mDirty &= ~kgdWakeupTxIdleBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgListenNoiseAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgListenNoise.encode()));
+      mDirty &= ~kgListenNoiseBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgMacroPerCycleAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgMacroPerCycle.encode()));
+      mDirty &= ~kgMacroPerCycleBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgMaxWithoutClockCorrectionFatal.encode()));
+      mDirty &= ~kgMaxWithoutClockCorrectionFatalBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgMaxWithoutClockCorrectionPassive.encode()));
+      mDirty &= ~kgMaxWithoutClockCorrectionPassiveBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgNumberOfMiniSlotsAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgNumberOfMiniSlots.encode()));
+      mDirty &= ~kgNumberOfMiniSlotsBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgNumberOfStaticSlotsAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgNumberOfStaticSlots.encode()));
+      mDirty &= ~kgNumberOfStaticSlotsBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgPayloadLengthStaticAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgPayloadLengthStatic.encode()));
+      mDirty &= ~kgPayloadLengthStaticBit;
+    }
+    else if (attributeHandle == mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mgSyncFrameIDCountMax.encode()));
+      mDirty &= ~kgSyncFrameIDCountMaxBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
+} // FlexRayCluster::ReflectAttributeValues
+
+uint32_t FlexRayCluster::RegisterUpdateCallback(UpdateCallbackType callback)
+{
+  mLastCallbackToken++;
+  mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void FlexRayCluster::UnregisterUpdateCallback(uint32_t callbackToken)
+{
+  mUpdateCallbacks.erase(callbackToken);
+}
+
+void FlexRayCluster::ExecuteUpdateCallbacks()
 {
   for (auto& callbackEntry : mUpdateCallbacks)
   {
@@ -2414,8 +3791,9 @@ std::string BusController::GetNetworkID() const
   return mNetworkID.get();
 }
 
-void BusController::SetNetworkID(std::string newValue)
+void BusController::SetNetworkID(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
 }
@@ -2426,8 +3804,9 @@ std::string BusController::GetDeviceID() const
   return mDeviceID.get();
 }
 
-void BusController::SetDeviceID(std::string newValue)
+void BusController::SetDeviceID(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mDeviceID.set(newValue);
   mDirty |= kDeviceIDBit;
 }
@@ -2757,8 +4136,9 @@ std::string BusControllerCan::GetNetworkID() const
   return mNetworkID.get();
 }
 
-void BusControllerCan::SetNetworkID(std::string newValue)
+void BusControllerCan::SetNetworkID(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
 }
@@ -2769,8 +4149,9 @@ std::string BusControllerCan::GetDeviceID() const
   return mDeviceID.get();
 }
 
-void BusControllerCan::SetDeviceID(std::string newValue)
+void BusControllerCan::SetDeviceID(const std::string& newValue)
 {
+  // CanTranslateToCpp=True
   mDeviceID.set(newValue);
   mDirty |= kDeviceIDBit;
 }
@@ -2783,6 +4164,7 @@ int32_t BusControllerCan::GetBaudRate() const
 
 void BusControllerCan::SetBaudRate(int32_t newValue)
 {
+  // CanTranslateToCpp=True
   mBaudRate.set(newValue);
   mDirty |= kBaudRateBit;
 }
@@ -2795,6 +4177,7 @@ int32_t BusControllerCan::GetDataBaudRate() const
 
 void BusControllerCan::SetDataBaudRate(int32_t newValue)
 {
+  // CanTranslateToCpp=True
   mDataBaudRate.set(newValue);
   mDirty |= kDataBaudRateBit;
 }
@@ -2807,6 +4190,7 @@ int32_t BusControllerCan::GetPreScaler() const
 
 void BusControllerCan::SetPreScaler(int32_t newValue)
 {
+  // CanTranslateToCpp=True
   mPreScaler.set(newValue);
   mDirty |= kPreScalerBit;
 }
@@ -2819,7 +4203,8 @@ CanOperationMode BusControllerCan::GetOperationMode() const
 
 void BusControllerCan::SetOperationMode(CanOperationMode newValue)
 {
-  mOperationMode.set(newValue);
+  // CanTranslateToCpp=True
+  mOperationMode.set(static_cast<int32_t>(newValue));
   mDirty |= kOperationModeBit;
 }
 
@@ -2831,6 +4216,7 @@ int32_t BusControllerCan::GetSync_Seg() const
 
 void BusControllerCan::SetSync_Seg(int32_t newValue)
 {
+  // CanTranslateToCpp=True
   mSync_Seg.set(newValue);
   mDirty |= kSync_SegBit;
 }
@@ -2843,6 +4229,7 @@ int32_t BusControllerCan::GetProp_Seg() const
 
 void BusControllerCan::SetProp_Seg(int32_t newValue)
 {
+  // CanTranslateToCpp=True
   mProp_Seg.set(newValue);
   mDirty |= kProp_SegBit;
 }
@@ -2855,6 +4242,7 @@ int32_t BusControllerCan::GetPhase_Seg1() const
 
 void BusControllerCan::SetPhase_Seg1(int32_t newValue)
 {
+  // CanTranslateToCpp=True
   mPhase_Seg1.set(newValue);
   mDirty |= kPhase_Seg1Bit;
 }
@@ -2867,6 +4255,7 @@ int32_t BusControllerCan::GetPhase_Seg2() const
 
 void BusControllerCan::SetPhase_Seg2(int32_t newValue)
 {
+  // CanTranslateToCpp=True
   mPhase_Seg2.set(newValue);
   mDirty |= kPhase_Seg2Bit;
 }
@@ -2879,7 +4268,8 @@ CanSamplingMode BusControllerCan::GetSamplingMode() const
 
 void BusControllerCan::SetSamplingMode(CanSamplingMode newValue)
 {
-  mSamplingMode.set(newValue);
+  // CanTranslateToCpp=True
+  mSamplingMode.set(static_cast<int32_t>(newValue));
   mDirty |= kSamplingModeBit;
 }
 
@@ -3166,6 +4556,2764 @@ void BusControllerCan::ExecuteUpdateCallbacks()
   }
 }
 
+// object class type 'BusControllerEthernet'
+BusControllerEthernetObjectClass::BusControllerEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass)
+{
+  mRtiAmbassador = rtiAmbassador;
+  mBaseClass = baseClass;
+  mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusController.BusControllerEthernet");
+  // attribute PortName : HLAASCIIstring
+  mPortNameAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"PortName");
+}
+
+void BusControllerEthernetObjectClass::Publish()
+{
+  if (!mPublished)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
+    mPublished = true;
+  }
+}
+
+void BusControllerEthernetObjectClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishObjectClass(mObjectClassHandle);
+    mPublished = false;
+  }
+}
+
+void BusControllerEthernetObjectClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void BusControllerEthernetObjectClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeObjectClass(mObjectClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void BusControllerEthernetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle, const std::wstring& instanceName)
+{
+  assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
+  assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
+  BusControllerEthernet* newObject = new BusControllerEthernet(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+}
+
+void BusControllerEthernetObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
+{
+  std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
+  auto iter = mObjectInstancesByName.find(instanceName);
+  assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+  mObjectInstancesByName.erase(iter);
+  mObjectInstancesByHandle.erase(theObject);
+}
+
+IBusControllerEthernet* BusControllerEthernetObjectClass::GetObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IBusControllerEthernet* BusControllerEthernetObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
+{
+  auto iter = mObjectInstancesByHandle.find(instanceHandle);
+  if (iter != mObjectInstancesByHandle.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IBusControllerEthernet* BusControllerEthernetObjectClass::CreateObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    throw rti1516ev::ObjectClassNotPublished(L"BusControllerEthernet");
+  }
+  BusControllerEthernet* newObject = new BusControllerEthernet(this, instanceName, mRtiAmbassador);
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  return newObject;
+}
+
+rti1516ev::AttributeHandleSet BusControllerEthernetObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetNetworkIDAttributeHandle());
+  result.insert(GetDeviceIDAttributeHandle());
+  result.insert(GetPortNameAttributeHandle());
+  return result;
+}
+
+uint32_t BusControllerEthernetObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void BusControllerEthernetObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void BusControllerEthernetObjectClass::ExecuteDiscoverCallbacks(IBusControllerEthernet* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
+// object instances of type 'BusControllerEthernet'
+BusControllerEthernet::BusControllerEthernet()
+{
+}
+
+BusControllerEthernet::BusControllerEthernet(BusControllerEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+BusControllerEthernet::~BusControllerEthernet()
+{
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
+  {
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
+  }
+}
+
+// attribute BusControllerEthernet.HLAprivilegeToDeleteObject : no data type
+
+// attribute NetworkID : HLAASCIIstring
+std::string BusControllerEthernet::GetNetworkID() const
+{
+  return mNetworkID.get();
+}
+
+void BusControllerEthernet::SetNetworkID(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mNetworkID.set(newValue);
+  mDirty |= kNetworkIDBit;
+}
+
+// attribute DeviceID : HLAASCIIstring
+std::string BusControllerEthernet::GetDeviceID() const
+{
+  return mDeviceID.get();
+}
+
+void BusControllerEthernet::SetDeviceID(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mDeviceID.set(newValue);
+  mDirty |= kDeviceIDBit;
+}
+
+// attribute PortName : HLAASCIIstring
+std::string BusControllerEthernet::GetPortName() const
+{
+  return mPortName.get();
+}
+
+void BusControllerEthernet::SetPortName(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mPortName.set(newValue);
+  mDirty |= kPortNameBit;
+}
+
+rti1516ev::AttributeHandleValueMap BusControllerEthernet::GetAllAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  result[mObjectClass->GetNetworkIDAttributeHandle()] = mNetworkID.encode();
+  result[mObjectClass->GetDeviceIDAttributeHandle()] = mDeviceID.encode();
+  result[mObjectClass->GetPortNameAttributeHandle()] = mPortName.encode();
+  return result;
+}
+
+rti1516ev::AttributeHandleValueMap BusControllerEthernet::GetModifiedAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  if (mDirty & kPortNameBit)
+  {
+    result[mObjectClass->GetPortNameAttributeHandle()] = mPortName.encode();
+  }
+  return result;
+}
+
+void BusControllerEthernet::UpdateAllAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
+}
+
+void BusControllerEthernet::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
+}
+
+void BusControllerEthernet::UpdateModifiedAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
+}
+
+void BusControllerEthernet::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
+}
+
+void BusControllerEthernet::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
+{
+  for (auto& attributeHandleValue : attributes)
+  {
+    rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
+    if (attributeHandle == mObjectClass->GetPortNameAttributeHandle())
+    {
+      mPortName.decode(attributeHandleValue.second);
+      mLastUpdated |= kPortNameBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // BusControllerEthernet::ReflectAttributeValues
+
+void BusControllerEthernet::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kPortNameBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetPortNameAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void BusControllerEthernet::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetPortNameAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void BusControllerEthernet::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetPortNameAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mPortName.encode()));
+      mDirty &= ~kPortNameBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
+} // BusControllerEthernet::ReflectAttributeValues
+
+uint32_t BusControllerEthernet::RegisterUpdateCallback(UpdateCallbackType callback)
+{
+  mLastCallbackToken++;
+  mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void BusControllerEthernet::UnregisterUpdateCallback(uint32_t callbackToken)
+{
+  mUpdateCallbacks.erase(callbackToken);
+}
+
+void BusControllerEthernet::ExecuteUpdateCallbacks()
+{
+  for (auto& callbackEntry : mUpdateCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(this);
+  }
+}
+
+// object class type 'FlexRayControllerStatus'
+FlexRayControllerStatusObjectClass::FlexRayControllerStatusObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass)
+{
+  mRtiAmbassador = rtiAmbassador;
+  mBaseClass = baseClass;
+  mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusController.FlexRayControllerStatus");
+  // attribute PocState : FlexRayPocState
+  mPocStateAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"PocState");
+  // attribute chiHaltRequest : HLAboolean
+  mchiHaltRequestAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"chiHaltRequest");
+  // attribute coldstartNoise : HLAboolean
+  mcoldstartNoiseAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"coldstartNoise");
+  // attribute freeze : HLAboolean
+  mfreezeAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"freeze");
+  // attribute chiReadyRequest : HLAboolean
+  mchiReadyRequestAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"chiReadyRequest");
+  // attribute errorMode : FlexRayErrorModeType
+  merrorModeAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"errorMode");
+  // attribute slotMode : FlexRaySlotModeType
+  mslotModeAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"slotMode");
+  // attribute startupState : FlexRayStartupStateType
+  mstartupStateAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"startupState");
+  // attribute wakeupStatus : FlexRayWakeupStatusType
+  mwakeupStatusAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"wakeupStatus");
+}
+
+void FlexRayControllerStatusObjectClass::Publish()
+{
+  if (!mPublished)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
+    mPublished = true;
+  }
+}
+
+void FlexRayControllerStatusObjectClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishObjectClass(mObjectClassHandle);
+    mPublished = false;
+  }
+}
+
+void FlexRayControllerStatusObjectClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void FlexRayControllerStatusObjectClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeObjectClass(mObjectClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void FlexRayControllerStatusObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle, const std::wstring& instanceName)
+{
+  assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
+  assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
+  FlexRayControllerStatus* newObject = new FlexRayControllerStatus(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+}
+
+void FlexRayControllerStatusObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
+{
+  std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
+  auto iter = mObjectInstancesByName.find(instanceName);
+  assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+  mObjectInstancesByName.erase(iter);
+  mObjectInstancesByHandle.erase(theObject);
+}
+
+IFlexRayControllerStatus* FlexRayControllerStatusObjectClass::GetObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IFlexRayControllerStatus* FlexRayControllerStatusObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
+{
+  auto iter = mObjectInstancesByHandle.find(instanceHandle);
+  if (iter != mObjectInstancesByHandle.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IFlexRayControllerStatus* FlexRayControllerStatusObjectClass::CreateObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    throw rti1516ev::ObjectClassNotPublished(L"FlexRayControllerStatus");
+  }
+  FlexRayControllerStatus* newObject = new FlexRayControllerStatus(this, instanceName, mRtiAmbassador);
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  return newObject;
+}
+
+rti1516ev::AttributeHandleSet FlexRayControllerStatusObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetNetworkIDAttributeHandle());
+  result.insert(GetDeviceIDAttributeHandle());
+  result.insert(GetPocStateAttributeHandle());
+  result.insert(GetchiHaltRequestAttributeHandle());
+  result.insert(GetcoldstartNoiseAttributeHandle());
+  result.insert(GetfreezeAttributeHandle());
+  result.insert(GetchiReadyRequestAttributeHandle());
+  result.insert(GeterrorModeAttributeHandle());
+  result.insert(GetslotModeAttributeHandle());
+  result.insert(GetstartupStateAttributeHandle());
+  result.insert(GetwakeupStatusAttributeHandle());
+  return result;
+}
+
+uint32_t FlexRayControllerStatusObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void FlexRayControllerStatusObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void FlexRayControllerStatusObjectClass::ExecuteDiscoverCallbacks(IFlexRayControllerStatus* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
+// object instances of type 'FlexRayControllerStatus'
+FlexRayControllerStatus::FlexRayControllerStatus()
+{
+}
+
+FlexRayControllerStatus::FlexRayControllerStatus(FlexRayControllerStatusObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+FlexRayControllerStatus::~FlexRayControllerStatus()
+{
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
+  {
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
+  }
+}
+
+// attribute FlexRayControllerStatus.HLAprivilegeToDeleteObject : no data type
+
+// attribute NetworkID : HLAASCIIstring
+std::string FlexRayControllerStatus::GetNetworkID() const
+{
+  return mNetworkID.get();
+}
+
+void FlexRayControllerStatus::SetNetworkID(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mNetworkID.set(newValue);
+  mDirty |= kNetworkIDBit;
+}
+
+// attribute DeviceID : HLAASCIIstring
+std::string FlexRayControllerStatus::GetDeviceID() const
+{
+  return mDeviceID.get();
+}
+
+void FlexRayControllerStatus::SetDeviceID(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mDeviceID.set(newValue);
+  mDirty |= kDeviceIDBit;
+}
+
+// attribute PocState : FlexRayPocState
+FlexRayPocState FlexRayControllerStatus::GetPocState() const
+{
+  return static_cast<FlexRayPocState>(mPocState.get());
+}
+
+void FlexRayControllerStatus::SetPocState(FlexRayPocState newValue)
+{
+  // CanTranslateToCpp=True
+  mPocState.set(static_cast<uint8_t>(newValue));
+  mDirty |= kPocStateBit;
+}
+
+// attribute chiHaltRequest : HLAboolean
+bool FlexRayControllerStatus::GetchiHaltRequest() const
+{
+  return mchiHaltRequest.get();
+}
+
+void FlexRayControllerStatus::SetchiHaltRequest(bool newValue)
+{
+  // CanTranslateToCpp=True
+  mchiHaltRequest.set(newValue);
+  mDirty |= kchiHaltRequestBit;
+}
+
+// attribute coldstartNoise : HLAboolean
+bool FlexRayControllerStatus::GetcoldstartNoise() const
+{
+  return mcoldstartNoise.get();
+}
+
+void FlexRayControllerStatus::SetcoldstartNoise(bool newValue)
+{
+  // CanTranslateToCpp=True
+  mcoldstartNoise.set(newValue);
+  mDirty |= kcoldstartNoiseBit;
+}
+
+// attribute freeze : HLAboolean
+bool FlexRayControllerStatus::Getfreeze() const
+{
+  return mfreeze.get();
+}
+
+void FlexRayControllerStatus::Setfreeze(bool newValue)
+{
+  // CanTranslateToCpp=True
+  mfreeze.set(newValue);
+  mDirty |= kfreezeBit;
+}
+
+// attribute chiReadyRequest : HLAboolean
+bool FlexRayControllerStatus::GetchiReadyRequest() const
+{
+  return mchiReadyRequest.get();
+}
+
+void FlexRayControllerStatus::SetchiReadyRequest(bool newValue)
+{
+  // CanTranslateToCpp=True
+  mchiReadyRequest.set(newValue);
+  mDirty |= kchiReadyRequestBit;
+}
+
+// attribute errorMode : FlexRayErrorModeType
+FlexRayErrorModeType FlexRayControllerStatus::GeterrorMode() const
+{
+  return static_cast<FlexRayErrorModeType>(merrorMode.get());
+}
+
+void FlexRayControllerStatus::SeterrorMode(FlexRayErrorModeType newValue)
+{
+  // CanTranslateToCpp=True
+  merrorMode.set(static_cast<uint8_t>(newValue));
+  mDirty |= kerrorModeBit;
+}
+
+// attribute slotMode : FlexRaySlotModeType
+FlexRaySlotModeType FlexRayControllerStatus::GetslotMode() const
+{
+  return static_cast<FlexRaySlotModeType>(mslotMode.get());
+}
+
+void FlexRayControllerStatus::SetslotMode(FlexRaySlotModeType newValue)
+{
+  // CanTranslateToCpp=True
+  mslotMode.set(static_cast<uint8_t>(newValue));
+  mDirty |= kslotModeBit;
+}
+
+// attribute startupState : FlexRayStartupStateType
+FlexRayStartupStateType FlexRayControllerStatus::GetstartupState() const
+{
+  return static_cast<FlexRayStartupStateType>(mstartupState.get());
+}
+
+void FlexRayControllerStatus::SetstartupState(FlexRayStartupStateType newValue)
+{
+  // CanTranslateToCpp=True
+  mstartupState.set(static_cast<uint8_t>(newValue));
+  mDirty |= kstartupStateBit;
+}
+
+// attribute wakeupStatus : FlexRayWakeupStatusType
+FlexRayWakeupStatusType FlexRayControllerStatus::GetwakeupStatus() const
+{
+  return static_cast<FlexRayWakeupStatusType>(mwakeupStatus.get());
+}
+
+void FlexRayControllerStatus::SetwakeupStatus(FlexRayWakeupStatusType newValue)
+{
+  // CanTranslateToCpp=True
+  mwakeupStatus.set(static_cast<uint8_t>(newValue));
+  mDirty |= kwakeupStatusBit;
+}
+
+rti1516ev::AttributeHandleValueMap FlexRayControllerStatus::GetAllAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  result[mObjectClass->GetNetworkIDAttributeHandle()] = mNetworkID.encode();
+  result[mObjectClass->GetDeviceIDAttributeHandle()] = mDeviceID.encode();
+  result[mObjectClass->GetPocStateAttributeHandle()] = mPocState.encode();
+  result[mObjectClass->GetchiHaltRequestAttributeHandle()] = mchiHaltRequest.encode();
+  result[mObjectClass->GetcoldstartNoiseAttributeHandle()] = mcoldstartNoise.encode();
+  result[mObjectClass->GetfreezeAttributeHandle()] = mfreeze.encode();
+  result[mObjectClass->GetchiReadyRequestAttributeHandle()] = mchiReadyRequest.encode();
+  result[mObjectClass->GeterrorModeAttributeHandle()] = merrorMode.encode();
+  result[mObjectClass->GetslotModeAttributeHandle()] = mslotMode.encode();
+  result[mObjectClass->GetstartupStateAttributeHandle()] = mstartupState.encode();
+  result[mObjectClass->GetwakeupStatusAttributeHandle()] = mwakeupStatus.encode();
+  return result;
+}
+
+rti1516ev::AttributeHandleValueMap FlexRayControllerStatus::GetModifiedAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  if (mDirty & kPocStateBit)
+  {
+    result[mObjectClass->GetPocStateAttributeHandle()] = mPocState.encode();
+  }
+  if (mDirty & kchiHaltRequestBit)
+  {
+    result[mObjectClass->GetchiHaltRequestAttributeHandle()] = mchiHaltRequest.encode();
+  }
+  if (mDirty & kcoldstartNoiseBit)
+  {
+    result[mObjectClass->GetcoldstartNoiseAttributeHandle()] = mcoldstartNoise.encode();
+  }
+  if (mDirty & kfreezeBit)
+  {
+    result[mObjectClass->GetfreezeAttributeHandle()] = mfreeze.encode();
+  }
+  if (mDirty & kchiReadyRequestBit)
+  {
+    result[mObjectClass->GetchiReadyRequestAttributeHandle()] = mchiReadyRequest.encode();
+  }
+  if (mDirty & kerrorModeBit)
+  {
+    result[mObjectClass->GeterrorModeAttributeHandle()] = merrorMode.encode();
+  }
+  if (mDirty & kslotModeBit)
+  {
+    result[mObjectClass->GetslotModeAttributeHandle()] = mslotMode.encode();
+  }
+  if (mDirty & kstartupStateBit)
+  {
+    result[mObjectClass->GetstartupStateAttributeHandle()] = mstartupState.encode();
+  }
+  if (mDirty & kwakeupStatusBit)
+  {
+    result[mObjectClass->GetwakeupStatusAttributeHandle()] = mwakeupStatus.encode();
+  }
+  return result;
+}
+
+void FlexRayControllerStatus::UpdateAllAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
+}
+
+void FlexRayControllerStatus::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
+}
+
+void FlexRayControllerStatus::UpdateModifiedAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
+}
+
+void FlexRayControllerStatus::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
+}
+
+void FlexRayControllerStatus::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
+{
+  for (auto& attributeHandleValue : attributes)
+  {
+    rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
+    if (attributeHandle == mObjectClass->GetPocStateAttributeHandle())
+    {
+      mPocState.decode(attributeHandleValue.second);
+      mLastUpdated |= kPocStateBit;
+    }
+    else if (attributeHandle == mObjectClass->GetchiHaltRequestAttributeHandle())
+    {
+      mchiHaltRequest.decode(attributeHandleValue.second);
+      mLastUpdated |= kchiHaltRequestBit;
+    }
+    else if (attributeHandle == mObjectClass->GetcoldstartNoiseAttributeHandle())
+    {
+      mcoldstartNoise.decode(attributeHandleValue.second);
+      mLastUpdated |= kcoldstartNoiseBit;
+    }
+    else if (attributeHandle == mObjectClass->GetfreezeAttributeHandle())
+    {
+      mfreeze.decode(attributeHandleValue.second);
+      mLastUpdated |= kfreezeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetchiReadyRequestAttributeHandle())
+    {
+      mchiReadyRequest.decode(attributeHandleValue.second);
+      mLastUpdated |= kchiReadyRequestBit;
+    }
+    else if (attributeHandle == mObjectClass->GeterrorModeAttributeHandle())
+    {
+      merrorMode.decode(attributeHandleValue.second);
+      mLastUpdated |= kerrorModeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetslotModeAttributeHandle())
+    {
+      mslotMode.decode(attributeHandleValue.second);
+      mLastUpdated |= kslotModeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetstartupStateAttributeHandle())
+    {
+      mstartupState.decode(attributeHandleValue.second);
+      mLastUpdated |= kstartupStateBit;
+    }
+    else if (attributeHandle == mObjectClass->GetwakeupStatusAttributeHandle())
+    {
+      mwakeupStatus.decode(attributeHandleValue.second);
+      mLastUpdated |= kwakeupStatusBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // FlexRayControllerStatus::ReflectAttributeValues
+
+void FlexRayControllerStatus::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kPocStateBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetPocStateAttributeHandle());
+  }
+  if ((mLastUpdated & kchiHaltRequestBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetchiHaltRequestAttributeHandle());
+  }
+  if ((mLastUpdated & kcoldstartNoiseBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetcoldstartNoiseAttributeHandle());
+  }
+  if ((mLastUpdated & kfreezeBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetfreezeAttributeHandle());
+  }
+  if ((mLastUpdated & kchiReadyRequestBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetchiReadyRequestAttributeHandle());
+  }
+  if ((mLastUpdated & kerrorModeBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GeterrorModeAttributeHandle());
+  }
+  if ((mLastUpdated & kslotModeBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetslotModeAttributeHandle());
+  }
+  if ((mLastUpdated & kstartupStateBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetstartupStateAttributeHandle());
+  }
+  if ((mLastUpdated & kwakeupStatusBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetwakeupStatusAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void FlexRayControllerStatus::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetPocStateAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetchiHaltRequestAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetcoldstartNoiseAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetfreezeAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetchiReadyRequestAttributeHandle());
+  requestAttributes.insert(mObjectClass->GeterrorModeAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetslotModeAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetstartupStateAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetwakeupStatusAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void FlexRayControllerStatus::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetPocStateAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mPocState.encode()));
+      mDirty &= ~kPocStateBit;
+    }
+    else if (attributeHandle == mObjectClass->GetchiHaltRequestAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mchiHaltRequest.encode()));
+      mDirty &= ~kchiHaltRequestBit;
+    }
+    else if (attributeHandle == mObjectClass->GetcoldstartNoiseAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mcoldstartNoise.encode()));
+      mDirty &= ~kcoldstartNoiseBit;
+    }
+    else if (attributeHandle == mObjectClass->GetfreezeAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mfreeze.encode()));
+      mDirty &= ~kfreezeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetchiReadyRequestAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mchiReadyRequest.encode()));
+      mDirty &= ~kchiReadyRequestBit;
+    }
+    else if (attributeHandle == mObjectClass->GeterrorModeAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, merrorMode.encode()));
+      mDirty &= ~kerrorModeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetslotModeAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mslotMode.encode()));
+      mDirty &= ~kslotModeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetstartupStateAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mstartupState.encode()));
+      mDirty &= ~kstartupStateBit;
+    }
+    else if (attributeHandle == mObjectClass->GetwakeupStatusAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mwakeupStatus.encode()));
+      mDirty &= ~kwakeupStatusBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
+} // FlexRayControllerStatus::ReflectAttributeValues
+
+uint32_t FlexRayControllerStatus::RegisterUpdateCallback(UpdateCallbackType callback)
+{
+  mLastCallbackToken++;
+  mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void FlexRayControllerStatus::UnregisterUpdateCallback(uint32_t callbackToken)
+{
+  mUpdateCallbacks.erase(callbackToken);
+}
+
+void FlexRayControllerStatus::ExecuteUpdateCallbacks()
+{
+  for (auto& callbackEntry : mUpdateCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(this);
+  }
+}
+
+// object class type 'FlexRayController'
+FlexRayControllerObjectClass::FlexRayControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass)
+{
+  mRtiAmbassador = rtiAmbassador;
+  mBaseClass = baseClass;
+  mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusController.FlexRayController");
+  // attribute PocRequest : FlexRayPocState
+  mPocRequestAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"PocRequest");
+  // attribute ChiCommand : FlexRayChiCommand
+  mChiCommandAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"ChiCommand");
+  // attribute pAllowHaltDueToClock : HLAoctet
+  mpAllowHaltDueToClockAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pAllowHaltDueToClock");
+  // attribute pAllowPassiveToActive : HLAoctet
+  mpAllowPassiveToActiveAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pAllowPassiveToActive");
+  // attribute pChannels : FlexRayChannel
+  mpChannelsAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pChannels");
+  // attribute pClusterDriftDamping : HLAoctet
+  mpClusterDriftDampingAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pClusterDriftDamping");
+  // attribute pdAcceptedStartupRange : HLAinteger32LE
+  mpdAcceptedStartupRangeAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pdAcceptedStartupRange");
+  // attribute pdListenTimeout : HLAinteger32LE
+  mpdListenTimeoutAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pdListenTimeout");
+  // attribute pKeySlotId : HLAinteger16LE
+  mpKeySlotIdAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pKeySlotId");
+  // attribute pKeySlotOnlyEnabled : HLAoctet
+  mpKeySlotOnlyEnabledAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pKeySlotOnlyEnabled");
+  // attribute pKeySlotUsedForStartup : HLAoctet
+  mpKeySlotUsedForStartupAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pKeySlotUsedForStartup");
+  // attribute pKeySlotUsedForSync : HLAoctet
+  mpKeySlotUsedForSyncAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pKeySlotUsedForSync");
+  // attribute pLatestTx : HLAinteger16LE
+  mpLatestTxAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pLatestTx");
+  // attribute pMacroInitialOffsetA : HLAoctet
+  mpMacroInitialOffsetAAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pMacroInitialOffsetA");
+  // attribute pMacroInitialOffsetB : HLAoctet
+  mpMacroInitialOffsetBAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pMacroInitialOffsetB");
+  // attribute pMicroInitialOffsetA : HLAinteger32LE
+  mpMicroInitialOffsetAAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pMicroInitialOffsetA");
+  // attribute pMicroInitialOffsetB : HLAinteger32LE
+  mpMicroInitialOffsetBAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pMicroInitialOffsetB");
+  // attribute pMicroPerCycle : HLAinteger32LE
+  mpMicroPerCycleAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pMicroPerCycle");
+  // attribute pOffsetCorrectionOut : HLAinteger32LE
+  mpOffsetCorrectionOutAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pOffsetCorrectionOut");
+  // attribute pOffsetCorrectionStart : HLAinteger16LE
+  mpOffsetCorrectionStartAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pOffsetCorrectionStart");
+  // attribute pRateCorrectionOut : HLAinteger32LE
+  mpRateCorrectionOutAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pRateCorrectionOut");
+  // attribute pWakeupChannel : FlexRayChannel
+  mpWakeupChannelAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pWakeupChannel");
+  // attribute pWakeupPattern : HLAoctet
+  mpWakeupPatternAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pWakeupPattern");
+  // attribute pdMicrotick : FlexRayClockPeriod
+  mpdMicrotickAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pdMicrotick");
+  // attribute pSamplesPerMicrotick : HLAoctet
+  mpSamplesPerMicrotickAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pSamplesPerMicrotick");
+}
+
+void FlexRayControllerObjectClass::Publish()
+{
+  if (!mPublished)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
+    mPublished = true;
+  }
+}
+
+void FlexRayControllerObjectClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishObjectClass(mObjectClassHandle);
+    mPublished = false;
+  }
+}
+
+void FlexRayControllerObjectClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void FlexRayControllerObjectClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeObjectClass(mObjectClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void FlexRayControllerObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle, const std::wstring& instanceName)
+{
+  assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
+  assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
+  FlexRayController* newObject = new FlexRayController(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+}
+
+void FlexRayControllerObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
+{
+  std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
+  auto iter = mObjectInstancesByName.find(instanceName);
+  assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+  mObjectInstancesByName.erase(iter);
+  mObjectInstancesByHandle.erase(theObject);
+}
+
+IFlexRayController* FlexRayControllerObjectClass::GetObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IFlexRayController* FlexRayControllerObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
+{
+  auto iter = mObjectInstancesByHandle.find(instanceHandle);
+  if (iter != mObjectInstancesByHandle.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IFlexRayController* FlexRayControllerObjectClass::CreateObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    throw rti1516ev::ObjectClassNotPublished(L"FlexRayController");
+  }
+  FlexRayController* newObject = new FlexRayController(this, instanceName, mRtiAmbassador);
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  return newObject;
+}
+
+rti1516ev::AttributeHandleSet FlexRayControllerObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetNetworkIDAttributeHandle());
+  result.insert(GetDeviceIDAttributeHandle());
+  result.insert(GetPocRequestAttributeHandle());
+  result.insert(GetChiCommandAttributeHandle());
+  result.insert(GetpAllowHaltDueToClockAttributeHandle());
+  result.insert(GetpAllowPassiveToActiveAttributeHandle());
+  result.insert(GetpChannelsAttributeHandle());
+  result.insert(GetpClusterDriftDampingAttributeHandle());
+  result.insert(GetpdAcceptedStartupRangeAttributeHandle());
+  result.insert(GetpdListenTimeoutAttributeHandle());
+  result.insert(GetpKeySlotIdAttributeHandle());
+  result.insert(GetpKeySlotOnlyEnabledAttributeHandle());
+  result.insert(GetpKeySlotUsedForStartupAttributeHandle());
+  result.insert(GetpKeySlotUsedForSyncAttributeHandle());
+  result.insert(GetpLatestTxAttributeHandle());
+  result.insert(GetpMacroInitialOffsetAAttributeHandle());
+  result.insert(GetpMacroInitialOffsetBAttributeHandle());
+  result.insert(GetpMicroInitialOffsetAAttributeHandle());
+  result.insert(GetpMicroInitialOffsetBAttributeHandle());
+  result.insert(GetpMicroPerCycleAttributeHandle());
+  result.insert(GetpOffsetCorrectionOutAttributeHandle());
+  result.insert(GetpOffsetCorrectionStartAttributeHandle());
+  result.insert(GetpRateCorrectionOutAttributeHandle());
+  result.insert(GetpWakeupChannelAttributeHandle());
+  result.insert(GetpWakeupPatternAttributeHandle());
+  result.insert(GetpdMicrotickAttributeHandle());
+  result.insert(GetpSamplesPerMicrotickAttributeHandle());
+  return result;
+}
+
+uint32_t FlexRayControllerObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void FlexRayControllerObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void FlexRayControllerObjectClass::ExecuteDiscoverCallbacks(IFlexRayController* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
+// object instances of type 'FlexRayController'
+FlexRayController::FlexRayController()
+{
+}
+
+FlexRayController::FlexRayController(FlexRayControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+FlexRayController::~FlexRayController()
+{
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
+  {
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
+  }
+}
+
+// attribute FlexRayController.HLAprivilegeToDeleteObject : no data type
+
+// attribute NetworkID : HLAASCIIstring
+std::string FlexRayController::GetNetworkID() const
+{
+  return mNetworkID.get();
+}
+
+void FlexRayController::SetNetworkID(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mNetworkID.set(newValue);
+  mDirty |= kNetworkIDBit;
+}
+
+// attribute DeviceID : HLAASCIIstring
+std::string FlexRayController::GetDeviceID() const
+{
+  return mDeviceID.get();
+}
+
+void FlexRayController::SetDeviceID(const std::string& newValue)
+{
+  // CanTranslateToCpp=True
+  mDeviceID.set(newValue);
+  mDirty |= kDeviceIDBit;
+}
+
+// attribute PocRequest : FlexRayPocState
+FlexRayPocState FlexRayController::GetPocRequest() const
+{
+  return static_cast<FlexRayPocState>(mPocRequest.get());
+}
+
+void FlexRayController::SetPocRequest(FlexRayPocState newValue)
+{
+  // CanTranslateToCpp=True
+  mPocRequest.set(static_cast<uint8_t>(newValue));
+  mDirty |= kPocRequestBit;
+}
+
+// attribute ChiCommand : FlexRayChiCommand
+FlexRayChiCommand FlexRayController::GetChiCommand() const
+{
+  return static_cast<FlexRayChiCommand>(mChiCommand.get());
+}
+
+void FlexRayController::SetChiCommand(FlexRayChiCommand newValue)
+{
+  // CanTranslateToCpp=True
+  mChiCommand.set(static_cast<uint8_t>(newValue));
+  mDirty |= kChiCommandBit;
+}
+
+// attribute pAllowHaltDueToClock : HLAoctet
+uint8_t FlexRayController::GetpAllowHaltDueToClock() const
+{
+  return mpAllowHaltDueToClock.get();
+}
+
+void FlexRayController::SetpAllowHaltDueToClock(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpAllowHaltDueToClock.set(newValue);
+  mDirty |= kpAllowHaltDueToClockBit;
+}
+
+// attribute pAllowPassiveToActive : HLAoctet
+uint8_t FlexRayController::GetpAllowPassiveToActive() const
+{
+  return mpAllowPassiveToActive.get();
+}
+
+void FlexRayController::SetpAllowPassiveToActive(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpAllowPassiveToActive.set(newValue);
+  mDirty |= kpAllowPassiveToActiveBit;
+}
+
+// attribute pChannels : FlexRayChannel
+FlexRayChannel FlexRayController::GetpChannels() const
+{
+  return static_cast<FlexRayChannel>(mpChannels.get());
+}
+
+void FlexRayController::SetpChannels(FlexRayChannel newValue)
+{
+  // CanTranslateToCpp=True
+  mpChannels.set(static_cast<uint8_t>(newValue));
+  mDirty |= kpChannelsBit;
+}
+
+// attribute pClusterDriftDamping : HLAoctet
+uint8_t FlexRayController::GetpClusterDriftDamping() const
+{
+  return mpClusterDriftDamping.get();
+}
+
+void FlexRayController::SetpClusterDriftDamping(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpClusterDriftDamping.set(newValue);
+  mDirty |= kpClusterDriftDampingBit;
+}
+
+// attribute pdAcceptedStartupRange : HLAinteger32LE
+int32_t FlexRayController::GetpdAcceptedStartupRange() const
+{
+  return mpdAcceptedStartupRange.get();
+}
+
+void FlexRayController::SetpdAcceptedStartupRange(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpdAcceptedStartupRange.set(newValue);
+  mDirty |= kpdAcceptedStartupRangeBit;
+}
+
+// attribute pdListenTimeout : HLAinteger32LE
+int32_t FlexRayController::GetpdListenTimeout() const
+{
+  return mpdListenTimeout.get();
+}
+
+void FlexRayController::SetpdListenTimeout(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpdListenTimeout.set(newValue);
+  mDirty |= kpdListenTimeoutBit;
+}
+
+// attribute pKeySlotId : HLAinteger16LE
+int16_t FlexRayController::GetpKeySlotId() const
+{
+  return mpKeySlotId.get();
+}
+
+void FlexRayController::SetpKeySlotId(int16_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpKeySlotId.set(newValue);
+  mDirty |= kpKeySlotIdBit;
+}
+
+// attribute pKeySlotOnlyEnabled : HLAoctet
+uint8_t FlexRayController::GetpKeySlotOnlyEnabled() const
+{
+  return mpKeySlotOnlyEnabled.get();
+}
+
+void FlexRayController::SetpKeySlotOnlyEnabled(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpKeySlotOnlyEnabled.set(newValue);
+  mDirty |= kpKeySlotOnlyEnabledBit;
+}
+
+// attribute pKeySlotUsedForStartup : HLAoctet
+uint8_t FlexRayController::GetpKeySlotUsedForStartup() const
+{
+  return mpKeySlotUsedForStartup.get();
+}
+
+void FlexRayController::SetpKeySlotUsedForStartup(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpKeySlotUsedForStartup.set(newValue);
+  mDirty |= kpKeySlotUsedForStartupBit;
+}
+
+// attribute pKeySlotUsedForSync : HLAoctet
+uint8_t FlexRayController::GetpKeySlotUsedForSync() const
+{
+  return mpKeySlotUsedForSync.get();
+}
+
+void FlexRayController::SetpKeySlotUsedForSync(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpKeySlotUsedForSync.set(newValue);
+  mDirty |= kpKeySlotUsedForSyncBit;
+}
+
+// attribute pLatestTx : HLAinteger16LE
+int16_t FlexRayController::GetpLatestTx() const
+{
+  return mpLatestTx.get();
+}
+
+void FlexRayController::SetpLatestTx(int16_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpLatestTx.set(newValue);
+  mDirty |= kpLatestTxBit;
+}
+
+// attribute pMacroInitialOffsetA : HLAoctet
+uint8_t FlexRayController::GetpMacroInitialOffsetA() const
+{
+  return mpMacroInitialOffsetA.get();
+}
+
+void FlexRayController::SetpMacroInitialOffsetA(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpMacroInitialOffsetA.set(newValue);
+  mDirty |= kpMacroInitialOffsetABit;
+}
+
+// attribute pMacroInitialOffsetB : HLAoctet
+uint8_t FlexRayController::GetpMacroInitialOffsetB() const
+{
+  return mpMacroInitialOffsetB.get();
+}
+
+void FlexRayController::SetpMacroInitialOffsetB(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpMacroInitialOffsetB.set(newValue);
+  mDirty |= kpMacroInitialOffsetBBit;
+}
+
+// attribute pMicroInitialOffsetA : HLAinteger32LE
+int32_t FlexRayController::GetpMicroInitialOffsetA() const
+{
+  return mpMicroInitialOffsetA.get();
+}
+
+void FlexRayController::SetpMicroInitialOffsetA(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpMicroInitialOffsetA.set(newValue);
+  mDirty |= kpMicroInitialOffsetABit;
+}
+
+// attribute pMicroInitialOffsetB : HLAinteger32LE
+int32_t FlexRayController::GetpMicroInitialOffsetB() const
+{
+  return mpMicroInitialOffsetB.get();
+}
+
+void FlexRayController::SetpMicroInitialOffsetB(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpMicroInitialOffsetB.set(newValue);
+  mDirty |= kpMicroInitialOffsetBBit;
+}
+
+// attribute pMicroPerCycle : HLAinteger32LE
+int32_t FlexRayController::GetpMicroPerCycle() const
+{
+  return mpMicroPerCycle.get();
+}
+
+void FlexRayController::SetpMicroPerCycle(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpMicroPerCycle.set(newValue);
+  mDirty |= kpMicroPerCycleBit;
+}
+
+// attribute pOffsetCorrectionOut : HLAinteger32LE
+int32_t FlexRayController::GetpOffsetCorrectionOut() const
+{
+  return mpOffsetCorrectionOut.get();
+}
+
+void FlexRayController::SetpOffsetCorrectionOut(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpOffsetCorrectionOut.set(newValue);
+  mDirty |= kpOffsetCorrectionOutBit;
+}
+
+// attribute pOffsetCorrectionStart : HLAinteger16LE
+int16_t FlexRayController::GetpOffsetCorrectionStart() const
+{
+  return mpOffsetCorrectionStart.get();
+}
+
+void FlexRayController::SetpOffsetCorrectionStart(int16_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpOffsetCorrectionStart.set(newValue);
+  mDirty |= kpOffsetCorrectionStartBit;
+}
+
+// attribute pRateCorrectionOut : HLAinteger32LE
+int32_t FlexRayController::GetpRateCorrectionOut() const
+{
+  return mpRateCorrectionOut.get();
+}
+
+void FlexRayController::SetpRateCorrectionOut(int32_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpRateCorrectionOut.set(newValue);
+  mDirty |= kpRateCorrectionOutBit;
+}
+
+// attribute pWakeupChannel : FlexRayChannel
+FlexRayChannel FlexRayController::GetpWakeupChannel() const
+{
+  return static_cast<FlexRayChannel>(mpWakeupChannel.get());
+}
+
+void FlexRayController::SetpWakeupChannel(FlexRayChannel newValue)
+{
+  // CanTranslateToCpp=True
+  mpWakeupChannel.set(static_cast<uint8_t>(newValue));
+  mDirty |= kpWakeupChannelBit;
+}
+
+// attribute pWakeupPattern : HLAoctet
+uint8_t FlexRayController::GetpWakeupPattern() const
+{
+  return mpWakeupPattern.get();
+}
+
+void FlexRayController::SetpWakeupPattern(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpWakeupPattern.set(newValue);
+  mDirty |= kpWakeupPatternBit;
+}
+
+// attribute pdMicrotick : FlexRayClockPeriod
+FlexRayClockPeriod FlexRayController::GetpdMicrotick() const
+{
+  return static_cast<FlexRayClockPeriod>(mpdMicrotick.get());
+}
+
+void FlexRayController::SetpdMicrotick(FlexRayClockPeriod newValue)
+{
+  // CanTranslateToCpp=True
+  mpdMicrotick.set(static_cast<uint8_t>(newValue));
+  mDirty |= kpdMicrotickBit;
+}
+
+// attribute pSamplesPerMicrotick : HLAoctet
+uint8_t FlexRayController::GetpSamplesPerMicrotick() const
+{
+  return mpSamplesPerMicrotick.get();
+}
+
+void FlexRayController::SetpSamplesPerMicrotick(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mpSamplesPerMicrotick.set(newValue);
+  mDirty |= kpSamplesPerMicrotickBit;
+}
+
+rti1516ev::AttributeHandleValueMap FlexRayController::GetAllAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  result[mObjectClass->GetNetworkIDAttributeHandle()] = mNetworkID.encode();
+  result[mObjectClass->GetDeviceIDAttributeHandle()] = mDeviceID.encode();
+  result[mObjectClass->GetPocRequestAttributeHandle()] = mPocRequest.encode();
+  result[mObjectClass->GetChiCommandAttributeHandle()] = mChiCommand.encode();
+  result[mObjectClass->GetpAllowHaltDueToClockAttributeHandle()] = mpAllowHaltDueToClock.encode();
+  result[mObjectClass->GetpAllowPassiveToActiveAttributeHandle()] = mpAllowPassiveToActive.encode();
+  result[mObjectClass->GetpChannelsAttributeHandle()] = mpChannels.encode();
+  result[mObjectClass->GetpClusterDriftDampingAttributeHandle()] = mpClusterDriftDamping.encode();
+  result[mObjectClass->GetpdAcceptedStartupRangeAttributeHandle()] = mpdAcceptedStartupRange.encode();
+  result[mObjectClass->GetpdListenTimeoutAttributeHandle()] = mpdListenTimeout.encode();
+  result[mObjectClass->GetpKeySlotIdAttributeHandle()] = mpKeySlotId.encode();
+  result[mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle()] = mpKeySlotOnlyEnabled.encode();
+  result[mObjectClass->GetpKeySlotUsedForStartupAttributeHandle()] = mpKeySlotUsedForStartup.encode();
+  result[mObjectClass->GetpKeySlotUsedForSyncAttributeHandle()] = mpKeySlotUsedForSync.encode();
+  result[mObjectClass->GetpLatestTxAttributeHandle()] = mpLatestTx.encode();
+  result[mObjectClass->GetpMacroInitialOffsetAAttributeHandle()] = mpMacroInitialOffsetA.encode();
+  result[mObjectClass->GetpMacroInitialOffsetBAttributeHandle()] = mpMacroInitialOffsetB.encode();
+  result[mObjectClass->GetpMicroInitialOffsetAAttributeHandle()] = mpMicroInitialOffsetA.encode();
+  result[mObjectClass->GetpMicroInitialOffsetBAttributeHandle()] = mpMicroInitialOffsetB.encode();
+  result[mObjectClass->GetpMicroPerCycleAttributeHandle()] = mpMicroPerCycle.encode();
+  result[mObjectClass->GetpOffsetCorrectionOutAttributeHandle()] = mpOffsetCorrectionOut.encode();
+  result[mObjectClass->GetpOffsetCorrectionStartAttributeHandle()] = mpOffsetCorrectionStart.encode();
+  result[mObjectClass->GetpRateCorrectionOutAttributeHandle()] = mpRateCorrectionOut.encode();
+  result[mObjectClass->GetpWakeupChannelAttributeHandle()] = mpWakeupChannel.encode();
+  result[mObjectClass->GetpWakeupPatternAttributeHandle()] = mpWakeupPattern.encode();
+  result[mObjectClass->GetpdMicrotickAttributeHandle()] = mpdMicrotick.encode();
+  result[mObjectClass->GetpSamplesPerMicrotickAttributeHandle()] = mpSamplesPerMicrotick.encode();
+  return result;
+}
+
+rti1516ev::AttributeHandleValueMap FlexRayController::GetModifiedAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  if (mDirty & kPocRequestBit)
+  {
+    result[mObjectClass->GetPocRequestAttributeHandle()] = mPocRequest.encode();
+  }
+  if (mDirty & kChiCommandBit)
+  {
+    result[mObjectClass->GetChiCommandAttributeHandle()] = mChiCommand.encode();
+  }
+  if (mDirty & kpAllowHaltDueToClockBit)
+  {
+    result[mObjectClass->GetpAllowHaltDueToClockAttributeHandle()] = mpAllowHaltDueToClock.encode();
+  }
+  if (mDirty & kpAllowPassiveToActiveBit)
+  {
+    result[mObjectClass->GetpAllowPassiveToActiveAttributeHandle()] = mpAllowPassiveToActive.encode();
+  }
+  if (mDirty & kpChannelsBit)
+  {
+    result[mObjectClass->GetpChannelsAttributeHandle()] = mpChannels.encode();
+  }
+  if (mDirty & kpClusterDriftDampingBit)
+  {
+    result[mObjectClass->GetpClusterDriftDampingAttributeHandle()] = mpClusterDriftDamping.encode();
+  }
+  if (mDirty & kpdAcceptedStartupRangeBit)
+  {
+    result[mObjectClass->GetpdAcceptedStartupRangeAttributeHandle()] = mpdAcceptedStartupRange.encode();
+  }
+  if (mDirty & kpdListenTimeoutBit)
+  {
+    result[mObjectClass->GetpdListenTimeoutAttributeHandle()] = mpdListenTimeout.encode();
+  }
+  if (mDirty & kpKeySlotIdBit)
+  {
+    result[mObjectClass->GetpKeySlotIdAttributeHandle()] = mpKeySlotId.encode();
+  }
+  if (mDirty & kpKeySlotOnlyEnabledBit)
+  {
+    result[mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle()] = mpKeySlotOnlyEnabled.encode();
+  }
+  if (mDirty & kpKeySlotUsedForStartupBit)
+  {
+    result[mObjectClass->GetpKeySlotUsedForStartupAttributeHandle()] = mpKeySlotUsedForStartup.encode();
+  }
+  if (mDirty & kpKeySlotUsedForSyncBit)
+  {
+    result[mObjectClass->GetpKeySlotUsedForSyncAttributeHandle()] = mpKeySlotUsedForSync.encode();
+  }
+  if (mDirty & kpLatestTxBit)
+  {
+    result[mObjectClass->GetpLatestTxAttributeHandle()] = mpLatestTx.encode();
+  }
+  if (mDirty & kpMacroInitialOffsetABit)
+  {
+    result[mObjectClass->GetpMacroInitialOffsetAAttributeHandle()] = mpMacroInitialOffsetA.encode();
+  }
+  if (mDirty & kpMacroInitialOffsetBBit)
+  {
+    result[mObjectClass->GetpMacroInitialOffsetBAttributeHandle()] = mpMacroInitialOffsetB.encode();
+  }
+  if (mDirty & kpMicroInitialOffsetABit)
+  {
+    result[mObjectClass->GetpMicroInitialOffsetAAttributeHandle()] = mpMicroInitialOffsetA.encode();
+  }
+  if (mDirty & kpMicroInitialOffsetBBit)
+  {
+    result[mObjectClass->GetpMicroInitialOffsetBAttributeHandle()] = mpMicroInitialOffsetB.encode();
+  }
+  if (mDirty & kpMicroPerCycleBit)
+  {
+    result[mObjectClass->GetpMicroPerCycleAttributeHandle()] = mpMicroPerCycle.encode();
+  }
+  if (mDirty & kpOffsetCorrectionOutBit)
+  {
+    result[mObjectClass->GetpOffsetCorrectionOutAttributeHandle()] = mpOffsetCorrectionOut.encode();
+  }
+  if (mDirty & kpOffsetCorrectionStartBit)
+  {
+    result[mObjectClass->GetpOffsetCorrectionStartAttributeHandle()] = mpOffsetCorrectionStart.encode();
+  }
+  if (mDirty & kpRateCorrectionOutBit)
+  {
+    result[mObjectClass->GetpRateCorrectionOutAttributeHandle()] = mpRateCorrectionOut.encode();
+  }
+  if (mDirty & kpWakeupChannelBit)
+  {
+    result[mObjectClass->GetpWakeupChannelAttributeHandle()] = mpWakeupChannel.encode();
+  }
+  if (mDirty & kpWakeupPatternBit)
+  {
+    result[mObjectClass->GetpWakeupPatternAttributeHandle()] = mpWakeupPattern.encode();
+  }
+  if (mDirty & kpdMicrotickBit)
+  {
+    result[mObjectClass->GetpdMicrotickAttributeHandle()] = mpdMicrotick.encode();
+  }
+  if (mDirty & kpSamplesPerMicrotickBit)
+  {
+    result[mObjectClass->GetpSamplesPerMicrotickAttributeHandle()] = mpSamplesPerMicrotick.encode();
+  }
+  return result;
+}
+
+void FlexRayController::UpdateAllAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
+}
+
+void FlexRayController::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
+}
+
+void FlexRayController::UpdateModifiedAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
+}
+
+void FlexRayController::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
+}
+
+void FlexRayController::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
+{
+  for (auto& attributeHandleValue : attributes)
+  {
+    rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
+    if (attributeHandle == mObjectClass->GetPocRequestAttributeHandle())
+    {
+      mPocRequest.decode(attributeHandleValue.second);
+      mLastUpdated |= kPocRequestBit;
+    }
+    else if (attributeHandle == mObjectClass->GetChiCommandAttributeHandle())
+    {
+      mChiCommand.decode(attributeHandleValue.second);
+      mLastUpdated |= kChiCommandBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpAllowHaltDueToClockAttributeHandle())
+    {
+      mpAllowHaltDueToClock.decode(attributeHandleValue.second);
+      mLastUpdated |= kpAllowHaltDueToClockBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpAllowPassiveToActiveAttributeHandle())
+    {
+      mpAllowPassiveToActive.decode(attributeHandleValue.second);
+      mLastUpdated |= kpAllowPassiveToActiveBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpChannelsAttributeHandle())
+    {
+      mpChannels.decode(attributeHandleValue.second);
+      mLastUpdated |= kpChannelsBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpClusterDriftDampingAttributeHandle())
+    {
+      mpClusterDriftDamping.decode(attributeHandleValue.second);
+      mLastUpdated |= kpClusterDriftDampingBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpdAcceptedStartupRangeAttributeHandle())
+    {
+      mpdAcceptedStartupRange.decode(attributeHandleValue.second);
+      mLastUpdated |= kpdAcceptedStartupRangeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpdListenTimeoutAttributeHandle())
+    {
+      mpdListenTimeout.decode(attributeHandleValue.second);
+      mLastUpdated |= kpdListenTimeoutBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpKeySlotIdAttributeHandle())
+    {
+      mpKeySlotId.decode(attributeHandleValue.second);
+      mLastUpdated |= kpKeySlotIdBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle())
+    {
+      mpKeySlotOnlyEnabled.decode(attributeHandleValue.second);
+      mLastUpdated |= kpKeySlotOnlyEnabledBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpKeySlotUsedForStartupAttributeHandle())
+    {
+      mpKeySlotUsedForStartup.decode(attributeHandleValue.second);
+      mLastUpdated |= kpKeySlotUsedForStartupBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpKeySlotUsedForSyncAttributeHandle())
+    {
+      mpKeySlotUsedForSync.decode(attributeHandleValue.second);
+      mLastUpdated |= kpKeySlotUsedForSyncBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpLatestTxAttributeHandle())
+    {
+      mpLatestTx.decode(attributeHandleValue.second);
+      mLastUpdated |= kpLatestTxBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetAAttributeHandle())
+    {
+      mpMacroInitialOffsetA.decode(attributeHandleValue.second);
+      mLastUpdated |= kpMacroInitialOffsetABit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetBAttributeHandle())
+    {
+      mpMacroInitialOffsetB.decode(attributeHandleValue.second);
+      mLastUpdated |= kpMacroInitialOffsetBBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetAAttributeHandle())
+    {
+      mpMicroInitialOffsetA.decode(attributeHandleValue.second);
+      mLastUpdated |= kpMicroInitialOffsetABit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetBAttributeHandle())
+    {
+      mpMicroInitialOffsetB.decode(attributeHandleValue.second);
+      mLastUpdated |= kpMicroInitialOffsetBBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMicroPerCycleAttributeHandle())
+    {
+      mpMicroPerCycle.decode(attributeHandleValue.second);
+      mLastUpdated |= kpMicroPerCycleBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpOffsetCorrectionOutAttributeHandle())
+    {
+      mpOffsetCorrectionOut.decode(attributeHandleValue.second);
+      mLastUpdated |= kpOffsetCorrectionOutBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpOffsetCorrectionStartAttributeHandle())
+    {
+      mpOffsetCorrectionStart.decode(attributeHandleValue.second);
+      mLastUpdated |= kpOffsetCorrectionStartBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpRateCorrectionOutAttributeHandle())
+    {
+      mpRateCorrectionOut.decode(attributeHandleValue.second);
+      mLastUpdated |= kpRateCorrectionOutBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpWakeupChannelAttributeHandle())
+    {
+      mpWakeupChannel.decode(attributeHandleValue.second);
+      mLastUpdated |= kpWakeupChannelBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpWakeupPatternAttributeHandle())
+    {
+      mpWakeupPattern.decode(attributeHandleValue.second);
+      mLastUpdated |= kpWakeupPatternBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpdMicrotickAttributeHandle())
+    {
+      mpdMicrotick.decode(attributeHandleValue.second);
+      mLastUpdated |= kpdMicrotickBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpSamplesPerMicrotickAttributeHandle())
+    {
+      mpSamplesPerMicrotick.decode(attributeHandleValue.second);
+      mLastUpdated |= kpSamplesPerMicrotickBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // FlexRayController::ReflectAttributeValues
+
+void FlexRayController::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kPocRequestBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetPocRequestAttributeHandle());
+  }
+  if ((mLastUpdated & kChiCommandBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetChiCommandAttributeHandle());
+  }
+  if ((mLastUpdated & kpAllowHaltDueToClockBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpAllowHaltDueToClockAttributeHandle());
+  }
+  if ((mLastUpdated & kpAllowPassiveToActiveBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpAllowPassiveToActiveAttributeHandle());
+  }
+  if ((mLastUpdated & kpChannelsBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpChannelsAttributeHandle());
+  }
+  if ((mLastUpdated & kpClusterDriftDampingBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpClusterDriftDampingAttributeHandle());
+  }
+  if ((mLastUpdated & kpdAcceptedStartupRangeBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpdAcceptedStartupRangeAttributeHandle());
+  }
+  if ((mLastUpdated & kpdListenTimeoutBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpdListenTimeoutAttributeHandle());
+  }
+  if ((mLastUpdated & kpKeySlotIdBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpKeySlotIdAttributeHandle());
+  }
+  if ((mLastUpdated & kpKeySlotOnlyEnabledBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle());
+  }
+  if ((mLastUpdated & kpKeySlotUsedForStartupBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpKeySlotUsedForStartupAttributeHandle());
+  }
+  if ((mLastUpdated & kpKeySlotUsedForSyncBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpKeySlotUsedForSyncAttributeHandle());
+  }
+  if ((mLastUpdated & kpLatestTxBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpLatestTxAttributeHandle());
+  }
+  if ((mLastUpdated & kpMacroInitialOffsetABit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpMacroInitialOffsetAAttributeHandle());
+  }
+  if ((mLastUpdated & kpMacroInitialOffsetBBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpMacroInitialOffsetBAttributeHandle());
+  }
+  if ((mLastUpdated & kpMicroInitialOffsetABit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpMicroInitialOffsetAAttributeHandle());
+  }
+  if ((mLastUpdated & kpMicroInitialOffsetBBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpMicroInitialOffsetBAttributeHandle());
+  }
+  if ((mLastUpdated & kpMicroPerCycleBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpMicroPerCycleAttributeHandle());
+  }
+  if ((mLastUpdated & kpOffsetCorrectionOutBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpOffsetCorrectionOutAttributeHandle());
+  }
+  if ((mLastUpdated & kpOffsetCorrectionStartBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpOffsetCorrectionStartAttributeHandle());
+  }
+  if ((mLastUpdated & kpRateCorrectionOutBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpRateCorrectionOutAttributeHandle());
+  }
+  if ((mLastUpdated & kpWakeupChannelBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpWakeupChannelAttributeHandle());
+  }
+  if ((mLastUpdated & kpWakeupPatternBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpWakeupPatternAttributeHandle());
+  }
+  if ((mLastUpdated & kpdMicrotickBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpdMicrotickAttributeHandle());
+  }
+  if ((mLastUpdated & kpSamplesPerMicrotickBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetpSamplesPerMicrotickAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void FlexRayController::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetPocRequestAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetChiCommandAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpAllowHaltDueToClockAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpAllowPassiveToActiveAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpChannelsAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpClusterDriftDampingAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpdAcceptedStartupRangeAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpdListenTimeoutAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpKeySlotIdAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpKeySlotUsedForStartupAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpKeySlotUsedForSyncAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpLatestTxAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpMacroInitialOffsetAAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpMacroInitialOffsetBAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpMicroInitialOffsetAAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpMicroInitialOffsetBAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpMicroPerCycleAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpOffsetCorrectionOutAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpOffsetCorrectionStartAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpRateCorrectionOutAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpWakeupChannelAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpWakeupPatternAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpdMicrotickAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetpSamplesPerMicrotickAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void FlexRayController::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetPocRequestAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mPocRequest.encode()));
+      mDirty &= ~kPocRequestBit;
+    }
+    else if (attributeHandle == mObjectClass->GetChiCommandAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mChiCommand.encode()));
+      mDirty &= ~kChiCommandBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpAllowHaltDueToClockAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpAllowHaltDueToClock.encode()));
+      mDirty &= ~kpAllowHaltDueToClockBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpAllowPassiveToActiveAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpAllowPassiveToActive.encode()));
+      mDirty &= ~kpAllowPassiveToActiveBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpChannelsAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpChannels.encode()));
+      mDirty &= ~kpChannelsBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpClusterDriftDampingAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpClusterDriftDamping.encode()));
+      mDirty &= ~kpClusterDriftDampingBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpdAcceptedStartupRangeAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpdAcceptedStartupRange.encode()));
+      mDirty &= ~kpdAcceptedStartupRangeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpdListenTimeoutAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpdListenTimeout.encode()));
+      mDirty &= ~kpdListenTimeoutBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpKeySlotIdAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotId.encode()));
+      mDirty &= ~kpKeySlotIdBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotOnlyEnabled.encode()));
+      mDirty &= ~kpKeySlotOnlyEnabledBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpKeySlotUsedForStartupAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotUsedForStartup.encode()));
+      mDirty &= ~kpKeySlotUsedForStartupBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpKeySlotUsedForSyncAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotUsedForSync.encode()));
+      mDirty &= ~kpKeySlotUsedForSyncBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpLatestTxAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpLatestTx.encode()));
+      mDirty &= ~kpLatestTxBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetAAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpMacroInitialOffsetA.encode()));
+      mDirty &= ~kpMacroInitialOffsetABit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetBAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpMacroInitialOffsetB.encode()));
+      mDirty &= ~kpMacroInitialOffsetBBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetAAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpMicroInitialOffsetA.encode()));
+      mDirty &= ~kpMicroInitialOffsetABit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetBAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpMicroInitialOffsetB.encode()));
+      mDirty &= ~kpMicroInitialOffsetBBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpMicroPerCycleAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpMicroPerCycle.encode()));
+      mDirty &= ~kpMicroPerCycleBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpOffsetCorrectionOutAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpOffsetCorrectionOut.encode()));
+      mDirty &= ~kpOffsetCorrectionOutBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpOffsetCorrectionStartAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpOffsetCorrectionStart.encode()));
+      mDirty &= ~kpOffsetCorrectionStartBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpRateCorrectionOutAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpRateCorrectionOut.encode()));
+      mDirty &= ~kpRateCorrectionOutBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpWakeupChannelAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpWakeupChannel.encode()));
+      mDirty &= ~kpWakeupChannelBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpWakeupPatternAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpWakeupPattern.encode()));
+      mDirty &= ~kpWakeupPatternBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpdMicrotickAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpdMicrotick.encode()));
+      mDirty &= ~kpdMicrotickBit;
+    }
+    else if (attributeHandle == mObjectClass->GetpSamplesPerMicrotickAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mpSamplesPerMicrotick.encode()));
+      mDirty &= ~kpSamplesPerMicrotickBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
+} // FlexRayController::ReflectAttributeValues
+
+uint32_t FlexRayController::RegisterUpdateCallback(UpdateCallbackType callback)
+{
+  mLastCallbackToken++;
+  mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void FlexRayController::UnregisterUpdateCallback(uint32_t callbackToken)
+{
+  mUpdateCallbacks.erase(callbackToken);
+}
+
+void FlexRayController::ExecuteUpdateCallbacks()
+{
+  for (auto& callbackEntry : mUpdateCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(this);
+  }
+}
+
+// object class type 'FlexRaySendBuffer'
+FlexRaySendBufferObjectClass::FlexRaySendBufferObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass)
+{
+  mRtiAmbassador = rtiAmbassador;
+  mBaseClass = baseClass;
+  mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.FlexRaySendBuffer");
+  // attribute Sender : HLAhandle
+  mSenderAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"Sender");
+  // attribute TransmissionMode : FlexRayTransmissionMode
+  mTransmissionModeAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"TransmissionMode");
+  // attribute Payload : FlexRayPayload
+  mPayloadAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"Payload");
+  // attribute CycleOffset : HLAoctet
+  mCycleOffsetAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"CycleOffset");
+  // attribute CycleRepetition : HLAoctet
+  mCycleRepetitionAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"CycleRepetition");
+  // attribute SlotId : HLAinteger16LE
+  mSlotIdAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"SlotId");
+  // attribute Channel : FlexRayChannel
+  mChannelAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"Channel");
+  // attribute PPIndicator : HLAboolean
+  mPPIndicatorAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"PPIndicator");
+  // attribute HeaderCRC : HLAinteger16LE
+  mHeaderCRCAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"HeaderCRC");
+}
+
+void FlexRaySendBufferObjectClass::Publish()
+{
+  if (!mPublished)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->publishObjectClassAttributes(mObjectClassHandle, attributes);
+    mPublished = true;
+  }
+}
+
+void FlexRaySendBufferObjectClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishObjectClass(mObjectClassHandle);
+    mPublished = false;
+  }
+}
+
+void FlexRaySendBufferObjectClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    rti1516ev::AttributeHandleSet attributes = GetAllAttributeHandles();
+    mRtiAmbassador->subscribeObjectClassAttributes(mObjectClassHandle, attributes);
+    mRtiAmbassador->setObjectClassDeliverToSelf(mObjectClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void FlexRaySendBufferObjectClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeObjectClass(mObjectClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void FlexRaySendBufferObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle, const std::wstring& instanceName)
+{
+  assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
+  assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
+  FlexRaySendBuffer* newObject = new FlexRaySendBuffer(this, instanceName, mRtiAmbassador);
+  newObject->mObjectInstanceHandle = instanceHandle;
+  newObject->mIsOwner = false;
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+}
+
+void FlexRaySendBufferObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
+{
+  std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(theObject);
+  auto iter = mObjectInstancesByName.find(instanceName);
+  assert(iter != mObjectInstancesByName.end());
+  auto* objectInstance = iter->second;
+  objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+  mObjectInstancesByName.erase(iter);
+  mObjectInstancesByHandle.erase(theObject);
+}
+
+IFlexRaySendBuffer* FlexRaySendBufferObjectClass::GetObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IFlexRaySendBuffer* FlexRaySendBufferObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
+{
+  auto iter = mObjectInstancesByHandle.find(instanceHandle);
+  if (iter != mObjectInstancesByHandle.end())
+  {
+    return iter->second;
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+IFlexRaySendBuffer* FlexRaySendBufferObjectClass::CreateObjectInstance(const std::wstring& instanceName)
+{
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    throw rti1516ev::ObjectClassNotPublished(L"FlexRaySendBuffer");
+  }
+  FlexRaySendBuffer* newObject = new FlexRaySendBuffer(this, instanceName, mRtiAmbassador);
+  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+    if (success) {
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      newObject->mObjectInstanceHandle = instanceHandle;
+      newObject->mIsOwner = true;
+      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+    }
+  });
+  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
+  return newObject;
+}
+
+rti1516ev::AttributeHandleSet FlexRaySendBufferObjectClass::GetAllAttributeHandles()
+{
+  rti1516ev::AttributeHandleSet result;
+  result.insert(GetSenderAttributeHandle());
+  result.insert(GetTransmissionModeAttributeHandle());
+  result.insert(GetPayloadAttributeHandle());
+  result.insert(GetCycleOffsetAttributeHandle());
+  result.insert(GetCycleRepetitionAttributeHandle());
+  result.insert(GetSlotIdAttributeHandle());
+  result.insert(GetChannelAttributeHandle());
+  result.insert(GetPPIndicatorAttributeHandle());
+  result.insert(GetHeaderCRCAttributeHandle());
+  return result;
+}
+
+uint32_t FlexRaySendBufferObjectClass::RegisterDiscoverCallback(DiscoverCallbackType callback)
+{
+  mLastCallbackToken++;
+  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void FlexRaySendBufferObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)
+{
+  mDiscoverCallbacks.erase(callbackToken);
+}
+
+void FlexRaySendBufferObjectClass::ExecuteDiscoverCallbacks(IFlexRaySendBuffer* newObjectInstance)
+{
+  for (auto& callbackEntry : mDiscoverCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(newObjectInstance);
+  }
+}
+
+// object instances of type 'FlexRaySendBuffer'
+FlexRaySendBuffer::FlexRaySendBuffer()
+{
+}
+
+FlexRaySendBuffer::FlexRaySendBuffer(FlexRaySendBufferObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
+  : mObjectClass(objectClass)
+  , mInstanceName(instanceName)
+  , mRtiAmbassador(rtiAmbassador)
+{
+}
+
+FlexRaySendBuffer::~FlexRaySendBuffer()
+{
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
+  {
+    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
+  }
+}
+
+// attribute FlexRaySendBuffer.HLAprivilegeToDeleteObject : no data type
+
+// attribute Sender : HLAhandle
+rti1516ev::HLAhandle FlexRaySendBuffer::GetSender() const
+{
+  return mSender;
+}
+
+void FlexRaySendBuffer::SetSender(rti1516ev::HLAhandle newValue)
+{
+  // CanTranslateToCpp=False
+  mSender.set(newValue);
+  mDirty |= kSenderBit;
+}
+
+// attribute TransmissionMode : FlexRayTransmissionMode
+FlexRayTransmissionMode FlexRaySendBuffer::GetTransmissionMode() const
+{
+  return static_cast<FlexRayTransmissionMode>(mTransmissionMode.get());
+}
+
+void FlexRaySendBuffer::SetTransmissionMode(FlexRayTransmissionMode newValue)
+{
+  // CanTranslateToCpp=True
+  mTransmissionMode.set(static_cast<uint8_t>(newValue));
+  mDirty |= kTransmissionModeBit;
+}
+
+// attribute Payload : FlexRayPayload
+const FlexRayPayload& FlexRaySendBuffer::GetPayload() const
+{
+  return mPayload;
+}
+
+void FlexRaySendBuffer::SetPayload(const FlexRayPayload& newValue)
+{
+  // CanTranslateToCpp=True
+  mPayload = newValue;
+  mDirty |= kPayloadBit;
+}
+
+// attribute CycleOffset : HLAoctet
+uint8_t FlexRaySendBuffer::GetCycleOffset() const
+{
+  return mCycleOffset.get();
+}
+
+void FlexRaySendBuffer::SetCycleOffset(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mCycleOffset.set(newValue);
+  mDirty |= kCycleOffsetBit;
+}
+
+// attribute CycleRepetition : HLAoctet
+uint8_t FlexRaySendBuffer::GetCycleRepetition() const
+{
+  return mCycleRepetition.get();
+}
+
+void FlexRaySendBuffer::SetCycleRepetition(uint8_t newValue)
+{
+  // CanTranslateToCpp=True
+  mCycleRepetition.set(newValue);
+  mDirty |= kCycleRepetitionBit;
+}
+
+// attribute SlotId : HLAinteger16LE
+int16_t FlexRaySendBuffer::GetSlotId() const
+{
+  return mSlotId.get();
+}
+
+void FlexRaySendBuffer::SetSlotId(int16_t newValue)
+{
+  // CanTranslateToCpp=True
+  mSlotId.set(newValue);
+  mDirty |= kSlotIdBit;
+}
+
+// attribute Channel : FlexRayChannel
+FlexRayChannel FlexRaySendBuffer::GetChannel() const
+{
+  return static_cast<FlexRayChannel>(mChannel.get());
+}
+
+void FlexRaySendBuffer::SetChannel(FlexRayChannel newValue)
+{
+  // CanTranslateToCpp=True
+  mChannel.set(static_cast<uint8_t>(newValue));
+  mDirty |= kChannelBit;
+}
+
+// attribute PPIndicator : HLAboolean
+bool FlexRaySendBuffer::GetPPIndicator() const
+{
+  return mPPIndicator.get();
+}
+
+void FlexRaySendBuffer::SetPPIndicator(bool newValue)
+{
+  // CanTranslateToCpp=True
+  mPPIndicator.set(newValue);
+  mDirty |= kPPIndicatorBit;
+}
+
+// attribute HeaderCRC : HLAinteger16LE
+int16_t FlexRaySendBuffer::GetHeaderCRC() const
+{
+  return mHeaderCRC.get();
+}
+
+void FlexRaySendBuffer::SetHeaderCRC(int16_t newValue)
+{
+  // CanTranslateToCpp=True
+  mHeaderCRC.set(newValue);
+  mDirty |= kHeaderCRCBit;
+}
+
+rti1516ev::AttributeHandleValueMap FlexRaySendBuffer::GetAllAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  result[mObjectClass->GetSenderAttributeHandle()] = mSender.encode();
+  result[mObjectClass->GetTransmissionModeAttributeHandle()] = mTransmissionMode.encode();
+  result[mObjectClass->GetPayloadAttributeHandle()] = mPayload.encode();
+  result[mObjectClass->GetCycleOffsetAttributeHandle()] = mCycleOffset.encode();
+  result[mObjectClass->GetCycleRepetitionAttributeHandle()] = mCycleRepetition.encode();
+  result[mObjectClass->GetSlotIdAttributeHandle()] = mSlotId.encode();
+  result[mObjectClass->GetChannelAttributeHandle()] = mChannel.encode();
+  result[mObjectClass->GetPPIndicatorAttributeHandle()] = mPPIndicator.encode();
+  result[mObjectClass->GetHeaderCRCAttributeHandle()] = mHeaderCRC.encode();
+  return result;
+}
+
+rti1516ev::AttributeHandleValueMap FlexRaySendBuffer::GetModifiedAttributeValues() const
+{
+  rti1516ev::AttributeHandleValueMap result;
+  if (mDirty & kSenderBit)
+  {
+    result[mObjectClass->GetSenderAttributeHandle()] = mSender.encode();
+  }
+  if (mDirty & kTransmissionModeBit)
+  {
+    result[mObjectClass->GetTransmissionModeAttributeHandle()] = mTransmissionMode.encode();
+  }
+  if (mDirty & kPayloadBit)
+  {
+    result[mObjectClass->GetPayloadAttributeHandle()] = mPayload.encode();
+  }
+  if (mDirty & kCycleOffsetBit)
+  {
+    result[mObjectClass->GetCycleOffsetAttributeHandle()] = mCycleOffset.encode();
+  }
+  if (mDirty & kCycleRepetitionBit)
+  {
+    result[mObjectClass->GetCycleRepetitionAttributeHandle()] = mCycleRepetition.encode();
+  }
+  if (mDirty & kSlotIdBit)
+  {
+    result[mObjectClass->GetSlotIdAttributeHandle()] = mSlotId.encode();
+  }
+  if (mDirty & kChannelBit)
+  {
+    result[mObjectClass->GetChannelAttributeHandle()] = mChannel.encode();
+  }
+  if (mDirty & kPPIndicatorBit)
+  {
+    result[mObjectClass->GetPPIndicatorAttributeHandle()] = mPPIndicator.encode();
+  }
+  if (mDirty & kHeaderCRCBit)
+  {
+    result[mObjectClass->GetHeaderCRCAttributeHandle()] = mHeaderCRC.encode();
+  }
+  return result;
+}
+
+void FlexRaySendBuffer::UpdateAllAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+  }
+}
+
+void FlexRaySendBuffer::UpdateAllAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+  }
+}
+
+void FlexRaySendBuffer::UpdateModifiedAttributeValues()
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    mDirty = kNone;
+  }
+}
+
+void FlexRaySendBuffer::UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time)
+{
+  if (IsValid())
+  {
+    rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), time);
+    mDirty = kNone;
+  }
+}
+
+void FlexRaySendBuffer::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
+{
+  for (auto& attributeHandleValue : attributes)
+  {
+    rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
+    if (attributeHandle == mObjectClass->GetSenderAttributeHandle())
+    {
+      mSender.decode(attributeHandleValue.second);
+      mLastUpdated |= kSenderBit;
+    }
+    else if (attributeHandle == mObjectClass->GetTransmissionModeAttributeHandle())
+    {
+      mTransmissionMode.decode(attributeHandleValue.second);
+      mLastUpdated |= kTransmissionModeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetPayloadAttributeHandle())
+    {
+      mPayload.decode(attributeHandleValue.second);
+      mLastUpdated |= kPayloadBit;
+    }
+    else if (attributeHandle == mObjectClass->GetCycleOffsetAttributeHandle())
+    {
+      mCycleOffset.decode(attributeHandleValue.second);
+      mLastUpdated |= kCycleOffsetBit;
+    }
+    else if (attributeHandle == mObjectClass->GetCycleRepetitionAttributeHandle())
+    {
+      mCycleRepetition.decode(attributeHandleValue.second);
+      mLastUpdated |= kCycleRepetitionBit;
+    }
+    else if (attributeHandle == mObjectClass->GetSlotIdAttributeHandle())
+    {
+      mSlotId.decode(attributeHandleValue.second);
+      mLastUpdated |= kSlotIdBit;
+    }
+    else if (attributeHandle == mObjectClass->GetChannelAttributeHandle())
+    {
+      mChannel.decode(attributeHandleValue.second);
+      mLastUpdated |= kChannelBit;
+    }
+    else if (attributeHandle == mObjectClass->GetPPIndicatorAttributeHandle())
+    {
+      mPPIndicator.decode(attributeHandleValue.second);
+      mLastUpdated |= kPPIndicatorBit;
+    }
+    else if (attributeHandle == mObjectClass->GetHeaderCRCAttributeHandle())
+    {
+      mHeaderCRC.decode(attributeHandleValue.second);
+      mLastUpdated |= kHeaderCRCBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+    ExecuteUpdateCallbacks();
+} // FlexRaySendBuffer::ReflectAttributeValues
+
+void FlexRaySendBuffer::RequestAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  if ((mLastUpdated & kSenderBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetSenderAttributeHandle());
+  }
+  if ((mLastUpdated & kTransmissionModeBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetTransmissionModeAttributeHandle());
+  }
+  if ((mLastUpdated & kPayloadBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetPayloadAttributeHandle());
+  }
+  if ((mLastUpdated & kCycleOffsetBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetCycleOffsetAttributeHandle());
+  }
+  if ((mLastUpdated & kCycleRepetitionBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetCycleRepetitionAttributeHandle());
+  }
+  if ((mLastUpdated & kSlotIdBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetSlotIdAttributeHandle());
+  }
+  if ((mLastUpdated & kChannelBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetChannelAttributeHandle());
+  }
+  if ((mLastUpdated & kPPIndicatorBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetPPIndicatorAttributeHandle());
+  }
+  if ((mLastUpdated & kHeaderCRCBit) == 0)
+  {
+    requestAttributes.insert(mObjectClass->GetHeaderCRCAttributeHandle());
+  }
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void FlexRaySendBuffer::RequestAllAttributeValues()
+{
+  rti1516ev::AttributeHandleSet requestAttributes;
+  requestAttributes.insert(mObjectClass->GetSenderAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetTransmissionModeAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetPayloadAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetCycleOffsetAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetCycleRepetitionAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetSlotIdAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetChannelAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetPPIndicatorAttributeHandle());
+  requestAttributes.insert(mObjectClass->GetHeaderCRCAttributeHandle());
+  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
+}
+
+void FlexRaySendBuffer::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+{
+  rti1516ev::AttributeHandleValueMap updateAttributes;
+  for (auto& attributeHandle : attributeHandles)
+  {
+    if (attributeHandle == mObjectClass->GetSenderAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mSender.encode()));
+      mDirty &= ~kSenderBit;
+    }
+    else if (attributeHandle == mObjectClass->GetTransmissionModeAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mTransmissionMode.encode()));
+      mDirty &= ~kTransmissionModeBit;
+    }
+    else if (attributeHandle == mObjectClass->GetPayloadAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mPayload.encode()));
+      mDirty &= ~kPayloadBit;
+    }
+    else if (attributeHandle == mObjectClass->GetCycleOffsetAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mCycleOffset.encode()));
+      mDirty &= ~kCycleOffsetBit;
+    }
+    else if (attributeHandle == mObjectClass->GetCycleRepetitionAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mCycleRepetition.encode()));
+      mDirty &= ~kCycleRepetitionBit;
+    }
+    else if (attributeHandle == mObjectClass->GetSlotIdAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mSlotId.encode()));
+      mDirty &= ~kSlotIdBit;
+    }
+    else if (attributeHandle == mObjectClass->GetChannelAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mChannel.encode()));
+      mDirty &= ~kChannelBit;
+    }
+    else if (attributeHandle == mObjectClass->GetPPIndicatorAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mPPIndicator.encode()));
+      mDirty &= ~kPPIndicatorBit;
+    }
+    else if (attributeHandle == mObjectClass->GetHeaderCRCAttributeHandle())
+    {
+      updateAttributes.insert(std::make_pair(attributeHandle, mHeaderCRC.encode()));
+      mDirty &= ~kHeaderCRCBit;
+    }
+  } // for (auto& attributeHandleValue : attributes)
+  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
+} // FlexRaySendBuffer::ReflectAttributeValues
+
+uint32_t FlexRaySendBuffer::RegisterUpdateCallback(UpdateCallbackType callback)
+{
+  mLastCallbackToken++;
+  mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
+  return mLastCallbackToken;
+}
+
+void FlexRaySendBuffer::UnregisterUpdateCallback(uint32_t callbackToken)
+{
+  mUpdateCallbacks.erase(callbackToken);
+}
+
+void FlexRaySendBuffer::ExecuteUpdateCallbacks()
+{
+  for (auto& callbackEntry : mUpdateCallbacks)
+  {
+    auto& callback = callbackEntry.second;
+    callback(this);
+  }
+}
+
  
 
 ObjectClassRegistry* ObjectClassRegistry::sClassRegistry = nullptr;
@@ -3191,8 +7339,14 @@ void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
   mDOMemberTargetObjectClass = std::unique_ptr<DOMemberTargetObjectClass>(new DOMemberTargetObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
   mBusManagementObjectClass = std::unique_ptr<BusManagementObjectClass>(new BusManagementObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
   mBusManagementCanObjectClass = std::unique_ptr<BusManagementCanObjectClass>(new BusManagementCanObjectClass(mRtiAmbassador, mBusManagementObjectClass.get()));
+  mBusManagementEthernetObjectClass = std::unique_ptr<BusManagementEthernetObjectClass>(new BusManagementEthernetObjectClass(mRtiAmbassador, mBusManagementObjectClass.get()));
+  mFlexRayClusterObjectClass = std::unique_ptr<FlexRayClusterObjectClass>(new FlexRayClusterObjectClass(mRtiAmbassador, mBusManagementObjectClass.get()));
   mBusControllerObjectClass = std::unique_ptr<BusControllerObjectClass>(new BusControllerObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
   mBusControllerCanObjectClass = std::unique_ptr<BusControllerCanObjectClass>(new BusControllerCanObjectClass(mRtiAmbassador, mBusControllerObjectClass.get()));
+  mBusControllerEthernetObjectClass = std::unique_ptr<BusControllerEthernetObjectClass>(new BusControllerEthernetObjectClass(mRtiAmbassador, mBusControllerObjectClass.get()));
+  mFlexRayControllerStatusObjectClass = std::unique_ptr<FlexRayControllerStatusObjectClass>(new FlexRayControllerStatusObjectClass(mRtiAmbassador, mBusControllerObjectClass.get()));
+  mFlexRayControllerObjectClass = std::unique_ptr<FlexRayControllerObjectClass>(new FlexRayControllerObjectClass(mRtiAmbassador, mBusControllerObjectClass.get()));
+  mFlexRaySendBufferObjectClass = std::unique_ptr<FlexRaySendBufferObjectClass>(new FlexRaySendBufferObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
 } // Initialize
 
 void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
@@ -3226,6 +7380,14 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
   {
     mBusManagementCanObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
+  else if (theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
+  {
+    mBusManagementEthernetObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
+  }
+  else if (theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
+  {
+    mFlexRayClusterObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
+  }
   else if (theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
     mBusControllerObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
@@ -3233,6 +7395,22 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
   else if (theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
     mBusControllerCanObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
+  }
+  else if (theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
+  {
+    mBusControllerEthernetObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
+  }
+  else if (theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
+  {
+    mFlexRayControllerStatusObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
+  }
+  else if (theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
+  {
+    mFlexRayControllerObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
+  }
+  else if (theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
+  {
+    mFlexRaySendBufferObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
 }
 
@@ -3267,6 +7445,14 @@ void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle t
   {
     mBusManagementCanObjectClass->RemoveObjectInstance(theObject);
   }
+  else if (theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
+  {
+    mBusManagementEthernetObjectClass->RemoveObjectInstance(theObject);
+  }
+  else if (theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
+  {
+    mFlexRayClusterObjectClass->RemoveObjectInstance(theObject);
+  }
   else if (theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
     mBusControllerObjectClass->RemoveObjectInstance(theObject);
@@ -3274,6 +7460,22 @@ void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle t
   else if (theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
     mBusControllerCanObjectClass->RemoveObjectInstance(theObject);
+  }
+  else if (theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
+  {
+    mBusControllerEthernetObjectClass->RemoveObjectInstance(theObject);
+  }
+  else if (theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
+  {
+    mFlexRayControllerStatusObjectClass->RemoveObjectInstance(theObject);
+  }
+  else if (theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
+  {
+    mFlexRayControllerObjectClass->RemoveObjectInstance(theObject);
+  }
+  else if (theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
+  {
+    mFlexRaySendBufferObjectClass->RemoveObjectInstance(theObject);
   }
 }
 
@@ -3304,6 +7506,14 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
   {
     static_cast<BusManagementCan*>(mBusManagementCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
+  else if (theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
+  {
+    static_cast<BusManagementEthernet*>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+  }
+  else if (theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
+  {
+    static_cast<FlexRayCluster*>(mFlexRayClusterObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+  }
   else if (theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
     static_cast<BusController*>(mBusControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
@@ -3311,6 +7521,22 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
   else if (theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
     static_cast<BusControllerCan*>(mBusControllerCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+  }
+  else if (theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
+  {
+    static_cast<BusControllerEthernet*>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+  }
+  else if (theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
+  {
+    static_cast<FlexRayControllerStatus*>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+  }
+  else if (theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
+  {
+    static_cast<FlexRayController*>(mFlexRayControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+  }
+  else if (theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
+  {
+    static_cast<FlexRaySendBuffer*>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
 }
 
@@ -3340,6 +7566,14 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   {
     static_cast<BusManagementCan*>(mBusManagementCanObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
   }
+  else if (theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
+  {
+    static_cast<BusManagementEthernet*>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
+  {
+    static_cast<FlexRayCluster*>(mFlexRayClusterObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
   else if (theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
     static_cast<BusController*>(mBusControllerObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
@@ -3347,6 +7581,22 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   else if (theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
     static_cast<BusControllerCan*>(mBusControllerCanObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
+  {
+    static_cast<BusControllerEthernet*>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
+  {
+    static_cast<FlexRayControllerStatus*>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
+  {
+    static_cast<FlexRayController*>(mFlexRayControllerObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+  }
+  else if (theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
+  {
+    static_cast<FlexRaySendBuffer*>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
   }
 }
 

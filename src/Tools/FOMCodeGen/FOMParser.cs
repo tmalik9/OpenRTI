@@ -87,6 +87,36 @@ namespace FOMCodeGen
       }
       public string Name { get; set; }
       public DataType DataType { get; set; }
+      public string ToEncoderExpression()
+      {
+        if (DataType is ArrayDataType || DataType is FixedRecordDataType)
+        {
+          return string.Format("const {0}& {1}Encoder = static_cast<const {0}&>({1});", DataType.Encoding, Name);
+        }
+        else if (DataType is ObjectInstanceHandleType)
+        {
+          var objectInstanceHandleType = DataType as ObjectInstanceHandleType;
+          if (objectInstanceHandleType.ObjectClass != null)
+          {
+            return string.Format("{0} {1}Encoder(static_cast<{2}*>({1})->GetObjectInstanceHandle());"
+              , DataType.Encoding, Name, objectInstanceHandleType.ObjectClass.Name);
+          }
+          else
+          {
+            return string.Format("{0} {1}Encoder({1}));", DataType.Encoding, Name);
+          }
+        }
+        else if (DataType is FOMParser.EnumeratedDataType)
+        {
+          var enumeratedDataType = DataType as FOMParser.EnumeratedDataType;
+          return string.Format("{0} {1}Encoder(static_cast<{2}>({1}));",
+            DataType.Encoding, Name, enumeratedDataType.Representation.CPPType);
+        }
+        else
+        {
+          return string.Format("{0} {1}Encoder({1});", DataType.Encoding, Name);
+        }
+      }
     }
     public enum Order { Receive, Timestamp };
     public class InteractionClass
@@ -170,11 +200,16 @@ namespace FOMCodeGen
       {
         return false;
       }
-      // does the encoding class of this type have 'get/set' methods?
+      // does the encoding class of this type have 'get()/set()' methods?
       public virtual bool CanTranslateToCpp { get { return true; } }
       // Translate encoder type to native type. Used to pass a interaction parameter into the registered callback.
-      public virtual string CppGetter(string var) {
+      public virtual string CppGetter(string var)
+      {
         return var + ".get()";
+      }
+      public virtual string CppSetter(string var, string value)
+      {
+        return var + ".set(" + value + ")";
       }
       // The name of the data type, as specified in the FOM
       public string Name { get; set; }
@@ -184,7 +219,17 @@ namespace FOMCodeGen
       {
         get { return Name; }
       }
-      // by ref, if applicable
+      // derived const ref type
+      public string ConstRefCppType
+      {
+        get { return "const " + CPPType + "&"; }
+      }
+      // derived ref type
+      public string RefCppType
+      {
+        get { return CPPType + "&"; }
+      }
+      // default is by value, may be const ref in compund data types
       public virtual string ParameterCppType
       {
         get { return CPPType; }
@@ -204,7 +249,8 @@ namespace FOMCodeGen
       // An optional comment, generated from the 'semantics' tag in the FOM.
       public string Comment
       {
-        get {
+        get
+        {
           if (_comment != null && _comment != "")
             return FormatAsComment(_comment);
           else
@@ -240,7 +286,8 @@ namespace FOMCodeGen
       }
       public override string ParameterCppType
       {
-        get {
+        get
+        {
           if (Name == "HLAASCIIstring" || Name == "HLAunicodeString")
           {
             return "const " + CPPType + "&";
@@ -285,7 +332,8 @@ namespace FOMCodeGen
       }
       public override string ParameterCppType
       {
-        get {
+        get
+        {
           if (_passByReference)
           {
             return "const " + CPPType + "&";
@@ -302,7 +350,8 @@ namespace FOMCodeGen
       }
       public override bool CanTranslateToCpp
       {
-        get {
+        get
+        {
           if (Name == "HLAopaqueData")
             return true;
           return false;
@@ -332,7 +381,7 @@ namespace FOMCodeGen
       public ObjectInstanceHandleType() : base("HLAobjectInstanceHandle", "#include \"RTI/encoding/HLAhandle.h\"", "rti1516ev::ObjectInstanceHandle")
       {
       }
-      public ObjectInstanceHandleType(ObjectClass objectClass) 
+      public ObjectInstanceHandleType(ObjectClass objectClass)
         : base("HLAobjectInstanceHandle" + "." + objectClass.Name, "#include \"RTI/encoding/HLAhandle.h\"", "rti1516ev::ObjectInstanceHandle")
       {
         ObjectClass = objectClass;
@@ -346,7 +395,8 @@ namespace FOMCodeGen
       }
       public override string ParameterCppType
       {
-        get {
+        get
+        {
           if (ObjectClass != null)
             return "I" + ObjectClass.Name + "*";
           else
@@ -355,7 +405,8 @@ namespace FOMCodeGen
       }
       public override string CPPType
       {
-        get {
+        get
+        {
           if (ObjectClass != null)
             return ObjectClass.Name + "*";
           else
@@ -426,6 +477,10 @@ namespace FOMCodeGen
       {
         return "static_cast<" + Name + ">(" + var + ".get())";
       }
+      public override string CppSetter(string var, string value)
+      {
+        return var + ".set(static_cast<" + Representation.CPPType +">(" + value + "))";
+      }
     }
     // An array data type, one of HLAfixedArray or HLAvariableArray.
     public class ArrayDataType : DataType
@@ -456,14 +511,6 @@ namespace FOMCodeGen
           else
             return "std::vector<" + DataType.Encoding + ">";
         }
-      }
-      public string ConstRefCppType
-      {
-        get { return "const " + CPPType + "&"; }
-      }
-      public string RefCppType
-      {
-        get { return CPPType + "&"; }
       }
       public override string ParameterCppType
       {
@@ -516,9 +563,13 @@ namespace FOMCodeGen
       }
       public override string ParameterCppType
       {
-        get { return "const " + CPPType + "&"; }
+        get { return ConstRefCppType; }
       }
-
+      // usually by value
+      public override string ReturnCppType
+      {
+        get { return ConstRefCppType; }
+      }
       public uint Version { get; set; }
       public List<FixedRecordField> Fields { get; set; }
       public List<FixedRecordField> AllFields
@@ -567,6 +618,10 @@ namespace FOMCodeGen
       public override string CppGetter(string var)
       {
         return var;
+      }
+      public override string CppSetter(string var, string value)
+      {
+        return var + " = " + value;
       }
     }
 
@@ -679,7 +734,7 @@ namespace FOMCodeGen
       else
         return "static_cast<const rti1516ev::HLAinteger64Time&>(" + param + ").getTime()";
     }
-    DataType GetDataType(string name, bool replaceWithUnresolved=true)
+    DataType GetDataType(string name, bool replaceWithUnresolved = true)
     {
       DataType result = DataTypes.Find(dataType => dataType.Name == name);
       if (result != null)
@@ -851,6 +906,11 @@ namespace FOMCodeGen
       FixedRecordDataType includedFixedRecordType = null;
       if (fixedRecordDataTypeNode["include"] != null)
       {
+        var includeNodes = fixedRecordDataTypeNode.GetElementsByTagName("include");
+        if (includeNodes.Count > 1)
+        {
+          throw new ApplicationException("fixed record \"" + name + "\" can only have one 'included' base record");
+        }
         includedFixedRecordType = GetDataType(fixedRecordDataTypeNode["include"].FirstChild.InnerText) as FixedRecordDataType;
         includedFixedRecordType.HasChilds = true;
       }
@@ -1076,6 +1136,19 @@ namespace FOMCodeGen
       foreach (DataType dataType in DataTypes)
       {
         dataType.Resolve(DataTypes);
+      }
+      List<string> unresolvedDataTypes = new List<string>();
+      foreach (DataType dataType in DataTypes)
+      {
+        if (dataType is UnresolvedDataType)
+        {
+          unresolvedDataTypes.Add(dataType.Name);
+        }
+      }
+      if (unresolvedDataTypes.Count > 0)
+      {
+        var types = String.Join("\n", unresolvedDataTypes);
+        throw new ApplicationException("some datatypes could not be resolved:\n" + types);
       }
       foreach (DataType dataType in DataTypes)
       {

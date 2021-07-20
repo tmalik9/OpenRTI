@@ -100,7 +100,7 @@ class I<#=objectClass.Name#><#
     { #>
     // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
     virtual <#=attribute.DataType.ReturnCppType#> Get<#=attribute.Name#>() const = 0;
-    virtual void Set<#=attribute.Name#>(<#=attribute.DataType.CPPType#> newValue) = 0;
+    virtual void Set<#=attribute.Name#>(<#=attribute.DataType.ParameterCppType#> newValue) = 0;
 <#  } else { #>
     // attribute <#=attribute.Name#> : no data type
 <#  

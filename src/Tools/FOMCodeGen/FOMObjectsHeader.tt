@@ -141,7 +141,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     {
 #>    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
     <#=attribute.DataType.ReturnCppType#> Get<#=attribute.Name#>() const override;
-    void Set<#=attribute.Name#>(<#=attribute.DataType.CPPType#> newValue) override;
+    void Set<#=attribute.Name#>(<#=attribute.DataType.ParameterCppType#> newValue) override;
 <#  } else { #>
     // attribute <#=attribute.Name#> : no data type
 <#

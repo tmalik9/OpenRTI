@@ -9,6 +9,8 @@
 #pragma once
 
 #include <vector>
+#include <ostream>
+
 #include "RTI/encoding/HLAopaqueData.h"
 #include "RTI/encoding/HLAhandle.h"
 
@@ -21,7 +23,7 @@ typedef int64_t VTimeNS;
 
 typedef int32_t VMessageId;
 
-enum BusType : int32_t
+enum class BusType : int32_t
 {
       kBtInvalid = 0,
       kBtCAN = 1,
@@ -30,28 +32,86 @@ enum BusType : int32_t
       kBtEthernet = 11,
 }; // enum BusType
 
-enum SimulatedFlag : uint8_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, BusType value)
+{
+  switch (value)
+  {
+    case BusType::kBtInvalid: os << "kBtInvalid"; break;
+    case BusType::kBtCAN: os << "kBtCAN"; break;
+    case BusType::kBtLIN: os << "kBtLIN"; break;
+    case BusType::kBtFlexRay: os << "kBtFlexRay"; break;
+    case BusType::kBtEthernet: os << "kBtEthernet"; break;
+  }
+  return os;
+}
+
+
+enum class SimulatedFlag : uint8_t
 {
       kSimulated_fromBus = 0,
       kSimulated_fromTool = 1,
       kSimulated_internalEvent = 2,
 }; // enum SimulatedFlag
 
-enum DirMask : uint8_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, SimulatedFlag value)
+{
+  switch (value)
+  {
+    case SimulatedFlag::kSimulated_fromBus: os << "kSimulated_fromBus"; break;
+    case SimulatedFlag::kSimulated_fromTool: os << "kSimulated_fromTool"; break;
+    case SimulatedFlag::kSimulated_internalEvent: os << "kSimulated_internalEvent"; break;
+  }
+  return os;
+}
+
+
+enum class DirMask : uint8_t
 {
       kMskTxRequest = 0,
       kMskRx = 1,
       kMskTx = 2,
 }; // enum DirMask
 
-enum MessageFlags : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, DirMask value)
+{
+  switch (value)
+  {
+    case DirMask::kMskTxRequest: os << "kMskTxRequest"; break;
+    case DirMask::kMskRx: os << "kMskRx"; break;
+    case DirMask::kMskTx: os << "kMskTx"; break;
+  }
+  return os;
+}
+
+
+enum class MessageFlags : int32_t
 {
       kMsgFlagRemoteFrame = 0x10,
       kMsgFlagEDL = 0x1000,
       kMsgFlagBRS = 0x2000,
 }; // enum MessageFlags
 
-enum LinkStatus : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, MessageFlags value)
+{
+  switch (value)
+  {
+    case MessageFlags::kMsgFlagRemoteFrame: os << "kMsgFlagRemoteFrame"; break;
+    case MessageFlags::kMsgFlagEDL: os << "kMsgFlagEDL"; break;
+    case MessageFlags::kMsgFlagBRS: os << "kMsgFlagBRS"; break;
+  }
+  return os;
+}
+
+
+enum class LinkStatus : int32_t
 {
       kLinkUnknown = 0,
       kLinkDown = 1,
@@ -60,42 +120,128 @@ enum LinkStatus : int32_t
       kLinkError = 4,
 }; // enum LinkStatus
 
-enum EthernetPhy : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, LinkStatus value)
+{
+  switch (value)
+  {
+    case LinkStatus::kLinkUnknown: os << "kLinkUnknown"; break;
+    case LinkStatus::kLinkDown: os << "kLinkDown"; break;
+    case LinkStatus::kLinkUp: os << "kLinkUp"; break;
+    case LinkStatus::kLinkNegotiate: os << "kLinkNegotiate"; break;
+    case LinkStatus::kLinkError: os << "kLinkError"; break;
+  }
+  return os;
+}
+
+
+enum class EthernetPhy : int32_t
 {
       kPhyUnknown = 0,
       kPhyIEEE_802_3 = 1,
       kPhyBroadR_Reach = 2,
 }; // enum EthernetPhy
 
-enum Duplex : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, EthernetPhy value)
+{
+  switch (value)
+  {
+    case EthernetPhy::kPhyUnknown: os << "kPhyUnknown"; break;
+    case EthernetPhy::kPhyIEEE_802_3: os << "kPhyIEEE_802_3"; break;
+    case EthernetPhy::kPhyBroadR_Reach: os << "kPhyBroadR_Reach"; break;
+  }
+  return os;
+}
+
+
+enum class Duplex : int32_t
 {
       kDuplexUnkown = 0,
       kDuplexHalf = 1,
       kDuplexFull = 2,
 }; // enum Duplex
 
-enum MdiType : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, Duplex value)
+{
+  switch (value)
+  {
+    case Duplex::kDuplexUnkown: os << "kDuplexUnkown"; break;
+    case Duplex::kDuplexHalf: os << "kDuplexHalf"; break;
+    case Duplex::kDuplexFull: os << "kDuplexFull"; break;
+  }
+  return os;
+}
+
+
+enum class MdiType : int32_t
 {
       kMdiUnknown = 0,
       kMdiStraight = 1,
       kMdiCrossover = 2,
 }; // enum MdiType
 
-enum Connector : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, MdiType value)
+{
+  switch (value)
+  {
+    case MdiType::kMdiUnknown: os << "kMdiUnknown"; break;
+    case MdiType::kMdiStraight: os << "kMdiStraight"; break;
+    case MdiType::kMdiCrossover: os << "kMdiCrossover"; break;
+  }
+  return os;
+}
+
+
+enum class Connector : int32_t
 {
       kConnectorUnknown = 0,
       kConnectorRJ45 = 1,
       kConnectorDSub = 2,
 }; // enum Connector
 
-enum ClockMode : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, Connector value)
+{
+  switch (value)
+  {
+    case Connector::kConnectorUnknown: os << "kConnectorUnknown"; break;
+    case Connector::kConnectorRJ45: os << "kConnectorRJ45"; break;
+    case Connector::kConnectorDSub: os << "kConnectorDSub"; break;
+  }
+  return os;
+}
+
+
+enum class ClockMode : int32_t
 {
       kClockModeUnknown = 0,
       kClockModeMaster = 1,
       kClockModeSlave = 2,
 }; // enum ClockMode
 
-enum BrPair : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, ClockMode value)
+{
+  switch (value)
+  {
+    case ClockMode::kClockModeUnknown: os << "kClockModeUnknown"; break;
+    case ClockMode::kClockModeMaster: os << "kClockModeMaster"; break;
+    case ClockMode::kClockModeSlave: os << "kClockModeSlave"; break;
+  }
+  return os;
+}
+
+
+enum class BrPair : int32_t
 {
       kBrPairUnknown = 0,
       kBrPair1Pair = 1,
@@ -103,25 +249,331 @@ enum BrPair : int32_t
       kBrPair4Pair = 3,
 }; // enum BrPair
 
-enum CanOperationMode : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, BrPair value)
+{
+  switch (value)
+  {
+    case BrPair::kBrPairUnknown: os << "kBrPairUnknown"; break;
+    case BrPair::kBrPair1Pair: os << "kBrPair1Pair"; break;
+    case BrPair::kBrPair2Pair: os << "kBrPair2Pair"; break;
+    case BrPair::kBrPair4Pair: os << "kBrPair4Pair"; break;
+  }
+  return os;
+}
+
+
+enum class CanOperationMode : int32_t
 {
       kCanOperationModeCan = 0,
       kCanOperationModeCanFD = 1,
       kCanOperationModeCanXL = 2,
 }; // enum CanOperationMode
 
-enum CanSamplingMode : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, CanOperationMode value)
+{
+  switch (value)
+  {
+    case CanOperationMode::kCanOperationModeCan: os << "kCanOperationModeCan"; break;
+    case CanOperationMode::kCanOperationModeCanFD: os << "kCanOperationModeCanFD"; break;
+    case CanOperationMode::kCanOperationModeCanXL: os << "kCanOperationModeCanXL"; break;
+  }
+  return os;
+}
+
+
+enum class CanSamplingMode : int32_t
 {
       kCanSamplingModeSampling_1 = 0,
       kCanSamplingModeSampling_3 = 1,
 }; // enum CanSamplingMode
 
-enum CanBusState : int32_t
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, CanSamplingMode value)
+{
+  switch (value)
+  {
+    case CanSamplingMode::kCanSamplingModeSampling_1: os << "kCanSamplingModeSampling_1"; break;
+    case CanSamplingMode::kCanSamplingModeSampling_3: os << "kCanSamplingModeSampling_3"; break;
+  }
+  return os;
+}
+
+
+enum class CanBusState : int32_t
 {
       kCanBusStateOnline = 0,
       kCanBusStateOffline = 1,
       kCanBusStateError = 2,
 }; // enum CanBusState
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, CanBusState value)
+{
+  switch (value)
+  {
+    case CanBusState::kCanBusStateOnline: os << "kCanBusStateOnline"; break;
+    case CanBusState::kCanBusStateOffline: os << "kCanBusStateOffline"; break;
+    case CanBusState::kCanBusStateError: os << "kCanBusStateError"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRayChannel : uint8_t
+{
+      None = 0,
+      A = 1,
+      B = 2,
+      AB = 3,
+}; // enum FlexRayChannel
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayChannel value)
+{
+  switch (value)
+  {
+    case FlexRayChannel::None: os << "None"; break;
+    case FlexRayChannel::A: os << "A"; break;
+    case FlexRayChannel::B: os << "B"; break;
+    case FlexRayChannel::AB: os << "AB"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRaySymbolPattern : uint8_t
+{
+      CAS = 0,
+      WUP = 1,
+      WUDOP = 2,
+}; // enum FlexRaySymbolPattern
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRaySymbolPattern value)
+{
+  switch (value)
+  {
+    case FlexRaySymbolPattern::CAS: os << "CAS"; break;
+    case FlexRaySymbolPattern::WUP: os << "WUP"; break;
+    case FlexRaySymbolPattern::WUDOP: os << "WUDOP"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRayChiCommand : uint8_t
+{
+      RUN = 0,
+      DEFERRED_HALT = 1,
+      FREEZE = 2,
+      ALLOW_COLDSTART = 3,
+      ALL_SLOTS = 4,
+      WAKEUP = 5,
+}; // enum FlexRayChiCommand
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayChiCommand value)
+{
+  switch (value)
+  {
+    case FlexRayChiCommand::RUN: os << "RUN"; break;
+    case FlexRayChiCommand::DEFERRED_HALT: os << "DEFERRED_HALT"; break;
+    case FlexRayChiCommand::FREEZE: os << "FREEZE"; break;
+    case FlexRayChiCommand::ALLOW_COLDSTART: os << "ALLOW_COLDSTART"; break;
+    case FlexRayChiCommand::ALL_SLOTS: os << "ALL_SLOTS"; break;
+    case FlexRayChiCommand::WAKEUP: os << "WAKEUP"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRayTransmissionMode : uint8_t
+{
+      SingleShot = 0,
+      Continuous = 1,
+}; // enum FlexRayTransmissionMode
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayTransmissionMode value)
+{
+  switch (value)
+  {
+    case FlexRayTransmissionMode::SingleShot: os << "SingleShot"; break;
+    case FlexRayTransmissionMode::Continuous: os << "Continuous"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRayPocState : uint8_t
+{
+      DefaultConfig = 0,
+      Config = 1,
+      Ready = 2,
+      Startup = 3,
+      Wakeup = 4,
+      NormalActive = 5,
+      NormalPassive = 6,
+      Halt = 7,
+}; // enum FlexRayPocState
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayPocState value)
+{
+  switch (value)
+  {
+    case FlexRayPocState::DefaultConfig: os << "DefaultConfig"; break;
+    case FlexRayPocState::Config: os << "Config"; break;
+    case FlexRayPocState::Ready: os << "Ready"; break;
+    case FlexRayPocState::Startup: os << "Startup"; break;
+    case FlexRayPocState::Wakeup: os << "Wakeup"; break;
+    case FlexRayPocState::NormalActive: os << "NormalActive"; break;
+    case FlexRayPocState::NormalPassive: os << "NormalPassive"; break;
+    case FlexRayPocState::Halt: os << "Halt"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRaySlotModeType : uint8_t
+{
+      KeySlot = 0,
+      AllPending = 1,
+      All = 2,
+}; // enum FlexRaySlotModeType
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRaySlotModeType value)
+{
+  switch (value)
+  {
+    case FlexRaySlotModeType::KeySlot: os << "KeySlot"; break;
+    case FlexRaySlotModeType::AllPending: os << "AllPending"; break;
+    case FlexRaySlotModeType::All: os << "All"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRayErrorModeType : uint8_t
+{
+      Active = 0,
+      Passive = 1,
+      CommHalt = 2,
+}; // enum FlexRayErrorModeType
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayErrorModeType value)
+{
+  switch (value)
+  {
+    case FlexRayErrorModeType::Active: os << "Active"; break;
+    case FlexRayErrorModeType::Passive: os << "Passive"; break;
+    case FlexRayErrorModeType::CommHalt: os << "CommHalt"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRayStartupStateType : uint8_t
+{
+      Undefined = 0,
+      ColdStartListen = 1,
+      IntegrationColdstartCheck = 2,
+      ColdStartJoin = 3,
+      ColdStartCollisionResolution = 4,
+      ColdStartConsistencyCheck = 5,
+      IntegrationListen = 6,
+      InitializeSchedule = 7,
+      IntegrationConsistencyCheck = 8,
+      ColdStartGap = 9,
+      ExternalStartup = 10,
+}; // enum FlexRayStartupStateType
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayStartupStateType value)
+{
+  switch (value)
+  {
+    case FlexRayStartupStateType::Undefined: os << "Undefined"; break;
+    case FlexRayStartupStateType::ColdStartListen: os << "ColdStartListen"; break;
+    case FlexRayStartupStateType::IntegrationColdstartCheck: os << "IntegrationColdstartCheck"; break;
+    case FlexRayStartupStateType::ColdStartJoin: os << "ColdStartJoin"; break;
+    case FlexRayStartupStateType::ColdStartCollisionResolution: os << "ColdStartCollisionResolution"; break;
+    case FlexRayStartupStateType::ColdStartConsistencyCheck: os << "ColdStartConsistencyCheck"; break;
+    case FlexRayStartupStateType::IntegrationListen: os << "IntegrationListen"; break;
+    case FlexRayStartupStateType::InitializeSchedule: os << "InitializeSchedule"; break;
+    case FlexRayStartupStateType::IntegrationConsistencyCheck: os << "IntegrationConsistencyCheck"; break;
+    case FlexRayStartupStateType::ColdStartGap: os << "ColdStartGap"; break;
+    case FlexRayStartupStateType::ExternalStartup: os << "ExternalStartup"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRayWakeupStatusType : uint8_t
+{
+      Undefined = 0,
+      ReceivedHeader = 1,
+      ReceivedWup = 2,
+      CollisionHeader = 3,
+      CollisionWup = 4,
+      CollisionUnknown = 5,
+      Transmitted = 6,
+}; // enum FlexRayWakeupStatusType
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayWakeupStatusType value)
+{
+  switch (value)
+  {
+    case FlexRayWakeupStatusType::Undefined: os << "Undefined"; break;
+    case FlexRayWakeupStatusType::ReceivedHeader: os << "ReceivedHeader"; break;
+    case FlexRayWakeupStatusType::ReceivedWup: os << "ReceivedWup"; break;
+    case FlexRayWakeupStatusType::CollisionHeader: os << "CollisionHeader"; break;
+    case FlexRayWakeupStatusType::CollisionWup: os << "CollisionWup"; break;
+    case FlexRayWakeupStatusType::CollisionUnknown: os << "CollisionUnknown"; break;
+    case FlexRayWakeupStatusType::Transmitted: os << "Transmitted"; break;
+  }
+  return os;
+}
+
+
+enum class FlexRayClockPeriod : uint8_t
+{
+      T12_5NS = 1,
+      T25NS = 2,
+      T50NS = 3,
+}; // enum FlexRayClockPeriod
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayClockPeriod value)
+{
+  switch (value)
+  {
+    case FlexRayClockPeriod::T12_5NS: os << "T12_5NS"; break;
+    case FlexRayClockPeriod::T25NS: os << "T25NS"; break;
+    case FlexRayClockPeriod::T50NS: os << "T50NS"; break;
+  }
+  return os;
+}
+
 
 // Base class for all bus events, inclulding error and status events
 class BusEvent
@@ -300,6 +752,62 @@ class EthernetPacketErrorForwarded : public EthernetPacketError
     virtual ~EthernetPacketErrorForwarded() noexcept {}
 
 }; // class EthernetPacketErrorForwarded
+
+// Payload of FlexRay Frame
+class FlexRayPayload : public BusMessage
+{
+  public:
+    virtual ~FlexRayPayload() noexcept {}
+    virtual void SetPayloadData(const std::vector<uint8_t>& value) = 0;
+    virtual void SetPayloadData(const uint8_t* value, size_t size) = 0;
+    virtual const std::vector<uint8_t>& GetPayloadData() const = 0;
+    virtual bool IsPayloadDataAvailable() const = 0;
+    virtual void SetPayloadValid(bool value) = 0;
+    virtual bool GetPayloadValid() const = 0;
+    virtual bool IsPayloadValidAvailable() const = 0;
+
+}; // class FlexRayPayload
+
+// Header of FlexRay Frame
+class FlexRayHeader
+{
+  public:
+    virtual ~FlexRayHeader() noexcept {}
+    virtual uint32_t getVersion() const = 0;
+    virtual void SetSuFindicator(bool value) = 0;
+    virtual bool GetSuFindicator() const = 0;
+    virtual bool IsSuFindicatorAvailable() const = 0;
+    virtual void SetSyFIndicator(bool value) = 0;
+    virtual bool GetSyFIndicator() const = 0;
+    virtual bool IsSyFIndicatorAvailable() const = 0;
+    virtual void SetNFIndicator(bool value) = 0;
+    virtual bool GetNFIndicator() const = 0;
+    virtual bool IsNFIndicatorAvailable() const = 0;
+    virtual void SetPPIndicator(bool value) = 0;
+    virtual bool GetPPIndicator() const = 0;
+    virtual bool IsPPIndicatorAvailable() const = 0;
+    virtual void SetFrameID(int16_t value) = 0;
+    virtual int16_t GetFrameID() const = 0;
+    virtual bool IsFrameIDAvailable() const = 0;
+    virtual void SetpayloadLength(uint8_t value) = 0;
+    virtual uint8_t GetpayloadLength() const = 0;
+    virtual bool IspayloadLengthAvailable() const = 0;
+    virtual void SetHeaderCRC(int16_t value) = 0;
+    virtual int16_t GetHeaderCRC() const = 0;
+    virtual bool IsHeaderCRCAvailable() const = 0;
+    virtual void SetCycle(uint8_t value) = 0;
+    virtual uint8_t GetCycle() const = 0;
+    virtual bool IsCycleAvailable() const = 0;
+
+}; // class FlexRayHeader
+
+// FlexRay Frame
+class FlexRayFrame : public FlexRayPayload
+{
+  public:
+    virtual ~FlexRayFrame() noexcept {}
+
+}; // class FlexRayFrame
 
 
 } // namespace NDistSimIB

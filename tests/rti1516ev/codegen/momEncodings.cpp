@@ -1,5 +1,5 @@
 
-// Code automatically generated from D:\vfs\CANoe\release\15.2\Projects_Source\OpenRTI-master\tests\rti1516ev\codegen\\mom.xml, do not edit
+// Code automatically generated from mom.xml, do not edit
 
 #include <vector>
 #include <cstring>
@@ -594,7 +594,8 @@ HLAinteractionSubscriptionEncoding::~HLAinteractionSubscriptionEncoding()
 uint32_t HLAinteractionSubscriptionEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void HLAinteractionSubscriptionEncoding::SetHLAinteractionClass(rti1516ev::HLAhandle value)
 {
-      mHLAinteractionClass = value;
+  // FOMCodeGen.FOMParser+PredefinedType HLAhandle 
+  mHLAinteractionClass = value;
 }
 rti1516ev::HLAhandle HLAinteractionSubscriptionEncoding::GetHLAinteractionClass() const
 {
@@ -606,7 +607,7 @@ bool HLAinteractionSubscriptionEncoding::IsHLAinteractionClassAvailable() const
 }
 void HLAinteractionSubscriptionEncoding::SetHLAactive(bool value)
 {
-      mHLAactive.set(value);
+  mHLAactive.set(value);
 }
 bool HLAinteractionSubscriptionEncoding::GetHLAactive() const
 {
@@ -656,7 +657,8 @@ HLAobjectClassBasedCountEncoding::~HLAobjectClassBasedCountEncoding()
 uint32_t HLAobjectClassBasedCountEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void HLAobjectClassBasedCountEncoding::SetHLAobjectClass(rti1516ev::HLAhandle value)
 {
-      mHLAobjectClass = value;
+  // FOMCodeGen.FOMParser+PredefinedType HLAhandle 
+  mHLAobjectClass = value;
 }
 rti1516ev::HLAhandle HLAobjectClassBasedCountEncoding::GetHLAobjectClass() const
 {
@@ -668,7 +670,7 @@ bool HLAobjectClassBasedCountEncoding::IsHLAobjectClassAvailable() const
 }
 void HLAobjectClassBasedCountEncoding::SetHLAcount(HLAcount value)
 {
-      mHLAcount.set(value);
+  mHLAcount.set(value);
 }
 HLAcount HLAobjectClassBasedCountEncoding::GetHLAcount() const
 {
@@ -690,7 +692,8 @@ HLAinteractionCountEncoding::~HLAinteractionCountEncoding()
 uint32_t HLAinteractionCountEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void HLAinteractionCountEncoding::SetHLAinteractionClass(rti1516ev::HLAhandle value)
 {
-      mHLAinteractionClass = value;
+  // FOMCodeGen.FOMParser+PredefinedType HLAhandle 
+  mHLAinteractionClass = value;
 }
 rti1516ev::HLAhandle HLAinteractionCountEncoding::GetHLAinteractionClass() const
 {
@@ -702,7 +705,7 @@ bool HLAinteractionCountEncoding::IsHLAinteractionClassAvailable() const
 }
 void HLAinteractionCountEncoding::SetHLAinteractionCount(HLAcount value)
 {
-      mHLAinteractionCount.set(value);
+  mHLAinteractionCount.set(value);
 }
 HLAcount HLAinteractionCountEncoding::GetHLAinteractionCount() const
 {
@@ -724,7 +727,8 @@ HLAsynchPointFederateEncoding::~HLAsynchPointFederateEncoding()
 uint32_t HLAsynchPointFederateEncoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }
 void HLAsynchPointFederateEncoding::SetHLAfederate(rti1516ev::HLAhandle value)
 {
-      mHLAfederate = value;
+  // FOMCodeGen.FOMParser+PredefinedType HLAhandle 
+  mHLAfederate = value;
 }
 rti1516ev::HLAhandle HLAsynchPointFederateEncoding::GetHLAfederate() const
 {
@@ -736,7 +740,8 @@ bool HLAsynchPointFederateEncoding::IsHLAfederateAvailable() const
 }
 void HLAsynchPointFederateEncoding::SetHLAfederateSynchStatus(HLAsynchPointStatus value)
 {
-      mHLAfederateSynchStatus = value;
+  // FOMCodeGen.FOMParser+EnumeratedDataType
+  mHLAfederateSynchStatus = static_cast<int32_t>(value);
 }
 HLAsynchPointStatus HLAsynchPointFederateEncoding::GetHLAfederateSynchStatus() const
 {

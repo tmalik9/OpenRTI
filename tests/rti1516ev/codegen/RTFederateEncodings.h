@@ -52,6 +52,26 @@ using CanOperationModeEncoding=rti1516ev::HLAinteger32LE;
 using CanSamplingModeEncoding=rti1516ev::HLAinteger32LE;
 // enumerated data type CanBusState
 using CanBusStateEncoding=rti1516ev::HLAinteger32LE;
+// enumerated data type FlexRayChannel
+using FlexRayChannelEncoding=rti1516ev::HLAoctet;
+// enumerated data type FlexRaySymbolPattern
+using FlexRaySymbolPatternEncoding=rti1516ev::HLAoctet;
+// enumerated data type FlexRayChiCommand
+using FlexRayChiCommandEncoding=rti1516ev::HLAoctet;
+// enumerated data type FlexRayTransmissionMode
+using FlexRayTransmissionModeEncoding=rti1516ev::HLAoctet;
+// enumerated data type FlexRayPocState
+using FlexRayPocStateEncoding=rti1516ev::HLAoctet;
+// enumerated data type FlexRaySlotModeType
+using FlexRaySlotModeTypeEncoding=rti1516ev::HLAoctet;
+// enumerated data type FlexRayErrorModeType
+using FlexRayErrorModeTypeEncoding=rti1516ev::HLAoctet;
+// enumerated data type FlexRayStartupStateType
+using FlexRayStartupStateTypeEncoding=rti1516ev::HLAoctet;
+// enumerated data type FlexRayWakeupStatusType
+using FlexRayWakeupStatusTypeEncoding=rti1516ev::HLAoctet;
+// enumerated data type FlexRayClockPeriod
+using FlexRayClockPeriodEncoding=rti1516ev::HLAoctet;
 // 
 // Bytes carried in a CAN frame. Note that the actual number of bytes is carried in
 // a distinct member field of the CANFrame.
@@ -95,6 +115,27 @@ class EthernetPacketDataEncoding : public rti1516ev::HLAvariableArray
     std::vector<rti1516ev::HLAbyte> mEncoding;
 }; // class EthernetPacketData
 
+// Bytes carried in a FlexRay Frame. The data is variable-sized and carries the actual number of bytes used.
+// variable array of simple type HLAbyte
+class FlexRayPayloadDataEncoding : public rti1516ev::HLAvariableArray
+{
+  public:
+    FlexRayPayloadDataEncoding();
+    FlexRayPayloadDataEncoding(const std::vector<uint8_t>& data);
+    using rti1516ev::HLAvariableArray::set;
+    void set(const std::vector<uint8_t>& data);
+    void set(const uint8_t* data, size_t size);
+    using rti1516ev::HLAvariableArray::get;
+    const std::vector<uint8_t>& get() const;
+    void resize(size_t size);
+    using rti1516ev::HLAvariableArray::decodeFrom;
+    virtual size_t decodeFrom(const rti1516ev::Octet* buffer, size_t bufferSize, size_t index) override;
+  private:
+    void update();
+    std::vector<uint8_t> mData;
+    std::vector<rti1516ev::HLAbyte> mEncoding;
+}; // class FlexRayPayloadData
+
 // CAN Frame
 class CANFrameEncoding : public CANFrame, public rti1516ev::HLAfixedRecord
 {
@@ -133,6 +174,7 @@ class CANFrameEncoding : public CANFrame, public rti1516ev::HLAfixedRecord
     void SetBitCount(int16_t value) override;
     int16_t GetBitCount() const override;
     bool IsBitCountAvailable() const override;
+    CANFrameEncoding& operator=(const CANFrame& ref);
   private:
     rti1516ev::HLAinteger16LE mClientIndex;
     rti1516ev::HLAoctet mDir;
@@ -162,6 +204,7 @@ class CANErrorFrameEncoding : public CANErrorFrame, public rti1516ev::HLAfixedRe
     void SetClientIndex(int16_t value) override;
     int16_t GetClientIndex() const override;
     bool IsClientIndexAvailable() const override;
+    CANErrorFrameEncoding& operator=(const CANErrorFrame& ref);
   private:
     rti1516ev::HLAinteger16LE mErrorBitPosition;
     rti1516ev::HLAinteger32LE mFrameLengthNS;
@@ -208,6 +251,7 @@ class EthernetStatusEncoding : public EthernetStatus, public rti1516ev::HLAfixed
     void SetDeviceOperationMode(int32_t value) override;
     int32_t GetDeviceOperationMode() const override;
     bool IsDeviceOperationModeAvailable() const override;
+    EthernetStatusEncoding& operator=(const EthernetStatus& ref);
   private:
     rti1516ev::HLAinteger16LE mBusType;
     rti1516ev::HLAinteger64LE mHardwareChannel;
@@ -257,6 +301,7 @@ class EthernetPacketEncoding : public EthernetPacket, public rti1516ev::HLAfixed
     void SetPacketData(const uint8_t* value, size_t size) override;
     const std::vector<uint8_t>& GetPacketData() const override;
     bool IsPacketDataAvailable() const override;
+    EthernetPacketEncoding& operator=(const EthernetPacket& ref);
   private:
     rti1516ev::HLAinteger16LE mClientIndex;
     rti1516ev::HLAoctet mDir;
@@ -303,6 +348,7 @@ class EthernetPacketForwardedEncoding : public EthernetPacketForwarded, public r
     void SetPacketData(const uint8_t* value, size_t size) override;
     const std::vector<uint8_t>& GetPacketData() const override;
     bool IsPacketDataAvailable() const override;
+    EthernetPacketForwardedEncoding& operator=(const EthernetPacketForwarded& ref);
   private:
     rti1516ev::HLAinteger16LE mClientIndex;
     rti1516ev::HLAoctet mDir;
@@ -352,6 +398,7 @@ class EthernetPacketErrorEncoding : public EthernetPacketError, public rti1516ev
     void SetPacketData(const uint8_t* value, size_t size) override;
     const std::vector<uint8_t>& GetPacketData() const override;
     bool IsPacketDataAvailable() const override;
+    EthernetPacketErrorEncoding& operator=(const EthernetPacketError& ref);
   private:
     rti1516ev::HLAinteger16LE mClientIndex;
     rti1516ev::HLAoctet mDir;
@@ -402,6 +449,7 @@ class EthernetPacketErrorForwardedEncoding : public EthernetPacketErrorForwarded
     void SetPacketData(const uint8_t* value, size_t size) override;
     const std::vector<uint8_t>& GetPacketData() const override;
     bool IsPacketDataAvailable() const override;
+    EthernetPacketErrorForwardedEncoding& operator=(const EthernetPacketErrorForwarded& ref);
   private:
     rti1516ev::HLAinteger16LE mClientIndex;
     rti1516ev::HLAoctet mDir;
@@ -414,6 +462,121 @@ class EthernetPacketErrorForwardedEncoding : public EthernetPacketErrorForwarded
     rti1516ev::HLAinteger32LE mEthernetChecksum;
     EthernetPacketDataEncoding mPacketData;
 }; // class EthernetPacketErrorForwardedEncoding
+
+// Payload of FlexRay Frame
+class FlexRayPayloadEncoding : public FlexRayPayload, public rti1516ev::HLAfixedRecord
+{
+  public:
+    FlexRayPayloadEncoding();
+    virtual ~FlexRayPayloadEncoding();
+    uint32_t getVersion() const override;
+    void SetClientIndex(int16_t value) override;
+    int16_t GetClientIndex() const override;
+    bool IsClientIndexAvailable() const override;
+    void SetDir(DirMask value) override;
+    DirMask GetDir() const override;
+    bool IsDirAvailable() const override;
+    void SetOriginalTimeStamp(VTimeNS value) override;
+    VTimeNS GetOriginalTimeStamp() const override;
+    bool IsOriginalTimeStampAvailable() const override;
+    void SetSimulated(SimulatedFlag value) override;
+    SimulatedFlag GetSimulated() const override;
+    bool IsSimulatedAvailable() const override;
+    void SetPayloadData(const std::vector<uint8_t>& value) override;
+    void SetPayloadData(const uint8_t* value, size_t size) override;
+    const std::vector<uint8_t>& GetPayloadData() const override;
+    bool IsPayloadDataAvailable() const override;
+    void SetPayloadValid(bool value) override;
+    bool GetPayloadValid() const override;
+    bool IsPayloadValidAvailable() const override;
+    FlexRayPayloadEncoding& operator=(const FlexRayPayload& ref);
+  private:
+    rti1516ev::HLAinteger16LE mClientIndex;
+    rti1516ev::HLAoctet mDir;
+    rti1516ev::HLAinteger64LE mOriginalTimeStamp;
+    rti1516ev::HLAoctet mSimulated;
+    FlexRayPayloadDataEncoding mPayloadData;
+    rti1516ev::HLAboolean mPayloadValid;
+}; // class FlexRayPayloadEncoding
+
+// Header of FlexRay Frame
+class FlexRayHeaderEncoding : public FlexRayHeader, public rti1516ev::HLAfixedRecord
+{
+  public:
+    FlexRayHeaderEncoding();
+    virtual ~FlexRayHeaderEncoding();
+    uint32_t getVersion() const override;
+    void SetSuFindicator(bool value) override;
+    bool GetSuFindicator() const override;
+    bool IsSuFindicatorAvailable() const override;
+    void SetSyFIndicator(bool value) override;
+    bool GetSyFIndicator() const override;
+    bool IsSyFIndicatorAvailable() const override;
+    void SetNFIndicator(bool value) override;
+    bool GetNFIndicator() const override;
+    bool IsNFIndicatorAvailable() const override;
+    void SetPPIndicator(bool value) override;
+    bool GetPPIndicator() const override;
+    bool IsPPIndicatorAvailable() const override;
+    void SetFrameID(int16_t value) override;
+    int16_t GetFrameID() const override;
+    bool IsFrameIDAvailable() const override;
+    void SetpayloadLength(uint8_t value) override;
+    uint8_t GetpayloadLength() const override;
+    bool IspayloadLengthAvailable() const override;
+    void SetHeaderCRC(int16_t value) override;
+    int16_t GetHeaderCRC() const override;
+    bool IsHeaderCRCAvailable() const override;
+    void SetCycle(uint8_t value) override;
+    uint8_t GetCycle() const override;
+    bool IsCycleAvailable() const override;
+    FlexRayHeaderEncoding& operator=(const FlexRayHeader& ref);
+  private:
+    rti1516ev::HLAboolean mSuFindicator;
+    rti1516ev::HLAboolean mSyFIndicator;
+    rti1516ev::HLAboolean mNFIndicator;
+    rti1516ev::HLAboolean mPPIndicator;
+    rti1516ev::HLAinteger16LE mFrameID;
+    rti1516ev::HLAoctet mpayloadLength;
+    rti1516ev::HLAinteger16LE mHeaderCRC;
+    rti1516ev::HLAoctet mCycle;
+}; // class FlexRayHeaderEncoding
+
+// FlexRay Frame
+class FlexRayFrameEncoding : public FlexRayFrame, public rti1516ev::HLAfixedRecord
+{
+  public:
+    FlexRayFrameEncoding();
+    virtual ~FlexRayFrameEncoding();
+    uint32_t getVersion() const override;
+    void SetClientIndex(int16_t value) override;
+    int16_t GetClientIndex() const override;
+    bool IsClientIndexAvailable() const override;
+    void SetDir(DirMask value) override;
+    DirMask GetDir() const override;
+    bool IsDirAvailable() const override;
+    void SetOriginalTimeStamp(VTimeNS value) override;
+    VTimeNS GetOriginalTimeStamp() const override;
+    bool IsOriginalTimeStampAvailable() const override;
+    void SetSimulated(SimulatedFlag value) override;
+    SimulatedFlag GetSimulated() const override;
+    bool IsSimulatedAvailable() const override;
+    void SetPayloadData(const std::vector<uint8_t>& value) override;
+    void SetPayloadData(const uint8_t* value, size_t size) override;
+    const std::vector<uint8_t>& GetPayloadData() const override;
+    bool IsPayloadDataAvailable() const override;
+    void SetPayloadValid(bool value) override;
+    bool GetPayloadValid() const override;
+    bool IsPayloadValidAvailable() const override;
+    FlexRayFrameEncoding& operator=(const FlexRayFrame& ref);
+  private:
+    rti1516ev::HLAinteger16LE mClientIndex;
+    rti1516ev::HLAoctet mDir;
+    rti1516ev::HLAinteger64LE mOriginalTimeStamp;
+    rti1516ev::HLAoctet mSimulated;
+    FlexRayPayloadDataEncoding mPayloadData;
+    rti1516ev::HLAboolean mPayloadValid;
+}; // class FlexRayFrameEncoding
 
 } // namespace NDistSimIB
 } // namespace NRTFederateEncoding

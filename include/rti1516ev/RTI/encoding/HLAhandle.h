@@ -38,6 +38,7 @@ class RTI_EXPORT HLAhandle : public DataElement
     InteractionClassHandle getInteractionClassHandle() const;
     ParameterHandle getParameterHandle() const;
 
+    void set(HLAhandle handle);
     void set(FederateHandle handle);
     void set(ObjectClassHandle handle);
     void set(ObjectInstanceHandle handle);

@@ -73,7 +73,7 @@ class ISystemVariable : public IHLAobjectRoot
 
     // attribute Value : HLAopaqueData
     virtual std::vector<uint8_t> GetValue() const = 0;
-    virtual void SetValue(std::vector<uint8_t> newValue) = 0;
+    virtual void SetValue(const std::vector<uint8_t>& newValue) = 0;
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
@@ -122,7 +122,7 @@ class IValueEntity : public IHLAobjectRoot
 
     // attribute Value : HLAopaqueData
     virtual std::vector<uint8_t> GetValue() const = 0;
-    virtual void SetValue(std::vector<uint8_t> newValue) = 0;
+    virtual void SetValue(const std::vector<uint8_t>& newValue) = 0;
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
@@ -173,13 +173,13 @@ class IDOMemberSource : public IHLAobjectRoot
 
     // attribute DOSourceMemberName : HLAASCIIstring
     virtual std::string GetDOSourceMemberName() const = 0;
-    virtual void SetDOSourceMemberName(std::string newValue) = 0;
+    virtual void SetDOSourceMemberName(const std::string& newValue) = 0;
     // attribute DOSourceMemberConnectionType : HLAASCIIstring
     virtual std::string GetDOSourceMemberConnectionType() const = 0;
-    virtual void SetDOSourceMemberConnectionType(std::string newValue) = 0;
+    virtual void SetDOSourceMemberConnectionType(const std::string& newValue) = 0;
     // attribute DOSourceMemberDataBytes : HLAopaqueData
     virtual std::vector<uint8_t> GetDOSourceMemberDataBytes() const = 0;
-    virtual void SetDOSourceMemberDataBytes(std::vector<uint8_t> newValue) = 0;
+    virtual void SetDOSourceMemberDataBytes(const std::vector<uint8_t>& newValue) = 0;
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
@@ -229,10 +229,10 @@ class IDOMemberTarget : public IHLAobjectRoot
 
     // attribute DOTargetMemberName : HLAASCIIstring
     virtual std::string GetDOTargetMemberName() const = 0;
-    virtual void SetDOTargetMemberName(std::string newValue) = 0;
+    virtual void SetDOTargetMemberName(const std::string& newValue) = 0;
     // attribute DOTargetMemberConnectionType : HLAASCIIstring
     virtual std::string GetDOTargetMemberConnectionType() const = 0;
-    virtual void SetDOTargetMemberConnectionType(std::string newValue) = 0;
+    virtual void SetDOTargetMemberConnectionType(const std::string& newValue) = 0;
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
@@ -281,7 +281,7 @@ class IBusManagement : public IHLAobjectRoot
 
     // attribute NetworkID : HLAASCIIstring
     virtual std::string GetNetworkID() const = 0;
-    virtual void SetNetworkID(std::string newValue) = 0;
+    virtual void SetNetworkID(const std::string& newValue) = 0;
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
@@ -345,6 +345,156 @@ class IBusManagementCan : public IBusManagement
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
 };
 
+class IBusManagementEthernet;
+class IBusManagementEthernetObjectClass
+{
+  public:
+    using DiscoverCallbackType = std::function<void(IBusManagementEthernet*)>;
+    virtual void Publish() = 0;
+    virtual void Unpublish() = 0;
+    virtual void Subscribe() = 0;
+    virtual void Unsubscribe() = 0;
+    virtual IBusManagementEthernet* GetObjectInstance(const std::wstring& instanceName) = 0;
+    virtual IBusManagementEthernet* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+};
+
+class IBusManagementEthernet : public IBusManagement
+{
+  public:
+    static const AttributeBits kPortNameBit = 0x4;
+    static const AttributeBits kSendMessagesAsRxBit = 0x8;
+
+    IBusManagementEthernet() {}
+    ~IBusManagementEthernet() {}
+    IBusManagementEthernet(const IBusManagementEthernet&) = delete;
+    IBusManagementEthernet(IBusManagementEthernet&&) = delete;
+    IBusManagementEthernet& operator=(const IBusManagementEthernet&) = delete;
+    IBusManagementEthernet& operator=(IBusManagementEthernet&&) = delete;
+
+    // attribute PortName : HLAASCIIstring
+    virtual std::string GetPortName() const = 0;
+    virtual void SetPortName(const std::string& newValue) = 0;
+    // attribute SendMessagesAsRx : HLAboolean
+    virtual bool GetSendMessagesAsRx() const = 0;
+    virtual void SetSendMessagesAsRx(bool newValue) = 0;
+    using UpdateCallbackType = std::function<void(IBusManagementEthernet*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+};
+
+class IFlexRayCluster;
+class IFlexRayClusterObjectClass
+{
+  public:
+    using DiscoverCallbackType = std::function<void(IFlexRayCluster*)>;
+    virtual void Publish() = 0;
+    virtual void Unpublish() = 0;
+    virtual void Subscribe() = 0;
+    virtual void Unsubscribe() = 0;
+    virtual IFlexRayCluster* GetObjectInstance(const std::wstring& instanceName) = 0;
+    virtual IFlexRayCluster* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+};
+
+class IFlexRayCluster : public IBusManagement
+{
+  public:
+    static const AttributeBits kgColdstartAttemptsBit = 0x4;
+    static const AttributeBits kgCycleCountMaxBit = 0x8;
+    static const AttributeBits kgdActionPointOffsetBit = 0x10;
+    static const AttributeBits kgdDynamicSlotIdlePhaseBit = 0x20;
+    static const AttributeBits kgdMiniSlotBit = 0x40;
+    static const AttributeBits kgdMiniSlotActionPointOffsetBit = 0x80;
+    static const AttributeBits kgdStaticSlotBit = 0x100;
+    static const AttributeBits kgdSymbolWindowBit = 0x200;
+    static const AttributeBits kgdSymbolWindowActionPointOffsetBit = 0x400;
+    static const AttributeBits kgdTSSTransmitterBit = 0x800;
+    static const AttributeBits kgdWakeupTxActiveBit = 0x1000;
+    static const AttributeBits kgdWakeupTxIdleBit = 0x2000;
+    static const AttributeBits kgListenNoiseBit = 0x4000;
+    static const AttributeBits kgMacroPerCycleBit = 0x8000;
+    static const AttributeBits kgMaxWithoutClockCorrectionFatalBit = 0x10000;
+    static const AttributeBits kgMaxWithoutClockCorrectionPassiveBit = 0x20000;
+    static const AttributeBits kgNumberOfMiniSlotsBit = 0x40000;
+    static const AttributeBits kgNumberOfStaticSlotsBit = 0x80000;
+    static const AttributeBits kgPayloadLengthStaticBit = 0x100000;
+    static const AttributeBits kgSyncFrameIDCountMaxBit = 0x200000;
+
+    IFlexRayCluster() {}
+    ~IFlexRayCluster() {}
+    IFlexRayCluster(const IFlexRayCluster&) = delete;
+    IFlexRayCluster(IFlexRayCluster&&) = delete;
+    IFlexRayCluster& operator=(const IFlexRayCluster&) = delete;
+    IFlexRayCluster& operator=(IFlexRayCluster&&) = delete;
+
+    // attribute gColdstartAttempts : HLAoctet
+    virtual uint8_t GetgColdstartAttempts() const = 0;
+    virtual void SetgColdstartAttempts(uint8_t newValue) = 0;
+    // attribute gCycleCountMax : HLAoctet
+    virtual uint8_t GetgCycleCountMax() const = 0;
+    virtual void SetgCycleCountMax(uint8_t newValue) = 0;
+    // attribute gdActionPointOffset : HLAinteger32LE
+    virtual int32_t GetgdActionPointOffset() const = 0;
+    virtual void SetgdActionPointOffset(int32_t newValue) = 0;
+    // attribute gdDynamicSlotIdlePhase : HLAinteger32LE
+    virtual int32_t GetgdDynamicSlotIdlePhase() const = 0;
+    virtual void SetgdDynamicSlotIdlePhase(int32_t newValue) = 0;
+    // attribute gdMiniSlot : HLAinteger32LE
+    virtual int32_t GetgdMiniSlot() const = 0;
+    virtual void SetgdMiniSlot(int32_t newValue) = 0;
+    // attribute gdMiniSlotActionPointOffset : HLAinteger32LE
+    virtual int32_t GetgdMiniSlotActionPointOffset() const = 0;
+    virtual void SetgdMiniSlotActionPointOffset(int32_t newValue) = 0;
+    // attribute gdStaticSlot : HLAinteger32LE
+    virtual int32_t GetgdStaticSlot() const = 0;
+    virtual void SetgdStaticSlot(int32_t newValue) = 0;
+    // attribute gdSymbolWindow : HLAinteger32LE
+    virtual int32_t GetgdSymbolWindow() const = 0;
+    virtual void SetgdSymbolWindow(int32_t newValue) = 0;
+    // attribute gdSymbolWindowActionPointOffset : HLAinteger32LE
+    virtual int32_t GetgdSymbolWindowActionPointOffset() const = 0;
+    virtual void SetgdSymbolWindowActionPointOffset(int32_t newValue) = 0;
+    // attribute gdTSSTransmitter : HLAinteger32LE
+    virtual int32_t GetgdTSSTransmitter() const = 0;
+    virtual void SetgdTSSTransmitter(int32_t newValue) = 0;
+    // attribute gdWakeupTxActive : HLAinteger32LE
+    virtual int32_t GetgdWakeupTxActive() const = 0;
+    virtual void SetgdWakeupTxActive(int32_t newValue) = 0;
+    // attribute gdWakeupTxIdle : HLAinteger32LE
+    virtual int32_t GetgdWakeupTxIdle() const = 0;
+    virtual void SetgdWakeupTxIdle(int32_t newValue) = 0;
+    // attribute gListenNoise : HLAoctet
+    virtual uint8_t GetgListenNoise() const = 0;
+    virtual void SetgListenNoise(uint8_t newValue) = 0;
+    // attribute gMacroPerCycle : HLAinteger32LE
+    virtual int32_t GetgMacroPerCycle() const = 0;
+    virtual void SetgMacroPerCycle(int32_t newValue) = 0;
+    // attribute gMaxWithoutClockCorrectionFatal : HLAoctet
+    virtual uint8_t GetgMaxWithoutClockCorrectionFatal() const = 0;
+    virtual void SetgMaxWithoutClockCorrectionFatal(uint8_t newValue) = 0;
+    // attribute gMaxWithoutClockCorrectionPassive : HLAoctet
+    virtual uint8_t GetgMaxWithoutClockCorrectionPassive() const = 0;
+    virtual void SetgMaxWithoutClockCorrectionPassive(uint8_t newValue) = 0;
+    // attribute gNumberOfMiniSlots : HLAinteger32LE
+    virtual int32_t GetgNumberOfMiniSlots() const = 0;
+    virtual void SetgNumberOfMiniSlots(int32_t newValue) = 0;
+    // attribute gNumberOfStaticSlots : HLAinteger32LE
+    virtual int32_t GetgNumberOfStaticSlots() const = 0;
+    virtual void SetgNumberOfStaticSlots(int32_t newValue) = 0;
+    // attribute gPayloadLengthStatic : HLAinteger32LE
+    virtual int32_t GetgPayloadLengthStatic() const = 0;
+    virtual void SetgPayloadLengthStatic(int32_t newValue) = 0;
+    // attribute gSyncFrameIDCountMax : HLAoctet
+    virtual uint8_t GetgSyncFrameIDCountMax() const = 0;
+    virtual void SetgSyncFrameIDCountMax(uint8_t newValue) = 0;
+    using UpdateCallbackType = std::function<void(IFlexRayCluster*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+};
+
 class IBusController;
 class IBusControllerObjectClass
 {
@@ -375,10 +525,10 @@ class IBusController : public IHLAobjectRoot
 
     // attribute NetworkID : HLAASCIIstring
     virtual std::string GetNetworkID() const = 0;
-    virtual void SetNetworkID(std::string newValue) = 0;
+    virtual void SetNetworkID(const std::string& newValue) = 0;
     // attribute DeviceID : HLAASCIIstring
     virtual std::string GetDeviceID() const = 0;
-    virtual void SetDeviceID(std::string newValue) = 0;
+    virtual void SetDeviceID(const std::string& newValue) = 0;
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
@@ -462,6 +612,320 @@ class IBusControllerCan : public IBusController
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
 };
 
+class IBusControllerEthernet;
+class IBusControllerEthernetObjectClass
+{
+  public:
+    using DiscoverCallbackType = std::function<void(IBusControllerEthernet*)>;
+    virtual void Publish() = 0;
+    virtual void Unpublish() = 0;
+    virtual void Subscribe() = 0;
+    virtual void Unsubscribe() = 0;
+    virtual IBusControllerEthernet* GetObjectInstance(const std::wstring& instanceName) = 0;
+    virtual IBusControllerEthernet* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+};
+
+class IBusControllerEthernet : public IBusController
+{
+  public:
+    static const AttributeBits kPortNameBit = 0x8;
+
+    IBusControllerEthernet() {}
+    ~IBusControllerEthernet() {}
+    IBusControllerEthernet(const IBusControllerEthernet&) = delete;
+    IBusControllerEthernet(IBusControllerEthernet&&) = delete;
+    IBusControllerEthernet& operator=(const IBusControllerEthernet&) = delete;
+    IBusControllerEthernet& operator=(IBusControllerEthernet&&) = delete;
+
+    // attribute PortName : HLAASCIIstring
+    virtual std::string GetPortName() const = 0;
+    virtual void SetPortName(const std::string& newValue) = 0;
+    using UpdateCallbackType = std::function<void(IBusControllerEthernet*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+};
+
+class IFlexRayControllerStatus;
+class IFlexRayControllerStatusObjectClass
+{
+  public:
+    using DiscoverCallbackType = std::function<void(IFlexRayControllerStatus*)>;
+    virtual void Publish() = 0;
+    virtual void Unpublish() = 0;
+    virtual void Subscribe() = 0;
+    virtual void Unsubscribe() = 0;
+    virtual IFlexRayControllerStatus* GetObjectInstance(const std::wstring& instanceName) = 0;
+    virtual IFlexRayControllerStatus* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+};
+
+class IFlexRayControllerStatus : public IBusController
+{
+  public:
+    static const AttributeBits kPocStateBit = 0x8;
+    static const AttributeBits kchiHaltRequestBit = 0x10;
+    static const AttributeBits kcoldstartNoiseBit = 0x20;
+    static const AttributeBits kfreezeBit = 0x40;
+    static const AttributeBits kchiReadyRequestBit = 0x80;
+    static const AttributeBits kerrorModeBit = 0x100;
+    static const AttributeBits kslotModeBit = 0x200;
+    static const AttributeBits kstartupStateBit = 0x400;
+    static const AttributeBits kwakeupStatusBit = 0x800;
+
+    IFlexRayControllerStatus() {}
+    ~IFlexRayControllerStatus() {}
+    IFlexRayControllerStatus(const IFlexRayControllerStatus&) = delete;
+    IFlexRayControllerStatus(IFlexRayControllerStatus&&) = delete;
+    IFlexRayControllerStatus& operator=(const IFlexRayControllerStatus&) = delete;
+    IFlexRayControllerStatus& operator=(IFlexRayControllerStatus&&) = delete;
+
+    // attribute PocState : FlexRayPocState
+    virtual FlexRayPocState GetPocState() const = 0;
+    virtual void SetPocState(FlexRayPocState newValue) = 0;
+    // attribute chiHaltRequest : HLAboolean
+    virtual bool GetchiHaltRequest() const = 0;
+    virtual void SetchiHaltRequest(bool newValue) = 0;
+    // attribute coldstartNoise : HLAboolean
+    virtual bool GetcoldstartNoise() const = 0;
+    virtual void SetcoldstartNoise(bool newValue) = 0;
+    // attribute freeze : HLAboolean
+    virtual bool Getfreeze() const = 0;
+    virtual void Setfreeze(bool newValue) = 0;
+    // attribute chiReadyRequest : HLAboolean
+    virtual bool GetchiReadyRequest() const = 0;
+    virtual void SetchiReadyRequest(bool newValue) = 0;
+    // attribute errorMode : FlexRayErrorModeType
+    virtual FlexRayErrorModeType GeterrorMode() const = 0;
+    virtual void SeterrorMode(FlexRayErrorModeType newValue) = 0;
+    // attribute slotMode : FlexRaySlotModeType
+    virtual FlexRaySlotModeType GetslotMode() const = 0;
+    virtual void SetslotMode(FlexRaySlotModeType newValue) = 0;
+    // attribute startupState : FlexRayStartupStateType
+    virtual FlexRayStartupStateType GetstartupState() const = 0;
+    virtual void SetstartupState(FlexRayStartupStateType newValue) = 0;
+    // attribute wakeupStatus : FlexRayWakeupStatusType
+    virtual FlexRayWakeupStatusType GetwakeupStatus() const = 0;
+    virtual void SetwakeupStatus(FlexRayWakeupStatusType newValue) = 0;
+    using UpdateCallbackType = std::function<void(IFlexRayControllerStatus*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+};
+
+class IFlexRayController;
+class IFlexRayControllerObjectClass
+{
+  public:
+    using DiscoverCallbackType = std::function<void(IFlexRayController*)>;
+    virtual void Publish() = 0;
+    virtual void Unpublish() = 0;
+    virtual void Subscribe() = 0;
+    virtual void Unsubscribe() = 0;
+    virtual IFlexRayController* GetObjectInstance(const std::wstring& instanceName) = 0;
+    virtual IFlexRayController* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+};
+
+class IFlexRayController : public IBusController
+{
+  public:
+    static const AttributeBits kPocRequestBit = 0x8;
+    static const AttributeBits kChiCommandBit = 0x10;
+    static const AttributeBits kpAllowHaltDueToClockBit = 0x20;
+    static const AttributeBits kpAllowPassiveToActiveBit = 0x40;
+    static const AttributeBits kpChannelsBit = 0x80;
+    static const AttributeBits kpClusterDriftDampingBit = 0x100;
+    static const AttributeBits kpdAcceptedStartupRangeBit = 0x200;
+    static const AttributeBits kpdListenTimeoutBit = 0x400;
+    static const AttributeBits kpKeySlotIdBit = 0x800;
+    static const AttributeBits kpKeySlotOnlyEnabledBit = 0x1000;
+    static const AttributeBits kpKeySlotUsedForStartupBit = 0x2000;
+    static const AttributeBits kpKeySlotUsedForSyncBit = 0x4000;
+    static const AttributeBits kpLatestTxBit = 0x8000;
+    static const AttributeBits kpMacroInitialOffsetABit = 0x10000;
+    static const AttributeBits kpMacroInitialOffsetBBit = 0x20000;
+    static const AttributeBits kpMicroInitialOffsetABit = 0x40000;
+    static const AttributeBits kpMicroInitialOffsetBBit = 0x80000;
+    static const AttributeBits kpMicroPerCycleBit = 0x100000;
+    static const AttributeBits kpOffsetCorrectionOutBit = 0x200000;
+    static const AttributeBits kpOffsetCorrectionStartBit = 0x400000;
+    static const AttributeBits kpRateCorrectionOutBit = 0x800000;
+    static const AttributeBits kpWakeupChannelBit = 0x1000000;
+    static const AttributeBits kpWakeupPatternBit = 0x2000000;
+    static const AttributeBits kpdMicrotickBit = 0x4000000;
+    static const AttributeBits kpSamplesPerMicrotickBit = 0x8000000;
+
+    IFlexRayController() {}
+    ~IFlexRayController() {}
+    IFlexRayController(const IFlexRayController&) = delete;
+    IFlexRayController(IFlexRayController&&) = delete;
+    IFlexRayController& operator=(const IFlexRayController&) = delete;
+    IFlexRayController& operator=(IFlexRayController&&) = delete;
+
+    // attribute PocRequest : FlexRayPocState
+    virtual FlexRayPocState GetPocRequest() const = 0;
+    virtual void SetPocRequest(FlexRayPocState newValue) = 0;
+    // attribute ChiCommand : FlexRayChiCommand
+    virtual FlexRayChiCommand GetChiCommand() const = 0;
+    virtual void SetChiCommand(FlexRayChiCommand newValue) = 0;
+    // attribute pAllowHaltDueToClock : HLAoctet
+    virtual uint8_t GetpAllowHaltDueToClock() const = 0;
+    virtual void SetpAllowHaltDueToClock(uint8_t newValue) = 0;
+    // attribute pAllowPassiveToActive : HLAoctet
+    virtual uint8_t GetpAllowPassiveToActive() const = 0;
+    virtual void SetpAllowPassiveToActive(uint8_t newValue) = 0;
+    // attribute pChannels : FlexRayChannel
+    virtual FlexRayChannel GetpChannels() const = 0;
+    virtual void SetpChannels(FlexRayChannel newValue) = 0;
+    // attribute pClusterDriftDamping : HLAoctet
+    virtual uint8_t GetpClusterDriftDamping() const = 0;
+    virtual void SetpClusterDriftDamping(uint8_t newValue) = 0;
+    // attribute pdAcceptedStartupRange : HLAinteger32LE
+    virtual int32_t GetpdAcceptedStartupRange() const = 0;
+    virtual void SetpdAcceptedStartupRange(int32_t newValue) = 0;
+    // attribute pdListenTimeout : HLAinteger32LE
+    virtual int32_t GetpdListenTimeout() const = 0;
+    virtual void SetpdListenTimeout(int32_t newValue) = 0;
+    // attribute pKeySlotId : HLAinteger16LE
+    virtual int16_t GetpKeySlotId() const = 0;
+    virtual void SetpKeySlotId(int16_t newValue) = 0;
+    // attribute pKeySlotOnlyEnabled : HLAoctet
+    virtual uint8_t GetpKeySlotOnlyEnabled() const = 0;
+    virtual void SetpKeySlotOnlyEnabled(uint8_t newValue) = 0;
+    // attribute pKeySlotUsedForStartup : HLAoctet
+    virtual uint8_t GetpKeySlotUsedForStartup() const = 0;
+    virtual void SetpKeySlotUsedForStartup(uint8_t newValue) = 0;
+    // attribute pKeySlotUsedForSync : HLAoctet
+    virtual uint8_t GetpKeySlotUsedForSync() const = 0;
+    virtual void SetpKeySlotUsedForSync(uint8_t newValue) = 0;
+    // attribute pLatestTx : HLAinteger16LE
+    virtual int16_t GetpLatestTx() const = 0;
+    virtual void SetpLatestTx(int16_t newValue) = 0;
+    // attribute pMacroInitialOffsetA : HLAoctet
+    virtual uint8_t GetpMacroInitialOffsetA() const = 0;
+    virtual void SetpMacroInitialOffsetA(uint8_t newValue) = 0;
+    // attribute pMacroInitialOffsetB : HLAoctet
+    virtual uint8_t GetpMacroInitialOffsetB() const = 0;
+    virtual void SetpMacroInitialOffsetB(uint8_t newValue) = 0;
+    // attribute pMicroInitialOffsetA : HLAinteger32LE
+    virtual int32_t GetpMicroInitialOffsetA() const = 0;
+    virtual void SetpMicroInitialOffsetA(int32_t newValue) = 0;
+    // attribute pMicroInitialOffsetB : HLAinteger32LE
+    virtual int32_t GetpMicroInitialOffsetB() const = 0;
+    virtual void SetpMicroInitialOffsetB(int32_t newValue) = 0;
+    // attribute pMicroPerCycle : HLAinteger32LE
+    virtual int32_t GetpMicroPerCycle() const = 0;
+    virtual void SetpMicroPerCycle(int32_t newValue) = 0;
+    // attribute pOffsetCorrectionOut : HLAinteger32LE
+    virtual int32_t GetpOffsetCorrectionOut() const = 0;
+    virtual void SetpOffsetCorrectionOut(int32_t newValue) = 0;
+    // attribute pOffsetCorrectionStart : HLAinteger16LE
+    virtual int16_t GetpOffsetCorrectionStart() const = 0;
+    virtual void SetpOffsetCorrectionStart(int16_t newValue) = 0;
+    // attribute pRateCorrectionOut : HLAinteger32LE
+    virtual int32_t GetpRateCorrectionOut() const = 0;
+    virtual void SetpRateCorrectionOut(int32_t newValue) = 0;
+    // attribute pWakeupChannel : FlexRayChannel
+    virtual FlexRayChannel GetpWakeupChannel() const = 0;
+    virtual void SetpWakeupChannel(FlexRayChannel newValue) = 0;
+    // attribute pWakeupPattern : HLAoctet
+    virtual uint8_t GetpWakeupPattern() const = 0;
+    virtual void SetpWakeupPattern(uint8_t newValue) = 0;
+    // attribute pdMicrotick : FlexRayClockPeriod
+    virtual FlexRayClockPeriod GetpdMicrotick() const = 0;
+    virtual void SetpdMicrotick(FlexRayClockPeriod newValue) = 0;
+    // attribute pSamplesPerMicrotick : HLAoctet
+    virtual uint8_t GetpSamplesPerMicrotick() const = 0;
+    virtual void SetpSamplesPerMicrotick(uint8_t newValue) = 0;
+    using UpdateCallbackType = std::function<void(IFlexRayController*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+};
+
+class IFlexRaySendBuffer;
+class IFlexRaySendBufferObjectClass
+{
+  public:
+    using DiscoverCallbackType = std::function<void(IFlexRaySendBuffer*)>;
+    virtual void Publish() = 0;
+    virtual void Unpublish() = 0;
+    virtual void Subscribe() = 0;
+    virtual void Unsubscribe() = 0;
+    virtual IFlexRaySendBuffer* GetObjectInstance(const std::wstring& instanceName) = 0;
+    virtual IFlexRaySendBuffer* CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
+    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+};
+
+class IFlexRaySendBuffer : public IHLAobjectRoot
+{
+  public:
+    static const AttributeBits kSenderBit = 0x2;
+    static const AttributeBits kTransmissionModeBit = 0x4;
+    static const AttributeBits kPayloadBit = 0x8;
+    static const AttributeBits kCycleOffsetBit = 0x10;
+    static const AttributeBits kCycleRepetitionBit = 0x20;
+    static const AttributeBits kSlotIdBit = 0x40;
+    static const AttributeBits kChannelBit = 0x80;
+    static const AttributeBits kPPIndicatorBit = 0x100;
+    static const AttributeBits kHeaderCRCBit = 0x200;
+
+    IFlexRaySendBuffer() {}
+    ~IFlexRaySendBuffer() {}
+    IFlexRaySendBuffer(const IFlexRaySendBuffer&) = delete;
+    IFlexRaySendBuffer(IFlexRaySendBuffer&&) = delete;
+    IFlexRaySendBuffer& operator=(const IFlexRaySendBuffer&) = delete;
+    IFlexRaySendBuffer& operator=(IFlexRaySendBuffer&&) = delete;
+
+    // attribute Sender : HLAhandle
+    virtual rti1516ev::HLAhandle GetSender() const = 0;
+    virtual void SetSender(rti1516ev::HLAhandle newValue) = 0;
+    // attribute TransmissionMode : FlexRayTransmissionMode
+    virtual FlexRayTransmissionMode GetTransmissionMode() const = 0;
+    virtual void SetTransmissionMode(FlexRayTransmissionMode newValue) = 0;
+    // attribute Payload : FlexRayPayload
+    virtual const FlexRayPayload& GetPayload() const = 0;
+    virtual void SetPayload(const FlexRayPayload& newValue) = 0;
+    // attribute CycleOffset : HLAoctet
+    virtual uint8_t GetCycleOffset() const = 0;
+    virtual void SetCycleOffset(uint8_t newValue) = 0;
+    // attribute CycleRepetition : HLAoctet
+    virtual uint8_t GetCycleRepetition() const = 0;
+    virtual void SetCycleRepetition(uint8_t newValue) = 0;
+    // attribute SlotId : HLAinteger16LE
+    virtual int16_t GetSlotId() const = 0;
+    virtual void SetSlotId(int16_t newValue) = 0;
+    // attribute Channel : FlexRayChannel
+    virtual FlexRayChannel GetChannel() const = 0;
+    virtual void SetChannel(FlexRayChannel newValue) = 0;
+    // attribute PPIndicator : HLAboolean
+    virtual bool GetPPIndicator() const = 0;
+    virtual void SetPPIndicator(bool newValue) = 0;
+    // attribute HeaderCRC : HLAinteger16LE
+    virtual int16_t GetHeaderCRC() const = 0;
+    virtual void SetHeaderCRC(int16_t newValue) = 0;
+    // send all attribute values
+    virtual void UpdateAllAttributeValues() = 0;
+    // send all attribute values, as TSO message
+    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // send attribute values which have been modified since last call
+    virtual void UpdateModifiedAttributeValues() = 0;
+    // send attribute values which have been modified since last call, as TSO message
+    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
+    virtual AttributeBits GetUpdatedAttributes() const = 0;
+    // request attribute values which haven't been updated in last reflectAttributeValues
+    virtual void RequestAttributeValues() = 0;
+    // request all attribute values
+    virtual void RequestAllAttributeValues() = 0;
+    using UpdateCallbackType = std::function<void(IFlexRaySendBuffer*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+};
+
 
 class IObjectClassRegistry
 {
@@ -473,8 +937,14 @@ class IObjectClassRegistry
     virtual IDOMemberTargetObjectClass* GetDOMemberTargetObjectClass() const = 0;
     virtual IBusManagementObjectClass* GetBusManagementObjectClass() const = 0;
     virtual IBusManagementCanObjectClass* GetBusManagementCanObjectClass() const = 0;
+    virtual IBusManagementEthernetObjectClass* GetBusManagementEthernetObjectClass() const = 0;
+    virtual IFlexRayClusterObjectClass* GetFlexRayClusterObjectClass() const = 0;
     virtual IBusControllerObjectClass* GetBusControllerObjectClass() const = 0;
     virtual IBusControllerCanObjectClass* GetBusControllerCanObjectClass() const = 0;
+    virtual IBusControllerEthernetObjectClass* GetBusControllerEthernetObjectClass() const = 0;
+    virtual IFlexRayControllerStatusObjectClass* GetFlexRayControllerStatusObjectClass() const = 0;
+    virtual IFlexRayControllerObjectClass* GetFlexRayControllerObjectClass() const = 0;
+    virtual IFlexRaySendBufferObjectClass* GetFlexRaySendBufferObjectClass() const = 0;
   protected:
     virtual ~IObjectClassRegistry() {}
 }; // class IObjectClassRegistry

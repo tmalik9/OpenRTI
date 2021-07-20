@@ -25,6 +25,8 @@
 #pragma once
 
 #include <vector>
+#include <ostream>
+
 <#=FOM.PredefinedTypeIncludes#>
 
 <#
@@ -82,7 +84,7 @@ class <#=fixedRecordDataType.Name#><#=fixedRecordDataType.BaseClass != null ? " 
   {
     var enumeratedDataType = dataType as FOMParser.EnumeratedDataType;
 #>
-enum <#=dataType.Name#> : <#=enumeratedDataType.Representation.CPPType#>
+enum class <#=dataType.Name#> : <#=enumeratedDataType.Representation.CPPType#>
 {
 <#
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
@@ -93,6 +95,25 @@ enum <#=dataType.Name#> : <#=enumeratedDataType.Representation.CPPType#>
     } // foreach enumeratedDataType.Enumerators.Values
 #>
 }; // enum <#=dataType.Name#>
+
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, <#=dataType.Name#> value)
+{
+  switch (value)
+  {
+<#
+    foreach (var enumerator in enumeratedDataType.Enumerators.Values)
+    {
+#>
+    case <#=dataType.Name#>::<#=enumerator.Name#>: os << "<#=enumerator.Name#>"; break;
+<#
+    } // foreach enumeratedDataType.Enumerators.Values
+#>
+  }
+  return os;
+}
+
 
 <#
   } // if (dataType is FOMParser.EnumeratedDataType)

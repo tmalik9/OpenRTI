@@ -65,6 +65,7 @@ class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1
     <#=field.DataType.ReturnCppType#> Get<#=field.Name#>() const override;
     bool Is<#=field.Name#>Available() const override;
 <# } // foreach fixedRecordDataType.Fields #>
+    <#=fixedRecordDataType.Encoding#>& operator=(const <#=dataType.Name#>& ref);
   private:
 <#
     foreach (var field in fixedRecordDataType.AllFields)

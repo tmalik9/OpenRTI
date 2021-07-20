@@ -127,6 +127,11 @@ ParameterHandle HLAhandle::getParameterHandle() const
   return rti1516eHandle;
 }
 
+void HLAhandle::set(HLAhandle handle)
+{
+  _impl = std::unique_ptr<HLAhandle::Implementation>(new HLAhandle::Implementation(*handle._impl.get()));
+}
+
 void HLAhandle::set(FederateHandle handle)
 {
   OpenRTI::FederateHandle nativeHandle;

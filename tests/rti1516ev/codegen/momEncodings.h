@@ -1,5 +1,5 @@
 
-// Code automatically generated from D:\vfs\CANoe\release\15.2\Projects_Source\OpenRTI-master\tests\rti1516ev\codegen\\mom.xml, do not edit
+// Code automatically generated from mom.xml, do not edit
 
 #pragma once
 
