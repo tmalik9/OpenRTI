@@ -10,8 +10,8 @@
 #include <vector>
 #include <functional>
 
-<#=FOM.PredefinedTypeIncludes#>
-#include "<#=EncodingHeaderFilename#>"
+<#=FOM.GetPredefinedTypeIncludes(FOMParser.FileContext.kObjectInterfaces)#>
+#include "<#=DataTypesHeaderFilename#>"
 
 <#
 foreach (var namespacePart in FOM.Namespace)

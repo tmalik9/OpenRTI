@@ -8,6 +8,12 @@
     <Filter Include="generated source files">
       <UniqueIdentifier>{cc01c060-17d0-4d61-bf3f-aceb56740f9d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="generated source files\implementation">
+      <UniqueIdentifier>{1b8980c7-3660-4d17-9dbf-529440b5c5b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="generated source files\interface">
+      <UniqueIdentifier>{770e7cf8-b509-4a8d-9bd0-269456ea7014}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="codegen.cpp">
@@ -16,14 +22,14 @@
     <ClCompile Include="momEncodings.cpp">
       <Filter>generated source files</Filter>
     </ClCompile>
-    <ClCompile Include="RTFederateEncodings.cpp">
-      <Filter>generated source files</Filter>
+    <ClCompile Include="implementation\RTFederateEncodings.cpp">
+      <Filter>generated source files\implementation</Filter>
     </ClCompile>
-    <ClCompile Include="RTFederateObjects.cpp">
-      <Filter>generated source files</Filter>
+    <ClCompile Include="implementation\RTFederateInteractions.cpp">
+      <Filter>generated source files\implementation</Filter>
     </ClCompile>
-    <ClCompile Include="RTFederateInteractions.cpp">
-      <Filter>generated source files</Filter>
+    <ClCompile Include="implementation\RTFederateObjects.cpp">
+      <Filter>generated source files\implementation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,23 +39,23 @@
     <ClInclude Include="momEncodings.h">
       <Filter>generated source files</Filter>
     </ClInclude>
-    <ClInclude Include="RTFederateDataTypes.h">
-      <Filter>generated source files</Filter>
+    <ClInclude Include="interface\RTFederateDataTypes.h">
+      <Filter>generated source files\interface</Filter>
     </ClInclude>
-    <ClInclude Include="RTFederateEncodings.h">
-      <Filter>generated source files</Filter>
+    <ClInclude Include="interface\RTFederateInteractionInterfaces.h">
+      <Filter>generated source files\interface</Filter>
     </ClInclude>
-    <ClInclude Include="RTFederateObjects.h">
-      <Filter>generated source files</Filter>
+    <ClInclude Include="interface\RTFederateObjectInterfaces.h">
+      <Filter>generated source files\interface</Filter>
     </ClInclude>
-    <ClInclude Include="RTFederateObjectInterfaces.h">
-      <Filter>generated source files</Filter>
+    <ClInclude Include="implementation\RTFederateEncodings.h">
+      <Filter>generated source files\implementation</Filter>
     </ClInclude>
-    <ClInclude Include="RTFederateInteractionInterfaces.h">
-      <Filter>generated source files</Filter>
+    <ClInclude Include="implementation\RTFederateInteractions.h">
+      <Filter>generated source files\implementation</Filter>
     </ClInclude>
-    <ClInclude Include="RTFederateInteractions.h">
-      <Filter>generated source files</Filter>
+    <ClInclude Include="implementation\RTFederateObjects.h">
+      <Filter>generated source files\implementation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

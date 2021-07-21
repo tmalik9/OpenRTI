@@ -4,8 +4,6 @@
 #include <vector>
 #include <cassert>
 
-#include "RTI/encoding/HLAopaqueData.h"
-#include "RTI/encoding/HLAhandle.h"
 #include "RTI/time/HLAinteger64Time.h"
 
 #include "RTFederateInteractions.h"

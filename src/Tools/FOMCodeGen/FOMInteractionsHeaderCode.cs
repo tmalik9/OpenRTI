@@ -11,11 +11,18 @@
     string InteractionInterfacesHeaderFilename { get; set; }
     string EncodingHeaderFilename { get; set; }
     string ObjectsHeaderFilename { get; set; }
-    public FOMInteractionsHeader(FOMParser fom, string interactionsHeaderFilename, string interactionInterfacesHeaderFilename, string objectsHeaderFilename, string encodingHeaderFilename)
+    public FOMInteractionsHeader(FOMParser fom, string interactionsHeaderFilename, string interactionInterfacesHeaderFilename, string objectsHeaderFilename, string encodingHeaderFilename, string includePath)
     {
       FOM = fom;
       InteractionsHeaderFilename = System.IO.Path.GetFileName(interactionsHeaderFilename);
-      InteractionInterfacesHeaderFilename = System.IO.Path.GetFileName(interactionInterfacesHeaderFilename);
+      if (includePath.Length > 0)
+      {
+        InteractionInterfacesHeaderFilename = includePath + "/" + System.IO.Path.GetFileName(interactionInterfacesHeaderFilename);
+      }
+      else
+      {
+        InteractionInterfacesHeaderFilename = System.IO.Path.GetFileName(interactionInterfacesHeaderFilename);
+      }
       ObjectsHeaderFilename = System.IO.Path.GetFileName(objectsHeaderFilename);
       EncodingHeaderFilename = System.IO.Path.GetFileName(encodingHeaderFilename);
     }

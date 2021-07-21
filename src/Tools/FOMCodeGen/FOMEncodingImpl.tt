@@ -16,7 +16,6 @@
 #include "RTI/encoding/HLAfixedRecord.h"
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
-<#=FOM.PredefinedTypeIncludes#>
 #include "<#=EncodingHeaderFilename#>"
 
 <# foreach (var namespacePart in FOM.Namespace) { #>

@@ -14,7 +14,8 @@
 #include "RTI/encoding/HLAfixedRecord.h"
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
-<#=FOM.PredefinedTypeIncludes#>
+
+<#=FOM.GetPredefinedTypeIncludes(FOMParser.FileContext.kInteractionHeader)#>
 #include "<#=InteractionInterfacesHeaderFilename#>"
 #include "<#=EncodingHeaderFilename#>"
 

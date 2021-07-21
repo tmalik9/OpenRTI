@@ -8,12 +8,12 @@
   {
     FOMParser FOM { get; set; }
     string ObjectInterfacesHeaderFilename { get; set; }
-    string EncodingHeaderFilename { get; set; }
+    string DataTypesHeaderFilename { get; set; }
     public FOMObjectInterfacesHeader(FOMParser fom, string objectInterfacesHeaderFilename, string encodingHeaderFilename)
     {
       FOM = fom;
       ObjectInterfacesHeaderFilename = System.IO.Path.GetFileName(objectInterfacesHeaderFilename);
-      EncodingHeaderFilename = System.IO.Path.GetFileName(encodingHeaderFilename);
+      DataTypesHeaderFilename = System.IO.Path.GetFileName(encodingHeaderFilename);
     }
   }
   }

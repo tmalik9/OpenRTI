@@ -134,7 +134,7 @@ namespace FOMCodeGen
             this.Write("\r\n#pragma once\r\n\r\n#include <vector>\r\n#include <ostream>\r\n\r\n");
             
             #line 30 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.PredefinedTypeIncludes));
+            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.GetPredefinedTypeIncludes(FOMParser.FileContext.kDataTypes)));
             
             #line default
             #line hidden

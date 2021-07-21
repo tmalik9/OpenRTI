@@ -10,10 +10,8 @@
 #include "RTI/encoding/HLAfixedRecord.h"
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
-#include "RTI/encoding/HLAopaqueData.h"
-#include "RTI/encoding/HLAhandle.h"
 
-#include "RTFederateDataTypes.h"
+#include "interface/RTFederateDataTypes.h"
 
 namespace NDistSimIB {
 namespace NRTFederateEncoding {

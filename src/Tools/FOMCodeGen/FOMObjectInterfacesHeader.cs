@@ -38,14 +38,14 @@ namespace FOMCodeGen
             this.Write(", do not edit\r\n#pragma once\r\n\r\n#include <vector>\r\n#include <functional>\r\n\r\n");
             
             #line 13 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.PredefinedTypeIncludes));
+            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.GetPredefinedTypeIncludes(FOMParser.FileContext.kObjectInterfaces)));
             
             #line default
             #line hidden
             this.Write("\r\n#include \"");
             
             #line 14 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(EncodingHeaderFilename));
+            this.Write(this.ToStringHelper.ToStringWithCulture(DataTypesHeaderFilename));
             
             #line default
             #line hidden

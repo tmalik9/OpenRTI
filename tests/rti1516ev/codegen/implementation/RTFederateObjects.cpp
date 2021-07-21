@@ -4,9 +4,6 @@
 #include <vector>
 #include <cassert>
 
-#include "RTI/encoding/HLAopaqueData.h"
-#include "RTI/encoding/HLAhandle.h"
-
 #include "RTFederateObjects.h"
 
 namespace NDistSimIB {

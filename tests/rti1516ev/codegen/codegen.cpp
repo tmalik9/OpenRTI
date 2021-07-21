@@ -13,8 +13,8 @@
 #include "../../../src/rti1516ev/HandleFactory.h"
 #include "RTI1516ETestLib.h"
 
-#include "RTFederateObjects.h"
-#include "RTFederateInteractions.h"
+#include "implementation/RTFederateObjects.h"
+#include "implementation/RTFederateInteractions.h"
 
 template<typename TInputIter>
 static inline std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercase = true, bool insert_spaces = false)

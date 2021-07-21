@@ -8,10 +8,17 @@
   {
     FOMParser FOM { get; set; }
     string DataTypesHeaderFilename { get; set; }
-    public FOMEncodingHeader(FOMParser fom, string dataTypesHeaderFilename)
+    public FOMEncodingHeader(FOMParser fom, string dataTypesHeaderFilename, string includePath)
     {
       FOM = fom;
-      DataTypesHeaderFilename = System.IO.Path.GetFileName(dataTypesHeaderFilename);
+      if (includePath.Length > 0)
+      {
+        DataTypesHeaderFilename = includePath + "/" + System.IO.Path.GetFileName(dataTypesHeaderFilename);
+      }
+      else
+      {
+        DataTypesHeaderFilename = System.IO.Path.GetFileName(dataTypesHeaderFilename);
+      }
     }
   }
   }

@@ -49,23 +49,16 @@ namespace FOMCodeGen
             
             #line default
             #line hidden
-            this.Write("\r\n#include <vector>\r\n#include <cassert>\r\n\r\n");
+            this.Write("\r\n#include <vector>\r\n#include <cassert>\r\n\r\n#include \"");
             
             #line 15 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.PredefinedTypeIncludes));
-            
-            #line default
-            #line hidden
-            this.Write("\r\n\r\n#include \"");
-            
-            #line 17 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(ObjectsHeaderFilename));
             
             #line default
             #line hidden
             this.Write("\"\r\n\r\n");
             
-            #line 19 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 17 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
 foreach (var namespacePart in FOM.Namespace)
 {
@@ -75,20 +68,20 @@ foreach (var namespacePart in FOM.Namespace)
             #line hidden
             this.Write("namespace ");
             
-            #line 23 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 21 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write(" {\r\n");
             
-            #line 24 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 22 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   } 
             
             #line default
             #line hidden
             
-            #line 25 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 23 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
 foreach (var objectClass in FOM.ObjectClasses)
 {
@@ -100,83 +93,83 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line hidden
             this.Write("// object class type \'");
             
-            #line 31 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 29 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("\'\r\n");
             
-            #line 32 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 30 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass::");
             
-            #line 32 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 30 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ");
             
-            #line 32 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 30 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.BaseClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass* baseClass)\r\n");
             
-            #line 33 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 31 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } else {
             
             #line default
             #line hidden
             
-            #line 34 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 32 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass::");
             
-            #line 34 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 32 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass(rti1516ev::RTIambassador* rtiAmbassador)\r\n");
             
-            #line 35 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 33 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } 
             
             #line default
             #line hidden
             this.Write("{\r\n  mRtiAmbassador = rtiAmbassador;\r\n");
             
-            #line 38 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 36 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  if (objectClass.BaseClass != null) { 
             
             #line default
             #line hidden
             this.Write("  mBaseClass = baseClass;\r\n");
             
-            #line 40 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 38 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } 
             
             #line default
             #line hidden
             this.Write("  mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L\"");
             
-            #line 41 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 39 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.QualifiedName));
             
             #line default
             #line hidden
             this.Write("\");\r\n");
             
-            #line 42 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 40 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
   foreach (var attribute in objectClass.Attributes)
   {
@@ -188,56 +181,56 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line hidden
             this.Write("  // attribute ");
             
-            #line 47 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 45 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 47 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 45 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n  m");
             
-            #line 48 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 46 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("AttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L\"");
             
-            #line 48 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 46 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("\");\r\n");
             
-            #line 49 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 47 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   } else { 
             
             #line default
             #line hidden
             this.Write("// attribute ");
             
-            #line 50 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 48 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write(".");
             
-            #line 50 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 48 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : no data type\r\n");
             
-            #line 51 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 49 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
@@ -247,7 +240,7 @@ foreach (var objectClass in FOM.ObjectClasses)
             #line hidden
             this.Write("}\r\n\r\nvoid ");
             
-            #line 57 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 55 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -257,7 +250,7 @@ foreach (var objectClass in FOM.ObjectClasses)
                     "assAttributes(mObjectClassHandle, attributes);\r\n    mPublished = true;\r\n  }\r\n}\r\n" +
                     "\r\nvoid ");
             
-            #line 67 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 65 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -265,7 +258,7 @@ foreach (var objectClass in FOM.ObjectClasses)
             this.Write("ObjectClass::Unpublish()\r\n{\r\n  if (mPublished)\r\n  {\r\n    mRtiAmbassador->unpublis" +
                     "hObjectClass(mObjectClassHandle);\r\n    mPublished = false;\r\n  }\r\n}\r\n\r\nvoid ");
             
-            #line 76 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 74 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -283,7 +276,7 @@ foreach (var objectClass in FOM.ObjectClasses)
 
 void ");
             
-            #line 87 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 85 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -292,7 +285,7 @@ void ");
                     "scribeObjectClass(mObjectClassHandle);\r\n    mSubscribed = false;\r\n  }\r\n}\r\n\r\nvoid" +
                     " ");
             
-            #line 96 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 94 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -303,14 +296,14 @@ void ");
   assert(mObjectInstancesByHandle.find(instanceHandle) == mObjectInstancesByHandle.end());
   ");
             
-            #line 100 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 98 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("* newObject = new ");
             
-            #line 100 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 98 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -324,7 +317,7 @@ void ");
 
 void ");
             
-            #line 107 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 105 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -342,14 +335,14 @@ void ");
 
 I");
             
-            #line 118 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 116 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("* ");
             
-            #line 118 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 116 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -359,14 +352,14 @@ I");
                     "me.end())\r\n  {\r\n    return iter->second;\r\n  }\r\n  else\r\n  {\r\n    return nullptr;\r" +
                     "\n  }\r\n}\r\n\r\nI");
             
-            #line 131 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 129 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("* ");
             
-            #line 131 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 129 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -386,14 +379,14 @@ I");
 
 I");
             
-            #line 144 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 142 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("* ");
             
-            #line 144 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 142 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -409,21 +402,21 @@ I");
   {
     throw rti1516ev::ObjectClassNotPublished(L""");
             
-            #line 153 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 151 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("\");\r\n  }\r\n  ");
             
-            #line 155 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 153 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("* newObject = new ");
             
-            #line 155 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 153 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -443,7 +436,7 @@ I");
 
 rti1516ev::AttributeHandleSet ");
             
-            #line 168 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 166 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -451,7 +444,7 @@ rti1516ev::AttributeHandleSet ");
             this.Write("ObjectClass::GetAllAttributeHandles()\r\n{\r\n  rti1516ev::AttributeHandleSet result;" +
                     "\r\n");
             
-            #line 171 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 169 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
   foreach (var attribute in objectClass.AllAttributes)
   {
@@ -463,14 +456,14 @@ rti1516ev::AttributeHandleSet ");
             #line hidden
             this.Write("  result.insert(Get");
             
-            #line 177 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 175 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("AttributeHandle());\r\n");
             
-            #line 178 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 176 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
@@ -480,7 +473,7 @@ rti1516ev::AttributeHandleSet ");
             #line hidden
             this.Write("  return result;\r\n}\r\n\r\nuint32_t ");
             
-            #line 185 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 183 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -489,7 +482,7 @@ rti1516ev::AttributeHandleSet ");
                     "allbackToken++;\r\n  mDiscoverCallbacks.insert(std::make_pair(mLastCallbackToken, " +
                     "callback));\r\n  return mLastCallbackToken;\r\n}\r\n\r\nvoid ");
             
-            #line 192 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 190 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -497,14 +490,14 @@ rti1516ev::AttributeHandleSet ");
             this.Write("ObjectClass::UnregisterDiscoverCallback(uint32_t callbackToken)\r\n{\r\n  mDiscoverCa" +
                     "llbacks.erase(callbackToken);\r\n}\r\n\r\nvoid ");
             
-            #line 197 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 195 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass::ExecuteDiscoverCallbacks(I");
             
-            #line 197 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 195 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -513,42 +506,42 @@ rti1516ev::AttributeHandleSet ");
                     "   auto& callback = callbackEntry.second;\r\n    callback(newObjectInstance);\r\n  }" +
                     "\r\n}\r\n\r\n// object instances of type \'");
             
-            #line 206 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 204 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("\'\r\n");
             
-            #line 207 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 205 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("::");
             
-            #line 207 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 205 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("()\r\n{\r\n}\r\n\r\n");
             
-            #line 211 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 209 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("::");
             
-            #line 211 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 209 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 211 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 209 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -557,14 +550,14 @@ rti1516ev::AttributeHandleSet ");
                     "dor* rtiAmbassador)\r\n  : mObjectClass(objectClass)\r\n  , mInstanceName(instanceNa" +
                     "me)\r\n  , mRtiAmbassador(rtiAmbassador)\r\n{\r\n}\r\n\r\n");
             
-            #line 218 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 216 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("::~");
             
-            #line 218 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 216 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -581,7 +574,7 @@ rti1516ev::AttributeHandleSet ");
 
 ");
             
-            #line 228 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 226 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
   foreach (var attribute in objectClass.AllAttributes)
   {
@@ -593,112 +586,112 @@ rti1516ev::AttributeHandleSet ");
             #line hidden
             this.Write("// attribute ");
             
-            #line 233 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 231 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 233 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 231 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 234 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 232 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 234 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 232 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("::Get");
             
-            #line 234 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 232 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("() const\r\n{\r\n  return ");
             
-            #line 236 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 234 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.CppGetter("m" + attribute.Name)));
             
             #line default
             #line hidden
             this.Write(";\r\n}\r\n\r\nvoid ");
             
-            #line 239 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 237 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("::Set");
             
-            #line 239 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 237 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 239 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 237 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" newValue)\r\n{\r\n  // CanTranslateToCpp=");
             
-            #line 241 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 239 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.CanTranslateToCpp));
             
             #line default
             #line hidden
             this.Write("\r\n  ");
             
-            #line 242 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 240 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.CppSetter("m" + attribute.Name, "newValue")));
             
             #line default
             #line hidden
             this.Write(";\r\n  mDirty |= k");
             
-            #line 243 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 241 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("Bit;\r\n}\r\n\r\n");
             
-            #line 246 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 244 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   } else { 
             
             #line default
             #line hidden
             this.Write("// attribute ");
             
-            #line 247 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 245 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write(".");
             
-            #line 247 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 245 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : no data type\r\n\r\n");
             
-            #line 249 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 247 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.AllAttributes)
@@ -708,7 +701,7 @@ rti1516ev::AttributeHandleSet ");
             #line hidden
             this.Write("rti1516ev::AttributeHandleValueMap ");
             
-            #line 253 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 251 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -716,7 +709,7 @@ rti1516ev::AttributeHandleSet ");
             this.Write("::GetAllAttributeValues() const\r\n{\r\n  rti1516ev::AttributeHandleValueMap result;\r" +
                     "\n");
             
-            #line 256 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 254 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
   foreach (var attribute in objectClass.AllAttributes)
   {
@@ -728,21 +721,21 @@ rti1516ev::AttributeHandleSet ");
             #line hidden
             this.Write("  result[mObjectClass->Get");
             
-            #line 262 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 260 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("AttributeHandle()] = m");
             
-            #line 262 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 260 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(".encode();\r\n");
             
-            #line 263 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 261 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
     } // if
   } // foreach
@@ -752,7 +745,7 @@ rti1516ev::AttributeHandleSet ");
             #line hidden
             this.Write("  return result;\r\n}\r\n\r\nrti1516ev::AttributeHandleValueMap ");
             
-            #line 270 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 268 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -760,7 +753,7 @@ rti1516ev::AttributeHandleSet ");
             this.Write("::GetModifiedAttributeValues() const\r\n{\r\n  rti1516ev::AttributeHandleValueMap res" +
                     "ult;\r\n");
             
-            #line 273 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 271 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
   foreach (var attribute in objectClass.Attributes)
   {
@@ -772,28 +765,28 @@ rti1516ev::AttributeHandleSet ");
             #line hidden
             this.Write("  if (mDirty & k");
             
-            #line 279 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 277 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("Bit)\r\n  {\r\n    result[mObjectClass->Get");
             
-            #line 281 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 279 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("AttributeHandle()] = m");
             
-            #line 281 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 279 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(".encode();\r\n  }\r\n");
             
-            #line 283 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 281 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
     } // if
   } // foreach
@@ -803,14 +796,14 @@ rti1516ev::AttributeHandleSet ");
             #line hidden
             this.Write("  return result;\r\n}\r\n\r\n");
             
-            #line 290 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 288 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  if (objectClass.HasValidAttributes) { 
             
             #line default
             #line hidden
             this.Write("void ");
             
-            #line 291 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 289 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -826,7 +819,7 @@ rti1516ev::AttributeHandleSet ");
 
 void ");
             
-            #line 300 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 298 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -842,7 +835,7 @@ void ");
 
 void ");
             
-            #line 309 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 307 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -859,7 +852,7 @@ void ");
 
 void ");
             
-            #line 319 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 317 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -876,7 +869,7 @@ void ");
 
 void ");
             
-            #line 329 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 327 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -885,7 +878,7 @@ void ");
                     "\r\n  for (auto& attributeHandleValue : attributes)\r\n  {\r\n    rti1516ev::Attribute" +
                     "Handle attributeHandle = attributeHandleValue.first;\r\n");
             
-            #line 334 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 332 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
   {
   bool firstInObjectInstanceReflectAttributeValues = true;
@@ -898,12 +891,26 @@ void ");
             #line default
             #line hidden
             
-            #line 342 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 340 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  if (firstInObjectInstanceReflectAttributeValues)  {
             
             #line default
             #line hidden
             this.Write("    if (attributeHandle == mObjectClass->Get");
+            
+            #line 341 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
+            
+            #line default
+            #line hidden
+            this.Write("AttributeHandle())\r\n");
+            
+            #line 342 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+ } else { 
+            
+            #line default
+            #line hidden
+            this.Write("    else if (attributeHandle == mObjectClass->Get");
             
             #line 343 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
@@ -913,41 +920,27 @@ void ");
             this.Write("AttributeHandle())\r\n");
             
             #line 344 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } else { 
-            
-            #line default
-            #line hidden
-            this.Write("    else if (attributeHandle == mObjectClass->Get");
-            
-            #line 345 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
-            
-            #line default
-            #line hidden
-            this.Write("AttributeHandle())\r\n");
-            
-            #line 346 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    {\r\n      m");
             
-            #line 348 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 346 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(".decode(attributeHandleValue.second);\r\n      mLastUpdated |= k");
             
-            #line 349 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 347 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("Bit;\r\n    }\r\n");
             
-            #line 351 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 349 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
       firstInObjectInstanceReflectAttributeValues = false;
     } // if
@@ -959,28 +952,28 @@ void ");
             #line hidden
             this.Write("  } // for (auto& attributeHandleValue : attributes)\r\n");
             
-            #line 358 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 356 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { 
             
             #line default
             #line hidden
             this.Write("    ExecuteUpdateCallbacks();\r\n");
             
-            #line 360 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 358 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } 
             
             #line default
             #line hidden
             this.Write("} // ");
             
-            #line 361 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 359 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("::ReflectAttributeValues\r\n\r\nvoid ");
             
-            #line 363 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 361 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -988,7 +981,7 @@ void ");
             this.Write("::RequestAttributeValues()\r\n{\r\n  rti1516ev::AttributeHandleSet requestAttributes;" +
                     "\r\n");
             
-            #line 366 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 364 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
   foreach (var attribute in objectClass.Attributes)
   {
@@ -1000,21 +993,21 @@ void ");
             #line hidden
             this.Write("  if ((mLastUpdated & k");
             
-            #line 372 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 370 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("Bit) == 0)\r\n  {\r\n    requestAttributes.insert(mObjectClass->Get");
             
-            #line 374 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 372 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("AttributeHandle());\r\n  }\r\n");
             
-            #line 376 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 374 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
     } // if
   } // foreach
@@ -1025,7 +1018,7 @@ void ");
             this.Write("  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttri" +
                     "butes, rti1516ev::VariableLengthData());\r\n}\r\n\r\nvoid ");
             
-            #line 383 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 381 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -1033,7 +1026,7 @@ void ");
             this.Write("::RequestAllAttributeValues()\r\n{\r\n  rti1516ev::AttributeHandleSet requestAttribut" +
                     "es;\r\n");
             
-            #line 386 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 384 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
   foreach (var attribute in objectClass.Attributes)
   {
@@ -1045,14 +1038,14 @@ void ");
             #line hidden
             this.Write("  requestAttributes.insert(mObjectClass->Get");
             
-            #line 392 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 390 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("AttributeHandle());\r\n");
             
-            #line 393 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 391 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
     } // if
   } // foreach
@@ -1063,7 +1056,7 @@ void ");
             this.Write("  mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttri" +
                     "butes, rti1516ev::VariableLengthData());\r\n}\r\n\r\nvoid ");
             
-            #line 400 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 398 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -1072,7 +1065,7 @@ void ");
                     "{\r\n  rti1516ev::AttributeHandleValueMap updateAttributes;\r\n  for (auto& attribut" +
                     "eHandle : attributeHandles)\r\n  {\r\n");
             
-            #line 405 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 403 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
   {
   bool firstInObjectInstanceProvideAttributeValues = true;
@@ -1085,12 +1078,26 @@ void ");
             #line default
             #line hidden
             
-            #line 413 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 411 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  if (firstInObjectInstanceProvideAttributeValues)  {
             
             #line default
             #line hidden
             this.Write("    if (attributeHandle == mObjectClass->Get");
+            
+            #line 412 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
+            
+            #line default
+            #line hidden
+            this.Write("AttributeHandle())\r\n");
+            
+            #line 413 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+ } else { 
+            
+            #line default
+            #line hidden
+            this.Write("    else if (attributeHandle == mObjectClass->Get");
             
             #line 414 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
@@ -1100,41 +1107,27 @@ void ");
             this.Write("AttributeHandle())\r\n");
             
             #line 415 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } else { 
-            
-            #line default
-            #line hidden
-            this.Write("    else if (attributeHandle == mObjectClass->Get");
-            
-            #line 416 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
-            
-            #line default
-            #line hidden
-            this.Write("AttributeHandle())\r\n");
-            
-            #line 417 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    {\r\n      updateAttributes.insert(std::make_pair(attributeHandle, m");
             
-            #line 419 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 417 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(".encode()));\r\n      mDirty &= ~k");
             
-            #line 420 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 418 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("Bit;\r\n    }\r\n");
             
-            #line 422 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 420 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
 
       firstInObjectInstanceProvideAttributeValues = false;
     } // if
@@ -1148,21 +1141,21 @@ void ");
                     "ributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthD" +
                     "ata());\r\n} // ");
             
-            #line 430 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 428 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("::ReflectAttributeValues\r\n\r\n");
             
-            #line 432 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 430 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  if (objectClass.ChildClasses.Count == 0) { 
             
             #line default
             #line hidden
             this.Write("uint32_t ");
             
-            #line 433 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 431 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -1171,7 +1164,7 @@ void ");
                     "\r\n  mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));\r\n  re" +
                     "turn mLastCallbackToken;\r\n}\r\n\r\nvoid ");
             
-            #line 440 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 438 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -1179,7 +1172,7 @@ void ");
             this.Write("::UnregisterUpdateCallback(uint32_t callbackToken)\r\n{\r\n  mUpdateCallbacks.erase(c" +
                     "allbackToken);\r\n}\r\n\r\nvoid ");
             
-            #line 445 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 443 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -1187,20 +1180,20 @@ void ");
             this.Write("::ExecuteUpdateCallbacks()\r\n{\r\n  for (auto& callbackEntry : mUpdateCallbacks)\r\n  " +
                     "{\r\n    auto& callback = callbackEntry.second;\r\n    callback(this);\r\n  }\r\n}\r\n");
             
-            #line 453 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 451 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // if (objectClass.ChildClasses.Count == 0) 
             
             #line default
             #line hidden
             
-            #line 454 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 452 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // if (objectClass.HasValidAttributes) 
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 456 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 454 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // foreach (var objectClass in FOM.ObjectClasses) 
             
             #line default
@@ -1225,7 +1218,7 @@ void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
   mRtiAmbassador = rtiAmbassador;
 ");
             
-            #line 474 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 472 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
   foreach (var objectClass in FOM.ObjectClasses)
   {
@@ -1237,69 +1230,69 @@ void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
             #line hidden
             this.Write("  m");
             
-            #line 480 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 478 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass = std::unique_ptr<");
             
-            #line 480 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 478 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass>(new ");
             
-            #line 480 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 478 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass(mRtiAmbassador, m");
             
-            #line 480 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 478 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.BaseClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass.get()));\r\n");
             
-            #line 481 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 479 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } else { 
             
             #line default
             #line hidden
             this.Write("  m");
             
-            #line 482 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 480 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass = std::unique_ptr<");
             
-            #line 482 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 480 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass>(new ");
             
-            #line 482 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 480 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass(mRtiAmbassador));\r\n");
             
-            #line 483 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 481 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // if 
             
             #line default
             #line hidden
             
-            #line 484 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 482 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // foreach 
             
             #line default
@@ -1311,7 +1304,7 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 ");
             
-            #line 490 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 488 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
   bool first = true;
   foreach (var objectClass in FOM.ObjectClasses)
@@ -1321,12 +1314,26 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
             #line default
             #line hidden
             
-            #line 495 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 493 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   if (first) { 
             
             #line default
             #line hidden
             this.Write("  if (theObjectClass == m");
+            
+            #line 494 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
+            
+            #line 495 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+ } else { 
+            
+            #line default
+            #line hidden
+            this.Write("  else if (theObjectClass == m");
             
             #line 496 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
@@ -1336,20 +1343,6 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
             this.Write("ObjectClass->GetObjectClassHandle())\r\n");
             
             #line 497 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (theObjectClass == m");
-            
-            #line 498 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 499 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // if
    first=false;
 
@@ -1358,14 +1351,14 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
             #line hidden
             this.Write("  {\r\n    m");
             
-            #line 503 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 501 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);\r\n  }\r\n");
             
-            #line 505 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 503 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // foreach 
             
             #line default
@@ -1374,7 +1367,7 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
                     "le theObject)\r\n{\r\n  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador" +
                     "->getKnownObjectClassHandle(theObject);\r\n");
             
-            #line 511 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 509 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
   bool firstInRemoveObjectInstance = true;
   foreach (var objectClass in FOM.ObjectClasses)
@@ -1384,12 +1377,26 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
             #line default
             #line hidden
             
-            #line 516 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 514 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   if (firstInRemoveObjectInstance) { 
             
             #line default
             #line hidden
             this.Write("  if (theObjectClass == m");
+            
+            #line 515 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
+            
+            #line 516 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+ } else { 
+            
+            #line default
+            #line hidden
+            this.Write("  else if (theObjectClass == m");
             
             #line 517 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
@@ -1399,20 +1406,6 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
             this.Write("ObjectClass->GetObjectClassHandle())\r\n");
             
             #line 518 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (theObjectClass == m");
-            
-            #line 519 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 520 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // if
    firstInRemoveObjectInstance=false;
 
@@ -1421,14 +1414,14 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
             #line hidden
             this.Write("  {\r\n    m");
             
-            #line 524 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 522 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass->RemoveObjectInstance(theObject);\r\n  }\r\n");
             
-            #line 526 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 524 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // foreach 
             
             #line default
@@ -1440,7 +1433,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 ");
             
-            #line 532 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 530 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
   bool firstInClassRegistryReflectAttributeValues = true;
   foreach (var objectClass in FOM.ObjectClasses)
@@ -1453,6 +1446,20 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             #line hidden
             this.Write("  if (theObjectClass == m");
             
+            #line 537 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
+            
+            #line 538 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+    } else { 
+            
+            #line default
+            #line hidden
+            this.Write("  else if (theObjectClass == m");
+            
             #line 539 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
@@ -1461,20 +1468,6 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             this.Write("ObjectClass->GetObjectClassHandle())\r\n");
             
             #line 540 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-    } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (theObjectClass == m");
-            
-            #line 541 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 542 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
     } // if
       firstInClassRegistryReflectAttributeValues = false; 
             
@@ -1482,14 +1475,14 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             #line hidden
             this.Write("  {\r\n    static_cast<");
             
-            #line 545 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 543 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("*>(m");
             
-            #line 545 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 543 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -1497,7 +1490,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             this.Write("ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);\r\n" +
                     "  }\r\n");
             
-            #line 547 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 545 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   
     } // if (objectClass.hasValidAttributes)
 } // foreach 
@@ -1509,7 +1502,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
                     "e theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::At" +
                     "tributeHandleSet& attributeHandles)\r\n{\r\n");
             
-            #line 555 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 553 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  
   bool firstInClassRegistryProvideAttributeValues = true;
   foreach (var objectClass in FOM.ObjectClasses)
@@ -1522,6 +1515,20 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             #line hidden
             this.Write("  if (theObjectClass == m");
             
+            #line 560 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
+            
+            #line 561 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+    } else { 
+            
+            #line default
+            #line hidden
+            this.Write("  else if (theObjectClass == m");
+            
             #line 562 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
@@ -1530,20 +1537,6 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             this.Write("ObjectClass->GetObjectClassHandle())\r\n");
             
             #line 563 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-    } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (theObjectClass == m");
-            
-            #line 564 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 565 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
     } // if
       firstInClassRegistryProvideAttributeValues = false; 
             
@@ -1551,14 +1544,14 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             #line hidden
             this.Write("  {\r\n    static_cast<");
             
-            #line 568 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 566 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("*>(m");
             
-            #line 568 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 566 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
@@ -1566,7 +1559,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             this.Write("ObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandl" +
                     "es);\r\n  }\r\n");
             
-            #line 570 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 568 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
   
     } // if (objectClass.hasValidAttributes)
 } // foreach 
@@ -1603,21 +1596,21 @@ IObjectClassRegistry* GetObjectClassRegistry()
 
 ");
             
-            #line 601 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 599 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  foreach (var namespacePart in FOM.Namespace) { 
             
             #line default
             #line hidden
             this.Write("} // namespace ");
             
-            #line 602 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 600 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 603 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 601 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } 
             
             #line default

@@ -5,9 +5,8 @@
 #include <vector>
 #include <functional>
 
-#include "RTI/encoding/HLAopaqueData.h"
 #include "RTI/encoding/HLAhandle.h"
-#include "RTFederateEncodings.h"
+#include "RTFederateDataTypes.h"
 
 namespace NDistSimIB {
 namespace NRTFederateEncoding {

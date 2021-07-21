@@ -11,8 +11,7 @@
 #include <vector>
 #include <ostream>
 
-#include "RTI/encoding/HLAopaqueData.h"
-#include "RTI/encoding/HLAhandle.h"
+
 
 namespace NDistSimIB {
 namespace NRTFederateEncoding {

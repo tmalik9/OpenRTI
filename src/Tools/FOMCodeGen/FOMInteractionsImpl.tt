@@ -12,7 +12,6 @@
 #include <vector>
 #include <cassert>
 
-<#=FOM.PredefinedTypeIncludes#>
 <# if (FOM.IsFloatTime) { #>
 #include "RTI/time/HLAfloat64Time.h"
 <#} else {#>

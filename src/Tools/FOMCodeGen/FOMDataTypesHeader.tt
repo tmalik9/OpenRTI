@@ -27,7 +27,7 @@
 #include <vector>
 #include <ostream>
 
-<#=FOM.PredefinedTypeIncludes#>
+<#=FOM.GetPredefinedTypeIncludes(FOMParser.FileContext.kDataTypes)#>
 
 <#
 foreach (var namespacePart in FOM.Namespace)

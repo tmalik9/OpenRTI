@@ -10,7 +10,7 @@
 #include <vector>
 #include <functional>
 
-<#=FOM.PredefinedTypeIncludes#>
+<#=FOM.GetPredefinedTypeIncludes(FOMParser.FileContext.kInteractionInterfaces)#>
 #include "<#=DataTypesHeaderFilename#>"
 #include "<#=ObjectInterfacesHeaderFilename#>"
 

@@ -8,7 +8,7 @@
   {
     FOMParser FOM { get; set; }
     string EncodingHeaderFilename { get; set; }
-    public FOMEncodingImpl(FOMParser fom, string encodingHeaderFilename)
+    public FOMEncodingImpl(FOMParser fom, string encodingHeaderFilename, string includePath)
     {
       FOM = fom;
       EncodingHeaderFilename = System.IO.Path.GetFileName(encodingHeaderFilename);

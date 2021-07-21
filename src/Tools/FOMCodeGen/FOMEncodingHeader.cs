@@ -35,54 +35,56 @@ namespace FOMCodeGen
             
             #line default
             #line hidden
-            this.Write(", do not edit\r\n\r\n#pragma once\r\n\r\n#include <vector>\r\n#include <cstring>\r\n\r\n#includ" +
-                    "e \"RTI/encoding/BasicDataElements.h\"\r\n#include \"RTI/encoding/HLAfixedRecord.h\"\r\n" +
-                    "#include \"RTI/encoding/HLAfixedArray.h\"\r\n#include \"RTI/encoding/HLAvariableArray" +
-                    ".h\"\r\n");
+            this.Write(@", do not edit
+
+#pragma once
+
+#include <vector>
+#include <cstring>
+
+#include ""RTI/encoding/BasicDataElements.h""
+#include ""RTI/encoding/HLAfixedRecord.h""
+#include ""RTI/encoding/HLAfixedArray.h""
+#include ""RTI/encoding/HLAvariableArray.h""
+
+#include """);
             
-            #line 18 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.PredefinedTypeIncludes));
-            
-            #line default
-            #line hidden
-            this.Write("\r\n\r\n#include \"");
-            
-            #line 20 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 19 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(DataTypesHeaderFilename));
             
             #line default
             #line hidden
             this.Write("\"\r\n\r\n");
             
-            #line 22 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 21 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
  foreach (var namespacePart in FOM.Namespace) { 
             
             #line default
             #line hidden
             this.Write("namespace ");
             
-            #line 23 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 22 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write(" {\r\n");
             
-            #line 24 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 23 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 26 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 25 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.EncodingForwardDeclarations));
             
             #line default
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 28 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 27 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
 
 foreach (var dataType in FOM.DataTypes)
 {
@@ -95,28 +97,28 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("// simple data type ");
             
-            #line 35 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 34 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(simpleDataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\nusing ");
             
-            #line 36 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 35 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(simpleDataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding=");
             
-            #line 36 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 35 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(simpleDataType.Representation.Encoding));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 37 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 36 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
 }
   else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
   {
@@ -127,28 +129,28 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("// enumerated data type ");
             
-            #line 42 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 41 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeratedDataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\nusing ");
             
-            #line 43 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 42 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeratedDataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding=");
             
-            #line 43 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 42 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeratedDataType.Representation.Encoding));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 44 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 43 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
 }
   else if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
   {
@@ -159,70 +161,70 @@ foreach (var dataType in FOM.DataTypes)
             #line default
             #line hidden
             
-            #line 50 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 49 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 51 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 50 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } 
             
             #line default
             #line hidden
             this.Write("class ");
             
-            #line 52 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 51 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Encoding));
             
             #line default
             #line hidden
             this.Write(" : public ");
             
-            #line 52 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 51 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(", public rti1516ev::HLAfixedRecord\r\n{\r\n  public:\r\n    ");
             
-            #line 55 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 54 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding();\r\n    virtual ~");
             
-            #line 56 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 55 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding();\r\n    uint32_t getVersion() const override;\r\n");
             
-            #line 58 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 57 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
  foreach (var field in fixedRecordDataType.AllFields) { 
             
             #line default
             #line hidden
             this.Write("    void Set");
             
-            #line 59 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 58 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 59 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 58 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" value) override;\r\n");
             
-            #line 60 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 59 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
  if (field.DataType is FOMParser.ArrayDataType) {
      var arrayDataType = field.DataType as FOMParser.ArrayDataType;
 
@@ -231,70 +233,70 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    void Set");
             
-            #line 63 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 62 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(const ");
             
-            #line 63 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 62 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("* value, size_t size) override;\r\n");
             
-            #line 64 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 63 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 65 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 64 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" Get");
             
-            #line 65 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 64 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("() const override;\r\n    bool Is");
             
-            #line 66 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 65 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("Available() const override;\r\n");
             
-            #line 67 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 66 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
  } // foreach fixedRecordDataType.Fields 
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 68 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 67 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Encoding));
             
             #line default
             #line hidden
             this.Write("& operator=(const ");
             
-            #line 68 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 67 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("& ref);\r\n  private:\r\n");
             
-            #line 70 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 69 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
 
     foreach (var field in fixedRecordDataType.AllFields)
     {
@@ -304,21 +306,21 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    ");
             
-            #line 74 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 73 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write(" m");
             
-            #line 74 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 73 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 75 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 74 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
 
     } // foreach fixedRecordDataType.Fields
 
@@ -327,14 +329,14 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("}; // class ");
             
-            #line 78 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 77 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding\r\n\r\n");
             
-            #line 80 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 79 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
 
   } // if (dataType is FOMParser.FixedRecordDataType)
   else if (dataType is FOMParser.FixedArrayDataType && dataType.Generate)
@@ -348,20 +350,20 @@ foreach (var dataType in FOM.DataTypes)
             #line default
             #line hidden
             
-            #line 89 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 88 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 90 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 89 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } 
             
             #line default
             #line hidden
             
-            #line 91 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 90 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
     { // array of simple or basic types: access data by reference/pointer
 
@@ -370,210 +372,210 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("// fixed array of simple type ");
             
-            #line 94 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 93 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\nclass ");
             
-            #line 95 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 94 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding : public rti1516ev::HLAfixedArray\r\n{\r\n  public:\r\n    ");
             
-            #line 98 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 97 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding();\r\n");
             
-            #line 99 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 98 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
  if (cardinality > 0) {
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 100 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 99 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding(");
             
-            #line 100 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 99 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data);\r\n    using rti1516ev::HLAfixedArray::set;\r\n    void set(");
             
-            #line 102 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 101 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data);\r\n    void set(const ");
             
-            #line 103 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 102 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("* data, size_t size);\r\n    using rti1516ev::HLAfixedArray::get;\r\n    ");
             
-            #line 105 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 104 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" get() const;\r\n");
             
-            #line 106 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 105 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } else { 
             
             #line default
             #line hidden
             this.Write("    // cardinality is 0, no settable contents\r\n");
             
-            #line 108 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 107 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } 
             
             #line default
             #line hidden
             this.Write("  private:\r\n");
             
-            #line 110 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 109 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
  if (cardinality > 0) {
             
             #line default
             #line hidden
             this.Write("    std::vector<");
             
-            #line 111 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 110 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("> mData;\r\n    ");
             
-            #line 112 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 111 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write(" mEncoding[");
             
-            #line 112 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 111 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Cardinality));
             
             #line default
             #line hidden
             this.Write("];\r\n");
             
-            #line 113 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 112 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } 
             
             #line default
             #line hidden
             this.Write("}; // class ");
             
-            #line 114 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 113 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 115 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 114 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } else {  // array of complex type 
             
             #line default
             #line hidden
             this.Write("// fixed array of complex type ");
             
-            #line 116 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 115 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\nclass ");
             
-            #line 117 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 116 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding : public rti1516ev::HLAfixedArray\r\n{\r\n  public:\r\n    ");
             
-            #line 120 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 119 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding();\r\n");
             
-            #line 121 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 120 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
  if (cardinality > 0) {
             
             #line default
             #line hidden
             this.Write("    ");
             
-            #line 122 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 121 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding(");
             
-            #line 122 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 121 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data);\r\n    using rti1516ev::HLAfixedArray::set;\r\n    void set(");
             
-            #line 124 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 123 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data);\r\n    void set(const ");
             
-            #line 125 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 124 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("* data, size_t size);\r\n    // not yet supported: ");
             
-            #line 126 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 125 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" get() const;\r\n");
             
-            #line 127 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 126 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } 
             
             #line default
             #line hidden
             this.Write("  private:\r\n}; // class ");
             
-            #line 129 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 128 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 130 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 129 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } // if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
   }  // if (dataType is FOMParser.FixedArrayDataType)
   else if (dataType is FOMParser.VariableArrayDataType && dataType.Generate)
@@ -586,20 +588,20 @@ foreach (var dataType in FOM.DataTypes)
             #line default
             #line hidden
             
-            #line 138 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 137 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 139 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 138 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } 
             
             #line default
             #line hidden
             
-            #line 140 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 139 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
     { // array of simple or basic types: access data by reference/pointer
 
@@ -608,56 +610,56 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("// variable array of simple type ");
             
-            #line 143 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 142 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\nclass ");
             
-            #line 144 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 143 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding : public rti1516ev::HLAvariableArray\r\n{\r\n  public:\r\n    ");
             
-            #line 147 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 146 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding();\r\n    ");
             
-            #line 148 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 147 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding(");
             
-            #line 148 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 147 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data);\r\n    using rti1516ev::HLAvariableArray::set;\r\n    void set(");
             
-            #line 150 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 149 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data);\r\n    void set(const ");
             
-            #line 151 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 150 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("* data, size_t size);\r\n    using rti1516ev::HLAvariableArray::get;\r\n    ");
             
-            #line 153 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 152 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ReturnCppType));
             
             #line default
@@ -667,91 +669,91 @@ foreach (var dataType in FOM.DataTypes)
                     "ize_t bufferSize, size_t index) override;\r\n  private:\r\n    void update();\r\n    s" +
                     "td::vector<");
             
-            #line 159 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 158 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("> mData;\r\n    std::vector<");
             
-            #line 160 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 159 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("> mEncoding;\r\n}; // class ");
             
-            #line 161 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 160 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 163 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 162 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } else { 
             
             #line default
             #line hidden
             this.Write("// variable array of complex type ");
             
-            #line 164 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 163 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\nclass ");
             
-            #line 165 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 164 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding : public rti1516ev::HLAvariableArray\r\n{\r\n  public:\r\n    ");
             
-            #line 168 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 167 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding();\r\n    ");
             
-            #line 169 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 168 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding(");
             
-            #line 169 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 168 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data);\r\n    using rti1516ev::HLAvariableArray::set;\r\n    void set(");
             
-            #line 171 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 170 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ConstRefCppType));
             
             #line default
             #line hidden
             this.Write(" data);\r\n    void set(");
             
-            #line 172 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 171 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.RefCppType));
             
             #line default
             #line hidden
             this.Write(" data);\r\n    void set(const ");
             
-            #line 173 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 172 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("* data, size_t size);\r\n    void set(");
             
-            #line 174 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 173 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
@@ -759,14 +761,14 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("* data, size_t size);\r\n    virtual size_t decodeFrom(const rti1516ev::Octet* buff" +
                     "er, size_t bufferSize, size_t index) override;\r\n}; // class ");
             
-            #line 176 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 175 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 178 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 177 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
 
     } // if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
   } // if (dataType is FOMParser.VariableArrayDataType)
@@ -776,7 +778,7 @@ foreach (var dataType in FOM.DataTypes)
             #line default
             #line hidden
             
-            #line 183 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 182 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
 
 foreach (var namespacePart in FOM.Namespace)
 {
@@ -786,14 +788,14 @@ foreach (var namespacePart in FOM.Namespace)
             #line hidden
             this.Write("} // namespace ");
             
-            #line 187 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 186 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 188 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
+            #line 187 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingHeader.tt"
   } 
             
             #line default

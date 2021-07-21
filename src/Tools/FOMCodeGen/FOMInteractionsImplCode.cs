@@ -9,7 +9,7 @@
     FOMParser FOM { get; set; }
     string InteractionsHeaderFilename { get; set; }
     string ObjectsHeaderFilename { get; set; }
-    public FOMInteractionsImpl(FOMParser fom, string interactionsHeaderFilename, string objectsHeaderFilename)
+    public FOMInteractionsImpl(FOMParser fom, string interactionsHeaderFilename, string objectsHeaderFilename, string includePath)
     {
       FOM = fom;
       InteractionsHeaderFilename = System.IO.Path.GetFileName(interactionsHeaderFilename);

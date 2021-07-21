@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.Linq;
+using System.Text;
 
 namespace FOMCodeGen
 {
@@ -319,6 +321,8 @@ namespace FOMCodeGen
         _include = include;
         _passByReference = false;
       }
+      // a 'predefined type' represents an encoder defined in some HLA header (such as HLAopaqueData, HLAhandle),
+      // *except* basic types, and for which there is no direct C++ equivalent.
       public PredefinedType(string name, string include, string cppType, bool passByReference) : base(name)
       {
         _cppType = cppType;
@@ -658,24 +662,27 @@ namespace FOMCodeGen
       { "HLAunicodeChar", "wchar_t" },
       { "HLAunicodeString", "std::wstring" },
     };
-
     private List<PredefinedType> mPredefinedTypes = new List<PredefinedType>()
     {
       new PredefinedType("HLAopaqueData", "#include \"RTI/encoding/HLAopaqueData.h\"", "std::vector<uint8_t>", true),
       new PredefinedType("HLAhandle", "#include \"RTI/encoding/HLAhandle.h\""),
       new ObjectInstanceHandleType()
     };
-
-    private HashSet<string> mPredefinedTypeIncludes = new HashSet<string>();
-
-    public string PredefinedTypeIncludes
+    public enum FileContext { kDataTypes, kObjectInterfaces, kObjectHeader, kInteractionInterfaces, kInteractionHeader };
+    Dictionary<FileContext, HashSet<string>> mPredefinedTypeIncludes = new Dictionary<FileContext, HashSet<string>>()
     {
-      get
-      {
-        string[] lines = new string[mPredefinedTypeIncludes.Count];
-        mPredefinedTypeIncludes.CopyTo(lines);
-        return string.Join("\n", lines);
-      }
+      [FileContext.kDataTypes] = new HashSet<string>(),
+      [FileContext.kObjectInterfaces] = new HashSet<string>(),
+      [FileContext.kObjectHeader] = new HashSet<string>(),
+      [FileContext.kInteractionInterfaces] = new HashSet<string>(),
+      [FileContext.kInteractionHeader] = new HashSet<string>(),
+    };
+
+    public string GetPredefinedTypeIncludes(FileContext context)
+    {
+      string[] lines = new string[mPredefinedTypeIncludes[context].Count];
+      mPredefinedTypeIncludes[context].CopyTo(lines);
+      return string.Join("\n", lines);
     }
 
     private HashSet<string> mDataTypeForwardDeclarations = new HashSet<string>();
@@ -734,26 +741,29 @@ namespace FOMCodeGen
       else
         return "static_cast<const rti1516ev::HLAinteger64Time&>(" + param + ").getTime()";
     }
-    DataType GetDataType(string name, bool replaceWithUnresolved = true)
+    DataType GetDataType(string name, FileContext context)
     {
       DataType result = DataTypes.Find(dataType => dataType.Name == name);
       if (result != null)
       {
         if (result is PredefinedType)
         {
-          mPredefinedTypeIncludes.Add((result as PredefinedType).Include);
+          if (!result.CanTranslateToCpp)
+          {
+            mPredefinedTypeIncludes[context].Add((result as PredefinedType).Include);
+          }
+          if (context == FileContext.kObjectInterfaces)
+          {
+            mPredefinedTypeIncludes[FileContext.kObjectHeader].Add((result as PredefinedType).Include);
+          }
         }
         return result;
       }
-      else if (replaceWithUnresolved)
+      else
       {
         mDataTypeForwardDeclarations.Add("class " + name + ";");
         mEncodingForwardDeclarations.Add("class " + name + "Encoding;");
         return new UnresolvedDataType(name);
-      }
-      else
-      {
-        return null;
       }
     }
     bool IsBasicOrPredefinedType(string name)
@@ -784,6 +794,7 @@ namespace FOMCodeGen
       }
       return result;
     }
+
     // Compare data types according to dependency/usage:
     // If x is using y, y must be defined first.
     // If y is using x, x must be defined first.
@@ -808,7 +819,7 @@ namespace FOMCodeGen
         return;
       }
       string representation = simpleDataTypeNode["representation"].FirstChild.InnerText;
-      var representationType = GetDataType(representation) as BasicDataRepresentation;
+      var representationType = GetDataType(representation, FileContext.kDataTypes) as BasicDataRepresentation;
       var simpleType = new SimpleDataType(name, representationType);
       simpleType.Index = index++;
       simpleType.Generate = (simpleDataTypeNode["nocode"] == null);
@@ -825,7 +836,7 @@ namespace FOMCodeGen
         return;
       }
       string representation = enumeratedDataTypeNode["representation"].FirstChild.InnerText;
-      var representationType = GetDataType(representation) as BasicDataRepresentation;
+      var representationType = GetDataType(representation, FileContext.kDataTypes) as BasicDataRepresentation;
       var enumeratedDataType = new EnumeratedDataType(name, representationType);
       foreach (XmlElement enumeratorNode in enumeratedDataTypeNode.SelectNodes("enumerator"))
       {
@@ -863,14 +874,14 @@ namespace FOMCodeGen
         }
         if (dataType == "HLAunicodeChar")
         {
-          var simpleType = new SimpleDataType(name, GetDataType("HLAunicodeString") as BasicDataRepresentation);
+          var simpleType = new SimpleDataType(name, GetDataType("HLAunicodeString", FileContext.kDataTypes) as BasicDataRepresentation);
           simpleType.Generate = generate;
           DataTypes.Add(simpleType);
           simpleType.Index = index++;
         }
         else
         {
-          var arrayDataType = new VariableArrayDataType(name, GetDataType(dataType));
+          var arrayDataType = new VariableArrayDataType(name, GetDataType(dataType, FileContext.kDataTypes));
           arrayDataType.Generate = generate;
           arrayDataType.Comment = comment;
           DataTypes.Add(arrayDataType);
@@ -884,7 +895,7 @@ namespace FOMCodeGen
         {
           throw new ApplicationException("array with encoding \"HLAfixedArray\" must specify integer cardinality");
         }
-        var arrayDataType = new FixedArrayDataType(name, GetDataType(dataType), cardinality);
+        var arrayDataType = new FixedArrayDataType(name, GetDataType(dataType, FileContext.kDataTypes), cardinality);
         arrayDataType.Generate = (arrayDataTypeNode["nocode"] == null);
         if (arrayDataTypeNode["semantics"] != null)
           arrayDataType.Comment = arrayDataTypeNode["semantics"].FirstChild.InnerText;
@@ -911,7 +922,7 @@ namespace FOMCodeGen
         {
           throw new ApplicationException("fixed record \"" + name + "\" can only have one 'included' base record");
         }
-        includedFixedRecordType = GetDataType(fixedRecordDataTypeNode["include"].FirstChild.InnerText) as FixedRecordDataType;
+        includedFixedRecordType = GetDataType(fixedRecordDataTypeNode["include"].FirstChild.InnerText, FileContext.kDataTypes) as FixedRecordDataType;
         includedFixedRecordType.HasChilds = true;
       }
 
@@ -944,7 +955,7 @@ namespace FOMCodeGen
             throw new ApplicationException("field version must be an integer: \"" + versionString + "\"");
           }
         }
-        var field = new FixedRecordField(fieldName, GetDataType(fieldDataType), fieldVersion);
+        var field = new FixedRecordField(fieldName, GetDataType(fieldDataType, FileContext.kDataTypes), fieldVersion);
         if (fieldNode["semantics"] != null && fieldNode["semantics"].FirstChild != null)
         {
           field.Comment = fieldNode["semantics"].FirstChild.InnerText;
@@ -993,7 +1004,7 @@ namespace FOMCodeGen
         objectClass.Attributes.Add(attribute);
         if (attributeNode["dataType"] != null)
         {
-          DataType dataType = GetDataType(attributeNode["dataType"].FirstChild.InnerText);
+          DataType dataType = GetDataType(attributeNode["dataType"].FirstChild.InnerText, FileContext.kObjectInterfaces);
           attribute.DataType = dataType;
         }
       }
@@ -1036,7 +1047,7 @@ namespace FOMCodeGen
         XmlElement dataTypeElement = parameterNode["dataType"];
         if (dataTypeElement != null)
         {
-          DataType dataType = GetDataType(dataTypeElement.FirstChild.InnerText);
+          DataType dataType = GetDataType(dataTypeElement.FirstChild.InnerText, FileContext.kObjectInterfaces);
           string dataTypeElementClassAttribute = dataTypeElement.GetAttribute("class");
           if (dataType is ObjectInstanceHandleType && dataTypeElementClassAttribute != null)
           {
