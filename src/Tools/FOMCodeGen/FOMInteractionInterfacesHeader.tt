@@ -51,8 +51,6 @@ class IInteractionClassRegistry
     virtual ~IInteractionClassRegistry() {}
 }; // class IInteractionClassRegistry
 
-IInteractionClassRegistry* GetInteractionClassRegistry();
-
 <# foreach (var namespacePart in FOM.Namespace) { #>
 } // namespace <#=namespacePart#>
 <# } #>

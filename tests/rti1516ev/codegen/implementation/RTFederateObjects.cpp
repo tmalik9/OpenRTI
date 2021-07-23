@@ -8,8 +8,9 @@
 
 namespace NDistSimIB {
 namespace NRTFederateEncoding {
-HLAobjectRootObjectClass::HLAobjectRootObjectClass(rti1516ev::RTIambassador* rtiAmbassador)
+HLAobjectRootObjectClass::HLAobjectRootObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot");
 // attribute HLAobjectRoot.HLAprivilegeToDeleteObject : no data type
@@ -114,7 +115,7 @@ IHLAobjectRoot* HLAobjectRootObjectClass::CreateObjectInstance(const std::wstrin
     throw rti1516ev::ObjectClassNotPublished(L"HLAobjectRoot");
   }
   HLAobjectRoot* newObject = new HLAobjectRoot(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -191,8 +192,9 @@ rti1516ev::AttributeHandleValueMap HLAobjectRoot::GetModifiedAttributeValues() c
 
 
 // object class type 'SystemVariable'
-SystemVariableObjectClass::SystemVariableObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass)
+SystemVariableObjectClass::SystemVariableObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.SystemVariable");
@@ -299,7 +301,7 @@ ISystemVariable* SystemVariableObjectClass::CreateObjectInstance(const std::wstr
     throw rti1516ev::ObjectClassNotPublished(L"SystemVariable");
   }
   SystemVariable* newObject = new SystemVariable(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -498,8 +500,9 @@ void SystemVariable::ExecuteUpdateCallbacks()
 }
 
 // object class type 'ValueEntity'
-ValueEntityObjectClass::ValueEntityObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass)
+ValueEntityObjectClass::ValueEntityObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ValueEntity");
@@ -606,7 +609,7 @@ IValueEntity* ValueEntityObjectClass::CreateObjectInstance(const std::wstring& i
     throw rti1516ev::ObjectClassNotPublished(L"ValueEntity");
   }
   ValueEntity* newObject = new ValueEntity(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -805,8 +808,9 @@ void ValueEntity::ExecuteUpdateCallbacks()
 }
 
 // object class type 'DOMemberSource'
-DOMemberSourceObjectClass::DOMemberSourceObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass)
+DOMemberSourceObjectClass::DOMemberSourceObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.DOMemberSource");
@@ -917,7 +921,7 @@ IDOMemberSource* DOMemberSourceObjectClass::CreateObjectInstance(const std::wstr
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberSource");
   }
   DOMemberSource* newObject = new DOMemberSource(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -1184,8 +1188,9 @@ void DOMemberSource::ExecuteUpdateCallbacks()
 }
 
 // object class type 'DOMemberTarget'
-DOMemberTargetObjectClass::DOMemberTargetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass)
+DOMemberTargetObjectClass::DOMemberTargetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.DOMemberTarget");
@@ -1294,7 +1299,7 @@ IDOMemberTarget* DOMemberTargetObjectClass::CreateObjectInstance(const std::wstr
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberTarget");
   }
   DOMemberTarget* newObject = new DOMemberTarget(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -1527,8 +1532,9 @@ void DOMemberTarget::ExecuteUpdateCallbacks()
 }
 
 // object class type 'BusManagement'
-BusManagementObjectClass::BusManagementObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass)
+BusManagementObjectClass::BusManagementObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusManagement");
@@ -1635,7 +1641,7 @@ IBusManagement* BusManagementObjectClass::CreateObjectInstance(const std::wstrin
     throw rti1516ev::ObjectClassNotPublished(L"BusManagement");
   }
   BusManagement* newObject = new BusManagement(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -1813,8 +1819,9 @@ void BusManagement::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& 
 
 
 // object class type 'BusManagementCan'
-BusManagementCanObjectClass::BusManagementCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass)
+BusManagementCanObjectClass::BusManagementCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusManagement.BusManagementCan");
@@ -1927,7 +1934,7 @@ IBusManagementCan* BusManagementCanObjectClass::CreateObjectInstance(const std::
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementCan");
   }
   BusManagementCan* newObject = new BusManagementCan(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -2243,8 +2250,9 @@ void BusManagementCan::ExecuteUpdateCallbacks()
 }
 
 // object class type 'BusManagementEthernet'
-BusManagementEthernetObjectClass::BusManagementEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass)
+BusManagementEthernetObjectClass::BusManagementEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusManagement.BusManagementEthernet");
@@ -2353,7 +2361,7 @@ IBusManagementEthernet* BusManagementEthernetObjectClass::CreateObjectInstance(c
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementEthernet");
   }
   BusManagementEthernet* newObject = new BusManagementEthernet(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -2601,8 +2609,9 @@ void BusManagementEthernet::ExecuteUpdateCallbacks()
 }
 
 // object class type 'FlexRayCluster'
-FlexRayClusterObjectClass::FlexRayClusterObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass)
+FlexRayClusterObjectClass::FlexRayClusterObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusManagement.FlexRayCluster");
@@ -2747,7 +2756,7 @@ IFlexRayCluster* FlexRayClusterObjectClass::CreateObjectInstance(const std::wstr
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayCluster");
   }
   FlexRayCluster* newObject = new FlexRayCluster(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -3607,8 +3616,9 @@ void FlexRayCluster::ExecuteUpdateCallbacks()
 }
 
 // object class type 'BusController'
-BusControllerObjectClass::BusControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass)
+BusControllerObjectClass::BusControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusController");
@@ -3717,7 +3727,7 @@ IBusController* BusControllerObjectClass::CreateObjectInstance(const std::wstrin
     throw rti1516ev::ObjectClassNotPublished(L"BusController");
   }
   BusController* newObject = new BusController(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -3929,8 +3939,9 @@ void BusController::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& 
 
 
 // object class type 'BusControllerCan'
-BusControllerCanObjectClass::BusControllerCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass)
+BusControllerCanObjectClass::BusControllerCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusController.BusControllerCan");
@@ -4053,7 +4064,7 @@ IBusControllerCan* BusControllerCanObjectClass::CreateObjectInstance(const std::
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerCan");
   }
   BusControllerCan* newObject = new BusControllerCan(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -4554,8 +4565,9 @@ void BusControllerCan::ExecuteUpdateCallbacks()
 }
 
 // object class type 'BusControllerEthernet'
-BusControllerEthernetObjectClass::BusControllerEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass)
+BusControllerEthernetObjectClass::BusControllerEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusController.BusControllerEthernet");
@@ -4662,7 +4674,7 @@ IBusControllerEthernet* BusControllerEthernetObjectClass::CreateObjectInstance(c
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerEthernet");
   }
   BusControllerEthernet* newObject = new BusControllerEthernet(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -4891,8 +4903,9 @@ void BusControllerEthernet::ExecuteUpdateCallbacks()
 }
 
 // object class type 'FlexRayControllerStatus'
-FlexRayControllerStatusObjectClass::FlexRayControllerStatusObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass)
+FlexRayControllerStatusObjectClass::FlexRayControllerStatusObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusController.FlexRayControllerStatus");
@@ -5015,7 +5028,7 @@ IFlexRayControllerStatus* FlexRayControllerStatusObjectClass::CreateObjectInstan
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayControllerStatus");
   }
   FlexRayControllerStatus* newObject = new FlexRayControllerStatus(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -5516,8 +5529,9 @@ void FlexRayControllerStatus::ExecuteUpdateCallbacks()
 }
 
 // object class type 'FlexRayController'
-FlexRayControllerObjectClass::FlexRayControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass)
+FlexRayControllerObjectClass::FlexRayControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusController.FlexRayController");
@@ -5672,7 +5686,7 @@ IFlexRayController* FlexRayControllerObjectClass::CreateObjectInstance(const std
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayController");
   }
   FlexRayController* newObject = new FlexRayController(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -6717,12 +6731,13 @@ void FlexRayController::ExecuteUpdateCallbacks()
 }
 
 // object class type 'FlexRaySendBuffer'
-FlexRaySendBufferObjectClass::FlexRaySendBufferObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass)
+FlexRaySendBufferObjectClass::FlexRaySendBufferObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass)
 {
+  mRegistry = registry;
   mRtiAmbassador = rtiAmbassador;
   mBaseClass = baseClass;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.FlexRaySendBuffer");
-  // attribute Sender : HLAhandle
+  // attribute Sender : HLAobjectInstanceHandle.FlexRayController
   mSenderAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"Sender");
   // attribute TransmissionMode : FlexRayTransmissionMode
   mTransmissionModeAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"TransmissionMode");
@@ -6841,7 +6856,7 @@ IFlexRaySendBuffer* FlexRaySendBufferObjectClass::CreateObjectInstance(const std
     throw rti1516ev::ObjectClassNotPublished(L"FlexRaySendBuffer");
   }
   FlexRaySendBuffer* newObject = new FlexRaySendBuffer(this, instanceName, mRtiAmbassador);
-  ObjectClassRegistry::GetInstance()->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
@@ -6913,16 +6928,16 @@ FlexRaySendBuffer::~FlexRaySendBuffer()
 
 // attribute FlexRaySendBuffer.HLAprivilegeToDeleteObject : no data type
 
-// attribute Sender : HLAhandle
-rti1516ev::HLAhandle FlexRaySendBuffer::GetSender() const
+// attribute Sender : HLAobjectInstanceHandle.FlexRayController
+IFlexRayController* FlexRaySendBuffer::GetSender() const
 {
-  return mSender;
+  return static_cast<FlexRayControllerObjectClass*>(GetObjectClassRegistry()->GetFlexRayControllerObjectClass())->GetObjectInstance(mSender.get());
 }
 
-void FlexRaySendBuffer::SetSender(rti1516ev::HLAhandle newValue)
+void FlexRaySendBuffer::SetSender(IFlexRayController* newValue)
 {
-  // CanTranslateToCpp=False
-  mSender.set(newValue);
+  // CanTranslateToCpp=True
+  mSender.set(static_cast<FlexRayController*>(newValue)->GetObjectInstanceHandle());
   mDirty |= kSenderBit;
 }
 
@@ -6941,6 +6956,11 @@ void FlexRaySendBuffer::SetTransmissionMode(FlexRayTransmissionMode newValue)
 
 // attribute Payload : FlexRayPayload
 const FlexRayPayload& FlexRaySendBuffer::GetPayload() const
+{
+  return mPayload;
+}
+
+FlexRayPayload& FlexRaySendBuffer::GetPayload()
 {
   return mPayload;
 }
@@ -7313,99 +7333,185 @@ void FlexRaySendBuffer::ExecuteUpdateCallbacks()
 
  
 
-ObjectClassRegistry* ObjectClassRegistry::sClassRegistry = nullptr;
-
 ObjectClassRegistry::ObjectClassRegistry()
+  : mRtiAmbassador(nullptr)
 {
-  assert(sClassRegistry == nullptr);
-  sClassRegistry = this;
 }
 
 ObjectClassRegistry::~ObjectClassRegistry()
 {
-  sClassRegistry = nullptr;
 }
 
 void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 {
   mRtiAmbassador = rtiAmbassador;
-  mHLAobjectRootObjectClass = std::unique_ptr<HLAobjectRootObjectClass>(new HLAobjectRootObjectClass(mRtiAmbassador));
-  mSystemVariableObjectClass = std::unique_ptr<SystemVariableObjectClass>(new SystemVariableObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
-  mValueEntityObjectClass = std::unique_ptr<ValueEntityObjectClass>(new ValueEntityObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
-  mDOMemberSourceObjectClass = std::unique_ptr<DOMemberSourceObjectClass>(new DOMemberSourceObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
-  mDOMemberTargetObjectClass = std::unique_ptr<DOMemberTargetObjectClass>(new DOMemberTargetObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
-  mBusManagementObjectClass = std::unique_ptr<BusManagementObjectClass>(new BusManagementObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
-  mBusManagementCanObjectClass = std::unique_ptr<BusManagementCanObjectClass>(new BusManagementCanObjectClass(mRtiAmbassador, mBusManagementObjectClass.get()));
-  mBusManagementEthernetObjectClass = std::unique_ptr<BusManagementEthernetObjectClass>(new BusManagementEthernetObjectClass(mRtiAmbassador, mBusManagementObjectClass.get()));
-  mFlexRayClusterObjectClass = std::unique_ptr<FlexRayClusterObjectClass>(new FlexRayClusterObjectClass(mRtiAmbassador, mBusManagementObjectClass.get()));
-  mBusControllerObjectClass = std::unique_ptr<BusControllerObjectClass>(new BusControllerObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
-  mBusControllerCanObjectClass = std::unique_ptr<BusControllerCanObjectClass>(new BusControllerCanObjectClass(mRtiAmbassador, mBusControllerObjectClass.get()));
-  mBusControllerEthernetObjectClass = std::unique_ptr<BusControllerEthernetObjectClass>(new BusControllerEthernetObjectClass(mRtiAmbassador, mBusControllerObjectClass.get()));
-  mFlexRayControllerStatusObjectClass = std::unique_ptr<FlexRayControllerStatusObjectClass>(new FlexRayControllerStatusObjectClass(mRtiAmbassador, mBusControllerObjectClass.get()));
-  mFlexRayControllerObjectClass = std::unique_ptr<FlexRayControllerObjectClass>(new FlexRayControllerObjectClass(mRtiAmbassador, mBusControllerObjectClass.get()));
-  mFlexRaySendBufferObjectClass = std::unique_ptr<FlexRaySendBufferObjectClass>(new FlexRaySendBufferObjectClass(mRtiAmbassador, mHLAobjectRootObjectClass.get()));
+  try
+  {
+    mHLAobjectRootObjectClass = std::unique_ptr<HLAobjectRootObjectClass>(new HLAobjectRootObjectClass(mRtiAmbassador, this));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mSystemVariableObjectClass = std::unique_ptr<SystemVariableObjectClass>(new SystemVariableObjectClass(mRtiAmbassador, this, mHLAobjectRootObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mValueEntityObjectClass = std::unique_ptr<ValueEntityObjectClass>(new ValueEntityObjectClass(mRtiAmbassador, this, mHLAobjectRootObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mDOMemberSourceObjectClass = std::unique_ptr<DOMemberSourceObjectClass>(new DOMemberSourceObjectClass(mRtiAmbassador, this, mHLAobjectRootObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mDOMemberTargetObjectClass = std::unique_ptr<DOMemberTargetObjectClass>(new DOMemberTargetObjectClass(mRtiAmbassador, this, mHLAobjectRootObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mBusManagementObjectClass = std::unique_ptr<BusManagementObjectClass>(new BusManagementObjectClass(mRtiAmbassador, this, mHLAobjectRootObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mBusManagementCanObjectClass = std::unique_ptr<BusManagementCanObjectClass>(new BusManagementCanObjectClass(mRtiAmbassador, this, mBusManagementObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mBusManagementEthernetObjectClass = std::unique_ptr<BusManagementEthernetObjectClass>(new BusManagementEthernetObjectClass(mRtiAmbassador, this, mBusManagementObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mFlexRayClusterObjectClass = std::unique_ptr<FlexRayClusterObjectClass>(new FlexRayClusterObjectClass(mRtiAmbassador, this, mBusManagementObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mBusControllerObjectClass = std::unique_ptr<BusControllerObjectClass>(new BusControllerObjectClass(mRtiAmbassador, this, mHLAobjectRootObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mBusControllerCanObjectClass = std::unique_ptr<BusControllerCanObjectClass>(new BusControllerCanObjectClass(mRtiAmbassador, this, mBusControllerObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mBusControllerEthernetObjectClass = std::unique_ptr<BusControllerEthernetObjectClass>(new BusControllerEthernetObjectClass(mRtiAmbassador, this, mBusControllerObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mFlexRayControllerStatusObjectClass = std::unique_ptr<FlexRayControllerStatusObjectClass>(new FlexRayControllerStatusObjectClass(mRtiAmbassador, this, mBusControllerObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mFlexRayControllerObjectClass = std::unique_ptr<FlexRayControllerObjectClass>(new FlexRayControllerObjectClass(mRtiAmbassador, this, mBusControllerObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mFlexRaySendBufferObjectClass = std::unique_ptr<FlexRaySendBufferObjectClass>(new FlexRaySendBufferObjectClass(mRtiAmbassador, this, mHLAobjectRootObjectClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
 } // Initialize
 
 void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-  if (theObjectClass == mHLAobjectRootObjectClass->GetObjectClassHandle())
+  if (mHLAobjectRootObjectClass != nullptr && theObjectClass == mHLAobjectRootObjectClass->GetObjectClassHandle())
   {
     mHLAobjectRootObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
+  else if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
     mSystemVariableObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
+  else if (mValueEntityObjectClass != nullptr && theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
   {
     mValueEntityObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
+  else if (mDOMemberSourceObjectClass != nullptr && theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
   {
     mDOMemberSourceObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
+  else if (mDOMemberTargetObjectClass != nullptr && theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
   {
     mDOMemberTargetObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
+  else if (mBusManagementObjectClass != nullptr && theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
   {
     mBusManagementObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
+  else if (mBusManagementCanObjectClass != nullptr && theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
   {
     mBusManagementCanObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
+  else if (mBusManagementEthernetObjectClass != nullptr && theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
   {
     mBusManagementEthernetObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
+  else if (mFlexRayClusterObjectClass != nullptr && theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
   {
     mFlexRayClusterObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
+  else if (mBusControllerObjectClass != nullptr && theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
     mBusControllerObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
+  else if (mBusControllerCanObjectClass != nullptr && theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
     mBusControllerCanObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
+  else if (mBusControllerEthernetObjectClass != nullptr && theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
   {
     mBusControllerEthernetObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
+  else if (mFlexRayControllerStatusObjectClass != nullptr && theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
   {
     mFlexRayControllerStatusObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
+  else if (mFlexRayControllerObjectClass != nullptr && theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
   {
     mFlexRayControllerObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
-  else if (theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
+  else if (mFlexRaySendBufferObjectClass != nullptr && theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
   {
     mFlexRaySendBufferObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
   }
@@ -7414,63 +7520,63 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
 void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-  if (theObjectClass == mHLAobjectRootObjectClass->GetObjectClassHandle())
+  if (mHLAobjectRootObjectClass != nullptr && theObjectClass == mHLAobjectRootObjectClass->GetObjectClassHandle())
   {
     mHLAobjectRootObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
+  else if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
     mSystemVariableObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
+  else if (mValueEntityObjectClass != nullptr && theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
   {
     mValueEntityObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
+  else if (mDOMemberSourceObjectClass != nullptr && theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
   {
     mDOMemberSourceObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
+  else if (mDOMemberTargetObjectClass != nullptr && theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
   {
     mDOMemberTargetObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
+  else if (mBusManagementObjectClass != nullptr && theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
   {
     mBusManagementObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
+  else if (mBusManagementCanObjectClass != nullptr && theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
   {
     mBusManagementCanObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
+  else if (mBusManagementEthernetObjectClass != nullptr && theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
   {
     mBusManagementEthernetObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
+  else if (mFlexRayClusterObjectClass != nullptr && theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
   {
     mFlexRayClusterObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
+  else if (mBusControllerObjectClass != nullptr && theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
     mBusControllerObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
+  else if (mBusControllerCanObjectClass != nullptr && theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
     mBusControllerCanObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
+  else if (mBusControllerEthernetObjectClass != nullptr && theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
   {
     mBusControllerEthernetObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
+  else if (mFlexRayControllerStatusObjectClass != nullptr && theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
   {
     mFlexRayControllerStatusObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
+  else if (mFlexRayControllerObjectClass != nullptr && theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
   {
     mFlexRayControllerObjectClass->RemoveObjectInstance(theObject);
   }
-  else if (theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
+  else if (mFlexRaySendBufferObjectClass != nullptr && theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
   {
     mFlexRaySendBufferObjectClass->RemoveObjectInstance(theObject);
   }
@@ -7479,59 +7585,59 @@ void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle t
 void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
 {
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-  if (theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
+  if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
     static_cast<SystemVariable*>(mSystemVariableObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
+  else if (mValueEntityObjectClass != nullptr && theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
   {
     static_cast<ValueEntity*>(mValueEntityObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
+  else if (mDOMemberSourceObjectClass != nullptr && theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
   {
     static_cast<DOMemberSource*>(mDOMemberSourceObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
+  else if (mDOMemberTargetObjectClass != nullptr && theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
   {
     static_cast<DOMemberTarget*>(mDOMemberTargetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
+  else if (mBusManagementObjectClass != nullptr && theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
   {
     static_cast<BusManagement*>(mBusManagementObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
+  else if (mBusManagementCanObjectClass != nullptr && theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
   {
     static_cast<BusManagementCan*>(mBusManagementCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
+  else if (mBusManagementEthernetObjectClass != nullptr && theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
   {
     static_cast<BusManagementEthernet*>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
+  else if (mFlexRayClusterObjectClass != nullptr && theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
   {
     static_cast<FlexRayCluster*>(mFlexRayClusterObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
+  else if (mBusControllerObjectClass != nullptr && theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
     static_cast<BusController*>(mBusControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
+  else if (mBusControllerCanObjectClass != nullptr && theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
     static_cast<BusControllerCan*>(mBusControllerCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
+  else if (mBusControllerEthernetObjectClass != nullptr && theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
   {
     static_cast<BusControllerEthernet*>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
+  else if (mFlexRayControllerStatusObjectClass != nullptr && theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
   {
     static_cast<FlexRayControllerStatus*>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
+  else if (mFlexRayControllerObjectClass != nullptr && theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
   {
     static_cast<FlexRayController*>(mFlexRayControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
-  else if (theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
+  else if (mFlexRaySendBufferObjectClass != nullptr && theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
   {
     static_cast<FlexRaySendBuffer*>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
@@ -7539,61 +7645,117 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 
 void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  if (theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
+  if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
-    static_cast<SystemVariable*>(mSystemVariableObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<SystemVariable*>(mSystemVariableObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
+  else if (mValueEntityObjectClass != nullptr && theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
   {
-    static_cast<ValueEntity*>(mValueEntityObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<ValueEntity*>(mValueEntityObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
+  else if (mDOMemberSourceObjectClass != nullptr && theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
   {
-    static_cast<DOMemberSource*>(mDOMemberSourceObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<DOMemberSource*>(mDOMemberSourceObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
+  else if (mDOMemberTargetObjectClass != nullptr && theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
   {
-    static_cast<DOMemberTarget*>(mDOMemberTargetObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<DOMemberTarget*>(mDOMemberTargetObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
+  else if (mBusManagementObjectClass != nullptr && theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
   {
-    static_cast<BusManagement*>(mBusManagementObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<BusManagement*>(mBusManagementObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
+  else if (mBusManagementCanObjectClass != nullptr && theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
   {
-    static_cast<BusManagementCan*>(mBusManagementCanObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<BusManagementCan*>(mBusManagementCanObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
+  else if (mBusManagementEthernetObjectClass != nullptr && theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
   {
-    static_cast<BusManagementEthernet*>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<BusManagementEthernet*>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
+  else if (mFlexRayClusterObjectClass != nullptr && theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
   {
-    static_cast<FlexRayCluster*>(mFlexRayClusterObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<FlexRayCluster*>(mFlexRayClusterObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
+  else if (mBusControllerObjectClass != nullptr && theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
-    static_cast<BusController*>(mBusControllerObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<BusController*>(mBusControllerObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
+  else if (mBusControllerCanObjectClass != nullptr && theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
-    static_cast<BusControllerCan*>(mBusControllerCanObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<BusControllerCan*>(mBusControllerCanObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
+  else if (mBusControllerEthernetObjectClass != nullptr && theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
   {
-    static_cast<BusControllerEthernet*>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<BusControllerEthernet*>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
+  else if (mFlexRayControllerStatusObjectClass != nullptr && theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
   {
-    static_cast<FlexRayControllerStatus*>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<FlexRayControllerStatus*>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
+  else if (mFlexRayControllerObjectClass != nullptr && theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
   {
-    static_cast<FlexRayController*>(mFlexRayControllerObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<FlexRayController*>(mFlexRayControllerObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
-  else if (theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
+  else if (mFlexRaySendBufferObjectClass != nullptr && theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
   {
-    static_cast<FlexRaySendBuffer*>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject))->ProvideAttributeValues(attributeHandles);
+    auto objectInstance = static_cast<FlexRaySendBuffer*>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject));
+    if (objectInstance != nullptr)
+    {
+      objectInstance->ProvideAttributeValues(attributeHandles);
+    }
   }
 }
 
@@ -7606,20 +7768,21 @@ void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObje
 void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
 {
   auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
-  iter->second(true);
-  mInstanceNameReservationCallbacks.erase(iter);
+  if (iter != mInstanceNameReservationCallbacks.end())
+  {
+    iter->second(true);
+    mInstanceNameReservationCallbacks.erase(iter);
+  }
 }
 
 void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
 {
   auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
-  iter->second(false);
-  mInstanceNameReservationCallbacks.erase(iter);
-}
-
-IObjectClassRegistry* GetObjectClassRegistry()
-{
-  return ObjectClassRegistry::GetInstance();
+  if (iter != mInstanceNameReservationCallbacks.end())
+  {
+    iter->second(false);
+    mInstanceNameReservationCallbacks.erase(iter);
+  }
 }
 
 } // namespace NDistSimIB

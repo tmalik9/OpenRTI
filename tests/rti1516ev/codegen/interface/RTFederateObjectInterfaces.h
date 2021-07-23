@@ -879,14 +879,15 @@ class IFlexRaySendBuffer : public IHLAobjectRoot
     IFlexRaySendBuffer& operator=(const IFlexRaySendBuffer&) = delete;
     IFlexRaySendBuffer& operator=(IFlexRaySendBuffer&&) = delete;
 
-    // attribute Sender : HLAhandle
-    virtual rti1516ev::HLAhandle GetSender() const = 0;
-    virtual void SetSender(rti1516ev::HLAhandle newValue) = 0;
+    // attribute Sender : HLAobjectInstanceHandle.FlexRayController
+    virtual IFlexRayController* GetSender() const = 0;
+    virtual void SetSender(IFlexRayController* newValue) = 0;
     // attribute TransmissionMode : FlexRayTransmissionMode
     virtual FlexRayTransmissionMode GetTransmissionMode() const = 0;
     virtual void SetTransmissionMode(FlexRayTransmissionMode newValue) = 0;
     // attribute Payload : FlexRayPayload
     virtual const FlexRayPayload& GetPayload() const = 0;
+    virtual FlexRayPayload& GetPayload() = 0;
     virtual void SetPayload(const FlexRayPayload& newValue) = 0;
     // attribute CycleOffset : HLAoctet
     virtual uint8_t GetCycleOffset() const = 0;
@@ -947,8 +948,6 @@ class IObjectClassRegistry
   protected:
     virtual ~IObjectClassRegistry() {}
 }; // class IObjectClassRegistry
-
-IObjectClassRegistry* GetObjectClassRegistry();
 
 } // namespace NDistSimIB
 } // namespace NRTFederateEncoding

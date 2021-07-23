@@ -15,8 +15,12 @@
 #include "interface/RTFederateObjectInterfaces.h"
 #include "RTFederateEncodings.h"
 
+class ObjectClassRegistry;
+
 namespace NDistSimIB {
 namespace NRTFederateEncoding {
+
+class ObjectClassRegistry;
 
 class HLAobjectRoot;
 class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
@@ -36,14 +40,16 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
     void ExecuteDiscoverCallbacks(IHLAobjectRoot* newObjectInstance);
 
     // internal
-    HLAobjectRootObjectClass(rti1516ev::RTIambassador* rtiAmbassador);
+    HLAobjectRootObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry);
     // attribute HLAprivilegeToDeleteObject : no data type
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IHLAobjectRoot* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -68,6 +74,7 @@ class HLAobjectRoot : public IHLAobjectRoot
     HLAobjectRoot& operator=(const HLAobjectRoot&) = delete;
     HLAobjectRoot& operator=(HLAobjectRoot&&) = delete;
     IHLAobjectRootObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -112,7 +119,7 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     void ExecuteDiscoverCallbacks(ISystemVariable* newObjectInstance);
 
     // internal
-    SystemVariableObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
+    SystemVariableObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute Value : HLAopaqueData
@@ -122,7 +129,9 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     ISystemVariable* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -149,6 +158,7 @@ class SystemVariable : public ISystemVariable
     SystemVariable& operator=(const SystemVariable&) = delete;
     SystemVariable& operator=(SystemVariable&&) = delete;
     ISystemVariableObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -216,7 +226,7 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     void ExecuteDiscoverCallbacks(IValueEntity* newObjectInstance);
 
     // internal
-    ValueEntityObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
+    ValueEntityObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute Value : HLAopaqueData
@@ -226,7 +236,9 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IValueEntity* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -253,6 +265,7 @@ class ValueEntity : public IValueEntity
     ValueEntity& operator=(const ValueEntity&) = delete;
     ValueEntity& operator=(ValueEntity&&) = delete;
     IValueEntityObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -320,7 +333,7 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     void ExecuteDiscoverCallbacks(IDOMemberSource* newObjectInstance);
 
     // internal
-    DOMemberSourceObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
+    DOMemberSourceObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute DOSourceMemberName : HLAASCIIstring
@@ -334,7 +347,9 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IDOMemberSource* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -365,6 +380,7 @@ class DOMemberSource : public IDOMemberSource
     DOMemberSource& operator=(const DOMemberSource&) = delete;
     DOMemberSource& operator=(DOMemberSource&&) = delete;
     IDOMemberSourceObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -442,7 +458,7 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     void ExecuteDiscoverCallbacks(IDOMemberTarget* newObjectInstance);
 
     // internal
-    DOMemberTargetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
+    DOMemberTargetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute DOTargetMemberName : HLAASCIIstring
@@ -454,7 +470,9 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IDOMemberTarget* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -483,6 +501,7 @@ class DOMemberTarget : public IDOMemberTarget
     DOMemberTarget& operator=(const DOMemberTarget&) = delete;
     DOMemberTarget& operator=(DOMemberTarget&&) = delete;
     IDOMemberTargetObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -555,7 +574,7 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     void ExecuteDiscoverCallbacks(IBusManagement* newObjectInstance);
 
     // internal
-    BusManagementObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
+    BusManagementObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
@@ -565,7 +584,9 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IBusManagement* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -592,6 +613,7 @@ class BusManagement : public IBusManagement
     BusManagement& operator=(const BusManagement&) = delete;
     BusManagement& operator=(BusManagement&&) = delete;
     IBusManagementObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -654,7 +676,7 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     void ExecuteDiscoverCallbacks(IBusManagementCan* newObjectInstance);
 
     // internal
-    BusManagementCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass);
+    BusManagementCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass);
 
     // attribute NetworkID : HLAASCIIstring
     rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
@@ -672,7 +694,9 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IBusManagementCan* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -705,6 +729,7 @@ class BusManagementCan : public IBusManagementCan
     BusManagementCan& operator=(const BusManagementCan&) = delete;
     BusManagementCan& operator=(BusManagementCan&&) = delete;
     IBusManagementCanObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -792,7 +817,7 @@ class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClas
     void ExecuteDiscoverCallbacks(IBusManagementEthernet* newObjectInstance);
 
     // internal
-    BusManagementEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass);
+    BusManagementEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass);
 
     // attribute NetworkID : HLAASCIIstring
     rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
@@ -806,7 +831,9 @@ class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClas
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IBusManagementEthernet* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -835,6 +862,7 @@ class BusManagementEthernet : public IBusManagementEthernet
     BusManagementEthernet& operator=(const BusManagementEthernet&) = delete;
     BusManagementEthernet& operator=(BusManagementEthernet&&) = delete;
     IBusManagementEthernetObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -912,7 +940,7 @@ class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
     void ExecuteDiscoverCallbacks(IFlexRayCluster* newObjectInstance);
 
     // internal
-    FlexRayClusterObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusManagementObjectClass* baseClass);
+    FlexRayClusterObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass);
 
     // attribute NetworkID : HLAASCIIstring
     rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
@@ -962,7 +990,9 @@ class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IFlexRayCluster* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -1027,6 +1057,7 @@ class FlexRayCluster : public IFlexRayCluster
     FlexRayCluster& operator=(const FlexRayCluster&) = delete;
     FlexRayCluster& operator=(FlexRayCluster&&) = delete;
     IFlexRayClusterObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1194,7 +1225,7 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     void ExecuteDiscoverCallbacks(IBusController* newObjectInstance);
 
     // internal
-    BusControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
+    BusControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
@@ -1206,7 +1237,9 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IBusController* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -1235,6 +1268,7 @@ class BusController : public IBusController
     BusController& operator=(const BusController&) = delete;
     BusController& operator=(BusController&&) = delete;
     IBusControllerObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1302,7 +1336,7 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     void ExecuteDiscoverCallbacks(IBusControllerCan* newObjectInstance);
 
     // internal
-    BusControllerCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass);
+    BusControllerCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
     // attribute NetworkID : HLAASCIIstring
     rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
@@ -1332,7 +1366,9 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IBusControllerCan* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -1375,6 +1411,7 @@ class BusControllerCan : public IBusControllerCan
     BusControllerCan& operator=(const BusControllerCan&) = delete;
     BusControllerCan& operator=(BusControllerCan&&) = delete;
     IBusControllerCanObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1492,7 +1529,7 @@ class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClas
     void ExecuteDiscoverCallbacks(IBusControllerEthernet* newObjectInstance);
 
     // internal
-    BusControllerEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass);
+    BusControllerEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
     // attribute NetworkID : HLAASCIIstring
     rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
@@ -1506,7 +1543,9 @@ class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClas
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IBusControllerEthernet* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -1533,6 +1572,7 @@ class BusControllerEthernet : public IBusControllerEthernet
     BusControllerEthernet& operator=(const BusControllerEthernet&) = delete;
     BusControllerEthernet& operator=(BusControllerEthernet&&) = delete;
     IBusControllerEthernetObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1610,7 +1650,7 @@ class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObject
     void ExecuteDiscoverCallbacks(IFlexRayControllerStatus* newObjectInstance);
 
     // internal
-    FlexRayControllerStatusObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass);
+    FlexRayControllerStatusObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
     // attribute NetworkID : HLAASCIIstring
     rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
@@ -1640,7 +1680,9 @@ class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObject
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IFlexRayControllerStatus* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -1683,6 +1725,7 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
     FlexRayControllerStatus& operator=(const FlexRayControllerStatus&) = delete;
     FlexRayControllerStatus& operator=(FlexRayControllerStatus&&) = delete;
     IFlexRayControllerStatusObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1800,7 +1843,7 @@ class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
     void ExecuteDiscoverCallbacks(IFlexRayController* newObjectInstance);
 
     // internal
-    FlexRayControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, BusControllerObjectClass* baseClass);
+    FlexRayControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
     // attribute NetworkID : HLAASCIIstring
     rti1516ev::AttributeHandle GetNetworkIDAttributeHandle() const { return mBaseClass->GetNetworkIDAttributeHandle(); }
@@ -1862,7 +1905,9 @@ class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IFlexRayController* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -1937,6 +1982,7 @@ class FlexRayController : public IFlexRayController
     FlexRayController& operator=(const FlexRayController&) = delete;
     FlexRayController& operator=(FlexRayController&&) = delete;
     IFlexRayControllerObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -2134,10 +2180,10 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
     void ExecuteDiscoverCallbacks(IFlexRaySendBuffer* newObjectInstance);
 
     // internal
-    FlexRaySendBufferObjectClass(rti1516ev::RTIambassador* rtiAmbassador, HLAobjectRootObjectClass* baseClass);
+    FlexRaySendBufferObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
     // attribute HLAprivilegeToDeleteObject : no data type
-    // attribute Sender : HLAhandle
+    // attribute Sender : HLAobjectInstanceHandle.FlexRayController
     rti1516ev::AttributeHandle GetSenderAttributeHandle() const { return mSenderAttributeHandle; }
     // attribute TransmissionMode : FlexRayTransmissionMode
     rti1516ev::AttributeHandle GetTransmissionModeAttributeHandle() const { return mTransmissionModeAttributeHandle; }
@@ -2160,7 +2206,9 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     IFlexRaySendBuffer* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -2168,7 +2216,7 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
-    // attribute Sender : HLAhandle
+    // attribute Sender : HLAobjectInstanceHandle.FlexRayController
     rti1516ev::AttributeHandle mSenderAttributeHandle;
     // attribute TransmissionMode : FlexRayTransmissionMode
     rti1516ev::AttributeHandle mTransmissionModeAttributeHandle;
@@ -2203,17 +2251,19 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     FlexRaySendBuffer& operator=(const FlexRaySendBuffer&) = delete;
     FlexRaySendBuffer& operator=(FlexRaySendBuffer&&) = delete;
     IFlexRaySendBufferObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
     // attribute HLAprivilegeToDeleteObject : no data type
-    // attribute Sender : HLAhandle
-    rti1516ev::HLAhandle GetSender() const override;
-    void SetSender(rti1516ev::HLAhandle newValue) override;
+    // attribute Sender : HLAobjectInstanceHandle.FlexRayController
+    IFlexRayController* GetSender() const override;
+    void SetSender(IFlexRayController* newValue) override;
     // attribute TransmissionMode : FlexRayTransmissionMode
     FlexRayTransmissionMode GetTransmissionMode() const override;
     void SetTransmissionMode(FlexRayTransmissionMode newValue) override;
     // attribute Payload : FlexRayPayload
     const FlexRayPayload& GetPayload() const override;
+    FlexRayPayload& GetPayload() override;
     void SetPayload(const FlexRayPayload& newValue) override;
     // attribute CycleOffset : HLAoctet
     uint8_t GetCycleOffset() const override;
@@ -2272,8 +2322,8 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
-    // attribute Sender : HLAhandle
-    rti1516ev::HLAhandle mSender;
+    // attribute Sender : HLAobjectInstanceHandle.FlexRayController
+    rti1516ev::HLAobjectInstanceHandle mSender;
     // attribute TransmissionMode : FlexRayTransmissionMode
     rti1516ev::HLAoctet mTransmissionMode;
     // attribute Payload : FlexRayPayload
@@ -2300,7 +2350,6 @@ class ObjectClassRegistry : public IObjectClassRegistry
     ObjectClassRegistry();
     ~ObjectClassRegistry();
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
-    static ObjectClassRegistry* GetInstance() { return sClassRegistry; }
 
     IHLAobjectRootObjectClass* GetHLAobjectRootObjectClass() const override { return mHLAobjectRootObjectClass.get(); }
     ISystemVariableObjectClass* GetSystemVariableObjectClass() const override { return mSystemVariableObjectClass.get(); }
@@ -2328,7 +2377,6 @@ class ObjectClassRegistry : public IObjectClassRegistry
 
   private:
     std::map<std::wstring, std::function<void(bool)> > mInstanceNameReservationCallbacks;
-    static ObjectClassRegistry* sClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     std::unique_ptr<HLAobjectRootObjectClass> mHLAobjectRootObjectClass;
     std::unique_ptr<SystemVariableObjectClass> mSystemVariableObjectClass;

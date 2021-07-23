@@ -218,24 +218,23 @@ namespace FOMCodeGen
             #line default
             #line hidden
             this.Write("  protected:\r\n    virtual ~IInteractionClassRegistry() {}\r\n}; // class IInteracti" +
-                    "onClassRegistry\r\n\r\nIInteractionClassRegistry* GetInteractionClassRegistry();\r\n\r\n" +
-                    "");
+                    "onClassRegistry\r\n\r\n");
             
-            #line 56 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 54 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  foreach (var namespacePart in FOM.Namespace) { 
             
             #line default
             #line hidden
             this.Write("} // namespace ");
             
-            #line 57 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 55 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 58 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 56 "D:\vfs\CANoe\release\15.3\Projects_Source\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  } 
             
             #line default

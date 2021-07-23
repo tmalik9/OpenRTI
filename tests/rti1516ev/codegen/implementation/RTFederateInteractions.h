@@ -17,6 +17,9 @@
 namespace NDistSimIB {
 namespace NRTFederateEncoding {
 
+class InteractionClassRegistry;
+class ObjectClassRegistry;
+
 class HLAinteractionRoot;
 class HLAinteractionRootInteractionClass : public IHLAinteractionRootInteractionClass
 {
@@ -24,6 +27,8 @@ class HLAinteractionRootInteractionClass : public IHLAinteractionRootInteraction
     // IHLAinteractionRootInteractionClass
     HLAinteractionRootInteractionClass() = default;
     virtual ~HLAinteractionRootInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -37,9 +42,10 @@ class HLAinteractionRootInteractionClass : public IHLAinteractionRootInteraction
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    HLAinteractionRootInteractionClass(rti1516ev::RTIambassador* rtiAmbassador);
+    HLAinteractionRootInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry);
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -60,6 +66,8 @@ class MeasurementInitInteractionClass : public IMeasurementInitInteractionClass
     // IMeasurementInitInteractionClass
     MeasurementInitInteractionClass() = default;
     virtual ~MeasurementInitInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -70,11 +78,12 @@ class MeasurementInitInteractionClass : public IMeasurementInitInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    MeasurementInitInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
+    MeasurementInitInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
     // parameter Dummy : HLAopaqueData
     rti1516ev::ParameterHandle GetDummyParameterHandle() const { return mDummyParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -96,6 +105,8 @@ class MeasurementStopInteractionClass : public IMeasurementStopInteractionClass
     // IMeasurementStopInteractionClass
     MeasurementStopInteractionClass() = default;
     virtual ~MeasurementStopInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -109,11 +120,12 @@ class MeasurementStopInteractionClass : public IMeasurementStopInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    MeasurementStopInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
+    MeasurementStopInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
     // parameter NextFederationSuffix : HLAunicodeString
     rti1516ev::ParameterHandle GetNextFederationSuffixParameterHandle() const { return mNextFederationSuffixParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -137,6 +149,8 @@ class KeyEventInteractionClass : public IKeyEventInteractionClass
     // IKeyEventInteractionClass
     KeyEventInteractionClass() = default;
     virtual ~KeyEventInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -150,11 +164,12 @@ class KeyEventInteractionClass : public IKeyEventInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    KeyEventInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
+    KeyEventInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
     // parameter KeyCode : HLAinteger32LE
     rti1516ev::ParameterHandle GetKeyCodeParameterHandle() const { return mKeyCodeParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -178,6 +193,8 @@ class TextLogInteractionClass : public ITextLogInteractionClass
     // ITextLogInteractionClass
     TextLogInteractionClass() = default;
     virtual ~TextLogInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -191,13 +208,14 @@ class TextLogInteractionClass : public ITextLogInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    TextLogInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
+    TextLogInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
     // parameter Sender : HLAunicodeString
     rti1516ev::ParameterHandle GetSenderParameterHandle() const { return mSenderParameterHandle; }
     // parameter Text : HLAunicodeString
     rti1516ev::ParameterHandle GetTextParameterHandle() const { return mTextParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -216,6 +234,58 @@ class TextLogInteractionClass : public ITextLogInteractionClass
 };
 
 
+class DOMemberTransmitData;
+class DOMemberTransmitDataInteractionClass : public IDOMemberTransmitDataInteractionClass
+{
+  public:
+    // IDOMemberTransmitDataInteractionClass
+    DOMemberTransmitDataInteractionClass() = default;
+    virtual ~DOMemberTransmitDataInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
+    void Publish() override;
+    void Unpublish() override;
+    void Subscribe() override;
+    void Unsubscribe() override;
+    void send(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    void sendWithTime(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time) override;
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, rti1516ev::OrderType receivedOrder);
+    uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) override;
+
+    // internal
+    rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
+    DOMemberTransmitDataInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
+    // parameter ObjInstanceHandle : HLAobjectInstanceHandle.DOMemberSource
+    rti1516ev::ParameterHandle GetObjInstanceHandleParameterHandle() const { return mObjInstanceHandleParameterHandle; }
+    // parameter ConnectionType : HLAASCIIstring
+    rti1516ev::ParameterHandle GetConnectionTypeParameterHandle() const { return mConnectionTypeParameterHandle; }
+    // parameter DataBytes : HLAopaqueData
+    rti1516ev::ParameterHandle GetDataBytesParameterHandle() const { return mDataBytesParameterHandle; }
+    rti1516ev::ParameterHandleSet GetAllParameterHandles();
+  private:
+    InteractionClassRegistry* mInteractionClassRegistry;
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // interaction class handle
+    rti1516ev::InteractionClassHandle mInteractionClassHandle;
+    HLAinteractionRootInteractionClass* mBaseClass;
+    bool mPublished = false;
+    bool mSubscribed = false;
+    // Parameter handles
+    // parameter ObjInstanceHandle : HLAobjectInstanceHandle.DOMemberSource
+    rti1516ev::ParameterHandle mObjInstanceHandleParameterHandle;
+    // parameter ConnectionType : HLAASCIIstring
+    rti1516ev::ParameterHandle mConnectionTypeParameterHandle;
+    // parameter DataBytes : HLAopaqueData
+    rti1516ev::ParameterHandle mDataBytesParameterHandle;
+    std::map<uint32_t, ReceiveCallback> _receiveCallbacks;
+    uint32_t _receiveCallbacksNextKey = 0;
+    std::map<uint32_t, ReceiveCallbackWithTime> _receiveCallbacksWithTime;
+    uint32_t _receiveCallbacksWithTimeNextKey = 0;
+};
+
+
 class SystemVariableUpdate;
 class SystemVariableUpdateInteractionClass : public ISystemVariableUpdateInteractionClass
 {
@@ -223,6 +293,8 @@ class SystemVariableUpdateInteractionClass : public ISystemVariableUpdateInterac
     // ISystemVariableUpdateInteractionClass
     SystemVariableUpdateInteractionClass() = default;
     virtual ~SystemVariableUpdateInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -236,7 +308,7 @@ class SystemVariableUpdateInteractionClass : public ISystemVariableUpdateInterac
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    SystemVariableUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
+    SystemVariableUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
     // parameter Id : HLAASCIIstring
     rti1516ev::ParameterHandle GetIdParameterHandle() const { return mIdParameterHandle; }
     // parameter Value : HLAopaqueData
@@ -247,6 +319,7 @@ class SystemVariableUpdateInteractionClass : public ISystemVariableUpdateInterac
     rti1516ev::ParameterHandle GetHasChangedParameterHandle() const { return mHasChangedParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -276,6 +349,8 @@ class SystemVariableModificationInteractionClass : public ISystemVariableModific
     // ISystemVariableModificationInteractionClass
     SystemVariableModificationInteractionClass() = default;
     virtual ~SystemVariableModificationInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -289,11 +364,12 @@ class SystemVariableModificationInteractionClass : public ISystemVariableModific
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    SystemVariableModificationInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
+    SystemVariableModificationInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
     // parameter Value : HLAopaqueData
     rti1516ev::ParameterHandle GetValueParameterHandle() const { return mValueParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -317,6 +393,8 @@ class ValueEntityUpdateInteractionClass : public IValueEntityUpdateInteractionCl
     // IValueEntityUpdateInteractionClass
     ValueEntityUpdateInteractionClass() = default;
     virtual ~ValueEntityUpdateInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -330,13 +408,14 @@ class ValueEntityUpdateInteractionClass : public IValueEntityUpdateInteractionCl
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    ValueEntityUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
+    ValueEntityUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
     // parameter Id : HLAopaqueData
     rti1516ev::ParameterHandle GetIdParameterHandle() const { return mIdParameterHandle; }
     // parameter Value : HLAopaqueData
     rti1516ev::ParameterHandle GetValueParameterHandle() const { return mValueParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -362,6 +441,8 @@ class BusMessageInteractionClass : public IBusMessageInteractionClass
     // IBusMessageInteractionClass
     BusMessageInteractionClass() = default;
     virtual ~BusMessageInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -375,7 +456,7 @@ class BusMessageInteractionClass : public IBusMessageInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    BusMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
+    BusMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mIsRequestParameterHandle; }
     // parameter ChannelName : HLAASCIIstring
@@ -390,6 +471,7 @@ class BusMessageInteractionClass : public IBusMessageInteractionClass
     rti1516ev::ParameterHandle GetReceiverParameterHandle() const { return mReceiverParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -423,6 +505,8 @@ class EthPacketInteractionClass : public IEthPacketInteractionClass
     // IEthPacketInteractionClass
     EthPacketInteractionClass() = default;
     virtual ~EthPacketInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -436,7 +520,7 @@ class EthPacketInteractionClass : public IEthPacketInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    EthPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    EthPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -455,6 +539,7 @@ class EthPacketInteractionClass : public IEthPacketInteractionClass
     rti1516ev::ParameterHandle GetPortNameParameterHandle() const { return mPortNameParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -480,6 +565,8 @@ class EthPacketErrorInteractionClass : public IEthPacketErrorInteractionClass
     // IEthPacketErrorInteractionClass
     EthPacketErrorInteractionClass() = default;
     virtual ~EthPacketErrorInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -493,7 +580,7 @@ class EthPacketErrorInteractionClass : public IEthPacketErrorInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    EthPacketErrorInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    EthPacketErrorInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -510,6 +597,7 @@ class EthPacketErrorInteractionClass : public IEthPacketErrorInteractionClass
     rti1516ev::ParameterHandle GetFrameParameterHandle() const { return mFrameParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -533,6 +621,8 @@ class EthPacketErrorForwardedInteractionClass : public IEthPacketErrorForwardedI
     // IEthPacketErrorForwardedInteractionClass
     EthPacketErrorForwardedInteractionClass() = default;
     virtual ~EthPacketErrorForwardedInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -546,7 +636,7 @@ class EthPacketErrorForwardedInteractionClass : public IEthPacketErrorForwardedI
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    EthPacketErrorForwardedInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    EthPacketErrorForwardedInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -563,6 +653,7 @@ class EthPacketErrorForwardedInteractionClass : public IEthPacketErrorForwardedI
     rti1516ev::ParameterHandle GetFrameParameterHandle() const { return mFrameParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -586,6 +677,8 @@ class EthForwardedPacketInteractionClass : public IEthForwardedPacketInteraction
     // IEthForwardedPacketInteractionClass
     EthForwardedPacketInteractionClass() = default;
     virtual ~EthForwardedPacketInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -599,7 +692,7 @@ class EthForwardedPacketInteractionClass : public IEthForwardedPacketInteraction
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    EthForwardedPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    EthForwardedPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -618,6 +711,7 @@ class EthForwardedPacketInteractionClass : public IEthForwardedPacketInteraction
     rti1516ev::ParameterHandle GetPortNameParameterHandle() const { return mPortNameParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -643,6 +737,8 @@ class EthStatusInteractionClass : public IEthStatusInteractionClass
     // IEthStatusInteractionClass
     EthStatusInteractionClass() = default;
     virtual ~EthStatusInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -656,7 +752,7 @@ class EthStatusInteractionClass : public IEthStatusInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    EthStatusInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    EthStatusInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -675,6 +771,7 @@ class EthStatusInteractionClass : public IEthStatusInteractionClass
     rti1516ev::ParameterHandle GetPortNameParameterHandle() const { return mPortNameParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -700,6 +797,8 @@ class CANMessageInteractionClass : public ICANMessageInteractionClass
     // ICANMessageInteractionClass
     CANMessageInteractionClass() = default;
     virtual ~CANMessageInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -713,7 +812,7 @@ class CANMessageInteractionClass : public ICANMessageInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    CANMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    CANMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -732,6 +831,7 @@ class CANMessageInteractionClass : public ICANMessageInteractionClass
     rti1516ev::ParameterHandle GetFrameParameterHandle() const { return mFrameParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -757,6 +857,8 @@ class CANErrorFrameInteractionClass : public ICANErrorFrameInteractionClass
     // ICANErrorFrameInteractionClass
     CANErrorFrameInteractionClass() = default;
     virtual ~CANErrorFrameInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -770,7 +872,7 @@ class CANErrorFrameInteractionClass : public ICANErrorFrameInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    CANErrorFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    CANErrorFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -787,6 +889,7 @@ class CANErrorFrameInteractionClass : public ICANErrorFrameInteractionClass
     rti1516ev::ParameterHandle GetFrameParameterHandle() const { return mFrameParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -810,6 +913,8 @@ class FlexRaySymbolInteractionClass : public IFlexRaySymbolInteractionClass
     // IFlexRaySymbolInteractionClass
     FlexRaySymbolInteractionClass() = default;
     virtual ~FlexRaySymbolInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -823,7 +928,7 @@ class FlexRaySymbolInteractionClass : public IFlexRaySymbolInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    FlexRaySymbolInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    FlexRaySymbolInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -842,6 +947,7 @@ class FlexRaySymbolInteractionClass : public IFlexRaySymbolInteractionClass
     rti1516ev::ParameterHandle GetFlexRayChannelParameterHandle() const { return mFlexRayChannelParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -867,6 +973,8 @@ class FlexRayCycleStartInteractionClass : public IFlexRayCycleStartInteractionCl
     // IFlexRayCycleStartInteractionClass
     FlexRayCycleStartInteractionClass() = default;
     virtual ~FlexRayCycleStartInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -880,7 +988,7 @@ class FlexRayCycleStartInteractionClass : public IFlexRayCycleStartInteractionCl
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    FlexRayCycleStartInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    FlexRayCycleStartInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -897,6 +1005,7 @@ class FlexRayCycleStartInteractionClass : public IFlexRayCycleStartInteractionCl
     rti1516ev::ParameterHandle GetCycleParameterHandle() const { return mCycleParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -920,6 +1029,8 @@ class FlexRayFrameInteractionClass : public IFlexRayFrameInteractionClass
     // IFlexRayFrameInteractionClass
     FlexRayFrameInteractionClass() = default;
     virtual ~FlexRayFrameInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -933,7 +1044,7 @@ class FlexRayFrameInteractionClass : public IFlexRayFrameInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    FlexRayFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass);
+    FlexRayFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass);
     // parameter IsRequest : HLAboolean
     rti1516ev::ParameterHandle GetIsRequestParameterHandle() const { return mBaseClass->GetIsRequestParameterHandle(); }
     // parameter ChannelName : HLAASCIIstring
@@ -956,6 +1067,7 @@ class FlexRayFrameInteractionClass : public IFlexRayFrameInteractionClass
     rti1516ev::ParameterHandle GetPayloadParameterHandle() const { return mPayloadParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -985,6 +1097,8 @@ class PythonCommandInteractionClass : public IPythonCommandInteractionClass
     // IPythonCommandInteractionClass
     PythonCommandInteractionClass() = default;
     virtual ~PythonCommandInteractionClass() = default;
+    ObjectClassRegistry* GetObjectClassRegistry();
+    InteractionClassRegistry* GetInteractionClassRegistry() { return mInteractionClassRegistry; }
     void Publish() override;
     void Unpublish() override;
     void Subscribe() override;
@@ -998,7 +1112,7 @@ class PythonCommandInteractionClass : public IPythonCommandInteractionClass
 
     // internal
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
-    PythonCommandInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass);
+    PythonCommandInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass);
     // parameter Code : HLAopaqueData
     rti1516ev::ParameterHandle GetCodeParameterHandle() const { return mCodeParameterHandle; }
     // parameter Target : HLAopaqueData
@@ -1007,6 +1121,7 @@ class PythonCommandInteractionClass : public IPythonCommandInteractionClass
     rti1516ev::ParameterHandle GetRefIDParameterHandle() const { return mRefIDParameterHandle; }
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
+    InteractionClassRegistry* mInteractionClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // interaction class handle
     rti1516ev::InteractionClassHandle mInteractionClassHandle;
@@ -1029,19 +1144,21 @@ class PythonCommandInteractionClass : public IPythonCommandInteractionClass
 
  
 
+class ObjectClassRegistry;
 class InteractionClassRegistry : public IInteractionClassRegistry
 {
   public:
-    InteractionClassRegistry();
+    InteractionClassRegistry(ObjectClassRegistry* objectClassRegistry);
     ~InteractionClassRegistry();
+    ObjectClassRegistry* GetObjectClassRegistry() { return mObjectClassRegistry; }
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
-    static InteractionClassRegistry* GetInstance() { return sClassRegistry; }
 
     IHLAinteractionRootInteractionClass* GetHLAinteractionRootInteractionClass() const override { return mHLAinteractionRootInteractionClass.get(); }
     IMeasurementInitInteractionClass* GetMeasurementInitInteractionClass() const override { return mMeasurementInitInteractionClass.get(); }
     IMeasurementStopInteractionClass* GetMeasurementStopInteractionClass() const override { return mMeasurementStopInteractionClass.get(); }
     IKeyEventInteractionClass* GetKeyEventInteractionClass() const override { return mKeyEventInteractionClass.get(); }
     ITextLogInteractionClass* GetTextLogInteractionClass() const override { return mTextLogInteractionClass.get(); }
+    IDOMemberTransmitDataInteractionClass* GetDOMemberTransmitDataInteractionClass() const override { return mDOMemberTransmitDataInteractionClass.get(); }
     ISystemVariableUpdateInteractionClass* GetSystemVariableUpdateInteractionClass() const override { return mSystemVariableUpdateInteractionClass.get(); }
     ISystemVariableModificationInteractionClass* GetSystemVariableModificationInteractionClass() const override { return mSystemVariableModificationInteractionClass.get(); }
     IValueEntityUpdateInteractionClass* GetValueEntityUpdateInteractionClass() const override { return mValueEntityUpdateInteractionClass.get(); }
@@ -1061,13 +1178,14 @@ class InteractionClassRegistry : public IInteractionClassRegistry
     void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters);
 
   private:
-    static InteractionClassRegistry* sClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
+    ObjectClassRegistry* mObjectClassRegistry;
     std::unique_ptr<HLAinteractionRootInteractionClass> mHLAinteractionRootInteractionClass;
     std::unique_ptr<MeasurementInitInteractionClass> mMeasurementInitInteractionClass;
     std::unique_ptr<MeasurementStopInteractionClass> mMeasurementStopInteractionClass;
     std::unique_ptr<KeyEventInteractionClass> mKeyEventInteractionClass;
     std::unique_ptr<TextLogInteractionClass> mTextLogInteractionClass;
+    std::unique_ptr<DOMemberTransmitDataInteractionClass> mDOMemberTransmitDataInteractionClass;
     std::unique_ptr<SystemVariableUpdateInteractionClass> mSystemVariableUpdateInteractionClass;
     std::unique_ptr<SystemVariableModificationInteractionClass> mSystemVariableModificationInteractionClass;
     std::unique_ptr<ValueEntityUpdateInteractionClass> mValueEntityUpdateInteractionClass;

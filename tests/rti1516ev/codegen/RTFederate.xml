@@ -264,7 +264,7 @@
         </objectClass>
       </objectClass>
       <objectClass><name>FlexRaySendBuffer</name>
-        <attribute><name>Sender</name><dataType>HLAhandle</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>Sender</name><dataType class="FlexRayController">HLAobjectInstanceHandle</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
         <attribute><name>TransmissionMode</name><dataType>FlexRayTransmissionMode</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
         <attribute><name>Payload</name><dataType>FlexRayPayload</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
         <attribute><name>CycleOffset</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
@@ -323,6 +323,24 @@
         <parameter>
           <name>Text</name>
           <dataType>HLAunicodeString</dataType>
+        </parameter>
+      </interactionClass>
+      <interactionClass>
+        <name>DOMemberTransmitData</name>
+        <order>TimeStamp</order>
+        <transportation>HLAreliable</transportation>
+        <sharing>PublishSubscribe</sharing>
+        <parameter>
+          <name>ObjInstanceHandle</name>
+          <dataType class="DOMemberSource">HLAobjectInstanceHandle</dataType>
+        </parameter>
+        <parameter>
+          <name>ConnectionType</name>
+          <dataType>HLAASCIIstring</dataType>
+        </parameter>
+        <parameter>
+          <name>DataBytes</name>
+          <dataType>HLAopaqueData</dataType>
         </parameter>
       </interactionClass>
       <interactionClass>

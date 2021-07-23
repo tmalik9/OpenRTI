@@ -34,12 +34,14 @@ foreach (var interactionClass in FOM.InteractionClasses)
   {
 #>
 // object class type '<#=interactionClass.Name#>'
-<#=interactionClass.Name#>InteractionClass::<#=interactionClass.Name#>InteractionClass(rti1516ev::RTIambassador* rtiAmbassador, <#=interactionClass.BaseClass.Name#>InteractionClass* baseClass)
+<#=interactionClass.Name#>InteractionClass::<#=interactionClass.Name#>InteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, <#=interactionClass.BaseClass.Name#>InteractionClass* baseClass)
 <# } else {#>
-<#=interactionClass.Name#>InteractionClass::<#=interactionClass.Name#>InteractionClass(rti1516ev::RTIambassador* rtiAmbassador)
+<#=interactionClass.Name#>InteractionClass::<#=interactionClass.Name#>InteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry)
 <# } #>
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
 <# if (interactionClass.BaseClass != null) { #>
   mBaseClass = baseClass;
 <# } #>
@@ -57,6 +59,11 @@ foreach (var interactionClass in FOM.InteractionClasses)
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
+}
+
+ObjectClassRegistry* <#=interactionClass.Name#>InteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void <#=interactionClass.Name#>InteractionClass::Publish()
@@ -222,33 +229,31 @@ rti1516ev::ParameterHandleSet <#=interactionClass.Name#>InteractionClass::GetAll
 
 <# } // foreach (var interactionClass in FOM.InteractionClasses) #> 
 
-InteractionClassRegistry* InteractionClassRegistry::sClassRegistry = nullptr;
-
-InteractionClassRegistry::InteractionClassRegistry()
+InteractionClassRegistry::InteractionClassRegistry(ObjectClassRegistry* objectClassRegistry)
+  : mRtiAmbassador(nullptr), mObjectClassRegistry(objectClassRegistry)
 {
-  assert(sClassRegistry == nullptr);
-  sClassRegistry = this;
 }
 
 InteractionClassRegistry::~InteractionClassRegistry()
 {
-  sClassRegistry = nullptr;
 }
 
 void InteractionClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 {
   mRtiAmbassador = rtiAmbassador;
-<# 
-  foreach (var interactionClass in FOM.InteractionClasses)
+<#  foreach (var interactionClass in FOM.InteractionClasses) { #>
+  try
   {
-    if (interactionClass.BaseClass != null)
-    {
-#>
-  m<#=interactionClass.Name#>InteractionClass = std::unique_ptr<<#=interactionClass.Name#>InteractionClass>(new <#=interactionClass.Name#>InteractionClass(mRtiAmbassador, m<#=interactionClass.BaseClass.Name#>InteractionClass.get()));
-<# } else { #>
-  m<#=interactionClass.Name#>InteractionClass = std::unique_ptr<<#=interactionClass.Name#>InteractionClass>(new <#=interactionClass.Name#>InteractionClass(mRtiAmbassador));
-<# } // if #>
-<# } // foreach #>
+<#    if (interactionClass.BaseClass != null) { #>
+    m<#=interactionClass.Name#>InteractionClass = std::unique_ptr<<#=interactionClass.Name#>InteractionClass>(new <#=interactionClass.Name#>InteractionClass(mRtiAmbassador, this, m<#=interactionClass.BaseClass.Name#>InteractionClass.get()));
+<#    } else { #>
+    m<#=interactionClass.Name#>InteractionClass = std::unique_ptr<<#=interactionClass.Name#>InteractionClass>(new <#=interactionClass.Name#>InteractionClass(mRtiAmbassador, this));
+<#    } // if #>
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+<#  } // foreach #>
 } // Initialize
 
 void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass, const rti1516ev::ParameterHandleValueMap & parameters)
@@ -272,11 +277,6 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
     } // if (interactionClass.hasValidParameters)
 } // foreach 
 #>
-}
-
-IInteractionClassRegistry* GetInteractionClassRegistry()
-{
-  return InteractionClassRegistry::GetInstance();
 }
 
 <# foreach (var namespacePart in FOM.Namespace) { #>

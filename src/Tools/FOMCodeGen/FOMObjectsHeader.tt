@@ -19,12 +19,16 @@
 #include "<#=ObjectInterfacesHeaderFilename#>"
 #include "<#=EncodingHeaderFilename#>"
 
+class ObjectClassRegistry;
+
 <#
 foreach (var namespacePart in FOM.Namespace)
 {
 #>
 namespace <#=namespacePart#> {
 <# } #>
+
+class ObjectClassRegistry;
 
 <# 
 foreach (var objectClass in FOM.ObjectClasses)
@@ -52,10 +56,10 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
   if (objectClass.BaseClass != null)
   {
 #>
-    <#=objectClass.Name#>ObjectClass(rti1516ev::RTIambassador* rtiAmbassador, <#=objectClass.BaseClass.Name#>ObjectClass* baseClass);
+    <#=objectClass.Name#>ObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, <#=objectClass.BaseClass.Name#>ObjectClass* baseClass);
 
 <# } else {#>
-    <#=objectClass.Name#>ObjectClass(rti1516ev::RTIambassador* rtiAmbassador);
+    <#=objectClass.Name#>ObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry);
 <# } #>
 <# 
   var baseClass = objectClass.BaseClass;
@@ -93,7 +97,9 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
     I<#=objectClass.Name#>* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
   private:
+    ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
@@ -133,6 +139,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     <#=objectClass.Name#>& operator=(const <#=objectClass.Name#>&) = delete;
     <#=objectClass.Name#>& operator=(<#=objectClass.Name#>&&) = delete;
     I<#=objectClass.Name#>ObjectClass* GetObjectClass() const { return mObjectClass; }
+    ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
 <#
@@ -142,6 +149,9 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     {
 #>    // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
     <#=attribute.DataType.ReturnCppType#> Get<#=attribute.Name#>() const override;
+<#    if (attribute.DataType is FOMParser.FixedRecordDataType) { #>
+    <#=attribute.DataType.ModifiableReturnCppType#> Get<#=attribute.Name#>() override;
+<#    } #>
     void Set<#=attribute.Name#>(<#=attribute.DataType.ParameterCppType#> newValue) override;
 <#  } else { #>
     // attribute <#=attribute.Name#> : no data type
@@ -222,7 +232,6 @@ class ObjectClassRegistry : public IObjectClassRegistry
     ObjectClassRegistry();
     ~ObjectClassRegistry();
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
-    static ObjectClassRegistry* GetInstance() { return sClassRegistry; }
 
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
     I<#=objectClass.Name#>ObjectClass* Get<#=objectClass.Name#>ObjectClass() const override { return m<#=objectClass.Name#>ObjectClass.get(); }
@@ -238,7 +247,6 @@ class ObjectClassRegistry : public IObjectClassRegistry
 
   private:
     std::map<std::wstring, std::function<void(bool)> > mInstanceNameReservationCallbacks;
-    static ObjectClassRegistry* sClassRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
     std::unique_ptr<<#=objectClass.Name#>ObjectClass> m<#=objectClass.Name#>ObjectClass;

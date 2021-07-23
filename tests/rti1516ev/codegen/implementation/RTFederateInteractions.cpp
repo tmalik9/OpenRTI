@@ -11,10 +11,17 @@
 
 namespace NDistSimIB {
 namespace NRTFederateEncoding {
-HLAinteractionRootInteractionClass::HLAinteractionRootInteractionClass(rti1516ev::RTIambassador* rtiAmbassador)
+HLAinteractionRootInteractionClass::HLAinteractionRootInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot");
+}
+
+ObjectClassRegistry* HLAinteractionRootInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void HLAinteractionRootInteractionClass::Publish()
@@ -103,13 +110,20 @@ rti1516ev::ParameterHandleSet HLAinteractionRootInteractionClass::GetAllParamete
 }
 
 // object class type 'MeasurementInit'
-MeasurementInitInteractionClass::MeasurementInitInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
+MeasurementInitInteractionClass::MeasurementInitInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.MeasurementInit");
   // parameter Dummy : HLAopaqueData
   mDummyParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Dummy");
+}
+
+ObjectClassRegistry* MeasurementInitInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void MeasurementInitInteractionClass::Publish()
@@ -189,13 +203,20 @@ rti1516ev::ParameterHandleSet MeasurementInitInteractionClass::GetAllParameterHa
 }
 
 // object class type 'MeasurementStop'
-MeasurementStopInteractionClass::MeasurementStopInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
+MeasurementStopInteractionClass::MeasurementStopInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.MeasurementStop");
   // parameter NextFederationSuffix : HLAunicodeString
   mNextFederationSuffixParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"NextFederationSuffix");
+}
+
+ObjectClassRegistry* MeasurementStopInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void MeasurementStopInteractionClass::Publish()
@@ -301,13 +322,20 @@ rti1516ev::ParameterHandleSet MeasurementStopInteractionClass::GetAllParameterHa
 }
 
 // object class type 'KeyEvent'
-KeyEventInteractionClass::KeyEventInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
+KeyEventInteractionClass::KeyEventInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.KeyEvent");
   // parameter KeyCode : HLAinteger32LE
   mKeyCodeParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"KeyCode");
+}
+
+ObjectClassRegistry* KeyEventInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void KeyEventInteractionClass::Publish()
@@ -413,15 +441,22 @@ rti1516ev::ParameterHandleSet KeyEventInteractionClass::GetAllParameterHandles()
 }
 
 // object class type 'TextLog'
-TextLogInteractionClass::TextLogInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
+TextLogInteractionClass::TextLogInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.TextLog");
   // parameter Sender : HLAunicodeString
   mSenderParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Sender");
   // parameter Text : HLAunicodeString
   mTextParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Text");
+}
+
+ObjectClassRegistry* TextLogInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void TextLogInteractionClass::Publish()
@@ -543,10 +578,169 @@ rti1516ev::ParameterHandleSet TextLogInteractionClass::GetAllParameterHandles()
   return result;
 }
 
-// object class type 'SystemVariableUpdate'
-SystemVariableUpdateInteractionClass::SystemVariableUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
+// object class type 'DOMemberTransmitData'
+DOMemberTransmitDataInteractionClass::DOMemberTransmitDataInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
+  mBaseClass = baseClass;
+  mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.DOMemberTransmitData");
+  // parameter ObjInstanceHandle : HLAobjectInstanceHandle.DOMemberSource
+  mObjInstanceHandleParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"ObjInstanceHandle");
+  // parameter ConnectionType : HLAASCIIstring
+  mConnectionTypeParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"ConnectionType");
+  // parameter DataBytes : HLAopaqueData
+  mDataBytesParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"DataBytes");
+}
+
+ObjectClassRegistry* DOMemberTransmitDataInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
+}
+
+void DOMemberTransmitDataInteractionClass::Publish()
+{
+  if (!mPublished)
+  {
+    mRtiAmbassador->publishInteractionClass(mInteractionClassHandle);
+    mPublished = true;
+  }
+}
+
+void DOMemberTransmitDataInteractionClass::Unpublish()
+{
+  if (mPublished)
+  {
+    mRtiAmbassador->unpublishInteractionClass(mInteractionClassHandle);
+    mPublished = false;
+  }
+}
+
+void DOMemberTransmitDataInteractionClass::Subscribe()
+{
+  if (!mSubscribed)
+  {
+    mRtiAmbassador->subscribeInteractionClass(mInteractionClassHandle);
+    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, true);
+    mSubscribed = true;
+  }
+}
+
+void DOMemberTransmitDataInteractionClass::Unsubscribe()
+{
+  if (mSubscribed)
+  {
+    mRtiAmbassador->unsubscribeInteractionClass(mInteractionClassHandle);
+    mSubscribed = false;
+  }
+}
+
+void DOMemberTransmitDataInteractionClass::send(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleEncoder(static_cast<DOMemberSource*>(ObjInstanceHandle)->GetObjectInstanceHandle());
+  parameters.insert(std::make_pair(GetObjInstanceHandleParameterHandle(), ObjInstanceHandleEncoder.encode()));
+  rti1516ev::HLAASCIIstring ConnectionTypeEncoder(ConnectionType);
+  parameters.insert(std::make_pair(GetConnectionTypeParameterHandle(), ConnectionTypeEncoder.encode()));
+  rti1516ev::HLAopaqueData DataBytesEncoder(DataBytes);
+  parameters.insert(std::make_pair(GetDataBytesParameterHandle(), DataBytesEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+}
+
+void DOMemberTransmitDataInteractionClass::sendWithTime(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time)
+{
+  rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleEncoder(static_cast<DOMemberSource*>(ObjInstanceHandle)->GetObjectInstanceHandle());
+  parameters.insert(std::make_pair(GetObjInstanceHandleParameterHandle(), ObjInstanceHandleEncoder.encode()));
+  rti1516ev::HLAASCIIstring ConnectionTypeEncoder(ConnectionType);
+  parameters.insert(std::make_pair(GetConnectionTypeParameterHandle(), ConnectionTypeEncoder.encode()));
+  rti1516ev::HLAopaqueData DataBytesEncoder(DataBytes);
+  parameters.insert(std::make_pair(GetDataBytesParameterHandle(), DataBytesEncoder.encode()));
+  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), rti1516ev::HLAinteger64Time(time));
+}
+
+void DOMemberTransmitDataInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+{
+  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ObjInstanceHandleIter = parameters.find(GetObjInstanceHandleParameterHandle());
+  if (ObjInstanceHandleIter != parameters.end())
+  {
+    ObjInstanceHandleDecoder.decode(ObjInstanceHandleIter->second);
+  }
+  rti1516ev::HLAASCIIstring ConnectionTypeDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ConnectionTypeIter = parameters.find(GetConnectionTypeParameterHandle());
+  if (ConnectionTypeIter != parameters.end())
+  {
+    ConnectionTypeDecoder.decode(ConnectionTypeIter->second);
+  }
+  rti1516ev::HLAopaqueData DataBytesDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator DataBytesIter = parameters.find(GetDataBytesParameterHandle());
+  if (DataBytesIter != parameters.end())
+  {
+    DataBytesDecoder.decode(DataBytesIter->second);
+  }
+  for (auto& entry : _receiveCallbacks) {
+    auto& callback = entry.second;
+    callback(static_cast<DOMemberSourceObjectClass*>(GetObjectClassRegistry()->GetDOMemberSourceObjectClass())->GetObjectInstance(ObjInstanceHandleDecoder.get()), ConnectionTypeDecoder.get(), DataBytesDecoder.get());
+  }
+}
+
+void DOMemberTransmitDataInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, rti1516ev::OrderType /*receivedOrder*/)
+{
+  rti1516ev::HLAobjectInstanceHandle ObjInstanceHandleDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ObjInstanceHandleIter = parameters.find(GetObjInstanceHandleParameterHandle());
+  if (ObjInstanceHandleIter != parameters.end())
+  {
+    ObjInstanceHandleDecoder.decode(ObjInstanceHandleIter->second);
+  }
+  rti1516ev::HLAASCIIstring ConnectionTypeDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator ConnectionTypeIter = parameters.find(GetConnectionTypeParameterHandle());
+  if (ConnectionTypeIter != parameters.end())
+  {
+    ConnectionTypeDecoder.decode(ConnectionTypeIter->second);
+  }
+  rti1516ev::HLAopaqueData DataBytesDecoder;
+  rti1516ev::ParameterHandleValueMap::const_iterator DataBytesIter = parameters.find(GetDataBytesParameterHandle());
+  if (DataBytesIter != parameters.end())
+  {
+    DataBytesDecoder.decode(DataBytesIter->second);
+  }
+  for (auto& entry : _receiveCallbacksWithTime) {
+    auto& callback = entry.second;
+    callback(static_cast<DOMemberSourceObjectClass*>(GetObjectClassRegistry()->GetDOMemberSourceObjectClass())->GetObjectInstance(ObjInstanceHandleDecoder.get()), ConnectionTypeDecoder.get(), DataBytesDecoder.get(), static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime());
+  }
+}
+
+uint32_t DOMemberTransmitDataInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+{
+  uint32_t key = _receiveCallbacksNextKey++;
+  _receiveCallbacks.insert(std::make_pair(key, callback));
+  return key;
+}
+
+uint32_t DOMemberTransmitDataInteractionClass::RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback)
+{
+  uint32_t key = _receiveCallbacksWithTimeNextKey++;
+  _receiveCallbacksWithTime.insert(std::make_pair(key, callback));
+  return key;
+}
+
+rti1516ev::ParameterHandleSet DOMemberTransmitDataInteractionClass::GetAllParameterHandles()
+{
+  rti1516ev::ParameterHandleSet result;
+  result.insert(GetObjInstanceHandleParameterHandle());
+  result.insert(GetConnectionTypeParameterHandle());
+  result.insert(GetDataBytesParameterHandle());
+  return result;
+}
+
+// object class type 'SystemVariableUpdate'
+SystemVariableUpdateInteractionClass::SystemVariableUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
+{
+  mInteractionClassRegistry = interactionClassRegistry;
+  mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SystemVariableUpdate");
   // parameter Id : HLAASCIIstring
@@ -557,6 +751,11 @@ SystemVariableUpdateInteractionClass::SystemVariableUpdateInteractionClass(rti15
   mClientParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Client");
   // parameter HasChanged : HLAboolean
   mHasChangedParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"HasChanged");
+}
+
+ObjectClassRegistry* SystemVariableUpdateInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void SystemVariableUpdateInteractionClass::Publish()
@@ -713,13 +912,20 @@ rti1516ev::ParameterHandleSet SystemVariableUpdateInteractionClass::GetAllParame
 }
 
 // object class type 'SystemVariableModification'
-SystemVariableModificationInteractionClass::SystemVariableModificationInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
+SystemVariableModificationInteractionClass::SystemVariableModificationInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.SystemVariableModification");
   // parameter Value : HLAopaqueData
   mValueParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Value");
+}
+
+ObjectClassRegistry* SystemVariableModificationInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void SystemVariableModificationInteractionClass::Publish()
@@ -825,15 +1031,22 @@ rti1516ev::ParameterHandleSet SystemVariableModificationInteractionClass::GetAll
 }
 
 // object class type 'ValueEntityUpdate'
-ValueEntityUpdateInteractionClass::ValueEntityUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
+ValueEntityUpdateInteractionClass::ValueEntityUpdateInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.ValueEntityUpdate");
   // parameter Id : HLAopaqueData
   mIdParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Id");
   // parameter Value : HLAopaqueData
   mValueParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Value");
+}
+
+ObjectClassRegistry* ValueEntityUpdateInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void ValueEntityUpdateInteractionClass::Publish()
@@ -956,9 +1169,11 @@ rti1516ev::ParameterHandleSet ValueEntityUpdateInteractionClass::GetAllParameter
 }
 
 // object class type 'BusMessage'
-BusMessageInteractionClass::BusMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
+BusMessageInteractionClass::BusMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage");
   // parameter IsRequest : HLAboolean
@@ -973,6 +1188,11 @@ BusMessageInteractionClass::BusMessageInteractionClass(rti1516ev::RTIambassador*
   mSenderParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Sender");
   // parameter Receiver : HLAhandle
   mReceiverParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Receiver");
+}
+
+ObjectClassRegistry* BusMessageInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void BusMessageInteractionClass::Publish()
@@ -1163,15 +1383,22 @@ rti1516ev::ParameterHandleSet BusMessageInteractionClass::GetAllParameterHandles
 }
 
 // object class type 'EthPacket'
-EthPacketInteractionClass::EthPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+EthPacketInteractionClass::EthPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.EthPacket");
   // parameter Frame : EthernetPacket
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
   // parameter PortName : HLAASCIIstring
   mPortNameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"PortName");
+}
+
+ObjectClassRegistry* EthPacketInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void EthPacketInteractionClass::Publish()
@@ -1396,13 +1623,20 @@ rti1516ev::ParameterHandleSet EthPacketInteractionClass::GetAllParameterHandles(
 }
 
 // object class type 'EthPacketError'
-EthPacketErrorInteractionClass::EthPacketErrorInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+EthPacketErrorInteractionClass::EthPacketErrorInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.EthPacketError");
   // parameter Frame : EthernetPacketError
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
+}
+
+ObjectClassRegistry* EthPacketErrorInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void EthPacketErrorInteractionClass::Publish()
@@ -1610,13 +1844,20 @@ rti1516ev::ParameterHandleSet EthPacketErrorInteractionClass::GetAllParameterHan
 }
 
 // object class type 'EthPacketErrorForwarded'
-EthPacketErrorForwardedInteractionClass::EthPacketErrorForwardedInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+EthPacketErrorForwardedInteractionClass::EthPacketErrorForwardedInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.EthPacketErrorForwarded");
   // parameter Frame : EthernetPacketErrorForwarded
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
+}
+
+ObjectClassRegistry* EthPacketErrorForwardedInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void EthPacketErrorForwardedInteractionClass::Publish()
@@ -1824,15 +2065,22 @@ rti1516ev::ParameterHandleSet EthPacketErrorForwardedInteractionClass::GetAllPar
 }
 
 // object class type 'EthForwardedPacket'
-EthForwardedPacketInteractionClass::EthForwardedPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+EthForwardedPacketInteractionClass::EthForwardedPacketInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.EthForwardedPacket");
   // parameter Frame : EthernetPacketForwarded
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
   // parameter PortName : HLAASCIIstring
   mPortNameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"PortName");
+}
+
+ObjectClassRegistry* EthForwardedPacketInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void EthForwardedPacketInteractionClass::Publish()
@@ -2057,15 +2305,22 @@ rti1516ev::ParameterHandleSet EthForwardedPacketInteractionClass::GetAllParamete
 }
 
 // object class type 'EthStatus'
-EthStatusInteractionClass::EthStatusInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+EthStatusInteractionClass::EthStatusInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.EthStatus");
   // parameter Frame : EthernetStatus
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
   // parameter PortName : HLAASCIIstring
   mPortNameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"PortName");
+}
+
+ObjectClassRegistry* EthStatusInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void EthStatusInteractionClass::Publish()
@@ -2290,15 +2545,22 @@ rti1516ev::ParameterHandleSet EthStatusInteractionClass::GetAllParameterHandles(
 }
 
 // object class type 'CANMessage'
-CANMessageInteractionClass::CANMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+CANMessageInteractionClass::CANMessageInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.CANMessage");
   // parameter Id : HLAinteger32LE
   mIdParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Id");
   // parameter Frame : CANFrame
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
+}
+
+ObjectClassRegistry* CANMessageInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void CANMessageInteractionClass::Publish()
@@ -2523,13 +2785,20 @@ rti1516ev::ParameterHandleSet CANMessageInteractionClass::GetAllParameterHandles
 }
 
 // object class type 'CANErrorFrame'
-CANErrorFrameInteractionClass::CANErrorFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+CANErrorFrameInteractionClass::CANErrorFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.CANErrorFrame");
   // parameter Frame : HLAopaqueData
   mFrameParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Frame");
+}
+
+ObjectClassRegistry* CANErrorFrameInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void CANErrorFrameInteractionClass::Publish()
@@ -2737,15 +3006,22 @@ rti1516ev::ParameterHandleSet CANErrorFrameInteractionClass::GetAllParameterHand
 }
 
 // object class type 'FlexRaySymbol'
-FlexRaySymbolInteractionClass::FlexRaySymbolInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+FlexRaySymbolInteractionClass::FlexRaySymbolInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.FlexRaySymbol");
   // parameter SymbolPattern : FlexRaySymbolPattern
   mSymbolPatternParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"SymbolPattern");
   // parameter FlexRayChannel : FlexRayChannel
   mFlexRayChannelParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"FlexRayChannel");
+}
+
+ObjectClassRegistry* FlexRaySymbolInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void FlexRaySymbolInteractionClass::Publish()
@@ -2970,13 +3246,20 @@ rti1516ev::ParameterHandleSet FlexRaySymbolInteractionClass::GetAllParameterHand
 }
 
 // object class type 'FlexRayCycleStart'
-FlexRayCycleStartInteractionClass::FlexRayCycleStartInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+FlexRayCycleStartInteractionClass::FlexRayCycleStartInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.FlexRayCycleStart");
   // parameter Cycle : HLAoctet
   mCycleParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Cycle");
+}
+
+ObjectClassRegistry* FlexRayCycleStartInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void FlexRayCycleStartInteractionClass::Publish()
@@ -3184,9 +3467,11 @@ rti1516ev::ParameterHandleSet FlexRayCycleStartInteractionClass::GetAllParameter
 }
 
 // object class type 'FlexRayFrame'
-FlexRayFrameInteractionClass::FlexRayFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, BusMessageInteractionClass* baseClass)
+FlexRayFrameInteractionClass::FlexRayFrameInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, BusMessageInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.BusMessage.FlexRayFrame");
   // parameter FrameID : HLAinteger16LE
@@ -3197,6 +3482,11 @@ FlexRayFrameInteractionClass::FlexRayFrameInteractionClass(rti1516ev::RTIambassa
   mHeaderParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Header");
   // parameter Payload : FlexRayPayload
   mPayloadParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Payload");
+}
+
+ObjectClassRegistry* FlexRayFrameInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void FlexRayFrameInteractionClass::Publish()
@@ -3455,9 +3745,11 @@ rti1516ev::ParameterHandleSet FlexRayFrameInteractionClass::GetAllParameterHandl
 }
 
 // object class type 'PythonCommand'
-PythonCommandInteractionClass::PythonCommandInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, HLAinteractionRootInteractionClass* baseClass)
+PythonCommandInteractionClass::PythonCommandInteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, HLAinteractionRootInteractionClass* baseClass)
 {
+  mInteractionClassRegistry = interactionClassRegistry;
   mRtiAmbassador = rtiAmbassador;
+
   mBaseClass = baseClass;
   mInteractionClassHandle = rtiAmbassador->getInteractionClassHandle(L"HLAinteractionRoot.PythonCommand");
   // parameter Code : HLAopaqueData
@@ -3466,6 +3758,11 @@ PythonCommandInteractionClass::PythonCommandInteractionClass(rti1516ev::RTIambas
   mTargetParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"Target");
   // parameter RefID : HLAopaqueData
   mRefIDParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"RefID");
+}
+
+ObjectClassRegistry* PythonCommandInteractionClass::GetObjectClassRegistry()
+{
+  return mInteractionClassRegistry->GetObjectClassRegistry();
 }
 
 void PythonCommandInteractionClass::Publish()
@@ -3606,42 +3903,165 @@ rti1516ev::ParameterHandleSet PythonCommandInteractionClass::GetAllParameterHand
 
  
 
-InteractionClassRegistry* InteractionClassRegistry::sClassRegistry = nullptr;
-
-InteractionClassRegistry::InteractionClassRegistry()
+InteractionClassRegistry::InteractionClassRegistry(ObjectClassRegistry* objectClassRegistry)
+  : mRtiAmbassador(nullptr), mObjectClassRegistry(objectClassRegistry)
 {
-  assert(sClassRegistry == nullptr);
-  sClassRegistry = this;
 }
 
 InteractionClassRegistry::~InteractionClassRegistry()
 {
-  sClassRegistry = nullptr;
 }
 
 void InteractionClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 {
   mRtiAmbassador = rtiAmbassador;
-  mHLAinteractionRootInteractionClass = std::unique_ptr<HLAinteractionRootInteractionClass>(new HLAinteractionRootInteractionClass(mRtiAmbassador));
-  mMeasurementInitInteractionClass = std::unique_ptr<MeasurementInitInteractionClass>(new MeasurementInitInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
-  mMeasurementStopInteractionClass = std::unique_ptr<MeasurementStopInteractionClass>(new MeasurementStopInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
-  mKeyEventInteractionClass = std::unique_ptr<KeyEventInteractionClass>(new KeyEventInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
-  mTextLogInteractionClass = std::unique_ptr<TextLogInteractionClass>(new TextLogInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
-  mSystemVariableUpdateInteractionClass = std::unique_ptr<SystemVariableUpdateInteractionClass>(new SystemVariableUpdateInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
-  mSystemVariableModificationInteractionClass = std::unique_ptr<SystemVariableModificationInteractionClass>(new SystemVariableModificationInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
-  mValueEntityUpdateInteractionClass = std::unique_ptr<ValueEntityUpdateInteractionClass>(new ValueEntityUpdateInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
-  mBusMessageInteractionClass = std::unique_ptr<BusMessageInteractionClass>(new BusMessageInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
-  mEthPacketInteractionClass = std::unique_ptr<EthPacketInteractionClass>(new EthPacketInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mEthPacketErrorInteractionClass = std::unique_ptr<EthPacketErrorInteractionClass>(new EthPacketErrorInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mEthPacketErrorForwardedInteractionClass = std::unique_ptr<EthPacketErrorForwardedInteractionClass>(new EthPacketErrorForwardedInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mEthForwardedPacketInteractionClass = std::unique_ptr<EthForwardedPacketInteractionClass>(new EthForwardedPacketInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mEthStatusInteractionClass = std::unique_ptr<EthStatusInteractionClass>(new EthStatusInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mCANMessageInteractionClass = std::unique_ptr<CANMessageInteractionClass>(new CANMessageInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mCANErrorFrameInteractionClass = std::unique_ptr<CANErrorFrameInteractionClass>(new CANErrorFrameInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mFlexRaySymbolInteractionClass = std::unique_ptr<FlexRaySymbolInteractionClass>(new FlexRaySymbolInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mFlexRayCycleStartInteractionClass = std::unique_ptr<FlexRayCycleStartInteractionClass>(new FlexRayCycleStartInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mFlexRayFrameInteractionClass = std::unique_ptr<FlexRayFrameInteractionClass>(new FlexRayFrameInteractionClass(mRtiAmbassador, mBusMessageInteractionClass.get()));
-  mPythonCommandInteractionClass = std::unique_ptr<PythonCommandInteractionClass>(new PythonCommandInteractionClass(mRtiAmbassador, mHLAinteractionRootInteractionClass.get()));
+  try
+  {
+    mHLAinteractionRootInteractionClass = std::unique_ptr<HLAinteractionRootInteractionClass>(new HLAinteractionRootInteractionClass(mRtiAmbassador, this));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mMeasurementInitInteractionClass = std::unique_ptr<MeasurementInitInteractionClass>(new MeasurementInitInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mMeasurementStopInteractionClass = std::unique_ptr<MeasurementStopInteractionClass>(new MeasurementStopInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mKeyEventInteractionClass = std::unique_ptr<KeyEventInteractionClass>(new KeyEventInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mTextLogInteractionClass = std::unique_ptr<TextLogInteractionClass>(new TextLogInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mDOMemberTransmitDataInteractionClass = std::unique_ptr<DOMemberTransmitDataInteractionClass>(new DOMemberTransmitDataInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mSystemVariableUpdateInteractionClass = std::unique_ptr<SystemVariableUpdateInteractionClass>(new SystemVariableUpdateInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mSystemVariableModificationInteractionClass = std::unique_ptr<SystemVariableModificationInteractionClass>(new SystemVariableModificationInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mValueEntityUpdateInteractionClass = std::unique_ptr<ValueEntityUpdateInteractionClass>(new ValueEntityUpdateInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mBusMessageInteractionClass = std::unique_ptr<BusMessageInteractionClass>(new BusMessageInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mEthPacketInteractionClass = std::unique_ptr<EthPacketInteractionClass>(new EthPacketInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mEthPacketErrorInteractionClass = std::unique_ptr<EthPacketErrorInteractionClass>(new EthPacketErrorInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mEthPacketErrorForwardedInteractionClass = std::unique_ptr<EthPacketErrorForwardedInteractionClass>(new EthPacketErrorForwardedInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mEthForwardedPacketInteractionClass = std::unique_ptr<EthForwardedPacketInteractionClass>(new EthForwardedPacketInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mEthStatusInteractionClass = std::unique_ptr<EthStatusInteractionClass>(new EthStatusInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mCANMessageInteractionClass = std::unique_ptr<CANMessageInteractionClass>(new CANMessageInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mCANErrorFrameInteractionClass = std::unique_ptr<CANErrorFrameInteractionClass>(new CANErrorFrameInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mFlexRaySymbolInteractionClass = std::unique_ptr<FlexRaySymbolInteractionClass>(new FlexRaySymbolInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mFlexRayCycleStartInteractionClass = std::unique_ptr<FlexRayCycleStartInteractionClass>(new FlexRayCycleStartInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mFlexRayFrameInteractionClass = std::unique_ptr<FlexRayFrameInteractionClass>(new FlexRayFrameInteractionClass(mRtiAmbassador, this, mBusMessageInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
+  try
+  {
+    mPythonCommandInteractionClass = std::unique_ptr<PythonCommandInteractionClass>(new PythonCommandInteractionClass(mRtiAmbassador, this, mHLAinteractionRootInteractionClass.get()));
+  }
+  catch (const rti1516ev::NameNotFound&)
+  {
+  }
 } // Initialize
 
 void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass, const rti1516ev::ParameterHandleValueMap & parameters)
@@ -3661,6 +4081,10 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   else if (theInteractionClass == mTextLogInteractionClass->GetInteractionClassHandle())
   {
     mTextLogInteractionClass->ReceiveInteraction(parameters);
+  }
+  else if (theInteractionClass == mDOMemberTransmitDataInteractionClass->GetInteractionClassHandle())
+  {
+    mDOMemberTransmitDataInteractionClass->ReceiveInteraction(parameters);
   }
   else if (theInteractionClass == mSystemVariableUpdateInteractionClass->GetInteractionClassHandle())
   {
@@ -3722,11 +4146,6 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   {
     mPythonCommandInteractionClass->ReceiveInteraction(parameters);
   }
-}
-
-IInteractionClassRegistry* GetInteractionClassRegistry()
-{
-  return InteractionClassRegistry::GetInstance();
 }
 
 } // namespace NDistSimIB

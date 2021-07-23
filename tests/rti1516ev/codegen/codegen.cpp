@@ -131,7 +131,10 @@ bool testHLAobjectClassBasedCountsEncoding()
 class OPENRTI_LOCAL RTFederateAmbassador : public OpenRTI::RTI1516ESimpleAmbassador
 {
 public:
-  RTFederateAmbassador() : OpenRTI::RTI1516ESimpleAmbassador() {}
+  RTFederateAmbassador() 
+    : OpenRTI::RTI1516ESimpleAmbassador(), objectClassRegistry(), interactionClassRegistry(&objectClassRegistry)
+  {
+  }
   virtual void objectInstanceNameReservationSucceeded(const std::wstring& name) override
   {
     objectClassRegistry.ObjectInstanceNameReservationSucceeded(name);

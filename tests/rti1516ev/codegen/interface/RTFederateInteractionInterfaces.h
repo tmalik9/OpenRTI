@@ -89,6 +89,22 @@ class ITextLogInteractionClass
     virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
+class IDOMemberTransmitDataInteractionClass
+{
+  public:
+    virtual void Publish() = 0;
+    virtual void Unpublish() = 0;
+    virtual void Subscribe() = 0;
+    virtual void Unsubscribe() = 0;
+    virtual void send(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes) = 0;
+    using ReceiveCallback = std::function<void(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes)>;
+    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    // send/receive with timestamps
+    virtual void sendWithTime(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time) = 0;
+    using ReceiveCallbackWithTime = std::function<void(IDOMemberSource* ObjInstanceHandle, const std::string& ConnectionType, const std::vector<uint8_t>& DataBytes, int64_t time)>;
+    virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
+};
+
 class ISystemVariableUpdateInteractionClass
 {
   public:
@@ -338,6 +354,7 @@ class IInteractionClassRegistry
     virtual IMeasurementStopInteractionClass* GetMeasurementStopInteractionClass() const = 0;
     virtual IKeyEventInteractionClass* GetKeyEventInteractionClass() const = 0;
     virtual ITextLogInteractionClass* GetTextLogInteractionClass() const = 0;
+    virtual IDOMemberTransmitDataInteractionClass* GetDOMemberTransmitDataInteractionClass() const = 0;
     virtual ISystemVariableUpdateInteractionClass* GetSystemVariableUpdateInteractionClass() const = 0;
     virtual ISystemVariableModificationInteractionClass* GetSystemVariableModificationInteractionClass() const = 0;
     virtual IValueEntityUpdateInteractionClass* GetValueEntityUpdateInteractionClass() const = 0;
@@ -356,8 +373,6 @@ class IInteractionClassRegistry
   protected:
     virtual ~IInteractionClassRegistry() {}
 }; // class IInteractionClassRegistry
-
-IInteractionClassRegistry* GetInteractionClassRegistry();
 
 } // namespace NDistSimIB
 } // namespace NRTFederateEncoding

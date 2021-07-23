@@ -100,6 +100,9 @@ class I<#=objectClass.Name#><#
     { #>
     // attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
     virtual <#=attribute.DataType.ReturnCppType#> Get<#=attribute.Name#>() const = 0;
+<#    if (attribute.DataType is FOMParser.FixedRecordDataType) { #>
+    virtual <#=attribute.DataType.ModifiableReturnCppType#> Get<#=attribute.Name#>() = 0;
+<#  } #>
     virtual void Set<#=attribute.Name#>(<#=attribute.DataType.ParameterCppType#> newValue) = 0;
 <#  } else { #>
     // attribute <#=attribute.Name#> : no data type
@@ -143,8 +146,6 @@ class IObjectClassRegistry
   protected:
     virtual ~IObjectClassRegistry() {}
 }; // class IObjectClassRegistry
-
-IObjectClassRegistry* GetObjectClassRegistry();
 
 <#
 foreach (var namespacePart in FOM.Namespace)
