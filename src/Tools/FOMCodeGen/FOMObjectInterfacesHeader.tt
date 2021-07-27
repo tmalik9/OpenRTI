@@ -28,15 +28,22 @@ class I<#=objectClass.Name#>;
 class I<#=objectClass.Name#>ObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(I<#=objectClass.Name#>*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(I<#=objectClass.Name#>*)>;
+    using RemoveObjectInstanceCallback = std::function<void(I<#=objectClass.Name#>*)>;
+    using ObjectCreatedCallbackType = std::function<void(I<#=objectClass.Name#>*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual I<#=objectClass.Name#>* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class I<#=objectClass.Name#><#
@@ -92,6 +99,8 @@ class I<#=objectClass.Name#><#
 
 <# if (objectClass.BaseClass == null)  {#>
     virtual std::wstring GetObjectInstanceName() const = 0;
+    virtual bool IsValid() const = 0;
+    virtual bool IsOwner() const = 0;
 <# } #>
 <# 
   foreach (var attribute in objectClass.Attributes)
@@ -111,15 +120,15 @@ class I<#=objectClass.Name#><#
   } // foreach (var attribute in objectClass.Attributes)
 #>
 <# if (objectClass.HasValidAttributes) { #>
-<# if (objectClass.BaseClass != null && !objectClass.BaseClass.HasValidAttributes) { #>
+<# if (objectClass.BaseClass != null && !objectClass.BaseClass.HasValidAttributes) { // first child class with valid attributes #>
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateAllAttributeValues(<#=FOM.NativeTimeType#> time) = 0;
     // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
     // send attribute values which have been modified since last call, as TSO message
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateModifiedAttributeValues(<#=FOM.NativeTimeType#> time) = 0;
     // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
     // request attribute values which haven't been updated in last reflectAttributeValues
@@ -128,9 +137,12 @@ class I<#=objectClass.Name#><#
     virtual void RequestAllAttributeValues() = 0;
 <# } #>
 <# if (objectClass.ChildClasses.Count == 0) { #>
-    using UpdateCallbackType = std::function<void(I<#=objectClass.Name#>*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(I<#=objectClass.Name#>*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(I<#=objectClass.Name#>*, <#=FOM.NativeTimeType#> time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
 };

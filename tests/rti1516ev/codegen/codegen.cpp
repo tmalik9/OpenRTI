@@ -236,7 +236,7 @@ bool testRTFederate(int argc, char* argv[])
   canMessageInteractionClass->send(false, "CAN1", NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), HLAhandle(ObjectInstanceHandle()), HLAhandle(ObjectInstanceHandle()), 0x100, canFrame);
   auto* busControllerObjectClass = ambassador.objectClassRegistry.GetBusControllerCanObjectClass();
   busControllerObjectClass->Publish();
-  busControllerObjectClass->Subscribe();
+  busControllerObjectClass->Subscribe(true);
   NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan = busControllerObjectClass->CreateObjectInstance(L"CAN1");
   while (!static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCan*>(busControllerCan)->IsValid())
   {

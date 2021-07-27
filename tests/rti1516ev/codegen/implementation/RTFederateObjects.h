@@ -9,6 +9,7 @@
 #include "RTI/encoding/HLAfixedRecord.h"
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
+#include "RTI/time/HLAinteger64Time.h"
 
 #include "RTI/encoding/HLAopaqueData.h"
 #include "RTI/encoding/HLAhandle.h"
@@ -28,17 +29,21 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
   public:
     // IHLAobjectRootObjectClass
     HLAobjectRootObjectClass() = default;
-    virtual ~HLAobjectRootObjectClass() = default;
+    virtual ~HLAobjectRootObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IHLAobjectRoot* GetObjectInstance(const std::wstring& instanceName) override;
     IHLAobjectRoot* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IHLAobjectRoot* newObjectInstance);
+    IHLAobjectRoot* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IHLAobjectRoot* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IHLAobjectRoot* newObjectInstance);
     // internal
     HLAobjectRootObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry);
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -60,8 +65,10 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
     std::map<std::wstring, HLAobjectRoot*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, HLAobjectRoot*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class HLAobjectRoot : public IHLAobjectRoot
@@ -84,8 +91,8 @@ class HLAobjectRoot : public IHLAobjectRoot
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class HLAobjectRootObjectClass;
 
@@ -107,17 +114,21 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
   public:
     // ISystemVariableObjectClass
     SystemVariableObjectClass() = default;
-    virtual ~SystemVariableObjectClass() = default;
+    virtual ~SystemVariableObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     ISystemVariable* GetObjectInstance(const std::wstring& instanceName) override;
     ISystemVariable* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(ISystemVariable* newObjectInstance);
+    ISystemVariable* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(ISystemVariable* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(ISystemVariable* newObjectInstance);
     // internal
     SystemVariableObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -144,8 +155,10 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     std::map<std::wstring, SystemVariable*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, SystemVariable*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class SystemVariable : public ISystemVariable
@@ -167,23 +180,26 @@ class SystemVariable : public ISystemVariable
     void SetValue(const std::vector<uint8_t>& newValue) override;
     // ISystemVariable
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class SystemVariableObjectClass;
 
@@ -191,6 +207,7 @@ class SystemVariable : public ISystemVariable
     SystemVariable(SystemVariableObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     SystemVariableObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -200,8 +217,10 @@ class SystemVariable : public ISystemVariable
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute Value : HLAopaqueData
@@ -214,17 +233,21 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
   public:
     // IValueEntityObjectClass
     ValueEntityObjectClass() = default;
-    virtual ~ValueEntityObjectClass() = default;
+    virtual ~ValueEntityObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IValueEntity* GetObjectInstance(const std::wstring& instanceName) override;
     IValueEntity* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IValueEntity* newObjectInstance);
+    IValueEntity* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IValueEntity* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IValueEntity* newObjectInstance);
     // internal
     ValueEntityObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -251,8 +274,10 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     std::map<std::wstring, ValueEntity*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, ValueEntity*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class ValueEntity : public IValueEntity
@@ -274,23 +299,26 @@ class ValueEntity : public IValueEntity
     void SetValue(const std::vector<uint8_t>& newValue) override;
     // IValueEntity
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class ValueEntityObjectClass;
 
@@ -298,6 +326,7 @@ class ValueEntity : public IValueEntity
     ValueEntity(ValueEntityObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     ValueEntityObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -307,8 +336,10 @@ class ValueEntity : public IValueEntity
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute Value : HLAopaqueData
@@ -321,17 +352,21 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
   public:
     // IDOMemberSourceObjectClass
     DOMemberSourceObjectClass() = default;
-    virtual ~DOMemberSourceObjectClass() = default;
+    virtual ~DOMemberSourceObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IDOMemberSource* GetObjectInstance(const std::wstring& instanceName) override;
     IDOMemberSource* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IDOMemberSource* newObjectInstance);
+    IDOMemberSource* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IDOMemberSource* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IDOMemberSource* newObjectInstance);
     // internal
     DOMemberSourceObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -366,8 +401,10 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     std::map<std::wstring, DOMemberSource*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, DOMemberSource*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class DOMemberSource : public IDOMemberSource
@@ -395,23 +432,26 @@ class DOMemberSource : public IDOMemberSource
     void SetDOSourceMemberDataBytes(const std::vector<uint8_t>& newValue) override;
     // IDOMemberSource
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class DOMemberSourceObjectClass;
 
@@ -419,6 +459,7 @@ class DOMemberSource : public IDOMemberSource
     DOMemberSource(DOMemberSourceObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     DOMemberSourceObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -428,8 +469,10 @@ class DOMemberSource : public IDOMemberSource
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute DOSourceMemberName : HLAASCIIstring
@@ -446,17 +489,21 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
   public:
     // IDOMemberTargetObjectClass
     DOMemberTargetObjectClass() = default;
-    virtual ~DOMemberTargetObjectClass() = default;
+    virtual ~DOMemberTargetObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IDOMemberTarget* GetObjectInstance(const std::wstring& instanceName) override;
     IDOMemberTarget* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IDOMemberTarget* newObjectInstance);
+    IDOMemberTarget* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IDOMemberTarget* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IDOMemberTarget* newObjectInstance);
     // internal
     DOMemberTargetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -487,8 +534,10 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     std::map<std::wstring, DOMemberTarget*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, DOMemberTarget*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class DOMemberTarget : public IDOMemberTarget
@@ -513,23 +562,26 @@ class DOMemberTarget : public IDOMemberTarget
     void SetDOTargetMemberConnectionType(const std::string& newValue) override;
     // IDOMemberTarget
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class DOMemberTargetObjectClass;
 
@@ -537,6 +589,7 @@ class DOMemberTarget : public IDOMemberTarget
     DOMemberTarget(DOMemberTargetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     DOMemberTargetObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -546,8 +599,10 @@ class DOMemberTarget : public IDOMemberTarget
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute DOTargetMemberName : HLAASCIIstring
@@ -562,17 +617,21 @@ class BusManagementObjectClass : public IBusManagementObjectClass
   public:
     // IBusManagementObjectClass
     BusManagementObjectClass() = default;
-    virtual ~BusManagementObjectClass() = default;
+    virtual ~BusManagementObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IBusManagement* GetObjectInstance(const std::wstring& instanceName) override;
     IBusManagement* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IBusManagement* newObjectInstance);
+    IBusManagement* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IBusManagement* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IBusManagement* newObjectInstance);
     // internal
     BusManagementObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -599,8 +658,10 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     std::map<std::wstring, BusManagement*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusManagement*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class BusManagement : public IBusManagement
@@ -622,9 +683,9 @@ class BusManagement : public IBusManagement
     void SetNetworkID(const std::string& newValue) override;
     // IBusManagement
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
@@ -634,9 +695,10 @@ class BusManagement : public IBusManagement
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class BusManagementObjectClass;
 
@@ -664,17 +726,21 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
   public:
     // IBusManagementCanObjectClass
     BusManagementCanObjectClass() = default;
-    virtual ~BusManagementCanObjectClass() = default;
+    virtual ~BusManagementCanObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IBusManagementCan* GetObjectInstance(const std::wstring& instanceName) override;
     IBusManagementCan* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IBusManagementCan* newObjectInstance);
+    IBusManagementCan* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IBusManagementCan* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IBusManagementCan* newObjectInstance);
     // internal
     BusManagementCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass);
 
@@ -715,8 +781,10 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     std::map<std::wstring, BusManagementCan*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusManagementCan*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class BusManagementCan : public IBusManagementCan
@@ -750,23 +818,26 @@ class BusManagementCan : public IBusManagementCan
     void SetSendMessagesAsRx(bool newValue) override;
     // IBusManagementCan
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class BusManagementCanObjectClass;
 
@@ -774,6 +845,7 @@ class BusManagementCan : public IBusManagementCan
     BusManagementCan(BusManagementCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     BusManagementCanObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -783,8 +855,10 @@ class BusManagementCan : public IBusManagementCan
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
@@ -805,17 +879,21 @@ class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClas
   public:
     // IBusManagementEthernetObjectClass
     BusManagementEthernetObjectClass() = default;
-    virtual ~BusManagementEthernetObjectClass() = default;
+    virtual ~BusManagementEthernetObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IBusManagementEthernet* GetObjectInstance(const std::wstring& instanceName) override;
     IBusManagementEthernet* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IBusManagementEthernet* newObjectInstance);
+    IBusManagementEthernet* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IBusManagementEthernet* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IBusManagementEthernet* newObjectInstance);
     // internal
     BusManagementEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass);
 
@@ -848,8 +926,10 @@ class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClas
     std::map<std::wstring, BusManagementEthernet*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusManagementEthernet*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class BusManagementEthernet : public IBusManagementEthernet
@@ -877,23 +957,26 @@ class BusManagementEthernet : public IBusManagementEthernet
     void SetSendMessagesAsRx(bool newValue) override;
     // IBusManagementEthernet
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class BusManagementEthernetObjectClass;
 
@@ -901,6 +984,7 @@ class BusManagementEthernet : public IBusManagementEthernet
     BusManagementEthernet(BusManagementEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     BusManagementEthernetObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -910,8 +994,10 @@ class BusManagementEthernet : public IBusManagementEthernet
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
@@ -928,17 +1014,21 @@ class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
   public:
     // IFlexRayClusterObjectClass
     FlexRayClusterObjectClass() = default;
-    virtual ~FlexRayClusterObjectClass() = default;
+    virtual ~FlexRayClusterObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IFlexRayCluster* GetObjectInstance(const std::wstring& instanceName) override;
     IFlexRayCluster* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IFlexRayCluster* newObjectInstance);
+    IFlexRayCluster* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IFlexRayCluster* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IFlexRayCluster* newObjectInstance);
     // internal
     FlexRayClusterObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass);
 
@@ -1043,8 +1133,10 @@ class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
     std::map<std::wstring, FlexRayCluster*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, FlexRayCluster*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class FlexRayCluster : public IFlexRayCluster
@@ -1126,23 +1218,26 @@ class FlexRayCluster : public IFlexRayCluster
     void SetgSyncFrameIDCountMax(uint8_t newValue) override;
     // IFlexRayCluster
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class FlexRayClusterObjectClass;
 
@@ -1150,6 +1245,7 @@ class FlexRayCluster : public IFlexRayCluster
     FlexRayCluster(FlexRayClusterObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     FlexRayClusterObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -1159,8 +1255,10 @@ class FlexRayCluster : public IFlexRayCluster
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
@@ -1213,17 +1311,21 @@ class BusControllerObjectClass : public IBusControllerObjectClass
   public:
     // IBusControllerObjectClass
     BusControllerObjectClass() = default;
-    virtual ~BusControllerObjectClass() = default;
+    virtual ~BusControllerObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IBusController* GetObjectInstance(const std::wstring& instanceName) override;
     IBusController* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IBusController* newObjectInstance);
+    IBusController* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IBusController* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IBusController* newObjectInstance);
     // internal
     BusControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -1254,8 +1356,10 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     std::map<std::wstring, BusController*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusController*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class BusController : public IBusController
@@ -1280,9 +1384,9 @@ class BusController : public IBusController
     void SetDeviceID(const std::string& newValue) override;
     // IBusController
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
@@ -1292,9 +1396,10 @@ class BusController : public IBusController
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class BusControllerObjectClass;
 
@@ -1324,17 +1429,21 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
   public:
     // IBusControllerCanObjectClass
     BusControllerCanObjectClass() = default;
-    virtual ~BusControllerCanObjectClass() = default;
+    virtual ~BusControllerCanObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IBusControllerCan* GetObjectInstance(const std::wstring& instanceName) override;
     IBusControllerCan* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IBusControllerCan* newObjectInstance);
+    IBusControllerCan* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IBusControllerCan* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IBusControllerCan* newObjectInstance);
     // internal
     BusControllerCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
@@ -1397,8 +1506,10 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     std::map<std::wstring, BusControllerCan*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusControllerCan*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class BusControllerCan : public IBusControllerCan
@@ -1450,23 +1561,26 @@ class BusControllerCan : public IBusControllerCan
     void SetSamplingMode(CanSamplingMode newValue) override;
     // IBusControllerCan
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class BusControllerCanObjectClass;
 
@@ -1474,6 +1588,7 @@ class BusControllerCan : public IBusControllerCan
     BusControllerCan(BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     BusControllerCanObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -1483,8 +1598,10 @@ class BusControllerCan : public IBusControllerCan
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
@@ -1517,17 +1634,21 @@ class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClas
   public:
     // IBusControllerEthernetObjectClass
     BusControllerEthernetObjectClass() = default;
-    virtual ~BusControllerEthernetObjectClass() = default;
+    virtual ~BusControllerEthernetObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IBusControllerEthernet* GetObjectInstance(const std::wstring& instanceName) override;
     IBusControllerEthernet* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IBusControllerEthernet* newObjectInstance);
+    IBusControllerEthernet* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IBusControllerEthernet* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IBusControllerEthernet* newObjectInstance);
     // internal
     BusControllerEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
@@ -1558,8 +1679,10 @@ class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClas
     std::map<std::wstring, BusControllerEthernet*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, BusControllerEthernet*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class BusControllerEthernet : public IBusControllerEthernet
@@ -1587,23 +1710,26 @@ class BusControllerEthernet : public IBusControllerEthernet
     void SetPortName(const std::string& newValue) override;
     // IBusControllerEthernet
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class BusControllerEthernetObjectClass;
 
@@ -1611,6 +1737,7 @@ class BusControllerEthernet : public IBusControllerEthernet
     BusControllerEthernet(BusControllerEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     BusControllerEthernetObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -1620,8 +1747,10 @@ class BusControllerEthernet : public IBusControllerEthernet
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
@@ -1638,17 +1767,21 @@ class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObject
   public:
     // IFlexRayControllerStatusObjectClass
     FlexRayControllerStatusObjectClass() = default;
-    virtual ~FlexRayControllerStatusObjectClass() = default;
+    virtual ~FlexRayControllerStatusObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IFlexRayControllerStatus* GetObjectInstance(const std::wstring& instanceName) override;
     IFlexRayControllerStatus* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IFlexRayControllerStatus* newObjectInstance);
+    IFlexRayControllerStatus* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IFlexRayControllerStatus* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IFlexRayControllerStatus* newObjectInstance);
     // internal
     FlexRayControllerStatusObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
@@ -1711,8 +1844,10 @@ class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObject
     std::map<std::wstring, FlexRayControllerStatus*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, FlexRayControllerStatus*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class FlexRayControllerStatus : public IFlexRayControllerStatus
@@ -1764,23 +1899,26 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
     void SetwakeupStatus(FlexRayWakeupStatusType newValue) override;
     // IFlexRayControllerStatus
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class FlexRayControllerStatusObjectClass;
 
@@ -1788,6 +1926,7 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
     FlexRayControllerStatus(FlexRayControllerStatusObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     FlexRayControllerStatusObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -1797,8 +1936,10 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
@@ -1831,17 +1972,21 @@ class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
   public:
     // IFlexRayControllerObjectClass
     FlexRayControllerObjectClass() = default;
-    virtual ~FlexRayControllerObjectClass() = default;
+    virtual ~FlexRayControllerObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IFlexRayController* GetObjectInstance(const std::wstring& instanceName) override;
     IFlexRayController* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IFlexRayController* newObjectInstance);
+    IFlexRayController* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IFlexRayController* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IFlexRayController* newObjectInstance);
     // internal
     FlexRayControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
@@ -1968,8 +2113,10 @@ class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
     std::map<std::wstring, FlexRayController*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, FlexRayController*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class FlexRayController : public IFlexRayController
@@ -2069,23 +2216,26 @@ class FlexRayController : public IFlexRayController
     void SetpSamplesPerMicrotick(uint8_t newValue) override;
     // IFlexRayController
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class FlexRayControllerObjectClass;
 
@@ -2093,6 +2243,7 @@ class FlexRayController : public IFlexRayController
     FlexRayController(FlexRayControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     FlexRayControllerObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -2102,8 +2253,10 @@ class FlexRayController : public IFlexRayController
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute NetworkID : HLAASCIIstring
@@ -2168,17 +2321,21 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
   public:
     // IFlexRaySendBufferObjectClass
     FlexRaySendBufferObjectClass() = default;
-    virtual ~FlexRaySendBufferObjectClass() = default;
+    virtual ~FlexRaySendBufferObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     IFlexRaySendBuffer* GetObjectInstance(const std::wstring& instanceName) override;
     IFlexRaySendBuffer* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(IFlexRaySendBuffer* newObjectInstance);
+    IFlexRaySendBuffer* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(IFlexRaySendBuffer* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(IFlexRaySendBuffer* newObjectInstance);
     // internal
     FlexRaySendBufferObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -2237,8 +2394,10 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
     std::map<std::wstring, FlexRaySendBuffer*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, FlexRaySendBuffer*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class FlexRaySendBuffer : public IFlexRaySendBuffer
@@ -2285,23 +2444,26 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     void SetHeaderCRC(int16_t newValue) override;
     // IFlexRaySendBuffer
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(int64_t time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(int64_t time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 
     // get attribute handle/value map of all attributes
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class FlexRaySendBufferObjectClass;
 
@@ -2309,6 +2471,7 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     FlexRaySendBuffer(FlexRaySendBufferObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
     FlexRaySendBufferObjectClass* mObjectClass;
     std::wstring mInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -2318,8 +2481,10 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     AttributeBits mLastUpdated = kNone;
     // to be sent with next updateAttributes
     AttributeBits mDirty = kNone;
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
     // attribute Sender : HLAobjectInstanceHandle.FlexRayController
@@ -2350,6 +2515,7 @@ class ObjectClassRegistry : public IObjectClassRegistry
     ObjectClassRegistry();
     ~ObjectClassRegistry();
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
+    void Finalize();
 
     IHLAobjectRootObjectClass* GetHLAobjectRootObjectClass() const override { return mHLAobjectRootObjectClass.get(); }
     ISystemVariableObjectClass* GetSystemVariableObjectClass() const override { return mSystemVariableObjectClass.get(); }
@@ -2370,6 +2536,7 @@ class ObjectClassRegistry : public IObjectClassRegistry
     void DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes);
+    void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles);
     void ObjectInstanceNameReservationSucceeded(std::wstring const & theObjectInstanceName);
     void ObjectInstanceNameReservationFailed(std::wstring const & theObjectInstanceName);

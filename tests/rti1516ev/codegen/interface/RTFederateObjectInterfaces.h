@@ -5,7 +5,7 @@
 #include <vector>
 #include <functional>
 
-#include "RTI/encoding/HLAhandle.h"
+
 #include "RTFederateDataTypes.h"
 
 namespace NDistSimIB {
@@ -15,15 +15,22 @@ class IHLAobjectRoot;
 class IHLAobjectRootObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IHLAobjectRoot*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IHLAobjectRoot*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IHLAobjectRoot*)>;
+    using ObjectCreatedCallbackType = std::function<void(IHLAobjectRoot*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IHLAobjectRoot* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IHLAobjectRoot* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IHLAobjectRoot* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IHLAobjectRoot
@@ -40,6 +47,8 @@ class IHLAobjectRoot
     IHLAobjectRoot& operator=(IHLAobjectRoot&&) = delete;
 
     virtual std::wstring GetObjectInstanceName() const = 0;
+    virtual bool IsValid() const = 0;
+    virtual bool IsOwner() const = 0;
     // attribute HLAprivilegeToDeleteObject : no data type
 };
 
@@ -47,15 +56,22 @@ class ISystemVariable;
 class ISystemVariableObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(ISystemVariable*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(ISystemVariable*)>;
+    using RemoveObjectInstanceCallback = std::function<void(ISystemVariable*)>;
+    using ObjectCreatedCallbackType = std::function<void(ISystemVariable*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual ISystemVariable* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual ISystemVariable* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual ISystemVariable* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class ISystemVariable : public IHLAobjectRoot
@@ -76,35 +92,45 @@ class ISystemVariable : public IHLAobjectRoot
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateAllAttributeValues(int64_t time) = 0;
     // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
     // send attribute values which have been modified since last call, as TSO message
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateModifiedAttributeValues(int64_t time) = 0;
     // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
     // request attribute values which haven't been updated in last reflectAttributeValues
     virtual void RequestAttributeValues() = 0;
     // request all attribute values
     virtual void RequestAllAttributeValues() = 0;
-    using UpdateCallbackType = std::function<void(ISystemVariable*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(ISystemVariable*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(ISystemVariable*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IValueEntity;
 class IValueEntityObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IValueEntity*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IValueEntity*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IValueEntity*)>;
+    using ObjectCreatedCallbackType = std::function<void(IValueEntity*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IValueEntity* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IValueEntity* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IValueEntity* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IValueEntity : public IHLAobjectRoot
@@ -125,35 +151,45 @@ class IValueEntity : public IHLAobjectRoot
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateAllAttributeValues(int64_t time) = 0;
     // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
     // send attribute values which have been modified since last call, as TSO message
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateModifiedAttributeValues(int64_t time) = 0;
     // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
     // request attribute values which haven't been updated in last reflectAttributeValues
     virtual void RequestAttributeValues() = 0;
     // request all attribute values
     virtual void RequestAllAttributeValues() = 0;
-    using UpdateCallbackType = std::function<void(IValueEntity*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IValueEntity*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IValueEntity*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IDOMemberSource;
 class IDOMemberSourceObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IDOMemberSource*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IDOMemberSource*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IDOMemberSource*)>;
+    using ObjectCreatedCallbackType = std::function<void(IDOMemberSource*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IDOMemberSource* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IDOMemberSource* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IDOMemberSource* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IDOMemberSource : public IHLAobjectRoot
@@ -182,35 +218,45 @@ class IDOMemberSource : public IHLAobjectRoot
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateAllAttributeValues(int64_t time) = 0;
     // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
     // send attribute values which have been modified since last call, as TSO message
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateModifiedAttributeValues(int64_t time) = 0;
     // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
     // request attribute values which haven't been updated in last reflectAttributeValues
     virtual void RequestAttributeValues() = 0;
     // request all attribute values
     virtual void RequestAllAttributeValues() = 0;
-    using UpdateCallbackType = std::function<void(IDOMemberSource*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IDOMemberSource*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IDOMemberSource*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IDOMemberTarget;
 class IDOMemberTargetObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IDOMemberTarget*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IDOMemberTarget*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IDOMemberTarget*)>;
+    using ObjectCreatedCallbackType = std::function<void(IDOMemberTarget*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IDOMemberTarget* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IDOMemberTarget* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IDOMemberTarget* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IDOMemberTarget : public IHLAobjectRoot
@@ -235,35 +281,45 @@ class IDOMemberTarget : public IHLAobjectRoot
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateAllAttributeValues(int64_t time) = 0;
     // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
     // send attribute values which have been modified since last call, as TSO message
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateModifiedAttributeValues(int64_t time) = 0;
     // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
     // request attribute values which haven't been updated in last reflectAttributeValues
     virtual void RequestAttributeValues() = 0;
     // request all attribute values
     virtual void RequestAllAttributeValues() = 0;
-    using UpdateCallbackType = std::function<void(IDOMemberTarget*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IDOMemberTarget*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IDOMemberTarget*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IBusManagement;
 class IBusManagementObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IBusManagement*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IBusManagement*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IBusManagement*)>;
+    using ObjectCreatedCallbackType = std::function<void(IBusManagement*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusManagement* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusManagement* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IBusManagement* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusManagement : public IHLAobjectRoot
@@ -284,11 +340,11 @@ class IBusManagement : public IHLAobjectRoot
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateAllAttributeValues(int64_t time) = 0;
     // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
     // send attribute values which have been modified since last call, as TSO message
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateModifiedAttributeValues(int64_t time) = 0;
     // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
     // request attribute values which haven't been updated in last reflectAttributeValues
@@ -301,15 +357,22 @@ class IBusManagementCan;
 class IBusManagementCanObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IBusManagementCan*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IBusManagementCan*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IBusManagementCan*)>;
+    using ObjectCreatedCallbackType = std::function<void(IBusManagementCan*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusManagementCan* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusManagementCan* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IBusManagementCan* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusManagementCan : public IBusManagement
@@ -339,24 +402,34 @@ class IBusManagementCan : public IBusManagement
     // attribute SendMessagesAsRx : HLAboolean
     virtual bool GetSendMessagesAsRx() const = 0;
     virtual void SetSendMessagesAsRx(bool newValue) = 0;
-    using UpdateCallbackType = std::function<void(IBusManagementCan*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IBusManagementCan*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IBusManagementCan*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IBusManagementEthernet;
 class IBusManagementEthernetObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IBusManagementEthernet*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IBusManagementEthernet*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IBusManagementEthernet*)>;
+    using ObjectCreatedCallbackType = std::function<void(IBusManagementEthernet*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusManagementEthernet* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusManagementEthernet* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IBusManagementEthernet* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusManagementEthernet : public IBusManagement
@@ -378,24 +451,34 @@ class IBusManagementEthernet : public IBusManagement
     // attribute SendMessagesAsRx : HLAboolean
     virtual bool GetSendMessagesAsRx() const = 0;
     virtual void SetSendMessagesAsRx(bool newValue) = 0;
-    using UpdateCallbackType = std::function<void(IBusManagementEthernet*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IBusManagementEthernet*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IBusManagementEthernet*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IFlexRayCluster;
 class IFlexRayClusterObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IFlexRayCluster*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IFlexRayCluster*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IFlexRayCluster*)>;
+    using ObjectCreatedCallbackType = std::function<void(IFlexRayCluster*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IFlexRayCluster* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IFlexRayCluster* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IFlexRayCluster* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IFlexRayCluster : public IBusManagement
@@ -489,24 +572,34 @@ class IFlexRayCluster : public IBusManagement
     // attribute gSyncFrameIDCountMax : HLAoctet
     virtual uint8_t GetgSyncFrameIDCountMax() const = 0;
     virtual void SetgSyncFrameIDCountMax(uint8_t newValue) = 0;
-    using UpdateCallbackType = std::function<void(IFlexRayCluster*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IFlexRayCluster*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IFlexRayCluster*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IBusController;
 class IBusControllerObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IBusController*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IBusController*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IBusController*)>;
+    using ObjectCreatedCallbackType = std::function<void(IBusController*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusController* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusController* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IBusController* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusController : public IHLAobjectRoot
@@ -531,11 +624,11 @@ class IBusController : public IHLAobjectRoot
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateAllAttributeValues(int64_t time) = 0;
     // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
     // send attribute values which have been modified since last call, as TSO message
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateModifiedAttributeValues(int64_t time) = 0;
     // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
     // request attribute values which haven't been updated in last reflectAttributeValues
@@ -548,15 +641,22 @@ class IBusControllerCan;
 class IBusControllerCanObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IBusControllerCan*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IBusControllerCan*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IBusControllerCan*)>;
+    using ObjectCreatedCallbackType = std::function<void(IBusControllerCan*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusControllerCan* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusControllerCan* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IBusControllerCan* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusControllerCan : public IBusController
@@ -606,24 +706,34 @@ class IBusControllerCan : public IBusController
     // attribute SamplingMode : CanSamplingMode
     virtual CanSamplingMode GetSamplingMode() const = 0;
     virtual void SetSamplingMode(CanSamplingMode newValue) = 0;
-    using UpdateCallbackType = std::function<void(IBusControllerCan*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IBusControllerCan*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IBusControllerCan*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IBusControllerEthernet;
 class IBusControllerEthernetObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IBusControllerEthernet*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IBusControllerEthernet*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IBusControllerEthernet*)>;
+    using ObjectCreatedCallbackType = std::function<void(IBusControllerEthernet*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IBusControllerEthernet* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IBusControllerEthernet* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IBusControllerEthernet* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IBusControllerEthernet : public IBusController
@@ -641,24 +751,34 @@ class IBusControllerEthernet : public IBusController
     // attribute PortName : HLAASCIIstring
     virtual std::string GetPortName() const = 0;
     virtual void SetPortName(const std::string& newValue) = 0;
-    using UpdateCallbackType = std::function<void(IBusControllerEthernet*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IBusControllerEthernet*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IBusControllerEthernet*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IFlexRayControllerStatus;
 class IFlexRayControllerStatusObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IFlexRayControllerStatus*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IFlexRayControllerStatus*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IFlexRayControllerStatus*)>;
+    using ObjectCreatedCallbackType = std::function<void(IFlexRayControllerStatus*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IFlexRayControllerStatus* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IFlexRayControllerStatus* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IFlexRayControllerStatus* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IFlexRayControllerStatus : public IBusController
@@ -708,24 +828,34 @@ class IFlexRayControllerStatus : public IBusController
     // attribute wakeupStatus : FlexRayWakeupStatusType
     virtual FlexRayWakeupStatusType GetwakeupStatus() const = 0;
     virtual void SetwakeupStatus(FlexRayWakeupStatusType newValue) = 0;
-    using UpdateCallbackType = std::function<void(IFlexRayControllerStatus*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IFlexRayControllerStatus*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IFlexRayControllerStatus*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IFlexRayController;
 class IFlexRayControllerObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IFlexRayController*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IFlexRayController*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IFlexRayController*)>;
+    using ObjectCreatedCallbackType = std::function<void(IFlexRayController*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IFlexRayController* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IFlexRayController* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IFlexRayController* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IFlexRayController : public IBusController
@@ -839,24 +969,34 @@ class IFlexRayController : public IBusController
     // attribute pSamplesPerMicrotick : HLAoctet
     virtual uint8_t GetpSamplesPerMicrotick() const = 0;
     virtual void SetpSamplesPerMicrotick(uint8_t newValue) = 0;
-    using UpdateCallbackType = std::function<void(IFlexRayController*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IFlexRayController*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IFlexRayController*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 class IFlexRaySendBuffer;
 class IFlexRaySendBufferObjectClass
 {
   public:
-    using DiscoverCallbackType = std::function<void(IFlexRaySendBuffer*)>;
+    using DiscoverObjectInstanceCallback = std::function<void(IFlexRaySendBuffer*)>;
+    using RemoveObjectInstanceCallback = std::function<void(IFlexRaySendBuffer*)>;
+    using ObjectCreatedCallbackType = std::function<void(IFlexRaySendBuffer*, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
     virtual IFlexRaySendBuffer* GetObjectInstance(const std::wstring& instanceName) = 0;
     virtual IFlexRaySendBuffer* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) = 0;
-    virtual void UnregisterDiscoverCallback(uint32_t callbackToken) = 0;
+    virtual IFlexRaySendBuffer* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+
+    virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
+    virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
+
+    virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
+    virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };
 
 class IFlexRaySendBuffer : public IHLAobjectRoot
@@ -910,20 +1050,23 @@ class IFlexRaySendBuffer : public IHLAobjectRoot
     // send all attribute values
     virtual void UpdateAllAttributeValues() = 0;
     // send all attribute values, as TSO message
-    virtual void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateAllAttributeValues(int64_t time) = 0;
     // send attribute values which have been modified since last call
     virtual void UpdateModifiedAttributeValues() = 0;
     // send attribute values which have been modified since last call, as TSO message
-    virtual void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) = 0;
+    virtual void UpdateModifiedAttributeValues(int64_t time) = 0;
     // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
     virtual AttributeBits GetUpdatedAttributes() const = 0;
     // request attribute values which haven't been updated in last reflectAttributeValues
     virtual void RequestAttributeValues() = 0;
     // request all attribute values
     virtual void RequestAllAttributeValues() = 0;
-    using UpdateCallbackType = std::function<void(IFlexRaySendBuffer*)>;
-    virtual uint32_t RegisterUpdateCallback(UpdateCallbackType callback) = 0;
+    using UpdateCallback = std::function<void(IFlexRaySendBuffer*)>;
+    virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
+    using UpdateCallbackWithTime = std::function<void(IFlexRaySendBuffer*, int64_t time)>;
+    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
+    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 };
 
 

@@ -5,7 +5,7 @@
 #include <vector>
 #include <functional>
 
-
+#include "RTI/encoding/HLAhandle.h"
 #include "RTFederateDataTypes.h"
 #include "RTFederateObjectInterfaces.h"
 

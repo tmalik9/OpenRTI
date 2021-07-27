@@ -194,7 +194,7 @@ namespace FOMCodeGen
       {
         Name = name;
       }
-      public virtual bool Resolve(List<DataType> dataTypes)
+      public virtual bool Resolve(FOMParser fom)
       {
         return true;
       }
@@ -318,12 +318,14 @@ namespace FOMCodeGen
         _cppType = "rti1516ev::" + name;
         _include = include;
         _passByReference = false;
+        UseCount = 0;
       }
       public PredefinedType(string name, string include, string cppType) : base(name)
       {
         _cppType = cppType;
         _include = include;
         _passByReference = false;
+        UseCount = 0;
       }
       // a 'predefined type' represents an encoder defined in some HLA header (such as HLAopaqueData, HLAhandle),
       // *except* basic types, and for which there is no direct C++ equivalent.
@@ -332,6 +334,7 @@ namespace FOMCodeGen
         _cppType = cppType;
         _include = include;
         _passByReference = passByReference;
+        UseCount = 0;
       }
       private string _cppType;
       public override string CPPType
@@ -372,7 +375,7 @@ namespace FOMCodeGen
           return base.CppGetter(var);
         return var;
       }
-      public string Include
+      public virtual string Include
       {
         get { return _include; }
       }
@@ -383,6 +386,7 @@ namespace FOMCodeGen
         get { return _passByReference; }
       }
       private bool _passByReference;
+      public int UseCount { get; set; }
     }
     public class ObjectInstanceHandleType : PredefinedType
     {
@@ -390,9 +394,15 @@ namespace FOMCodeGen
       {
       }
       public ObjectInstanceHandleType(ObjectClass objectClass)
-        : base("HLAobjectInstanceHandle" + "." + objectClass.Name, "#include \"RTI/encoding/HLAhandle.h\"", "rti1516ev::ObjectInstanceHandle")
+        : base("HLAobjectInstanceHandle" + "." + objectClass.Name, "", "rti1516ev::ObjectInstanceHandle")
       {
         ObjectClass = objectClass;
+        ObjectClassName = objectClass.Name;
+      }
+      public ObjectInstanceHandleType(string objectClassName)
+        : base("HLAobjectInstanceHandle" + "." + objectClassName, "", "rti1516ev::ObjectInstanceHandle")
+      {
+        ObjectClassName = objectClassName;
       }
       public override bool CanTranslateToCpp
       {
@@ -451,6 +461,14 @@ namespace FOMCodeGen
       }
       public string ObjectClassName { get; set; }
       public ObjectClass ObjectClass { get; set; }
+      public override bool Resolve(FOMParser fom)
+      {
+        if (ObjectClass == null && ObjectClassName != null)
+        {
+          ObjectClass = fom.ObjectClasses.Find(x => x.Name == ObjectClassName);
+        }
+        return ObjectClass != null || ObjectClassName == null;
+      }
     }
 
     // A SimpleDataType is basically a typedef to a BasicDataRepresentation
@@ -513,11 +531,11 @@ namespace FOMCodeGen
         DataType = dataType;
       }
       public DataType DataType { get; set; }
-      public override bool Resolve(List<DataType> dataTypes)
+      public override bool Resolve(FOMParser fom)
       {
         if (DataType is UnresolvedDataType)
         {
-          DataType = dataTypes.Find(dataType => dataType.Name == DataType.Name);
+          DataType = fom.DataTypes.Find(dataType => dataType.Name == DataType.Name);
         }
         return true;
       }
@@ -619,13 +637,13 @@ namespace FOMCodeGen
       }
       public FixedRecordDataType BaseClass { get; set; }
       public bool HasChilds { get; set; }
-      public override bool Resolve(List<DataType> dataTypes)
+      public override bool Resolve(FOMParser fom)
       {
         foreach (var field in Fields)
         {
           if (field.DataType is UnresolvedDataType)
           {
-            field.DataType = dataTypes.Find(dataType => dataType.Name == field.DataType.Name);
+            field.DataType = fom.DataTypes.Find(dataType => dataType.Name == field.DataType.Name);
           }
         }
         return true;
@@ -693,6 +711,14 @@ namespace FOMCodeGen
       new ObjectInstanceHandleType()
     };
     public enum FileContext { kDataTypes, kObjectInterfaces, kObjectHeader, kInteractionInterfaces, kInteractionHeader };
+    Dictionary<FileContext, HashSet<DataType>> mPredefinedTypesInContext = new Dictionary<FileContext, HashSet<DataType>>()
+    {
+      [FileContext.kDataTypes] = new HashSet<DataType>(),
+      [FileContext.kObjectInterfaces] = new HashSet<DataType>(),
+      [FileContext.kObjectHeader] = new HashSet<DataType>(),
+      [FileContext.kInteractionInterfaces] = new HashSet<DataType>(),
+      [FileContext.kInteractionHeader] = new HashSet<DataType>(),
+    };
     Dictionary<FileContext, HashSet<string>> mPredefinedTypeIncludes = new Dictionary<FileContext, HashSet<string>>()
     {
       [FileContext.kDataTypes] = new HashSet<string>(),
@@ -704,8 +730,13 @@ namespace FOMCodeGen
 
     public string GetPredefinedTypeIncludes(FileContext context)
     {
-      string[] lines = new string[mPredefinedTypeIncludes[context].Count];
-      mPredefinedTypeIncludes[context].CopyTo(lines);
+      List<string> lines = new List<string>();
+      foreach (DataType dataType in mPredefinedTypesInContext[context])
+      {
+        string include = (dataType as PredefinedType).Include;
+        if (include.Length > 0)
+          lines.Add(include);
+      }
       return string.Join("\n", lines);
     }
 
@@ -774,11 +805,11 @@ namespace FOMCodeGen
         {
           if (!result.CanTranslateToCpp)
           {
-            mPredefinedTypeIncludes[context].Add((result as PredefinedType).Include);
+            mPredefinedTypesInContext[context].Add(result);
           }
           if (context == FileContext.kObjectInterfaces)
           {
-            mPredefinedTypeIncludes[FileContext.kObjectHeader].Add((result as PredefinedType).Include);
+            mPredefinedTypesInContext[FileContext.kObjectHeader].Add(result);
           }
         }
         return result;
@@ -1009,7 +1040,34 @@ namespace FOMCodeGen
       DataTypes.Add(fixedRecordDataType);
       fixedRecordDataType.Index = index++;
     }
-    void ParseObjectClasses(XmlElement objectClassNode, ObjectClass baseClass)
+    // replace dataType by ObjectInstanceHandleType of named class
+
+    private DataType GetObjectClassType(DataType dataType, string className)
+    {
+      if (dataType is ObjectInstanceHandleType)
+      {
+        ObjectInstanceHandleType objectInstanceHandleType = dataType as ObjectInstanceHandleType;
+        if (className != null)
+        {
+          var attributeTypeObjectClass = mObjectClasses.Find(x => x.Name == className);
+          if (attributeTypeObjectClass != null)
+          {
+            dataType = new ObjectInstanceHandleType(attributeTypeObjectClass);
+          }
+          else
+          {
+            dataType = new ObjectInstanceHandleType(className);
+          }
+        }
+        else
+        {
+          objectInstanceHandleType.UseCount++;
+        }
+      }
+      return dataType;
+    }
+
+    private void ParseObjectClasses(XmlElement objectClassNode, ObjectClass baseClass)
     {
       string name = objectClassNode["name"].FirstChild.InnerText;
       ObjectClass objectClass = new ObjectClass(name);
@@ -1030,25 +1088,7 @@ namespace FOMCodeGen
         if (dataTypeElement != null)
         {
           DataType dataType = GetDataType(dataTypeElement.FirstChild.InnerText, FileContext.kObjectInterfaces);
-          string dataTypeElementClassAttribute = dataTypeElement.GetAttribute("class");
-          if (dataType is ObjectInstanceHandleType && dataTypeElementClassAttribute != null)
-          {
-            string attributeTypeObjectClassName = dataTypeElementClassAttribute;
-            var attributeTypeObjectClass = mObjectClasses.Find(x => x.Name == attributeTypeObjectClassName);
-            if (attributeTypeObjectClass != null)
-            {
-              dataType = new ObjectInstanceHandleType(attributeTypeObjectClass);
-              /*
-              string objectClassInterface = "I" + objectClassName;
-              string forwardDeclaration = "class " + objectClassInterface + ";";
-              if (!mDataTypeForwardDeclarations.Contains(forwardDeclaration))
-              {
-                mDataTypeForwardDeclarations.Add(forwardDeclaration);
-              }
-              */
-            }
-          }
-          attribute.DataType = dataType;
+          attribute.DataType = GetObjectClassType(dataType, dataTypeElement.GetAttribute("class"));
         }
       }
       var childClassNodes = objectClassNode.SelectNodes("objectClass");
@@ -1057,7 +1097,8 @@ namespace FOMCodeGen
         ParseObjectClasses(childClass as XmlElement, objectClass);
       }
     }
-    void ParseInteractionClasses(XmlElement interactionClassNode, InteractionClass baseClass)
+
+    private void ParseInteractionClasses(XmlElement interactionClassNode, InteractionClass baseClass)
     {
       string name = interactionClassNode["name"].FirstChild.InnerText;
       InteractionClass interactionClass = new InteractionClass(name);
@@ -1090,26 +1131,8 @@ namespace FOMCodeGen
         XmlElement dataTypeElement = parameterNode["dataType"];
         if (dataTypeElement != null)
         {
-          DataType dataType = GetDataType(dataTypeElement.FirstChild.InnerText, FileContext.kObjectInterfaces);
-          string dataTypeElementClassAttribute = dataTypeElement.GetAttribute("class");
-          if (dataType is ObjectInstanceHandleType && dataTypeElementClassAttribute != null)
-          {
-            string objectClassName = dataTypeElementClassAttribute;
-            var objectClass = mObjectClasses.Find(x => x.Name == objectClassName);
-            if (objectClass != null)
-            {
-              dataType = new ObjectInstanceHandleType(objectClass);
-              /*
-              string objectClassInterface = "I" + objectClassName;
-              string forwardDeclaration = "class " + objectClassInterface + ";";
-              if (!mDataTypeForwardDeclarations.Contains(forwardDeclaration))
-              {
-                mDataTypeForwardDeclarations.Add(forwardDeclaration);
-              }
-              */
-            }
-          }
-          parameter.DataType = dataType;
+          DataType dataType = GetDataType(dataTypeElement.FirstChild.InnerText, FileContext.kInteractionInterfaces);
+          parameter.DataType = GetObjectClassType(dataType, dataTypeElement.GetAttribute("class"));
         }
       }
       var childClassNodes = interactionClassNode.SelectNodes("interactionClass");
@@ -1189,7 +1212,7 @@ namespace FOMCodeGen
       }
       foreach (DataType dataType in DataTypes)
       {
-        dataType.Resolve(DataTypes);
+        dataType.Resolve(this);
       }
       List<string> unresolvedDataTypes = new List<string>();
       foreach (DataType dataType in DataTypes)

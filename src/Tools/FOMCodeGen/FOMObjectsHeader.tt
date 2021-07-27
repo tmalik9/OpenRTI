@@ -14,6 +14,11 @@
 #include "RTI/encoding/HLAfixedRecord.h"
 #include "RTI/encoding/HLAfixedArray.h"
 #include "RTI/encoding/HLAvariableArray.h"
+<#if (FOM.IsFloatTime) {#>
+#include "RTI/time/HLAloat64Time.h"
+<# } else { #>
+#include "RTI/time/HLAinteger64Time.h"
+<# } #>
 
 <#=FOM.GetPredefinedTypeIncludes(FOMParser.FileContext.kObjectHeader)#>
 #include "<#=ObjectInterfacesHeaderFilename#>"
@@ -40,17 +45,21 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
   public:
     // I<#=objectClass.Name#>ObjectClass
     <#=objectClass.Name#>ObjectClass() = default;
-    virtual ~<#=objectClass.Name#>ObjectClass() = default;
+    virtual ~<#=objectClass.Name#>ObjectClass();
     void Publish() override;
     void Unpublish() override;
-    void Subscribe() override;
+    void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
     I<#=objectClass.Name#>* GetObjectInstance(const std::wstring& instanceName) override;
     I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName) override;
-    uint32_t RegisterDiscoverCallback(DiscoverCallbackType callback) override;
-    void UnregisterDiscoverCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverCallbacks(I<#=objectClass.Name#>* newObjectInstance);
+    I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
+    void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteDiscoverObjectInstanceCallbacks(I<#=objectClass.Name#>* newObjectInstance);
 
+    uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
+    void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
+    void ExecuteRemoveObjectInstanceCallbacks(I<#=objectClass.Name#>* newObjectInstance);
     // internal
 <#
   if (objectClass.BaseClass != null)
@@ -125,8 +134,10 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     std::map<std::wstring, <#=objectClass.Name#>*> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, <#=objectClass.Name#>*> mObjectInstancesByHandle;
 
-    std::map<uint32_t, DiscoverCallbackType> mDiscoverCallbacks;
-    uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
+    uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
+    std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
+    uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
 class <#=objectClass.Name#> : public I<#=objectClass.Name#>
@@ -162,15 +173,17 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     // I<#=objectClass.Name#>
 <# if (objectClass.HasValidAttributes) { #>
     void UpdateAllAttributeValues() override;
-    void UpdateAllAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateAllAttributeValues(<#=FOM.NativeTimeType#> time) override;
     void UpdateModifiedAttributeValues() override;
-    void UpdateModifiedAttributeValues(const rti1516ev::LogicalTime& time) override;
+    void UpdateModifiedAttributeValues(<#=FOM.NativeTimeType#> time) override;
     AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
 <# if (objectClass.ChildClasses.Count == 0) { #>
-    uint32_t RegisterUpdateCallback(UpdateCallbackType callback) override;
+    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
+    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
 
@@ -180,10 +193,11 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 <# if (objectClass.HasValidAttributes) { #>
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
 <# } #>
-    bool IsValid() const { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const { return mIsOwner; }
+    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
+    bool IsOwner() const override { return mIsOwner; }
   private:
     friend class <#=objectClass.Name#>ObjectClass;
 
@@ -192,6 +206,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
     void ExecuteUpdateCallbacks();
+    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime);
 <# } #>
     <#=objectClass.Name#>ObjectClass* mObjectClass;
     std::wstring mInstanceName;
@@ -205,8 +220,10 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     AttributeBits mDirty = kNone;
 <# } #>
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
-    std::map<uint32_t, UpdateCallbackType> mUpdateCallbacks;
+    std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
+    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
+    uint32_t mLastCallbackTokenWithTime = 0;
 <# } #>
     // Attribute value encoders
 <# 
@@ -232,6 +249,7 @@ class ObjectClassRegistry : public IObjectClassRegistry
     ObjectClassRegistry();
     ~ObjectClassRegistry();
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
+    void Finalize();
 
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
     I<#=objectClass.Name#>ObjectClass* Get<#=objectClass.Name#>ObjectClass() const override { return m<#=objectClass.Name#>ObjectClass.get(); }
@@ -240,6 +258,7 @@ class ObjectClassRegistry : public IObjectClassRegistry
     void DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes);
+    void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& theTime);
     void ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles);
     void ObjectInstanceNameReservationSucceeded(std::wstring const & theObjectInstanceName);
     void ObjectInstanceNameReservationFailed(std::wstring const & theObjectInstanceName);
