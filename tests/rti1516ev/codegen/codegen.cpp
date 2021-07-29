@@ -156,6 +156,23 @@ public:
   NDistSimIB::NRTFederateEncoding::InteractionClassRegistry interactionClassRegistry;
 };
 
+class MyBusControllerCan : public NDistSimIB::NRTFederateEncoding::BusControllerCan
+{
+public:
+  MyBusControllerCan(NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador)
+    : NDistSimIB::NRTFederateEncoding::BusControllerCan(objectClass, instanceName, ambassador)
+  {
+  }
+  void SetBaudRate(int32_t newValue) override {
+    NDistSimIB::NRTFederateEncoding::BusControllerCan::SetBaudRate(newValue);
+    std::cout << "MyBusControllerCan::SetBaudRate has been called " << std::endl;
+    if (mDirty & NDistSimIB::NRTFederateEncoding::BusControllerCan::kBaudRateBit)
+    {
+      std::cout << "baudrate has been changed" << std::endl;
+    }
+  }
+};
+
 bool testRTFederate(int argc, char* argv[])
 {
   OpenRTI::Options options(argc, argv);
@@ -234,7 +251,11 @@ bool testRTFederate(int argc, char* argv[])
   canMessageInteractionClass->Subscribe();
   NDistSimIB::NRTFederateEncoding::CANFrameEncoding canFrame;
   canMessageInteractionClass->send(false, "CAN1", NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), HLAhandle(ObjectInstanceHandle()), HLAhandle(ObjectInstanceHandle()), 0x100, canFrame);
+
   auto* busControllerObjectClass = ambassador.objectClassRegistry.GetBusControllerCanObjectClass();
+  static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass*>(busControllerObjectClass)->SetObjectInstanceCreator([](NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> NDistSimIB::NRTFederateEncoding::BusControllerCan* {
+    return new MyBusControllerCan(objectClass, instanceName, rtiAmbassador);
+  });
   busControllerObjectClass->Publish();
   busControllerObjectClass->Subscribe(true);
   NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan = busControllerObjectClass->CreateObjectInstance(L"CAN1");

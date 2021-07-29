@@ -60,6 +60,8 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(I<#=objectClass.Name#>* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<<#=objectClass.Name#>*(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
 <#
   if (objectClass.BaseClass != null)
@@ -115,6 +117,7 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
 <# if (objectClass.BaseClass != null) { #>
     <#=objectClass.BaseClass.Name#>ObjectClass* mBaseClass;
 <# } #>
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -198,7 +201,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 <# } #>
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class <#=objectClass.Name#>ObjectClass;
 
     <#=objectClass.Name#>();

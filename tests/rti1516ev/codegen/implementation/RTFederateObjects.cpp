@@ -14,6 +14,9 @@ HLAobjectRootObjectClass::HLAobjectRootObjectClass(rti1516ev::RTIambassador* rti
   mRtiAmbassador = rtiAmbassador;
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot");
 // attribute HLAobjectRoot.HLAprivilegeToDeleteObject : no data type
+  SetObjectInstanceCreator([](HLAobjectRootObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> HLAobjectRoot* {
+    return new HLAobjectRoot(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 HLAobjectRootObjectClass::~HLAobjectRootObjectClass()
@@ -75,7 +78,7 @@ void HLAobjectRootObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  HLAobjectRoot* newObject = new HLAobjectRoot(this, instanceName, mRtiAmbassador);
+  HLAobjectRoot* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -132,7 +135,7 @@ IHLAobjectRoot* HLAobjectRootObjectClass::CreateObjectInstance(const std::wstrin
   {
     throw rti1516ev::ObjectClassNotPublished(L"HLAobjectRoot");
   }
-  HLAobjectRoot* newObject = new HLAobjectRoot(this, instanceName, mRtiAmbassador);
+  HLAobjectRoot* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -156,7 +159,7 @@ IHLAobjectRoot* HLAobjectRootObjectClass::CreateObjectInstance(const std::wstrin
   {
     throw rti1516ev::ObjectClassNotPublished(L"HLAobjectRoot");
   }
-  HLAobjectRoot* newObject = new HLAobjectRoot(this, instanceName, mRtiAmbassador);
+  HLAobjectRoot* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -262,6 +265,9 @@ SystemVariableObjectClass::SystemVariableObjectClass(rti1516ev::RTIambassador* r
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.SystemVariable");
   // attribute Value : HLAopaqueData
   mValueAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"Value");
+  SetObjectInstanceCreator([](SystemVariableObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> SystemVariable* {
+    return new SystemVariable(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 SystemVariableObjectClass::~SystemVariableObjectClass()
@@ -324,7 +330,7 @@ void SystemVariableObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  SystemVariable* newObject = new SystemVariable(this, instanceName, mRtiAmbassador);
+  SystemVariable* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -381,7 +387,7 @@ ISystemVariable* SystemVariableObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"SystemVariable");
   }
-  SystemVariable* newObject = new SystemVariable(this, instanceName, mRtiAmbassador);
+  SystemVariable* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -405,7 +411,7 @@ ISystemVariable* SystemVariableObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"SystemVariable");
   }
-  SystemVariable* newObject = new SystemVariable(this, instanceName, mRtiAmbassador);
+  SystemVariable* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -610,7 +616,7 @@ void SystemVariable::ProvideAttributeValues(const rti1516ev::AttributeHandleSet&
     if (attributeHandle == mObjectClass->GetValueAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mValue.encode()));
-      mDirty &= ~kValueBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kValueBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -667,6 +673,9 @@ ValueEntityObjectClass::ValueEntityObjectClass(rti1516ev::RTIambassador* rtiAmba
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.ValueEntity");
   // attribute Value : HLAopaqueData
   mValueAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"Value");
+  SetObjectInstanceCreator([](ValueEntityObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> ValueEntity* {
+    return new ValueEntity(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 ValueEntityObjectClass::~ValueEntityObjectClass()
@@ -729,7 +738,7 @@ void ValueEntityObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHan
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  ValueEntity* newObject = new ValueEntity(this, instanceName, mRtiAmbassador);
+  ValueEntity* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -786,7 +795,7 @@ IValueEntity* ValueEntityObjectClass::CreateObjectInstance(const std::wstring& i
   {
     throw rti1516ev::ObjectClassNotPublished(L"ValueEntity");
   }
-  ValueEntity* newObject = new ValueEntity(this, instanceName, mRtiAmbassador);
+  ValueEntity* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -810,7 +819,7 @@ IValueEntity* ValueEntityObjectClass::CreateObjectInstance(const std::wstring& i
   {
     throw rti1516ev::ObjectClassNotPublished(L"ValueEntity");
   }
-  ValueEntity* newObject = new ValueEntity(this, instanceName, mRtiAmbassador);
+  ValueEntity* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -1015,7 +1024,7 @@ void ValueEntity::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& at
     if (attributeHandle == mObjectClass->GetValueAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mValue.encode()));
-      mDirty &= ~kValueBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kValueBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -1076,6 +1085,9 @@ DOMemberSourceObjectClass::DOMemberSourceObjectClass(rti1516ev::RTIambassador* r
   mDOSourceMemberConnectionTypeAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"DOSourceMemberConnectionType");
   // attribute DOSourceMemberDataBytes : HLAopaqueData
   mDOSourceMemberDataBytesAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"DOSourceMemberDataBytes");
+  SetObjectInstanceCreator([](DOMemberSourceObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> DOMemberSource* {
+    return new DOMemberSource(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 DOMemberSourceObjectClass::~DOMemberSourceObjectClass()
@@ -1140,7 +1152,7 @@ void DOMemberSourceObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  DOMemberSource* newObject = new DOMemberSource(this, instanceName, mRtiAmbassador);
+  DOMemberSource* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -1197,7 +1209,7 @@ IDOMemberSource* DOMemberSourceObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberSource");
   }
-  DOMemberSource* newObject = new DOMemberSource(this, instanceName, mRtiAmbassador);
+  DOMemberSource* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -1221,7 +1233,7 @@ IDOMemberSource* DOMemberSourceObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberSource");
   }
-  DOMemberSource* newObject = new DOMemberSource(this, instanceName, mRtiAmbassador);
+  DOMemberSource* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -1492,17 +1504,17 @@ void DOMemberSource::ProvideAttributeValues(const rti1516ev::AttributeHandleSet&
     if (attributeHandle == mObjectClass->GetDOSourceMemberNameAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberName.encode()));
-      mDirty &= ~kDOSourceMemberNameBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDOSourceMemberNameBit;
     }
     else if (attributeHandle == mObjectClass->GetDOSourceMemberConnectionTypeAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberConnectionType.encode()));
-      mDirty &= ~kDOSourceMemberConnectionTypeBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDOSourceMemberConnectionTypeBit;
     }
     else if (attributeHandle == mObjectClass->GetDOSourceMemberDataBytesAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberDataBytes.encode()));
-      mDirty &= ~kDOSourceMemberDataBytesBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDOSourceMemberDataBytesBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -1561,6 +1573,9 @@ DOMemberTargetObjectClass::DOMemberTargetObjectClass(rti1516ev::RTIambassador* r
   mDOTargetMemberNameAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"DOTargetMemberName");
   // attribute DOTargetMemberConnectionType : HLAASCIIstring
   mDOTargetMemberConnectionTypeAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"DOTargetMemberConnectionType");
+  SetObjectInstanceCreator([](DOMemberTargetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> DOMemberTarget* {
+    return new DOMemberTarget(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 DOMemberTargetObjectClass::~DOMemberTargetObjectClass()
@@ -1624,7 +1639,7 @@ void DOMemberTargetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  DOMemberTarget* newObject = new DOMemberTarget(this, instanceName, mRtiAmbassador);
+  DOMemberTarget* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -1681,7 +1696,7 @@ IDOMemberTarget* DOMemberTargetObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberTarget");
   }
-  DOMemberTarget* newObject = new DOMemberTarget(this, instanceName, mRtiAmbassador);
+  DOMemberTarget* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -1705,7 +1720,7 @@ IDOMemberTarget* DOMemberTargetObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberTarget");
   }
-  DOMemberTarget* newObject = new DOMemberTarget(this, instanceName, mRtiAmbassador);
+  DOMemberTarget* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -1943,12 +1958,12 @@ void DOMemberTarget::ProvideAttributeValues(const rti1516ev::AttributeHandleSet&
     if (attributeHandle == mObjectClass->GetDOTargetMemberNameAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDOTargetMemberName.encode()));
-      mDirty &= ~kDOTargetMemberNameBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDOTargetMemberNameBit;
     }
     else if (attributeHandle == mObjectClass->GetDOTargetMemberConnectionTypeAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDOTargetMemberConnectionType.encode()));
-      mDirty &= ~kDOTargetMemberConnectionTypeBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDOTargetMemberConnectionTypeBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -2005,6 +2020,9 @@ BusManagementObjectClass::BusManagementObjectClass(rti1516ev::RTIambassador* rti
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusManagement");
   // attribute NetworkID : HLAASCIIstring
   mNetworkIDAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"NetworkID");
+  SetObjectInstanceCreator([](BusManagementObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> BusManagement* {
+    return new BusManagement(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 BusManagementObjectClass::~BusManagementObjectClass()
@@ -2067,7 +2085,7 @@ void BusManagementObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  BusManagement* newObject = new BusManagement(this, instanceName, mRtiAmbassador);
+  BusManagement* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -2124,7 +2142,7 @@ IBusManagement* BusManagementObjectClass::CreateObjectInstance(const std::wstrin
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusManagement");
   }
-  BusManagement* newObject = new BusManagement(this, instanceName, mRtiAmbassador);
+  BusManagement* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -2148,7 +2166,7 @@ IBusManagement* BusManagementObjectClass::CreateObjectInstance(const std::wstrin
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusManagement");
   }
-  BusManagement* newObject = new BusManagement(this, instanceName, mRtiAmbassador);
+  BusManagement* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -2351,7 +2369,7 @@ void BusManagement::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& 
     if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kNetworkIDBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -2373,6 +2391,9 @@ BusManagementCanObjectClass::BusManagementCanObjectClass(rti1516ev::RTIambassado
   mRxErrorCountAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"RxErrorCount");
   // attribute SendMessagesAsRx : HLAboolean
   mSendMessagesAsRxAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"SendMessagesAsRx");
+  SetObjectInstanceCreator([](BusManagementCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> BusManagementCan* {
+    return new BusManagementCan(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 BusManagementCanObjectClass::~BusManagementCanObjectClass()
@@ -2439,7 +2460,7 @@ void BusManagementCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstan
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  BusManagementCan* newObject = new BusManagementCan(this, instanceName, mRtiAmbassador);
+  BusManagementCan* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -2496,7 +2517,7 @@ IBusManagementCan* BusManagementCanObjectClass::CreateObjectInstance(const std::
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementCan");
   }
-  BusManagementCan* newObject = new BusManagementCan(this, instanceName, mRtiAmbassador);
+  BusManagementCan* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -2520,7 +2541,7 @@ IBusManagementCan* BusManagementCanObjectClass::CreateObjectInstance(const std::
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementCan");
   }
-  BusManagementCan* newObject = new BusManagementCan(this, instanceName, mRtiAmbassador);
+  BusManagementCan* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -2857,27 +2878,27 @@ void BusManagementCan::ProvideAttributeValues(const rti1516ev::AttributeHandleSe
     if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kNetworkIDBit;
     }
     else if (attributeHandle == mObjectClass->GetBusStateAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mBusState.encode()));
-      mDirty &= ~kBusStateBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kBusStateBit;
     }
     else if (attributeHandle == mObjectClass->GetTxErrorCountAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mTxErrorCount.encode()));
-      mDirty &= ~kTxErrorCountBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kTxErrorCountBit;
     }
     else if (attributeHandle == mObjectClass->GetRxErrorCountAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mRxErrorCount.encode()));
-      mDirty &= ~kRxErrorCountBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kRxErrorCountBit;
     }
     else if (attributeHandle == mObjectClass->GetSendMessagesAsRxAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mSendMessagesAsRx.encode()));
-      mDirty &= ~kSendMessagesAsRxBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kSendMessagesAsRxBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -2936,6 +2957,9 @@ BusManagementEthernetObjectClass::BusManagementEthernetObjectClass(rti1516ev::RT
   mPortNameAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"PortName");
   // attribute SendMessagesAsRx : HLAboolean
   mSendMessagesAsRxAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"SendMessagesAsRx");
+  SetObjectInstanceCreator([](BusManagementEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> BusManagementEthernet* {
+    return new BusManagementEthernet(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 BusManagementEthernetObjectClass::~BusManagementEthernetObjectClass()
@@ -3000,7 +3024,7 @@ void BusManagementEthernetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectI
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  BusManagementEthernet* newObject = new BusManagementEthernet(this, instanceName, mRtiAmbassador);
+  BusManagementEthernet* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -3057,7 +3081,7 @@ IBusManagementEthernet* BusManagementEthernetObjectClass::CreateObjectInstance(c
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementEthernet");
   }
-  BusManagementEthernet* newObject = new BusManagementEthernet(this, instanceName, mRtiAmbassador);
+  BusManagementEthernet* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -3081,7 +3105,7 @@ IBusManagementEthernet* BusManagementEthernetObjectClass::CreateObjectInstance(c
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementEthernet");
   }
-  BusManagementEthernet* newObject = new BusManagementEthernet(this, instanceName, mRtiAmbassador);
+  BusManagementEthernet* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -3352,17 +3376,17 @@ void BusManagementEthernet::ProvideAttributeValues(const rti1516ev::AttributeHan
     if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kNetworkIDBit;
     }
     else if (attributeHandle == mObjectClass->GetPortNameAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mPortName.encode()));
-      mDirty &= ~kPortNameBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kPortNameBit;
     }
     else if (attributeHandle == mObjectClass->GetSendMessagesAsRxAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mSendMessagesAsRx.encode()));
-      mDirty &= ~kSendMessagesAsRxBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kSendMessagesAsRxBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -3457,6 +3481,9 @@ FlexRayClusterObjectClass::FlexRayClusterObjectClass(rti1516ev::RTIambassador* r
   mgPayloadLengthStaticAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gPayloadLengthStatic");
   // attribute gSyncFrameIDCountMax : HLAoctet
   mgSyncFrameIDCountMaxAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"gSyncFrameIDCountMax");
+  SetObjectInstanceCreator([](FlexRayClusterObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> FlexRayCluster* {
+    return new FlexRayCluster(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 FlexRayClusterObjectClass::~FlexRayClusterObjectClass()
@@ -3539,7 +3566,7 @@ void FlexRayClusterObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  FlexRayCluster* newObject = new FlexRayCluster(this, instanceName, mRtiAmbassador);
+  FlexRayCluster* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -3596,7 +3623,7 @@ IFlexRayCluster* FlexRayClusterObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayCluster");
   }
-  FlexRayCluster* newObject = new FlexRayCluster(this, instanceName, mRtiAmbassador);
+  FlexRayCluster* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -3620,7 +3647,7 @@ IFlexRayCluster* FlexRayClusterObjectClass::CreateObjectInstance(const std::wstr
   {
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayCluster");
   }
-  FlexRayCluster* newObject = new FlexRayCluster(this, instanceName, mRtiAmbassador);
+  FlexRayCluster* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -4485,107 +4512,107 @@ void FlexRayCluster::ProvideAttributeValues(const rti1516ev::AttributeHandleSet&
     if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kNetworkIDBit;
     }
     else if (attributeHandle == mObjectClass->GetgColdstartAttemptsAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgColdstartAttempts.encode()));
-      mDirty &= ~kgColdstartAttemptsBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgColdstartAttemptsBit;
     }
     else if (attributeHandle == mObjectClass->GetgCycleCountMaxAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgCycleCountMax.encode()));
-      mDirty &= ~kgCycleCountMaxBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgCycleCountMaxBit;
     }
     else if (attributeHandle == mObjectClass->GetgdActionPointOffsetAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdActionPointOffset.encode()));
-      mDirty &= ~kgdActionPointOffsetBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdActionPointOffsetBit;
     }
     else if (attributeHandle == mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdDynamicSlotIdlePhase.encode()));
-      mDirty &= ~kgdDynamicSlotIdlePhaseBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdDynamicSlotIdlePhaseBit;
     }
     else if (attributeHandle == mObjectClass->GetgdMiniSlotAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdMiniSlot.encode()));
-      mDirty &= ~kgdMiniSlotBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdMiniSlotBit;
     }
     else if (attributeHandle == mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdMiniSlotActionPointOffset.encode()));
-      mDirty &= ~kgdMiniSlotActionPointOffsetBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdMiniSlotActionPointOffsetBit;
     }
     else if (attributeHandle == mObjectClass->GetgdStaticSlotAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdStaticSlot.encode()));
-      mDirty &= ~kgdStaticSlotBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdStaticSlotBit;
     }
     else if (attributeHandle == mObjectClass->GetgdSymbolWindowAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdSymbolWindow.encode()));
-      mDirty &= ~kgdSymbolWindowBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdSymbolWindowBit;
     }
     else if (attributeHandle == mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdSymbolWindowActionPointOffset.encode()));
-      mDirty &= ~kgdSymbolWindowActionPointOffsetBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdSymbolWindowActionPointOffsetBit;
     }
     else if (attributeHandle == mObjectClass->GetgdTSSTransmitterAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdTSSTransmitter.encode()));
-      mDirty &= ~kgdTSSTransmitterBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdTSSTransmitterBit;
     }
     else if (attributeHandle == mObjectClass->GetgdWakeupTxActiveAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdWakeupTxActive.encode()));
-      mDirty &= ~kgdWakeupTxActiveBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdWakeupTxActiveBit;
     }
     else if (attributeHandle == mObjectClass->GetgdWakeupTxIdleAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgdWakeupTxIdle.encode()));
-      mDirty &= ~kgdWakeupTxIdleBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgdWakeupTxIdleBit;
     }
     else if (attributeHandle == mObjectClass->GetgListenNoiseAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgListenNoise.encode()));
-      mDirty &= ~kgListenNoiseBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgListenNoiseBit;
     }
     else if (attributeHandle == mObjectClass->GetgMacroPerCycleAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgMacroPerCycle.encode()));
-      mDirty &= ~kgMacroPerCycleBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgMacroPerCycleBit;
     }
     else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgMaxWithoutClockCorrectionFatal.encode()));
-      mDirty &= ~kgMaxWithoutClockCorrectionFatalBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgMaxWithoutClockCorrectionFatalBit;
     }
     else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgMaxWithoutClockCorrectionPassive.encode()));
-      mDirty &= ~kgMaxWithoutClockCorrectionPassiveBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgMaxWithoutClockCorrectionPassiveBit;
     }
     else if (attributeHandle == mObjectClass->GetgNumberOfMiniSlotsAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgNumberOfMiniSlots.encode()));
-      mDirty &= ~kgNumberOfMiniSlotsBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgNumberOfMiniSlotsBit;
     }
     else if (attributeHandle == mObjectClass->GetgNumberOfStaticSlotsAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgNumberOfStaticSlots.encode()));
-      mDirty &= ~kgNumberOfStaticSlotsBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgNumberOfStaticSlotsBit;
     }
     else if (attributeHandle == mObjectClass->GetgPayloadLengthStaticAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgPayloadLengthStatic.encode()));
-      mDirty &= ~kgPayloadLengthStaticBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgPayloadLengthStaticBit;
     }
     else if (attributeHandle == mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mgSyncFrameIDCountMax.encode()));
-      mDirty &= ~kgSyncFrameIDCountMaxBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kgSyncFrameIDCountMaxBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -4644,6 +4671,9 @@ BusControllerObjectClass::BusControllerObjectClass(rti1516ev::RTIambassador* rti
   mNetworkIDAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"NetworkID");
   // attribute DeviceID : HLAASCIIstring
   mDeviceIDAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"DeviceID");
+  SetObjectInstanceCreator([](BusControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> BusController* {
+    return new BusController(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 BusControllerObjectClass::~BusControllerObjectClass()
@@ -4707,7 +4737,7 @@ void BusControllerObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  BusController* newObject = new BusController(this, instanceName, mRtiAmbassador);
+  BusController* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -4764,7 +4794,7 @@ IBusController* BusControllerObjectClass::CreateObjectInstance(const std::wstrin
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusController");
   }
-  BusController* newObject = new BusController(this, instanceName, mRtiAmbassador);
+  BusController* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -4788,7 +4818,7 @@ IBusController* BusControllerObjectClass::CreateObjectInstance(const std::wstrin
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusController");
   }
-  BusController* newObject = new BusController(this, instanceName, mRtiAmbassador);
+  BusController* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -5024,12 +5054,12 @@ void BusController::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& 
     if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kNetworkIDBit;
     }
     else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDeviceIDBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -5061,6 +5091,9 @@ BusControllerCanObjectClass::BusControllerCanObjectClass(rti1516ev::RTIambassado
   mPhase_Seg2AttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"Phase_Seg2");
   // attribute SamplingMode : CanSamplingMode
   mSamplingModeAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"SamplingMode");
+  SetObjectInstanceCreator([](BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> BusControllerCan* {
+    return new BusControllerCan(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 BusControllerCanObjectClass::~BusControllerCanObjectClass()
@@ -5133,7 +5166,7 @@ void BusControllerCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstan
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  BusControllerCan* newObject = new BusControllerCan(this, instanceName, mRtiAmbassador);
+  BusControllerCan* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -5190,7 +5223,7 @@ IBusControllerCan* BusControllerCanObjectClass::CreateObjectInstance(const std::
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerCan");
   }
-  BusControllerCan* newObject = new BusControllerCan(this, instanceName, mRtiAmbassador);
+  BusControllerCan* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -5214,7 +5247,7 @@ IBusControllerCan* BusControllerCanObjectClass::CreateObjectInstance(const std::
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerCan");
   }
-  BusControllerCan* newObject = new BusControllerCan(this, instanceName, mRtiAmbassador);
+  BusControllerCan* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -5749,57 +5782,57 @@ void BusControllerCan::ProvideAttributeValues(const rti1516ev::AttributeHandleSe
     if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kNetworkIDBit;
     }
     else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDeviceIDBit;
     }
     else if (attributeHandle == mObjectClass->GetBaudRateAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mBaudRate.encode()));
-      mDirty &= ~kBaudRateBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kBaudRateBit;
     }
     else if (attributeHandle == mObjectClass->GetDataBaudRateAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDataBaudRate.encode()));
-      mDirty &= ~kDataBaudRateBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDataBaudRateBit;
     }
     else if (attributeHandle == mObjectClass->GetPreScalerAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mPreScaler.encode()));
-      mDirty &= ~kPreScalerBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kPreScalerBit;
     }
     else if (attributeHandle == mObjectClass->GetOperationModeAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mOperationMode.encode()));
-      mDirty &= ~kOperationModeBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kOperationModeBit;
     }
     else if (attributeHandle == mObjectClass->GetSync_SegAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mSync_Seg.encode()));
-      mDirty &= ~kSync_SegBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kSync_SegBit;
     }
     else if (attributeHandle == mObjectClass->GetProp_SegAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mProp_Seg.encode()));
-      mDirty &= ~kProp_SegBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kProp_SegBit;
     }
     else if (attributeHandle == mObjectClass->GetPhase_Seg1AttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mPhase_Seg1.encode()));
-      mDirty &= ~kPhase_Seg1Bit; // clear dirty bit - it's part of this update
+      mDirty &= ~kPhase_Seg1Bit;
     }
     else if (attributeHandle == mObjectClass->GetPhase_Seg2AttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mPhase_Seg2.encode()));
-      mDirty &= ~kPhase_Seg2Bit; // clear dirty bit - it's part of this update
+      mDirty &= ~kPhase_Seg2Bit;
     }
     else if (attributeHandle == mObjectClass->GetSamplingModeAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mSamplingMode.encode()));
-      mDirty &= ~kSamplingModeBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kSamplingModeBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -5856,6 +5889,9 @@ BusControllerEthernetObjectClass::BusControllerEthernetObjectClass(rti1516ev::RT
   mObjectClassHandle = rtiAmbassador->getObjectClassHandle(L"HLAobjectRoot.BusController.BusControllerEthernet");
   // attribute PortName : HLAASCIIstring
   mPortNameAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"PortName");
+  SetObjectInstanceCreator([](BusControllerEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> BusControllerEthernet* {
+    return new BusControllerEthernet(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 BusControllerEthernetObjectClass::~BusControllerEthernetObjectClass()
@@ -5920,7 +5956,7 @@ void BusControllerEthernetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectI
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  BusControllerEthernet* newObject = new BusControllerEthernet(this, instanceName, mRtiAmbassador);
+  BusControllerEthernet* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -5977,7 +6013,7 @@ IBusControllerEthernet* BusControllerEthernetObjectClass::CreateObjectInstance(c
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerEthernet");
   }
-  BusControllerEthernet* newObject = new BusControllerEthernet(this, instanceName, mRtiAmbassador);
+  BusControllerEthernet* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -6001,7 +6037,7 @@ IBusControllerEthernet* BusControllerEthernetObjectClass::CreateObjectInstance(c
   {
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerEthernet");
   }
-  BusControllerEthernet* newObject = new BusControllerEthernet(this, instanceName, mRtiAmbassador);
+  BusControllerEthernet* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -6272,17 +6308,17 @@ void BusControllerEthernet::ProvideAttributeValues(const rti1516ev::AttributeHan
     if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kNetworkIDBit;
     }
     else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDeviceIDBit;
     }
     else if (attributeHandle == mObjectClass->GetPortNameAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mPortName.encode()));
-      mDirty &= ~kPortNameBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kPortNameBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -6355,6 +6391,9 @@ FlexRayControllerStatusObjectClass::FlexRayControllerStatusObjectClass(rti1516ev
   mstartupStateAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"startupState");
   // attribute wakeupStatus : FlexRayWakeupStatusType
   mwakeupStatusAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"wakeupStatus");
+  SetObjectInstanceCreator([](FlexRayControllerStatusObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> FlexRayControllerStatus* {
+    return new FlexRayControllerStatus(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 FlexRayControllerStatusObjectClass::~FlexRayControllerStatusObjectClass()
@@ -6427,7 +6466,7 @@ void FlexRayControllerStatusObjectClass::DiscoverObjectInstance(rti1516ev::Objec
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  FlexRayControllerStatus* newObject = new FlexRayControllerStatus(this, instanceName, mRtiAmbassador);
+  FlexRayControllerStatus* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -6484,7 +6523,7 @@ IFlexRayControllerStatus* FlexRayControllerStatusObjectClass::CreateObjectInstan
   {
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayControllerStatus");
   }
-  FlexRayControllerStatus* newObject = new FlexRayControllerStatus(this, instanceName, mRtiAmbassador);
+  FlexRayControllerStatus* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -6508,7 +6547,7 @@ IFlexRayControllerStatus* FlexRayControllerStatusObjectClass::CreateObjectInstan
   {
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayControllerStatus");
   }
-  FlexRayControllerStatus* newObject = new FlexRayControllerStatus(this, instanceName, mRtiAmbassador);
+  FlexRayControllerStatus* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -7043,57 +7082,57 @@ void FlexRayControllerStatus::ProvideAttributeValues(const rti1516ev::AttributeH
     if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kNetworkIDBit;
     }
     else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDeviceIDBit;
     }
     else if (attributeHandle == mObjectClass->GetPocStateAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mPocState.encode()));
-      mDirty &= ~kPocStateBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kPocStateBit;
     }
     else if (attributeHandle == mObjectClass->GetchiHaltRequestAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mchiHaltRequest.encode()));
-      mDirty &= ~kchiHaltRequestBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kchiHaltRequestBit;
     }
     else if (attributeHandle == mObjectClass->GetcoldstartNoiseAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mcoldstartNoise.encode()));
-      mDirty &= ~kcoldstartNoiseBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kcoldstartNoiseBit;
     }
     else if (attributeHandle == mObjectClass->GetfreezeAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mfreeze.encode()));
-      mDirty &= ~kfreezeBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kfreezeBit;
     }
     else if (attributeHandle == mObjectClass->GetchiReadyRequestAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mchiReadyRequest.encode()));
-      mDirty &= ~kchiReadyRequestBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kchiReadyRequestBit;
     }
     else if (attributeHandle == mObjectClass->GeterrorModeAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, merrorMode.encode()));
-      mDirty &= ~kerrorModeBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kerrorModeBit;
     }
     else if (attributeHandle == mObjectClass->GetslotModeAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mslotMode.encode()));
-      mDirty &= ~kslotModeBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kslotModeBit;
     }
     else if (attributeHandle == mObjectClass->GetstartupStateAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mstartupState.encode()));
-      mDirty &= ~kstartupStateBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kstartupStateBit;
     }
     else if (attributeHandle == mObjectClass->GetwakeupStatusAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mwakeupStatus.encode()));
-      mDirty &= ~kwakeupStatusBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kwakeupStatusBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -7198,6 +7237,9 @@ FlexRayControllerObjectClass::FlexRayControllerObjectClass(rti1516ev::RTIambassa
   mpdMicrotickAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pdMicrotick");
   // attribute pSamplesPerMicrotick : HLAoctet
   mpSamplesPerMicrotickAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"pSamplesPerMicrotick");
+  SetObjectInstanceCreator([](FlexRayControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> FlexRayController* {
+    return new FlexRayController(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 FlexRayControllerObjectClass::~FlexRayControllerObjectClass()
@@ -7286,7 +7328,7 @@ void FlexRayControllerObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInsta
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  FlexRayController* newObject = new FlexRayController(this, instanceName, mRtiAmbassador);
+  FlexRayController* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -7343,7 +7385,7 @@ IFlexRayController* FlexRayControllerObjectClass::CreateObjectInstance(const std
   {
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayController");
   }
-  FlexRayController* newObject = new FlexRayController(this, instanceName, mRtiAmbassador);
+  FlexRayController* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -7367,7 +7409,7 @@ IFlexRayController* FlexRayControllerObjectClass::CreateObjectInstance(const std
   {
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayController");
   }
-  FlexRayController* newObject = new FlexRayController(this, instanceName, mRtiAmbassador);
+  FlexRayController* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -8430,137 +8472,137 @@ void FlexRayController::ProvideAttributeValues(const rti1516ev::AttributeHandleS
     if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kNetworkIDBit;
     }
     else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kDeviceIDBit;
     }
     else if (attributeHandle == mObjectClass->GetPocRequestAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mPocRequest.encode()));
-      mDirty &= ~kPocRequestBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kPocRequestBit;
     }
     else if (attributeHandle == mObjectClass->GetChiCommandAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mChiCommand.encode()));
-      mDirty &= ~kChiCommandBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kChiCommandBit;
     }
     else if (attributeHandle == mObjectClass->GetpAllowHaltDueToClockAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpAllowHaltDueToClock.encode()));
-      mDirty &= ~kpAllowHaltDueToClockBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpAllowHaltDueToClockBit;
     }
     else if (attributeHandle == mObjectClass->GetpAllowPassiveToActiveAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpAllowPassiveToActive.encode()));
-      mDirty &= ~kpAllowPassiveToActiveBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpAllowPassiveToActiveBit;
     }
     else if (attributeHandle == mObjectClass->GetpChannelsAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpChannels.encode()));
-      mDirty &= ~kpChannelsBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpChannelsBit;
     }
     else if (attributeHandle == mObjectClass->GetpClusterDriftDampingAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpClusterDriftDamping.encode()));
-      mDirty &= ~kpClusterDriftDampingBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpClusterDriftDampingBit;
     }
     else if (attributeHandle == mObjectClass->GetpdAcceptedStartupRangeAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpdAcceptedStartupRange.encode()));
-      mDirty &= ~kpdAcceptedStartupRangeBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpdAcceptedStartupRangeBit;
     }
     else if (attributeHandle == mObjectClass->GetpdListenTimeoutAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpdListenTimeout.encode()));
-      mDirty &= ~kpdListenTimeoutBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpdListenTimeoutBit;
     }
     else if (attributeHandle == mObjectClass->GetpKeySlotIdAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotId.encode()));
-      mDirty &= ~kpKeySlotIdBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpKeySlotIdBit;
     }
     else if (attributeHandle == mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotOnlyEnabled.encode()));
-      mDirty &= ~kpKeySlotOnlyEnabledBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpKeySlotOnlyEnabledBit;
     }
     else if (attributeHandle == mObjectClass->GetpKeySlotUsedForStartupAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotUsedForStartup.encode()));
-      mDirty &= ~kpKeySlotUsedForStartupBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpKeySlotUsedForStartupBit;
     }
     else if (attributeHandle == mObjectClass->GetpKeySlotUsedForSyncAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotUsedForSync.encode()));
-      mDirty &= ~kpKeySlotUsedForSyncBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpKeySlotUsedForSyncBit;
     }
     else if (attributeHandle == mObjectClass->GetpLatestTxAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpLatestTx.encode()));
-      mDirty &= ~kpLatestTxBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpLatestTxBit;
     }
     else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetAAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpMacroInitialOffsetA.encode()));
-      mDirty &= ~kpMacroInitialOffsetABit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpMacroInitialOffsetABit;
     }
     else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetBAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpMacroInitialOffsetB.encode()));
-      mDirty &= ~kpMacroInitialOffsetBBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpMacroInitialOffsetBBit;
     }
     else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetAAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpMicroInitialOffsetA.encode()));
-      mDirty &= ~kpMicroInitialOffsetABit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpMicroInitialOffsetABit;
     }
     else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetBAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpMicroInitialOffsetB.encode()));
-      mDirty &= ~kpMicroInitialOffsetBBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpMicroInitialOffsetBBit;
     }
     else if (attributeHandle == mObjectClass->GetpMicroPerCycleAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpMicroPerCycle.encode()));
-      mDirty &= ~kpMicroPerCycleBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpMicroPerCycleBit;
     }
     else if (attributeHandle == mObjectClass->GetpOffsetCorrectionOutAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpOffsetCorrectionOut.encode()));
-      mDirty &= ~kpOffsetCorrectionOutBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpOffsetCorrectionOutBit;
     }
     else if (attributeHandle == mObjectClass->GetpOffsetCorrectionStartAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpOffsetCorrectionStart.encode()));
-      mDirty &= ~kpOffsetCorrectionStartBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpOffsetCorrectionStartBit;
     }
     else if (attributeHandle == mObjectClass->GetpRateCorrectionOutAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpRateCorrectionOut.encode()));
-      mDirty &= ~kpRateCorrectionOutBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpRateCorrectionOutBit;
     }
     else if (attributeHandle == mObjectClass->GetpWakeupChannelAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpWakeupChannel.encode()));
-      mDirty &= ~kpWakeupChannelBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpWakeupChannelBit;
     }
     else if (attributeHandle == mObjectClass->GetpWakeupPatternAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpWakeupPattern.encode()));
-      mDirty &= ~kpWakeupPatternBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpWakeupPatternBit;
     }
     else if (attributeHandle == mObjectClass->GetpdMicrotickAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpdMicrotick.encode()));
-      mDirty &= ~kpdMicrotickBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpdMicrotickBit;
     }
     else if (attributeHandle == mObjectClass->GetpSamplesPerMicrotickAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mpSamplesPerMicrotick.encode()));
-      mDirty &= ~kpSamplesPerMicrotickBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kpSamplesPerMicrotickBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
@@ -8633,6 +8675,9 @@ FlexRaySendBufferObjectClass::FlexRaySendBufferObjectClass(rti1516ev::RTIambassa
   mPPIndicatorAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"PPIndicator");
   // attribute HeaderCRC : HLAinteger16LE
   mHeaderCRCAttributeHandle = rtiAmbassador->getAttributeHandle(mObjectClassHandle, L"HeaderCRC");
+  SetObjectInstanceCreator([](FlexRaySendBufferObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> FlexRaySendBuffer* {
+    return new FlexRaySendBuffer(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 FlexRaySendBufferObjectClass::~FlexRaySendBufferObjectClass()
@@ -8703,7 +8748,7 @@ void FlexRaySendBufferObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInsta
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  FlexRaySendBuffer* newObject = new FlexRaySendBuffer(this, instanceName, mRtiAmbassador);
+  FlexRaySendBuffer* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -8760,7 +8805,7 @@ IFlexRaySendBuffer* FlexRaySendBufferObjectClass::CreateObjectInstance(const std
   {
     throw rti1516ev::ObjectClassNotPublished(L"FlexRaySendBuffer");
   }
-  FlexRaySendBuffer* newObject = new FlexRaySendBuffer(this, instanceName, mRtiAmbassador);
+  FlexRaySendBuffer* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -8784,7 +8829,7 @@ IFlexRaySendBuffer* FlexRaySendBufferObjectClass::CreateObjectInstance(const std
   {
     throw rti1516ev::ObjectClassNotPublished(L"FlexRaySendBuffer");
   }
-  FlexRaySendBuffer* newObject = new FlexRaySendBuffer(this, instanceName, mRtiAmbassador);
+  FlexRaySendBuffer* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -9259,47 +9304,47 @@ void FlexRaySendBuffer::ProvideAttributeValues(const rti1516ev::AttributeHandleS
     if (attributeHandle == mObjectClass->GetSenderAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mSender.encode()));
-      mDirty &= ~kSenderBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kSenderBit;
     }
     else if (attributeHandle == mObjectClass->GetTransmissionModeAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mTransmissionMode.encode()));
-      mDirty &= ~kTransmissionModeBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kTransmissionModeBit;
     }
     else if (attributeHandle == mObjectClass->GetPayloadAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mPayload.encode()));
-      mDirty &= ~kPayloadBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kPayloadBit;
     }
     else if (attributeHandle == mObjectClass->GetCycleOffsetAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mCycleOffset.encode()));
-      mDirty &= ~kCycleOffsetBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kCycleOffsetBit;
     }
     else if (attributeHandle == mObjectClass->GetCycleRepetitionAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mCycleRepetition.encode()));
-      mDirty &= ~kCycleRepetitionBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kCycleRepetitionBit;
     }
     else if (attributeHandle == mObjectClass->GetSlotIdAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mSlotId.encode()));
-      mDirty &= ~kSlotIdBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kSlotIdBit;
     }
     else if (attributeHandle == mObjectClass->GetChannelAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mChannel.encode()));
-      mDirty &= ~kChannelBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kChannelBit;
     }
     else if (attributeHandle == mObjectClass->GetPPIndicatorAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mPPIndicator.encode()));
-      mDirty &= ~kPPIndicatorBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kPPIndicatorBit;
     }
     else if (attributeHandle == mObjectClass->GetHeaderCRCAttributeHandle())
     {
       updateAttributes.insert(std::make_pair(attributeHandle, mHeaderCRC.encode()));
-      mDirty &= ~kHeaderCRCBit; // clear dirty bit - it's part of this update
+      mDirty &= ~kHeaderCRCBit;
     }
   } // for (auto& attributeHandleValue : attributes)
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());

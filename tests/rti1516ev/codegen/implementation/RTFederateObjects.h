@@ -44,6 +44,8 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IHLAobjectRoot* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<HLAobjectRoot*(HLAobjectRootObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     HLAobjectRootObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry);
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -58,6 +60,7 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
     rti1516ev::RTIambassador* mRtiAmbassador;
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -93,7 +96,7 @@ class HLAobjectRoot : public IHLAobjectRoot
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class HLAobjectRootObjectClass;
 
     HLAobjectRoot();
@@ -129,6 +132,8 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(ISystemVariable* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<SystemVariable*(SystemVariableObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     SystemVariableObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -147,6 +152,7 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     HLAobjectRootObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -200,7 +206,7 @@ class SystemVariable : public ISystemVariable
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class SystemVariableObjectClass;
 
     SystemVariable();
@@ -248,6 +254,8 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IValueEntity* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<ValueEntity*(ValueEntityObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     ValueEntityObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -266,6 +274,7 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     HLAobjectRootObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -319,7 +328,7 @@ class ValueEntity : public IValueEntity
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class ValueEntityObjectClass;
 
     ValueEntity();
@@ -367,6 +376,8 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IDOMemberSource* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<DOMemberSource*(DOMemberSourceObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     DOMemberSourceObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -389,6 +400,7 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     HLAobjectRootObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -452,7 +464,7 @@ class DOMemberSource : public IDOMemberSource
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class DOMemberSourceObjectClass;
 
     DOMemberSource();
@@ -504,6 +516,8 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IDOMemberTarget* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<DOMemberTarget*(DOMemberTargetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     DOMemberTargetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -524,6 +538,7 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     HLAobjectRootObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -582,7 +597,7 @@ class DOMemberTarget : public IDOMemberTarget
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class DOMemberTargetObjectClass;
 
     DOMemberTarget();
@@ -632,6 +647,8 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IBusManagement* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<BusManagement*(BusManagementObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     BusManagementObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -650,6 +667,7 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     HLAobjectRootObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -699,7 +717,7 @@ class BusManagement : public IBusManagement
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class BusManagementObjectClass;
 
     BusManagement();
@@ -741,6 +759,8 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IBusManagementCan* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<BusManagementCan*(BusManagementCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     BusManagementCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass);
 
@@ -767,6 +787,7 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     BusManagementObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -838,7 +859,7 @@ class BusManagementCan : public IBusManagementCan
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class BusManagementCanObjectClass;
 
     BusManagementCan();
@@ -894,6 +915,8 @@ class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClas
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IBusManagementEthernet* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<BusManagementEthernet*(BusManagementEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     BusManagementEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass);
 
@@ -916,6 +939,7 @@ class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClas
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     BusManagementObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -977,7 +1001,7 @@ class BusManagementEthernet : public IBusManagementEthernet
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class BusManagementEthernetObjectClass;
 
     BusManagementEthernet();
@@ -1029,6 +1053,8 @@ class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IFlexRayCluster* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<FlexRayCluster*(FlexRayClusterObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     FlexRayClusterObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusManagementObjectClass* baseClass);
 
@@ -1087,6 +1113,7 @@ class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     BusManagementObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -1238,7 +1265,7 @@ class FlexRayCluster : public IFlexRayCluster
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class FlexRayClusterObjectClass;
 
     FlexRayCluster();
@@ -1326,6 +1353,8 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IBusController* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<BusController*(BusControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     BusControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -1346,6 +1375,7 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     HLAobjectRootObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -1400,7 +1430,7 @@ class BusController : public IBusController
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class BusControllerObjectClass;
 
     BusController();
@@ -1444,6 +1474,8 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IBusControllerCan* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<BusControllerCan*(BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     BusControllerCanObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
@@ -1482,6 +1514,7 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     BusControllerObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -1581,7 +1614,7 @@ class BusControllerCan : public IBusControllerCan
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class BusControllerCanObjectClass;
 
     BusControllerCan();
@@ -1649,6 +1682,8 @@ class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClas
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IBusControllerEthernet* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<BusControllerEthernet*(BusControllerEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     BusControllerEthernetObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
@@ -1671,6 +1706,7 @@ class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClas
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     BusControllerObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -1730,7 +1766,7 @@ class BusControllerEthernet : public IBusControllerEthernet
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class BusControllerEthernetObjectClass;
 
     BusControllerEthernet();
@@ -1782,6 +1818,8 @@ class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObject
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IFlexRayControllerStatus* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<FlexRayControllerStatus*(FlexRayControllerStatusObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     FlexRayControllerStatusObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
@@ -1820,6 +1858,7 @@ class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObject
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     BusControllerObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -1919,7 +1958,7 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class FlexRayControllerStatusObjectClass;
 
     FlexRayControllerStatus();
@@ -1987,6 +2026,8 @@ class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IFlexRayController* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<FlexRayController*(FlexRayControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     FlexRayControllerObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, BusControllerObjectClass* baseClass);
 
@@ -2057,6 +2098,7 @@ class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     BusControllerObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -2236,7 +2278,7 @@ class FlexRayController : public IFlexRayController
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class FlexRayControllerObjectClass;
 
     FlexRayController();
@@ -2336,6 +2378,8 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(IFlexRaySendBuffer* newObjectInstance);
+    using ObjectInstanceCreatorFunction = std::function<FlexRaySendBuffer*(FlexRaySendBufferObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
     FlexRaySendBufferObjectClass(rti1516ev::RTIambassador* rtiAmbassador, ObjectClassRegistry* registry, HLAobjectRootObjectClass* baseClass);
 
@@ -2370,6 +2414,7 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
     // object class handle
     rti1516ev::ObjectClassHandle mObjectClassHandle;
     HLAobjectRootObjectClass* mBaseClass;
+    ObjectInstanceCreatorFunction mCreatorFunction;
     bool mPublished = false;
     bool mSubscribed = false;
     // Attribute handles
@@ -2464,7 +2509,7 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
-  private:
+  protected:
     friend class FlexRaySendBufferObjectClass;
 
     FlexRaySendBuffer();

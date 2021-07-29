@@ -51,6 +51,9 @@ foreach (var objectClass in FOM.ObjectClasses)
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
 #>
+  SetObjectInstanceCreator([](<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> <#=objectClass.Name#>* {
+    return new <#=objectClass.Name#>(objectClass, instanceName, rtiAmbassador);
+  });
 }
 
 <#=objectClass.Name#>ObjectClass::~<#=objectClass.Name#>ObjectClass()
@@ -123,7 +126,7 @@ void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectI
 {
   assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(this, instanceName, mRtiAmbassador);
+  <#=objectClass.Name#>* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
   mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
@@ -180,7 +183,7 @@ I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(c
   {
     throw rti1516ev::ObjectClassNotPublished(L"<#=objectClass.Name#>");
   }
-  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(this, instanceName, mRtiAmbassador);
+  <#=objectClass.Name#>* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -204,7 +207,7 @@ I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(c
   {
     throw rti1516ev::ObjectClassNotPublished(L"<#=objectClass.Name#>");
   }
-  <#=objectClass.Name#>* newObject = new <#=objectClass.Name#>(this, instanceName, mRtiAmbassador);
+  <#=objectClass.Name#>* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
