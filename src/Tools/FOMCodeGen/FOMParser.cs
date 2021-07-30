@@ -433,7 +433,7 @@ namespace FOMCodeGen
       }
       public override string CppSetter(string var, string value)
       {
-        return var + ".set(static_cast<" + ObjectClass.Name +"*>(" + value + ")->GetObjectInstanceHandle())";
+        return var + ".set(static_cast<" + ObjectClass.Name + "*>(" + value + ")->GetObjectInstanceHandle())";
       }
 
       public override string CPPType
@@ -520,7 +520,7 @@ namespace FOMCodeGen
       }
       public override string CppSetter(string var, string value)
       {
-        return var + ".set(static_cast<" + Representation.CPPType +">(" + value + "))";
+        return var + ".set(static_cast<" + Representation.CPPType + ">(" + value + "))";
       }
     }
     // An array data type, one of HLAfixedArray or HLAvariableArray.
@@ -849,7 +849,15 @@ namespace FOMCodeGen
       }
       return result;
     }
-
+    public string GeneratorVersion
+    {
+      get
+      {
+        System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        System.Diagnostics.FileVersionInfo fileVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+        return fileVersion.FileVersion;
+      }
+    }
     // Compare data types according to dependency/usage:
     // If x is using y, y must be defined first.
     // If y is using x, x must be defined first.
