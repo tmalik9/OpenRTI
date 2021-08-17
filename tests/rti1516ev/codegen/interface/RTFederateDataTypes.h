@@ -36,14 +36,12 @@ inline X* placement_new(void* addr, Types&& ... args)
 // define our own simplified 'optional' types, similar to but independent of std::optional (since C++17) or boost::optional
 #pragma warning(push)
 #pragma warning(disable: 4324) // MSVC: 'struct_name' : structure was padded due to __declspec(align())
-template< typename T > struct optional
+template<typename T, bool X=std::is_fundamental<T>::value > struct optional
 {
-  static_assert(!std::is_reference< T >::value,
-    "reference is not supported as optional value");
+  static_assert(!std::is_reference< T >::value, "reference is not supported as optional value");
   // constructors
   optional() : _valid(false) {}
   optional(const optional& rhs): _valid(rhs._valid) { create(rhs); }
-  optional(optional&& rhs): _valid(rhs._valid) { create(std::forward< optional >(rhs)); }
   optional(const T& w): _valid(true) { create(w); }
   template<typename Other>
   optional(const Other& w): _valid(true) { create(w); }
@@ -57,11 +55,10 @@ template< typename T > struct optional
 
   // assign
   optional& operator = (optional const& rhs) { return assign(rhs); }
-  optional& operator = (optional&& rhs) { return assign(rhs); }
   optional& operator = (T const& w) { return assign(w); }
 
   // get value
-  T const& operator * () const { return *get(); }
+  const T& operator * () const { return *get(); }
   T& operator * () { return *get(); }
   T const* operator -> () const { return get(); }
   T* operator -> () { return get(); }
@@ -70,14 +67,8 @@ private:
   void create(const Other& w) {
     placement_new<T>(_value, w);
   }
-  void create(T&& w) {
-    placement_new<T>(_value, std::forward< T >(w));
-  }
   void create(const optional& rhs) {
     if(_valid) create(*rhs.get());
-  }
-  void create(optional&& rhs) {
-    if(_valid) create(std::move(*rhs.get()));
   }
   void destroy() {
     get()->~T();
@@ -98,19 +89,8 @@ private:
     else create(w), _valid = true;
     return *this;
   }
-  optional& assign(T&& w) {
-    if(_valid) *get() = w;
-    else create(std::forward(w)), _valid = true;
-    return *this;
-  }
   optional& assign(const optional& rhs) {
     if(rhs._valid) return assign(*rhs.get());
-    if(!_valid) return *this;
-    cleanup();
-    return *this;
-  }
-  optional& assign(optional&& rhs) {
-    if(rhs._valid) return assign(std::move(*rhs.get()));
     if(!_valid) return *this;
     cleanup();
     return *this;
@@ -119,12 +99,11 @@ private:
   alignas(alignof(T)) uint8_t _value[sizeof(T)];
 };
 
-template< typename T > struct optional<const T&>
+template<typename T> struct optional<const T&, false>
 {
   // constructors
   optional() : _valid(false) {}
   optional(const optional& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }
-  optional(optional&& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }
   optional(const T& rhs): _valid(true), _pointer(&rhs) { }
   template<typename Other>
   optional(const Other& rhs): _valid(true), _pointer(&rhs) { }
@@ -142,7 +121,6 @@ template< typename T > struct optional<const T&>
     _pointer = rhs._pointer;
     return *this;
   }
-  //optional& operator = (optional&& rhs) { return assign(rhs); }
   optional& operator = (const T& w) {
     _valid = true;
     _pointer = &w;
@@ -158,6 +136,40 @@ private:
   }
   bool _valid;
   const T* _pointer = nullptr;
+};
+template<typename T> struct optional<T, true>
+{
+  // constructors
+  optional() : _valid(false) {}
+  optional(const optional& rhs): _valid(rhs._valid), _value(rhs._value) { }
+  optional(const T& rhs): _valid(true), _value(rhs) { }
+  template<typename Other>
+  optional(const Other& rhs): _valid(true), _value(rhs) { }
+
+  // destructor
+  ~optional() { }
+
+  // check for value presence
+  bool operator ! () const { return !_valid; }
+  explicit operator bool() const { return _valid; }
+
+  // assign
+  optional& operator = (const optional& rhs) {
+    _valid = rhs._valid;
+    _value = rhs._value;
+    return *this;
+  }
+  optional& operator = (const T& w) {
+    _valid = true;
+    _value = w;
+    return *this;
+  }
+  // get value
+  T const& operator * () const { return _value; }
+  T const* operator -> () const { return &_value; }
+private:
+  bool _valid;
+  T _value;
 };
 #pragma warning(pop)
 
