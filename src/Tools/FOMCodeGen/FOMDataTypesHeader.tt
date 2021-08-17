@@ -291,6 +291,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, <#=dataType.Name#> va
 <#
     } // foreach enumeratedDataType.Enumerators.Values
 #>
+    default: os << "<invalid <#=dataType.Name#>>"; break;
   }
   return os;
 }
@@ -307,6 +308,7 @@ inline std::string to_string(<#=dataType.Name#> value)
 <#
     } // foreach enumeratedDataType.Enumerators.Values
 #>
+    default: return "<invalid <#=dataType.Name#>>";
   }
 }
 
@@ -322,6 +324,7 @@ inline std::wstring to_wstring(<#=dataType.Name#> value)
 <#
     } // foreach enumeratedDataType.Enumerators.Values
 #>
+    default: return L"<invalid <#=dataType.Name#>>";
   }
 }
 

@@ -221,6 +221,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, BusType value)
     case BusType::kBtLIN: os << "kBtLIN"; break;
     case BusType::kBtFlexRay: os << "kBtFlexRay"; break;
     case BusType::kBtEthernet: os << "kBtEthernet"; break;
+    default: os << "<invalid BusType>"; break;
   }
   return os;
 }
@@ -234,6 +235,7 @@ inline std::string to_string(BusType value)
     case BusType::kBtLIN: return "kBtLIN";
     case BusType::kBtFlexRay: return "kBtFlexRay";
     case BusType::kBtEthernet: return "kBtEthernet";
+    default: return "<invalid BusType>";
   }
 }
 
@@ -246,6 +248,7 @@ inline std::wstring to_wstring(BusType value)
     case BusType::kBtLIN: return L"kBtLIN";
     case BusType::kBtFlexRay: return L"kBtFlexRay";
     case BusType::kBtEthernet: return L"kBtEthernet";
+    default: return L"<invalid BusType>";
   }
 }
 
@@ -265,6 +268,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, SimulatedFlag value)
     case SimulatedFlag::kSimulated_fromBus: os << "kSimulated_fromBus"; break;
     case SimulatedFlag::kSimulated_fromTool: os << "kSimulated_fromTool"; break;
     case SimulatedFlag::kSimulated_internalEvent: os << "kSimulated_internalEvent"; break;
+    default: os << "<invalid SimulatedFlag>"; break;
   }
   return os;
 }
@@ -276,6 +280,7 @@ inline std::string to_string(SimulatedFlag value)
     case SimulatedFlag::kSimulated_fromBus: return "kSimulated_fromBus";
     case SimulatedFlag::kSimulated_fromTool: return "kSimulated_fromTool";
     case SimulatedFlag::kSimulated_internalEvent: return "kSimulated_internalEvent";
+    default: return "<invalid SimulatedFlag>";
   }
 }
 
@@ -286,6 +291,7 @@ inline std::wstring to_wstring(SimulatedFlag value)
     case SimulatedFlag::kSimulated_fromBus: return L"kSimulated_fromBus";
     case SimulatedFlag::kSimulated_fromTool: return L"kSimulated_fromTool";
     case SimulatedFlag::kSimulated_internalEvent: return L"kSimulated_internalEvent";
+    default: return L"<invalid SimulatedFlag>";
   }
 }
 
@@ -305,6 +311,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, DirMask value)
     case DirMask::kMskTxRequest: os << "kMskTxRequest"; break;
     case DirMask::kMskRx: os << "kMskRx"; break;
     case DirMask::kMskTx: os << "kMskTx"; break;
+    default: os << "<invalid DirMask>"; break;
   }
   return os;
 }
@@ -316,6 +323,7 @@ inline std::string to_string(DirMask value)
     case DirMask::kMskTxRequest: return "kMskTxRequest";
     case DirMask::kMskRx: return "kMskRx";
     case DirMask::kMskTx: return "kMskTx";
+    default: return "<invalid DirMask>";
   }
 }
 
@@ -326,6 +334,7 @@ inline std::wstring to_wstring(DirMask value)
     case DirMask::kMskTxRequest: return L"kMskTxRequest";
     case DirMask::kMskRx: return L"kMskRx";
     case DirMask::kMskTx: return L"kMskTx";
+    default: return L"<invalid DirMask>";
   }
 }
 
@@ -345,6 +354,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, MessageFlags value)
     case MessageFlags::kMsgFlagRemoteFrame: os << "kMsgFlagRemoteFrame"; break;
     case MessageFlags::kMsgFlagEDL: os << "kMsgFlagEDL"; break;
     case MessageFlags::kMsgFlagBRS: os << "kMsgFlagBRS"; break;
+    default: os << "<invalid MessageFlags>"; break;
   }
   return os;
 }
@@ -356,6 +366,7 @@ inline std::string to_string(MessageFlags value)
     case MessageFlags::kMsgFlagRemoteFrame: return "kMsgFlagRemoteFrame";
     case MessageFlags::kMsgFlagEDL: return "kMsgFlagEDL";
     case MessageFlags::kMsgFlagBRS: return "kMsgFlagBRS";
+    default: return "<invalid MessageFlags>";
   }
 }
 
@@ -366,6 +377,7 @@ inline std::wstring to_wstring(MessageFlags value)
     case MessageFlags::kMsgFlagRemoteFrame: return L"kMsgFlagRemoteFrame";
     case MessageFlags::kMsgFlagEDL: return L"kMsgFlagEDL";
     case MessageFlags::kMsgFlagBRS: return L"kMsgFlagBRS";
+    default: return L"<invalid MessageFlags>";
   }
 }
 
@@ -389,6 +401,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, LinkStatus value)
     case LinkStatus::kLinkUp: os << "kLinkUp"; break;
     case LinkStatus::kLinkNegotiate: os << "kLinkNegotiate"; break;
     case LinkStatus::kLinkError: os << "kLinkError"; break;
+    default: os << "<invalid LinkStatus>"; break;
   }
   return os;
 }
@@ -402,6 +415,7 @@ inline std::string to_string(LinkStatus value)
     case LinkStatus::kLinkUp: return "kLinkUp";
     case LinkStatus::kLinkNegotiate: return "kLinkNegotiate";
     case LinkStatus::kLinkError: return "kLinkError";
+    default: return "<invalid LinkStatus>";
   }
 }
 
@@ -414,6 +428,7 @@ inline std::wstring to_wstring(LinkStatus value)
     case LinkStatus::kLinkUp: return L"kLinkUp";
     case LinkStatus::kLinkNegotiate: return L"kLinkNegotiate";
     case LinkStatus::kLinkError: return L"kLinkError";
+    default: return L"<invalid LinkStatus>";
   }
 }
 
@@ -433,6 +448,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, EthernetPhy value)
     case EthernetPhy::kPhyUnknown: os << "kPhyUnknown"; break;
     case EthernetPhy::kPhyIEEE_802_3: os << "kPhyIEEE_802_3"; break;
     case EthernetPhy::kPhyBroadR_Reach: os << "kPhyBroadR_Reach"; break;
+    default: os << "<invalid EthernetPhy>"; break;
   }
   return os;
 }
@@ -444,6 +460,7 @@ inline std::string to_string(EthernetPhy value)
     case EthernetPhy::kPhyUnknown: return "kPhyUnknown";
     case EthernetPhy::kPhyIEEE_802_3: return "kPhyIEEE_802_3";
     case EthernetPhy::kPhyBroadR_Reach: return "kPhyBroadR_Reach";
+    default: return "<invalid EthernetPhy>";
   }
 }
 
@@ -454,6 +471,7 @@ inline std::wstring to_wstring(EthernetPhy value)
     case EthernetPhy::kPhyUnknown: return L"kPhyUnknown";
     case EthernetPhy::kPhyIEEE_802_3: return L"kPhyIEEE_802_3";
     case EthernetPhy::kPhyBroadR_Reach: return L"kPhyBroadR_Reach";
+    default: return L"<invalid EthernetPhy>";
   }
 }
 
@@ -473,6 +491,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, Duplex value)
     case Duplex::kDuplexUnkown: os << "kDuplexUnkown"; break;
     case Duplex::kDuplexHalf: os << "kDuplexHalf"; break;
     case Duplex::kDuplexFull: os << "kDuplexFull"; break;
+    default: os << "<invalid Duplex>"; break;
   }
   return os;
 }
@@ -484,6 +503,7 @@ inline std::string to_string(Duplex value)
     case Duplex::kDuplexUnkown: return "kDuplexUnkown";
     case Duplex::kDuplexHalf: return "kDuplexHalf";
     case Duplex::kDuplexFull: return "kDuplexFull";
+    default: return "<invalid Duplex>";
   }
 }
 
@@ -494,6 +514,7 @@ inline std::wstring to_wstring(Duplex value)
     case Duplex::kDuplexUnkown: return L"kDuplexUnkown";
     case Duplex::kDuplexHalf: return L"kDuplexHalf";
     case Duplex::kDuplexFull: return L"kDuplexFull";
+    default: return L"<invalid Duplex>";
   }
 }
 
@@ -513,6 +534,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, MdiType value)
     case MdiType::kMdiUnknown: os << "kMdiUnknown"; break;
     case MdiType::kMdiStraight: os << "kMdiStraight"; break;
     case MdiType::kMdiCrossover: os << "kMdiCrossover"; break;
+    default: os << "<invalid MdiType>"; break;
   }
   return os;
 }
@@ -524,6 +546,7 @@ inline std::string to_string(MdiType value)
     case MdiType::kMdiUnknown: return "kMdiUnknown";
     case MdiType::kMdiStraight: return "kMdiStraight";
     case MdiType::kMdiCrossover: return "kMdiCrossover";
+    default: return "<invalid MdiType>";
   }
 }
 
@@ -534,6 +557,7 @@ inline std::wstring to_wstring(MdiType value)
     case MdiType::kMdiUnknown: return L"kMdiUnknown";
     case MdiType::kMdiStraight: return L"kMdiStraight";
     case MdiType::kMdiCrossover: return L"kMdiCrossover";
+    default: return L"<invalid MdiType>";
   }
 }
 
@@ -553,6 +577,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, Connector value)
     case Connector::kConnectorUnknown: os << "kConnectorUnknown"; break;
     case Connector::kConnectorRJ45: os << "kConnectorRJ45"; break;
     case Connector::kConnectorDSub: os << "kConnectorDSub"; break;
+    default: os << "<invalid Connector>"; break;
   }
   return os;
 }
@@ -564,6 +589,7 @@ inline std::string to_string(Connector value)
     case Connector::kConnectorUnknown: return "kConnectorUnknown";
     case Connector::kConnectorRJ45: return "kConnectorRJ45";
     case Connector::kConnectorDSub: return "kConnectorDSub";
+    default: return "<invalid Connector>";
   }
 }
 
@@ -574,6 +600,7 @@ inline std::wstring to_wstring(Connector value)
     case Connector::kConnectorUnknown: return L"kConnectorUnknown";
     case Connector::kConnectorRJ45: return L"kConnectorRJ45";
     case Connector::kConnectorDSub: return L"kConnectorDSub";
+    default: return L"<invalid Connector>";
   }
 }
 
@@ -593,6 +620,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, ClockMode value)
     case ClockMode::kClockModeUnknown: os << "kClockModeUnknown"; break;
     case ClockMode::kClockModeMaster: os << "kClockModeMaster"; break;
     case ClockMode::kClockModeSlave: os << "kClockModeSlave"; break;
+    default: os << "<invalid ClockMode>"; break;
   }
   return os;
 }
@@ -604,6 +632,7 @@ inline std::string to_string(ClockMode value)
     case ClockMode::kClockModeUnknown: return "kClockModeUnknown";
     case ClockMode::kClockModeMaster: return "kClockModeMaster";
     case ClockMode::kClockModeSlave: return "kClockModeSlave";
+    default: return "<invalid ClockMode>";
   }
 }
 
@@ -614,6 +643,7 @@ inline std::wstring to_wstring(ClockMode value)
     case ClockMode::kClockModeUnknown: return L"kClockModeUnknown";
     case ClockMode::kClockModeMaster: return L"kClockModeMaster";
     case ClockMode::kClockModeSlave: return L"kClockModeSlave";
+    default: return L"<invalid ClockMode>";
   }
 }
 
@@ -635,6 +665,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, BrPair value)
     case BrPair::kBrPair1Pair: os << "kBrPair1Pair"; break;
     case BrPair::kBrPair2Pair: os << "kBrPair2Pair"; break;
     case BrPair::kBrPair4Pair: os << "kBrPair4Pair"; break;
+    default: os << "<invalid BrPair>"; break;
   }
   return os;
 }
@@ -647,6 +678,7 @@ inline std::string to_string(BrPair value)
     case BrPair::kBrPair1Pair: return "kBrPair1Pair";
     case BrPair::kBrPair2Pair: return "kBrPair2Pair";
     case BrPair::kBrPair4Pair: return "kBrPair4Pair";
+    default: return "<invalid BrPair>";
   }
 }
 
@@ -658,6 +690,7 @@ inline std::wstring to_wstring(BrPair value)
     case BrPair::kBrPair1Pair: return L"kBrPair1Pair";
     case BrPair::kBrPair2Pair: return L"kBrPair2Pair";
     case BrPair::kBrPair4Pair: return L"kBrPair4Pair";
+    default: return L"<invalid BrPair>";
   }
 }
 
@@ -677,6 +710,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, CanOperationMode valu
     case CanOperationMode::kCanOperationModeCan: os << "kCanOperationModeCan"; break;
     case CanOperationMode::kCanOperationModeCanFD: os << "kCanOperationModeCanFD"; break;
     case CanOperationMode::kCanOperationModeCanXL: os << "kCanOperationModeCanXL"; break;
+    default: os << "<invalid CanOperationMode>"; break;
   }
   return os;
 }
@@ -688,6 +722,7 @@ inline std::string to_string(CanOperationMode value)
     case CanOperationMode::kCanOperationModeCan: return "kCanOperationModeCan";
     case CanOperationMode::kCanOperationModeCanFD: return "kCanOperationModeCanFD";
     case CanOperationMode::kCanOperationModeCanXL: return "kCanOperationModeCanXL";
+    default: return "<invalid CanOperationMode>";
   }
 }
 
@@ -698,6 +733,7 @@ inline std::wstring to_wstring(CanOperationMode value)
     case CanOperationMode::kCanOperationModeCan: return L"kCanOperationModeCan";
     case CanOperationMode::kCanOperationModeCanFD: return L"kCanOperationModeCanFD";
     case CanOperationMode::kCanOperationModeCanXL: return L"kCanOperationModeCanXL";
+    default: return L"<invalid CanOperationMode>";
   }
 }
 
@@ -715,6 +751,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, CanSamplingMode value
   {
     case CanSamplingMode::kCanSamplingModeSampling_1: os << "kCanSamplingModeSampling_1"; break;
     case CanSamplingMode::kCanSamplingModeSampling_3: os << "kCanSamplingModeSampling_3"; break;
+    default: os << "<invalid CanSamplingMode>"; break;
   }
   return os;
 }
@@ -725,6 +762,7 @@ inline std::string to_string(CanSamplingMode value)
   {
     case CanSamplingMode::kCanSamplingModeSampling_1: return "kCanSamplingModeSampling_1";
     case CanSamplingMode::kCanSamplingModeSampling_3: return "kCanSamplingModeSampling_3";
+    default: return "<invalid CanSamplingMode>";
   }
 }
 
@@ -734,6 +772,7 @@ inline std::wstring to_wstring(CanSamplingMode value)
   {
     case CanSamplingMode::kCanSamplingModeSampling_1: return L"kCanSamplingModeSampling_1";
     case CanSamplingMode::kCanSamplingModeSampling_3: return L"kCanSamplingModeSampling_3";
+    default: return L"<invalid CanSamplingMode>";
   }
 }
 
@@ -753,6 +792,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, CanBusState value)
     case CanBusState::kCanBusStateOnline: os << "kCanBusStateOnline"; break;
     case CanBusState::kCanBusStateOffline: os << "kCanBusStateOffline"; break;
     case CanBusState::kCanBusStateError: os << "kCanBusStateError"; break;
+    default: os << "<invalid CanBusState>"; break;
   }
   return os;
 }
@@ -764,6 +804,7 @@ inline std::string to_string(CanBusState value)
     case CanBusState::kCanBusStateOnline: return "kCanBusStateOnline";
     case CanBusState::kCanBusStateOffline: return "kCanBusStateOffline";
     case CanBusState::kCanBusStateError: return "kCanBusStateError";
+    default: return "<invalid CanBusState>";
   }
 }
 
@@ -774,6 +815,7 @@ inline std::wstring to_wstring(CanBusState value)
     case CanBusState::kCanBusStateOnline: return L"kCanBusStateOnline";
     case CanBusState::kCanBusStateOffline: return L"kCanBusStateOffline";
     case CanBusState::kCanBusStateError: return L"kCanBusStateError";
+    default: return L"<invalid CanBusState>";
   }
 }
 
@@ -795,6 +837,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayChannel value)
     case FlexRayChannel::A: os << "A"; break;
     case FlexRayChannel::B: os << "B"; break;
     case FlexRayChannel::AB: os << "AB"; break;
+    default: os << "<invalid FlexRayChannel>"; break;
   }
   return os;
 }
@@ -807,6 +850,7 @@ inline std::string to_string(FlexRayChannel value)
     case FlexRayChannel::A: return "A";
     case FlexRayChannel::B: return "B";
     case FlexRayChannel::AB: return "AB";
+    default: return "<invalid FlexRayChannel>";
   }
 }
 
@@ -818,6 +862,7 @@ inline std::wstring to_wstring(FlexRayChannel value)
     case FlexRayChannel::A: return L"A";
     case FlexRayChannel::B: return L"B";
     case FlexRayChannel::AB: return L"AB";
+    default: return L"<invalid FlexRayChannel>";
   }
 }
 
@@ -837,6 +882,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRaySymbolPattern 
     case FlexRaySymbolPattern::CAS: os << "CAS"; break;
     case FlexRaySymbolPattern::WUP: os << "WUP"; break;
     case FlexRaySymbolPattern::WUDOP: os << "WUDOP"; break;
+    default: os << "<invalid FlexRaySymbolPattern>"; break;
   }
   return os;
 }
@@ -848,6 +894,7 @@ inline std::string to_string(FlexRaySymbolPattern value)
     case FlexRaySymbolPattern::CAS: return "CAS";
     case FlexRaySymbolPattern::WUP: return "WUP";
     case FlexRaySymbolPattern::WUDOP: return "WUDOP";
+    default: return "<invalid FlexRaySymbolPattern>";
   }
 }
 
@@ -858,6 +905,7 @@ inline std::wstring to_wstring(FlexRaySymbolPattern value)
     case FlexRaySymbolPattern::CAS: return L"CAS";
     case FlexRaySymbolPattern::WUP: return L"WUP";
     case FlexRaySymbolPattern::WUDOP: return L"WUDOP";
+    default: return L"<invalid FlexRaySymbolPattern>";
   }
 }
 
@@ -883,6 +931,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayChiCommand val
     case FlexRayChiCommand::ALLOW_COLDSTART: os << "ALLOW_COLDSTART"; break;
     case FlexRayChiCommand::ALL_SLOTS: os << "ALL_SLOTS"; break;
     case FlexRayChiCommand::WAKEUP: os << "WAKEUP"; break;
+    default: os << "<invalid FlexRayChiCommand>"; break;
   }
   return os;
 }
@@ -897,6 +946,7 @@ inline std::string to_string(FlexRayChiCommand value)
     case FlexRayChiCommand::ALLOW_COLDSTART: return "ALLOW_COLDSTART";
     case FlexRayChiCommand::ALL_SLOTS: return "ALL_SLOTS";
     case FlexRayChiCommand::WAKEUP: return "WAKEUP";
+    default: return "<invalid FlexRayChiCommand>";
   }
 }
 
@@ -910,6 +960,7 @@ inline std::wstring to_wstring(FlexRayChiCommand value)
     case FlexRayChiCommand::ALLOW_COLDSTART: return L"ALLOW_COLDSTART";
     case FlexRayChiCommand::ALL_SLOTS: return L"ALL_SLOTS";
     case FlexRayChiCommand::WAKEUP: return L"WAKEUP";
+    default: return L"<invalid FlexRayChiCommand>";
   }
 }
 
@@ -927,6 +978,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayTransmissionMo
   {
     case FlexRayTransmissionMode::SingleShot: os << "SingleShot"; break;
     case FlexRayTransmissionMode::Continuous: os << "Continuous"; break;
+    default: os << "<invalid FlexRayTransmissionMode>"; break;
   }
   return os;
 }
@@ -937,6 +989,7 @@ inline std::string to_string(FlexRayTransmissionMode value)
   {
     case FlexRayTransmissionMode::SingleShot: return "SingleShot";
     case FlexRayTransmissionMode::Continuous: return "Continuous";
+    default: return "<invalid FlexRayTransmissionMode>";
   }
 }
 
@@ -946,6 +999,7 @@ inline std::wstring to_wstring(FlexRayTransmissionMode value)
   {
     case FlexRayTransmissionMode::SingleShot: return L"SingleShot";
     case FlexRayTransmissionMode::Continuous: return L"Continuous";
+    default: return L"<invalid FlexRayTransmissionMode>";
   }
 }
 
@@ -975,6 +1029,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayPocState value
     case FlexRayPocState::NormalActive: os << "NormalActive"; break;
     case FlexRayPocState::NormalPassive: os << "NormalPassive"; break;
     case FlexRayPocState::Halt: os << "Halt"; break;
+    default: os << "<invalid FlexRayPocState>"; break;
   }
   return os;
 }
@@ -991,6 +1046,7 @@ inline std::string to_string(FlexRayPocState value)
     case FlexRayPocState::NormalActive: return "NormalActive";
     case FlexRayPocState::NormalPassive: return "NormalPassive";
     case FlexRayPocState::Halt: return "Halt";
+    default: return "<invalid FlexRayPocState>";
   }
 }
 
@@ -1006,6 +1062,7 @@ inline std::wstring to_wstring(FlexRayPocState value)
     case FlexRayPocState::NormalActive: return L"NormalActive";
     case FlexRayPocState::NormalPassive: return L"NormalPassive";
     case FlexRayPocState::Halt: return L"Halt";
+    default: return L"<invalid FlexRayPocState>";
   }
 }
 
@@ -1025,6 +1082,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRaySlotModeType v
     case FlexRaySlotModeType::KeySlot: os << "KeySlot"; break;
     case FlexRaySlotModeType::AllPending: os << "AllPending"; break;
     case FlexRaySlotModeType::All: os << "All"; break;
+    default: os << "<invalid FlexRaySlotModeType>"; break;
   }
   return os;
 }
@@ -1036,6 +1094,7 @@ inline std::string to_string(FlexRaySlotModeType value)
     case FlexRaySlotModeType::KeySlot: return "KeySlot";
     case FlexRaySlotModeType::AllPending: return "AllPending";
     case FlexRaySlotModeType::All: return "All";
+    default: return "<invalid FlexRaySlotModeType>";
   }
 }
 
@@ -1046,6 +1105,7 @@ inline std::wstring to_wstring(FlexRaySlotModeType value)
     case FlexRaySlotModeType::KeySlot: return L"KeySlot";
     case FlexRaySlotModeType::AllPending: return L"AllPending";
     case FlexRaySlotModeType::All: return L"All";
+    default: return L"<invalid FlexRaySlotModeType>";
   }
 }
 
@@ -1065,6 +1125,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayErrorModeType 
     case FlexRayErrorModeType::Active: os << "Active"; break;
     case FlexRayErrorModeType::Passive: os << "Passive"; break;
     case FlexRayErrorModeType::CommHalt: os << "CommHalt"; break;
+    default: os << "<invalid FlexRayErrorModeType>"; break;
   }
   return os;
 }
@@ -1076,6 +1137,7 @@ inline std::string to_string(FlexRayErrorModeType value)
     case FlexRayErrorModeType::Active: return "Active";
     case FlexRayErrorModeType::Passive: return "Passive";
     case FlexRayErrorModeType::CommHalt: return "CommHalt";
+    default: return "<invalid FlexRayErrorModeType>";
   }
 }
 
@@ -1086,6 +1148,7 @@ inline std::wstring to_wstring(FlexRayErrorModeType value)
     case FlexRayErrorModeType::Active: return L"Active";
     case FlexRayErrorModeType::Passive: return L"Passive";
     case FlexRayErrorModeType::CommHalt: return L"CommHalt";
+    default: return L"<invalid FlexRayErrorModeType>";
   }
 }
 
@@ -1121,6 +1184,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayStartupStateTy
     case FlexRayStartupStateType::IntegrationConsistencyCheck: os << "IntegrationConsistencyCheck"; break;
     case FlexRayStartupStateType::ColdStartGap: os << "ColdStartGap"; break;
     case FlexRayStartupStateType::ExternalStartup: os << "ExternalStartup"; break;
+    default: os << "<invalid FlexRayStartupStateType>"; break;
   }
   return os;
 }
@@ -1140,6 +1204,7 @@ inline std::string to_string(FlexRayStartupStateType value)
     case FlexRayStartupStateType::IntegrationConsistencyCheck: return "IntegrationConsistencyCheck";
     case FlexRayStartupStateType::ColdStartGap: return "ColdStartGap";
     case FlexRayStartupStateType::ExternalStartup: return "ExternalStartup";
+    default: return "<invalid FlexRayStartupStateType>";
   }
 }
 
@@ -1158,6 +1223,7 @@ inline std::wstring to_wstring(FlexRayStartupStateType value)
     case FlexRayStartupStateType::IntegrationConsistencyCheck: return L"IntegrationConsistencyCheck";
     case FlexRayStartupStateType::ColdStartGap: return L"ColdStartGap";
     case FlexRayStartupStateType::ExternalStartup: return L"ExternalStartup";
+    default: return L"<invalid FlexRayStartupStateType>";
   }
 }
 
@@ -1185,6 +1251,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayWakeupStatusTy
     case FlexRayWakeupStatusType::CollisionWup: os << "CollisionWup"; break;
     case FlexRayWakeupStatusType::CollisionUnknown: os << "CollisionUnknown"; break;
     case FlexRayWakeupStatusType::Transmitted: os << "Transmitted"; break;
+    default: os << "<invalid FlexRayWakeupStatusType>"; break;
   }
   return os;
 }
@@ -1200,6 +1267,7 @@ inline std::string to_string(FlexRayWakeupStatusType value)
     case FlexRayWakeupStatusType::CollisionWup: return "CollisionWup";
     case FlexRayWakeupStatusType::CollisionUnknown: return "CollisionUnknown";
     case FlexRayWakeupStatusType::Transmitted: return "Transmitted";
+    default: return "<invalid FlexRayWakeupStatusType>";
   }
 }
 
@@ -1214,6 +1282,7 @@ inline std::wstring to_wstring(FlexRayWakeupStatusType value)
     case FlexRayWakeupStatusType::CollisionWup: return L"CollisionWup";
     case FlexRayWakeupStatusType::CollisionUnknown: return L"CollisionUnknown";
     case FlexRayWakeupStatusType::Transmitted: return L"Transmitted";
+    default: return L"<invalid FlexRayWakeupStatusType>";
   }
 }
 
@@ -1233,6 +1302,7 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, FlexRayClockPeriod va
     case FlexRayClockPeriod::T12_5NS: os << "T12_5NS"; break;
     case FlexRayClockPeriod::T25NS: os << "T25NS"; break;
     case FlexRayClockPeriod::T50NS: os << "T50NS"; break;
+    default: os << "<invalid FlexRayClockPeriod>"; break;
   }
   return os;
 }
@@ -1244,6 +1314,7 @@ inline std::string to_string(FlexRayClockPeriod value)
     case FlexRayClockPeriod::T12_5NS: return "T12_5NS";
     case FlexRayClockPeriod::T25NS: return "T25NS";
     case FlexRayClockPeriod::T50NS: return "T50NS";
+    default: return "<invalid FlexRayClockPeriod>";
   }
 }
 
@@ -1254,6 +1325,7 @@ inline std::wstring to_wstring(FlexRayClockPeriod value)
     case FlexRayClockPeriod::T12_5NS: return L"T12_5NS";
     case FlexRayClockPeriod::T25NS: return L"T25NS";
     case FlexRayClockPeriod::T50NS: return L"T50NS";
+    default: return L"<invalid FlexRayClockPeriod>";
   }
 }
 
