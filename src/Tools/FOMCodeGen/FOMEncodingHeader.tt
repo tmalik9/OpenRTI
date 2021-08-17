@@ -52,6 +52,7 @@ class <#=fixedRecordDataType.Encoding#> : public <#=dataType.Name#>, public rti1
 {
   public:
     <#=dataType.Name#>Encoding();
+    <#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& ref);
     virtual ~<#=dataType.Name#>Encoding();
     uint32_t getVersion() const override;
 <# foreach (var field in fixedRecordDataType.AllFields) { #>

@@ -45,6 +45,28 @@ foreach (var dataType in FOM.DataTypes)
     } // foreach fixedRecordDataType.Fields
 #>
 }
+
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& ref)
+  : rti1516ev::HLAfixedRecord(<#=fixedRecordDataType.Version#>)
+<#
+    foreach (var field in fixedRecordDataType.AllFields)
+    {
+#>
+  , m<#=field.Name#>(ref.m<#=field.Name#>)
+<#
+    } // foreach fixedRecordDataType.Fields
+#>
+{
+<#
+    foreach (var field in fixedRecordDataType.AllFields)
+    {
+#>
+  rti1516ev::HLAfixedRecord::appendElementPointer(&m<#=field.Name#>, <#=field.Version#>);
+<#
+    } // foreach fixedRecordDataType.Fields
+#>
+}
+
 <#=dataType.Name#>Encoding::~<#=dataType.Name#>Encoding()
 {
 }

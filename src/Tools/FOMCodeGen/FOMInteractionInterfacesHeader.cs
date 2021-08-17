@@ -195,23 +195,35 @@ namespace FOMCodeGen
             #line default
             #line hidden
             this.Write("InteractionClass\r\n{\r\n  public:\r\n    virtual void Publish() = 0;\r\n    virtual void" +
-                    " Unpublish() = 0;\r\n    virtual void Subscribe() = 0;\r\n    virtual void Unsubscri" +
-                    "be() = 0;\r\n    virtual void send(");
+                    " Unpublish() = 0;\r\n    virtual void Subscribe(bool deliverToSelf) = 0;\r\n");
+            
+            #line 45 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+ if (interactionClass.HasValidParameters) {
+            
+            #line default
+            #line hidden
+            this.Write("    virtual void Subscribe(");
             
             #line 46 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.CppParameterList));
             
             #line default
             #line hidden
-            this.Write(") = 0;\r\n    using ReceiveCallback = std::function<void(");
+            this.Write(", bool deliverToSelf) = 0;\r\n");
             
             #line 47 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+}
+            
+            #line default
+            #line hidden
+            this.Write("    virtual void Unsubscribe() = 0;\r\n    virtual void send(");
+            
+            #line 49 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.CppParameterList));
             
             #line default
             #line hidden
-            this.Write(")>;\r\n    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;\r" +
-                    "\n    // send/receive with timestamps\r\n    virtual void sendWithTime(");
+            this.Write(") = 0;\r\n    virtual void sendWithTime(");
             
             #line 50 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.CppParameterList));
@@ -220,7 +232,7 @@ namespace FOMCodeGen
             #line hidden
             
             #line 50 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
- if (interactionClass.Parameters.Count > 0) {
+ if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
@@ -237,7 +249,7 @@ namespace FOMCodeGen
             
             #line default
             #line hidden
-            this.Write(" time) = 0;\r\n    using ReceiveCallbackWithTime = std::function<void(");
+            this.Write(" time) = 0;\r\n    using ReceiveCallback = std::function<void(");
             
             #line 51 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.CppParameterList));
@@ -246,7 +258,7 @@ namespace FOMCodeGen
             #line hidden
             
             #line 51 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
- if (interactionClass.Parameters.Count > 0) {
+ if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
@@ -257,14 +269,15 @@ namespace FOMCodeGen
             
             #line default
             #line hidden
+            this.Write("optional<");
             
             #line 51 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
             
             #line default
             #line hidden
-            this.Write(" time, OrderType orderType)>;\r\n    virtual uint32_t RegisterReceiveCallbackWithTi" +
-                    "me(ReceiveCallbackWithTime callback) = 0;\r\n};\r\n\r\n");
+            this.Write("> time, optional<OrderType> orderType)>;\r\n    virtual uint32_t RegisterReceiveCal" +
+                    "lback(ReceiveCallback callback) = 0;\r\n};\r\n\r\n");
             
             #line 55 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  } // foreach (var interactionClass in FOM.InteractionClasses) 

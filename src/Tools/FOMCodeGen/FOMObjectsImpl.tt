@@ -283,7 +283,16 @@ void <#=objectClass.Name#>ObjectClass::ExecuteRemoveObjectInstanceCallbacks(I<#=
 {
   if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
-    mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    try
+    {
+      mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    }
+    catch (const rti1516ev::NotConnected&)
+    {
+    }
+    catch (const rti1516ev::FederateNotExecutionMember&)
+    {
+    }
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
     mIsOwner = false;
   }
@@ -600,6 +609,7 @@ void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
   try
   {
 <#   if (objectClass.BaseClass != null) { #>
+    assert(m<#=objectClass.BaseClass.Name#>ObjectClass.get() != nullptr);
     m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(mRtiAmbassador, this, m<#=objectClass.BaseClass.Name#>ObjectClass.get()));
 <#   } else { #>
     m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(mRtiAmbassador, this));

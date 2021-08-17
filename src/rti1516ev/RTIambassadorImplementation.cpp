@@ -1677,8 +1677,8 @@ void
 RTIambassadorImplementation::shutdown()
 {
   _ambassadorInterface->shutdown();
-  delete _ambassadorInterface;
-  _ambassadorInterface = nullptr;
+  //delete _ambassadorInterface;
+  //_ambassadorInterface = nullptr;
 }
 
 void

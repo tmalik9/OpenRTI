@@ -84,15 +84,42 @@ void <#=interactionClass.Name#>InteractionClass::Unpublish()
   }
 }
 
-void <#=interactionClass.Name#>InteractionClass::Subscribe()
+void <#=interactionClass.Name#>InteractionClass::Subscribe(bool deliverToSelf)
 {
   if (!mSubscribed)
   {
     mRtiAmbassador->subscribeInteractionClass(mInteractionClassHandle);
-    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, true);
+    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, deliverToSelf);
     mSubscribed = true;
   }
 }
+
+<# if (interactionClass.HasValidParameters) {#>
+void <#=interactionClass.Name#>InteractionClass::Subscribe(<#=interactionClass.CppParameterList#>, bool deliverToSelf)
+{
+  if (!mSubscribed)
+  {
+    rti1516ev::ParameterHandleValueMap parameters;
+<# 
+  foreach (var parameter in interactionClass.AllParameters)
+  {
+    if (parameter.DataType != null)
+    { #>
+    if (<#=parameter.Name#>)
+    {
+      <#= parameter.ToEncoderExpression() #>
+      parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
+    }
+<#  
+    } // if (parameter.DataType != null)
+  } // foreach (var parameter in interactionClass.Parameters)
+#>
+    mRtiAmbassador->subscribeInteractionClassWithFilter(mInteractionClassHandle, parameters);
+    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, deliverToSelf);
+    mSubscribed = true;
+  }
+}
+<#}#>
 
 void <#=interactionClass.Name#>InteractionClass::Unsubscribe()
 {
@@ -111,8 +138,11 @@ void <#=interactionClass.Name#>InteractionClass::send(<#=interactionClass.CppPar
   {
     if (parameter.DataType != null)
     { #>
-  <#= parameter.ToEncoderExpression() #>
-  parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
+  if (<#=parameter.Name#>)
+  {
+    <#= parameter.ToEncoderExpression() #>
+    parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
+  }
 <#  
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
@@ -120,7 +150,7 @@ void <#=interactionClass.Name#>InteractionClass::send(<#=interactionClass.CppPar
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
 }
 
-void <#=interactionClass.Name#>InteractionClass::sendWithTime(<#=interactionClass.CppParameterList#><# if (interactionClass.Parameters.Count > 0) {#>, <#}#><#=FOM.NativeTimeType#> time)
+void <#=interactionClass.Name#>InteractionClass::sendWithTime(<#=interactionClass.CppParameterList#><# if (interactionClass.HasValidParameters) {#>, <#}#><#=FOM.NativeTimeType#> time)
 {
   rti1516ev::ParameterHandleValueMap parameters;
 <# 
@@ -140,16 +170,29 @@ void <#=interactionClass.Name#>InteractionClass::sendWithTime(<#=interactionClas
 void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&<#if (interactionClass.HasValidParameters) {#> parameters <#}#>)
 {
 <#
-  List<string> callArguments = new List<string>();
+  List<string> callArguments1 = new List<string>();
+  var timeArgument1 = "optional<" + FOM.NativeTimeType + ">()";
   foreach (var parameter in interactionClass.AllParameters) {
     if (parameter.DataType != null) {
-      callArguments.Add(parameter.DataType.CppGetter(parameter.Name + "Decoder"));
+      string parameterName = (parameter.Name != parameter.DataType.Name ? parameter.Name : parameter.Name + "P");
+      callArguments1.Add(parameterName);
+#>
+  optional<<#=parameter.DataType.ParameterCppType#>> <#=parameterName#>;
+<#  
+    } // if (parameter.DataType != null)
+  } // foreach (var parameter in interactionClass.Parameters)
+#>
+<#
+  foreach (var parameter in interactionClass.AllParameters) {
+    if (parameter.DataType != null) {
+      var parameterName = (parameter.Name != parameter.DataType.Name ? parameter.Name : parameter.Name + "P");
 #>
   <#=parameter.DataType.Encoding#> <#=parameter.Name#>Decoder;
   rti1516ev::ParameterHandleValueMap::const_iterator <#=parameter.Name#>Iter = parameters.find(Get<#=parameter.Name#>ParameterHandle());
   if (<#=parameter.Name#>Iter != parameters.end())
   {
     <#=parameter.Name#>Decoder.decode(<#=parameter.Name#>Iter->second);
+    <#=parameterName#> = <#=parameter.DataType.CppGetter(parameter.Name + "Decoder")#>;
   }
 <#  
     } // if (parameter.DataType != null)
@@ -157,7 +200,11 @@ void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti151
 #>
   for (auto& entry : _receiveCallbacks) {
     auto& callback = entry.second;
-    callback(<#=string.Join(", ", callArguments)#>);
+<#    if (callArguments1.Count > 0) { #>
+    callback(<#=string.Join(", ", callArguments1)#>, <#=timeArgument1#>, optional<OrderType>());
+<#    } else {#>
+    callback(<#=timeArgument1#>, optional<OrderType>());
+<#    }#>
   }
 }
 
@@ -165,28 +212,41 @@ void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti151
 {
 <#
 {
-  List<string> callArgumentsWithTime = new List<string>();
-  var timeArgument = "static_cast<const " + FOM.LogicalTimeType + "&>(time).getTime()";
+  List<string> callArguments2 = new List<string>();
+  var timeArgument2 = "static_cast<const " + FOM.LogicalTimeType + "&>(time).getTime()";
   foreach (var parameter in interactionClass.AllParameters) {
     if (parameter.DataType != null) {
-      callArgumentsWithTime.Add(parameter.DataType.CppGetter(parameter.Name + "Decoder"));
+      string parameterName = (parameter.Name != parameter.DataType.Name ? parameter.Name : parameter.Name + "P");
+      callArguments2.Add(parameterName);
+#>
+  optional<<#=parameter.DataType.ParameterCppType#>> <#=parameterName#>;
+<#  
+    } // if (parameter.DataType != null)
+  } // foreach (var parameter in interactionClass.Parameters)
+#>
+
+<#
+  foreach (var parameter in interactionClass.AllParameters) {
+    if (parameter.DataType != null) {
+      string parameterName = (parameter.Name != parameter.DataType.Name ? parameter.Name : parameter.Name + "P");
 #>
   <#=parameter.DataType.Encoding#> <#=parameter.Name#>Decoder;
   rti1516ev::ParameterHandleValueMap::const_iterator <#=parameter.Name#>Iter = parameters.find(Get<#=parameter.Name#>ParameterHandle());
   if (<#=parameter.Name#>Iter != parameters.end())
   {
     <#=parameter.Name#>Decoder.decode(<#=parameter.Name#>Iter->second);
+    <#=parameterName#> = <#=parameter.DataType.CppGetter(parameter.Name + "Decoder")#>;
   }
 <#  
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
-  for (auto& entry : _receiveCallbacksWithTime) {
+  for (auto& entry : _receiveCallbacks) {
     auto& callback = entry.second;
-<#    if (callArgumentsWithTime.Count > 0) { #>
-    callback(<#=string.Join(", ", callArgumentsWithTime)#>, <#=timeArgument#>, orderType);
+<#    if (callArguments2.Count > 0) { #>
+    callback(<#=string.Join(", ", callArguments2)#>, <#=timeArgument2#>, orderType);
 <#    } else {#>
-    callback(<#=timeArgument#>, orderType);
+    callback(<#=timeArgument2#>, orderType);
 <#    }#>
 <#}#>
   }
@@ -196,13 +256,6 @@ uint32_t <#=interactionClass.Name#>InteractionClass::RegisterReceiveCallback(Rec
 {
   uint32_t key = _receiveCallbacksNextKey++;
   _receiveCallbacks.insert(std::make_pair(key, callback));
-  return key;
-}
-
-uint32_t <#=interactionClass.Name#>InteractionClass::RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback)
-{
-  uint32_t key = _receiveCallbacksWithTimeNextKey++;
-  _receiveCallbacksWithTime.insert(std::make_pair(key, callback));
   return key;
 }
 
@@ -239,6 +292,7 @@ void InteractionClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassado
   try
   {
 <#    if (interactionClass.BaseClass != null) { #>
+    assert(m<#=interactionClass.BaseClass.Name#>InteractionClass.get() != nullptr);
     m<#=interactionClass.Name#>InteractionClass = std::unique_ptr<<#=interactionClass.Name#>InteractionClass>(new <#=interactionClass.Name#>InteractionClass(mRtiAmbassador, this, m<#=interactionClass.BaseClass.Name#>InteractionClass.get()));
 <#    } else { #>
     m<#=interactionClass.Name#>InteractionClass = std::unique_ptr<<#=interactionClass.Name#>InteractionClass>(new <#=interactionClass.Name#>InteractionClass(mRtiAmbassador, this));

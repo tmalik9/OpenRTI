@@ -93,30 +93,30 @@ namespace FOMCodeGen
       {
         if (DataType is ArrayDataType || DataType is FixedRecordDataType)
         {
-          return string.Format("const {0}& {1}Encoder = static_cast<const {0}&>({1});", DataType.Encoding, Name);
+          return string.Format("const {0}& {1}Encoder = static_cast<const {0}&>(*{1});", DataType.Encoding, Name);
         }
         else if (DataType is ObjectInstanceHandleType)
         {
           var objectInstanceHandleType = DataType as ObjectInstanceHandleType;
           if (objectInstanceHandleType.ObjectClass != null)
           {
-            return string.Format("{0} {1}Encoder(static_cast<{2}*>({1})->GetObjectInstanceHandle());"
+            return string.Format("{0} {1}Encoder(static_cast<{2}*>(*{1})->GetObjectInstanceHandle());"
               , DataType.Encoding, Name, objectInstanceHandleType.ObjectClass.Name);
           }
           else
           {
-            return string.Format("{0} {1}Encoder({1}));", DataType.Encoding, Name);
+            return string.Format("{0} {1}Encoder(*{1}));", DataType.Encoding, Name);
           }
         }
         else if (DataType is FOMParser.EnumeratedDataType)
         {
           var enumeratedDataType = DataType as FOMParser.EnumeratedDataType;
-          return string.Format("{0} {1}Encoder(static_cast<{2}>({1}));",
+          return string.Format("{0} {1}Encoder(static_cast<{2}>(*{1}));",
             DataType.Encoding, Name, enumeratedDataType.Representation.CPPType);
         }
         else
         {
-          return string.Format("{0} {1}Encoder({1});", DataType.Encoding, Name);
+          return string.Format("{0} {1}Encoder(*{1});", DataType.Encoding, Name);
         }
       }
     }
@@ -171,7 +171,10 @@ namespace FOMCodeGen
           List<string> parameters = new List<string>();
           foreach (var parameter in AllParameters)
           {
-            parameters.Add(parameter.DataType.ParameterCppType + " " + parameter.Name);
+            if (parameter.DataType != null)
+            {
+              parameters.Add("optional<" + parameter.DataType.ParameterCppType + "> " + parameter.Name);
+            }
           }
           return string.Join(", ", parameters);
         }
@@ -294,14 +297,14 @@ namespace FOMCodeGen
       {
         get
         {
-          if (Name == "HLAASCIIstring" || Name == "HLAunicodeString")
-          {
-            return "const " + CPPType + "&";
-          }
-          else
-          {
+          //if (Name == "HLAASCIIstring" || Name == "HLAunicodeString")
+          //{
+          //  return "const " + CPPType + "&";
+          //}
+          //else
+          //{
             return CPPType;
-          }
+          //}
         }
       }
       public override string Encoding

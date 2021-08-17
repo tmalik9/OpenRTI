@@ -152,6 +152,15 @@ public:
   {
     objectClassRegistry.ReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
   }
+  virtual void receiveInteraction(rti1516ev::InteractionClassHandle interaction,
+                                    const rti1516ev::ParameterHandleValueMap& parameters,
+                                    const rti1516ev::VariableLengthData&,
+                                    rti1516ev::OrderType,
+                                    rti1516ev::TransportationType,
+                                    rti1516ev::SupplementalReceiveInfo theReceiveInfo) override
+  {
+    interactionClassRegistry.ReceiveInteraction(interaction, parameters);
+  }
   NDistSimIB::NRTFederateEncoding::ObjectClassRegistry objectClassRegistry;
   NDistSimIB::NRTFederateEncoding::InteractionClassRegistry interactionClassRegistry;
 };
@@ -173,12 +182,12 @@ public:
   }
 };
 
+using NDistSimIB::NRTFederateEncoding::optional;
 bool testRTFederate(int argc, char* argv[])
 {
   OpenRTI::Options options(argc, argv);
   std::wstring fomModule = L"RTFederate.xml";
   std::wstring federationExecutionName = L"test";
-
   std::vector<std::wstring> args;
   while (options.next("F:O:")) {
     switch (options.getOptChar()) {
@@ -244,13 +253,62 @@ bool testRTFederate(int argc, char* argv[])
   ambassador.interactionClassRegistry.Initialize(ambassador.getRtiAmbassador());
 
   auto* canMessageInteractionClass = ambassador.interactionClassRegistry.GetCANMessageInteractionClass();
-  canMessageInteractionClass->RegisterReceiveCallback([](bool IsRequest, const std::string& ChannelName, NDistSimIB::NRTFederateEncoding::BusType BusType, rti1516ev::HLAhandle RequestingFederate, rti1516ev::HLAhandle Sender, rti1516ev::HLAhandle Receiver, int32_t Id, const NDistSimIB::NRTFederateEncoding::CANFrame& Frame)
+  bool received = false;
+  canMessageInteractionClass->RegisterReceiveCallback([&received](
+    optional<bool> IsRequest,
+    optional<std::string> ChannelName,
+    optional<NDistSimIB::NRTFederateEncoding::BusType> BusType,
+    optional<rti1516ev::HLAhandle> RequestingFederate,
+    optional<rti1516ev::HLAhandle> Sender,
+    optional<rti1516ev::HLAhandle> Receiver,
+    optional<int32_t> Id,
+    optional<const NDistSimIB::NRTFederateEncoding::CANFrame&> Frame,
+    optional<int64_t> time, optional<NDistSimIB::NRTFederateEncoding::OrderType> order)
   {
+    std::cout << "received CANFrame:" << std::endl;
+    if (Id) std::cout << "Id = " << std::hex << *Id << std::dec << std::endl;
+    if (ChannelName) std::cout << "ChannelName = " << *ChannelName << std::endl;
+    if (Frame)
+    {
+      std::cout << "Dir = " << Frame->GetDir() << " (" << (int)Frame->GetDir() << ")" << std::endl;
+      std::cout << "DataLength = " << (int)(Frame->GetDataLength()) << std::endl;
+      std::cout << "Data = " << Frame->GetData() << std::endl;
+    }
+    if (time)
+    {
+      std::cout << "time = " << *time << " order=" << *order << std::endl;
+    }
+    received = true;
   });
   canMessageInteractionClass->Publish();
-  canMessageInteractionClass->Subscribe();
+  canMessageInteractionClass->Subscribe(true);
   NDistSimIB::NRTFederateEncoding::CANFrameEncoding canFrame;
-  canMessageInteractionClass->send(false, "CAN1", NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), HLAhandle(ObjectInstanceHandle()), HLAhandle(ObjectInstanceHandle()), 0x100, canFrame);
+  std::vector<uint8_t> data{1, 2, 3, 4};
+  canFrame.SetDataLength(4);
+  canFrame.SetData(data);
+  std::cout << "canFrame.DataLength=" << (int)canFrame.GetDataLength() << std::endl;
+  std::cout << "canFrame.Data=" << canFrame.GetData() << std::endl;
+  rti1516ev::VariableLengthData encodedData = canFrame.encode();
+  NDistSimIB::NRTFederateEncoding::CANFrameEncoding canFrameDecoder;
+  canFrameDecoder.decode(encodedData);
+  std::cout << "canFrameDecoder.DataLength=" << (int)canFrameDecoder.GetDataLength() << std::endl;
+  std::cout << "canFrameDecoder.Data=" << canFrameDecoder.GetData() << std::endl;
+
+  NDistSimIB::NRTFederateEncoding::CANFrameEncoding canFrameCopy(canFrame);
+  std::cout << "canFrameCopy.DataLength=" << (int)canFrameCopy.GetDataLength() << std::endl;
+  std::cout << "canFrameCopy.Data=" << canFrameCopy.GetData() << std::endl;
+
+  received = false;
+  canFrame.SetDir(NDistSimIB::NRTFederateEncoding::DirMask::kMskTx);
+  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), HLAhandle(ObjectInstanceHandle()), HLAhandle(ObjectInstanceHandle()), 0x100, canFrame);
+  while (!received)
+    ambassador.getRtiAmbassador()->evokeCallback(0.5);
+
+  received = false;
+  canFrameCopy.SetDir(NDistSimIB::NRTFederateEncoding::DirMask::kMskRx);
+  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), HLAhandle(ObjectInstanceHandle()), HLAhandle(ObjectInstanceHandle()), 0x100, canFrameCopy);
+  while (!received)
+    ambassador.getRtiAmbassador()->evokeCallback(0.5);
 
   auto* busControllerObjectClass = ambassador.objectClassRegistry.GetBusControllerCanObjectClass();
   static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass*>(busControllerObjectClass)->SetObjectInstanceCreator([](NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> NDistSimIB::NRTFederateEncoding::BusControllerCan* {

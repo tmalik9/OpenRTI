@@ -26,6 +26,10 @@
 
 #include <vector>
 #include <ostream>
+#include <cassert>
+#include <new>
+#include <utility>
+#include <type_traits>
 
 <#=FOM.GetPredefinedTypeIncludes(FOMParser.FileContext.kDataTypes)#>
 
@@ -36,10 +40,185 @@ foreach (var namespacePart in FOM.Namespace)
 namespace <#=namespacePart#> {
 <#  } #>
 
+// define placement_new in case some other header has redefined operator new to sth. different (e.g. MS crtdbg)
+#ifndef _PLACEMENT_NEW_DEFINED
+#pragma push_macro("new")
+#undef new
+template <class X, typename ... Types>
+inline X* placement_new(void* addr, Types&& ... args)
+{
+  return new (addr) X(std::forward<Types>(args)...);
+}
+#pragma pop_macro("new")
+#define _PLACEMENT_NEW_DEFINED
+#endif
+
+// define our own simplified 'optional' types, similar to but independent of std::optional (since C++17) or boost::optional
+#pragma warning(push)
+#pragma warning(disable: 4324) // MSVC: 'struct_name' : structure was padded due to __declspec(align())
+template< typename T > struct optional
+{
+  static_assert(!std::is_reference< T >::value,
+    "reference is not supported as optional value");
+  // constructors
+  optional() : _valid(false) {}
+  optional(const optional& rhs): _valid(rhs._valid) { create(rhs); }
+  optional(optional&& rhs): _valid(rhs._valid) { create(std::forward< optional >(rhs)); }
+  optional(const T& w): _valid(true) { create(w); }
+  template<typename Other>
+  optional(const Other& w): _valid(true) { create(w); }
+
+  // destructor
+  ~optional() { if(_valid) destroy(); }
+
+  // check for value presence
+  bool operator ! () const { return !_valid; }
+  explicit operator bool() const { return _valid; }
+
+  // assign
+  optional& operator = (optional const& rhs) { return assign(rhs); }
+  optional& operator = (optional&& rhs) { return assign(rhs); }
+  optional& operator = (T const& w) { return assign(w); }
+
+  // get value
+  T const& operator * () const { return *get(); }
+  T& operator * () { return *get(); }
+  T const* operator -> () const { return get(); }
+  T* operator -> () { return get(); }
+private:
+  template<typename Other>
+  void create(const Other& w) {
+    placement_new<T>(_value, w);
+  }
+  void create(T&& w) {
+    placement_new<T>(_value, std::forward< T >(w));
+  }
+  void create(const optional& rhs) {
+    if(_valid) create(*rhs.get());
+  }
+  void create(optional&& rhs) {
+    if(_valid) create(std::move(*rhs.get()));
+  }
+  void destroy() {
+    get()->~T();
+  }
+  T const* get() const {
+    assert(_valid && "no optional value");
+    return reinterpret_cast< const T* >(_value);
+  }
+  T* get() {
+    assert(_valid && "no optional value");
+    return reinterpret_cast< T* >(_value);
+  }
+  void cleanup() {
+    destroy(); _valid = false;
+  }
+  optional& assign(const T& w) {
+    if(_valid) *get() = w;
+    else create(w), _valid = true;
+    return *this;
+  }
+  optional& assign(T&& w) {
+    if(_valid) *get() = w;
+    else create(std::forward(w)), _valid = true;
+    return *this;
+  }
+  optional& assign(const optional& rhs) {
+    if(rhs._valid) return assign(*rhs.get());
+    if(!_valid) return *this;
+    cleanup();
+    return *this;
+  }
+  optional& assign(optional&& rhs) {
+    if(rhs._valid) return assign(std::move(*rhs.get()));
+    if(!_valid) return *this;
+    cleanup();
+    return *this;
+  }
+  bool _valid;
+  alignas(alignof(T)) uint8_t _value[sizeof(T)];
+};
+
+template< typename T > struct optional<const T&>
+{
+  // constructors
+  optional() : _valid(false) {}
+  optional(const optional& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }
+  optional(optional&& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }
+  optional(const T& rhs): _valid(true), _pointer(&rhs) { }
+  template<typename Other>
+  optional(const Other& rhs): _valid(true), _pointer(&rhs) { }
+
+  // destructor
+  ~optional() { }
+
+  // check for value presence
+  bool operator ! () const { return !_valid; }
+  explicit operator bool() const { return _valid; }
+
+  // assign
+  optional& operator = (const optional& rhs) {
+    _valid = rhs._valid;
+    _pointer = rhs._pointer;
+    return *this;
+  }
+  //optional& operator = (optional&& rhs) { return assign(rhs); }
+  optional& operator = (const T& w) {
+    _valid = true;
+    _pointer = &w;
+    return *this;
+  }
+  // get value
+  T const& operator * () const { return *get(); }
+  T const* operator -> () const { return get(); }
+private:
+  const T* get() const {
+    assert(_valid && "no optional value");
+    return _pointer;
+  }
+  bool _valid;
+  const T* _pointer = nullptr;
+};
+#pragma warning(pop)
+
+// extended receive order type, includes 'interpolated' for application-generated timestamps
 enum class OrderType { RECEIVE, TIMESTAMP, INTERPOLATED };
 
-<#=FOM.DataTypeForwardDeclarations#>
+template<typename char_type, typename traits_type>
+std::basic_ostream<char_type, traits_type>&
+operator<<(std::basic_ostream<char_type, traits_type>& os, OrderType value)
+{
+  switch (value)
+  {
+    case OrderType::RECEIVE: os << "RECEIVE"; break;
+    case OrderType::TIMESTAMP: os << "TIMESTAMP"; break;
+    case OrderType::INTERPOLATED: os << "INTERPOLATED"; break;
+  }
+  return os;
+}
 
+inline std::string to_string(OrderType value)
+{
+  switch (value)
+  {
+    case OrderType::RECEIVE: return "RECEIVE";
+    case OrderType::TIMESTAMP: return "TIMESTAMP";
+    case OrderType::INTERPOLATED: return "INTERPOLATED";
+  }
+}
+
+inline std::wstring to_wstring(OrderType value)
+{
+  switch (value)
+  {
+    case OrderType::RECEIVE: return L"RECEIVE";
+    case OrderType::TIMESTAMP: return L"TIMESTAMP";
+    case OrderType::INTERPOLATED: return L"INTERPOLATED";
+  }
+}
+<#=
+FOM.DataTypeForwardDeclarations
+#>
 <#
 foreach (var dataType in FOM.DataTypes)
 {
@@ -116,6 +295,35 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, <#=dataType.Name#> va
   return os;
 }
 
+inline std::string to_string(<#=dataType.Name#> value)
+{
+  switch (value)
+  {
+<#
+    foreach (var enumerator in enumeratedDataType.Enumerators.Values)
+    {
+#>
+    case <#=dataType.Name#>::<#=enumerator.Name#>: return "<#=enumerator.Name#>";
+<#
+    } // foreach enumeratedDataType.Enumerators.Values
+#>
+  }
+}
+
+inline std::wstring to_wstring(<#=dataType.Name#> value)
+{
+  switch (value)
+  {
+<#
+    foreach (var enumerator in enumeratedDataType.Enumerators.Values)
+    {
+#>
+    case <#=dataType.Name#>::<#=enumerator.Name#>: return L"<#=enumerator.Name#>";
+<#
+    } // foreach enumeratedDataType.Enumerators.Values
+#>
+  }
+}
 
 <#
   } // if (dataType is FOMParser.EnumeratedDataType)

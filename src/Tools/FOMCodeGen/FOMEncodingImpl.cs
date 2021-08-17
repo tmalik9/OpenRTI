@@ -173,72 +173,166 @@ foreach (var dataType in FOM.DataTypes)
             
             #line default
             #line hidden
-            this.Write("}\r\n");
+            this.Write("}\r\n\r\n");
             
-            #line 48 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 49 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
+            
+            #line default
+            #line hidden
+            this.Write("Encoding::");
+            
+            #line 49 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
+            
+            #line default
+            #line hidden
+            this.Write("Encoding(const ");
+            
+            #line 49 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
+            
+            #line default
+            #line hidden
+            this.Write("Encoding& ref)\r\n  : rti1516ev::HLAfixedRecord(");
+            
+            #line 50 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Version));
+            
+            #line default
+            #line hidden
+            this.Write(")\r\n");
+            
+            #line 51 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+
+    foreach (var field in fixedRecordDataType.AllFields)
+    {
+
+            
+            #line default
+            #line hidden
+            this.Write("  , m");
+            
+            #line 55 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
+            
+            #line default
+            #line hidden
+            this.Write("(ref.m");
+            
+            #line 55 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
+            
+            #line default
+            #line hidden
+            this.Write(")\r\n");
+            
+            #line 56 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+
+    } // foreach fixedRecordDataType.Fields
+
+            
+            #line default
+            #line hidden
+            this.Write("{\r\n");
+            
+            #line 60 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+
+    foreach (var field in fixedRecordDataType.AllFields)
+    {
+
+            
+            #line default
+            #line hidden
+            this.Write("  rti1516ev::HLAfixedRecord::appendElementPointer(&m");
+            
+            #line 64 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
+            
+            #line default
+            #line hidden
+            this.Write(", ");
+            
+            #line 64 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(field.Version));
+            
+            #line default
+            #line hidden
+            this.Write(");\r\n");
+            
+            #line 65 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+
+    } // foreach fixedRecordDataType.Fields
+
+            
+            #line default
+            #line hidden
+            this.Write("}\r\n\r\n");
+            
+            #line 70 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::~");
             
-            #line 48 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 70 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding()\r\n{\r\n}\r\n\r\n");
             
-            #line 52 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 74 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Encoding));
             
             #line default
             #line hidden
             this.Write("& ");
             
-            #line 52 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 74 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::operator=(const ");
             
-            #line 52 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 74 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("& ref)\r\n{\r\n  if (this != &ref)\r\n  {\r\n");
             
-            #line 56 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 78 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  foreach (var field in fixedRecordDataType.AllFields) { 
             
             #line default
             #line hidden
             this.Write("  Set");
             
-            #line 57 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 79 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(ref.Get");
             
-            #line 57 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 79 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("());\r\n");
             
-            #line 58 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 80 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } 
             
             #line default
             #line hidden
             this.Write("  }\r\n  return *this;\r\n}\r\n\r\nuint32_t ");
             
-            #line 63 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 85 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
@@ -246,49 +340,49 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("Encoding::getVersion() const { return rti1516ev::HLAfixedRecord::getVersion(); }\r" +
                     "\n");
             
-            #line 64 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 86 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  foreach (var field in fixedRecordDataType.AllFields) { 
             
             #line default
             #line hidden
             this.Write("void ");
             
-            #line 65 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 87 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::Set");
             
-            #line 65 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 87 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 65 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 87 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" value)\r\n{\r\n");
             
-            #line 67 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 89 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   if (field.DataType is FOMParser.BasicDataRepresentation || field.DataType is FOMParser.SimpleDataType || field.DataType is FOMParser.ArrayDataType) { 
             
             #line default
             #line hidden
             this.Write("  m");
             
-            #line 68 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 90 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(".set(value);\r\n");
             
-            #line 69 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 91 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } else if (field.DataType is FOMParser.EnumeratedDataType) {
       var enumeratedDataType = field.DataType as FOMParser.EnumeratedDataType;
 
@@ -297,63 +391,63 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("  // ");
             
-            #line 72 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 94 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType));
             
             #line default
             #line hidden
             this.Write("\r\n  m");
             
-            #line 73 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 95 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(" = static_cast<");
             
-            #line 73 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 95 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeratedDataType.Representation.CPPType));
             
             #line default
             #line hidden
             this.Write(">(value);\r\n");
             
-            #line 74 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 96 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } else { 
             
             #line default
             #line hidden
             this.Write("  // ");
             
-            #line 75 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 97 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 75 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 97 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.Name));
             
             #line default
             #line hidden
             this.Write(" \r\n  m");
             
-            #line 76 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 98 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(" = value;\r\n");
             
-            #line 77 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 99 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } 
             
             #line default
             #line hidden
             this.Write("}\r\n");
             
-            #line 79 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 101 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  if (field.DataType is FOMParser.ArrayDataType) {
      var arrayDataType = field.DataType as FOMParser.ArrayDataType;
 
@@ -362,76 +456,76 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("void ");
             
-            #line 82 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 104 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::Set");
             
-            #line 82 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 104 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(const ");
             
-            #line 82 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 104 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("* value, size_t size)\r\n{\r\n\tm");
             
-            #line 84 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 106 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(".set(value, size);\r\n}\r\n");
             
-            #line 86 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 108 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 87 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 109 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 87 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 109 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::Get");
             
-            #line 87 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 109 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("() const\r\n{\r\n");
             
-            #line 89 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 111 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  if (field.Version > 0) { 
             
             #line default
             #line hidden
             this.Write("  if (getVersion() < ");
             
-            #line 90 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 112 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Version));
             
             #line default
             #line hidden
             this.Write(")\r\n  {\r\n    throw rti1516ev::EncoderException(L\"field \\\"");
             
-            #line 92 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 114 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
@@ -439,117 +533,117 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("\\\" is not available in decoded record version \" + std::to_wstring(getVersion()));" +
                     "\r\n  }\r\n");
             
-            #line 94 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 116 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 95 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 117 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  if (field.DataType is FOMParser.EnumeratedDataType) { 
             
             #line default
             #line hidden
             this.Write("  return static_cast<");
             
-            #line 96 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 118 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write(">(m");
             
-            #line 96 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 118 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(".get());\r\n");
             
-            #line 97 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 119 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  } else if (field.DataType is FOMParser.BasicDataRepresentation || field.DataType is FOMParser.SimpleDataType || field.DataType is FOMParser.ArrayDataType) { 
             
             #line default
             #line hidden
             this.Write("  return m");
             
-            #line 98 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 120 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(".get();\r\n");
             
-            #line 99 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 121 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  } else {
             
             #line default
             #line hidden
             this.Write("  return m");
             
-            #line 100 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 122 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 101 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 123 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  } // else (field.DataType is FOMParser.EnumeratedDataType) 
             
             #line default
             #line hidden
             this.Write("}\r\nbool ");
             
-            #line 103 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 125 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::Is");
             
-            #line 103 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 125 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("Available() const\r\n{\r\n");
             
-            #line 105 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 127 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  if (field.Version > 0) { 
             
             #line default
             #line hidden
             this.Write("  return (getVersion() >= ");
             
-            #line 106 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 128 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Version));
             
             #line default
             #line hidden
             this.Write(");\r\n");
             
-            #line 107 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 129 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  } else { 
             
             #line default
             #line hidden
             this.Write("  return true;\r\n");
             
-            #line 109 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 131 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  } 
             
             #line default
             #line hidden
             this.Write("}\r\n");
             
-            #line 111 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 133 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  } // foreach fixedRecordDataType.Fields 
             
             #line default
             #line hidden
             
-            #line 112 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 134 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
 
   } // if (dataType is FOMParser.FixedRecordDataType)
   else if (dataType is FOMParser.FixedArrayDataType && dataType.Generate)
@@ -563,20 +657,20 @@ foreach (var dataType in FOM.DataTypes)
             #line default
             #line hidden
             
-            #line 121 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 143 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 122 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 144 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } 
             
             #line default
             #line hidden
             
-            #line 123 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 145 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
     { // array of simple or basic types: access data by reference/pointer
 
@@ -585,70 +679,70 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("// fixed array of simple type ");
             
-            #line 126 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 148 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 127 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 149 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::");
             
-            #line 127 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 149 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding()\r\n  : HLAfixedArray(");
             
-            #line 128 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 150 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("(), ");
             
-            #line 128 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 150 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Cardinality));
             
             #line default
             #line hidden
             this.Write(")\r\n");
             
-            #line 129 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 151 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  if (cardinality > 0) {
             
             #line default
             #line hidden
             this.Write("  , mData(");
             
-            #line 130 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 152 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(cardinality));
             
             #line default
             #line hidden
             this.Write(")\r\n");
             
-            #line 131 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 153 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } 
             
             #line default
             #line hidden
             this.Write("{\r\n");
             
-            #line 133 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 155 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  if (cardinality > 0) {
             
             #line default
             #line hidden
             this.Write("  for (int i=0; i < ");
             
-            #line 134 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 156 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(cardinality));
             
             #line default
@@ -656,62 +750,62 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("; i++)\r\n  {\r\n    mEncoding[i].setDataPointer(&mData[i]);\r\n    setElementPointer(i" +
                     ", &mEncoding[i]);\r\n  }\r\n");
             
-            #line 139 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 161 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } 
             
             #line default
             #line hidden
             this.Write("}\r\n");
             
-            #line 141 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 163 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  if (cardinality > 0) {
             
             #line default
             #line hidden
             
-            #line 142 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 164 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::");
             
-            #line 142 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 164 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding(");
             
-            #line 142 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 164 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data)\r\n  : HLAfixedArray(");
             
-            #line 143 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 165 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("(), ");
             
-            #line 143 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 165 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Cardinality));
             
             #line default
             #line hidden
             this.Write(")\r\n  , mData(");
             
-            #line 144 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 166 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Cardinality));
             
             #line default
             #line hidden
             this.Write(")\r\n{\r\n  set(data.data(), data.size());\r\n  for (int i=0;i<");
             
-            #line 147 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 169 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Cardinality));
             
             #line default
@@ -719,35 +813,35 @@ foreach (var dataType in FOM.DataTypes)
             this.Write(";i++)\r\n  {\r\n    mEncoding[i].setDataPointer(&mData[i]);\r\n    setElementPointer(i," +
                     " &mEncoding[i]);\r\n  }\r\n}\r\nvoid ");
             
-            #line 153 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 175 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(");
             
-            #line 153 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 175 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data) {\r\n  set(data.data(), data.size());\r\n}\r\nvoid ");
             
-            #line 156 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 178 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(const ");
             
-            #line 156 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 178 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("* data, size_t size) \r\n{\r\n  if (size <= ");
             
-            #line 158 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 180 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Cardinality));
             
             #line default
@@ -755,152 +849,152 @@ foreach (var dataType in FOM.DataTypes)
             this.Write(") {\r\n    memcpy(mData.data(), data, size);\r\n  } else {\r\n    memcpy(mData.data(), " +
                     "data, ");
             
-            #line 161 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 183 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Cardinality));
             
             #line default
             #line hidden
             this.Write(");\r\n  }\r\n}\r\n");
             
-            #line 164 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 186 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 164 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 186 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::get() const\r\n{\r\n  return mData;\r\n}\r\n");
             
-            #line 168 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 190 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } 
             
             #line default
             #line hidden
             
-            #line 169 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 191 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } else {  // array of complex type 
             
             #line default
             #line hidden
             this.Write("// fixed array of complex type ");
             
-            #line 170 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 192 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 171 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 193 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::");
             
-            #line 171 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 193 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding()\r\n  : HLAfixedArray(");
             
-            #line 172 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 194 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("(), ");
             
-            #line 172 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 194 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Cardinality));
             
             #line default
             #line hidden
             this.Write(")\r\n{\r\n}\r\n");
             
-            #line 175 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 197 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
  if (cardinality > 0) {
             
             #line default
             #line hidden
             
-            #line 176 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 198 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::");
             
-            #line 176 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 198 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding(");
             
-            #line 176 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 198 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ConstRefCppType));
             
             #line default
             #line hidden
             this.Write(" data)\r\n  : HLAfixedArray(");
             
-            #line 177 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 199 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("(), ");
             
-            #line 177 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 199 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Cardinality));
             
             #line default
             #line hidden
             this.Write(")\r\n{\r\n  set(data);\r\n}\r\nvoid ");
             
-            #line 181 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 203 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(");
             
-            #line 181 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 203 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ConstRefCppType));
             
             #line default
             #line hidden
             this.Write(" data) {\r\n  set(data.data(), data.size());\r\n}\r\nvoid ");
             
-            #line 184 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 206 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(const ");
             
-            #line 184 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 206 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("* data, size_t size) \r\n{\r\n  for (size_t i = 0; i < size; i++)\r\n  {\r\n    const ");
             
-            #line 188 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 210 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("* encoding = dynamic_cast<const ");
             
-            #line 188 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 210 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.DataType.Encoding));
             
             #line default
@@ -908,34 +1002,34 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("*>(&data[i]);\r\n    HLAfixedArray::set(i, *encoding);\r\n  }\r\n}\r\n// not yet supporte" +
                     "d:\r\n//");
             
-            #line 193 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 215 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 193 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 215 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::get() const\r\n//{\r\n//  ");
             
-            #line 195 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 217 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedArrayDataType.CPPType));
             
             #line default
             #line hidden
             this.Write(" result;\r\n//  return result;\r\n//}\r\n");
             
-            #line 198 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 220 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } 
             
             #line default
             #line hidden
             
-            #line 199 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 221 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } // if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
   }  // if (dataType is FOMParser.FixedArrayDataType)
   else if (dataType is FOMParser.VariableArrayDataType && dataType.Generate)
@@ -948,20 +1042,20 @@ foreach (var dataType in FOM.DataTypes)
             #line default
             #line hidden
             
-            #line 207 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 229 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 208 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 230 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } 
             
             #line default
             #line hidden
             
-            #line 209 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 231 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
     { // array of simple or basic types: access data by reference/pointer
 
@@ -970,70 +1064,70 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("// variable array of simple type ");
             
-            #line 212 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 234 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 213 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 235 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::");
             
-            #line 213 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 235 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding()\r\n  : HLAvariableArray(");
             
-            #line 214 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 236 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("())\r\n  , mData()\r\n{\r\n}\r\n");
             
-            #line 218 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 240 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::");
             
-            #line 218 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 240 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding(");
             
-            #line 218 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 240 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data)\r\n  : HLAvariableArray(");
             
-            #line 219 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 241 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("())\r\n  , mData(data)\r\n{\r\n  update();\r\n}\r\nvoid ");
             
-            #line 224 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 246 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(");
             
-            #line 224 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 246 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ParameterCppType));
             
             #line default
@@ -1042,14 +1136,14 @@ foreach (var dataType in FOM.DataTypes)
                     "\r\n  } else {\r\n    memcpy(mData.data(), data.data(), mData.size());\r\n  }\r\n}\r\nvoid" +
                     " ");
             
-            #line 233 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 255 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(const ");
             
-            #line 233 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 255 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.CPPType));
             
             #line default
@@ -1057,21 +1151,21 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("* data, size_t size)\r\n{\r\n  if (mData.size() != size) {\r\n    mData.resize(size);\r\n" +
                     "    update();\r\n  }\r\n  memcpy(mData.data(), data, size);\r\n}\r\n");
             
-            #line 241 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 263 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 241 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 263 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::get() const { return mData; }\r\nvoid ");
             
-            #line 242 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 264 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
@@ -1079,7 +1173,7 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("Encoding::resize(size_t size)\r\n{\r\n  mData.resize(size);\r\n  update();\r\n}\r\n// resiz" +
                     "e buffer and encoder array before actually decoding \r\nsize_t ");
             
-            #line 248 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 270 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
@@ -1089,7 +1183,7 @@ foreach (var dataType in FOM.DataTypes)
                     "wSize);\r\n  return HLAvariableArray::decodeFrom(buffer, bufferSize, index);\r\n}\r\nv" +
                     "oid ");
             
-            #line 254 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 276 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
@@ -1111,77 +1205,77 @@ foreach (var dataType in FOM.DataTypes)
 
 ");
             
-            #line 269 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 291 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } else {  // array of complex type 
             
             #line default
             #line hidden
             this.Write("// variable array of complex type ");
             
-            #line 270 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 292 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 271 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 293 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::");
             
-            #line 271 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 293 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding()\r\n  : HLAvariableArray(");
             
-            #line 272 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 294 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("())\r\n{\r\n}\r\n");
             
-            #line 275 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 297 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::");
             
-            #line 275 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 297 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding(");
             
-            #line 275 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 297 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" data)\r\n  : HLAvariableArray(");
             
-            #line 276 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 298 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("())\r\n{\r\n  set(data);\r\n}\r\nvoid ");
             
-            #line 280 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 302 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(");
             
-            #line 280 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 302 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.ParameterCppType));
             
             #line default
@@ -1189,21 +1283,21 @@ foreach (var dataType in FOM.DataTypes)
             this.Write(" data)\r\n{\r\n  clear();\r\n  for (size_t i=0; i < data.size();i++)\r\n  {\r\n    addEleme" +
                     "nt(static_cast<const ");
             
-            #line 285 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 307 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("&>(data[i]));\r\n  }\r\n}\r\nvoid ");
             
-            #line 288 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 310 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(");
             
-            #line 288 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 310 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.RefCppType));
             
             #line default
@@ -1211,21 +1305,21 @@ foreach (var dataType in FOM.DataTypes)
             this.Write(" data)\r\n{\r\n  clear();\r\n  for (size_t i=0; i < data.size();i++)\r\n  {\r\n    addEleme" +
                     "ntPointer(static_cast<");
             
-            #line 293 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 315 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("*>(&data[i]));\r\n  }\r\n}\r\nvoid ");
             
-            #line 296 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 318 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(const ");
             
-            #line 296 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 318 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
@@ -1233,21 +1327,21 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("* data, size_t size)\r\n{\r\n  clear();\r\n  for (size_t i=0; i < size;i++)\r\n  {\r\n    a" +
                     "ddElement(static_cast<const ");
             
-            #line 301 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 323 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
             #line hidden
             this.Write("&>(data[i]));\r\n  }\r\n}\r\nvoid ");
             
-            #line 304 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 326 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("Encoding::set(");
             
-            #line 304 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 326 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
@@ -1255,7 +1349,7 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("* data, size_t size)\r\n{\r\n  clear();\r\n  for (size_t i=0; i < size;i++)\r\n  {\r\n    a" +
                     "ddElementPointer(static_cast<");
             
-            #line 309 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 331 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(variableArrayDataType.DataType.Encoding));
             
             #line default
@@ -1263,7 +1357,7 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("*>(&data[i]));\r\n  }\r\n}\r\n// resize buffer and encoder array before actually decodi" +
                     "ng \r\nsize_t ");
             
-            #line 313 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 335 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
@@ -1272,7 +1366,7 @@ foreach (var dataType in FOM.DataTypes)
                     "dex)\r\n{\r\n  size_t newSize = decodedSize(buffer, bufferSize, index);\r\n  resize(ne" +
                     "wSize);\r\n  return HLAvariableArray::decodeFrom(buffer, bufferSize, index);\r\n}\r\n");
             
-            #line 319 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 341 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
 
     } // if (elementDataType is FOMParser.BasicDataRepresentation || elementDataType is FOMParser.SimpleDataType)
   } // if (dataType is FOMParser.VariableArrayDataType)
@@ -1283,7 +1377,7 @@ foreach (var dataType in FOM.DataTypes)
             #line default
             #line hidden
             
-            #line 325 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 347 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
 
 foreach (var namespacePart in FOM.Namespace)
 {
@@ -1293,14 +1387,14 @@ foreach (var namespacePart in FOM.Namespace)
             #line hidden
             this.Write("} // namespace ");
             
-            #line 329 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 351 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 330 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
+            #line 352 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMEncodingImpl.tt"
   } 
             
             #line default

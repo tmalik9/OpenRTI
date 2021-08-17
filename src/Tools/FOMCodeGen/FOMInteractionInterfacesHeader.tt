@@ -41,15 +41,15 @@ class I<#=interactionClass.Name#>InteractionClass
   public:
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
-    virtual void Subscribe() = 0;
+    virtual void Subscribe(bool deliverToSelf) = 0;
+<# if (interactionClass.HasValidParameters) {#>
+    virtual void Subscribe(<#=interactionClass.CppParameterList#>, bool deliverToSelf) = 0;
+<#}#>
     virtual void Unsubscribe() = 0;
     virtual void send(<#=interactionClass.CppParameterList#>) = 0;
-    using ReceiveCallback = std::function<void(<#=interactionClass.CppParameterList#>)>;
+    virtual void sendWithTime(<#=interactionClass.CppParameterList#><# if (interactionClass.HasValidParameters) {#>, <#}#><#=FOM.NativeTimeType#> time) = 0;
+    using ReceiveCallback = std::function<void(<#=interactionClass.CppParameterList#><# if (interactionClass.HasValidParameters) {#>, <#}#>optional<<#=FOM.NativeTimeType#>> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
-    // send/receive with timestamps
-    virtual void sendWithTime(<#=interactionClass.CppParameterList#><# if (interactionClass.Parameters.Count > 0) {#>, <#}#><#=FOM.NativeTimeType#> time) = 0;
-    using ReceiveCallbackWithTime = std::function<void(<#=interactionClass.CppParameterList#><# if (interactionClass.Parameters.Count > 0) {#>, <#}#><#=FOM.NativeTimeType#> time, OrderType orderType)>;
-    virtual uint32_t RegisterReceiveCallbackWithTime(ReceiveCallbackWithTime callback) = 0;
 };
 
 <# } // foreach (var interactionClass in FOM.InteractionClasses) #>
