@@ -6,8 +6,6 @@
 
 #include <iostream>
 
-#include <iostream>
-
 #include "momDataTypes.h"
 #include "momEncodings.h"
 #include "../../../src/rti1516ev/HandleFactory.h"
@@ -63,6 +61,23 @@ operator<<(std::basic_ostream<char_type, traits_type>& os, const rti1516ev::Vari
   return os;
 }
 
+int compare(const rti1516ev::VariableLengthData& lhs, const rti1516ev::VariableLengthData& rhs)
+{
+  if (lhs.size() < rhs.size()) return -1;
+  else if (lhs.size() < rhs.size()) return 1;
+  else 
+  {
+    return memcmp(lhs.data(), rhs.data(), lhs.size());
+  }
+}
+bool operator!=(const rti1516ev::VariableLengthData& lhs, const rti1516ev::VariableLengthData& rhs)
+{
+  return compare(lhs, rhs) != 0;
+}
+bool operator==(const rti1516ev::VariableLengthData& lhs, const rti1516ev::VariableLengthData& rhs)
+{
+  return compare(lhs, rhs) == 0;
+}
 constexpr bool gDebugPrint = true;
 
 using namespace rti1516ev;
@@ -286,17 +301,44 @@ bool testRTFederate(int argc, char* argv[])
   std::vector<uint8_t> data{1, 2, 3, 4};
   canFrame.SetDataLength(4);
   canFrame.SetData(data);
+
   std::cout << "canFrame.DataLength=" << (int)canFrame.GetDataLength() << std::endl;
   std::cout << "canFrame.Data=" << canFrame.GetData() << std::endl;
-  rti1516ev::VariableLengthData encodedData = canFrame.encode();
+  rti1516ev::VariableLengthData canFrameEncodedData = canFrame.encode();
   NDistSimIB::NRTFederateEncoding::CANFrameEncoding canFrameDecoder;
-  canFrameDecoder.decode(encodedData);
+  canFrameDecoder.decode(canFrameEncodedData);
   std::cout << "canFrameDecoder.DataLength=" << (int)canFrameDecoder.GetDataLength() << std::endl;
   std::cout << "canFrameDecoder.Data=" << canFrameDecoder.GetData() << std::endl;
-
+  if (canFrameDecoder.GetData() != canFrame.GetData())
+  {
+    std::cerr << "decoded data incorrect" << std::endl;
+    return false;
+  }
   NDistSimIB::NRTFederateEncoding::CANFrameEncoding canFrameCopy(canFrame);
   std::cout << "canFrameCopy.DataLength=" << (int)canFrameCopy.GetDataLength() << std::endl;
   std::cout << "canFrameCopy.Data=" << canFrameCopy.GetData() << std::endl;
+  if (canFrameCopy.GetData() != canFrame.GetData())
+  {
+    std::cerr << "copied data incorrect" << std::endl;
+    return false;
+  }
+  rti1516ev::VariableLengthData canFrameCopyEncodedData = canFrameCopy.encode();
+  if (canFrameCopy.encode() != canFrame.encode())
+  {
+    std::cerr << "encoded data from copied can frame incorrect" << std::endl;
+    std::cerr << "canFrame.encode     = " << canFrame.encode() << std::endl;
+    std::cerr << "canFrameCopy.encode = " << canFrameCopy.encode() << std::endl;
+    return false;
+  }
+  NDistSimIB::NRTFederateEncoding::CANFrameEncoding canFrameCopyDecoder;
+  canFrameCopyDecoder.decode(canFrameCopyEncodedData);
+  std::cout << "canFrameCopyDecoder.DataLength=" << (int)canFrameCopyDecoder.GetDataLength() << std::endl;
+  std::cout << "canFrameCopyDecoder.Data=" << canFrameCopyDecoder.GetData() << std::endl;
+  if (canFrameCopyDecoder.GetData() != canFrame.GetData())
+  {
+    std::cerr << "copied data incorrect" << std::endl;
+    return false;
+  }
 
   received = false;
   canFrame.SetDir(NDistSimIB::NRTFederateEncoding::DirMask::kMskTx);

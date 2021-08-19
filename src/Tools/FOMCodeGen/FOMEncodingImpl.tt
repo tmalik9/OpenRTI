@@ -160,6 +160,21 @@ bool <#=dataType.Name#>Encoding::Is<#=field.Name#>Available() const
   }
 <#  } #>
 }
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs)
+  : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
+<# if (cardinality > 0) {#>
+  , mData(<#=cardinality#>)
+<#  } #>
+{
+<# if (cardinality > 0) {#>
+  set(rhs.mData.data(), rhs.mData.size());
+  for (int i=0; i < <#=cardinality#>; i++)
+  {
+    mEncoding[i].setDataPointer(&mData[i]);
+    setElementPointer(i, &mEncoding[i]);
+  }
+<#  } #>
+}
 <# if (cardinality > 0) {#>
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=fixedArrayDataType.ParameterCppType#> data)
   : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
@@ -193,6 +208,11 @@ void <#=dataType.Name#>Encoding::set(const <#=fixedArrayDataType.DataType.CPPTyp
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding()
   : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
 {
+}
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs)
+  : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
+{
+  set(rhs-mData);
 }
 <# if (cardinality > 0) {#>
 <#=fixedArrayDataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=fixedArrayDataType.ConstRefCppType#> data)
@@ -236,6 +256,12 @@ void <#=fixedArrayDataType.Name#>Encoding::set(const <#=fixedArrayDataType.DataT
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
   , mData()
 {
+}
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs)
+  : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
+  , mData(rhs.mData)
+{
+  update();
 }
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data)
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
@@ -293,6 +319,11 @@ void <#=dataType.Name#>Encoding::update()
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding()
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
 {
+}
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs)
+  : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
+{
+  set(rhs.mData);
 }
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data)
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())

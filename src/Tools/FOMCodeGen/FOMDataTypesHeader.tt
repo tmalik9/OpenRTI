@@ -56,7 +56,10 @@ inline X* placement_new(void* addr, Types&& ... args)
 // define our own simplified 'optional' types, similar to but independent of std::optional (since C++17) or boost::optional
 #pragma warning(push)
 #pragma warning(disable: 4324) // MSVC: 'struct_name' : structure was padded due to __declspec(align())
-template<typename T, bool X=std::is_fundamental<T>::value > struct optional
+// (empty) base template
+template<typename T, bool X=std::is_class<T>::value > struct optional {};
+// specialization for classes and structs used by-value, w. in-place copy-construction
+template<typename T> struct optional<T, true>
 {
   static_assert(!std::is_reference< T >::value, "reference is not supported as optional value");
   // constructors
@@ -84,26 +87,12 @@ template<typename T, bool X=std::is_fundamental<T>::value > struct optional
   T* operator -> () { return get(); }
 private:
   template<typename Other>
-  void create(const Other& w) {
-    placement_new<T>(_value, w);
-  }
-  void create(const optional& rhs) {
-    if(_valid) create(*rhs.get());
-  }
-  void destroy() {
-    get()->~T();
-  }
-  T const* get() const {
-    assert(_valid && "no optional value");
-    return reinterpret_cast< const T* >(_value);
-  }
-  T* get() {
-    assert(_valid && "no optional value");
-    return reinterpret_cast< T* >(_value);
-  }
-  void cleanup() {
-    destroy(); _valid = false;
-  }
+  void create(const Other& w) { placement_new<T>(_value, w); }
+  void create(const optional& rhs) { if(_valid) create(*rhs.get()); }
+  void destroy() { get()->~T(); }
+  T const* get() const { assert(_valid && "no optional value"); return reinterpret_cast< const T* >(_value); }
+  T* get() { assert(_valid && "no optional value"); return reinterpret_cast< T* >(_value); }
+  void cleanup() { destroy(); _valid = false; }
   optional& assign(const T& w) {
     if(_valid) *get() = w;
     else create(w), _valid = true;
@@ -118,7 +107,8 @@ private:
   bool _valid;
   alignas(alignof(T)) uint8_t _value[sizeof(T)];
 };
-
+// Specialization for const-ref parameters, implemented by holding a pointer to the original variable.
+// Note that non-const references are *not* supported (but could be easily added)!
 template<typename T> struct optional<const T&, false>
 {
   // constructors
@@ -157,7 +147,8 @@ private:
   bool _valid;
   const T* _pointer = nullptr;
 };
-template<typename T> struct optional<T, true>
+// Specialization for everything else, which includes fundamental types and pointer types.
+template<typename T> struct optional<T, false>
 {
   // constructors
   optional() : _valid(false) {}

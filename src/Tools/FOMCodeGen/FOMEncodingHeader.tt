@@ -96,6 +96,7 @@ class <#=dataType.Name#>Encoding : public rti1516ev::HLAfixedArray
 {
   public:
     <#=dataType.Name#>Encoding();
+    <#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs);
 <# if (cardinality > 0) {#>
     <#=dataType.Name#>Encoding(<#=fixedArrayDataType.ParameterCppType#> data);
     using rti1516ev::HLAfixedArray::set;
@@ -118,6 +119,7 @@ class <#=dataType.Name#>Encoding : public rti1516ev::HLAfixedArray
 {
   public:
     <#=dataType.Name#>Encoding();
+    <#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs);
 <# if (cardinality > 0) {#>
     <#=dataType.Name#>Encoding(<#=fixedArrayDataType.ParameterCppType#> data);
     using rti1516ev::HLAfixedArray::set;
@@ -145,6 +147,7 @@ class <#=dataType.Name#>Encoding : public rti1516ev::HLAvariableArray
 {
   public:
     <#=dataType.Name#>Encoding();
+    <#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs);
     <#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data);
     using rti1516ev::HLAvariableArray::set;
     void set(<#=variableArrayDataType.ParameterCppType#> data);
@@ -166,6 +169,7 @@ class <#=dataType.Name#>Encoding : public rti1516ev::HLAvariableArray
 {
   public:
     <#=dataType.Name#>Encoding();
+    <#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs);
     <#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data);
     using rti1516ev::HLAvariableArray::set;
     void set(<#=variableArrayDataType.ConstRefCppType#> data);
