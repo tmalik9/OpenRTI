@@ -11,7 +11,6 @@
 
 #include <vector>
 #include <cassert>
-
 #include "<#=ObjectsHeaderFilename#>"
 
 <#
@@ -20,6 +19,7 @@ foreach (var namespacePart in FOM.Namespace)
 #>
 namespace <#=namespacePart#> {
 <#  } #>
+
 <# 
 foreach (var objectClass in FOM.ObjectClasses)
 {
@@ -58,10 +58,6 @@ foreach (var objectClass in FOM.ObjectClasses)
 
 <#=objectClass.Name#>ObjectClass::~<#=objectClass.Name#>ObjectClass()
 {
-  for (auto& keyValue : mObjectInstancesByHandle)
-  {
-    delete keyValue.second;
-  }
   mObjectInstancesByHandle.clear();
   mObjectInstancesByName.clear();
 }
@@ -122,57 +118,71 @@ rti1516ev::AttributeHandleSet <#=objectClass.Name#>ObjectClass::GetAllAttributeH
   return result;
 }
 
-void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& instanceName)
+void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  assert(mObjectInstancesByName.find(instanceName) == mObjectInstancesByName.end());
+  assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  <#=objectClass.Name#>* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
+  std::shared_ptr<<#=objectClass.Name#>> newObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
   newObject->mObjectInstanceHandle = objectInstanceHandle;
   newObject->mIsOwner = false;
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
-  mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, newObject));
+  InsertObjectInstanceName(newObject, objectInstanceName);
+  InsertObjectInstanceHandle(newObject, objectInstanceHandle);
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::wstring instanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
-  auto iter = mObjectInstancesByName.find(instanceName);
+  std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
+  auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
-  auto* objectInstance = iter->second;
+  auto objectInstance = std::dynamic_pointer_cast<<#=objectClass.Name#>>(iter->second);
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
-  mObjectInstancesByName.erase(iter);
-  mObjectInstancesByHandle.erase(objectInstanceHandle);
+  EraseObjectInstance(objectInstanceHandle, objectInstanceName);
+  // Do not delete the object yet, it may still be in use by the application.
 }
 
-I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::GetObjectInstance(const std::wstring& instanceName)
+std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
     return iter->second;
   }
+<# if (objectClass.BaseClass != null) { #>
   else
   {
-    return nullptr;
+    std::shared_ptr<I<#=objectClass.BaseClass.Name#>> baseClassObjectInterface = mBaseClass->GetObjectInstance(instanceName);
+    if (baseClassObjectInterface != nullptr)
+    {
+      return std::dynamic_pointer_cast<I<#=objectClass.Name#>>(baseClassObjectInterface);
+    }
   }
+<# } #>
+  return nullptr;
 }
 
-I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
+std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
     return iter->second;
   }
+<# if (objectClass.BaseClass != null) { #>
   else
   {
-    return nullptr;
+    std::shared_ptr<I<#=objectClass.BaseClass.Name#>> baseClassObjectInterface = mBaseClass->GetObjectInstance(instanceHandle);
+    if (baseClassObjectInterface != nullptr)
+    {
+      return std::dynamic_pointer_cast<I<#=objectClass.Name#>>(baseClassObjectInterface);
+    }
   }
+<# } #>
+  return nullptr;
 }
 
-I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName)
+std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
@@ -183,20 +193,20 @@ I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(c
   {
     throw rti1516ev::ObjectClassNotPublished(L"<#=objectClass.Name#>");
   }
-  <#=objectClass.Name#>* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
+  std::shared_ptr<<#=objectClass.Name#>> newObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
-I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
+std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
@@ -207,7 +217,7 @@ I<#=objectClass.Name#>* <#=objectClass.Name#>ObjectClass::CreateObjectInstance(c
   {
     throw rti1516ev::ObjectClassNotPublished(L"<#=objectClass.Name#>");
   }
-  <#=objectClass.Name#>* newObject = mCreatorFunction(this, instanceName, mRtiAmbassador);
+  std::shared_ptr<<#=objectClass.Name#>> newObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
@@ -237,7 +247,7 @@ void <#=objectClass.Name#>ObjectClass::UnregisterDiscoverObjectInstanceCallback(
   mDiscoverCallbacks.erase(callbackToken);
 }
 
-void <#=objectClass.Name#>ObjectClass::ExecuteDiscoverObjectInstanceCallbacks(I<#=objectClass.Name#>* newObjectInstance)
+void <#=objectClass.Name#>ObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<I<#=objectClass.Name#>> newObjectInstance)
 {
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
@@ -258,7 +268,7 @@ void <#=objectClass.Name#>ObjectClass::UnregisterRemoveObjectInstanceCallback(ui
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
-void <#=objectClass.Name#>ObjectClass::ExecuteRemoveObjectInstanceCallbacks(I<#=objectClass.Name#>* newObjectInstance)
+void <#=objectClass.Name#>ObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<I<#=objectClass.Name#>> newObjectInstance)
 {
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
@@ -267,6 +277,32 @@ void <#=objectClass.Name#>ObjectClass::ExecuteRemoveObjectInstanceCallbacks(I<#=
   }
 }
 
+void <#=objectClass.Name#>ObjectClass::InsertObjectInstanceName(std::shared_ptr<I<#=objectClass.Name#>> objectInstance, const std::wstring& objectInstanceName)
+{
+  mObjectInstancesByName.insert(std::make_pair(objectInstanceName, objectInstance));
+<# if (objectClass.BaseClass != null) { #>
+  mBaseClass->InsertObjectInstanceName(objectInstance, objectInstanceName);
+<# } #>
+}
+
+void <#=objectClass.Name#>ObjectClass::InsertObjectInstanceHandle(std::shared_ptr<I<#=objectClass.Name#>> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
+{
+  mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
+<# if (objectClass.BaseClass != null) { #>
+  mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
+<# } #>
+}
+
+void <#=objectClass.Name#>ObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
+{
+<# if (objectClass.BaseClass != null) { #>
+  mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
+<# } #>
+  mObjectInstancesByName.erase(objectInstanceName);
+  mObjectInstancesByHandle.erase(objectInstanceHandle);
+}
+
+
 // object instances of type '<#=objectClass.Name#>'
 <#=objectClass.Name#>::<#=objectClass.Name#>()
 {
@@ -274,7 +310,7 @@ void <#=objectClass.Name#>ObjectClass::ExecuteRemoveObjectInstanceCallbacks(I<#=
 
 <#=objectClass.Name#>::<#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
   : mObjectClass(objectClass)
-  , mInstanceName(instanceName)
+  , mObjectInstanceName(instanceName)
   , mRtiAmbassador(rtiAmbassador)
 {
 }
@@ -283,6 +319,28 @@ void <#=objectClass.Name#>ObjectClass::ExecuteRemoveObjectInstanceCallbacks(I<#=
 {
   if (mObjectInstanceHandle.isValid() && mIsOwner)
   {
+    try
+    {
+      mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+    }
+    catch (const rti1516ev::NotConnected&)
+    {
+    }
+    catch (const rti1516ev::FederateNotExecutionMember&)
+    {
+    }
+    mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mIsOwner = false;
+  }
+}
+
+void <#=objectClass.Name#>::Release()
+{
+  if (mObjectInstanceHandle.isValid() && mIsOwner)
+  {
+    // For now, do *not* remove the object if it has been discovered.
+    // It should be entirely owned by the object class.
+    mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     try
     {
       mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
@@ -687,7 +745,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 <#    } // if
       firstInClassRegistryReflectAttributeValues = false; #>
   {
-    static_cast<<#=objectClass.Name#>*>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::static_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
 <#  
     } // if (objectClass.hasValidAttributes)
@@ -711,7 +769,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 <#    } // if
       firstInClassRegistryReflectAttributeValuesWithTime = false; #>
   {
-    static_cast<<#=objectClass.Name#>*>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::static_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
 <#  
     } // if (objectClass.hasValidAttributes)
@@ -734,7 +792,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
 <#    } // if
       firstInClassRegistryProvideAttributeValues = false; #>
   {
-    auto objectInstance = static_cast<<#=objectClass.Name#>*>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::static_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles);
@@ -748,27 +806,27 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
 
 void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
 {
-  mInstanceNameReservationCallbacks.insert(std::make_pair(theObjectInstanceName, completionCallback));
+  mObjectInstanceNameReservationCallbacks.insert(std::make_pair(theObjectInstanceName, completionCallback));
   mRtiAmbassador->reserveObjectInstanceName(theObjectInstanceName);
 }
 
 void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
 {
-  auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
-  if (iter != mInstanceNameReservationCallbacks.end())
+  auto iter = mObjectInstanceNameReservationCallbacks.find(theObjectInstanceName);
+  if (iter != mObjectInstanceNameReservationCallbacks.end())
   {
     iter->second(true);
-    mInstanceNameReservationCallbacks.erase(iter);
+    mObjectInstanceNameReservationCallbacks.erase(iter);
   }
 }
 
 void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
 {
-  auto iter = mInstanceNameReservationCallbacks.find(theObjectInstanceName);
-  if (iter != mInstanceNameReservationCallbacks.end())
+  auto iter = mObjectInstanceNameReservationCallbacks.find(theObjectInstanceName);
+  if (iter != mObjectInstanceNameReservationCallbacks.end())
   {
     iter->second(false);
-    mInstanceNameReservationCallbacks.erase(iter);
+    mObjectInstanceNameReservationCallbacks.erase(iter);
   }
 }
 

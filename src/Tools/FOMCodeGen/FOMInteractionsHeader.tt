@@ -66,12 +66,11 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
       if (parameter.DataType != null)
       { #>
     // parameter <#=parameter.Name#> : <#=parameter.DataType.Name#>
-    rti1516ev::ParameterHandle Get<#=parameter.Name#>ParameterHandle() const { return mBaseClass->Get<#=parameter.Name#>ParameterHandle(); }
 <#    } else { #>
     // parameter <#=parameter.Name#> : no data type
-<#
-      } // if (parameter.DataType != null)
-    } // foreach (var parameter in interactionClass.Parameters)
+<#    } // if (parameter.DataType != null) #>
+    rti1516ev::ParameterHandle Get<#=parameter.Name#>ParameterHandle() const { return mBaseClass->Get<#=parameter.Name#>ParameterHandle(); }
+<#  } // foreach (var parameter in interactionClass.Parameters)
     baseClass = baseClass.BaseClass;
   } // while (baseClass != null)
 #>
@@ -81,13 +80,11 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     if (parameter.DataType != null)
     { #>
     // parameter <#=parameter.Name#> : <#=parameter.DataType.Name#>
-    rti1516ev::ParameterHandle Get<#=parameter.Name#>ParameterHandle() const { return m<#=parameter.Name#>ParameterHandle; }
 <#  } else { #>
     // parameter <#=parameter.Name#> : no data type
-<#  
-    } // if (parameter.DataType != null)
-  } // foreach (var parameter in interactionClass.Parameters)
-#>
+<# } // if (parameter.DataType != null) #>
+    rti1516ev::ParameterHandle Get<#=parameter.Name#>ParameterHandle() const { return m<#=parameter.Name#>ParameterHandle; }
+<#} // foreach (var parameter in interactionClass.Parameters) #>
     rti1516ev::ParameterHandleSet GetAllParameterHandles();
   private:
     InteractionClassRegistry* mInteractionClassRegistry;
@@ -106,17 +103,15 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     if (parameter.DataType != null)
     {
 #>    // parameter <#=parameter.Name#> : <#=parameter.DataType.Name#>
-    rti1516ev::ParameterHandle m<#=parameter.Name#>ParameterHandle;
 <#  } else {
 #>    // parameter <#=parameter.Name#> : no data type
-<#  
-    } // if (parameter.DataType != null)
-  } // foreach (var parameter in interactionClass.Parameters)
+<#  } // if (parameter.DataType != null) #>
+    rti1516ev::ParameterHandle m<#=parameter.Name#>ParameterHandle;
+<#} // foreach (var parameter in interactionClass.Parameters)
 #>
     std::map<uint32_t, ReceiveCallback> _receiveCallbacks;
     uint32_t _receiveCallbacksNextKey = 0;
 };
-
 
 <# } // foreach (var interactionClass in FOM.InteractionClasses) #> 
 

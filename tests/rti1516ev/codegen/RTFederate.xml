@@ -288,7 +288,6 @@
         <sharing>PublishSubscribe</sharing>
         <parameter>
           <name>Dummy</name>
-          <dataType>HLAopaqueData</dataType>
         </parameter>
       </interactionClass>
       <interactionClass>
@@ -411,11 +410,11 @@
         </parameter>
         <parameter>
           <name>Sender</name>
-          <dataType>HLAhandle</dataType>
+          <dataType class="BusController">HLAobjectInstanceHandle</dataType>
         </parameter>
         <parameter>
           <name>Receiver</name>
-          <dataType>HLAhandle</dataType>
+          <dataType class="BusController">HLAobjectInstanceHandle</dataType>
         </parameter>
         <interactionClass>
           <name>EthPacket</name>

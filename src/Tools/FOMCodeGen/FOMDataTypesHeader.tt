@@ -68,6 +68,8 @@ template<typename T> struct optional<T, true>
   optional(const T& w): _valid(true) { create(w); }
   template<typename Other>
   optional(const Other& w): _valid(true) { create(w); }
+  template<typename Other>
+  optional(const optional<Other>& rhs): _valid(rhs._valid) { create(rhs._value); }
 
   // destructor
   ~optional() { if(_valid) destroy(); }
@@ -117,6 +119,8 @@ template<typename T> struct optional<const T&, false>
   optional(const T& rhs): _valid(true), _pointer(&rhs) { }
   template<typename Other>
   optional(const Other& rhs): _valid(true), _pointer(&rhs) { }
+  template<typename Other>
+  optional(const optional<Other>& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }
 
   // destructor
   ~optional() { }
@@ -156,6 +160,8 @@ template<typename T> struct optional<T, false>
   optional(const T& rhs): _valid(true), _value(rhs) { }
   template<typename Other>
   optional(const Other& rhs): _valid(true), _value(rhs) { }
+  template<typename Other>
+  optional(const optional<Other>& rhs): _valid(rhs._valid), _value(rhs._value) { }
 
   // destructor
   ~optional() { }

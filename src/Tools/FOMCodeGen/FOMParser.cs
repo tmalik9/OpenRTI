@@ -457,7 +457,7 @@ namespace FOMCodeGen
       public override string CppGetter(string var)
       {
         if (ObjectClass != null)
-          return "static_cast<" + ObjectClass.Name + "ObjectClass*>(GetObjectClassRegistry()->Get" + ObjectClass.Name + "ObjectClass())->GetObjectInstance(" + var + ".get())";
+          return "static_cast<" + ObjectClass.Name + "ObjectClass*>(GetObjectClassRegistry()->Get" + ObjectClass.Name + "ObjectClass())->GetObjectInstance(" + var + ".get()).get()";
         else
           // no object class given - just pass in the object instance handle
           return var + ".get()";

@@ -50,17 +50,17 @@ foreach (var interactionClass in FOM.InteractionClasses)
   foreach (var parameter in interactionClass.Parameters)
   {
     if (parameter.DataType != null)
-    {
-#>  // parameter <#=parameter.Name#> : <#=parameter.DataType.Name#>
-  m<#=parameter.Name#>ParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"<#=parameter.Name#>");
+    { #>
+  // parameter <#=parameter.Name#> : <#=parameter.DataType.Name#>
 <#  } else { #>
-// parameter <#=interactionClass.Name#>.<#=parameter.Name#> : no data type
-<#  
-    } // if (parameter.DataType != null)
-  } // foreach (var parameter in interactionClass.Parameters)
+  // parameter <#=interactionClass.Name#>.<#=parameter.Name#> : no data type
+<#  } // if (parameter.DataType != null) #>
+  m<#=parameter.Name#>ParameterHandle = rtiAmbassador->getParameterHandle(mInteractionClassHandle, L"<#=parameter.Name#>");
+<#  } // foreach (var parameter in interactionClass.Parameters)
 #>
 }
 
+// get the corresponding *object* class registry, for access to objects sent as parameters
 ObjectClassRegistry* <#=interactionClass.Name#>InteractionClass::GetObjectClassRegistry()
 {
   return mInteractionClassRegistry->GetObjectClassRegistry();
@@ -86,20 +86,15 @@ void <#=interactionClass.Name#>InteractionClass::Unpublish()
 
 void <#=interactionClass.Name#>InteractionClass::Subscribe(bool deliverToSelf)
 {
-  if (!mSubscribed)
-  {
-    mRtiAmbassador->subscribeInteractionClass(mInteractionClassHandle);
-    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, deliverToSelf);
-    mSubscribed = true;
-  }
+  mRtiAmbassador->subscribeInteractionClass(mInteractionClassHandle);
+  mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, deliverToSelf);
+  mSubscribed = true;
 }
 
 <# if (interactionClass.HasValidParameters) {#>
 void <#=interactionClass.Name#>InteractionClass::Subscribe(<#=interactionClass.CppParameterList#>, bool deliverToSelf)
 {
-  if (!mSubscribed)
-  {
-    rti1516ev::ParameterHandleValueMap parameters;
+  rti1516ev::ParameterHandleValueMap parameters;
 <# 
   foreach (var parameter in interactionClass.AllParameters)
   {
@@ -114,10 +109,10 @@ void <#=interactionClass.Name#>InteractionClass::Subscribe(<#=interactionClass.C
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
-    mRtiAmbassador->subscribeInteractionClassWithFilter(mInteractionClassHandle, parameters);
-    mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, deliverToSelf);
-    mSubscribed = true;
-  }
+  mRtiAmbassador->subscribeInteractionClassWithFilter(mInteractionClassHandle, parameters);
+  mRtiAmbassador->setInteractionClassDeliverToSelf(mInteractionClassHandle, deliverToSelf);
+  // we must always set mSubscribed, otherwise we can't unsubscribe
+  mSubscribed = true;
 }
 <#}#>
 
@@ -143,8 +138,9 @@ void <#=interactionClass.Name#>InteractionClass::send(<#=interactionClass.CppPar
     <#= parameter.ToEncoderExpression() #>
     parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
   }
-<#  
-    } // if (parameter.DataType != null)
+<#  } else { #>
+  parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), rti1516ev::VariableLengthData()));
+<#  } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
@@ -158,10 +154,14 @@ void <#=interactionClass.Name#>InteractionClass::sendWithTime(<#=interactionClas
   {
     if (parameter.DataType != null)
     { #>
-  <#= parameter.ToEncoderExpression() #>
-  parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
-<#  
-    } // if (parameter.DataType != null)
+  if (<#=parameter.Name#>)
+  {
+    <#= parameter.ToEncoderExpression() #>
+    parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
+  }
+<#  } else { #>
+  parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), rti1516ev::VariableLengthData()));
+<#  } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
   mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(time));
@@ -264,11 +264,9 @@ rti1516ev::ParameterHandleSet <#=interactionClass.Name#>InteractionClass::GetAll
   rti1516ev::ParameterHandleSet result;
 <# 
   foreach (var parameter in interactionClass.AllParameters) {
-    if (parameter.DataType != null) {
 #>
   result.insert(Get<#=parameter.Name#>ParameterHandle());
 <#  
-    } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
   return result;
@@ -310,19 +308,16 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   bool firstInClassRegistryReceiveInteractionParameter = true;
   foreach (var interactionClass in FOM.InteractionClasses)
   {
-    if (interactionClass.HasValidParameters)
-    { 
-      if (firstInClassRegistryReceiveInteractionParameter) { #>
+    if (firstInClassRegistryReceiveInteractionParameter) { #>
   if (theInteractionClass == m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle())
-<#    } else { #>
+<#  } else { #>
   else if (theInteractionClass == m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle())
-<#    } // if
-      firstInClassRegistryReceiveInteractionParameter = false; #>
+<#  } // if
+    firstInClassRegistryReceiveInteractionParameter = false; #>
   {
     m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters);
   }
 <#  
-    } // if (interactionClass.hasValidParameters)
 } // foreach 
 #>
 }
@@ -336,21 +331,16 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   bool firstInClassRegistryReceiveWithTimeParameter = true;
   foreach (var interactionClass in FOM.InteractionClasses)
   {
-    if (interactionClass.HasValidParameters)
-    { 
-      if (firstInClassRegistryReceiveWithTimeParameter) { #>
+    if (firstInClassRegistryReceiveWithTimeParameter) { #>
   if (theInteractionClass == m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle())
-<#    } else { #>
+<#  } else { #>
   else if (theInteractionClass == m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle())
-<#    } // if
-      firstInClassRegistryReceiveWithTimeParameter = false; #>
+<#  } // if (firstInClassRegistryReceiveWithTimeParameter)
+    firstInClassRegistryReceiveWithTimeParameter = false; #>
   {
     m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters, time, orderType);
   }
-<#  
-    } // if (interactionClass.hasValidParameters)
-} // foreach 
-#>
+<#} // foreach #>
 }
 
 <# foreach (var namespacePart in FOM.Namespace) { #>

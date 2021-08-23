@@ -264,18 +264,35 @@ bool testRTFederate(int argc, char* argv[])
     std::wcout << L"Unknown Exception!" << std::endl;
     return false;
   }
+  bool received = false;
+
+  // initialize class registries
   ambassador.objectClassRegistry.Initialize(ambassador.getRtiAmbassador());
   ambassador.interactionClassRegistry.Initialize(ambassador.getRtiAmbassador());
 
+  // publish/subscribe & send MeasurementInit interaction
+  auto* measurementInitInteractionClass = ambassador.interactionClassRegistry.GetMeasurementInitInteractionClass();
+  measurementInitInteractionClass->RegisterReceiveCallback([&received](optional<int64_t> time, optional<NDistSimIB::NRTFederateEncoding::OrderType> orderType)
+  {
+    std::cout << "received MeasurementInit:" << std::endl;
+    received = true;
+  });
+  measurementInitInteractionClass->Publish();
+  measurementInitInteractionClass->Subscribe(true);
+  measurementInitInteractionClass->send();
+  while (!received)
+    ambassador.getRtiAmbassador()->evokeCallback(0.5);
+
+  received = false;
+
   auto* canMessageInteractionClass = ambassador.interactionClassRegistry.GetCANMessageInteractionClass();
-  bool received = false;
   canMessageInteractionClass->RegisterReceiveCallback([&received](
     optional<bool> IsRequest,
     optional<std::string> ChannelName,
     optional<NDistSimIB::NRTFederateEncoding::BusType> BusType,
     optional<rti1516ev::HLAhandle> RequestingFederate,
-    optional<rti1516ev::HLAhandle> Sender,
-    optional<rti1516ev::HLAhandle> Receiver,
+    optional<NDistSimIB::NRTFederateEncoding::IBusController*> Sender,
+    optional<NDistSimIB::NRTFederateEncoding::IBusController*> Receiver,
     optional<int32_t> Id,
     optional<const NDistSimIB::NRTFederateEncoding::CANFrame&> Frame,
     optional<int64_t> time, optional<NDistSimIB::NRTFederateEncoding::OrderType> order)
@@ -293,10 +310,50 @@ bool testRTFederate(int argc, char* argv[])
     {
       std::cout << "time = " << *time << " order=" << *order << std::endl;
     }
+    if (Sender)
+    {
+      std::cout << "Sender = " << OpenRTI::to_string((*Sender)->GetObjectInstanceName()) << std::endl;
+    }
+    if (Receiver)
+    {
+      std::cout << "Receiver = " << OpenRTI::to_string((*Receiver)->GetObjectInstanceName()) << std::endl;
+    }
     received = true;
   });
   canMessageInteractionClass->Publish();
   canMessageInteractionClass->Subscribe(true);
+
+  // set up a customized CAN controller
+  auto* busControllerObjectClass = ambassador.objectClassRegistry.GetBusControllerCanObjectClass();
+  static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass*>(busControllerObjectClass)->SetObjectInstanceCreator([](NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> NDistSimIB::NRTFederateEncoding::BusControllerCan* {
+    return new MyBusControllerCan(objectClass, instanceName, rtiAmbassador);
+  });
+  busControllerObjectClass->Publish();
+  busControllerObjectClass->Subscribe(true);
+  std::shared_ptr<NDistSimIB::NRTFederateEncoding::IBusControllerCan> busControllerCan = busControllerObjectClass->CreateObjectInstance(L"CAN1");
+  while (!std::static_pointer_cast<NDistSimIB::NRTFederateEncoding::BusControllerCan>(busControllerCan)->IsValid())
+  {
+    ambassador.getRtiAmbassador()->evokeCallback(0.5);
+  }
+  std::wcout << L"busControllerCan is valid" << std::endl;
+  bool updateReceived = false;
+  auto callbackToken = busControllerCan->RegisterUpdateCallback([&updateReceived](NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan) {
+    std::wcout << L"update received: " << busControllerCan->GetObjectInstanceName() << std::endl;
+    if (busControllerCan->GetUpdatedAttributes() & NDistSimIB::NRTFederateEncoding::IBusControllerCan::kBaudRateBit)
+      std::wcout << L"  BaudRate = " << busControllerCan->GetBaudRate() << std::endl;
+    if (busControllerCan->GetUpdatedAttributes() & NDistSimIB::NRTFederateEncoding::IBusControllerCan::kOperationModeBit)
+      std::wcout << L"  OperationMode = " << busControllerCan->GetOperationMode() << std::endl;
+    updateReceived = true;
+  });
+  busControllerCan->SetBaudRate(250000);
+  busControllerCan->SetOperationMode(NDistSimIB::NRTFederateEncoding::CanOperationMode::kCanOperationModeCanFD);
+  busControllerCan->UpdateModifiedAttributeValues();
+  while (!updateReceived)
+  {
+    ambassador.getRtiAmbassador()->evokeCallback(0.5);
+  }
+
+  // send a CAN frame
   NDistSimIB::NRTFederateEncoding::CANFrameEncoding canFrame;
   std::vector<uint8_t> data{1, 2, 3, 4};
   canFrame.SetDataLength(4);
@@ -342,48 +399,24 @@ bool testRTFederate(int argc, char* argv[])
 
   received = false;
   canFrame.SetDir(NDistSimIB::NRTFederateEncoding::DirMask::kMskTx);
-  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), HLAhandle(ObjectInstanceHandle()), HLAhandle(ObjectInstanceHandle()), 0x100, canFrame);
+  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), busControllerCan.get(), busControllerCan.get(), 0x100, canFrame);
   while (!received)
     ambassador.getRtiAmbassador()->evokeCallback(0.5);
 
   received = false;
   canFrameCopy.SetDir(NDistSimIB::NRTFederateEncoding::DirMask::kMskRx);
-  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), HLAhandle(ObjectInstanceHandle()), HLAhandle(ObjectInstanceHandle()), 0x100, canFrameCopy);
+  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), busControllerCan.get(), busControllerCan.get(), 0x100, canFrameCopy);
   while (!received)
     ambassador.getRtiAmbassador()->evokeCallback(0.5);
 
-  auto* busControllerObjectClass = ambassador.objectClassRegistry.GetBusControllerCanObjectClass();
-  static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass*>(busControllerObjectClass)->SetObjectInstanceCreator([](NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> NDistSimIB::NRTFederateEncoding::BusControllerCan* {
-    return new MyBusControllerCan(objectClass, instanceName, rtiAmbassador);
-  });
-  busControllerObjectClass->Publish();
-  busControllerObjectClass->Subscribe(true);
-  NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan = busControllerObjectClass->CreateObjectInstance(L"CAN1");
-  while (!static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCan*>(busControllerCan)->IsValid())
-  {
-    ambassador.getRtiAmbassador()->evokeCallback(0.5);
-  }
-  std::wcout << L"busControllerCan is valid" << std::endl;
-  bool updateReceived = false;
-  auto callbackToken = busControllerCan->RegisterUpdateCallback([&updateReceived](NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan) {
-    std::wcout << L"update received: " << busControllerCan->GetObjectInstanceName() << std::endl;
-    if (busControllerCan->GetUpdatedAttributes() & NDistSimIB::NRTFederateEncoding::IBusControllerCan::kBaudRateBit)
-      std::wcout << L"  BaudRate = " << busControllerCan->GetBaudRate() << std::endl;
-    if (busControllerCan->GetUpdatedAttributes() & NDistSimIB::NRTFederateEncoding::IBusControllerCan::kOperationModeBit)
-      std::wcout << L"  OperationMode = " << busControllerCan->GetOperationMode() << std::endl;
-    updateReceived = true;
-  });
-  busControllerCan->SetBaudRate(250000);
-  busControllerCan->SetOperationMode(NDistSimIB::NRTFederateEncoding::CanOperationMode::kCanOperationModeCanFD);
-  busControllerCan->UpdateModifiedAttributeValues();
-  while (!updateReceived)
-  {
-    ambassador.getRtiAmbassador()->evokeCallback(0.5);
-  }
 
-
-
+  // tear down
+  measurementInitInteractionClass->Unsubscribe();
+  measurementInitInteractionClass->Unpublish();
+  canMessageInteractionClass->Unsubscribe();
+  canMessageInteractionClass->Unpublish();
   busControllerCan->UnregisterUpdateCallback(callbackToken);
+  busControllerCan->Release();
   try
   {
     ambassador.resignFederationExecution(rti1516ev::NO_ACTION);

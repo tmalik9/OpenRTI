@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <functional>
+#include <memory>
 
 <#=FOM.GetPredefinedTypeIncludes(FOMParser.FileContext.kObjectInterfaces)#>
 #include "<#=DataTypesHeaderFilename#>"
@@ -45,16 +46,16 @@ class I<#=objectClass.Name#>;
 class I<#=objectClass.Name#>ObjectClass
 {
   public:
-    using DiscoverObjectInstanceCallback = std::function<void(I<#=objectClass.Name#>*)>;
-    using RemoveObjectInstanceCallback = std::function<void(I<#=objectClass.Name#>*)>;
-    using ObjectCreatedCallbackType = std::function<void(I<#=objectClass.Name#>*, bool success)>;
+    using DiscoverObjectInstanceCallback = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>)>;
+    using RemoveObjectInstanceCallback = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>)>;
+    using ObjectCreatedCallbackType = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>, bool success)>;
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
     virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
-    virtual I<#=objectClass.Name#>* GetObjectInstance(const std::wstring& instanceName) = 0;
-    virtual I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName) = 0;
-    virtual I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+    virtual std::shared_ptr<I<#=objectClass.Name#>> GetObjectInstance(const std::wstring& instanceName) = 0;
+    virtual std::shared_ptr<I<#=objectClass.Name#>> CreateObjectInstance(const std::wstring& instanceName) = 0;
+    virtual std::shared_ptr<I<#=objectClass.Name#>> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
 
     virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
     virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
@@ -118,6 +119,7 @@ class I<#=objectClass.Name#><#
     virtual std::wstring GetObjectInstanceName() const = 0;
     virtual bool IsValid() const = 0;
     virtual bool IsOwner() const = 0;
+    virtual void Release() = 0;
 <# } #>
 <# 
   foreach (var attribute in objectClass.Attributes)

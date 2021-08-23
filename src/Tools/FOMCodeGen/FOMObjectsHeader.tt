@@ -50,16 +50,16 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     void Unpublish() override;
     void Subscribe(bool deliverToSelf) override;
     void Unsubscribe() override;
-    I<#=objectClass.Name#>* GetObjectInstance(const std::wstring& instanceName) override;
-    I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName) override;
-    I<#=objectClass.Name#>* CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<I<#=objectClass.Name#>> GetObjectInstance(const std::wstring& instanceName) override;
+    std::shared_ptr<I<#=objectClass.Name#>> CreateObjectInstance(const std::wstring& instanceName) override;
+    std::shared_ptr<I<#=objectClass.Name#>> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
-    void ExecuteDiscoverObjectInstanceCallbacks(I<#=objectClass.Name#>* newObjectInstance);
+    void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<I<#=objectClass.Name#>> newObjectInstance);
 
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
-    void ExecuteRemoveObjectInstanceCallbacks(I<#=objectClass.Name#>* newObjectInstance);
+    void ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<I<#=objectClass.Name#>> newObjectInstance);
     using ObjectInstanceCreatorFunction = std::function<<#=objectClass.Name#>*(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
     void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
@@ -106,9 +106,15 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     void DiscoverObjectInstance (rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName);
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     rti1516ev::ObjectClassHandle GetObjectClassHandle() const { return mObjectClassHandle; }
-    I<#=objectClass.Name#>* GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
+    std::shared_ptr<I<#=objectClass.Name#>> GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle);
     rti1516ev::AttributeHandleSet GetAllAttributeHandles();
     ObjectClassRegistry* GetObjectClassRegistry() const { return mRegistry; }
+
+    // add object instance to maps (and to maps of base classes)
+    void InsertObjectInstanceName(std::shared_ptr<I<#=objectClass.Name#>> objectInstance, const std::wstring& objectInstanceName);
+    void InsertObjectInstanceHandle(std::shared_ptr<I<#=objectClass.Name#>> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle);
+    // remove object instance from maps (and from maps of base classes)
+    void EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName);
   private:
     ObjectClassRegistry* mRegistry;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -134,8 +140,8 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
 #>
-    std::map<std::wstring, <#=objectClass.Name#>*> mObjectInstancesByName;
-    std::map<rti1516ev::ObjectInstanceHandle, <#=objectClass.Name#>*> mObjectInstancesByHandle;
+    std::map<std::wstring, std::shared_ptr<I<#=objectClass.Name#>>> mObjectInstancesByName;
+    std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<I<#=objectClass.Name#>>> mObjectInstancesByHandle;
 
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
@@ -154,7 +160,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     <#=objectClass.Name#>& operator=(<#=objectClass.Name#>&&) = delete;
     I<#=objectClass.Name#>ObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
-    std::wstring GetObjectInstanceName() const override { return mInstanceName; }
+    std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
 <#
   foreach (var attribute in objectClass.AllAttributes)
@@ -201,6 +207,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 <# } #>
     bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
     bool IsOwner() const override { return mIsOwner; }
+    void Release() override;
   protected:
     friend class <#=objectClass.Name#>ObjectClass;
 
@@ -212,7 +219,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime, OrderType orderType);
 <# } #>
     <#=objectClass.Name#>ObjectClass* mObjectClass;
-    std::wstring mInstanceName;
+    std::wstring mObjectInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
@@ -268,7 +275,7 @@ class ObjectClassRegistry : public IObjectClassRegistry
     void RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback);
 
   private:
-    std::map<std::wstring, std::function<void(bool)> > mInstanceNameReservationCallbacks;
+    std::map<std::wstring, std::function<void(bool)> > mObjectInstanceNameReservationCallbacks;
     rti1516ev::RTIambassador* mRtiAmbassador;
 <# foreach (var objectClass in FOM.ObjectClasses) { #>
     std::unique_ptr<<#=objectClass.Name#>ObjectClass> m<#=objectClass.Name#>ObjectClass;
