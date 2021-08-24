@@ -302,6 +302,14 @@ void InteractionClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassado
 <#  } // foreach #>
 } // Initialize
 
+void InteractionClassRegistry::Finalize()
+{
+<#  foreach (var interactionClass in FOM.InteractionClasses) { #>
+  m<#=interactionClass.Name#>InteractionClass.reset();
+<# } // foreach #>
+  mRtiAmbassador = nullptr;
+} // Initialize
+
 void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass, const rti1516ev::ParameterHandleValueMap & parameters)
 {
 <# 

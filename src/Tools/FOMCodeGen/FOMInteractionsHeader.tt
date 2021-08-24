@@ -123,6 +123,7 @@ class InteractionClassRegistry : public IInteractionClassRegistry
     ~InteractionClassRegistry();
     ObjectClassRegistry* GetObjectClassRegistry() { return mObjectClassRegistry; }
     void Initialize(rti1516ev::RTIambassador* rtiAmbassador);
+    void Finalize();
 
 <# foreach (var interactionClass in FOM.InteractionClasses) { #>
     I<#=interactionClass.Name#>InteractionClass* Get<#=interactionClass.Name#>InteractionClass() const override { return m<#=interactionClass.Name#>InteractionClass.get(); }

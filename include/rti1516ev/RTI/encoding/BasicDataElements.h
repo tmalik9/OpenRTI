@@ -127,11 +127,11 @@ public:                                                                       \
                                                                               \
    /* Set the value to be encoded.                                         */ \
    /* If this element uses external memory, the memory will be modified.   */ \
-   virtual void set (                                                         \
+   void set (                                                                 \
       SimpleDataType inData);                                                 \
                                                                               \
    /* Get the value from encoded data.                                     */ \
-   virtual SimpleDataType get () const;                                       \
+   SimpleDataType get () const;                                               \
                                                                               \
    /* Assignment of the value to be encoded data.                          */ \
    /* If this element uses external memory, the memory will be modified.   */ \
