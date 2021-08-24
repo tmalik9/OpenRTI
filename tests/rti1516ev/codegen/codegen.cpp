@@ -324,18 +324,30 @@ bool testRTFederate(int argc, char* argv[])
   canMessageInteractionClass->Subscribe(true);
 
   // set up a customized CAN controller
-  auto* busControllerObjectClass = ambassador.objectClassRegistry.GetBusControllerCanObjectClass();
-  static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass*>(busControllerObjectClass)->SetObjectInstanceCreator([](NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> NDistSimIB::NRTFederateEncoding::BusControllerCan* {
+  auto* busControllerCanObjectClass = ambassador.objectClassRegistry.GetBusControllerCanObjectClass();
+  static_cast<NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass*>(busControllerCanObjectClass)->SetObjectInstanceCreator([](NDistSimIB::NRTFederateEncoding::BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador) -> NDistSimIB::NRTFederateEncoding::BusControllerCan* {
     return new MyBusControllerCan(objectClass, instanceName, rtiAmbassador);
   });
-  busControllerObjectClass->Publish();
-  busControllerObjectClass->Subscribe(true);
-  std::shared_ptr<NDistSimIB::NRTFederateEncoding::IBusControllerCan> busControllerCan = busControllerObjectClass->CreateObjectInstance(L"CAN1");
-  while (!std::static_pointer_cast<NDistSimIB::NRTFederateEncoding::BusControllerCan>(busControllerCan)->IsValid())
+  busControllerCanObjectClass->Publish();
+  busControllerCanObjectClass->Subscribe(true);
+  std::shared_ptr<NDistSimIB::NRTFederateEncoding::IBusControllerCan> busControllerCan = busControllerCanObjectClass->CreateObjectInstance(L"CAN1");
+  while (!busControllerCan->IsValid())
   {
     ambassador.getRtiAmbassador()->evokeCallback(0.5);
   }
   std::wcout << L"busControllerCan is valid" << std::endl;
+  auto* busControllerObjectClass = ambassador.objectClassRegistry.GetBusControllerObjectClass();
+  if (busControllerObjectClass->GetObjectInstance(L"CAN1") == nullptr)
+  {
+    std::cerr << "could not get bus controller from base object class" << std::endl;
+    return false;
+  }
+  if (!busControllerObjectClass->GetObjectInstance(L"CAN1")->IsValid())
+  {
+    std::cerr << "bus controller base object is not valid" << std::endl;
+    return false;
+  }
+  std::wcerr << L"bus controller base object is valid" << std::endl;
   bool updateReceived = false;
   auto callbackToken = busControllerCan->RegisterUpdateCallback([&updateReceived](NDistSimIB::NRTFederateEncoding::IBusControllerCan* busControllerCan) {
     std::wcout << L"update received: " << busControllerCan->GetObjectInstanceName() << std::endl;

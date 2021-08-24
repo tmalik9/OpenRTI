@@ -39,7 +39,18 @@ using <#=simpleDataType.Name#>Encoding=<#=simpleDataType.Representation.Encoding
     var enumeratedDataType = dataType as FOMParser.EnumeratedDataType;
 #>
 // enumerated data type <#=enumeratedDataType.Name#>
-using <#=enumeratedDataType.Name#>Encoding=<#=enumeratedDataType.Representation.Encoding#>;
+class <#=enumeratedDataType.Name#>Encoding : public <#=enumeratedDataType.Representation.Encoding#>
+{
+  public:
+    <#=enumeratedDataType.Name#>Encoding() : <#=enumeratedDataType.Representation.Encoding#>() {}
+    <#=enumeratedDataType.Name#>Encoding(<#=enumeratedDataType.Name#> value) : <#=enumeratedDataType.Representation.Encoding#>(static_cast<<#=enumeratedDataType.Representation.CPPType#>>(value)) {}
+    <#=enumeratedDataType.Name#>Encoding(const <#=enumeratedDataType.Name#>Encoding& ref) : <#=enumeratedDataType.Representation.Encoding#>(ref) {}
+    using <#=enumeratedDataType.Representation.Encoding#>::get;
+    <#=enumeratedDataType.Name#> get() const { return static_cast<<#=enumeratedDataType.Name#>>(<#=enumeratedDataType.Representation.Encoding#>::get()); }
+    using <#=enumeratedDataType.Representation.Encoding#>::set;
+    void set(<#=enumeratedDataType.Name#> value) { <#=enumeratedDataType.Representation.Encoding#>::set(static_cast<<#=enumeratedDataType.Representation.CPPType#>>(value)); }
+};
+
 <#}
   else if (dataType is FOMParser.FixedRecordDataType && dataType.Generate)
   {
