@@ -512,17 +512,13 @@ Global
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug All|x64.ActiveCfg = Debug|x64
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug All|x64.Build.0 = Debug|x64
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug|Win32.ActiveCfg = Debug|Win32
-		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug|Win32.Build.0 = Debug|Win32
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug|x64.ActiveCfg = Debug|x64
-		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Debug|x64.Build.0 = Debug|x64
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release All|Win32.ActiveCfg = Release|Win32
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release All|Win32.Build.0 = Release|Win32
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release All|x64.ActiveCfg = Release|x64
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release All|x64.Build.0 = Release|x64
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release|Win32.ActiveCfg = Release|Win32
-		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release|Win32.Build.0 = Release|Win32
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release|x64.ActiveCfg = Release|x64
-		{24881B4F-74DB-409C-A213-DE8A35BB31ED}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -556,7 +552,7 @@ Global
 		{24881B4F-74DB-409C-A213-DE8A35BB31ED} = {C06666B1-53E9-40DC-A7C2-22123791AA32}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {6CCC775F-F456-34F4-B339-8B27EB672AAC}
 		VisualSVNWorkingCopyRoot = .
+		SolutionGuid = {6CCC775F-F456-34F4-B339-8B27EB672AAC}
 	EndGlobalSection
 EndGlobal
