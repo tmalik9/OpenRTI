@@ -45,12 +45,13 @@ template<class BasicTypeEncoding>
 class OPENRTI_LOCAL HLAvariableArrayOfBasicTypeImplementation : public HLAarrayOfBasicTypeImplementation<BasicTypeEncoding>, public HLAvariableArrayBase
 {
   public:
-    HLAvariableArrayOfBasicTypeImplementation() : HLAarrayOfBasicTypeImplementation() { }
-    HLAvariableArrayOfBasicTypeImplementation(size_t length) : HLAarrayOfBasicTypeImplementation(length) { }
-    HLAvariableArrayOfBasicTypeImplementation(const HLAvariableArrayOfBasicTypeImplementation& rhs) : HLAarrayOfBasicTypeImplementation(rhs) {}
+    using baseclass=HLAarrayOfBasicTypeImplementation<BasicTypeEncoding>;
+    HLAvariableArrayOfBasicTypeImplementation() : baseclass() { }
+    HLAvariableArrayOfBasicTypeImplementation(size_t length) : baseclass(length) { }
+    HLAvariableArrayOfBasicTypeImplementation(const HLAvariableArrayOfBasicTypeImplementation& rhs) : baseclass(rhs) {}
 
     size_t getEncodedLength() const override {
-      return 4u + (_protoType->getEncodedLength() * _dataElementVector.size());
+      return 4u + (baseclass::_protoType->getEncodedLength() * baseclass::_dataElementVector.size());
     }
 
     size_t decodedSize(const Octet* buffer, size_t bufferSize, size_t index) override {
@@ -66,12 +67,12 @@ class OPENRTI_LOCAL HLAvariableArrayOfBasicTypeImplementation : public HLAarrayO
       if (bufferSize < offset + getEncodedLength())
         throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
 #endif
-      size_t length = _dataElementVector.size();
+      size_t length = baseclass::_dataElementVector.size();
       if (0xffffffffu < length)
         throw EncoderException(L"HLAvariableArray::encodeInto(): array size is too big to encode!");
       offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<uint32_t>(length));
-      for (size_t i = 0; i < _dataElementPointerVector.size(); ++i) {
-        offset = _dataElementPointerVector[i]->encodeInto(buffer, bufferSize, offset);
+      for (size_t i = 0; i < baseclass::_dataElementPointerVector.size(); ++i) {
+        offset = baseclass::_dataElementPointerVector[i]->encodeInto(buffer, bufferSize, offset);
       }
       return offset;
     }
@@ -82,9 +83,9 @@ class OPENRTI_LOCAL HLAvariableArrayOfBasicTypeImplementation : public HLAarrayO
       uint32_t length;
       offset = decodeFromBE32(buffer, bufferSize, offset, length);
 
-      resize(length);
+      baseclass::resize(length);
 
-      for (auto* dataElementPointer : _dataElementPointerVector) {
+      for (auto* dataElementPointer : baseclass::_dataElementPointerVector) {
         if (dataElementPointer == nullptr) // must not happen (should actually assert)
           throw EncoderException(L"HLAvariableArray::decodeFrom(): dataElement is zero!");
         offset = dataElementPointer->decodeFrom(buffer, bufferSize, offset);
@@ -168,178 +169,6 @@ class OPENRTI_LOCAL HLAvariableArrayImplementation : public HLAarrayImplementati
       return new HLAvariableArrayImplementation(*_protoType, size());
     }
 };
-
-/*
-class OPENRTI_LOCAL HLAvariableArrayImplementation : public HLAencodingImplementationBase {
-public:
-  HLAvariableArrayImplementation(const DataElement& protoType)
-  {
-    _protoType = protoType.clone().release();
-  }
-  HLAvariableArrayImplementation(const HLAvariableArrayImplementation& rhs)
-  {
-    _protoType = rhs._protoType->clone().release();
-    if (rhs._dataElementVector.size() > 0)
-    {
-      _dataElementVector.resize(rhs._dataElementVector.size(), std::make_pair(nullptr, true));
-      for (size_t i = 0; i < rhs._dataElementVector.size(); ++i)
-      {
-        _dataElementVector[i].first = rhs._dataElementVector[i].first->clone().release();
-      }
-    }
-  }
-  ~HLAvariableArrayImplementation() noexcept
-  {
-    for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      if (i->second) delete i->first;
-      i->first = nullptr;
-    }
-    delete _protoType;
-    _protoType = nullptr;
-  }
-
-  size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
-  {
-#ifdef _DEBUG
-    if (bufferSize < offset + getEncodedLength())
-      throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
-#endif
-    size_t length = _dataElementVector.size();
-    if (0xffffffffu < length)
-      throw EncoderException(L"HLAvariableArray::encodeInto(): array size is too big to encode!");
-    offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<uint32_t>(length));
-
-    for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      if (i->first == nullptr)
-        throw EncoderException(L"HLAvariableArray::encodeInto(): dataElement is zero!");
-      offset = i->first->encodeInto(buffer, bufferSize, offset);
-    }
-    return offset;
-  }
-
-  size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
-  {
-    if (bufferSize < index + 4)
-      throw EncoderException(L"Insufficient buffer size for decoding!");
-    uint32_t length;
-    index = decodeFromBE32(buffer, bufferSize, index, length);
-
-    // Shrink _dataElementVector if necessary, deleting owned elements.
-    // Note that _dataElementVector contains DataElements.
-    while (length < _dataElementVector.size()) {
-      if (_dataElementVector.back().first) delete _dataElementVector.back().first;
-      _dataElementVector.pop_back();
-    }
-
-    // Grow _dataElementVector if necessary, adding owned elements.
-    _dataElementVector.reserve(length);
-    while (_dataElementVector.size() < length)
-      _dataElementVector.push_back(std::make_pair(_protoType->clone().release(), true));
-
-    for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-      if (i->first == nullptr) // must not happen (should actually assert)
-        throw EncoderException(L"HLAvariableArray::decodeFrom(): dataElement is zero!");
-      index = i->first->decodeFrom(buffer, bufferSize, index);
-    }
-
-    return index;
-  }
-
-  HLAencodingImplementationBase* clone() const override
-  {
-    return new HLAvariableArrayImplementation(*this);
-  }
-
-  size_t getEncodedLength() const
-  {
-    size_t length = 4u;
-    for (auto& element : _dataElementVector) {
-      length += element.first->getEncodedLength();
-    }
-    return length;
-  }
-
-  unsigned int getOctetBoundary() const {
-    return std::max(_protoType->getOctetBoundary(), 4u);
-  }
-
-  size_t size () const { return _dataElementVector.size(); }
-
-  size_t decodedSize(const Octet* buffer, size_t bufferSize, size_t index)
-  {
-    if (bufferSize < index + 4)
-      throw EncoderException(L"Insufficient buffer size for decoding!");
-    uint32_t length;
-    decodeFromBE32(buffer, bufferSize, index, length);
-    return length;
-  }
-
-  void addElement(const DataElement& dataElement)
-  {
-    if (!dataElement.isSameTypeAs(*_protoType))
-      throw EncoderException(L"HLAvariableArray::addElement(): Data type is not compatible!");
-    _dataElementVector.push_back({dataElement.clone().release(), true});
-  }
-
-  void addElementPointer(DataElement* dataElement)
-  {
-    if (!dataElement)
-      throw EncoderException(L"HLAvariableArray::addElementPointer(): dataElement is zero!");
-    if (!dataElement->isSameTypeAs(*_protoType))
-      throw EncoderException(L"HLAvariableArray::addElementPointer(): Data type is not compatible!");
-    _dataElementVector.push_back({dataElement, false});
-  }
-
-  void set(size_t index, const DataElement& dataElement)
-  {
-    if (_dataElementVector.size() <= index)
-      throw EncoderException(L"HLAvariableArray::set(): Index out of range!");
-    if (!dataElement.isSameTypeAs(*_protoType))
-      throw EncoderException(L"HLAvariableArray::set(): Data type is not compatible!");
-    if (_dataElementVector[index].first) delete _dataElementVector[index].first;
-    _dataElementVector[index] = { dataElement.clone().release(), true };
-  }
-
-  void setElementPointer(size_t index, DataElement* dataElement)
-  {
-    if (_dataElementVector.size() <= index)
-      throw EncoderException(L"HLAvariableArray::setElementPointer(): Index out of range!");
-    if (!dataElement)
-      throw EncoderException(L"HLAvariableArray::setElementPointer(): dataElement is zero!");
-    if (!dataElement->isSameTypeAs(*_protoType))
-      throw EncoderException(L"HLAvariableArray::setElementPointer(): Data type is not compatible!");
-    if (_dataElementVector[index].first) delete _dataElementVector[index].first;
-    _dataElementVector[index] = { dataElement, false };
-  }
-
-  const DataElement& get(size_t index) const
-  {
-    if (_dataElementVector.size() <= index)
-      throw EncoderException(L"HLAvariableArray::get(): Index out of range!");
-    if (_dataElementVector[index].first == nullptr)
-      throw EncoderException(L"HLAvariableArray::get(): dataElement is zero!");
-    return *(_dataElementVector[index].first);
-  }
-
-  bool isSameTypeAs(const HLAvariableArrayImplementation& rhs) const
-  {
-    return _protoType->isSameTypeAs(*rhs._protoType);
-  }
-  void resize(size_t length)
-  {
-    _dataElementVector.resize(length);
-  }
-  void clear()
-  {
-    _dataElementVector.clear();
-  }
-
-  DataElement* _protoType;
-
-  typedef std::vector<std::pair<DataElement*, bool>> DataElementVector;
-  DataElementVector _dataElementVector;
-};
-*/
 
 HLAvariableArray::HLAvariableArray(const DataElement& protoType)
 {

@@ -160,19 +160,6 @@ class OPENRTI_LOCAL HLAarrayOfBasicTypeImplementation : public HLAarrayImplement
       return *_dataElementPointerVector[index];
     }
 
-    /*
-    // NOTE: pointers to outside data will be reset to internal data by calling this
-    void resize(size_t length) override {
-      _dataVector.resize(length);
-      _dataElementVector.resize(length);
-      _dataElementPointerVector.resize(length);
-      for (size_t i = 0; i < length; i++) {
-        _dataElementVector[i].setDataPointer(&_dataVector[i]);
-        _dataElementPointerVector[i] = &_dataElementVector[i];
-      }
-    }
-    */
-    // NOTE: 'preserving' version of resize, data element pointers to outside data will remain intact
     void resize(size_t length) override { 
       _dataElementPointerVector.resize(length);
 
@@ -263,7 +250,7 @@ class OPENRTI_LOCAL HLAarrayImplementation : public HLAarrayImplementationBase
       element.second = true;
     }
 
-    void addElement(const DataElement& dataElement) {
+    void addElement(const DataElement& dataElement) override {
       if (!dataElement.isSameTypeAs(*_protoType))
         throw EncoderException(L"HLAvariableArray::addElement(): Data type is not compatible!");
       _dataElementVector.push_back({dataElement.clone().release(), true});
@@ -282,7 +269,7 @@ class OPENRTI_LOCAL HLAarrayImplementation : public HLAarrayImplementationBase
       element.second = false;
     }
 
-    void addElementPointer(DataElement* dataElement) {
+    void addElementPointer(DataElement* dataElement) override {
       if (!dataElement)
         throw EncoderException(L"HLAvariableArray::addElementPointer(): dataElement is zero!");
       if (!dataElement->isSameTypeAs(*_protoType))

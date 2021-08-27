@@ -36,11 +36,12 @@ template<class BasicTypeEncoding>
 class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAarrayOfBasicTypeImplementation<BasicTypeEncoding>
 {
   public:
-    HLAfixedArrayOfBasicTypeImplementation(size_t length) : HLAarrayOfBasicTypeImplementation(length) { }
-    HLAfixedArrayOfBasicTypeImplementation(const HLAfixedArrayOfBasicTypeImplementation& rhs) : HLAarrayOfBasicTypeImplementation(rhs) {}
+    using baseclass=HLAarrayOfBasicTypeImplementation<BasicTypeEncoding>;
+    HLAfixedArrayOfBasicTypeImplementation(size_t length) : baseclass(length) { }
+    HLAfixedArrayOfBasicTypeImplementation(const HLAfixedArrayOfBasicTypeImplementation& rhs) : HLAarrayOfBasicTypeImplementation<BasicTypeEncoding>(rhs) {}
     ~HLAfixedArrayOfBasicTypeImplementation() noexcept {}
     size_t getEncodedLength() const override {
-      return _protoType->getEncodedLength() * _dataElementVector.size();
+      return baseclass::_protoType->getEncodedLength() * baseclass::_dataElementVector.size();
     }
 
     size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const  override 
@@ -49,16 +50,16 @@ class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAarrayOfBa
       if (bufferSize < offset + getEncodedLength())
         throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
 #endif
-      for (size_t i = 0; i < _dataElementPointerVector.size(); ++i) {
-        offset = _dataElementPointerVector[i]->encodeInto(buffer, bufferSize, offset);
+      for (size_t i = 0; i < baseclass::_dataElementPointerVector.size(); ++i) {
+        offset = baseclass::_dataElementPointerVector[i]->encodeInto(buffer, bufferSize, offset);
       }
       return offset;
     }
 
     size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t offset) override
     {
-      for (size_t i = 0; i < _dataElementPointerVector.size(); ++i) {
-        offset = _dataElementPointerVector[i]->decodeFrom(buffer, bufferSize, offset);
+      for (size_t i = 0; i < baseclass::_dataElementPointerVector.size(); ++i) {
+        offset = baseclass::_dataElementPointerVector[i]->decodeFrom(buffer, bufferSize, offset);
       }
       return offset;
     }
