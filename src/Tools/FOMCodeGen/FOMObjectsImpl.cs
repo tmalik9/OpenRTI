@@ -885,7 +885,6 @@ void ");
 {
   if (mObjectInstanceHandle.isValid())
   {
-    mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     if (mIsOwner)
     {
       try
@@ -900,6 +899,7 @@ void ");
       }
       mIsOwner = false;
     }
+    mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   }
 }
