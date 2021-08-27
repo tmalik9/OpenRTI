@@ -185,7 +185,6 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     void UpdateAllAttributeValues(<#=FOM.NativeTimeType#> time) override;
     void UpdateModifiedAttributeValues() override;
     void UpdateModifiedAttributeValues(<#=FOM.NativeTimeType#> time) override;
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
 <# if (objectClass.ChildClasses.Count == 0) { #>
@@ -200,7 +199,16 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
 <# if (objectClass.HasValidAttributes) { #>
+    // bitmask of attributes ever received
+    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    // bitmask of attributes received in last update (cleared after update callbacks executed)
+    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    // bitmask of attributes ever modified
+    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
+    AttributeBits GetModifiedAttributes() const override { return mDirty; }
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -224,9 +232,13 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
 <# if (objectClass.HasValidAttributes) { #>
-    // modified by ReflectAttributeValues
+    // modified by any ReflectAttributeValues in the past
+    AttributeBits mValuesReceived = kNone;
+    // modified by any attribute setter
+    AttributeBits mValuesSet = kNone;
+    // modified by last ReflectAttributeValues
     AttributeBits mLastUpdated = kNone;
-    // to be sent with next updateAttributes
+    // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
 <# } #>
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>

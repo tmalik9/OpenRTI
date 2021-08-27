@@ -21,7 +21,7 @@ namespace rti1516ev
 {
    // Forward Declarations
    class VariableLengthData;
-   class HLAvariableArrayImplementation;
+   class HLAarrayImplementationBase;
 
    // Interface for the HLAvariableArray complex data element
    class RTI_EXPORT HLAvariableArray : public rti1516ev::DataElement
@@ -138,7 +138,7 @@ namespace rti1516ev
 
    protected:
 
-      HLAvariableArrayImplementation* _impl;
+      HLAarrayImplementationBase* _impl;
    };
 }
 

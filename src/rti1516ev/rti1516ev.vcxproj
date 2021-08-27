@@ -198,6 +198,7 @@
     <ClInclude Include="Encoding.h" />
     <ClInclude Include="HandleFactory.h" />
     <ClInclude Include="HandleImplementation.h" />
+    <ClInclude Include="HLAarrayImplementation.h" />
     <ClInclude Include="RTI1516ELogicalTimeFactory.h" />
     <ClInclude Include="RTI1516Efloat64TimeFactory.h" />
     <ClInclude Include="RTI1516Einteger64TimeFactory.h" />

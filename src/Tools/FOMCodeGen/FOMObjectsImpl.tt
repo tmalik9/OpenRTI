@@ -58,8 +58,12 @@ foreach (var objectClass in FOM.ObjectClasses)
 
 <#=objectClass.Name#>ObjectClass::~<#=objectClass.Name#>ObjectClass()
 {
-  mObjectInstancesByHandle.clear();
-  mObjectInstancesByName.clear();
+  while (!mObjectInstancesByHandle.empty())
+  {
+    mObjectInstancesByHandle.begin()->second->Release();
+  }
+  assert(mObjectInstancesByHandle.empty());
+  assert(mObjectInstancesByName.empty());
 }
 
 void <#=objectClass.Name#>ObjectClass::Publish()
@@ -371,6 +375,7 @@ void <#=objectClass.Name#>::Release()
 <#=attribute.DataType.ModifiableReturnCppType#> <#=objectClass.Name#>::Get<#=attribute.Name#>()
 {
   mDirty |= k<#=attribute.Name#>Bit;
+  mValuesSet |= k<#=attribute.Name#>Bit;
   return <#=attribute.DataType.CppGetter("m" + attribute.Name)#>;
 }
 <#    } #>
@@ -380,6 +385,7 @@ void <#=objectClass.Name#>::Set<#=attribute.Name#>(<#=attribute.DataType.Paramet
   // CanTranslateToCpp=<#= attribute.DataType.CanTranslateToCpp #>
   <#=attribute.DataType.CppSetter("m" + attribute.Name, "newValue")#>;
   mDirty |= k<#=attribute.Name#>Bit;
+  mValuesSet |= k<#=attribute.Name#>Bit;
 }
 
 <#  } else { #>
@@ -494,14 +500,14 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
   }
 #>
   } // for (auto& attributeHandleValue : attributes)
+  mValuesReceived |= mLastUpdated;
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
-    ExecuteUpdateCallbacks();
+  ExecuteUpdateCallbacks();
 <# } #>
+  mLastUpdated = kNone;
 } // <#=objectClass.Name#>::ReflectAttributeValues
 
-void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes,
-                                                   const rti1516ev::LogicalTime& <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "theTime" : "/* theTime */" #>,
-                                                   OrderType <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "orderType" : "/* orderType */"#>)
+void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "theTime" : "/* theTime */" #>, OrderType <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "orderType" : "/* orderType */"#>)
 {
   for (auto& attributeHandleValue : attributes)
   {
@@ -530,11 +536,14 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
   }
 #>
   } // for (auto& attributeHandleValue : attributes)
+  mValuesReceived |= mLastUpdated;
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
-    ExecuteUpdateCallbacks(theTime, orderType);
+  ExecuteUpdateCallbacks(theTime, orderType);
 <# } #>
+  mLastUpdated = kNone;
 } // <#=objectClass.Name#>::ReflectAttributeValues
 
+// request attributes not being part of the last update
 void <#=objectClass.Name#>::RequestAttributeValues()
 {
   rti1516ev::AttributeHandleSet requestAttributes;
@@ -555,6 +564,7 @@ void <#=objectClass.Name#>::RequestAttributeValues()
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
+// request all attributes, regardless of current state
 void <#=objectClass.Name#>::RequestAllAttributeValues()
 {
   rti1516ev::AttributeHandleSet requestAttributes;
@@ -572,6 +582,7 @@ void <#=objectClass.Name#>::RequestAllAttributeValues()
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
+// provide requested attributes set since last sent update
 void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
   rti1516ev::AttributeHandleValueMap updateAttributes;
@@ -586,9 +597,9 @@ void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHan
     {
 #>
 <# if (firstInObjectInstanceProvideAttributeValues)  {#>
-    if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle())
+    if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle() && (mValuesSet & k<#=attribute.Name#>Bit) != 0)
 <# } else { #>
-    else if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle())
+    else if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle() && (mValuesSet & k<#=attribute.Name#>Bit) != 0)
 <# } #>
     {
       updateAttributes.insert(std::make_pair(attributeHandle, m<#=attribute.Name#>.encode()));
@@ -634,7 +645,7 @@ void <#=objectClass.Name#>::ExecuteUpdateCallbacks()
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
-    callback(this);
+    callback(std::static_pointer_cast<I<#=objectClass.Name#>>(shared_from_this()));
   }
 }
 
@@ -643,7 +654,7 @@ void <#=objectClass.Name#>::ExecuteUpdateCallbacks(const rti1516ev::LogicalTime&
   for (auto& callbackEntry : mUpdateCallbacksWithTime)
   {
     auto& callback = callbackEntry.second;
-    callback(this, static_cast<const <#=FOM.LogicalTimeType#>&>(theTime).getTime(), orderType);
+    callback(std::static_pointer_cast<I<#=objectClass.Name#>>(shared_from_this()), static_cast<const <#=FOM.LogicalTimeType#>&>(theTime).getTime(), orderType);
   }
 }
 <# } // if (objectClass.ChildClasses.Count == 0) #>
@@ -681,7 +692,7 @@ void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 
 void ObjectClassRegistry::Finalize()
 {
-<# foreach (var objectClass in FOM.ObjectClasses) { #>
+<# foreach (var objectClass in FOM.ReverseObjectClasses) { #>
   m<#=objectClass.Name#>ObjectClass.reset();
 <# } // foreach #>
   mRtiAmbassador = nullptr;

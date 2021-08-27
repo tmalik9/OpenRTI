@@ -20,10 +20,7 @@
 namespace rti1516ev {
 // Forward Declarations
 class VariableLengthData;
-// Base class for all encoder implementations. Not part of the public API.
-class HLAencodingImplementationBase;
-class HLAfixedArrayImplementation;
-class HLAfixedArrayImplementationBase;
+class HLAarrayImplementationBase;
 
 // Interface for the HLAfixedArray complex data element
 class RTI_EXPORT HLAfixedArray : public rti1516ev::DataElement
@@ -130,7 +127,7 @@ class RTI_EXPORT HLAfixedArray : public rti1516ev::DataElement
 
   protected:
 
-    HLAfixedArrayImplementationBase * _impl;
+    HLAarrayImplementationBase * _impl;
 };
 
 }

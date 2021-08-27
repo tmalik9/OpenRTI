@@ -28,60 +28,20 @@
 
 #include "Encoding.h"
 #include "Export.h"
+#include "HLAarrayImplementation.h"
 
 namespace rti1516ev {
 
-class HLAfixedArrayImplementationBase : public HLAencodingImplementationBase
-{
-  public:
-    virtual ~HLAfixedArrayImplementationBase() {}
-    virtual const DataElement* getPrototype() const = 0;
-    virtual size_t getEncodedLength() const = 0;
-    virtual unsigned int getOctetBoundary() const = 0;
-    virtual bool isSameTypeAs(const HLAfixedArrayImplementationBase& rhs) const = 0;
-    virtual size_t size() const = 0;
-    virtual void set(size_t index, const DataElement& dataElement) = 0;
-    virtual void setElementPointer(size_t index, DataElement* dataElement) = 0;
-    virtual const DataElement& get(size_t index) const = 0;
-
-    virtual void resize(size_t length) = 0;
-    virtual void clear() = 0;
-};
-
 template<class BasicTypeEncoding>
-class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAfixedArrayImplementationBase
+class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAarrayOfBasicTypeImplementation<BasicTypeEncoding>
 {
   public:
-    using SimpleDataType = typename BasicTypeEncoding::SimpleDataType;
-    HLAfixedArrayOfBasicTypeImplementation(size_t length) {
-      _protoType = std::unique_ptr<BasicTypeEncoding>(new BasicTypeEncoding());
-      _dataVector.resize(length);
-      _dataElementVector.resize(length);
-      _dataElementPointerVector.resize(length);
-      for (size_t i = 0; i < length; i++) {
-        _dataElementVector[i].setDataPointer(&_dataVector[i]);
-        _dataElementPointerVector[i] = &_dataElementVector[i];
-      }
-    }
-    HLAfixedArrayOfBasicTypeImplementation(const HLAfixedArrayOfBasicTypeImplementation& rhs) {
-      _protoType = std::unique_ptr<BasicTypeEncoding>(new BasicTypeEncoding());
-      size_t length = rhs.size();
-      _dataVector.resize(length);
-      _dataElementVector.resize(length);
-      _dataElementPointerVector.resize(length);
-      for (size_t i = 0; i < length; i++) {
-        _dataElementVector[i].setDataPointer(&_dataVector[i]);
-        _dataElementPointerVector[i] = &_dataElementVector[i];
-      }
-    }
-    virtual ~HLAfixedArrayOfBasicTypeImplementation() noexcept {
-      _protoType.reset();
-    }
-
-    const DataElement* getPrototype() const override { return _protoType.get(); }
-
+    using baseclass=HLAarrayOfBasicTypeImplementation<BasicTypeEncoding>;
+    HLAfixedArrayOfBasicTypeImplementation(size_t length) : baseclass(length) { }
+    HLAfixedArrayOfBasicTypeImplementation(const HLAfixedArrayOfBasicTypeImplementation& rhs) : HLAarrayOfBasicTypeImplementation<BasicTypeEncoding>(rhs) {}
+    ~HLAfixedArrayOfBasicTypeImplementation() noexcept {}
     size_t getEncodedLength() const override {
-      return _protoType->getEncodedLength() * _dataElementVector.size();
+      return baseclass::_protoType->getEncodedLength() * baseclass::_dataElementVector.size();
     }
 
     size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const  override 
@@ -90,125 +50,31 @@ class OPENRTI_LOCAL HLAfixedArrayOfBasicTypeImplementation : public HLAfixedArra
       if (bufferSize < offset + getEncodedLength())
         throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
 #endif
-      for (size_t i = 0; i < _dataElementPointerVector.size(); ++i) {
-        offset = _dataElementPointerVector[i]->encodeInto(buffer, bufferSize, offset);
+      for (size_t i = 0; i < baseclass::_dataElementPointerVector.size(); ++i) {
+        offset = baseclass::_dataElementPointerVector[i]->encodeInto(buffer, bufferSize, offset);
       }
       return offset;
     }
 
     size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t offset) override
     {
-      for (size_t i = 0; i < _dataElementPointerVector.size(); ++i) {
-        offset = _dataElementPointerVector[i]->decodeFrom(buffer, bufferSize, offset);
+      for (size_t i = 0; i < baseclass::_dataElementPointerVector.size(); ++i) {
+        offset = baseclass::_dataElementPointerVector[i]->decodeFrom(buffer, bufferSize, offset);
       }
       return offset;
     }
 
     HLAencodingImplementationBase* clone() const override {
-      return new HLAfixedArrayOfBasicTypeImplementation(size());
+      return new HLAfixedArrayOfBasicTypeImplementation(*this);
     }
-
-    unsigned int getOctetBoundary() const override {
-      return _protoType->getOctetBoundary();
-    }
-
-    bool isSameTypeAs(const HLAfixedArrayImplementationBase& rhs) const override {
-      return _protoType->isSameTypeAs(*(rhs.getPrototype()));
-    }
-
-    size_t size() const override {
-      return _dataVector.size();
-    }
-
-    //void set(size_t index, SimpleDataType dataElement)
-    //{
-    //  if (_dataVector.size() <= index)
-    //    throw EncoderException(L"HLAfixedArray::set(): Index out of range!");
-    //  _dataVector[index] = dataElement;
-    //  auto& element = _dataElementVector[index];
-    //  element.first = &_dataVector[index];
-    //  element.second = true;
-    //}
-
-    void set(size_t index, const DataElement& dataElement) override
-    {
-      if (!dataElement.isSameTypeAs(*_protoType))
-        throw EncoderException(L"HLAfixedArray::set(): Data type is not compatible!");
-      auto* basicDataElement = dynamic_cast<const BasicTypeEncoding*>(&dataElement);
-      if (basicDataElement == nullptr)
-        throw EncoderException(L"HLAfixedArray::set(): Data type is not compatible!");
-      if (_dataVector.size() <= index)
-        throw EncoderException(L"HLAfixedArray::set(): Index out of range!");
-      *(_dataElementPointerVector[index]) = basicDataElement->get();
-    }
-
-    void setElementPointer(size_t index, DataElement* dataElement) override
-    {
-      if (!dataElement)
-        throw EncoderException(L"HLAfixedArray::setElementPointer(): dataElement is zero!");
-      BasicTypeEncoding* basicDataElement = dynamic_cast<BasicTypeEncoding*>(dataElement);
-      if (basicDataElement == nullptr)
-        throw EncoderException(L"HLAfixedArray::setElementPointer(): Data type is not compatible!");
-      if (!basicDataElement->isSameTypeAs(*_protoType))
-        throw EncoderException(L"HLAfixedArray::setElementPointer(): Data type is not compatible!");
-      if (_dataElementVector.size() <= index)
-        throw EncoderException(L"HLAfixedArray::setElementPointer(): Index out of range!");
-      //if (element.second) delete element.first;
-      _dataElementPointerVector[index] = basicDataElement;
-    }
-
-    const DataElement& get(size_t index) const override
-    {
-      return *_dataElementPointerVector[index];
-    }
-
-    void resize(size_t length) override {
-      _dataElementVector.resize(length);
-      _dataVector.resize(length);
-    }
-
-    void clear() override {
-      _dataElementVector.clear();
-      _dataVector.clear();
-    }
-
-    // bool 'second' specifies whether the DataElement pointed is owned by this instance.
-    typedef std::vector<BasicTypeEncoding> DataElementVector;
-    DataElementVector _dataElementVector;
-    typedef std::vector<BasicTypeEncoding*> DataElementPointerVector;
-    DataElementPointerVector _dataElementPointerVector;
-    std::vector<SimpleDataType> _dataVector;
-    std::unique_ptr<BasicTypeEncoding> _protoType;
 };
 
-class OPENRTI_LOCAL HLAfixedArrayImplementation : public HLAfixedArrayImplementationBase
+class OPENRTI_LOCAL HLAfixedArrayImplementation : public HLAarrayImplementation
 {
   public:
-    HLAfixedArrayImplementation(const DataElement& protoType, size_t length) {
-      _protoType = protoType.clone().release();
-      _dataElementVector.resize(length);
-      for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-        i->first = _protoType->clone().release();
-        i->second = true;
-      }
-    }
-    HLAfixedArrayImplementation(const HLAfixedArrayImplementation& rhs) {
-      _protoType = rhs._protoType->clone().release();
-      _dataElementVector.resize(rhs._dataElementVector.size(), std::make_pair(nullptr, true));
-      for (size_t i = 0; i < rhs._dataElementVector.size(); ++i) {
-        _dataElementVector[i].first = rhs._dataElementVector[i].first->clone().release();
-      }
-    }
-    virtual ~HLAfixedArrayImplementation() noexcept {
-      for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
-        if (i->second) delete i->first;
-        i->first = nullptr;
-      }
-      delete _protoType;
-      _protoType = 0;
-    }
-
-    const DataElement* getPrototype() const override { return _protoType; }
+    HLAfixedArrayImplementation(const DataElement& protoType, size_t length) : HLAarrayImplementation(protoType, length) {}
+    HLAfixedArrayImplementation(const HLAfixedArrayImplementation& rhs) : HLAarrayImplementation(rhs) { }
+    virtual ~HLAfixedArrayImplementation() noexcept { }
 
     size_t getEncodedLength() const override {
       size_t length = 0;
@@ -218,7 +84,8 @@ class OPENRTI_LOCAL HLAfixedArrayImplementation : public HLAfixedArrayImplementa
       return length;
     }
 
-    size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override {
+    size_t encodeInto(Octet* buffer, size_t bufferSize, size_t offset) const override
+    {
 #ifdef _DEBUG
       if (bufferSize < offset + getEncodedLength())
         throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
@@ -231,7 +98,8 @@ class OPENRTI_LOCAL HLAfixedArrayImplementation : public HLAfixedArrayImplementa
       return offset;
     }
 
-    size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override {
+    size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t index) override
+    {
       for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
         if (i->first == nullptr)
           throw EncoderException(L"HLAfixedArray::decodeFrom(): dataElement is zero!");
@@ -240,73 +108,9 @@ class OPENRTI_LOCAL HLAfixedArrayImplementation : public HLAfixedArrayImplementa
       return index;
     }
 
-    unsigned int getOctetBoundary() const override {
-      if (_dataElementVector.empty())
-        return 1;
-      return _dataElementVector.front().first->getOctetBoundary();
-    }
-
-    size_t size () const override { return _dataElementVector.size(); }
-
-    void set(size_t index, const DataElement& dataElement) override {
-      if (_dataElementVector.size() <= index)
-        throw EncoderException(L"HLAfixedArray::set(): Index out of range!");
-      auto& element = _dataElementVector[index];
-      if (!dataElement.isSameTypeAs(*_protoType))
-        throw EncoderException(L"HLAfixedArray::set(): Data type is not compatible!");
-      if (element.second) delete element.first;
-      element.first = dataElement.clone().release();
-      element.second = true;
-    }
-
-    void setElementPointer(size_t index, DataElement* dataElement) override {
-      if (_dataElementVector.size() <= index)
-        throw EncoderException(L"HLAfixedArray::setElementPointer(): Index out of range!");
-      if (!dataElement)
-        throw EncoderException(L"HLAfixedArray::setElementPointer(): dataElement is zero!");
-      auto& element = _dataElementVector[index];
-      if (!dataElement->isSameTypeAs(*_protoType))
-        throw EncoderException(L"HLAfixedArray::setElementPointer(): Data type is not compatible!");
-      if (element.second) delete element.first;
-      element.first = dataElement;
-      element.second = false;
-    }
-
-    const DataElement& get(size_t index) const override {
-      if (_dataElementVector.size() <= index)
-        throw EncoderException(L"HLAfixedArray::get(): Index out of range!");
-      auto& element = _dataElementVector[index];
-      if (element.first == nullptr)
-        throw EncoderException(L"HLAfixedArray::get(): dataElement is zero!");
-      return *(_dataElementVector[index].first);
-    }
-
-    bool isSameTypeAs(const HLAfixedArrayImplementationBase& rhs) const override {
-      auto* ref = dynamic_cast<const HLAfixedArrayImplementation*>(&rhs);
-      if (_dataElementVector.empty()) {
-        return ref->_dataElementVector.empty();
-      }
-      else {
-        if (ref->_dataElementVector.empty())
-          return false;
-        return _protoType->isSameTypeAs(*(ref->_dataElementVector.front().first));
-      }
-    }
-
-    void resize(size_t length) override {
-      _dataElementVector.resize(length);
-    }
-    void clear() override {
-      _dataElementVector.clear();
-    }
-
     HLAencodingImplementationBase* clone() const override {
       return new HLAfixedArrayImplementation(*_protoType, size());
     }
-    // bool 'second' specifies whether the DataElement pointed is owned by this instance.
-    typedef std::vector<std::pair<DataElement*, bool>> DataElementVector;
-    DataElementVector _dataElementVector;
-    DataElement* _protoType;
 };
 
 HLAfixedArray::HLAfixedArray(const DataElement& protoType, size_t length) : _impl(nullptr)
@@ -350,7 +154,7 @@ HLAfixedArray::HLAfixedArray(const DataElement& protoType, size_t length) : _imp
 }
 
 HLAfixedArray::HLAfixedArray(HLAfixedArray const & rhs) :
-  _impl(static_cast<HLAfixedArrayImplementationBase*>(rhs._impl->clone()))
+  _impl(static_cast<HLAarrayImplementationBase*>(rhs._impl->clone()))
 {
 }
 

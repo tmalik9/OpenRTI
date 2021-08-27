@@ -769,6 +769,16 @@ namespace FOMCodeGen
     {
       get { return mObjectClasses; }
     }
+    public List<ObjectClass> ReverseObjectClasses
+    {
+      get {
+        List<ObjectClass> result = new List<ObjectClass>();
+        result.AddRange(mObjectClasses);
+        result.Reverse();
+        return result;
+      }
+    }
+
 
     private List<InteractionClass> mInteractionClasses = new List<InteractionClass>();
     public List<InteractionClass> InteractionClasses

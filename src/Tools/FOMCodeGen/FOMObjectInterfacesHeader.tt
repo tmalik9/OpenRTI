@@ -69,8 +69,7 @@ class I<#=objectClass.Name#><#
   {
 #> : public I<#=objectClass.BaseClass.Name#>
 <# } else {
-#>
-
+#> : public std::enable_shared_from_this<I<#=objectClass.Name#>>
 <# } // if #>
 {
 <# 
@@ -148,18 +147,25 @@ class I<#=objectClass.Name#><#
     virtual void UpdateModifiedAttributeValues() = 0;
     // send attribute values which have been modified since last call, as TSO message
     virtual void UpdateModifiedAttributeValues(<#=FOM.NativeTimeType#> time) = 0;
-    // get bitmap of attribute values which have been udpated in last call to reflectAttributeValues
+    // bitmask of attributes ever received
+    virtual AttributeBits GetReceivedAttributes() const = 0;
+    // bitmask of attributes received in last update (cleared after update callbacks executed)
     virtual AttributeBits GetUpdatedAttributes() const = 0;
+    // bitmask of attributes ever modified
+    virtual AttributeBits GetInitializedAttributes() const = 0;
+    // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
+    // (cleared by UpdateAttributeValues or ProvideAttributeValues)
+    virtual AttributeBits GetModifiedAttributes() const = 0;
     // request attribute values which haven't been updated in last reflectAttributeValues
     virtual void RequestAttributeValues() = 0;
     // request all attribute values
     virtual void RequestAllAttributeValues() = 0;
 <# } #>
 <# if (objectClass.ChildClasses.Count == 0) { #>
-    using UpdateCallback = std::function<void(I<#=objectClass.Name#>*)>;
+    using UpdateCallback = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
-    using UpdateCallbackWithTime = std::function<void(I<#=objectClass.Name#>*, <#=FOM.NativeTimeType#> time, OrderType orderType)>;
+    using UpdateCallbackWithTime = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>, <#=FOM.NativeTimeType#> time, OrderType orderType)>;
     virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
     virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 <# } // if (objectClass.ChildClasses.Count == 0) #>
