@@ -340,23 +340,24 @@ void <#=objectClass.Name#>ObjectClass::EraseObjectInstance(rti1516ev::ObjectInst
 
 void <#=objectClass.Name#>::Release()
 {
-  if (mObjectInstanceHandle.isValid() && mIsOwner)
+  if (mObjectInstanceHandle.isValid())
   {
-    // For now, do *not* remove the object if it has been discovered.
-    // It should be entirely owned by the object class.
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
-    try
+    if (mIsOwner)
     {
-      mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
-    }
-    catch (const rti1516ev::NotConnected&)
-    {
-    }
-    catch (const rti1516ev::FederateNotExecutionMember&)
-    {
+      try
+      {
+        mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
+      }
+      catch (const rti1516ev::NotConnected&)
+      {
+      }
+      catch (const rti1516ev::FederateNotExecutionMember&)
+      {
+      }
+      mIsOwner = false;
     }
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
-    mIsOwner = false;
   }
 }
 
