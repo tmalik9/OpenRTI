@@ -173,8 +173,7 @@ class OPENRTI_LOCAL HLAarrayOfBasicTypeImplementation : public HLAarrayImplement
     }
     */
     // NOTE: 'preserving' version of resize, data element pointers to outside data will remain intact
-    void resize(size_t length)
-    {
+    void resize(size_t length) override { 
       _dataElementPointerVector.resize(length);
 
       std::set<size_t> existingOwnedElements;
