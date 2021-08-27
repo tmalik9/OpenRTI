@@ -123,13 +123,13 @@ void EthernetPacketDataEncoding::update()
 {
   size_t size = mData.size();
   mEncoding.resize(size);
-  for (size_t i=0; i<size; i++)
+  for (size_t i=0; i < size; i++)
   {
     mEncoding[i].setDataPointer(&mData.data()[i]);
-    if (i < HLAvariableArray::size()) {
-      setElementPointer(i, &mEncoding[i]);
-    } else {
+    if (i >= HLAvariableArray::size()) {
       addElementPointer(&mEncoding[i]);
+    } else {
+      setElementPointer(i, &mEncoding[i]);
     }
   }
 }
@@ -187,13 +187,13 @@ void FlexRayPayloadDataEncoding::update()
 {
   size_t size = mData.size();
   mEncoding.resize(size);
-  for (size_t i=0; i<size; i++)
+  for (size_t i=0; i < size; i++)
   {
     mEncoding[i].setDataPointer(&mData.data()[i]);
-    if (i < HLAvariableArray::size()) {
-      setElementPointer(i, &mEncoding[i]);
-    } else {
+    if (i >= HLAvariableArray::size()) {
       addElementPointer(&mEncoding[i]);
+    } else {
+      setElementPointer(i, &mEncoding[i]);
     }
   }
 }

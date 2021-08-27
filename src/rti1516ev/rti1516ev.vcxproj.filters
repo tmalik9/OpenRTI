@@ -233,6 +233,9 @@
     <ClInclude Include="HandleFactory.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="HLAarrayImplementation.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="rti1516ev.rc">
