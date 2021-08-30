@@ -796,20 +796,92 @@ class ");
             
             #line default
             #line hidden
-            this.Write(@"    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
-    void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-");
+            this.Write("    uint32_t RegisterUpdateCallback(UpdateCallback callback) override;\r\n    void " +
+                    "UnregisterUpdateCallback(uint32_t callbackToken) override;\r\n");
             
-            #line 203 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 201 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } // if (objectClass.ChildClasses.Count == 0) 
             
             #line default
             #line hidden
             
-            #line 204 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 202 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } // if (objectClass.HasValidAttributes) 
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 204 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+ if (objectClass.HasValidAttributes) { 
+            
+            #line default
+            #line hidden
+            this.Write(@"    // bitmask of attributes ever received
+    AttributeBits GetReceivedAttributes() const override;
+    // bitmask of attributes received in last update (cleared after update callbacks executed)
+    AttributeBits GetUpdatedAttributes() const override;
+    // bitmask of attributes ever modified
+    AttributeBits GetInitializedAttributes() const override;
+    // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
+    AttributeBits GetModifiedAttributes() const override;
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
+    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+");
+            
+            #line 216 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+ } 
+            
+            #line default
+            #line hidden
+            this.Write("  protected:\r\n    friend class ");
+            
+            #line 218 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass;\r\n\r\n    ");
+            
+            #line 220 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("();\r\n    ");
+            
+            #line 221 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("(");
+            
+            #line 221 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassa" +
+                    "dor* ambassador);\r\n\r\n");
+            
+            #line 223 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+ if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { 
+            
+            #line default
+            #line hidden
+            this.Write("    void ExecuteUpdateCallbacks(optional<");
+            
+            #line 224 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
+            
+            #line default
+            #line hidden
+            this.Write("> time, optional<OrderType> orderType);\r\n");
+            
+            #line 225 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+ } 
             
             #line default
             #line hidden
@@ -819,91 +891,19 @@ class ");
     // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
     rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
-");
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
+    mutable std::mutex mMutex;
+
+    ");
             
-            #line 211 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
- if (objectClass.HasValidAttributes) { 
-            
-            #line default
-            #line hidden
-            this.Write(@"    // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
-    // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
-    // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
-    // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
-    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
-    void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
-    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-");
-            
-            #line 223 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
- } 
-            
-            #line default
-            #line hidden
-            this.Write("  protected:\r\n    friend class ");
-            
-            #line 225 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass;\r\n\r\n    ");
-            
-            #line 227 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("();\r\n    ");
-            
-            #line 228 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("(");
-            
-            #line 228 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassa" +
-                    "dor* ambassador);\r\n\r\n");
-            
-            #line 230 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
- if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { 
-            
-            #line default
-            #line hidden
-            this.Write("    void ExecuteUpdateCallbacks(optional<");
-            
-            #line 231 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
-            
-            #line default
-            #line hidden
-            this.Write("> time, optional<OrderType> orderType);\r\n");
-            
-            #line 232 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
- } 
-            
-            #line default
-            #line hidden
-            this.Write("    mutable std::mutex mMutex;\r\n\r\n    ");
-            
-            #line 235 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            #line 236 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass* mObjectClass;\r\n    std::wstring mObjectInstanceName;\r\n    rti1516ev:" +
-                    ":RTIambassador* mRtiAmbassador;\r\n    rti1516ev::ObjectInstanceHandle mObjectInst" +
-                    "anceHandle;\r\n    bool mIsOwner = false;\r\n");
+                    ":ObjectInstanceHandle mObjectInstanceHandle;\r\n    bool mIsOwner = false;\r\n");
             
             #line 240 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  if (objectClass.HasValidAttributes) { 

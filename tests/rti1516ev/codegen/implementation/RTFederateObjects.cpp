@@ -683,6 +683,30 @@ rti1516ev::AttributeHandleValueMap SystemVariable::GetModifiedAttributeValues() 
   return result;
 }
 
+SystemVariable::AttributeBits SystemVariable::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+SystemVariable::AttributeBits SystemVariable::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+SystemVariable::AttributeBits SystemVariable::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+SystemVariable::AttributeBits SystemVariable::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
+}
+
 void SystemVariable::UpdateAllAttributeValues()
 {
   if (mObjectInstanceHandle.isValid())
@@ -1179,6 +1203,30 @@ rti1516ev::AttributeHandleValueMap ValueEntity::GetModifiedAttributeValues() con
     result[mObjectClass->GetValueAttributeHandle()] = mValue.encode();
   }
   return result;
+}
+
+ValueEntity::AttributeBits ValueEntity::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+ValueEntity::AttributeBits ValueEntity::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+ValueEntity::AttributeBits ValueEntity::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+ValueEntity::AttributeBits ValueEntity::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
 }
 
 void ValueEntity::UpdateAllAttributeValues()
@@ -1725,6 +1773,30 @@ rti1516ev::AttributeHandleValueMap DOMemberSource::GetModifiedAttributeValues() 
     result[mObjectClass->GetDOSourceMemberDataBytesAttributeHandle()] = mDOSourceMemberDataBytes.encode();
   }
   return result;
+}
+
+DOMemberSource::AttributeBits DOMemberSource::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+DOMemberSource::AttributeBits DOMemberSource::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+DOMemberSource::AttributeBits DOMemberSource::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+DOMemberSource::AttributeBits DOMemberSource::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
 }
 
 void DOMemberSource::UpdateAllAttributeValues()
@@ -2289,6 +2361,30 @@ rti1516ev::AttributeHandleValueMap DOMemberTarget::GetModifiedAttributeValues() 
   return result;
 }
 
+DOMemberTarget::AttributeBits DOMemberTarget::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+DOMemberTarget::AttributeBits DOMemberTarget::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+DOMemberTarget::AttributeBits DOMemberTarget::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+DOMemberTarget::AttributeBits DOMemberTarget::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
+}
+
 void DOMemberTarget::UpdateAllAttributeValues()
 {
   if (mObjectInstanceHandle.isValid())
@@ -2805,6 +2901,30 @@ rti1516ev::AttributeHandleValueMap BusManagement::GetModifiedAttributeValues() c
     result[mObjectClass->GetNetworkIDAttributeHandle()] = mNetworkID.encode();
   }
   return result;
+}
+
+BusManagement::AttributeBits BusManagement::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+BusManagement::AttributeBits BusManagement::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+BusManagement::AttributeBits BusManagement::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+BusManagement::AttributeBits BusManagement::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
 }
 
 void BusManagement::UpdateAllAttributeValues()
@@ -3367,6 +3487,30 @@ rti1516ev::AttributeHandleValueMap BusManagementCan::GetModifiedAttributeValues(
     result[mObjectClass->GetSendMessagesAsRxAttributeHandle()] = mSendMessagesAsRx.encode();
   }
   return result;
+}
+
+BusManagementCan::AttributeBits BusManagementCan::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+BusManagementCan::AttributeBits BusManagementCan::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+BusManagementCan::AttributeBits BusManagementCan::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+BusManagementCan::AttributeBits BusManagementCan::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
 }
 
 void BusManagementCan::UpdateAllAttributeValues()
@@ -3991,6 +4135,30 @@ rti1516ev::AttributeHandleValueMap BusManagementEthernet::GetModifiedAttributeVa
     result[mObjectClass->GetSendMessagesAsRxAttributeHandle()] = mSendMessagesAsRx.encode();
   }
   return result;
+}
+
+BusManagementEthernet::AttributeBits BusManagementEthernet::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+BusManagementEthernet::AttributeBits BusManagementEthernet::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+BusManagementEthernet::AttributeBits BusManagementEthernet::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+BusManagementEthernet::AttributeBits BusManagementEthernet::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
 }
 
 void BusManagementEthernet::UpdateAllAttributeValues()
@@ -5009,6 +5177,30 @@ rti1516ev::AttributeHandleValueMap FlexRayCluster::GetModifiedAttributeValues() 
   return result;
 }
 
+FlexRayCluster::AttributeBits FlexRayCluster::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+FlexRayCluster::AttributeBits FlexRayCluster::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+FlexRayCluster::AttributeBits FlexRayCluster::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+FlexRayCluster::AttributeBits FlexRayCluster::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
+}
+
 void FlexRayCluster::UpdateAllAttributeValues()
 {
   if (mObjectInstanceHandle.isValid())
@@ -5931,6 +6123,30 @@ rti1516ev::AttributeHandleValueMap BusController::GetModifiedAttributeValues() c
   return result;
 }
 
+BusController::AttributeBits BusController::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+BusController::AttributeBits BusController::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+BusController::AttributeBits BusController::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+BusController::AttributeBits BusController::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
+}
+
 void BusController::UpdateAllAttributeValues()
 {
   if (mObjectInstanceHandle.isValid())
@@ -6653,6 +6869,30 @@ rti1516ev::AttributeHandleValueMap BusControllerCan::GetModifiedAttributeValues(
     result[mObjectClass->GetSamplingModeAttributeHandle()] = mSamplingMode.encode();
   }
   return result;
+}
+
+BusControllerCan::AttributeBits BusControllerCan::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+BusControllerCan::AttributeBits BusControllerCan::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+BusControllerCan::AttributeBits BusControllerCan::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+BusControllerCan::AttributeBits BusControllerCan::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
 }
 
 void BusControllerCan::UpdateAllAttributeValues()
@@ -7395,6 +7635,30 @@ rti1516ev::AttributeHandleValueMap BusControllerEthernet::GetModifiedAttributeVa
     result[mObjectClass->GetPortNameAttributeHandle()] = mPortName.encode();
   }
   return result;
+}
+
+BusControllerEthernet::AttributeBits BusControllerEthernet::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+BusControllerEthernet::AttributeBits BusControllerEthernet::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+BusControllerEthernet::AttributeBits BusControllerEthernet::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+BusControllerEthernet::AttributeBits BusControllerEthernet::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
 }
 
 void BusControllerEthernet::UpdateAllAttributeValues()
@@ -8169,6 +8433,30 @@ rti1516ev::AttributeHandleValueMap FlexRayControllerStatus::GetModifiedAttribute
     result[mObjectClass->GetwakeupStatusAttributeHandle()] = mwakeupStatus.encode();
   }
   return result;
+}
+
+FlexRayControllerStatus::AttributeBits FlexRayControllerStatus::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+FlexRayControllerStatus::AttributeBits FlexRayControllerStatus::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+FlexRayControllerStatus::AttributeBits FlexRayControllerStatus::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+FlexRayControllerStatus::AttributeBits FlexRayControllerStatus::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
 }
 
 void FlexRayControllerStatus::UpdateAllAttributeValues()
@@ -9489,6 +9777,30 @@ rti1516ev::AttributeHandleValueMap FlexRayController::GetModifiedAttributeValues
   return result;
 }
 
+FlexRayController::AttributeBits FlexRayController::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+FlexRayController::AttributeBits FlexRayController::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+FlexRayController::AttributeBits FlexRayController::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+FlexRayController::AttributeBits FlexRayController::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
+}
+
 void FlexRayController::UpdateAllAttributeValues()
 {
   if (mObjectInstanceHandle.isValid())
@@ -10705,6 +11017,30 @@ rti1516ev::AttributeHandleValueMap FlexRaySendBuffer::GetModifiedAttributeValues
     result[mObjectClass->GetHeaderCRCAttributeHandle()] = mHeaderCRC.encode();
   }
   return result;
+}
+
+FlexRaySendBuffer::AttributeBits FlexRaySendBuffer::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+FlexRaySendBuffer::AttributeBits FlexRaySendBuffer::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+FlexRaySendBuffer::AttributeBits FlexRaySendBuffer::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+FlexRaySendBuffer::AttributeBits FlexRaySendBuffer::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
 }
 
 void FlexRaySendBuffer::UpdateAllAttributeValues()

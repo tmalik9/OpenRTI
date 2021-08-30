@@ -462,6 +462,30 @@ rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetModifiedAttributeVa
 }
 
 <# if (objectClass.HasValidAttributes) { #>
+<#=objectClass.Name#>::AttributeBits <#=objectClass.Name#>::GetReceivedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesReceived;
+}
+
+<#=objectClass.Name#>::AttributeBits <#=objectClass.Name#>::GetUpdatedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mLastUpdated;
+}
+
+<#=objectClass.Name#>::AttributeBits <#=objectClass.Name#>::GetInitializedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mValuesSet;
+}
+
+<#=objectClass.Name#>::AttributeBits <#=objectClass.Name#>::GetModifiedAttributes() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mDirty;
+}
+
 void <#=objectClass.Name#>::UpdateAllAttributeValues()
 {
   if (mObjectInstanceHandle.isValid())

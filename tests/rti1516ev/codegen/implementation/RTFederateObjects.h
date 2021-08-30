@@ -104,22 +104,24 @@ class HLAobjectRoot : public IHLAobjectRoot
     // attribute HLAprivilegeToDeleteObject : no data type
     // IHLAobjectRoot
 
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
-
   protected:
     friend class HLAobjectRootObjectClass;
 
     HLAobjectRoot();
     HLAobjectRoot(HLAobjectRootObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     HLAobjectRootObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // Attribute value encoders
@@ -221,22 +223,15 @@ class SystemVariable : public ISystemVariable
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -247,11 +242,18 @@ class SystemVariable : public ISystemVariable
     SystemVariable(SystemVariableObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     SystemVariableObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -365,22 +367,15 @@ class ValueEntity : public IValueEntity
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -391,11 +386,18 @@ class ValueEntity : public IValueEntity
     ValueEntity(ValueEntityObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     ValueEntityObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -523,22 +525,15 @@ class DOMemberSource : public IDOMemberSource
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -549,11 +544,18 @@ class DOMemberSource : public IDOMemberSource
     DOMemberSource(DOMemberSourceObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     DOMemberSourceObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -678,22 +680,15 @@ class DOMemberTarget : public IDOMemberTarget
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -704,11 +699,18 @@ class DOMemberTarget : public IDOMemberTarget
     DOMemberTarget(DOMemberTargetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     DOMemberTargetObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -823,19 +825,14 @@ class BusManagement : public IBusManagement
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
 
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
-
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -845,11 +842,18 @@ class BusManagement : public IBusManagement
     BusManagement();
     BusManagement(BusManagementObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     BusManagementObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -987,22 +991,15 @@ class BusManagementCan : public IBusManagementCan
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -1013,11 +1010,18 @@ class BusManagementCan : public IBusManagementCan
     BusManagementCan(BusManagementCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     BusManagementCanObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -1151,22 +1155,15 @@ class BusManagementEthernet : public IBusManagementEthernet
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -1177,11 +1174,18 @@ class BusManagementEthernet : public IBusManagementEthernet
     BusManagementEthernet(BusManagementEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     BusManagementEthernetObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -1437,22 +1441,15 @@ class FlexRayCluster : public IFlexRayCluster
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -1463,11 +1460,18 @@ class FlexRayCluster : public IFlexRayCluster
     FlexRayCluster(FlexRayClusterObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     FlexRayClusterObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -1627,19 +1631,14 @@ class BusController : public IBusController
     void RequestAttributeValues() override;
     void RequestAllAttributeValues() override;
 
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
-
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -1649,11 +1648,18 @@ class BusController : public IBusController
     BusController();
     BusController(BusControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     BusControllerObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -1833,22 +1839,15 @@ class BusControllerCan : public IBusControllerCan
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -1859,11 +1858,18 @@ class BusControllerCan : public IBusControllerCan
     BusControllerCan(BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     BusControllerCanObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -2007,22 +2013,15 @@ class BusControllerEthernet : public IBusControllerEthernet
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -2033,11 +2032,18 @@ class BusControllerEthernet : public IBusControllerEthernet
     BusControllerEthernet(BusControllerEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     BusControllerEthernetObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -2221,22 +2227,15 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -2247,11 +2246,18 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
     FlexRayControllerStatus(FlexRayControllerStatusObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     FlexRayControllerStatusObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -2563,22 +2569,15 @@ class FlexRayController : public IFlexRayController
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -2589,11 +2588,18 @@ class FlexRayController : public IFlexRayController
     FlexRayController(FlexRayControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     FlexRayControllerObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past
@@ -2816,22 +2822,15 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     void RequestAllAttributeValues() override;
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
-
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
 
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -2842,11 +2841,18 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     FlexRaySendBuffer(FlexRaySendBufferObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
     void ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType);
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     FlexRaySendBufferObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
     // modified by any ReflectAttributeValues in the past

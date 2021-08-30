@@ -352,6 +352,8 @@ bool testRTFederate(int argc, char* argv[])
   auto callbackToken = busControllerCan->RegisterUpdateCallback(
     [&updateReceived](std::shared_ptr<NDistSimIB::NRTFederateEncoding::IBusControllerCan> busControllerCan, NDistSimIB::NRTFederateEncoding::optional<int64_t> time, NDistSimIB::NRTFederateEncoding::optional<NDistSimIB::NRTFederateEncoding::OrderType> orderType) {
     std::wcout << L"update received: " << busControllerCan->GetObjectInstanceName() << std::endl;
+    std::wcout << L"updated = 0x" << std::hex << busControllerCan->GetUpdatedAttributes() << std::dec << std::endl;
+    std::wcout << L"received = 0x" << std::hex << busControllerCan->GetReceivedAttributes() << std::dec << std::endl;
     if (time)
     {
       std::wcout << L"  time = " << *time << std::endl;
@@ -368,6 +370,8 @@ bool testRTFederate(int argc, char* argv[])
   });
   busControllerCan->SetBaudRate(250000);
   busControllerCan->SetOperationMode(NDistSimIB::NRTFederateEncoding::CanOperationMode::kCanOperationModeCanFD);
+  std::wcout << L"initialized = 0x" << std::hex << busControllerCan->GetInitializedAttributes() << std::dec << std::endl;
+  std::wcout << L"modified = 0x" << std::hex << busControllerCan->GetModifiedAttributes() << std::dec << std::endl;
   busControllerCan->UpdateModifiedAttributeValues();
   while (!updateReceived)
   {

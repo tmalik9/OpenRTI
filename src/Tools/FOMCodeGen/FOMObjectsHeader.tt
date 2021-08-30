@@ -198,25 +198,18 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 <# if (objectClass.ChildClasses.Count == 0) { #>
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
 
-    // get attribute handle/value map of all attributes
-    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
-    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
-    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
-
 <# if (objectClass.HasValidAttributes) { #>
     // bitmask of attributes ever received
-    AttributeBits GetReceivedAttributes() const override { return mValuesReceived; }
+    AttributeBits GetReceivedAttributes() const override;
     // bitmask of attributes received in last update (cleared after update callbacks executed)
-    AttributeBits GetUpdatedAttributes() const override { return mLastUpdated; }
+    AttributeBits GetUpdatedAttributes() const override;
     // bitmask of attributes ever modified
-    AttributeBits GetInitializedAttributes() const override { return mValuesSet; }
+    AttributeBits GetInitializedAttributes() const override;
     // bitmask of attributes modified since last updateAttributeValues/provideAttributeValues
-    AttributeBits GetModifiedAttributes() const override { return mDirty; }
+    AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
@@ -230,11 +223,18 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
     void ExecuteUpdateCallbacks(optional<<#=FOM.NativeTimeType#>> time, optional<OrderType> orderType);
 <# } #>
+
+    // get attribute handle/value map of all attributes
+    rti1516ev::AttributeHandleValueMap GetAllAttributeValues() const;
+    // get attribute handle/value map of attributes which have been modified since last call to UpdateModifiedAttributeValues
+    rti1516ev::AttributeHandleValueMap GetModifiedAttributeValues() const;
+
+    rti1516ev::RTIambassador* mRtiAmbassador;
+    // this mutex guards all of the fields below
     mutable std::mutex mMutex;
 
     <#=objectClass.Name#>ObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
-    rti1516ev::RTIambassador* mRtiAmbassador;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
 <# if (objectClass.HasValidAttributes) { #>
