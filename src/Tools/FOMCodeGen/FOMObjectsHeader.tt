@@ -8,6 +8,7 @@
 #pragma once
 
 #include <vector>
+#include <mutex>
 #include "RTI/Handle.h"
 #include "RTI/RTIambassador.h"
 #include "RTI/encoding/BasicDataElements.h"
@@ -60,7 +61,9 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) override;
     void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<I<#=objectClass.Name#>> newObjectInstance);
+    // Set a user-defined creator function, which returns subclasses of <#=objectClass.Name#>
     using ObjectInstanceCreatorFunction = std::function<<#=objectClass.Name#>*(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)>;
+    // When using custom object instance classes, don't forget to set the creator function *before* subscribing to the object class.
     void SetObjectInstanceCreator(ObjectInstanceCreatorFunction creatorFunction) { mCreatorFunction = creatorFunction; }
     // internal
 <#
@@ -140,6 +143,8 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
 #>
+    // this mutex guards the data structures below
+    mutable std::mutex mMutex;
     std::map<std::wstring, std::shared_ptr<I<#=objectClass.Name#>>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<I<#=objectClass.Name#>>> mObjectInstancesByHandle;
 
@@ -162,6 +167,9 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    bool IsValid() const override;
+    bool IsOwner() const override;
+    void Release() override;
 <#
   foreach (var attribute in objectClass.AllAttributes)
   {
@@ -190,8 +198,8 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 <# if (objectClass.ChildClasses.Count == 0) { #>
     uint32_t RegisterUpdateCallback(UpdateCallback callback) override;
     void UnregisterUpdateCallback(uint32_t callbackToken) override;
-    uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
-    void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
+    //uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) override;
+    //void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) override;
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
 
@@ -213,9 +221,6 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
     void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
 <# } #>
-    bool IsValid() const override { return mObjectInstanceHandle.isValid(); }
-    bool IsOwner() const override { return mIsOwner; }
-    void Release() override;
   protected:
     friend class <#=objectClass.Name#>ObjectClass;
 
@@ -223,9 +228,10 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     <#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* ambassador);
 
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
-    void ExecuteUpdateCallbacks();
-    void ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime, OrderType orderType);
+    void ExecuteUpdateCallbacks(optional<<#=FOM.NativeTimeType#>> time, optional<OrderType> orderType);
 <# } #>
+    mutable std::mutex mMutex;
+
     <#=objectClass.Name#>ObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
     rti1516ev::RTIambassador* mRtiAmbassador;
@@ -244,8 +250,6 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
-    std::map<uint32_t, UpdateCallbackWithTime> mUpdateCallbacksWithTime;
-    uint32_t mLastCallbackTokenWithTime = 0;
 <# } #>
     // Attribute value encoders
 <# 

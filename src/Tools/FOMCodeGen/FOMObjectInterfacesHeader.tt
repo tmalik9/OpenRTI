@@ -162,12 +162,9 @@ class I<#=objectClass.Name#><#
     virtual void RequestAllAttributeValues() = 0;
 <# } #>
 <# if (objectClass.ChildClasses.Count == 0) { #>
-    using UpdateCallback = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>)>;
+    using UpdateCallback = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>, optional<<#=FOM.NativeTimeType#>> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
-    using UpdateCallbackWithTime = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>, <#=FOM.NativeTimeType#> time, OrderType orderType)>;
-    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
-    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
 };

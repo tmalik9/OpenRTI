@@ -58,6 +58,7 @@ foreach (var objectClass in FOM.ObjectClasses)
 
 <#=objectClass.Name#>ObjectClass::~<#=objectClass.Name#>ObjectClass()
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
     mObjectInstancesByHandle.begin()->second->Release();
@@ -124,6 +125,7 @@ rti1516ev::AttributeHandleSet <#=objectClass.Name#>ObjectClass::GetAllAttributeH
 
 void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<<#=objectClass.Name#>> newObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -131,23 +133,27 @@ void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectI
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
+  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<<#=objectClass.Name#>>(iter->second);
+  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
+  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
-  // Do not delete the object yet, it may still be in use by the application.
 }
 
 std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -168,6 +174,7 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObj
 
 std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -188,6 +195,7 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObj
 
 std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -212,6 +220,7 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::Create
 
 std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -283,6 +292,7 @@ void <#=objectClass.Name#>ObjectClass::ExecuteRemoveObjectInstanceCallbacks(std:
 
 void <#=objectClass.Name#>ObjectClass::InsertObjectInstanceName(std::shared_ptr<I<#=objectClass.Name#>> objectInstance, const std::wstring& objectInstanceName)
 {
+  // prerequisite: mMutex must be locked
   mObjectInstancesByName.insert(std::make_pair(objectInstanceName, objectInstance));
 <# if (objectClass.BaseClass != null) { #>
   mBaseClass->InsertObjectInstanceName(objectInstance, objectInstanceName);
@@ -291,6 +301,7 @@ void <#=objectClass.Name#>ObjectClass::InsertObjectInstanceName(std::shared_ptr<
 
 void <#=objectClass.Name#>ObjectClass::InsertObjectInstanceHandle(std::shared_ptr<I<#=objectClass.Name#>> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
+  // prerequisite: mMutex must be locked
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
 <# if (objectClass.BaseClass != null) { #>
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
@@ -299,6 +310,7 @@ void <#=objectClass.Name#>ObjectClass::InsertObjectInstanceHandle(std::shared_pt
 
 void <#=objectClass.Name#>ObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
+  // prerequisite: mMutex must be locked
 <# if (objectClass.BaseClass != null) { #>
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 <# } #>
@@ -338,8 +350,21 @@ void <#=objectClass.Name#>ObjectClass::EraseObjectInstance(rti1516ev::ObjectInst
   }
 }
 
+bool <#=objectClass.Name#>::IsValid() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mObjectInstanceHandle.isValid();
+}
+
+bool <#=objectClass.Name#>::IsOwner() const
+{
+  std::unique_lock<std::mutex> lock(mMutex);
+  return mIsOwner;
+}
+
 void <#=objectClass.Name#>::Release()
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -369,12 +394,14 @@ void <#=objectClass.Name#>::Release()
 #>// attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
 <#=attribute.DataType.ReturnCppType#> <#=objectClass.Name#>::Get<#=attribute.Name#>() const
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   return <#=attribute.DataType.CppGetter("m" + attribute.Name)#>;
 }
 <#    if (attribute.DataType is FOMParser.FixedRecordDataType) { #>
 
 <#=attribute.DataType.ModifiableReturnCppType#> <#=objectClass.Name#>::Get<#=attribute.Name#>()
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   mDirty |= k<#=attribute.Name#>Bit;
   mValuesSet |= k<#=attribute.Name#>Bit;
   return <#=attribute.DataType.CppGetter("m" + attribute.Name)#>;
@@ -383,6 +410,7 @@ void <#=objectClass.Name#>::Release()
 
 void <#=objectClass.Name#>::Set<#=attribute.Name#>(<#=attribute.DataType.ParameterCppType#> newValue)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   // CanTranslateToCpp=<#= attribute.DataType.CanTranslateToCpp #>
   <#=attribute.DataType.CppSetter("m" + attribute.Name, "newValue")#>;
   mDirty |= k<#=attribute.Name#>Bit;
@@ -436,7 +464,7 @@ rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetModifiedAttributeVa
 <# if (objectClass.HasValidAttributes) { #>
 void <#=objectClass.Name#>::UpdateAllAttributeValues()
 {
-  if (IsValid())
+  if (mObjectInstanceHandle.isValid())
   {
     rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
     mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
@@ -445,7 +473,7 @@ void <#=objectClass.Name#>::UpdateAllAttributeValues()
 
 void <#=objectClass.Name#>::UpdateAllAttributeValues(<#=FOM.NativeTimeType#> time)
 {
-  if (IsValid())
+  if (mObjectInstanceHandle.isValid())
   {
     rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
     mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(time));
@@ -454,7 +482,7 @@ void <#=objectClass.Name#>::UpdateAllAttributeValues(<#=FOM.NativeTimeType#> tim
 
 void <#=objectClass.Name#>::UpdateModifiedAttributeValues()
 {
-  if (IsValid())
+  if (mObjectInstanceHandle.isValid())
   {
     rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
     mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
@@ -464,7 +492,7 @@ void <#=objectClass.Name#>::UpdateModifiedAttributeValues()
 
 void <#=objectClass.Name#>::UpdateModifiedAttributeValues(<#=FOM.NativeTimeType#> time)
 {
-  if (IsValid())
+  if (mObjectInstanceHandle.isValid())
   {
     rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
     mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(time));
@@ -474,6 +502,7 @@ void <#=objectClass.Name#>::UpdateModifiedAttributeValues(<#=FOM.NativeTimeType#
 
 void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -503,13 +532,16 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
-  ExecuteUpdateCallbacks();
+  lock.unlock();
+  ExecuteUpdateCallbacks(optional<<#=FOM.NativeTimeType#>>(), optional<OrderType>());
+  lock.lock();
 <# } #>
   mLastUpdated = kNone;
 } // <#=objectClass.Name#>::ReflectAttributeValues
 
 void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "theTime" : "/* theTime */" #>, OrderType <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "orderType" : "/* orderType */"#>)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -539,7 +571,9 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
-  ExecuteUpdateCallbacks(theTime, orderType);
+  lock.unlock();
+  ExecuteUpdateCallbacks(static_cast<const <#=FOM.LogicalTimeType#>&>(theTime).getTime(), orderType);
+  lock.lock();
 <# } #>
   mLastUpdated = kNone;
 } // <#=objectClass.Name#>::ReflectAttributeValues
@@ -547,6 +581,7 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
 // request attributes not being part of the last update
 void <#=objectClass.Name#>::RequestAttributeValues()
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
 <#
   foreach (var attribute in objectClass.AllAttributes)
@@ -562,6 +597,7 @@ void <#=objectClass.Name#>::RequestAttributeValues()
     } // if
   } // foreach
 #>
+  lock.release();
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -586,6 +622,7 @@ void <#=objectClass.Name#>::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
   for (auto& attributeHandle : attributeHandles)
   {
@@ -613,12 +650,14 @@ void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHan
   }
 #>
   } // for (auto& attributeHandleValue : attributes)
+  lock.release();
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // <#=objectClass.Name#>::ReflectAttributeValues
 
 <# if (objectClass.ChildClasses.Count == 0) { #>
 uint32_t <#=objectClass.Name#>::RegisterUpdateCallback(UpdateCallback callback)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -626,38 +665,20 @@ uint32_t <#=objectClass.Name#>::RegisterUpdateCallback(UpdateCallback callback)
 
 void <#=objectClass.Name#>::UnregisterUpdateCallback(uint32_t callbackToken)
 {
+  std::unique_lock<std::mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
-uint32_t <#=objectClass.Name#>::RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback)
+void <#=objectClass.Name#>::ExecuteUpdateCallbacks(optional<<#=FOM.NativeTimeType#>> time, optional<OrderType> orderType)
 {
-  mLastCallbackToken++;
-  mUpdateCallbacksWithTime.insert(std::make_pair(mLastCallbackToken, callback));
-  return mLastCallbackToken;
-}
-
-void <#=objectClass.Name#>::UnregisterUpdateCallbackWithTime(uint32_t callbackToken)
-{
-  mUpdateCallbacksWithTime.erase(callbackToken);
-}
-
-void <#=objectClass.Name#>::ExecuteUpdateCallbacks()
-{
+  // prerequisite: mMutex is unlocked
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
-    callback(std::static_pointer_cast<I<#=objectClass.Name#>>(shared_from_this()));
+    callback(std::static_pointer_cast<I<#=objectClass.Name#>>(shared_from_this()), time, orderType);
   }
 }
 
-void <#=objectClass.Name#>::ExecuteUpdateCallbacks(const rti1516ev::LogicalTime& theTime, OrderType orderType)
-{
-  for (auto& callbackEntry : mUpdateCallbacksWithTime)
-  {
-    auto& callback = callbackEntry.second;
-    callback(std::static_pointer_cast<I<#=objectClass.Name#>>(shared_from_this()), static_cast<const <#=FOM.LogicalTimeType#>&>(theTime).getTime(), orderType);
-  }
-}
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
 
