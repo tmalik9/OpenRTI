@@ -109,6 +109,7 @@ class I<#=objectClass.Name#><#
 <#  } else { #>
     ~I<#=objectClass.Name#>() {}
 <# } #>
+    // copying and moving an object instance is not allowed
     I<#=objectClass.Name#>(const I<#=objectClass.Name#>&) = delete;
     I<#=objectClass.Name#>(I<#=objectClass.Name#>&&) = delete;
     I<#=objectClass.Name#>& operator=(const I<#=objectClass.Name#>&) = delete;
@@ -116,8 +117,12 @@ class I<#=objectClass.Name#><#
 
 <# if (objectClass.BaseClass == null)  {#>
     virtual std::wstring GetObjectInstanceName() const = 0;
+    // has this object a valid HLA object instance handle?
     virtual bool IsValid() const = 0;
+    // has this object been created by this federate?
     virtual bool IsOwner() const = 0;
+    // Delete the object from HLA and the class registry.
+    // Be careful to keep a shared_ptr to the object while executing Release!
     virtual void Release() = 0;
 <# } #>
 <# 
@@ -162,12 +167,9 @@ class I<#=objectClass.Name#><#
     virtual void RequestAllAttributeValues() = 0;
 <# } #>
 <# if (objectClass.ChildClasses.Count == 0) { #>
-    using UpdateCallback = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>)>;
+    using UpdateCallback = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>, optional<<#=FOM.NativeTimeType#>> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterUpdateCallback(UpdateCallback callback) = 0;
     virtual void UnregisterUpdateCallback(uint32_t callbackToken) = 0;
-    using UpdateCallbackWithTime = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>, <#=FOM.NativeTimeType#> time, OrderType orderType)>;
-    virtual uint32_t RegisterUpdateCallbackWithTime(UpdateCallbackWithTime callback) = 0;
-    virtual void UnregisterUpdateCallbackWithTime(uint32_t callbackToken) = 0;
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
 };
