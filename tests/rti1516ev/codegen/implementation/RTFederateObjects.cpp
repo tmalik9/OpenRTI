@@ -164,13 +164,14 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
     throw rti1516ev::ObjectClassNotPublished(L"HLAobjectRoot");
   }
   std::shared_ptr<HLAobjectRoot> newObject = std::shared_ptr<HLAobjectRoot>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -178,7 +179,6 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -508,13 +508,14 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
     throw rti1516ev::ObjectClassNotPublished(L"SystemVariable");
   }
   std::shared_ptr<SystemVariable> newObject = std::shared_ptr<SystemVariable>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -522,7 +523,6 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -1036,13 +1036,14 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
     throw rti1516ev::ObjectClassNotPublished(L"ValueEntity");
   }
   std::shared_ptr<ValueEntity> newObject = std::shared_ptr<ValueEntity>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -1050,7 +1051,6 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -1570,13 +1570,14 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberSource");
   }
   std::shared_ptr<DOMemberSource> newObject = std::shared_ptr<DOMemberSource>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -1584,7 +1585,6 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -2183,13 +2183,14 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberTarget");
   }
   std::shared_ptr<DOMemberTarget> newObject = std::shared_ptr<DOMemberTarget>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -2197,7 +2198,6 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -2752,13 +2752,14 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
     throw rti1516ev::ObjectClassNotPublished(L"BusManagement");
   }
   std::shared_ptr<BusManagement> newObject = std::shared_ptr<BusManagement>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -2766,7 +2767,6 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -3264,13 +3264,14 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementCan");
   }
   std::shared_ptr<BusManagementCan> newObject = std::shared_ptr<BusManagementCan>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -3278,7 +3279,6 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -3960,13 +3960,14 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementEthernet");
   }
   std::shared_ptr<BusManagementEthernet> newObject = std::shared_ptr<BusManagementEthernet>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -3974,7 +3975,6 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -4628,13 +4628,14 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayCluster");
   }
   std::shared_ptr<FlexRayCluster> newObject = std::shared_ptr<FlexRayCluster>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -4642,7 +4643,6 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -5979,13 +5979,14 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
     throw rti1516ev::ObjectClassNotPublished(L"BusController");
   }
   std::shared_ptr<BusController> newObject = std::shared_ptr<BusController>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -5993,7 +5994,6 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -6548,13 +6548,14 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerCan");
   }
   std::shared_ptr<BusControllerCan> newObject = std::shared_ptr<BusControllerCan>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -6562,7 +6563,6 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -7488,13 +7488,14 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerEthernet");
   }
   std::shared_ptr<BusControllerEthernet> newObject = std::shared_ptr<BusControllerEthernet>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -7502,7 +7503,6 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -8124,13 +8124,14 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayControllerStatus");
   }
   std::shared_ptr<FlexRayControllerStatus> newObject = std::shared_ptr<FlexRayControllerStatus>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -8138,7 +8139,6 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -9136,13 +9136,14 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayController");
   }
   std::shared_ptr<FlexRayController> newObject = std::shared_ptr<FlexRayController>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -9150,7 +9151,6 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -10754,13 +10754,14 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
     throw rti1516ev::ObjectClassNotPublished(L"FlexRaySendBuffer");
   }
   std::shared_ptr<FlexRaySendBuffer> newObject = std::shared_ptr<FlexRaySendBuffer>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -10768,7 +10769,6 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 

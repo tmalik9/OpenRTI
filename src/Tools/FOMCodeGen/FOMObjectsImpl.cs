@@ -646,13 +646,14 @@ std::shared_ptr<I");
             #line default
             #line hidden
             this.Write(@">(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -660,7 +661,6 @@ std::shared_ptr<I");
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 

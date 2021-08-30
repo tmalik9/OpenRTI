@@ -223,31 +223,32 @@ foreach (var namespacePart in FOM.Namespace)
                     "nter;\r\n  }\r\n  bool _valid;\r\n  const T* _pointer = nullptr;\r\n};\r\n// Specializatio" +
                     "n for everything else, which includes fundamental types and pointer types.\r\ntemp" +
                     "late<typename T> struct optional<T, false>\r\n{\r\n  // constructors\r\n  optional() :" +
-                    " _valid(false) {}\r\n  optional(const optional& rhs): _valid(rhs._valid), _value(r" +
-                    "hs._value) { }\r\n  optional(const T& rhs): _valid(true), _value(rhs) { }\r\n  templ" +
-                    "ate<typename Other>\r\n  optional(const Other& rhs): _valid(true), _value(rhs) { }" +
-                    "\r\n  template<typename Other>\r\n  optional(const optional<Other>& rhs): _valid(rhs" +
-                    "._valid), _value(rhs._value) { }\r\n\r\n  // destructor\r\n  ~optional() { }\r\n\r\n  // c" +
-                    "heck for value presence\r\n  bool operator ! () const { return !_valid; }\r\n  expli" +
-                    "cit operator bool() const { return _valid; }\r\n\r\n  // assign\r\n  optional& operato" +
-                    "r = (const optional& rhs) {\r\n    _valid = rhs._valid;\r\n    _value = rhs._value;\r" +
-                    "\n    return *this;\r\n  }\r\n  optional& operator = (const T& w) {\r\n    _valid = tru" +
-                    "e;\r\n    _value = w;\r\n    return *this;\r\n  }\r\n  // get value\r\n  T const& operator" +
-                    " * () const { return _value; }\r\n  T const* operator -> () const { return &_value" +
-                    "; }\r\nprivate:\r\n  bool _valid;\r\n  T _value;\r\n};\r\n#pragma warning(pop)\r\n\r\n// exten" +
-                    "ded receive order type, includes \'interpolated\' for application-generated timest" +
-                    "amps\r\nenum class OrderType { RECEIVE, TIMESTAMP, INTERPOLATED };\r\n\r\ntemplate<typ" +
-                    "ename char_type, typename traits_type>\r\nstd::basic_ostream<char_type, traits_typ" +
-                    "e>&\r\noperator<<(std::basic_ostream<char_type, traits_type>& os, OrderType value)" +
-                    "\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderType::RECEIVE: os << \"RECEIVE\"; break;" +
-                    "\r\n    case OrderType::TIMESTAMP: os << \"TIMESTAMP\"; break;\r\n    case OrderType::" +
-                    "INTERPOLATED: os << \"INTERPOLATED\"; break;\r\n  }\r\n  return os;\r\n}\r\n\r\ninline std::" +
-                    "string to_string(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderType:" +
-                    ":RECEIVE: return \"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return \"TIMESTAMP\";\r" +
-                    "\n    case OrderType::INTERPOLATED: return \"INTERPOLATED\";\r\n  }\r\n}\r\n\r\ninline std:" +
-                    ":wstring to_wstring(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderTy" +
-                    "pe::RECEIVE: return L\"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return L\"TIMESTA" +
-                    "MP\";\r\n    case OrderType::INTERPOLATED: return L\"INTERPOLATED\";\r\n  }\r\n}\r\n");
+                    " _valid(false), _value() {}\r\n  optional(const optional& rhs): _valid(rhs._valid)" +
+                    ", _value(rhs._value) { }\r\n  optional(const T& rhs): _valid(true), _value(rhs) { " +
+                    "}\r\n  template<typename Other>\r\n  optional(const Other& rhs): _valid(true), _valu" +
+                    "e(rhs) { }\r\n  template<typename Other>\r\n  optional(const optional<Other>& rhs): " +
+                    "_valid(rhs._valid), _value(rhs._value) { }\r\n\r\n  // destructor\r\n  ~optional() { }" +
+                    "\r\n\r\n  // check for value presence\r\n  bool operator ! () const { return !_valid; " +
+                    "}\r\n  explicit operator bool() const { return _valid; }\r\n\r\n  // assign\r\n  optiona" +
+                    "l& operator = (const optional& rhs) {\r\n    _valid = rhs._valid;\r\n    _value = rh" +
+                    "s._value;\r\n    return *this;\r\n  }\r\n  optional& operator = (const T& w) {\r\n    _v" +
+                    "alid = true;\r\n    _value = w;\r\n    return *this;\r\n  }\r\n  // get value\r\n  T const" +
+                    "& operator * () const { return _value; }\r\n  T const* operator -> () const { retu" +
+                    "rn &_value; }\r\nprivate:\r\n  bool _valid;\r\n  T _value;\r\n};\r\n#pragma warning(pop)\r\n" +
+                    "\r\n// extended receive order type, includes \'interpolated\' for application-genera" +
+                    "ted timestamps\r\nenum class OrderType { RECEIVE, TIMESTAMP, INTERPOLATED };\r\n\r\nte" +
+                    "mplate<typename char_type, typename traits_type>\r\nstd::basic_ostream<char_type, " +
+                    "traits_type>&\r\noperator<<(std::basic_ostream<char_type, traits_type>& os, OrderT" +
+                    "ype value)\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderType::RECEIVE: os << \"RECEIV" +
+                    "E\"; break;\r\n    case OrderType::TIMESTAMP: os << \"TIMESTAMP\"; break;\r\n    case O" +
+                    "rderType::INTERPOLATED: os << \"INTERPOLATED\"; break;\r\n  }\r\n  return os;\r\n}\r\n\r\nin" +
+                    "line std::string to_string(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    case " +
+                    "OrderType::RECEIVE: return \"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return \"TI" +
+                    "MESTAMP\";\r\n    case OrderType::INTERPOLATED: return \"INTERPOLATED\";\r\n  }\r\n}\r\n\r\ni" +
+                    "nline std::wstring to_wstring(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    ca" +
+                    "se OrderType::RECEIVE: return L\"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return" +
+                    " L\"TIMESTAMP\";\r\n    case OrderType::INTERPOLATED: return L\"INTERPOLATED\";\r\n  }\r\n" +
+                    "}\r\n");
             
             #line 228 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.DataTypeForwardDeclarations));

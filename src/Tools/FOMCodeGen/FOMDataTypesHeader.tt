@@ -155,7 +155,7 @@ private:
 template<typename T> struct optional<T, false>
 {
   // constructors
-  optional() : _valid(false) {}
+  optional() : _valid(false), _value() {}
   optional(const optional& rhs): _valid(rhs._valid), _value(rhs._value) { }
   optional(const T& rhs): _valid(true), _value(rhs) { }
   template<typename Other>
