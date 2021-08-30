@@ -21,10 +21,13 @@ HLAobjectRootObjectClass::HLAobjectRootObjectClass(rti1516ev::RTIambassador* rti
 
 HLAobjectRootObjectClass::~HLAobjectRootObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -77,7 +80,7 @@ rti1516ev::AttributeHandleSet HLAobjectRootObjectClass::GetAllAttributeHandles()
 
 void HLAobjectRootObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<HLAobjectRoot> newObject = std::shared_ptr<HLAobjectRoot>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -85,27 +88,24 @@ void HLAobjectRootObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void HLAobjectRootObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<HLAobjectRoot>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -116,7 +116,7 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::GetObjectInstance(cons
 
 std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -127,7 +127,7 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::GetObjectInstance(rti1
 
 std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -141,6 +141,7 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -152,7 +153,7 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
 
 std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -165,6 +166,7 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
   std::shared_ptr<HLAobjectRoot> newObject = std::shared_ptr<HLAobjectRoot>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -182,6 +184,7 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
 
 uint32_t HLAobjectRootObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -189,11 +192,13 @@ uint32_t HLAobjectRootObjectClass::RegisterDiscoverObjectInstanceCallback(Discov
 
 void HLAobjectRootObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void HLAobjectRootObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IHLAobjectRoot> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -203,6 +208,7 @@ void HLAobjectRootObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::share
 
 uint32_t HLAobjectRootObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -210,11 +216,13 @@ uint32_t HLAobjectRootObjectClass::RegisterRemoveObjectInstanceCallback(RemoveOb
 
 void HLAobjectRootObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void HLAobjectRootObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IHLAobjectRoot> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -230,13 +238,13 @@ void HLAobjectRootObjectClass::InsertObjectInstanceName(std::shared_ptr<IHLAobje
 
 void HLAobjectRootObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IHLAobjectRoot> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
 }
 
 void HLAobjectRootObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
 }
@@ -275,19 +283,19 @@ HLAobjectRoot::~HLAobjectRoot()
 
 bool HLAobjectRoot::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool HLAobjectRoot::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void HLAobjectRoot::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -340,10 +348,13 @@ SystemVariableObjectClass::SystemVariableObjectClass(rti1516ev::RTIambassador* r
 
 SystemVariableObjectClass::~SystemVariableObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -397,7 +408,7 @@ rti1516ev::AttributeHandleSet SystemVariableObjectClass::GetAllAttributeHandles(
 
 void SystemVariableObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<SystemVariable> newObject = std::shared_ptr<SystemVariable>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -405,27 +416,24 @@ void SystemVariableObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void SystemVariableObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<SystemVariable>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<ISystemVariable> SystemVariableObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -444,7 +452,7 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::GetObjectInstance(co
 
 std::shared_ptr<ISystemVariable> SystemVariableObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -463,7 +471,7 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::GetObjectInstance(rt
 
 std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -477,6 +485,7 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -488,7 +497,7 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
 
 std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -501,6 +510,7 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
   std::shared_ptr<SystemVariable> newObject = std::shared_ptr<SystemVariable>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -518,6 +528,7 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
 
 uint32_t SystemVariableObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -525,11 +536,13 @@ uint32_t SystemVariableObjectClass::RegisterDiscoverObjectInstanceCallback(Disco
 
 void SystemVariableObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void SystemVariableObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<ISystemVariable> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -539,6 +552,7 @@ void SystemVariableObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shar
 
 uint32_t SystemVariableObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -546,11 +560,13 @@ uint32_t SystemVariableObjectClass::RegisterRemoveObjectInstanceCallback(RemoveO
 
 void SystemVariableObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void SystemVariableObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<ISystemVariable> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -567,14 +583,14 @@ void SystemVariableObjectClass::InsertObjectInstanceName(std::shared_ptr<ISystem
 
 void SystemVariableObjectClass::InsertObjectInstanceHandle(std::shared_ptr<ISystemVariable> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void SystemVariableObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -614,19 +630,19 @@ SystemVariable::~SystemVariable()
 
 bool SystemVariable::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool SystemVariable::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void SystemVariable::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -653,13 +669,13 @@ void SystemVariable::Release()
 // attribute Value : HLAopaqueData
 std::vector<uint8_t> SystemVariable::GetValue() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValue.get();
 }
 
 void SystemVariable::SetValue(const std::vector<uint8_t>& newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mValue.set(newValue);
   mDirty |= kValueBit;
@@ -685,25 +701,25 @@ rti1516ev::AttributeHandleValueMap SystemVariable::GetModifiedAttributeValues() 
 
 SystemVariable::AttributeBits SystemVariable::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 SystemVariable::AttributeBits SystemVariable::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 SystemVariable::AttributeBits SystemVariable::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 SystemVariable::AttributeBits SystemVariable::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -747,7 +763,7 @@ void SystemVariable::UpdateModifiedAttributeValues(int64_t time)
 
 void SystemVariable::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -758,15 +774,13 @@ void SystemVariable::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // SystemVariable::ReflectAttributeValues
 
 void SystemVariable::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -777,22 +791,21 @@ void SystemVariable::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // SystemVariable::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void SystemVariable::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kValueBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetValueAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kValueBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetValueAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -807,23 +820,24 @@ void SystemVariable::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void SystemVariable::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetValueAttributeHandle() && (mValuesSet & kValueBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mValue.encode()));
-      mDirty &= ~kValueBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetValueAttributeHandle() && (mValuesSet & kValueBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mValue.encode()));
+        mDirty &= ~kValueBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // SystemVariable::ReflectAttributeValues
 
 uint32_t SystemVariable::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -831,13 +845,13 @@ uint32_t SystemVariable::RegisterUpdateCallback(UpdateCallback callback)
 
 void SystemVariable::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void SystemVariable::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -862,10 +876,13 @@ ValueEntityObjectClass::ValueEntityObjectClass(rti1516ev::RTIambassador* rtiAmba
 
 ValueEntityObjectClass::~ValueEntityObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -919,7 +936,7 @@ rti1516ev::AttributeHandleSet ValueEntityObjectClass::GetAllAttributeHandles()
 
 void ValueEntityObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<ValueEntity> newObject = std::shared_ptr<ValueEntity>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -927,27 +944,24 @@ void ValueEntityObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHan
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void ValueEntityObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<ValueEntity>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IValueEntity> ValueEntityObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -966,7 +980,7 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::GetObjectInstance(const st
 
 std::shared_ptr<IValueEntity> ValueEntityObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -985,7 +999,7 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::GetObjectInstance(rti1516e
 
 std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -999,6 +1013,7 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -1010,7 +1025,7 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
 
 std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -1023,6 +1038,7 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
   std::shared_ptr<ValueEntity> newObject = std::shared_ptr<ValueEntity>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -1040,6 +1056,7 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
 
 uint32_t ValueEntityObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -1047,11 +1064,13 @@ uint32_t ValueEntityObjectClass::RegisterDiscoverObjectInstanceCallback(Discover
 
 void ValueEntityObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void ValueEntityObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IValueEntity> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -1061,6 +1080,7 @@ void ValueEntityObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_
 
 uint32_t ValueEntityObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -1068,11 +1088,13 @@ uint32_t ValueEntityObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObje
 
 void ValueEntityObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void ValueEntityObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IValueEntity> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -1089,14 +1111,14 @@ void ValueEntityObjectClass::InsertObjectInstanceName(std::shared_ptr<IValueEnti
 
 void ValueEntityObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IValueEntity> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void ValueEntityObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -1136,19 +1158,19 @@ ValueEntity::~ValueEntity()
 
 bool ValueEntity::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool ValueEntity::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void ValueEntity::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -1175,13 +1197,13 @@ void ValueEntity::Release()
 // attribute Value : HLAopaqueData
 std::vector<uint8_t> ValueEntity::GetValue() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValue.get();
 }
 
 void ValueEntity::SetValue(const std::vector<uint8_t>& newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mValue.set(newValue);
   mDirty |= kValueBit;
@@ -1207,25 +1229,25 @@ rti1516ev::AttributeHandleValueMap ValueEntity::GetModifiedAttributeValues() con
 
 ValueEntity::AttributeBits ValueEntity::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 ValueEntity::AttributeBits ValueEntity::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 ValueEntity::AttributeBits ValueEntity::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 ValueEntity::AttributeBits ValueEntity::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -1269,7 +1291,7 @@ void ValueEntity::UpdateModifiedAttributeValues(int64_t time)
 
 void ValueEntity::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -1280,15 +1302,13 @@ void ValueEntity::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMa
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // ValueEntity::ReflectAttributeValues
 
 void ValueEntity::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -1299,22 +1319,21 @@ void ValueEntity::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMa
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // ValueEntity::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void ValueEntity::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kValueBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetValueAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kValueBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetValueAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -1329,23 +1348,24 @@ void ValueEntity::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void ValueEntity::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetValueAttributeHandle() && (mValuesSet & kValueBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mValue.encode()));
-      mDirty &= ~kValueBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetValueAttributeHandle() && (mValuesSet & kValueBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mValue.encode()));
+        mDirty &= ~kValueBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // ValueEntity::ReflectAttributeValues
 
 uint32_t ValueEntity::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -1353,13 +1373,13 @@ uint32_t ValueEntity::RegisterUpdateCallback(UpdateCallback callback)
 
 void ValueEntity::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void ValueEntity::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -1388,10 +1408,13 @@ DOMemberSourceObjectClass::DOMemberSourceObjectClass(rti1516ev::RTIambassador* r
 
 DOMemberSourceObjectClass::~DOMemberSourceObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -1447,7 +1470,7 @@ rti1516ev::AttributeHandleSet DOMemberSourceObjectClass::GetAllAttributeHandles(
 
 void DOMemberSourceObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<DOMemberSource> newObject = std::shared_ptr<DOMemberSource>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -1455,27 +1478,24 @@ void DOMemberSourceObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void DOMemberSourceObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<DOMemberSource>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -1494,7 +1514,7 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::GetObjectInstance(co
 
 std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -1513,7 +1533,7 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::GetObjectInstance(rt
 
 std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -1527,6 +1547,7 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -1538,7 +1559,7 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
 
 std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -1551,6 +1572,7 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
   std::shared_ptr<DOMemberSource> newObject = std::shared_ptr<DOMemberSource>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -1568,6 +1590,7 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
 
 uint32_t DOMemberSourceObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -1575,11 +1598,13 @@ uint32_t DOMemberSourceObjectClass::RegisterDiscoverObjectInstanceCallback(Disco
 
 void DOMemberSourceObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void DOMemberSourceObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IDOMemberSource> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -1589,6 +1614,7 @@ void DOMemberSourceObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shar
 
 uint32_t DOMemberSourceObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -1596,11 +1622,13 @@ uint32_t DOMemberSourceObjectClass::RegisterRemoveObjectInstanceCallback(RemoveO
 
 void DOMemberSourceObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void DOMemberSourceObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IDOMemberSource> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -1617,14 +1645,14 @@ void DOMemberSourceObjectClass::InsertObjectInstanceName(std::shared_ptr<IDOMemb
 
 void DOMemberSourceObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IDOMemberSource> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void DOMemberSourceObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -1664,19 +1692,19 @@ DOMemberSource::~DOMemberSource()
 
 bool DOMemberSource::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool DOMemberSource::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void DOMemberSource::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -1703,13 +1731,13 @@ void DOMemberSource::Release()
 // attribute DOSourceMemberName : HLAASCIIstring
 std::string DOMemberSource::GetDOSourceMemberName() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDOSourceMemberName.get();
 }
 
 void DOMemberSource::SetDOSourceMemberName(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDOSourceMemberName.set(newValue);
   mDirty |= kDOSourceMemberNameBit;
@@ -1719,13 +1747,13 @@ void DOMemberSource::SetDOSourceMemberName(std::string newValue)
 // attribute DOSourceMemberConnectionType : HLAASCIIstring
 std::string DOMemberSource::GetDOSourceMemberConnectionType() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDOSourceMemberConnectionType.get();
 }
 
 void DOMemberSource::SetDOSourceMemberConnectionType(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDOSourceMemberConnectionType.set(newValue);
   mDirty |= kDOSourceMemberConnectionTypeBit;
@@ -1735,13 +1763,13 @@ void DOMemberSource::SetDOSourceMemberConnectionType(std::string newValue)
 // attribute DOSourceMemberDataBytes : HLAopaqueData
 std::vector<uint8_t> DOMemberSource::GetDOSourceMemberDataBytes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDOSourceMemberDataBytes.get();
 }
 
 void DOMemberSource::SetDOSourceMemberDataBytes(const std::vector<uint8_t>& newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDOSourceMemberDataBytes.set(newValue);
   mDirty |= kDOSourceMemberDataBytesBit;
@@ -1777,25 +1805,25 @@ rti1516ev::AttributeHandleValueMap DOMemberSource::GetModifiedAttributeValues() 
 
 DOMemberSource::AttributeBits DOMemberSource::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 DOMemberSource::AttributeBits DOMemberSource::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 DOMemberSource::AttributeBits DOMemberSource::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 DOMemberSource::AttributeBits DOMemberSource::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -1839,7 +1867,7 @@ void DOMemberSource::UpdateModifiedAttributeValues(int64_t time)
 
 void DOMemberSource::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -1860,15 +1888,13 @@ void DOMemberSource::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // DOMemberSource::ReflectAttributeValues
 
 void DOMemberSource::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -1889,30 +1915,29 @@ void DOMemberSource::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // DOMemberSource::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void DOMemberSource::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kDOSourceMemberNameBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetDOSourceMemberNameAttributeHandle());
-  }
-  if ((mLastUpdated & kDOSourceMemberConnectionTypeBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetDOSourceMemberConnectionTypeAttributeHandle());
-  }
-  if ((mLastUpdated & kDOSourceMemberDataBytesBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetDOSourceMemberDataBytesAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kDOSourceMemberNameBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDOSourceMemberNameAttributeHandle());
+    }
+    if ((mLastUpdated & kDOSourceMemberConnectionTypeBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDOSourceMemberConnectionTypeAttributeHandle());
+    }
+    if ((mLastUpdated & kDOSourceMemberDataBytesBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDOSourceMemberDataBytesAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -1929,33 +1954,34 @@ void DOMemberSource::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void DOMemberSource::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetDOSourceMemberNameAttributeHandle() && (mValuesSet & kDOSourceMemberNameBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberName.encode()));
-      mDirty &= ~kDOSourceMemberNameBit;
-    }
-    else if (attributeHandle == mObjectClass->GetDOSourceMemberConnectionTypeAttributeHandle() && (mValuesSet & kDOSourceMemberConnectionTypeBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberConnectionType.encode()));
-      mDirty &= ~kDOSourceMemberConnectionTypeBit;
-    }
-    else if (attributeHandle == mObjectClass->GetDOSourceMemberDataBytesAttributeHandle() && (mValuesSet & kDOSourceMemberDataBytesBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberDataBytes.encode()));
-      mDirty &= ~kDOSourceMemberDataBytesBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetDOSourceMemberNameAttributeHandle() && (mValuesSet & kDOSourceMemberNameBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberName.encode()));
+        mDirty &= ~kDOSourceMemberNameBit;
+      }
+      else if (attributeHandle == mObjectClass->GetDOSourceMemberConnectionTypeAttributeHandle() && (mValuesSet & kDOSourceMemberConnectionTypeBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberConnectionType.encode()));
+        mDirty &= ~kDOSourceMemberConnectionTypeBit;
+      }
+      else if (attributeHandle == mObjectClass->GetDOSourceMemberDataBytesAttributeHandle() && (mValuesSet & kDOSourceMemberDataBytesBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDOSourceMemberDataBytes.encode()));
+        mDirty &= ~kDOSourceMemberDataBytesBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // DOMemberSource::ReflectAttributeValues
 
 uint32_t DOMemberSource::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -1963,13 +1989,13 @@ uint32_t DOMemberSource::RegisterUpdateCallback(UpdateCallback callback)
 
 void DOMemberSource::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void DOMemberSource::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -1996,10 +2022,13 @@ DOMemberTargetObjectClass::DOMemberTargetObjectClass(rti1516ev::RTIambassador* r
 
 DOMemberTargetObjectClass::~DOMemberTargetObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -2054,7 +2083,7 @@ rti1516ev::AttributeHandleSet DOMemberTargetObjectClass::GetAllAttributeHandles(
 
 void DOMemberTargetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<DOMemberTarget> newObject = std::shared_ptr<DOMemberTarget>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -2062,27 +2091,24 @@ void DOMemberTargetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void DOMemberTargetObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<DOMemberTarget>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -2101,7 +2127,7 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::GetObjectInstance(co
 
 std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -2120,7 +2146,7 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::GetObjectInstance(rt
 
 std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -2134,6 +2160,7 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -2145,7 +2172,7 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
 
 std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -2158,6 +2185,7 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
   std::shared_ptr<DOMemberTarget> newObject = std::shared_ptr<DOMemberTarget>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -2175,6 +2203,7 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
 
 uint32_t DOMemberTargetObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -2182,11 +2211,13 @@ uint32_t DOMemberTargetObjectClass::RegisterDiscoverObjectInstanceCallback(Disco
 
 void DOMemberTargetObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void DOMemberTargetObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IDOMemberTarget> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -2196,6 +2227,7 @@ void DOMemberTargetObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shar
 
 uint32_t DOMemberTargetObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -2203,11 +2235,13 @@ uint32_t DOMemberTargetObjectClass::RegisterRemoveObjectInstanceCallback(RemoveO
 
 void DOMemberTargetObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void DOMemberTargetObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IDOMemberTarget> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -2224,14 +2258,14 @@ void DOMemberTargetObjectClass::InsertObjectInstanceName(std::shared_ptr<IDOMemb
 
 void DOMemberTargetObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IDOMemberTarget> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void DOMemberTargetObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -2271,19 +2305,19 @@ DOMemberTarget::~DOMemberTarget()
 
 bool DOMemberTarget::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool DOMemberTarget::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void DOMemberTarget::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -2310,13 +2344,13 @@ void DOMemberTarget::Release()
 // attribute DOTargetMemberName : HLAASCIIstring
 std::string DOMemberTarget::GetDOTargetMemberName() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDOTargetMemberName.get();
 }
 
 void DOMemberTarget::SetDOTargetMemberName(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDOTargetMemberName.set(newValue);
   mDirty |= kDOTargetMemberNameBit;
@@ -2326,13 +2360,13 @@ void DOMemberTarget::SetDOTargetMemberName(std::string newValue)
 // attribute DOTargetMemberConnectionType : HLAASCIIstring
 std::string DOMemberTarget::GetDOTargetMemberConnectionType() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDOTargetMemberConnectionType.get();
 }
 
 void DOMemberTarget::SetDOTargetMemberConnectionType(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDOTargetMemberConnectionType.set(newValue);
   mDirty |= kDOTargetMemberConnectionTypeBit;
@@ -2363,25 +2397,25 @@ rti1516ev::AttributeHandleValueMap DOMemberTarget::GetModifiedAttributeValues() 
 
 DOMemberTarget::AttributeBits DOMemberTarget::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 DOMemberTarget::AttributeBits DOMemberTarget::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 DOMemberTarget::AttributeBits DOMemberTarget::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 DOMemberTarget::AttributeBits DOMemberTarget::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -2425,7 +2459,7 @@ void DOMemberTarget::UpdateModifiedAttributeValues(int64_t time)
 
 void DOMemberTarget::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -2441,15 +2475,13 @@ void DOMemberTarget::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // DOMemberTarget::ReflectAttributeValues
 
 void DOMemberTarget::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -2465,26 +2497,25 @@ void DOMemberTarget::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // DOMemberTarget::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void DOMemberTarget::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kDOTargetMemberNameBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetDOTargetMemberNameAttributeHandle());
-  }
-  if ((mLastUpdated & kDOTargetMemberConnectionTypeBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetDOTargetMemberConnectionTypeAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kDOTargetMemberNameBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDOTargetMemberNameAttributeHandle());
+    }
+    if ((mLastUpdated & kDOTargetMemberConnectionTypeBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDOTargetMemberConnectionTypeAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -2500,28 +2531,29 @@ void DOMemberTarget::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void DOMemberTarget::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetDOTargetMemberNameAttributeHandle() && (mValuesSet & kDOTargetMemberNameBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDOTargetMemberName.encode()));
-      mDirty &= ~kDOTargetMemberNameBit;
-    }
-    else if (attributeHandle == mObjectClass->GetDOTargetMemberConnectionTypeAttributeHandle() && (mValuesSet & kDOTargetMemberConnectionTypeBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDOTargetMemberConnectionType.encode()));
-      mDirty &= ~kDOTargetMemberConnectionTypeBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetDOTargetMemberNameAttributeHandle() && (mValuesSet & kDOTargetMemberNameBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDOTargetMemberName.encode()));
+        mDirty &= ~kDOTargetMemberNameBit;
+      }
+      else if (attributeHandle == mObjectClass->GetDOTargetMemberConnectionTypeAttributeHandle() && (mValuesSet & kDOTargetMemberConnectionTypeBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDOTargetMemberConnectionType.encode()));
+        mDirty &= ~kDOTargetMemberConnectionTypeBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // DOMemberTarget::ReflectAttributeValues
 
 uint32_t DOMemberTarget::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -2529,13 +2561,13 @@ uint32_t DOMemberTarget::RegisterUpdateCallback(UpdateCallback callback)
 
 void DOMemberTarget::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void DOMemberTarget::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -2560,10 +2592,13 @@ BusManagementObjectClass::BusManagementObjectClass(rti1516ev::RTIambassador* rti
 
 BusManagementObjectClass::~BusManagementObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -2617,7 +2652,7 @@ rti1516ev::AttributeHandleSet BusManagementObjectClass::GetAllAttributeHandles()
 
 void BusManagementObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<BusManagement> newObject = std::shared_ptr<BusManagement>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -2625,27 +2660,24 @@ void BusManagementObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void BusManagementObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<BusManagement>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IBusManagement> BusManagementObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -2664,7 +2696,7 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::GetObjectInstance(cons
 
 std::shared_ptr<IBusManagement> BusManagementObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -2683,7 +2715,7 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::GetObjectInstance(rti1
 
 std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -2697,6 +2729,7 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -2708,7 +2741,7 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
 
 std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -2721,6 +2754,7 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
   std::shared_ptr<BusManagement> newObject = std::shared_ptr<BusManagement>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -2738,6 +2772,7 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
 
 uint32_t BusManagementObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -2745,11 +2780,13 @@ uint32_t BusManagementObjectClass::RegisterDiscoverObjectInstanceCallback(Discov
 
 void BusManagementObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void BusManagementObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusManagement> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -2759,6 +2796,7 @@ void BusManagementObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::share
 
 uint32_t BusManagementObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -2766,11 +2804,13 @@ uint32_t BusManagementObjectClass::RegisterRemoveObjectInstanceCallback(RemoveOb
 
 void BusManagementObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void BusManagementObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IBusManagement> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -2787,14 +2827,14 @@ void BusManagementObjectClass::InsertObjectInstanceName(std::shared_ptr<IBusMana
 
 void BusManagementObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IBusManagement> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void BusManagementObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -2834,19 +2874,19 @@ BusManagement::~BusManagement()
 
 bool BusManagement::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool BusManagement::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void BusManagement::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -2873,13 +2913,13 @@ void BusManagement::Release()
 // attribute NetworkID : HLAASCIIstring
 std::string BusManagement::GetNetworkID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mNetworkID.get();
 }
 
 void BusManagement::SetNetworkID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
@@ -2905,25 +2945,25 @@ rti1516ev::AttributeHandleValueMap BusManagement::GetModifiedAttributeValues() c
 
 BusManagement::AttributeBits BusManagement::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 BusManagement::AttributeBits BusManagement::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 BusManagement::AttributeBits BusManagement::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 BusManagement::AttributeBits BusManagement::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -2967,7 +3007,7 @@ void BusManagement::UpdateModifiedAttributeValues(int64_t time)
 
 void BusManagement::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -2983,7 +3023,7 @@ void BusManagement::ReflectAttributeValues(const rti1516ev::AttributeHandleValue
 
 void BusManagement::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& /* theTime */, OrderType /* orderType */)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -3000,13 +3040,14 @@ void BusManagement::ReflectAttributeValues(const rti1516ev::AttributeHandleValue
 // request attributes not being part of the last update
 void BusManagement::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kNetworkIDBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kNetworkIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -3021,17 +3062,18 @@ void BusManagement::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void BusManagement::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+        mDirty &= ~kNetworkIDBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusManagement::ReflectAttributeValues
 
@@ -3058,10 +3100,13 @@ BusManagementCanObjectClass::BusManagementCanObjectClass(rti1516ev::RTIambassado
 
 BusManagementCanObjectClass::~BusManagementCanObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -3119,7 +3164,7 @@ rti1516ev::AttributeHandleSet BusManagementCanObjectClass::GetAllAttributeHandle
 
 void BusManagementCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<BusManagementCan> newObject = std::shared_ptr<BusManagementCan>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -3127,27 +3172,24 @@ void BusManagementCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstan
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void BusManagementCanObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<BusManagementCan>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -3166,7 +3208,7 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::GetObjectInstanc
 
 std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -3185,7 +3227,7 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::GetObjectInstanc
 
 std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -3199,6 +3241,7 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -3210,7 +3253,7 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
 
 std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -3223,6 +3266,7 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
   std::shared_ptr<BusManagementCan> newObject = std::shared_ptr<BusManagementCan>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -3240,6 +3284,7 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
 
 uint32_t BusManagementCanObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -3247,11 +3292,13 @@ uint32_t BusManagementCanObjectClass::RegisterDiscoverObjectInstanceCallback(Dis
 
 void BusManagementCanObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void BusManagementCanObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusManagementCan> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -3261,6 +3308,7 @@ void BusManagementCanObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::sh
 
 uint32_t BusManagementCanObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -3268,11 +3316,13 @@ uint32_t BusManagementCanObjectClass::RegisterRemoveObjectInstanceCallback(Remov
 
 void BusManagementCanObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void BusManagementCanObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IBusManagementCan> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -3289,14 +3339,14 @@ void BusManagementCanObjectClass::InsertObjectInstanceName(std::shared_ptr<IBusM
 
 void BusManagementCanObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IBusManagementCan> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void BusManagementCanObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -3336,19 +3386,19 @@ BusManagementCan::~BusManagementCan()
 
 bool BusManagementCan::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool BusManagementCan::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void BusManagementCan::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -3375,13 +3425,13 @@ void BusManagementCan::Release()
 // attribute NetworkID : HLAASCIIstring
 std::string BusManagementCan::GetNetworkID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mNetworkID.get();
 }
 
 void BusManagementCan::SetNetworkID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
@@ -3391,13 +3441,13 @@ void BusManagementCan::SetNetworkID(std::string newValue)
 // attribute BusState : CanBusState
 CanBusState BusManagementCan::GetBusState() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<CanBusState>(mBusState.get());
 }
 
 void BusManagementCan::SetBusState(CanBusState newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mBusState.set(static_cast<int32_t>(newValue));
   mDirty |= kBusStateBit;
@@ -3407,13 +3457,13 @@ void BusManagementCan::SetBusState(CanBusState newValue)
 // attribute TxErrorCount : HLAinteger32LE
 int32_t BusManagementCan::GetTxErrorCount() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mTxErrorCount.get();
 }
 
 void BusManagementCan::SetTxErrorCount(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mTxErrorCount.set(newValue);
   mDirty |= kTxErrorCountBit;
@@ -3423,13 +3473,13 @@ void BusManagementCan::SetTxErrorCount(int32_t newValue)
 // attribute RxErrorCount : HLAinteger32LE
 int32_t BusManagementCan::GetRxErrorCount() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mRxErrorCount.get();
 }
 
 void BusManagementCan::SetRxErrorCount(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mRxErrorCount.set(newValue);
   mDirty |= kRxErrorCountBit;
@@ -3439,13 +3489,13 @@ void BusManagementCan::SetRxErrorCount(int32_t newValue)
 // attribute SendMessagesAsRx : HLAboolean
 bool BusManagementCan::GetSendMessagesAsRx() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mSendMessagesAsRx.get();
 }
 
 void BusManagementCan::SetSendMessagesAsRx(bool newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mSendMessagesAsRx.set(newValue);
   mDirty |= kSendMessagesAsRxBit;
@@ -3491,25 +3541,25 @@ rti1516ev::AttributeHandleValueMap BusManagementCan::GetModifiedAttributeValues(
 
 BusManagementCan::AttributeBits BusManagementCan::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 BusManagementCan::AttributeBits BusManagementCan::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 BusManagementCan::AttributeBits BusManagementCan::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 BusManagementCan::AttributeBits BusManagementCan::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -3553,7 +3603,7 @@ void BusManagementCan::UpdateModifiedAttributeValues(int64_t time)
 
 void BusManagementCan::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -3584,15 +3634,13 @@ void BusManagementCan::ReflectAttributeValues(const rti1516ev::AttributeHandleVa
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // BusManagementCan::ReflectAttributeValues
 
 void BusManagementCan::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -3623,38 +3671,37 @@ void BusManagementCan::ReflectAttributeValues(const rti1516ev::AttributeHandleVa
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // BusManagementCan::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void BusManagementCan::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kNetworkIDBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
-  }
-  if ((mLastUpdated & kBusStateBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetBusStateAttributeHandle());
-  }
-  if ((mLastUpdated & kTxErrorCountBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetTxErrorCountAttributeHandle());
-  }
-  if ((mLastUpdated & kRxErrorCountBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetRxErrorCountAttributeHandle());
-  }
-  if ((mLastUpdated & kSendMessagesAsRxBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetSendMessagesAsRxAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kNetworkIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+    }
+    if ((mLastUpdated & kBusStateBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetBusStateAttributeHandle());
+    }
+    if ((mLastUpdated & kTxErrorCountBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetTxErrorCountAttributeHandle());
+    }
+    if ((mLastUpdated & kRxErrorCountBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetRxErrorCountAttributeHandle());
+    }
+    if ((mLastUpdated & kSendMessagesAsRxBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetSendMessagesAsRxAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -3673,43 +3720,44 @@ void BusManagementCan::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void BusManagementCan::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetBusStateAttributeHandle() && (mValuesSet & kBusStateBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mBusState.encode()));
-      mDirty &= ~kBusStateBit;
-    }
-    else if (attributeHandle == mObjectClass->GetTxErrorCountAttributeHandle() && (mValuesSet & kTxErrorCountBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mTxErrorCount.encode()));
-      mDirty &= ~kTxErrorCountBit;
-    }
-    else if (attributeHandle == mObjectClass->GetRxErrorCountAttributeHandle() && (mValuesSet & kRxErrorCountBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mRxErrorCount.encode()));
-      mDirty &= ~kRxErrorCountBit;
-    }
-    else if (attributeHandle == mObjectClass->GetSendMessagesAsRxAttributeHandle() && (mValuesSet & kSendMessagesAsRxBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mSendMessagesAsRx.encode()));
-      mDirty &= ~kSendMessagesAsRxBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+        mDirty &= ~kNetworkIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetBusStateAttributeHandle() && (mValuesSet & kBusStateBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mBusState.encode()));
+        mDirty &= ~kBusStateBit;
+      }
+      else if (attributeHandle == mObjectClass->GetTxErrorCountAttributeHandle() && (mValuesSet & kTxErrorCountBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mTxErrorCount.encode()));
+        mDirty &= ~kTxErrorCountBit;
+      }
+      else if (attributeHandle == mObjectClass->GetRxErrorCountAttributeHandle() && (mValuesSet & kRxErrorCountBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mRxErrorCount.encode()));
+        mDirty &= ~kRxErrorCountBit;
+      }
+      else if (attributeHandle == mObjectClass->GetSendMessagesAsRxAttributeHandle() && (mValuesSet & kSendMessagesAsRxBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mSendMessagesAsRx.encode()));
+        mDirty &= ~kSendMessagesAsRxBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusManagementCan::ReflectAttributeValues
 
 uint32_t BusManagementCan::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -3717,13 +3765,13 @@ uint32_t BusManagementCan::RegisterUpdateCallback(UpdateCallback callback)
 
 void BusManagementCan::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void BusManagementCan::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -3750,10 +3798,13 @@ BusManagementEthernetObjectClass::BusManagementEthernetObjectClass(rti1516ev::RT
 
 BusManagementEthernetObjectClass::~BusManagementEthernetObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -3809,7 +3860,7 @@ rti1516ev::AttributeHandleSet BusManagementEthernetObjectClass::GetAllAttributeH
 
 void BusManagementEthernetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<BusManagementEthernet> newObject = std::shared_ptr<BusManagementEthernet>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -3817,27 +3868,24 @@ void BusManagementEthernetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectI
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void BusManagementEthernetObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<BusManagementEthernet>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -3856,7 +3904,7 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::GetObj
 
 std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -3875,7 +3923,7 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::GetObj
 
 std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -3889,6 +3937,7 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -3900,7 +3949,7 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
 
 std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -3913,6 +3962,7 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
   std::shared_ptr<BusManagementEthernet> newObject = std::shared_ptr<BusManagementEthernet>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -3930,6 +3980,7 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
 
 uint32_t BusManagementEthernetObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -3937,11 +3988,13 @@ uint32_t BusManagementEthernetObjectClass::RegisterDiscoverObjectInstanceCallbac
 
 void BusManagementEthernetObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void BusManagementEthernetObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusManagementEthernet> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -3951,6 +4004,7 @@ void BusManagementEthernetObjectClass::ExecuteDiscoverObjectInstanceCallbacks(st
 
 uint32_t BusManagementEthernetObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -3958,11 +4012,13 @@ uint32_t BusManagementEthernetObjectClass::RegisterRemoveObjectInstanceCallback(
 
 void BusManagementEthernetObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void BusManagementEthernetObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IBusManagementEthernet> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -3979,14 +4035,14 @@ void BusManagementEthernetObjectClass::InsertObjectInstanceName(std::shared_ptr<
 
 void BusManagementEthernetObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IBusManagementEthernet> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void BusManagementEthernetObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -4026,19 +4082,19 @@ BusManagementEthernet::~BusManagementEthernet()
 
 bool BusManagementEthernet::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool BusManagementEthernet::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void BusManagementEthernet::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -4065,13 +4121,13 @@ void BusManagementEthernet::Release()
 // attribute NetworkID : HLAASCIIstring
 std::string BusManagementEthernet::GetNetworkID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mNetworkID.get();
 }
 
 void BusManagementEthernet::SetNetworkID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
@@ -4081,13 +4137,13 @@ void BusManagementEthernet::SetNetworkID(std::string newValue)
 // attribute PortName : HLAASCIIstring
 std::string BusManagementEthernet::GetPortName() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mPortName.get();
 }
 
 void BusManagementEthernet::SetPortName(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mPortName.set(newValue);
   mDirty |= kPortNameBit;
@@ -4097,13 +4153,13 @@ void BusManagementEthernet::SetPortName(std::string newValue)
 // attribute SendMessagesAsRx : HLAboolean
 bool BusManagementEthernet::GetSendMessagesAsRx() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mSendMessagesAsRx.get();
 }
 
 void BusManagementEthernet::SetSendMessagesAsRx(bool newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mSendMessagesAsRx.set(newValue);
   mDirty |= kSendMessagesAsRxBit;
@@ -4139,25 +4195,25 @@ rti1516ev::AttributeHandleValueMap BusManagementEthernet::GetModifiedAttributeVa
 
 BusManagementEthernet::AttributeBits BusManagementEthernet::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 BusManagementEthernet::AttributeBits BusManagementEthernet::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 BusManagementEthernet::AttributeBits BusManagementEthernet::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 BusManagementEthernet::AttributeBits BusManagementEthernet::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -4201,7 +4257,7 @@ void BusManagementEthernet::UpdateModifiedAttributeValues(int64_t time)
 
 void BusManagementEthernet::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -4222,15 +4278,13 @@ void BusManagementEthernet::ReflectAttributeValues(const rti1516ev::AttributeHan
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // BusManagementEthernet::ReflectAttributeValues
 
 void BusManagementEthernet::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -4251,30 +4305,29 @@ void BusManagementEthernet::ReflectAttributeValues(const rti1516ev::AttributeHan
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // BusManagementEthernet::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void BusManagementEthernet::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kNetworkIDBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
-  }
-  if ((mLastUpdated & kPortNameBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetPortNameAttributeHandle());
-  }
-  if ((mLastUpdated & kSendMessagesAsRxBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetSendMessagesAsRxAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kNetworkIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+    }
+    if ((mLastUpdated & kPortNameBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetPortNameAttributeHandle());
+    }
+    if ((mLastUpdated & kSendMessagesAsRxBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetSendMessagesAsRxAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -4291,33 +4344,34 @@ void BusManagementEthernet::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void BusManagementEthernet::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetPortNameAttributeHandle() && (mValuesSet & kPortNameBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mPortName.encode()));
-      mDirty &= ~kPortNameBit;
-    }
-    else if (attributeHandle == mObjectClass->GetSendMessagesAsRxAttributeHandle() && (mValuesSet & kSendMessagesAsRxBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mSendMessagesAsRx.encode()));
-      mDirty &= ~kSendMessagesAsRxBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+        mDirty &= ~kNetworkIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetPortNameAttributeHandle() && (mValuesSet & kPortNameBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mPortName.encode()));
+        mDirty &= ~kPortNameBit;
+      }
+      else if (attributeHandle == mObjectClass->GetSendMessagesAsRxAttributeHandle() && (mValuesSet & kSendMessagesAsRxBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mSendMessagesAsRx.encode()));
+        mDirty &= ~kSendMessagesAsRxBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusManagementEthernet::ReflectAttributeValues
 
 uint32_t BusManagementEthernet::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -4325,13 +4379,13 @@ uint32_t BusManagementEthernet::RegisterUpdateCallback(UpdateCallback callback)
 
 void BusManagementEthernet::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void BusManagementEthernet::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -4394,10 +4448,13 @@ FlexRayClusterObjectClass::FlexRayClusterObjectClass(rti1516ev::RTIambassador* r
 
 FlexRayClusterObjectClass::~FlexRayClusterObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -4471,7 +4528,7 @@ rti1516ev::AttributeHandleSet FlexRayClusterObjectClass::GetAllAttributeHandles(
 
 void FlexRayClusterObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<FlexRayCluster> newObject = std::shared_ptr<FlexRayCluster>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -4479,27 +4536,24 @@ void FlexRayClusterObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstance
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void FlexRayClusterObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<FlexRayCluster>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -4518,7 +4572,7 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::GetObjectInstance(co
 
 std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -4537,7 +4591,7 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::GetObjectInstance(rt
 
 std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -4551,6 +4605,7 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -4562,7 +4617,7 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
 
 std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -4575,6 +4630,7 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
   std::shared_ptr<FlexRayCluster> newObject = std::shared_ptr<FlexRayCluster>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -4592,6 +4648,7 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
 
 uint32_t FlexRayClusterObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -4599,11 +4656,13 @@ uint32_t FlexRayClusterObjectClass::RegisterDiscoverObjectInstanceCallback(Disco
 
 void FlexRayClusterObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void FlexRayClusterObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IFlexRayCluster> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -4613,6 +4672,7 @@ void FlexRayClusterObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shar
 
 uint32_t FlexRayClusterObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -4620,11 +4680,13 @@ uint32_t FlexRayClusterObjectClass::RegisterRemoveObjectInstanceCallback(RemoveO
 
 void FlexRayClusterObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void FlexRayClusterObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IFlexRayCluster> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -4641,14 +4703,14 @@ void FlexRayClusterObjectClass::InsertObjectInstanceName(std::shared_ptr<IFlexRa
 
 void FlexRayClusterObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IFlexRayCluster> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void FlexRayClusterObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -4688,19 +4750,19 @@ FlexRayCluster::~FlexRayCluster()
 
 bool FlexRayCluster::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool FlexRayCluster::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void FlexRayCluster::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -4727,13 +4789,13 @@ void FlexRayCluster::Release()
 // attribute NetworkID : HLAASCIIstring
 std::string FlexRayCluster::GetNetworkID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mNetworkID.get();
 }
 
 void FlexRayCluster::SetNetworkID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
@@ -4743,13 +4805,13 @@ void FlexRayCluster::SetNetworkID(std::string newValue)
 // attribute gColdstartAttempts : HLAoctet
 uint8_t FlexRayCluster::GetgColdstartAttempts() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgColdstartAttempts.get();
 }
 
 void FlexRayCluster::SetgColdstartAttempts(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgColdstartAttempts.set(newValue);
   mDirty |= kgColdstartAttemptsBit;
@@ -4759,13 +4821,13 @@ void FlexRayCluster::SetgColdstartAttempts(uint8_t newValue)
 // attribute gCycleCountMax : HLAoctet
 uint8_t FlexRayCluster::GetgCycleCountMax() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgCycleCountMax.get();
 }
 
 void FlexRayCluster::SetgCycleCountMax(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgCycleCountMax.set(newValue);
   mDirty |= kgCycleCountMaxBit;
@@ -4775,13 +4837,13 @@ void FlexRayCluster::SetgCycleCountMax(uint8_t newValue)
 // attribute gdActionPointOffset : HLAinteger32LE
 int32_t FlexRayCluster::GetgdActionPointOffset() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdActionPointOffset.get();
 }
 
 void FlexRayCluster::SetgdActionPointOffset(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdActionPointOffset.set(newValue);
   mDirty |= kgdActionPointOffsetBit;
@@ -4791,13 +4853,13 @@ void FlexRayCluster::SetgdActionPointOffset(int32_t newValue)
 // attribute gdDynamicSlotIdlePhase : HLAinteger32LE
 int32_t FlexRayCluster::GetgdDynamicSlotIdlePhase() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdDynamicSlotIdlePhase.get();
 }
 
 void FlexRayCluster::SetgdDynamicSlotIdlePhase(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdDynamicSlotIdlePhase.set(newValue);
   mDirty |= kgdDynamicSlotIdlePhaseBit;
@@ -4807,13 +4869,13 @@ void FlexRayCluster::SetgdDynamicSlotIdlePhase(int32_t newValue)
 // attribute gdMiniSlot : HLAinteger32LE
 int32_t FlexRayCluster::GetgdMiniSlot() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdMiniSlot.get();
 }
 
 void FlexRayCluster::SetgdMiniSlot(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdMiniSlot.set(newValue);
   mDirty |= kgdMiniSlotBit;
@@ -4823,13 +4885,13 @@ void FlexRayCluster::SetgdMiniSlot(int32_t newValue)
 // attribute gdMiniSlotActionPointOffset : HLAinteger32LE
 int32_t FlexRayCluster::GetgdMiniSlotActionPointOffset() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdMiniSlotActionPointOffset.get();
 }
 
 void FlexRayCluster::SetgdMiniSlotActionPointOffset(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdMiniSlotActionPointOffset.set(newValue);
   mDirty |= kgdMiniSlotActionPointOffsetBit;
@@ -4839,13 +4901,13 @@ void FlexRayCluster::SetgdMiniSlotActionPointOffset(int32_t newValue)
 // attribute gdStaticSlot : HLAinteger32LE
 int32_t FlexRayCluster::GetgdStaticSlot() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdStaticSlot.get();
 }
 
 void FlexRayCluster::SetgdStaticSlot(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdStaticSlot.set(newValue);
   mDirty |= kgdStaticSlotBit;
@@ -4855,13 +4917,13 @@ void FlexRayCluster::SetgdStaticSlot(int32_t newValue)
 // attribute gdSymbolWindow : HLAinteger32LE
 int32_t FlexRayCluster::GetgdSymbolWindow() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdSymbolWindow.get();
 }
 
 void FlexRayCluster::SetgdSymbolWindow(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdSymbolWindow.set(newValue);
   mDirty |= kgdSymbolWindowBit;
@@ -4871,13 +4933,13 @@ void FlexRayCluster::SetgdSymbolWindow(int32_t newValue)
 // attribute gdSymbolWindowActionPointOffset : HLAinteger32LE
 int32_t FlexRayCluster::GetgdSymbolWindowActionPointOffset() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdSymbolWindowActionPointOffset.get();
 }
 
 void FlexRayCluster::SetgdSymbolWindowActionPointOffset(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdSymbolWindowActionPointOffset.set(newValue);
   mDirty |= kgdSymbolWindowActionPointOffsetBit;
@@ -4887,13 +4949,13 @@ void FlexRayCluster::SetgdSymbolWindowActionPointOffset(int32_t newValue)
 // attribute gdTSSTransmitter : HLAinteger32LE
 int32_t FlexRayCluster::GetgdTSSTransmitter() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdTSSTransmitter.get();
 }
 
 void FlexRayCluster::SetgdTSSTransmitter(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdTSSTransmitter.set(newValue);
   mDirty |= kgdTSSTransmitterBit;
@@ -4903,13 +4965,13 @@ void FlexRayCluster::SetgdTSSTransmitter(int32_t newValue)
 // attribute gdWakeupTxActive : HLAinteger32LE
 int32_t FlexRayCluster::GetgdWakeupTxActive() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdWakeupTxActive.get();
 }
 
 void FlexRayCluster::SetgdWakeupTxActive(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdWakeupTxActive.set(newValue);
   mDirty |= kgdWakeupTxActiveBit;
@@ -4919,13 +4981,13 @@ void FlexRayCluster::SetgdWakeupTxActive(int32_t newValue)
 // attribute gdWakeupTxIdle : HLAinteger32LE
 int32_t FlexRayCluster::GetgdWakeupTxIdle() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgdWakeupTxIdle.get();
 }
 
 void FlexRayCluster::SetgdWakeupTxIdle(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgdWakeupTxIdle.set(newValue);
   mDirty |= kgdWakeupTxIdleBit;
@@ -4935,13 +4997,13 @@ void FlexRayCluster::SetgdWakeupTxIdle(int32_t newValue)
 // attribute gListenNoise : HLAoctet
 uint8_t FlexRayCluster::GetgListenNoise() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgListenNoise.get();
 }
 
 void FlexRayCluster::SetgListenNoise(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgListenNoise.set(newValue);
   mDirty |= kgListenNoiseBit;
@@ -4951,13 +5013,13 @@ void FlexRayCluster::SetgListenNoise(uint8_t newValue)
 // attribute gMacroPerCycle : HLAinteger32LE
 int32_t FlexRayCluster::GetgMacroPerCycle() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgMacroPerCycle.get();
 }
 
 void FlexRayCluster::SetgMacroPerCycle(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgMacroPerCycle.set(newValue);
   mDirty |= kgMacroPerCycleBit;
@@ -4967,13 +5029,13 @@ void FlexRayCluster::SetgMacroPerCycle(int32_t newValue)
 // attribute gMaxWithoutClockCorrectionFatal : HLAoctet
 uint8_t FlexRayCluster::GetgMaxWithoutClockCorrectionFatal() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgMaxWithoutClockCorrectionFatal.get();
 }
 
 void FlexRayCluster::SetgMaxWithoutClockCorrectionFatal(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgMaxWithoutClockCorrectionFatal.set(newValue);
   mDirty |= kgMaxWithoutClockCorrectionFatalBit;
@@ -4983,13 +5045,13 @@ void FlexRayCluster::SetgMaxWithoutClockCorrectionFatal(uint8_t newValue)
 // attribute gMaxWithoutClockCorrectionPassive : HLAoctet
 uint8_t FlexRayCluster::GetgMaxWithoutClockCorrectionPassive() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgMaxWithoutClockCorrectionPassive.get();
 }
 
 void FlexRayCluster::SetgMaxWithoutClockCorrectionPassive(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgMaxWithoutClockCorrectionPassive.set(newValue);
   mDirty |= kgMaxWithoutClockCorrectionPassiveBit;
@@ -4999,13 +5061,13 @@ void FlexRayCluster::SetgMaxWithoutClockCorrectionPassive(uint8_t newValue)
 // attribute gNumberOfMiniSlots : HLAinteger32LE
 int32_t FlexRayCluster::GetgNumberOfMiniSlots() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgNumberOfMiniSlots.get();
 }
 
 void FlexRayCluster::SetgNumberOfMiniSlots(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgNumberOfMiniSlots.set(newValue);
   mDirty |= kgNumberOfMiniSlotsBit;
@@ -5015,13 +5077,13 @@ void FlexRayCluster::SetgNumberOfMiniSlots(int32_t newValue)
 // attribute gNumberOfStaticSlots : HLAinteger32LE
 int32_t FlexRayCluster::GetgNumberOfStaticSlots() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgNumberOfStaticSlots.get();
 }
 
 void FlexRayCluster::SetgNumberOfStaticSlots(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgNumberOfStaticSlots.set(newValue);
   mDirty |= kgNumberOfStaticSlotsBit;
@@ -5031,13 +5093,13 @@ void FlexRayCluster::SetgNumberOfStaticSlots(int32_t newValue)
 // attribute gPayloadLengthStatic : HLAinteger32LE
 int32_t FlexRayCluster::GetgPayloadLengthStatic() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgPayloadLengthStatic.get();
 }
 
 void FlexRayCluster::SetgPayloadLengthStatic(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgPayloadLengthStatic.set(newValue);
   mDirty |= kgPayloadLengthStaticBit;
@@ -5047,13 +5109,13 @@ void FlexRayCluster::SetgPayloadLengthStatic(int32_t newValue)
 // attribute gSyncFrameIDCountMax : HLAoctet
 uint8_t FlexRayCluster::GetgSyncFrameIDCountMax() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mgSyncFrameIDCountMax.get();
 }
 
 void FlexRayCluster::SetgSyncFrameIDCountMax(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mgSyncFrameIDCountMax.set(newValue);
   mDirty |= kgSyncFrameIDCountMaxBit;
@@ -5179,25 +5241,25 @@ rti1516ev::AttributeHandleValueMap FlexRayCluster::GetModifiedAttributeValues() 
 
 FlexRayCluster::AttributeBits FlexRayCluster::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 FlexRayCluster::AttributeBits FlexRayCluster::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 FlexRayCluster::AttributeBits FlexRayCluster::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 FlexRayCluster::AttributeBits FlexRayCluster::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -5241,7 +5303,7 @@ void FlexRayCluster::UpdateModifiedAttributeValues(int64_t time)
 
 void FlexRayCluster::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -5352,15 +5414,13 @@ void FlexRayCluster::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // FlexRayCluster::ReflectAttributeValues
 
 void FlexRayCluster::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -5471,102 +5531,101 @@ void FlexRayCluster::ReflectAttributeValues(const rti1516ev::AttributeHandleValu
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // FlexRayCluster::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void FlexRayCluster::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kNetworkIDBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
-  }
-  if ((mLastUpdated & kgColdstartAttemptsBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgColdstartAttemptsAttributeHandle());
-  }
-  if ((mLastUpdated & kgCycleCountMaxBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgCycleCountMaxAttributeHandle());
-  }
-  if ((mLastUpdated & kgdActionPointOffsetBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdActionPointOffsetAttributeHandle());
-  }
-  if ((mLastUpdated & kgdDynamicSlotIdlePhaseBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle());
-  }
-  if ((mLastUpdated & kgdMiniSlotBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdMiniSlotAttributeHandle());
-  }
-  if ((mLastUpdated & kgdMiniSlotActionPointOffsetBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle());
-  }
-  if ((mLastUpdated & kgdStaticSlotBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdStaticSlotAttributeHandle());
-  }
-  if ((mLastUpdated & kgdSymbolWindowBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdSymbolWindowAttributeHandle());
-  }
-  if ((mLastUpdated & kgdSymbolWindowActionPointOffsetBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle());
-  }
-  if ((mLastUpdated & kgdTSSTransmitterBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdTSSTransmitterAttributeHandle());
-  }
-  if ((mLastUpdated & kgdWakeupTxActiveBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdWakeupTxActiveAttributeHandle());
-  }
-  if ((mLastUpdated & kgdWakeupTxIdleBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgdWakeupTxIdleAttributeHandle());
-  }
-  if ((mLastUpdated & kgListenNoiseBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgListenNoiseAttributeHandle());
-  }
-  if ((mLastUpdated & kgMacroPerCycleBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgMacroPerCycleAttributeHandle());
-  }
-  if ((mLastUpdated & kgMaxWithoutClockCorrectionFatalBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle());
-  }
-  if ((mLastUpdated & kgMaxWithoutClockCorrectionPassiveBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle());
-  }
-  if ((mLastUpdated & kgNumberOfMiniSlotsBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgNumberOfMiniSlotsAttributeHandle());
-  }
-  if ((mLastUpdated & kgNumberOfStaticSlotsBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgNumberOfStaticSlotsAttributeHandle());
-  }
-  if ((mLastUpdated & kgPayloadLengthStaticBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgPayloadLengthStaticAttributeHandle());
-  }
-  if ((mLastUpdated & kgSyncFrameIDCountMaxBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kNetworkIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+    }
+    if ((mLastUpdated & kgColdstartAttemptsBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgColdstartAttemptsAttributeHandle());
+    }
+    if ((mLastUpdated & kgCycleCountMaxBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgCycleCountMaxAttributeHandle());
+    }
+    if ((mLastUpdated & kgdActionPointOffsetBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdActionPointOffsetAttributeHandle());
+    }
+    if ((mLastUpdated & kgdDynamicSlotIdlePhaseBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle());
+    }
+    if ((mLastUpdated & kgdMiniSlotBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdMiniSlotAttributeHandle());
+    }
+    if ((mLastUpdated & kgdMiniSlotActionPointOffsetBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle());
+    }
+    if ((mLastUpdated & kgdStaticSlotBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdStaticSlotAttributeHandle());
+    }
+    if ((mLastUpdated & kgdSymbolWindowBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdSymbolWindowAttributeHandle());
+    }
+    if ((mLastUpdated & kgdSymbolWindowActionPointOffsetBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle());
+    }
+    if ((mLastUpdated & kgdTSSTransmitterBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdTSSTransmitterAttributeHandle());
+    }
+    if ((mLastUpdated & kgdWakeupTxActiveBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdWakeupTxActiveAttributeHandle());
+    }
+    if ((mLastUpdated & kgdWakeupTxIdleBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgdWakeupTxIdleAttributeHandle());
+    }
+    if ((mLastUpdated & kgListenNoiseBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgListenNoiseAttributeHandle());
+    }
+    if ((mLastUpdated & kgMacroPerCycleBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgMacroPerCycleAttributeHandle());
+    }
+    if ((mLastUpdated & kgMaxWithoutClockCorrectionFatalBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle());
+    }
+    if ((mLastUpdated & kgMaxWithoutClockCorrectionPassiveBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle());
+    }
+    if ((mLastUpdated & kgNumberOfMiniSlotsBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgNumberOfMiniSlotsAttributeHandle());
+    }
+    if ((mLastUpdated & kgNumberOfStaticSlotsBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgNumberOfStaticSlotsAttributeHandle());
+    }
+    if ((mLastUpdated & kgPayloadLengthStaticBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgPayloadLengthStaticAttributeHandle());
+    }
+    if ((mLastUpdated & kgSyncFrameIDCountMaxBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -5601,123 +5660,124 @@ void FlexRayCluster::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void FlexRayCluster::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgColdstartAttemptsAttributeHandle() && (mValuesSet & kgColdstartAttemptsBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgColdstartAttempts.encode()));
-      mDirty &= ~kgColdstartAttemptsBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgCycleCountMaxAttributeHandle() && (mValuesSet & kgCycleCountMaxBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgCycleCountMax.encode()));
-      mDirty &= ~kgCycleCountMaxBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdActionPointOffsetAttributeHandle() && (mValuesSet & kgdActionPointOffsetBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdActionPointOffset.encode()));
-      mDirty &= ~kgdActionPointOffsetBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle() && (mValuesSet & kgdDynamicSlotIdlePhaseBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdDynamicSlotIdlePhase.encode()));
-      mDirty &= ~kgdDynamicSlotIdlePhaseBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdMiniSlotAttributeHandle() && (mValuesSet & kgdMiniSlotBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdMiniSlot.encode()));
-      mDirty &= ~kgdMiniSlotBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle() && (mValuesSet & kgdMiniSlotActionPointOffsetBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdMiniSlotActionPointOffset.encode()));
-      mDirty &= ~kgdMiniSlotActionPointOffsetBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdStaticSlotAttributeHandle() && (mValuesSet & kgdStaticSlotBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdStaticSlot.encode()));
-      mDirty &= ~kgdStaticSlotBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdSymbolWindowAttributeHandle() && (mValuesSet & kgdSymbolWindowBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdSymbolWindow.encode()));
-      mDirty &= ~kgdSymbolWindowBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle() && (mValuesSet & kgdSymbolWindowActionPointOffsetBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdSymbolWindowActionPointOffset.encode()));
-      mDirty &= ~kgdSymbolWindowActionPointOffsetBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdTSSTransmitterAttributeHandle() && (mValuesSet & kgdTSSTransmitterBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdTSSTransmitter.encode()));
-      mDirty &= ~kgdTSSTransmitterBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdWakeupTxActiveAttributeHandle() && (mValuesSet & kgdWakeupTxActiveBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdWakeupTxActive.encode()));
-      mDirty &= ~kgdWakeupTxActiveBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgdWakeupTxIdleAttributeHandle() && (mValuesSet & kgdWakeupTxIdleBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgdWakeupTxIdle.encode()));
-      mDirty &= ~kgdWakeupTxIdleBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgListenNoiseAttributeHandle() && (mValuesSet & kgListenNoiseBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgListenNoise.encode()));
-      mDirty &= ~kgListenNoiseBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgMacroPerCycleAttributeHandle() && (mValuesSet & kgMacroPerCycleBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgMacroPerCycle.encode()));
-      mDirty &= ~kgMacroPerCycleBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle() && (mValuesSet & kgMaxWithoutClockCorrectionFatalBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgMaxWithoutClockCorrectionFatal.encode()));
-      mDirty &= ~kgMaxWithoutClockCorrectionFatalBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle() && (mValuesSet & kgMaxWithoutClockCorrectionPassiveBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgMaxWithoutClockCorrectionPassive.encode()));
-      mDirty &= ~kgMaxWithoutClockCorrectionPassiveBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgNumberOfMiniSlotsAttributeHandle() && (mValuesSet & kgNumberOfMiniSlotsBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgNumberOfMiniSlots.encode()));
-      mDirty &= ~kgNumberOfMiniSlotsBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgNumberOfStaticSlotsAttributeHandle() && (mValuesSet & kgNumberOfStaticSlotsBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgNumberOfStaticSlots.encode()));
-      mDirty &= ~kgNumberOfStaticSlotsBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgPayloadLengthStaticAttributeHandle() && (mValuesSet & kgPayloadLengthStaticBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgPayloadLengthStatic.encode()));
-      mDirty &= ~kgPayloadLengthStaticBit;
-    }
-    else if (attributeHandle == mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle() && (mValuesSet & kgSyncFrameIDCountMaxBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mgSyncFrameIDCountMax.encode()));
-      mDirty &= ~kgSyncFrameIDCountMaxBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+        mDirty &= ~kNetworkIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgColdstartAttemptsAttributeHandle() && (mValuesSet & kgColdstartAttemptsBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgColdstartAttempts.encode()));
+        mDirty &= ~kgColdstartAttemptsBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgCycleCountMaxAttributeHandle() && (mValuesSet & kgCycleCountMaxBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgCycleCountMax.encode()));
+        mDirty &= ~kgCycleCountMaxBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdActionPointOffsetAttributeHandle() && (mValuesSet & kgdActionPointOffsetBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdActionPointOffset.encode()));
+        mDirty &= ~kgdActionPointOffsetBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdDynamicSlotIdlePhaseAttributeHandle() && (mValuesSet & kgdDynamicSlotIdlePhaseBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdDynamicSlotIdlePhase.encode()));
+        mDirty &= ~kgdDynamicSlotIdlePhaseBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdMiniSlotAttributeHandle() && (mValuesSet & kgdMiniSlotBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdMiniSlot.encode()));
+        mDirty &= ~kgdMiniSlotBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdMiniSlotActionPointOffsetAttributeHandle() && (mValuesSet & kgdMiniSlotActionPointOffsetBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdMiniSlotActionPointOffset.encode()));
+        mDirty &= ~kgdMiniSlotActionPointOffsetBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdStaticSlotAttributeHandle() && (mValuesSet & kgdStaticSlotBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdStaticSlot.encode()));
+        mDirty &= ~kgdStaticSlotBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdSymbolWindowAttributeHandle() && (mValuesSet & kgdSymbolWindowBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdSymbolWindow.encode()));
+        mDirty &= ~kgdSymbolWindowBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdSymbolWindowActionPointOffsetAttributeHandle() && (mValuesSet & kgdSymbolWindowActionPointOffsetBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdSymbolWindowActionPointOffset.encode()));
+        mDirty &= ~kgdSymbolWindowActionPointOffsetBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdTSSTransmitterAttributeHandle() && (mValuesSet & kgdTSSTransmitterBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdTSSTransmitter.encode()));
+        mDirty &= ~kgdTSSTransmitterBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdWakeupTxActiveAttributeHandle() && (mValuesSet & kgdWakeupTxActiveBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdWakeupTxActive.encode()));
+        mDirty &= ~kgdWakeupTxActiveBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgdWakeupTxIdleAttributeHandle() && (mValuesSet & kgdWakeupTxIdleBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgdWakeupTxIdle.encode()));
+        mDirty &= ~kgdWakeupTxIdleBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgListenNoiseAttributeHandle() && (mValuesSet & kgListenNoiseBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgListenNoise.encode()));
+        mDirty &= ~kgListenNoiseBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgMacroPerCycleAttributeHandle() && (mValuesSet & kgMacroPerCycleBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgMacroPerCycle.encode()));
+        mDirty &= ~kgMacroPerCycleBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionFatalAttributeHandle() && (mValuesSet & kgMaxWithoutClockCorrectionFatalBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgMaxWithoutClockCorrectionFatal.encode()));
+        mDirty &= ~kgMaxWithoutClockCorrectionFatalBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgMaxWithoutClockCorrectionPassiveAttributeHandle() && (mValuesSet & kgMaxWithoutClockCorrectionPassiveBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgMaxWithoutClockCorrectionPassive.encode()));
+        mDirty &= ~kgMaxWithoutClockCorrectionPassiveBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgNumberOfMiniSlotsAttributeHandle() && (mValuesSet & kgNumberOfMiniSlotsBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgNumberOfMiniSlots.encode()));
+        mDirty &= ~kgNumberOfMiniSlotsBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgNumberOfStaticSlotsAttributeHandle() && (mValuesSet & kgNumberOfStaticSlotsBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgNumberOfStaticSlots.encode()));
+        mDirty &= ~kgNumberOfStaticSlotsBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgPayloadLengthStaticAttributeHandle() && (mValuesSet & kgPayloadLengthStaticBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgPayloadLengthStatic.encode()));
+        mDirty &= ~kgPayloadLengthStaticBit;
+      }
+      else if (attributeHandle == mObjectClass->GetgSyncFrameIDCountMaxAttributeHandle() && (mValuesSet & kgSyncFrameIDCountMaxBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mgSyncFrameIDCountMax.encode()));
+        mDirty &= ~kgSyncFrameIDCountMaxBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // FlexRayCluster::ReflectAttributeValues
 
 uint32_t FlexRayCluster::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -5725,13 +5785,13 @@ uint32_t FlexRayCluster::RegisterUpdateCallback(UpdateCallback callback)
 
 void FlexRayCluster::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void FlexRayCluster::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -5758,10 +5818,13 @@ BusControllerObjectClass::BusControllerObjectClass(rti1516ev::RTIambassador* rti
 
 BusControllerObjectClass::~BusControllerObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -5816,7 +5879,7 @@ rti1516ev::AttributeHandleSet BusControllerObjectClass::GetAllAttributeHandles()
 
 void BusControllerObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<BusController> newObject = std::shared_ptr<BusController>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -5824,27 +5887,24 @@ void BusControllerObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceH
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void BusControllerObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<BusController>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IBusController> BusControllerObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -5863,7 +5923,7 @@ std::shared_ptr<IBusController> BusControllerObjectClass::GetObjectInstance(cons
 
 std::shared_ptr<IBusController> BusControllerObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -5882,7 +5942,7 @@ std::shared_ptr<IBusController> BusControllerObjectClass::GetObjectInstance(rti1
 
 std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -5896,6 +5956,7 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -5907,7 +5968,7 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
 
 std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -5920,6 +5981,7 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
   std::shared_ptr<BusController> newObject = std::shared_ptr<BusController>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -5937,6 +5999,7 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
 
 uint32_t BusControllerObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -5944,11 +6007,13 @@ uint32_t BusControllerObjectClass::RegisterDiscoverObjectInstanceCallback(Discov
 
 void BusControllerObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void BusControllerObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusController> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -5958,6 +6023,7 @@ void BusControllerObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::share
 
 uint32_t BusControllerObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -5965,11 +6031,13 @@ uint32_t BusControllerObjectClass::RegisterRemoveObjectInstanceCallback(RemoveOb
 
 void BusControllerObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void BusControllerObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IBusController> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -5986,14 +6054,14 @@ void BusControllerObjectClass::InsertObjectInstanceName(std::shared_ptr<IBusCont
 
 void BusControllerObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IBusController> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void BusControllerObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -6033,19 +6101,19 @@ BusController::~BusController()
 
 bool BusController::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool BusController::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void BusController::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -6072,13 +6140,13 @@ void BusController::Release()
 // attribute NetworkID : HLAASCIIstring
 std::string BusController::GetNetworkID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mNetworkID.get();
 }
 
 void BusController::SetNetworkID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
@@ -6088,13 +6156,13 @@ void BusController::SetNetworkID(std::string newValue)
 // attribute DeviceID : HLAASCIIstring
 std::string BusController::GetDeviceID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDeviceID.get();
 }
 
 void BusController::SetDeviceID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDeviceID.set(newValue);
   mDirty |= kDeviceIDBit;
@@ -6125,25 +6193,25 @@ rti1516ev::AttributeHandleValueMap BusController::GetModifiedAttributeValues() c
 
 BusController::AttributeBits BusController::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 BusController::AttributeBits BusController::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 BusController::AttributeBits BusController::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 BusController::AttributeBits BusController::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -6187,7 +6255,7 @@ void BusController::UpdateModifiedAttributeValues(int64_t time)
 
 void BusController::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -6208,7 +6276,7 @@ void BusController::ReflectAttributeValues(const rti1516ev::AttributeHandleValue
 
 void BusController::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& /* theTime */, OrderType /* orderType */)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -6230,17 +6298,18 @@ void BusController::ReflectAttributeValues(const rti1516ev::AttributeHandleValue
 // request attributes not being part of the last update
 void BusController::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kNetworkIDBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
-  }
-  if ((mLastUpdated & kDeviceIDBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kNetworkIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+    }
+    if ((mLastUpdated & kDeviceIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -6256,22 +6325,23 @@ void BusController::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void BusController::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+        mDirty &= ~kNetworkIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
+        mDirty &= ~kDeviceIDBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusController::ReflectAttributeValues
 
@@ -6308,10 +6378,13 @@ BusControllerCanObjectClass::BusControllerCanObjectClass(rti1516ev::RTIambassado
 
 BusControllerCanObjectClass::~BusControllerCanObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -6375,7 +6448,7 @@ rti1516ev::AttributeHandleSet BusControllerCanObjectClass::GetAllAttributeHandle
 
 void BusControllerCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<BusControllerCan> newObject = std::shared_ptr<BusControllerCan>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -6383,27 +6456,24 @@ void BusControllerCanObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstan
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void BusControllerCanObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<BusControllerCan>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -6422,7 +6492,7 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::GetObjectInstanc
 
 std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -6441,7 +6511,7 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::GetObjectInstanc
 
 std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -6455,6 +6525,7 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -6466,7 +6537,7 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
 
 std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -6479,6 +6550,7 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
   std::shared_ptr<BusControllerCan> newObject = std::shared_ptr<BusControllerCan>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -6496,6 +6568,7 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
 
 uint32_t BusControllerCanObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -6503,11 +6576,13 @@ uint32_t BusControllerCanObjectClass::RegisterDiscoverObjectInstanceCallback(Dis
 
 void BusControllerCanObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void BusControllerCanObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusControllerCan> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -6517,6 +6592,7 @@ void BusControllerCanObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::sh
 
 uint32_t BusControllerCanObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -6524,11 +6600,13 @@ uint32_t BusControllerCanObjectClass::RegisterRemoveObjectInstanceCallback(Remov
 
 void BusControllerCanObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void BusControllerCanObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IBusControllerCan> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -6545,14 +6623,14 @@ void BusControllerCanObjectClass::InsertObjectInstanceName(std::shared_ptr<IBusC
 
 void BusControllerCanObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IBusControllerCan> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void BusControllerCanObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -6592,19 +6670,19 @@ BusControllerCan::~BusControllerCan()
 
 bool BusControllerCan::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool BusControllerCan::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void BusControllerCan::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -6631,13 +6709,13 @@ void BusControllerCan::Release()
 // attribute NetworkID : HLAASCIIstring
 std::string BusControllerCan::GetNetworkID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mNetworkID.get();
 }
 
 void BusControllerCan::SetNetworkID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
@@ -6647,13 +6725,13 @@ void BusControllerCan::SetNetworkID(std::string newValue)
 // attribute DeviceID : HLAASCIIstring
 std::string BusControllerCan::GetDeviceID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDeviceID.get();
 }
 
 void BusControllerCan::SetDeviceID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDeviceID.set(newValue);
   mDirty |= kDeviceIDBit;
@@ -6663,13 +6741,13 @@ void BusControllerCan::SetDeviceID(std::string newValue)
 // attribute BaudRate : HLAinteger32LE
 int32_t BusControllerCan::GetBaudRate() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mBaudRate.get();
 }
 
 void BusControllerCan::SetBaudRate(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mBaudRate.set(newValue);
   mDirty |= kBaudRateBit;
@@ -6679,13 +6757,13 @@ void BusControllerCan::SetBaudRate(int32_t newValue)
 // attribute DataBaudRate : HLAinteger32LE
 int32_t BusControllerCan::GetDataBaudRate() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDataBaudRate.get();
 }
 
 void BusControllerCan::SetDataBaudRate(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDataBaudRate.set(newValue);
   mDirty |= kDataBaudRateBit;
@@ -6695,13 +6773,13 @@ void BusControllerCan::SetDataBaudRate(int32_t newValue)
 // attribute PreScaler : HLAinteger32LE
 int32_t BusControllerCan::GetPreScaler() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mPreScaler.get();
 }
 
 void BusControllerCan::SetPreScaler(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mPreScaler.set(newValue);
   mDirty |= kPreScalerBit;
@@ -6711,13 +6789,13 @@ void BusControllerCan::SetPreScaler(int32_t newValue)
 // attribute OperationMode : CanOperationMode
 CanOperationMode BusControllerCan::GetOperationMode() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<CanOperationMode>(mOperationMode.get());
 }
 
 void BusControllerCan::SetOperationMode(CanOperationMode newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mOperationMode.set(static_cast<int32_t>(newValue));
   mDirty |= kOperationModeBit;
@@ -6727,13 +6805,13 @@ void BusControllerCan::SetOperationMode(CanOperationMode newValue)
 // attribute Sync_Seg : HLAinteger32LE
 int32_t BusControllerCan::GetSync_Seg() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mSync_Seg.get();
 }
 
 void BusControllerCan::SetSync_Seg(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mSync_Seg.set(newValue);
   mDirty |= kSync_SegBit;
@@ -6743,13 +6821,13 @@ void BusControllerCan::SetSync_Seg(int32_t newValue)
 // attribute Prop_Seg : HLAinteger32LE
 int32_t BusControllerCan::GetProp_Seg() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mProp_Seg.get();
 }
 
 void BusControllerCan::SetProp_Seg(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mProp_Seg.set(newValue);
   mDirty |= kProp_SegBit;
@@ -6759,13 +6837,13 @@ void BusControllerCan::SetProp_Seg(int32_t newValue)
 // attribute Phase_Seg1 : HLAinteger32LE
 int32_t BusControllerCan::GetPhase_Seg1() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mPhase_Seg1.get();
 }
 
 void BusControllerCan::SetPhase_Seg1(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mPhase_Seg1.set(newValue);
   mDirty |= kPhase_Seg1Bit;
@@ -6775,13 +6853,13 @@ void BusControllerCan::SetPhase_Seg1(int32_t newValue)
 // attribute Phase_Seg2 : HLAinteger32LE
 int32_t BusControllerCan::GetPhase_Seg2() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mPhase_Seg2.get();
 }
 
 void BusControllerCan::SetPhase_Seg2(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mPhase_Seg2.set(newValue);
   mDirty |= kPhase_Seg2Bit;
@@ -6791,13 +6869,13 @@ void BusControllerCan::SetPhase_Seg2(int32_t newValue)
 // attribute SamplingMode : CanSamplingMode
 CanSamplingMode BusControllerCan::GetSamplingMode() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<CanSamplingMode>(mSamplingMode.get());
 }
 
 void BusControllerCan::SetSamplingMode(CanSamplingMode newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mSamplingMode.set(static_cast<int32_t>(newValue));
   mDirty |= kSamplingModeBit;
@@ -6873,25 +6951,25 @@ rti1516ev::AttributeHandleValueMap BusControllerCan::GetModifiedAttributeValues(
 
 BusControllerCan::AttributeBits BusControllerCan::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 BusControllerCan::AttributeBits BusControllerCan::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 BusControllerCan::AttributeBits BusControllerCan::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 BusControllerCan::AttributeBits BusControllerCan::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -6935,7 +7013,7 @@ void BusControllerCan::UpdateModifiedAttributeValues(int64_t time)
 
 void BusControllerCan::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -6996,15 +7074,13 @@ void BusControllerCan::ReflectAttributeValues(const rti1516ev::AttributeHandleVa
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // BusControllerCan::ReflectAttributeValues
 
 void BusControllerCan::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -7065,62 +7141,61 @@ void BusControllerCan::ReflectAttributeValues(const rti1516ev::AttributeHandleVa
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // BusControllerCan::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void BusControllerCan::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kNetworkIDBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
-  }
-  if ((mLastUpdated & kDeviceIDBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
-  }
-  if ((mLastUpdated & kBaudRateBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetBaudRateAttributeHandle());
-  }
-  if ((mLastUpdated & kDataBaudRateBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetDataBaudRateAttributeHandle());
-  }
-  if ((mLastUpdated & kPreScalerBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetPreScalerAttributeHandle());
-  }
-  if ((mLastUpdated & kOperationModeBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetOperationModeAttributeHandle());
-  }
-  if ((mLastUpdated & kSync_SegBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetSync_SegAttributeHandle());
-  }
-  if ((mLastUpdated & kProp_SegBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetProp_SegAttributeHandle());
-  }
-  if ((mLastUpdated & kPhase_Seg1Bit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetPhase_Seg1AttributeHandle());
-  }
-  if ((mLastUpdated & kPhase_Seg2Bit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetPhase_Seg2AttributeHandle());
-  }
-  if ((mLastUpdated & kSamplingModeBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetSamplingModeAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kNetworkIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+    }
+    if ((mLastUpdated & kDeviceIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
+    }
+    if ((mLastUpdated & kBaudRateBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetBaudRateAttributeHandle());
+    }
+    if ((mLastUpdated & kDataBaudRateBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDataBaudRateAttributeHandle());
+    }
+    if ((mLastUpdated & kPreScalerBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetPreScalerAttributeHandle());
+    }
+    if ((mLastUpdated & kOperationModeBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetOperationModeAttributeHandle());
+    }
+    if ((mLastUpdated & kSync_SegBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetSync_SegAttributeHandle());
+    }
+    if ((mLastUpdated & kProp_SegBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetProp_SegAttributeHandle());
+    }
+    if ((mLastUpdated & kPhase_Seg1Bit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetPhase_Seg1AttributeHandle());
+    }
+    if ((mLastUpdated & kPhase_Seg2Bit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetPhase_Seg2AttributeHandle());
+    }
+    if ((mLastUpdated & kSamplingModeBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetSamplingModeAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -7145,73 +7220,74 @@ void BusControllerCan::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void BusControllerCan::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetBaudRateAttributeHandle() && (mValuesSet & kBaudRateBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mBaudRate.encode()));
-      mDirty &= ~kBaudRateBit;
-    }
-    else if (attributeHandle == mObjectClass->GetDataBaudRateAttributeHandle() && (mValuesSet & kDataBaudRateBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDataBaudRate.encode()));
-      mDirty &= ~kDataBaudRateBit;
-    }
-    else if (attributeHandle == mObjectClass->GetPreScalerAttributeHandle() && (mValuesSet & kPreScalerBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mPreScaler.encode()));
-      mDirty &= ~kPreScalerBit;
-    }
-    else if (attributeHandle == mObjectClass->GetOperationModeAttributeHandle() && (mValuesSet & kOperationModeBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mOperationMode.encode()));
-      mDirty &= ~kOperationModeBit;
-    }
-    else if (attributeHandle == mObjectClass->GetSync_SegAttributeHandle() && (mValuesSet & kSync_SegBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mSync_Seg.encode()));
-      mDirty &= ~kSync_SegBit;
-    }
-    else if (attributeHandle == mObjectClass->GetProp_SegAttributeHandle() && (mValuesSet & kProp_SegBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mProp_Seg.encode()));
-      mDirty &= ~kProp_SegBit;
-    }
-    else if (attributeHandle == mObjectClass->GetPhase_Seg1AttributeHandle() && (mValuesSet & kPhase_Seg1Bit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mPhase_Seg1.encode()));
-      mDirty &= ~kPhase_Seg1Bit;
-    }
-    else if (attributeHandle == mObjectClass->GetPhase_Seg2AttributeHandle() && (mValuesSet & kPhase_Seg2Bit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mPhase_Seg2.encode()));
-      mDirty &= ~kPhase_Seg2Bit;
-    }
-    else if (attributeHandle == mObjectClass->GetSamplingModeAttributeHandle() && (mValuesSet & kSamplingModeBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mSamplingMode.encode()));
-      mDirty &= ~kSamplingModeBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+        mDirty &= ~kNetworkIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
+        mDirty &= ~kDeviceIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetBaudRateAttributeHandle() && (mValuesSet & kBaudRateBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mBaudRate.encode()));
+        mDirty &= ~kBaudRateBit;
+      }
+      else if (attributeHandle == mObjectClass->GetDataBaudRateAttributeHandle() && (mValuesSet & kDataBaudRateBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDataBaudRate.encode()));
+        mDirty &= ~kDataBaudRateBit;
+      }
+      else if (attributeHandle == mObjectClass->GetPreScalerAttributeHandle() && (mValuesSet & kPreScalerBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mPreScaler.encode()));
+        mDirty &= ~kPreScalerBit;
+      }
+      else if (attributeHandle == mObjectClass->GetOperationModeAttributeHandle() && (mValuesSet & kOperationModeBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mOperationMode.encode()));
+        mDirty &= ~kOperationModeBit;
+      }
+      else if (attributeHandle == mObjectClass->GetSync_SegAttributeHandle() && (mValuesSet & kSync_SegBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mSync_Seg.encode()));
+        mDirty &= ~kSync_SegBit;
+      }
+      else if (attributeHandle == mObjectClass->GetProp_SegAttributeHandle() && (mValuesSet & kProp_SegBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mProp_Seg.encode()));
+        mDirty &= ~kProp_SegBit;
+      }
+      else if (attributeHandle == mObjectClass->GetPhase_Seg1AttributeHandle() && (mValuesSet & kPhase_Seg1Bit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mPhase_Seg1.encode()));
+        mDirty &= ~kPhase_Seg1Bit;
+      }
+      else if (attributeHandle == mObjectClass->GetPhase_Seg2AttributeHandle() && (mValuesSet & kPhase_Seg2Bit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mPhase_Seg2.encode()));
+        mDirty &= ~kPhase_Seg2Bit;
+      }
+      else if (attributeHandle == mObjectClass->GetSamplingModeAttributeHandle() && (mValuesSet & kSamplingModeBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mSamplingMode.encode()));
+        mDirty &= ~kSamplingModeBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusControllerCan::ReflectAttributeValues
 
 uint32_t BusControllerCan::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -7219,13 +7295,13 @@ uint32_t BusControllerCan::RegisterUpdateCallback(UpdateCallback callback)
 
 void BusControllerCan::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void BusControllerCan::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -7250,10 +7326,13 @@ BusControllerEthernetObjectClass::BusControllerEthernetObjectClass(rti1516ev::RT
 
 BusControllerEthernetObjectClass::~BusControllerEthernetObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -7309,7 +7388,7 @@ rti1516ev::AttributeHandleSet BusControllerEthernetObjectClass::GetAllAttributeH
 
 void BusControllerEthernetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<BusControllerEthernet> newObject = std::shared_ptr<BusControllerEthernet>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -7317,27 +7396,24 @@ void BusControllerEthernetObjectClass::DiscoverObjectInstance(rti1516ev::ObjectI
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void BusControllerEthernetObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<BusControllerEthernet>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -7356,7 +7432,7 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::GetObj
 
 std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -7375,7 +7451,7 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::GetObj
 
 std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -7389,6 +7465,7 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -7400,7 +7477,7 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
 
 std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -7413,6 +7490,7 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
   std::shared_ptr<BusControllerEthernet> newObject = std::shared_ptr<BusControllerEthernet>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -7430,6 +7508,7 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
 
 uint32_t BusControllerEthernetObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -7437,11 +7516,13 @@ uint32_t BusControllerEthernetObjectClass::RegisterDiscoverObjectInstanceCallbac
 
 void BusControllerEthernetObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void BusControllerEthernetObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusControllerEthernet> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -7451,6 +7532,7 @@ void BusControllerEthernetObjectClass::ExecuteDiscoverObjectInstanceCallbacks(st
 
 uint32_t BusControllerEthernetObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -7458,11 +7540,13 @@ uint32_t BusControllerEthernetObjectClass::RegisterRemoveObjectInstanceCallback(
 
 void BusControllerEthernetObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void BusControllerEthernetObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IBusControllerEthernet> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -7479,14 +7563,14 @@ void BusControllerEthernetObjectClass::InsertObjectInstanceName(std::shared_ptr<
 
 void BusControllerEthernetObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IBusControllerEthernet> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void BusControllerEthernetObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -7526,19 +7610,19 @@ BusControllerEthernet::~BusControllerEthernet()
 
 bool BusControllerEthernet::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool BusControllerEthernet::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void BusControllerEthernet::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -7565,13 +7649,13 @@ void BusControllerEthernet::Release()
 // attribute NetworkID : HLAASCIIstring
 std::string BusControllerEthernet::GetNetworkID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mNetworkID.get();
 }
 
 void BusControllerEthernet::SetNetworkID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
@@ -7581,13 +7665,13 @@ void BusControllerEthernet::SetNetworkID(std::string newValue)
 // attribute DeviceID : HLAASCIIstring
 std::string BusControllerEthernet::GetDeviceID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDeviceID.get();
 }
 
 void BusControllerEthernet::SetDeviceID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDeviceID.set(newValue);
   mDirty |= kDeviceIDBit;
@@ -7597,13 +7681,13 @@ void BusControllerEthernet::SetDeviceID(std::string newValue)
 // attribute PortName : HLAASCIIstring
 std::string BusControllerEthernet::GetPortName() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mPortName.get();
 }
 
 void BusControllerEthernet::SetPortName(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mPortName.set(newValue);
   mDirty |= kPortNameBit;
@@ -7639,25 +7723,25 @@ rti1516ev::AttributeHandleValueMap BusControllerEthernet::GetModifiedAttributeVa
 
 BusControllerEthernet::AttributeBits BusControllerEthernet::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 BusControllerEthernet::AttributeBits BusControllerEthernet::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 BusControllerEthernet::AttributeBits BusControllerEthernet::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 BusControllerEthernet::AttributeBits BusControllerEthernet::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -7701,7 +7785,7 @@ void BusControllerEthernet::UpdateModifiedAttributeValues(int64_t time)
 
 void BusControllerEthernet::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -7722,15 +7806,13 @@ void BusControllerEthernet::ReflectAttributeValues(const rti1516ev::AttributeHan
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // BusControllerEthernet::ReflectAttributeValues
 
 void BusControllerEthernet::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -7751,30 +7833,29 @@ void BusControllerEthernet::ReflectAttributeValues(const rti1516ev::AttributeHan
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // BusControllerEthernet::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void BusControllerEthernet::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kNetworkIDBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
-  }
-  if ((mLastUpdated & kDeviceIDBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
-  }
-  if ((mLastUpdated & kPortNameBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetPortNameAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kNetworkIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+    }
+    if ((mLastUpdated & kDeviceIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
+    }
+    if ((mLastUpdated & kPortNameBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetPortNameAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -7791,33 +7872,34 @@ void BusControllerEthernet::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void BusControllerEthernet::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetPortNameAttributeHandle() && (mValuesSet & kPortNameBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mPortName.encode()));
-      mDirty &= ~kPortNameBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+        mDirty &= ~kNetworkIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
+        mDirty &= ~kDeviceIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetPortNameAttributeHandle() && (mValuesSet & kPortNameBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mPortName.encode()));
+        mDirty &= ~kPortNameBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // BusControllerEthernet::ReflectAttributeValues
 
 uint32_t BusControllerEthernet::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -7825,13 +7907,13 @@ uint32_t BusControllerEthernet::RegisterUpdateCallback(UpdateCallback callback)
 
 void BusControllerEthernet::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void BusControllerEthernet::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -7872,10 +7954,13 @@ FlexRayControllerStatusObjectClass::FlexRayControllerStatusObjectClass(rti1516ev
 
 FlexRayControllerStatusObjectClass::~FlexRayControllerStatusObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -7939,7 +8024,7 @@ rti1516ev::AttributeHandleSet FlexRayControllerStatusObjectClass::GetAllAttribut
 
 void FlexRayControllerStatusObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<FlexRayControllerStatus> newObject = std::shared_ptr<FlexRayControllerStatus>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -7947,27 +8032,24 @@ void FlexRayControllerStatusObjectClass::DiscoverObjectInstance(rti1516ev::Objec
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void FlexRayControllerStatusObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<FlexRayControllerStatus>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -7986,7 +8068,7 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Ge
 
 std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -8005,7 +8087,7 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Ge
 
 std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -8019,6 +8101,7 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -8030,7 +8113,7 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
 
 std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -8043,6 +8126,7 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
   std::shared_ptr<FlexRayControllerStatus> newObject = std::shared_ptr<FlexRayControllerStatus>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -8060,6 +8144,7 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
 
 uint32_t FlexRayControllerStatusObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -8067,11 +8152,13 @@ uint32_t FlexRayControllerStatusObjectClass::RegisterDiscoverObjectInstanceCallb
 
 void FlexRayControllerStatusObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void FlexRayControllerStatusObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IFlexRayControllerStatus> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -8081,6 +8168,7 @@ void FlexRayControllerStatusObjectClass::ExecuteDiscoverObjectInstanceCallbacks(
 
 uint32_t FlexRayControllerStatusObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -8088,11 +8176,13 @@ uint32_t FlexRayControllerStatusObjectClass::RegisterRemoveObjectInstanceCallbac
 
 void FlexRayControllerStatusObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void FlexRayControllerStatusObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IFlexRayControllerStatus> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -8109,14 +8199,14 @@ void FlexRayControllerStatusObjectClass::InsertObjectInstanceName(std::shared_pt
 
 void FlexRayControllerStatusObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IFlexRayControllerStatus> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void FlexRayControllerStatusObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -8156,19 +8246,19 @@ FlexRayControllerStatus::~FlexRayControllerStatus()
 
 bool FlexRayControllerStatus::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool FlexRayControllerStatus::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void FlexRayControllerStatus::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -8195,13 +8285,13 @@ void FlexRayControllerStatus::Release()
 // attribute NetworkID : HLAASCIIstring
 std::string FlexRayControllerStatus::GetNetworkID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mNetworkID.get();
 }
 
 void FlexRayControllerStatus::SetNetworkID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
@@ -8211,13 +8301,13 @@ void FlexRayControllerStatus::SetNetworkID(std::string newValue)
 // attribute DeviceID : HLAASCIIstring
 std::string FlexRayControllerStatus::GetDeviceID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDeviceID.get();
 }
 
 void FlexRayControllerStatus::SetDeviceID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDeviceID.set(newValue);
   mDirty |= kDeviceIDBit;
@@ -8227,13 +8317,13 @@ void FlexRayControllerStatus::SetDeviceID(std::string newValue)
 // attribute PocState : FlexRayPocState
 FlexRayPocState FlexRayControllerStatus::GetPocState() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayPocState>(mPocState.get());
 }
 
 void FlexRayControllerStatus::SetPocState(FlexRayPocState newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mPocState.set(static_cast<uint8_t>(newValue));
   mDirty |= kPocStateBit;
@@ -8243,13 +8333,13 @@ void FlexRayControllerStatus::SetPocState(FlexRayPocState newValue)
 // attribute chiHaltRequest : HLAboolean
 bool FlexRayControllerStatus::GetchiHaltRequest() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mchiHaltRequest.get();
 }
 
 void FlexRayControllerStatus::SetchiHaltRequest(bool newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mchiHaltRequest.set(newValue);
   mDirty |= kchiHaltRequestBit;
@@ -8259,13 +8349,13 @@ void FlexRayControllerStatus::SetchiHaltRequest(bool newValue)
 // attribute coldstartNoise : HLAboolean
 bool FlexRayControllerStatus::GetcoldstartNoise() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mcoldstartNoise.get();
 }
 
 void FlexRayControllerStatus::SetcoldstartNoise(bool newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mcoldstartNoise.set(newValue);
   mDirty |= kcoldstartNoiseBit;
@@ -8275,13 +8365,13 @@ void FlexRayControllerStatus::SetcoldstartNoise(bool newValue)
 // attribute freeze : HLAboolean
 bool FlexRayControllerStatus::Getfreeze() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mfreeze.get();
 }
 
 void FlexRayControllerStatus::Setfreeze(bool newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mfreeze.set(newValue);
   mDirty |= kfreezeBit;
@@ -8291,13 +8381,13 @@ void FlexRayControllerStatus::Setfreeze(bool newValue)
 // attribute chiReadyRequest : HLAboolean
 bool FlexRayControllerStatus::GetchiReadyRequest() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mchiReadyRequest.get();
 }
 
 void FlexRayControllerStatus::SetchiReadyRequest(bool newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mchiReadyRequest.set(newValue);
   mDirty |= kchiReadyRequestBit;
@@ -8307,13 +8397,13 @@ void FlexRayControllerStatus::SetchiReadyRequest(bool newValue)
 // attribute errorMode : FlexRayErrorModeType
 FlexRayErrorModeType FlexRayControllerStatus::GeterrorMode() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayErrorModeType>(merrorMode.get());
 }
 
 void FlexRayControllerStatus::SeterrorMode(FlexRayErrorModeType newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   merrorMode.set(static_cast<uint8_t>(newValue));
   mDirty |= kerrorModeBit;
@@ -8323,13 +8413,13 @@ void FlexRayControllerStatus::SeterrorMode(FlexRayErrorModeType newValue)
 // attribute slotMode : FlexRaySlotModeType
 FlexRaySlotModeType FlexRayControllerStatus::GetslotMode() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRaySlotModeType>(mslotMode.get());
 }
 
 void FlexRayControllerStatus::SetslotMode(FlexRaySlotModeType newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mslotMode.set(static_cast<uint8_t>(newValue));
   mDirty |= kslotModeBit;
@@ -8339,13 +8429,13 @@ void FlexRayControllerStatus::SetslotMode(FlexRaySlotModeType newValue)
 // attribute startupState : FlexRayStartupStateType
 FlexRayStartupStateType FlexRayControllerStatus::GetstartupState() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayStartupStateType>(mstartupState.get());
 }
 
 void FlexRayControllerStatus::SetstartupState(FlexRayStartupStateType newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mstartupState.set(static_cast<uint8_t>(newValue));
   mDirty |= kstartupStateBit;
@@ -8355,13 +8445,13 @@ void FlexRayControllerStatus::SetstartupState(FlexRayStartupStateType newValue)
 // attribute wakeupStatus : FlexRayWakeupStatusType
 FlexRayWakeupStatusType FlexRayControllerStatus::GetwakeupStatus() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayWakeupStatusType>(mwakeupStatus.get());
 }
 
 void FlexRayControllerStatus::SetwakeupStatus(FlexRayWakeupStatusType newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mwakeupStatus.set(static_cast<uint8_t>(newValue));
   mDirty |= kwakeupStatusBit;
@@ -8437,25 +8527,25 @@ rti1516ev::AttributeHandleValueMap FlexRayControllerStatus::GetModifiedAttribute
 
 FlexRayControllerStatus::AttributeBits FlexRayControllerStatus::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 FlexRayControllerStatus::AttributeBits FlexRayControllerStatus::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 FlexRayControllerStatus::AttributeBits FlexRayControllerStatus::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 FlexRayControllerStatus::AttributeBits FlexRayControllerStatus::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -8499,7 +8589,7 @@ void FlexRayControllerStatus::UpdateModifiedAttributeValues(int64_t time)
 
 void FlexRayControllerStatus::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -8560,15 +8650,13 @@ void FlexRayControllerStatus::ReflectAttributeValues(const rti1516ev::AttributeH
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // FlexRayControllerStatus::ReflectAttributeValues
 
 void FlexRayControllerStatus::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -8629,62 +8717,61 @@ void FlexRayControllerStatus::ReflectAttributeValues(const rti1516ev::AttributeH
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // FlexRayControllerStatus::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void FlexRayControllerStatus::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kNetworkIDBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
-  }
-  if ((mLastUpdated & kDeviceIDBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
-  }
-  if ((mLastUpdated & kPocStateBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetPocStateAttributeHandle());
-  }
-  if ((mLastUpdated & kchiHaltRequestBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetchiHaltRequestAttributeHandle());
-  }
-  if ((mLastUpdated & kcoldstartNoiseBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetcoldstartNoiseAttributeHandle());
-  }
-  if ((mLastUpdated & kfreezeBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetfreezeAttributeHandle());
-  }
-  if ((mLastUpdated & kchiReadyRequestBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetchiReadyRequestAttributeHandle());
-  }
-  if ((mLastUpdated & kerrorModeBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GeterrorModeAttributeHandle());
-  }
-  if ((mLastUpdated & kslotModeBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetslotModeAttributeHandle());
-  }
-  if ((mLastUpdated & kstartupStateBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetstartupStateAttributeHandle());
-  }
-  if ((mLastUpdated & kwakeupStatusBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetwakeupStatusAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kNetworkIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+    }
+    if ((mLastUpdated & kDeviceIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
+    }
+    if ((mLastUpdated & kPocStateBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetPocStateAttributeHandle());
+    }
+    if ((mLastUpdated & kchiHaltRequestBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetchiHaltRequestAttributeHandle());
+    }
+    if ((mLastUpdated & kcoldstartNoiseBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetcoldstartNoiseAttributeHandle());
+    }
+    if ((mLastUpdated & kfreezeBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetfreezeAttributeHandle());
+    }
+    if ((mLastUpdated & kchiReadyRequestBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetchiReadyRequestAttributeHandle());
+    }
+    if ((mLastUpdated & kerrorModeBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GeterrorModeAttributeHandle());
+    }
+    if ((mLastUpdated & kslotModeBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetslotModeAttributeHandle());
+    }
+    if ((mLastUpdated & kstartupStateBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetstartupStateAttributeHandle());
+    }
+    if ((mLastUpdated & kwakeupStatusBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetwakeupStatusAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -8709,73 +8796,74 @@ void FlexRayControllerStatus::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void FlexRayControllerStatus::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetPocStateAttributeHandle() && (mValuesSet & kPocStateBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mPocState.encode()));
-      mDirty &= ~kPocStateBit;
-    }
-    else if (attributeHandle == mObjectClass->GetchiHaltRequestAttributeHandle() && (mValuesSet & kchiHaltRequestBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mchiHaltRequest.encode()));
-      mDirty &= ~kchiHaltRequestBit;
-    }
-    else if (attributeHandle == mObjectClass->GetcoldstartNoiseAttributeHandle() && (mValuesSet & kcoldstartNoiseBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mcoldstartNoise.encode()));
-      mDirty &= ~kcoldstartNoiseBit;
-    }
-    else if (attributeHandle == mObjectClass->GetfreezeAttributeHandle() && (mValuesSet & kfreezeBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mfreeze.encode()));
-      mDirty &= ~kfreezeBit;
-    }
-    else if (attributeHandle == mObjectClass->GetchiReadyRequestAttributeHandle() && (mValuesSet & kchiReadyRequestBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mchiReadyRequest.encode()));
-      mDirty &= ~kchiReadyRequestBit;
-    }
-    else if (attributeHandle == mObjectClass->GeterrorModeAttributeHandle() && (mValuesSet & kerrorModeBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, merrorMode.encode()));
-      mDirty &= ~kerrorModeBit;
-    }
-    else if (attributeHandle == mObjectClass->GetslotModeAttributeHandle() && (mValuesSet & kslotModeBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mslotMode.encode()));
-      mDirty &= ~kslotModeBit;
-    }
-    else if (attributeHandle == mObjectClass->GetstartupStateAttributeHandle() && (mValuesSet & kstartupStateBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mstartupState.encode()));
-      mDirty &= ~kstartupStateBit;
-    }
-    else if (attributeHandle == mObjectClass->GetwakeupStatusAttributeHandle() && (mValuesSet & kwakeupStatusBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mwakeupStatus.encode()));
-      mDirty &= ~kwakeupStatusBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+        mDirty &= ~kNetworkIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
+        mDirty &= ~kDeviceIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetPocStateAttributeHandle() && (mValuesSet & kPocStateBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mPocState.encode()));
+        mDirty &= ~kPocStateBit;
+      }
+      else if (attributeHandle == mObjectClass->GetchiHaltRequestAttributeHandle() && (mValuesSet & kchiHaltRequestBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mchiHaltRequest.encode()));
+        mDirty &= ~kchiHaltRequestBit;
+      }
+      else if (attributeHandle == mObjectClass->GetcoldstartNoiseAttributeHandle() && (mValuesSet & kcoldstartNoiseBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mcoldstartNoise.encode()));
+        mDirty &= ~kcoldstartNoiseBit;
+      }
+      else if (attributeHandle == mObjectClass->GetfreezeAttributeHandle() && (mValuesSet & kfreezeBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mfreeze.encode()));
+        mDirty &= ~kfreezeBit;
+      }
+      else if (attributeHandle == mObjectClass->GetchiReadyRequestAttributeHandle() && (mValuesSet & kchiReadyRequestBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mchiReadyRequest.encode()));
+        mDirty &= ~kchiReadyRequestBit;
+      }
+      else if (attributeHandle == mObjectClass->GeterrorModeAttributeHandle() && (mValuesSet & kerrorModeBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, merrorMode.encode()));
+        mDirty &= ~kerrorModeBit;
+      }
+      else if (attributeHandle == mObjectClass->GetslotModeAttributeHandle() && (mValuesSet & kslotModeBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mslotMode.encode()));
+        mDirty &= ~kslotModeBit;
+      }
+      else if (attributeHandle == mObjectClass->GetstartupStateAttributeHandle() && (mValuesSet & kstartupStateBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mstartupState.encode()));
+        mDirty &= ~kstartupStateBit;
+      }
+      else if (attributeHandle == mObjectClass->GetwakeupStatusAttributeHandle() && (mValuesSet & kwakeupStatusBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mwakeupStatus.encode()));
+        mDirty &= ~kwakeupStatusBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // FlexRayControllerStatus::ReflectAttributeValues
 
 uint32_t FlexRayControllerStatus::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -8783,13 +8871,13 @@ uint32_t FlexRayControllerStatus::RegisterUpdateCallback(UpdateCallback callback
 
 void FlexRayControllerStatus::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void FlexRayControllerStatus::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -8862,10 +8950,13 @@ FlexRayControllerObjectClass::FlexRayControllerObjectClass(rti1516ev::RTIambassa
 
 FlexRayControllerObjectClass::~FlexRayControllerObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -8945,7 +9036,7 @@ rti1516ev::AttributeHandleSet FlexRayControllerObjectClass::GetAllAttributeHandl
 
 void FlexRayControllerObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<FlexRayController> newObject = std::shared_ptr<FlexRayController>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -8953,27 +9044,24 @@ void FlexRayControllerObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInsta
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void FlexRayControllerObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<FlexRayController>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -8992,7 +9080,7 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::GetObjectInsta
 
 std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -9011,7 +9099,7 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::GetObjectInsta
 
 std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -9025,6 +9113,7 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -9036,7 +9125,7 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
 
 std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -9049,6 +9138,7 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
   std::shared_ptr<FlexRayController> newObject = std::shared_ptr<FlexRayController>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -9066,6 +9156,7 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
 
 uint32_t FlexRayControllerObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -9073,11 +9164,13 @@ uint32_t FlexRayControllerObjectClass::RegisterDiscoverObjectInstanceCallback(Di
 
 void FlexRayControllerObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void FlexRayControllerObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IFlexRayController> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -9087,6 +9180,7 @@ void FlexRayControllerObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::s
 
 uint32_t FlexRayControllerObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -9094,11 +9188,13 @@ uint32_t FlexRayControllerObjectClass::RegisterRemoveObjectInstanceCallback(Remo
 
 void FlexRayControllerObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void FlexRayControllerObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IFlexRayController> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -9115,14 +9211,14 @@ void FlexRayControllerObjectClass::InsertObjectInstanceName(std::shared_ptr<IFle
 
 void FlexRayControllerObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IFlexRayController> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void FlexRayControllerObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -9162,19 +9258,19 @@ FlexRayController::~FlexRayController()
 
 bool FlexRayController::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool FlexRayController::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void FlexRayController::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -9201,13 +9297,13 @@ void FlexRayController::Release()
 // attribute NetworkID : HLAASCIIstring
 std::string FlexRayController::GetNetworkID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mNetworkID.get();
 }
 
 void FlexRayController::SetNetworkID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mNetworkID.set(newValue);
   mDirty |= kNetworkIDBit;
@@ -9217,13 +9313,13 @@ void FlexRayController::SetNetworkID(std::string newValue)
 // attribute DeviceID : HLAASCIIstring
 std::string FlexRayController::GetDeviceID() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDeviceID.get();
 }
 
 void FlexRayController::SetDeviceID(std::string newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mDeviceID.set(newValue);
   mDirty |= kDeviceIDBit;
@@ -9233,13 +9329,13 @@ void FlexRayController::SetDeviceID(std::string newValue)
 // attribute PocRequest : FlexRayPocState
 FlexRayPocState FlexRayController::GetPocRequest() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayPocState>(mPocRequest.get());
 }
 
 void FlexRayController::SetPocRequest(FlexRayPocState newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mPocRequest.set(static_cast<uint8_t>(newValue));
   mDirty |= kPocRequestBit;
@@ -9249,13 +9345,13 @@ void FlexRayController::SetPocRequest(FlexRayPocState newValue)
 // attribute ChiCommand : FlexRayChiCommand
 FlexRayChiCommand FlexRayController::GetChiCommand() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayChiCommand>(mChiCommand.get());
 }
 
 void FlexRayController::SetChiCommand(FlexRayChiCommand newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mChiCommand.set(static_cast<uint8_t>(newValue));
   mDirty |= kChiCommandBit;
@@ -9265,13 +9361,13 @@ void FlexRayController::SetChiCommand(FlexRayChiCommand newValue)
 // attribute pAllowHaltDueToClock : HLAoctet
 uint8_t FlexRayController::GetpAllowHaltDueToClock() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpAllowHaltDueToClock.get();
 }
 
 void FlexRayController::SetpAllowHaltDueToClock(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpAllowHaltDueToClock.set(newValue);
   mDirty |= kpAllowHaltDueToClockBit;
@@ -9281,13 +9377,13 @@ void FlexRayController::SetpAllowHaltDueToClock(uint8_t newValue)
 // attribute pAllowPassiveToActive : HLAoctet
 uint8_t FlexRayController::GetpAllowPassiveToActive() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpAllowPassiveToActive.get();
 }
 
 void FlexRayController::SetpAllowPassiveToActive(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpAllowPassiveToActive.set(newValue);
   mDirty |= kpAllowPassiveToActiveBit;
@@ -9297,13 +9393,13 @@ void FlexRayController::SetpAllowPassiveToActive(uint8_t newValue)
 // attribute pChannels : FlexRayChannel
 FlexRayChannel FlexRayController::GetpChannels() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayChannel>(mpChannels.get());
 }
 
 void FlexRayController::SetpChannels(FlexRayChannel newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpChannels.set(static_cast<uint8_t>(newValue));
   mDirty |= kpChannelsBit;
@@ -9313,13 +9409,13 @@ void FlexRayController::SetpChannels(FlexRayChannel newValue)
 // attribute pClusterDriftDamping : HLAoctet
 uint8_t FlexRayController::GetpClusterDriftDamping() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpClusterDriftDamping.get();
 }
 
 void FlexRayController::SetpClusterDriftDamping(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpClusterDriftDamping.set(newValue);
   mDirty |= kpClusterDriftDampingBit;
@@ -9329,13 +9425,13 @@ void FlexRayController::SetpClusterDriftDamping(uint8_t newValue)
 // attribute pdAcceptedStartupRange : HLAinteger32LE
 int32_t FlexRayController::GetpdAcceptedStartupRange() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpdAcceptedStartupRange.get();
 }
 
 void FlexRayController::SetpdAcceptedStartupRange(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpdAcceptedStartupRange.set(newValue);
   mDirty |= kpdAcceptedStartupRangeBit;
@@ -9345,13 +9441,13 @@ void FlexRayController::SetpdAcceptedStartupRange(int32_t newValue)
 // attribute pdListenTimeout : HLAinteger32LE
 int32_t FlexRayController::GetpdListenTimeout() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpdListenTimeout.get();
 }
 
 void FlexRayController::SetpdListenTimeout(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpdListenTimeout.set(newValue);
   mDirty |= kpdListenTimeoutBit;
@@ -9361,13 +9457,13 @@ void FlexRayController::SetpdListenTimeout(int32_t newValue)
 // attribute pKeySlotId : HLAinteger16LE
 int16_t FlexRayController::GetpKeySlotId() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpKeySlotId.get();
 }
 
 void FlexRayController::SetpKeySlotId(int16_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpKeySlotId.set(newValue);
   mDirty |= kpKeySlotIdBit;
@@ -9377,13 +9473,13 @@ void FlexRayController::SetpKeySlotId(int16_t newValue)
 // attribute pKeySlotOnlyEnabled : HLAoctet
 uint8_t FlexRayController::GetpKeySlotOnlyEnabled() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpKeySlotOnlyEnabled.get();
 }
 
 void FlexRayController::SetpKeySlotOnlyEnabled(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpKeySlotOnlyEnabled.set(newValue);
   mDirty |= kpKeySlotOnlyEnabledBit;
@@ -9393,13 +9489,13 @@ void FlexRayController::SetpKeySlotOnlyEnabled(uint8_t newValue)
 // attribute pKeySlotUsedForStartup : HLAoctet
 uint8_t FlexRayController::GetpKeySlotUsedForStartup() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpKeySlotUsedForStartup.get();
 }
 
 void FlexRayController::SetpKeySlotUsedForStartup(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpKeySlotUsedForStartup.set(newValue);
   mDirty |= kpKeySlotUsedForStartupBit;
@@ -9409,13 +9505,13 @@ void FlexRayController::SetpKeySlotUsedForStartup(uint8_t newValue)
 // attribute pKeySlotUsedForSync : HLAoctet
 uint8_t FlexRayController::GetpKeySlotUsedForSync() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpKeySlotUsedForSync.get();
 }
 
 void FlexRayController::SetpKeySlotUsedForSync(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpKeySlotUsedForSync.set(newValue);
   mDirty |= kpKeySlotUsedForSyncBit;
@@ -9425,13 +9521,13 @@ void FlexRayController::SetpKeySlotUsedForSync(uint8_t newValue)
 // attribute pLatestTx : HLAinteger16LE
 int16_t FlexRayController::GetpLatestTx() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpLatestTx.get();
 }
 
 void FlexRayController::SetpLatestTx(int16_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpLatestTx.set(newValue);
   mDirty |= kpLatestTxBit;
@@ -9441,13 +9537,13 @@ void FlexRayController::SetpLatestTx(int16_t newValue)
 // attribute pMacroInitialOffsetA : HLAoctet
 uint8_t FlexRayController::GetpMacroInitialOffsetA() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpMacroInitialOffsetA.get();
 }
 
 void FlexRayController::SetpMacroInitialOffsetA(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpMacroInitialOffsetA.set(newValue);
   mDirty |= kpMacroInitialOffsetABit;
@@ -9457,13 +9553,13 @@ void FlexRayController::SetpMacroInitialOffsetA(uint8_t newValue)
 // attribute pMacroInitialOffsetB : HLAoctet
 uint8_t FlexRayController::GetpMacroInitialOffsetB() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpMacroInitialOffsetB.get();
 }
 
 void FlexRayController::SetpMacroInitialOffsetB(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpMacroInitialOffsetB.set(newValue);
   mDirty |= kpMacroInitialOffsetBBit;
@@ -9473,13 +9569,13 @@ void FlexRayController::SetpMacroInitialOffsetB(uint8_t newValue)
 // attribute pMicroInitialOffsetA : HLAinteger32LE
 int32_t FlexRayController::GetpMicroInitialOffsetA() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpMicroInitialOffsetA.get();
 }
 
 void FlexRayController::SetpMicroInitialOffsetA(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpMicroInitialOffsetA.set(newValue);
   mDirty |= kpMicroInitialOffsetABit;
@@ -9489,13 +9585,13 @@ void FlexRayController::SetpMicroInitialOffsetA(int32_t newValue)
 // attribute pMicroInitialOffsetB : HLAinteger32LE
 int32_t FlexRayController::GetpMicroInitialOffsetB() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpMicroInitialOffsetB.get();
 }
 
 void FlexRayController::SetpMicroInitialOffsetB(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpMicroInitialOffsetB.set(newValue);
   mDirty |= kpMicroInitialOffsetBBit;
@@ -9505,13 +9601,13 @@ void FlexRayController::SetpMicroInitialOffsetB(int32_t newValue)
 // attribute pMicroPerCycle : HLAinteger32LE
 int32_t FlexRayController::GetpMicroPerCycle() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpMicroPerCycle.get();
 }
 
 void FlexRayController::SetpMicroPerCycle(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpMicroPerCycle.set(newValue);
   mDirty |= kpMicroPerCycleBit;
@@ -9521,13 +9617,13 @@ void FlexRayController::SetpMicroPerCycle(int32_t newValue)
 // attribute pOffsetCorrectionOut : HLAinteger32LE
 int32_t FlexRayController::GetpOffsetCorrectionOut() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpOffsetCorrectionOut.get();
 }
 
 void FlexRayController::SetpOffsetCorrectionOut(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpOffsetCorrectionOut.set(newValue);
   mDirty |= kpOffsetCorrectionOutBit;
@@ -9537,13 +9633,13 @@ void FlexRayController::SetpOffsetCorrectionOut(int32_t newValue)
 // attribute pOffsetCorrectionStart : HLAinteger16LE
 int16_t FlexRayController::GetpOffsetCorrectionStart() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpOffsetCorrectionStart.get();
 }
 
 void FlexRayController::SetpOffsetCorrectionStart(int16_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpOffsetCorrectionStart.set(newValue);
   mDirty |= kpOffsetCorrectionStartBit;
@@ -9553,13 +9649,13 @@ void FlexRayController::SetpOffsetCorrectionStart(int16_t newValue)
 // attribute pRateCorrectionOut : HLAinteger32LE
 int32_t FlexRayController::GetpRateCorrectionOut() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpRateCorrectionOut.get();
 }
 
 void FlexRayController::SetpRateCorrectionOut(int32_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpRateCorrectionOut.set(newValue);
   mDirty |= kpRateCorrectionOutBit;
@@ -9569,13 +9665,13 @@ void FlexRayController::SetpRateCorrectionOut(int32_t newValue)
 // attribute pWakeupChannel : FlexRayChannel
 FlexRayChannel FlexRayController::GetpWakeupChannel() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayChannel>(mpWakeupChannel.get());
 }
 
 void FlexRayController::SetpWakeupChannel(FlexRayChannel newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpWakeupChannel.set(static_cast<uint8_t>(newValue));
   mDirty |= kpWakeupChannelBit;
@@ -9585,13 +9681,13 @@ void FlexRayController::SetpWakeupChannel(FlexRayChannel newValue)
 // attribute pWakeupPattern : HLAoctet
 uint8_t FlexRayController::GetpWakeupPattern() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpWakeupPattern.get();
 }
 
 void FlexRayController::SetpWakeupPattern(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpWakeupPattern.set(newValue);
   mDirty |= kpWakeupPatternBit;
@@ -9601,13 +9697,13 @@ void FlexRayController::SetpWakeupPattern(uint8_t newValue)
 // attribute pdMicrotick : FlexRayClockPeriod
 FlexRayClockPeriod FlexRayController::GetpdMicrotick() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayClockPeriod>(mpdMicrotick.get());
 }
 
 void FlexRayController::SetpdMicrotick(FlexRayClockPeriod newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpdMicrotick.set(static_cast<uint8_t>(newValue));
   mDirty |= kpdMicrotickBit;
@@ -9617,13 +9713,13 @@ void FlexRayController::SetpdMicrotick(FlexRayClockPeriod newValue)
 // attribute pSamplesPerMicrotick : HLAoctet
 uint8_t FlexRayController::GetpSamplesPerMicrotick() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mpSamplesPerMicrotick.get();
 }
 
 void FlexRayController::SetpSamplesPerMicrotick(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mpSamplesPerMicrotick.set(newValue);
   mDirty |= kpSamplesPerMicrotickBit;
@@ -9779,25 +9875,25 @@ rti1516ev::AttributeHandleValueMap FlexRayController::GetModifiedAttributeValues
 
 FlexRayController::AttributeBits FlexRayController::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 FlexRayController::AttributeBits FlexRayController::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 FlexRayController::AttributeBits FlexRayController::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 FlexRayController::AttributeBits FlexRayController::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -9841,7 +9937,7 @@ void FlexRayController::UpdateModifiedAttributeValues(int64_t time)
 
 void FlexRayController::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -9982,15 +10078,13 @@ void FlexRayController::ReflectAttributeValues(const rti1516ev::AttributeHandleV
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // FlexRayController::ReflectAttributeValues
 
 void FlexRayController::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -10131,126 +10225,125 @@ void FlexRayController::ReflectAttributeValues(const rti1516ev::AttributeHandleV
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // FlexRayController::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void FlexRayController::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kNetworkIDBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
-  }
-  if ((mLastUpdated & kDeviceIDBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
-  }
-  if ((mLastUpdated & kPocRequestBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetPocRequestAttributeHandle());
-  }
-  if ((mLastUpdated & kChiCommandBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetChiCommandAttributeHandle());
-  }
-  if ((mLastUpdated & kpAllowHaltDueToClockBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpAllowHaltDueToClockAttributeHandle());
-  }
-  if ((mLastUpdated & kpAllowPassiveToActiveBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpAllowPassiveToActiveAttributeHandle());
-  }
-  if ((mLastUpdated & kpChannelsBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpChannelsAttributeHandle());
-  }
-  if ((mLastUpdated & kpClusterDriftDampingBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpClusterDriftDampingAttributeHandle());
-  }
-  if ((mLastUpdated & kpdAcceptedStartupRangeBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpdAcceptedStartupRangeAttributeHandle());
-  }
-  if ((mLastUpdated & kpdListenTimeoutBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpdListenTimeoutAttributeHandle());
-  }
-  if ((mLastUpdated & kpKeySlotIdBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpKeySlotIdAttributeHandle());
-  }
-  if ((mLastUpdated & kpKeySlotOnlyEnabledBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle());
-  }
-  if ((mLastUpdated & kpKeySlotUsedForStartupBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpKeySlotUsedForStartupAttributeHandle());
-  }
-  if ((mLastUpdated & kpKeySlotUsedForSyncBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpKeySlotUsedForSyncAttributeHandle());
-  }
-  if ((mLastUpdated & kpLatestTxBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpLatestTxAttributeHandle());
-  }
-  if ((mLastUpdated & kpMacroInitialOffsetABit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpMacroInitialOffsetAAttributeHandle());
-  }
-  if ((mLastUpdated & kpMacroInitialOffsetBBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpMacroInitialOffsetBAttributeHandle());
-  }
-  if ((mLastUpdated & kpMicroInitialOffsetABit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpMicroInitialOffsetAAttributeHandle());
-  }
-  if ((mLastUpdated & kpMicroInitialOffsetBBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpMicroInitialOffsetBAttributeHandle());
-  }
-  if ((mLastUpdated & kpMicroPerCycleBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpMicroPerCycleAttributeHandle());
-  }
-  if ((mLastUpdated & kpOffsetCorrectionOutBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpOffsetCorrectionOutAttributeHandle());
-  }
-  if ((mLastUpdated & kpOffsetCorrectionStartBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpOffsetCorrectionStartAttributeHandle());
-  }
-  if ((mLastUpdated & kpRateCorrectionOutBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpRateCorrectionOutAttributeHandle());
-  }
-  if ((mLastUpdated & kpWakeupChannelBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpWakeupChannelAttributeHandle());
-  }
-  if ((mLastUpdated & kpWakeupPatternBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpWakeupPatternAttributeHandle());
-  }
-  if ((mLastUpdated & kpdMicrotickBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpdMicrotickAttributeHandle());
-  }
-  if ((mLastUpdated & kpSamplesPerMicrotickBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetpSamplesPerMicrotickAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kNetworkIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetNetworkIDAttributeHandle());
+    }
+    if ((mLastUpdated & kDeviceIDBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetDeviceIDAttributeHandle());
+    }
+    if ((mLastUpdated & kPocRequestBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetPocRequestAttributeHandle());
+    }
+    if ((mLastUpdated & kChiCommandBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetChiCommandAttributeHandle());
+    }
+    if ((mLastUpdated & kpAllowHaltDueToClockBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpAllowHaltDueToClockAttributeHandle());
+    }
+    if ((mLastUpdated & kpAllowPassiveToActiveBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpAllowPassiveToActiveAttributeHandle());
+    }
+    if ((mLastUpdated & kpChannelsBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpChannelsAttributeHandle());
+    }
+    if ((mLastUpdated & kpClusterDriftDampingBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpClusterDriftDampingAttributeHandle());
+    }
+    if ((mLastUpdated & kpdAcceptedStartupRangeBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpdAcceptedStartupRangeAttributeHandle());
+    }
+    if ((mLastUpdated & kpdListenTimeoutBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpdListenTimeoutAttributeHandle());
+    }
+    if ((mLastUpdated & kpKeySlotIdBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpKeySlotIdAttributeHandle());
+    }
+    if ((mLastUpdated & kpKeySlotOnlyEnabledBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle());
+    }
+    if ((mLastUpdated & kpKeySlotUsedForStartupBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpKeySlotUsedForStartupAttributeHandle());
+    }
+    if ((mLastUpdated & kpKeySlotUsedForSyncBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpKeySlotUsedForSyncAttributeHandle());
+    }
+    if ((mLastUpdated & kpLatestTxBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpLatestTxAttributeHandle());
+    }
+    if ((mLastUpdated & kpMacroInitialOffsetABit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpMacroInitialOffsetAAttributeHandle());
+    }
+    if ((mLastUpdated & kpMacroInitialOffsetBBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpMacroInitialOffsetBAttributeHandle());
+    }
+    if ((mLastUpdated & kpMicroInitialOffsetABit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpMicroInitialOffsetAAttributeHandle());
+    }
+    if ((mLastUpdated & kpMicroInitialOffsetBBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpMicroInitialOffsetBAttributeHandle());
+    }
+    if ((mLastUpdated & kpMicroPerCycleBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpMicroPerCycleAttributeHandle());
+    }
+    if ((mLastUpdated & kpOffsetCorrectionOutBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpOffsetCorrectionOutAttributeHandle());
+    }
+    if ((mLastUpdated & kpOffsetCorrectionStartBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpOffsetCorrectionStartAttributeHandle());
+    }
+    if ((mLastUpdated & kpRateCorrectionOutBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpRateCorrectionOutAttributeHandle());
+    }
+    if ((mLastUpdated & kpWakeupChannelBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpWakeupChannelAttributeHandle());
+    }
+    if ((mLastUpdated & kpWakeupPatternBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpWakeupPatternAttributeHandle());
+    }
+    if ((mLastUpdated & kpdMicrotickBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpdMicrotickAttributeHandle());
+    }
+    if ((mLastUpdated & kpSamplesPerMicrotickBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetpSamplesPerMicrotickAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -10291,153 +10384,154 @@ void FlexRayController::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void FlexRayController::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
-      mDirty &= ~kNetworkIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
-      mDirty &= ~kDeviceIDBit;
-    }
-    else if (attributeHandle == mObjectClass->GetPocRequestAttributeHandle() && (mValuesSet & kPocRequestBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mPocRequest.encode()));
-      mDirty &= ~kPocRequestBit;
-    }
-    else if (attributeHandle == mObjectClass->GetChiCommandAttributeHandle() && (mValuesSet & kChiCommandBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mChiCommand.encode()));
-      mDirty &= ~kChiCommandBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpAllowHaltDueToClockAttributeHandle() && (mValuesSet & kpAllowHaltDueToClockBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpAllowHaltDueToClock.encode()));
-      mDirty &= ~kpAllowHaltDueToClockBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpAllowPassiveToActiveAttributeHandle() && (mValuesSet & kpAllowPassiveToActiveBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpAllowPassiveToActive.encode()));
-      mDirty &= ~kpAllowPassiveToActiveBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpChannelsAttributeHandle() && (mValuesSet & kpChannelsBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpChannels.encode()));
-      mDirty &= ~kpChannelsBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpClusterDriftDampingAttributeHandle() && (mValuesSet & kpClusterDriftDampingBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpClusterDriftDamping.encode()));
-      mDirty &= ~kpClusterDriftDampingBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpdAcceptedStartupRangeAttributeHandle() && (mValuesSet & kpdAcceptedStartupRangeBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpdAcceptedStartupRange.encode()));
-      mDirty &= ~kpdAcceptedStartupRangeBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpdListenTimeoutAttributeHandle() && (mValuesSet & kpdListenTimeoutBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpdListenTimeout.encode()));
-      mDirty &= ~kpdListenTimeoutBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpKeySlotIdAttributeHandle() && (mValuesSet & kpKeySlotIdBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotId.encode()));
-      mDirty &= ~kpKeySlotIdBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle() && (mValuesSet & kpKeySlotOnlyEnabledBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotOnlyEnabled.encode()));
-      mDirty &= ~kpKeySlotOnlyEnabledBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpKeySlotUsedForStartupAttributeHandle() && (mValuesSet & kpKeySlotUsedForStartupBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotUsedForStartup.encode()));
-      mDirty &= ~kpKeySlotUsedForStartupBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpKeySlotUsedForSyncAttributeHandle() && (mValuesSet & kpKeySlotUsedForSyncBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotUsedForSync.encode()));
-      mDirty &= ~kpKeySlotUsedForSyncBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpLatestTxAttributeHandle() && (mValuesSet & kpLatestTxBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpLatestTx.encode()));
-      mDirty &= ~kpLatestTxBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetAAttributeHandle() && (mValuesSet & kpMacroInitialOffsetABit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpMacroInitialOffsetA.encode()));
-      mDirty &= ~kpMacroInitialOffsetABit;
-    }
-    else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetBAttributeHandle() && (mValuesSet & kpMacroInitialOffsetBBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpMacroInitialOffsetB.encode()));
-      mDirty &= ~kpMacroInitialOffsetBBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetAAttributeHandle() && (mValuesSet & kpMicroInitialOffsetABit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpMicroInitialOffsetA.encode()));
-      mDirty &= ~kpMicroInitialOffsetABit;
-    }
-    else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetBAttributeHandle() && (mValuesSet & kpMicroInitialOffsetBBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpMicroInitialOffsetB.encode()));
-      mDirty &= ~kpMicroInitialOffsetBBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpMicroPerCycleAttributeHandle() && (mValuesSet & kpMicroPerCycleBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpMicroPerCycle.encode()));
-      mDirty &= ~kpMicroPerCycleBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpOffsetCorrectionOutAttributeHandle() && (mValuesSet & kpOffsetCorrectionOutBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpOffsetCorrectionOut.encode()));
-      mDirty &= ~kpOffsetCorrectionOutBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpOffsetCorrectionStartAttributeHandle() && (mValuesSet & kpOffsetCorrectionStartBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpOffsetCorrectionStart.encode()));
-      mDirty &= ~kpOffsetCorrectionStartBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpRateCorrectionOutAttributeHandle() && (mValuesSet & kpRateCorrectionOutBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpRateCorrectionOut.encode()));
-      mDirty &= ~kpRateCorrectionOutBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpWakeupChannelAttributeHandle() && (mValuesSet & kpWakeupChannelBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpWakeupChannel.encode()));
-      mDirty &= ~kpWakeupChannelBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpWakeupPatternAttributeHandle() && (mValuesSet & kpWakeupPatternBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpWakeupPattern.encode()));
-      mDirty &= ~kpWakeupPatternBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpdMicrotickAttributeHandle() && (mValuesSet & kpdMicrotickBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpdMicrotick.encode()));
-      mDirty &= ~kpdMicrotickBit;
-    }
-    else if (attributeHandle == mObjectClass->GetpSamplesPerMicrotickAttributeHandle() && (mValuesSet & kpSamplesPerMicrotickBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mpSamplesPerMicrotick.encode()));
-      mDirty &= ~kpSamplesPerMicrotickBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetNetworkIDAttributeHandle() && (mValuesSet & kNetworkIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mNetworkID.encode()));
+        mDirty &= ~kNetworkIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetDeviceIDAttributeHandle() && (mValuesSet & kDeviceIDBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mDeviceID.encode()));
+        mDirty &= ~kDeviceIDBit;
+      }
+      else if (attributeHandle == mObjectClass->GetPocRequestAttributeHandle() && (mValuesSet & kPocRequestBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mPocRequest.encode()));
+        mDirty &= ~kPocRequestBit;
+      }
+      else if (attributeHandle == mObjectClass->GetChiCommandAttributeHandle() && (mValuesSet & kChiCommandBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mChiCommand.encode()));
+        mDirty &= ~kChiCommandBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpAllowHaltDueToClockAttributeHandle() && (mValuesSet & kpAllowHaltDueToClockBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpAllowHaltDueToClock.encode()));
+        mDirty &= ~kpAllowHaltDueToClockBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpAllowPassiveToActiveAttributeHandle() && (mValuesSet & kpAllowPassiveToActiveBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpAllowPassiveToActive.encode()));
+        mDirty &= ~kpAllowPassiveToActiveBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpChannelsAttributeHandle() && (mValuesSet & kpChannelsBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpChannels.encode()));
+        mDirty &= ~kpChannelsBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpClusterDriftDampingAttributeHandle() && (mValuesSet & kpClusterDriftDampingBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpClusterDriftDamping.encode()));
+        mDirty &= ~kpClusterDriftDampingBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpdAcceptedStartupRangeAttributeHandle() && (mValuesSet & kpdAcceptedStartupRangeBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpdAcceptedStartupRange.encode()));
+        mDirty &= ~kpdAcceptedStartupRangeBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpdListenTimeoutAttributeHandle() && (mValuesSet & kpdListenTimeoutBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpdListenTimeout.encode()));
+        mDirty &= ~kpdListenTimeoutBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpKeySlotIdAttributeHandle() && (mValuesSet & kpKeySlotIdBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotId.encode()));
+        mDirty &= ~kpKeySlotIdBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpKeySlotOnlyEnabledAttributeHandle() && (mValuesSet & kpKeySlotOnlyEnabledBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotOnlyEnabled.encode()));
+        mDirty &= ~kpKeySlotOnlyEnabledBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpKeySlotUsedForStartupAttributeHandle() && (mValuesSet & kpKeySlotUsedForStartupBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotUsedForStartup.encode()));
+        mDirty &= ~kpKeySlotUsedForStartupBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpKeySlotUsedForSyncAttributeHandle() && (mValuesSet & kpKeySlotUsedForSyncBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpKeySlotUsedForSync.encode()));
+        mDirty &= ~kpKeySlotUsedForSyncBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpLatestTxAttributeHandle() && (mValuesSet & kpLatestTxBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpLatestTx.encode()));
+        mDirty &= ~kpLatestTxBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetAAttributeHandle() && (mValuesSet & kpMacroInitialOffsetABit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpMacroInitialOffsetA.encode()));
+        mDirty &= ~kpMacroInitialOffsetABit;
+      }
+      else if (attributeHandle == mObjectClass->GetpMacroInitialOffsetBAttributeHandle() && (mValuesSet & kpMacroInitialOffsetBBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpMacroInitialOffsetB.encode()));
+        mDirty &= ~kpMacroInitialOffsetBBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetAAttributeHandle() && (mValuesSet & kpMicroInitialOffsetABit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpMicroInitialOffsetA.encode()));
+        mDirty &= ~kpMicroInitialOffsetABit;
+      }
+      else if (attributeHandle == mObjectClass->GetpMicroInitialOffsetBAttributeHandle() && (mValuesSet & kpMicroInitialOffsetBBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpMicroInitialOffsetB.encode()));
+        mDirty &= ~kpMicroInitialOffsetBBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpMicroPerCycleAttributeHandle() && (mValuesSet & kpMicroPerCycleBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpMicroPerCycle.encode()));
+        mDirty &= ~kpMicroPerCycleBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpOffsetCorrectionOutAttributeHandle() && (mValuesSet & kpOffsetCorrectionOutBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpOffsetCorrectionOut.encode()));
+        mDirty &= ~kpOffsetCorrectionOutBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpOffsetCorrectionStartAttributeHandle() && (mValuesSet & kpOffsetCorrectionStartBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpOffsetCorrectionStart.encode()));
+        mDirty &= ~kpOffsetCorrectionStartBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpRateCorrectionOutAttributeHandle() && (mValuesSet & kpRateCorrectionOutBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpRateCorrectionOut.encode()));
+        mDirty &= ~kpRateCorrectionOutBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpWakeupChannelAttributeHandle() && (mValuesSet & kpWakeupChannelBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpWakeupChannel.encode()));
+        mDirty &= ~kpWakeupChannelBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpWakeupPatternAttributeHandle() && (mValuesSet & kpWakeupPatternBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpWakeupPattern.encode()));
+        mDirty &= ~kpWakeupPatternBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpdMicrotickAttributeHandle() && (mValuesSet & kpdMicrotickBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpdMicrotick.encode()));
+        mDirty &= ~kpdMicrotickBit;
+      }
+      else if (attributeHandle == mObjectClass->GetpSamplesPerMicrotickAttributeHandle() && (mValuesSet & kpSamplesPerMicrotickBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mpSamplesPerMicrotick.encode()));
+        mDirty &= ~kpSamplesPerMicrotickBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // FlexRayController::ReflectAttributeValues
 
 uint32_t FlexRayController::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -10445,13 +10539,13 @@ uint32_t FlexRayController::RegisterUpdateCallback(UpdateCallback callback)
 
 void FlexRayController::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void FlexRayController::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -10492,10 +10586,13 @@ FlexRaySendBufferObjectClass::FlexRaySendBufferObjectClass(rti1516ev::RTIambassa
 
 FlexRaySendBufferObjectClass::~FlexRaySendBufferObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -10557,7 +10654,7 @@ rti1516ev::AttributeHandleSet FlexRaySendBufferObjectClass::GetAllAttributeHandl
 
 void FlexRaySendBufferObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<FlexRaySendBuffer> newObject = std::shared_ptr<FlexRaySendBuffer>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -10565,27 +10662,24 @@ void FlexRaySendBufferObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInsta
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void FlexRaySendBufferObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<FlexRaySendBuffer>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -10604,7 +10698,7 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::GetObjectInsta
 
 std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -10623,7 +10717,7 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::GetObjectInsta
 
 std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -10637,6 +10731,7 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -10648,7 +10743,7 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
 
 std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -10661,6 +10756,7 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
   std::shared_ptr<FlexRaySendBuffer> newObject = std::shared_ptr<FlexRaySendBuffer>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -10678,6 +10774,7 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
 
 uint32_t FlexRaySendBufferObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -10685,11 +10782,13 @@ uint32_t FlexRaySendBufferObjectClass::RegisterDiscoverObjectInstanceCallback(Di
 
 void FlexRaySendBufferObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void FlexRaySendBufferObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IFlexRaySendBuffer> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -10699,6 +10798,7 @@ void FlexRaySendBufferObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::s
 
 uint32_t FlexRaySendBufferObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -10706,11 +10806,13 @@ uint32_t FlexRaySendBufferObjectClass::RegisterRemoveObjectInstanceCallback(Remo
 
 void FlexRaySendBufferObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void FlexRaySendBufferObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<IFlexRaySendBuffer> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -10727,14 +10829,14 @@ void FlexRaySendBufferObjectClass::InsertObjectInstanceName(std::shared_ptr<IFle
 
 void FlexRaySendBufferObjectClass::InsertObjectInstanceHandle(std::shared_ptr<IFlexRaySendBuffer> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
 }
 
 void FlexRaySendBufferObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
   mObjectInstancesByName.erase(objectInstanceName);
   mObjectInstancesByHandle.erase(objectInstanceHandle);
@@ -10774,19 +10876,19 @@ FlexRaySendBuffer::~FlexRaySendBuffer()
 
 bool FlexRaySendBuffer::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool FlexRaySendBuffer::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void FlexRaySendBuffer::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -10813,13 +10915,13 @@ void FlexRaySendBuffer::Release()
 // attribute Sender : HLAobjectInstanceHandle.FlexRayController
 IFlexRayController* FlexRaySendBuffer::GetSender() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayControllerObjectClass*>(GetObjectClassRegistry()->GetFlexRayControllerObjectClass())->GetObjectInstance(mSender.get()).get();
 }
 
 void FlexRaySendBuffer::SetSender(IFlexRayController* newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mSender.set(static_cast<FlexRayController*>(newValue)->GetObjectInstanceHandle());
   mDirty |= kSenderBit;
@@ -10829,13 +10931,13 @@ void FlexRaySendBuffer::SetSender(IFlexRayController* newValue)
 // attribute TransmissionMode : FlexRayTransmissionMode
 FlexRayTransmissionMode FlexRaySendBuffer::GetTransmissionMode() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayTransmissionMode>(mTransmissionMode.get());
 }
 
 void FlexRaySendBuffer::SetTransmissionMode(FlexRayTransmissionMode newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mTransmissionMode.set(static_cast<uint8_t>(newValue));
   mDirty |= kTransmissionModeBit;
@@ -10845,13 +10947,13 @@ void FlexRaySendBuffer::SetTransmissionMode(FlexRayTransmissionMode newValue)
 // attribute Payload : FlexRayPayload
 const FlexRayPayload& FlexRaySendBuffer::GetPayload() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mPayload;
 }
 
 FlexRayPayload& FlexRaySendBuffer::GetPayload()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mDirty |= kPayloadBit;
   mValuesSet |= kPayloadBit;
   return mPayload;
@@ -10859,7 +10961,7 @@ FlexRayPayload& FlexRaySendBuffer::GetPayload()
 
 void FlexRaySendBuffer::SetPayload(const FlexRayPayload& newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mPayload = newValue;
   mDirty |= kPayloadBit;
@@ -10869,13 +10971,13 @@ void FlexRaySendBuffer::SetPayload(const FlexRayPayload& newValue)
 // attribute CycleOffset : HLAoctet
 uint8_t FlexRaySendBuffer::GetCycleOffset() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mCycleOffset.get();
 }
 
 void FlexRaySendBuffer::SetCycleOffset(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mCycleOffset.set(newValue);
   mDirty |= kCycleOffsetBit;
@@ -10885,13 +10987,13 @@ void FlexRaySendBuffer::SetCycleOffset(uint8_t newValue)
 // attribute CycleRepetition : HLAoctet
 uint8_t FlexRaySendBuffer::GetCycleRepetition() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mCycleRepetition.get();
 }
 
 void FlexRaySendBuffer::SetCycleRepetition(uint8_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mCycleRepetition.set(newValue);
   mDirty |= kCycleRepetitionBit;
@@ -10901,13 +11003,13 @@ void FlexRaySendBuffer::SetCycleRepetition(uint8_t newValue)
 // attribute SlotId : HLAinteger16LE
 int16_t FlexRaySendBuffer::GetSlotId() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mSlotId.get();
 }
 
 void FlexRaySendBuffer::SetSlotId(int16_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mSlotId.set(newValue);
   mDirty |= kSlotIdBit;
@@ -10917,13 +11019,13 @@ void FlexRaySendBuffer::SetSlotId(int16_t newValue)
 // attribute Channel : FlexRayChannel
 FlexRayChannel FlexRaySendBuffer::GetChannel() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return static_cast<FlexRayChannel>(mChannel.get());
 }
 
 void FlexRaySendBuffer::SetChannel(FlexRayChannel newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mChannel.set(static_cast<uint8_t>(newValue));
   mDirty |= kChannelBit;
@@ -10933,13 +11035,13 @@ void FlexRaySendBuffer::SetChannel(FlexRayChannel newValue)
 // attribute PPIndicator : HLAboolean
 bool FlexRaySendBuffer::GetPPIndicator() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mPPIndicator.get();
 }
 
 void FlexRaySendBuffer::SetPPIndicator(bool newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mPPIndicator.set(newValue);
   mDirty |= kPPIndicatorBit;
@@ -10949,13 +11051,13 @@ void FlexRaySendBuffer::SetPPIndicator(bool newValue)
 // attribute HeaderCRC : HLAinteger16LE
 int16_t FlexRaySendBuffer::GetHeaderCRC() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mHeaderCRC.get();
 }
 
 void FlexRaySendBuffer::SetHeaderCRC(int16_t newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
   mHeaderCRC.set(newValue);
   mDirty |= kHeaderCRCBit;
@@ -11021,25 +11123,25 @@ rti1516ev::AttributeHandleValueMap FlexRaySendBuffer::GetModifiedAttributeValues
 
 FlexRaySendBuffer::AttributeBits FlexRaySendBuffer::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 FlexRaySendBuffer::AttributeBits FlexRaySendBuffer::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 FlexRaySendBuffer::AttributeBits FlexRaySendBuffer::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 FlexRaySendBuffer::AttributeBits FlexRaySendBuffer::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -11083,7 +11185,7 @@ void FlexRaySendBuffer::UpdateModifiedAttributeValues(int64_t time)
 
 void FlexRaySendBuffer::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -11134,15 +11236,13 @@ void FlexRaySendBuffer::ReflectAttributeValues(const rti1516ev::AttributeHandleV
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<int64_t>(), optional<OrderType>());
-  lock.lock();
   mLastUpdated = kNone;
 } // FlexRaySendBuffer::ReflectAttributeValues
 
 void FlexRaySendBuffer::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -11193,54 +11293,53 @@ void FlexRaySendBuffer::ReflectAttributeValues(const rti1516ev::AttributeHandleV
     }
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const rti1516ev::HLAinteger64Time&>(theTime).getTime(), orderType);
-  lock.lock();
   mLastUpdated = kNone;
 } // FlexRaySendBuffer::ReflectAttributeValues
 
 // request attributes not being part of the last update
 void FlexRaySendBuffer::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
-  if ((mLastUpdated & kSenderBit) == 0)
   {
-    requestAttributes.insert(mObjectClass->GetSenderAttributeHandle());
-  }
-  if ((mLastUpdated & kTransmissionModeBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetTransmissionModeAttributeHandle());
-  }
-  if ((mLastUpdated & kPayloadBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetPayloadAttributeHandle());
-  }
-  if ((mLastUpdated & kCycleOffsetBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetCycleOffsetAttributeHandle());
-  }
-  if ((mLastUpdated & kCycleRepetitionBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetCycleRepetitionAttributeHandle());
-  }
-  if ((mLastUpdated & kSlotIdBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetSlotIdAttributeHandle());
-  }
-  if ((mLastUpdated & kChannelBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetChannelAttributeHandle());
-  }
-  if ((mLastUpdated & kPPIndicatorBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetPPIndicatorAttributeHandle());
-  }
-  if ((mLastUpdated & kHeaderCRCBit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->GetHeaderCRCAttributeHandle());
-  }
-  lock.release();
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    if ((mLastUpdated & kSenderBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetSenderAttributeHandle());
+    }
+    if ((mLastUpdated & kTransmissionModeBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetTransmissionModeAttributeHandle());
+    }
+    if ((mLastUpdated & kPayloadBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetPayloadAttributeHandle());
+    }
+    if ((mLastUpdated & kCycleOffsetBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetCycleOffsetAttributeHandle());
+    }
+    if ((mLastUpdated & kCycleRepetitionBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetCycleRepetitionAttributeHandle());
+    }
+    if ((mLastUpdated & kSlotIdBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetSlotIdAttributeHandle());
+    }
+    if ((mLastUpdated & kChannelBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetChannelAttributeHandle());
+    }
+    if ((mLastUpdated & kPPIndicatorBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetPPIndicatorAttributeHandle());
+    }
+    if ((mLastUpdated & kHeaderCRCBit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->GetHeaderCRCAttributeHandle());
+    }
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -11263,63 +11362,64 @@ void FlexRaySendBuffer::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void FlexRaySendBuffer::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
-    if (attributeHandle == mObjectClass->GetSenderAttributeHandle() && (mValuesSet & kSenderBit) != 0)
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
     {
-      updateAttributes.insert(std::make_pair(attributeHandle, mSender.encode()));
-      mDirty &= ~kSenderBit;
-    }
-    else if (attributeHandle == mObjectClass->GetTransmissionModeAttributeHandle() && (mValuesSet & kTransmissionModeBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mTransmissionMode.encode()));
-      mDirty &= ~kTransmissionModeBit;
-    }
-    else if (attributeHandle == mObjectClass->GetPayloadAttributeHandle() && (mValuesSet & kPayloadBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mPayload.encode()));
-      mDirty &= ~kPayloadBit;
-    }
-    else if (attributeHandle == mObjectClass->GetCycleOffsetAttributeHandle() && (mValuesSet & kCycleOffsetBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mCycleOffset.encode()));
-      mDirty &= ~kCycleOffsetBit;
-    }
-    else if (attributeHandle == mObjectClass->GetCycleRepetitionAttributeHandle() && (mValuesSet & kCycleRepetitionBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mCycleRepetition.encode()));
-      mDirty &= ~kCycleRepetitionBit;
-    }
-    else if (attributeHandle == mObjectClass->GetSlotIdAttributeHandle() && (mValuesSet & kSlotIdBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mSlotId.encode()));
-      mDirty &= ~kSlotIdBit;
-    }
-    else if (attributeHandle == mObjectClass->GetChannelAttributeHandle() && (mValuesSet & kChannelBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mChannel.encode()));
-      mDirty &= ~kChannelBit;
-    }
-    else if (attributeHandle == mObjectClass->GetPPIndicatorAttributeHandle() && (mValuesSet & kPPIndicatorBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mPPIndicator.encode()));
-      mDirty &= ~kPPIndicatorBit;
-    }
-    else if (attributeHandle == mObjectClass->GetHeaderCRCAttributeHandle() && (mValuesSet & kHeaderCRCBit) != 0)
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, mHeaderCRC.encode()));
-      mDirty &= ~kHeaderCRCBit;
-    }
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+      if (attributeHandle == mObjectClass->GetSenderAttributeHandle() && (mValuesSet & kSenderBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mSender.encode()));
+        mDirty &= ~kSenderBit;
+      }
+      else if (attributeHandle == mObjectClass->GetTransmissionModeAttributeHandle() && (mValuesSet & kTransmissionModeBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mTransmissionMode.encode()));
+        mDirty &= ~kTransmissionModeBit;
+      }
+      else if (attributeHandle == mObjectClass->GetPayloadAttributeHandle() && (mValuesSet & kPayloadBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mPayload.encode()));
+        mDirty &= ~kPayloadBit;
+      }
+      else if (attributeHandle == mObjectClass->GetCycleOffsetAttributeHandle() && (mValuesSet & kCycleOffsetBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mCycleOffset.encode()));
+        mDirty &= ~kCycleOffsetBit;
+      }
+      else if (attributeHandle == mObjectClass->GetCycleRepetitionAttributeHandle() && (mValuesSet & kCycleRepetitionBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mCycleRepetition.encode()));
+        mDirty &= ~kCycleRepetitionBit;
+      }
+      else if (attributeHandle == mObjectClass->GetSlotIdAttributeHandle() && (mValuesSet & kSlotIdBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mSlotId.encode()));
+        mDirty &= ~kSlotIdBit;
+      }
+      else if (attributeHandle == mObjectClass->GetChannelAttributeHandle() && (mValuesSet & kChannelBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mChannel.encode()));
+        mDirty &= ~kChannelBit;
+      }
+      else if (attributeHandle == mObjectClass->GetPPIndicatorAttributeHandle() && (mValuesSet & kPPIndicatorBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mPPIndicator.encode()));
+        mDirty &= ~kPPIndicatorBit;
+      }
+      else if (attributeHandle == mObjectClass->GetHeaderCRCAttributeHandle() && (mValuesSet & kHeaderCRCBit) != 0)
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, mHeaderCRC.encode()));
+        mDirty &= ~kHeaderCRCBit;
+      }
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // FlexRaySendBuffer::ReflectAttributeValues
 
 uint32_t FlexRaySendBuffer::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -11327,13 +11427,13 @@ uint32_t FlexRaySendBuffer::RegisterUpdateCallback(UpdateCallback callback)
 
 void FlexRaySendBuffer::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void FlexRaySendBuffer::ExecuteUpdateCallbacks(optional<int64_t> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;

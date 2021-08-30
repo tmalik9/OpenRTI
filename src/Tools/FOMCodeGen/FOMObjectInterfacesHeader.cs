@@ -427,80 +427,86 @@ class I");
             
             #line default
             #line hidden
-            this.Write("    I");
+            this.Write("    // copying and moving an object instance is not allowed\r\n    I");
             
-            #line 112 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 113 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("(const I");
             
-            #line 112 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 113 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("&) = delete;\r\n    I");
             
-            #line 113 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 114 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("(I");
             
-            #line 113 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 114 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("&&) = delete;\r\n    I");
             
-            #line 114 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 115 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("& operator=(const I");
             
-            #line 114 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 115 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("&) = delete;\r\n    I");
             
-            #line 115 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 116 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("& operator=(I");
             
-            #line 115 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 116 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("&&) = delete;\r\n\r\n");
             
-            #line 117 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 118 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  if (objectClass.BaseClass == null)  {
             
             #line default
             #line hidden
-            this.Write("    virtual std::wstring GetObjectInstanceName() const = 0;\r\n    virtual bool IsV" +
-                    "alid() const = 0;\r\n    virtual bool IsOwner() const = 0;\r\n    virtual void Relea" +
-                    "se() = 0;\r\n");
+            this.Write(@"    virtual std::wstring GetObjectInstanceName() const = 0;
+    // has this object a valid HLA object instance handle?
+    virtual bool IsValid() const = 0;
+    // has this object been created by this federate?
+    virtual bool IsOwner() const = 0;
+    // Delete the object from HLA and the class registry.
+    // Be careful to keep a shared_ptr to the object while executing Release!
+    virtual void Release() = 0;
+");
             
-            #line 122 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 127 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 123 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 128 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  
   foreach (var attribute in objectClass.Attributes)
   {
@@ -511,91 +517,91 @@ class I");
             #line hidden
             this.Write("    // attribute ");
             
-            #line 128 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 133 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 128 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 133 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n    virtual ");
             
-            #line 129 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 134 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" Get");
             
-            #line 129 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 134 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("() const = 0;\r\n");
             
-            #line 130 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 135 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
     if (attribute.DataType is FOMParser.FixedRecordDataType) { 
             
             #line default
             #line hidden
             this.Write("    virtual ");
             
-            #line 131 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 136 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.ModifiableReturnCppType));
             
             #line default
             #line hidden
             this.Write(" Get");
             
-            #line 131 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 136 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("() = 0;\r\n");
             
-            #line 132 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 137 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
   } 
             
             #line default
             #line hidden
             this.Write("    virtual void Set");
             
-            #line 133 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 138 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 133 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 138 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.DataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" newValue) = 0;\r\n");
             
-            #line 134 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 139 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
   } else { 
             
             #line default
             #line hidden
             this.Write("    // attribute ");
             
-            #line 135 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 140 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(attribute.Name));
             
             #line default
             #line hidden
             this.Write(" : no data type\r\n");
             
-            #line 136 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 141 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
   
     } // if (attribute.DataType != null)
   } // foreach (var attribute in objectClass.Attributes)
@@ -604,13 +610,13 @@ class I");
             #line default
             #line hidden
             
-            #line 140 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 145 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  if (objectClass.HasValidAttributes) { 
             
             #line default
             #line hidden
             
-            #line 141 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 146 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  if (objectClass.BaseClass != null && !objectClass.BaseClass.HasValidAttributes) { // first child class with valid attributes 
             
             #line default
@@ -619,7 +625,7 @@ class I");
                     ";\r\n    // send all attribute values, as TSO message\r\n    virtual void UpdateAllA" +
                     "ttributeValues(");
             
-            #line 145 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 150 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
             
             #line default
@@ -630,7 +636,7 @@ class I");
     // send attribute values which have been modified since last call, as TSO message
     virtual void UpdateModifiedAttributeValues(");
             
-            #line 149 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 154 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
             
             #line default
@@ -651,27 +657,27 @@ class I");
     virtual void RequestAllAttributeValues() = 0;
 ");
             
-            #line 163 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 168 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 164 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 169 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  if (objectClass.ChildClasses.Count == 0) { 
             
             #line default
             #line hidden
             this.Write("    using UpdateCallback = std::function<void(std::shared_ptr<I");
             
-            #line 165 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 170 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write(">, optional<");
             
-            #line 165 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 170 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
             
             #line default
@@ -680,48 +686,48 @@ class I");
                     "back(UpdateCallback callback) = 0;\r\n    virtual void UnregisterUpdateCallback(ui" +
                     "nt32_t callbackToken) = 0;\r\n");
             
-            #line 168 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 173 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  } // if (objectClass.ChildClasses.Count == 0) 
             
             #line default
             #line hidden
             
-            #line 169 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 174 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  } // if (objectClass.HasValidAttributes) 
             
             #line default
             #line hidden
             this.Write("};\r\n\r\n");
             
-            #line 172 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 177 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  } // foreach (var objectClass in FOM.ObjectClasses) 
             
             #line default
             #line hidden
             this.Write("\r\nclass IObjectClassRegistry\r\n{\r\n  public:\r\n");
             
-            #line 177 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 182 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  foreach (var objectClass in FOM.ObjectClasses) { 
             
             #line default
             #line hidden
             this.Write("    virtual I");
             
-            #line 178 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 183 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass* Get");
             
-            #line 178 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 183 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass() const = 0;\r\n");
             
-            #line 179 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 184 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
  } 
             
             #line default
@@ -729,7 +735,7 @@ class I");
             this.Write("  protected:\r\n    virtual ~IObjectClassRegistry() {}\r\n}; // class IObjectClassReg" +
                     "istry\r\n\r\n");
             
-            #line 184 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 189 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
 
 foreach (var namespacePart in FOM.Namespace)
 {
@@ -739,14 +745,14 @@ foreach (var namespacePart in FOM.Namespace)
             #line hidden
             this.Write("} // namespace ");
             
-            #line 188 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 193 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 189 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
+            #line 194 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectInterfacesHeader.tt"
   } 
             
             #line default

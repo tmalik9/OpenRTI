@@ -58,10 +58,13 @@ foreach (var objectClass in FOM.ObjectClasses)
 
 <#=objectClass.Name#>ObjectClass::~<#=objectClass.Name#>ObjectClass()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  //std::lock_guard<std::recursive_mutex> lock(mMutex);
   while (!mObjectInstancesByHandle.empty())
   {
-    mObjectInstancesByHandle.begin()->second->Release();
+    // careful - hold the reference to the object instance until it has been removed from the maps,
+    // otherwise it's mutex will be destroyed while held
+    auto objectInstance = mObjectInstancesByHandle.begin()->second;
+    objectInstance->Release();
   }
   assert(mObjectInstancesByHandle.empty());
   assert(mObjectInstancesByName.empty());
@@ -125,7 +128,7 @@ rti1516ev::AttributeHandleSet <#=objectClass.Name#>ObjectClass::GetAllAttributeH
 
 void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
   std::shared_ptr<<#=objectClass.Name#>> newObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
@@ -133,27 +136,24 @@ void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectI
   newObject->mIsOwner = false;
   InsertObjectInstanceName(newObject, objectInstanceName);
   InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  lock.release();
   ExecuteDiscoverObjectInstanceCallbacks(newObject);
 }
 
 void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   std::wstring objectInstanceName = mRtiAmbassador->getObjectInstanceName(objectInstanceHandle);
   auto iter = mObjectInstancesByName.find(objectInstanceName);
   assert(iter != mObjectInstancesByName.end());
   auto objectInstance = std::dynamic_pointer_cast<<#=objectClass.Name#>>(iter->second);
-  lock.unlock();
   ExecuteRemoveObjectInstanceCallbacks(objectInstance);
-  lock.lock();
   objectInstance->mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
   EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 }
 
 std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -174,7 +174,7 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObj
 
 std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObjectInstance(rti1516ev::ObjectInstanceHandle instanceHandle)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByHandle.find(instanceHandle);
   if (iter != mObjectInstancesByHandle.end())
   {
@@ -195,7 +195,7 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObj
 
 std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -209,6 +209,7 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::Create
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -220,7 +221,7 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::Create
 
 std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
@@ -233,6 +234,7 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::Create
   std::shared_ptr<<#=objectClass.Name#>> newObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
@@ -250,6 +252,7 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::Create
 
 uint32_t <#=objectClass.Name#>ObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastDiscoverObjectInstanceCallbackToken++;
   mDiscoverCallbacks.insert(std::make_pair(mLastDiscoverObjectInstanceCallbackToken, callback));
   return mLastDiscoverObjectInstanceCallbackToken;
@@ -257,11 +260,13 @@ uint32_t <#=objectClass.Name#>ObjectClass::RegisterDiscoverObjectInstanceCallbac
 
 void <#=objectClass.Name#>ObjectClass::UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mDiscoverCallbacks.erase(callbackToken);
 }
 
 void <#=objectClass.Name#>ObjectClass::ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<I<#=objectClass.Name#>> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mDiscoverCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -271,6 +276,7 @@ void <#=objectClass.Name#>ObjectClass::ExecuteDiscoverObjectInstanceCallbacks(st
 
 uint32_t <#=objectClass.Name#>ObjectClass::RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mLastRemoveObjectInstanceCallbackToken++;
   mRemoveObjectInstanceCallbacks.insert(std::make_pair(mLastRemoveObjectInstanceCallbackToken, callback));
   return mLastRemoveObjectInstanceCallbackToken;
@@ -278,11 +284,13 @@ uint32_t <#=objectClass.Name#>ObjectClass::RegisterRemoveObjectInstanceCallback(
 
 void <#=objectClass.Name#>ObjectClass::UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   mRemoveObjectInstanceCallbacks.erase(callbackToken);
 }
 
 void <#=objectClass.Name#>ObjectClass::ExecuteRemoveObjectInstanceCallbacks(std::shared_ptr<I<#=objectClass.Name#>> newObjectInstance)
 {
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mRemoveObjectInstanceCallbacks)
   {
     auto& callback = callbackEntry.second;
@@ -301,7 +309,7 @@ void <#=objectClass.Name#>ObjectClass::InsertObjectInstanceName(std::shared_ptr<
 
 void <#=objectClass.Name#>ObjectClass::InsertObjectInstanceHandle(std::shared_ptr<I<#=objectClass.Name#>> objectInstance, rti1516ev::ObjectInstanceHandle objectInstanceHandle)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mObjectInstancesByHandle.insert(std::make_pair(objectInstanceHandle, objectInstance));
 <# if (objectClass.BaseClass != null) { #>
   mBaseClass->InsertObjectInstanceHandle(objectInstance, objectInstanceHandle);
@@ -310,7 +318,7 @@ void <#=objectClass.Name#>ObjectClass::InsertObjectInstanceHandle(std::shared_pt
 
 void <#=objectClass.Name#>ObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
-  // prerequisite: mMutex must be locked
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
 <# if (objectClass.BaseClass != null) { #>
   mBaseClass->EraseObjectInstance(objectInstanceHandle, objectInstanceName);
 <# } #>
@@ -352,19 +360,19 @@ void <#=objectClass.Name#>ObjectClass::EraseObjectInstance(rti1516ev::ObjectInst
 
 bool <#=objectClass.Name#>::IsValid() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mObjectInstanceHandle.isValid();
 }
 
 bool <#=objectClass.Name#>::IsOwner() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mIsOwner;
 }
 
 void <#=objectClass.Name#>::Release()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   if (mObjectInstanceHandle.isValid())
   {
     if (mIsOwner)
@@ -394,14 +402,14 @@ void <#=objectClass.Name#>::Release()
 #>// attribute <#=attribute.Name#> : <#=attribute.DataType.Name#>
 <#=attribute.DataType.ReturnCppType#> <#=objectClass.Name#>::Get<#=attribute.Name#>() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return <#=attribute.DataType.CppGetter("m" + attribute.Name)#>;
 }
 <#    if (attribute.DataType is FOMParser.FixedRecordDataType) { #>
 
 <#=attribute.DataType.ModifiableReturnCppType#> <#=objectClass.Name#>::Get<#=attribute.Name#>()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mDirty |= k<#=attribute.Name#>Bit;
   mValuesSet |= k<#=attribute.Name#>Bit;
   return <#=attribute.DataType.CppGetter("m" + attribute.Name)#>;
@@ -410,7 +418,7 @@ void <#=objectClass.Name#>::Release()
 
 void <#=objectClass.Name#>::Set<#=attribute.Name#>(<#=attribute.DataType.ParameterCppType#> newValue)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=<#= attribute.DataType.CanTranslateToCpp #>
   <#=attribute.DataType.CppSetter("m" + attribute.Name, "newValue")#>;
   mDirty |= k<#=attribute.Name#>Bit;
@@ -464,25 +472,25 @@ rti1516ev::AttributeHandleValueMap <#=objectClass.Name#>::GetModifiedAttributeVa
 <# if (objectClass.HasValidAttributes) { #>
 <#=objectClass.Name#>::AttributeBits <#=objectClass.Name#>::GetReceivedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesReceived;
 }
 
 <#=objectClass.Name#>::AttributeBits <#=objectClass.Name#>::GetUpdatedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mLastUpdated;
 }
 
 <#=objectClass.Name#>::AttributeBits <#=objectClass.Name#>::GetInitializedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mValuesSet;
 }
 
 <#=objectClass.Name#>::AttributeBits <#=objectClass.Name#>::GetModifiedAttributes() const
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   return mDirty;
 }
 
@@ -526,7 +534,7 @@ void <#=objectClass.Name#>::UpdateModifiedAttributeValues(<#=FOM.NativeTimeType#
 
 void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -556,16 +564,14 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
-  lock.unlock();
   ExecuteUpdateCallbacks(optional<<#=FOM.NativeTimeType#>>(), optional<OrderType>());
-  lock.lock();
 <# } #>
   mLastUpdated = kNone;
 } // <#=objectClass.Name#>::ReflectAttributeValues
 
 void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "theTime" : "/* theTime */" #>, OrderType <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "orderType" : "/* orderType */"#>)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
   {
     rti1516ev::AttributeHandle attributeHandle = attributeHandleValue.first;
@@ -595,9 +601,7 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
-  lock.unlock();
   ExecuteUpdateCallbacks(static_cast<const <#=FOM.LogicalTimeType#>&>(theTime).getTime(), orderType);
-  lock.lock();
 <# } #>
   mLastUpdated = kNone;
 } // <#=objectClass.Name#>::ReflectAttributeValues
@@ -605,23 +609,24 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
 // request attributes not being part of the last update
 void <#=objectClass.Name#>::RequestAttributeValues()
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleSet requestAttributes;
+  {
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
 <#
   foreach (var attribute in objectClass.AllAttributes)
   {
     if (attribute.DataType != null)
     {
 #>
-  if ((mLastUpdated & k<#=attribute.Name#>Bit) == 0)
-  {
-    requestAttributes.insert(mObjectClass->Get<#=attribute.Name#>AttributeHandle());
-  }
+    if ((mLastUpdated & k<#=attribute.Name#>Bit) == 0)
+    {
+      requestAttributes.insert(mObjectClass->Get<#=attribute.Name#>AttributeHandle());
+    }
 <#
     } // if
   } // foreach
 #>
-  lock.release();
+  } // scope of lock_guard
   mRtiAmbassador->requestAttributeValueUpdate(mObjectInstanceHandle, requestAttributes, rti1516ev::VariableLengthData());
 }
 
@@ -646,10 +651,11 @@ void <#=objectClass.Name#>::RequestAllAttributeValues()
 // provide requested attributes set since last sent update
 void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
   rti1516ev::AttributeHandleValueMap updateAttributes;
-  for (auto& attributeHandle : attributeHandles)
   {
+    std::lock_guard<std::recursive_mutex> lock(mMutex);
+    for (auto& attributeHandle : attributeHandles)
+    {
 <#
   {
   bool firstInObjectInstanceProvideAttributeValues = true;
@@ -659,29 +665,29 @@ void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHan
     {
 #>
 <# if (firstInObjectInstanceProvideAttributeValues)  {#>
-    if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle() && (mValuesSet & k<#=attribute.Name#>Bit) != 0)
+      if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle() && (mValuesSet & k<#=attribute.Name#>Bit) != 0)
 <# } else { #>
-    else if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle() && (mValuesSet & k<#=attribute.Name#>Bit) != 0)
+      else if (attributeHandle == mObjectClass->Get<#=attribute.Name#>AttributeHandle() && (mValuesSet & k<#=attribute.Name#>Bit) != 0)
 <# } #>
-    {
-      updateAttributes.insert(std::make_pair(attributeHandle, m<#=attribute.Name#>.encode()));
-      mDirty &= ~k<#=attribute.Name#>Bit;
-    }
+      {
+        updateAttributes.insert(std::make_pair(attributeHandle, m<#=attribute.Name#>.encode()));
+        mDirty &= ~k<#=attribute.Name#>Bit;
+      }
 <#
       firstInObjectInstanceProvideAttributeValues = false;
     } // if
   } // foreach
   }
 #>
-  } // for (auto& attributeHandleValue : attributes)
-  lock.release();
+    } // for (auto& attributeHandleValue : attributes)
+  } // scope of lock_guard
   mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // <#=objectClass.Name#>::ReflectAttributeValues
 
 <# if (objectClass.ChildClasses.Count == 0) { #>
 uint32_t <#=objectClass.Name#>::RegisterUpdateCallback(UpdateCallback callback)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mLastCallbackToken++;
   mUpdateCallbacks.insert(std::make_pair(mLastCallbackToken, callback));
   return mLastCallbackToken;
@@ -689,13 +695,13 @@ uint32_t <#=objectClass.Name#>::RegisterUpdateCallback(UpdateCallback callback)
 
 void <#=objectClass.Name#>::UnregisterUpdateCallback(uint32_t callbackToken)
 {
-  std::unique_lock<std::mutex> lock(mMutex);
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
   mUpdateCallbacks.erase(callbackToken);
 }
 
 void <#=objectClass.Name#>::ExecuteUpdateCallbacks(optional<<#=FOM.NativeTimeType#>> time, optional<OrderType> orderType)
 {
-  // prerequisite: mMutex is unlocked
+  std::lock_guard<std::mutex> lock(mCallbackListMutex);
   for (auto& callbackEntry : mUpdateCallbacks)
   {
     auto& callback = callbackEntry.second;

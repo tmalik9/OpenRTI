@@ -48,14 +48,19 @@ class IHLAobjectRoot : public std::enable_shared_from_this<IHLAobjectRoot>
 
     IHLAobjectRoot() {}
     virtual ~IHLAobjectRoot() {}
+    // copying and moving an object instance is not allowed
     IHLAobjectRoot(const IHLAobjectRoot&) = delete;
     IHLAobjectRoot(IHLAobjectRoot&&) = delete;
     IHLAobjectRoot& operator=(const IHLAobjectRoot&) = delete;
     IHLAobjectRoot& operator=(IHLAobjectRoot&&) = delete;
 
     virtual std::wstring GetObjectInstanceName() const = 0;
+    // has this object a valid HLA object instance handle?
     virtual bool IsValid() const = 0;
+    // has this object been created by this federate?
     virtual bool IsOwner() const = 0;
+    // Delete the object from HLA and the class registry.
+    // Be careful to keep a shared_ptr to the object while executing Release!
     virtual void Release() = 0;
     // attribute HLAprivilegeToDeleteObject : no data type
 };
@@ -89,6 +94,7 @@ class ISystemVariable : public IHLAobjectRoot
 
     ISystemVariable() {}
     ~ISystemVariable() {}
+    // copying and moving an object instance is not allowed
     ISystemVariable(const ISystemVariable&) = delete;
     ISystemVariable(ISystemVariable&&) = delete;
     ISystemVariable& operator=(const ISystemVariable&) = delete;
@@ -152,6 +158,7 @@ class IValueEntity : public IHLAobjectRoot
 
     IValueEntity() {}
     ~IValueEntity() {}
+    // copying and moving an object instance is not allowed
     IValueEntity(const IValueEntity&) = delete;
     IValueEntity(IValueEntity&&) = delete;
     IValueEntity& operator=(const IValueEntity&) = delete;
@@ -217,6 +224,7 @@ class IDOMemberSource : public IHLAobjectRoot
 
     IDOMemberSource() {}
     ~IDOMemberSource() {}
+    // copying and moving an object instance is not allowed
     IDOMemberSource(const IDOMemberSource&) = delete;
     IDOMemberSource(IDOMemberSource&&) = delete;
     IDOMemberSource& operator=(const IDOMemberSource&) = delete;
@@ -287,6 +295,7 @@ class IDOMemberTarget : public IHLAobjectRoot
 
     IDOMemberTarget() {}
     ~IDOMemberTarget() {}
+    // copying and moving an object instance is not allowed
     IDOMemberTarget(const IDOMemberTarget&) = delete;
     IDOMemberTarget(IDOMemberTarget&&) = delete;
     IDOMemberTarget& operator=(const IDOMemberTarget&) = delete;
@@ -353,6 +362,7 @@ class IBusManagement : public IHLAobjectRoot
 
     IBusManagement() {}
     ~IBusManagement() {}
+    // copying and moving an object instance is not allowed
     IBusManagement(const IBusManagement&) = delete;
     IBusManagement(IBusManagement&&) = delete;
     IBusManagement& operator=(const IBusManagement&) = delete;
@@ -416,6 +426,7 @@ class IBusManagementCan : public IBusManagement
 
     IBusManagementCan() {}
     ~IBusManagementCan() {}
+    // copying and moving an object instance is not allowed
     IBusManagementCan(const IBusManagementCan&) = delete;
     IBusManagementCan(IBusManagementCan&&) = delete;
     IBusManagementCan& operator=(const IBusManagementCan&) = delete;
@@ -468,6 +479,7 @@ class IBusManagementEthernet : public IBusManagement
 
     IBusManagementEthernet() {}
     ~IBusManagementEthernet() {}
+    // copying and moving an object instance is not allowed
     IBusManagementEthernet(const IBusManagementEthernet&) = delete;
     IBusManagementEthernet(IBusManagementEthernet&&) = delete;
     IBusManagementEthernet& operator=(const IBusManagementEthernet&) = delete;
@@ -532,6 +544,7 @@ class IFlexRayCluster : public IBusManagement
 
     IFlexRayCluster() {}
     ~IFlexRayCluster() {}
+    // copying and moving an object instance is not allowed
     IFlexRayCluster(const IFlexRayCluster&) = delete;
     IFlexRayCluster(IFlexRayCluster&&) = delete;
     IFlexRayCluster& operator=(const IFlexRayCluster&) = delete;
@@ -632,6 +645,7 @@ class IBusController : public IHLAobjectRoot
 
     IBusController() {}
     ~IBusController() {}
+    // copying and moving an object instance is not allowed
     IBusController(const IBusController&) = delete;
     IBusController(IBusController&&) = delete;
     IBusController& operator=(const IBusController&) = delete;
@@ -703,6 +717,7 @@ class IBusControllerCan : public IBusController
 
     IBusControllerCan() {}
     ~IBusControllerCan() {}
+    // copying and moving an object instance is not allowed
     IBusControllerCan(const IBusControllerCan&) = delete;
     IBusControllerCan(IBusControllerCan&&) = delete;
     IBusControllerCan& operator=(const IBusControllerCan&) = delete;
@@ -769,6 +784,7 @@ class IBusControllerEthernet : public IBusController
 
     IBusControllerEthernet() {}
     ~IBusControllerEthernet() {}
+    // copying and moving an object instance is not allowed
     IBusControllerEthernet(const IBusControllerEthernet&) = delete;
     IBusControllerEthernet(IBusControllerEthernet&&) = delete;
     IBusControllerEthernet& operator=(const IBusControllerEthernet&) = delete;
@@ -819,6 +835,7 @@ class IFlexRayControllerStatus : public IBusController
 
     IFlexRayControllerStatus() {}
     ~IFlexRayControllerStatus() {}
+    // copying and moving an object instance is not allowed
     IFlexRayControllerStatus(const IFlexRayControllerStatus&) = delete;
     IFlexRayControllerStatus(IFlexRayControllerStatus&&) = delete;
     IFlexRayControllerStatus& operator=(const IFlexRayControllerStatus&) = delete;
@@ -909,6 +926,7 @@ class IFlexRayController : public IBusController
 
     IFlexRayController() {}
     ~IFlexRayController() {}
+    // copying and moving an object instance is not allowed
     IFlexRayController(const IFlexRayController&) = delete;
     IFlexRayController(IFlexRayController&&) = delete;
     IFlexRayController& operator=(const IFlexRayController&) = delete;
@@ -1031,6 +1049,7 @@ class IFlexRaySendBuffer : public IHLAobjectRoot
 
     IFlexRaySendBuffer() {}
     ~IFlexRaySendBuffer() {}
+    // copying and moving an object instance is not allowed
     IFlexRaySendBuffer(const IFlexRaySendBuffer&) = delete;
     IFlexRaySendBuffer(IFlexRaySendBuffer&&) = delete;
     IFlexRaySendBuffer& operator=(const IFlexRaySendBuffer&) = delete;

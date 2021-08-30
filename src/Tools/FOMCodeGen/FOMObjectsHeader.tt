@@ -144,10 +144,11 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
   } // foreach (var attribute in objectClass.Attributes)
 #>
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<I<#=objectClass.Name#>>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<I<#=objectClass.Name#>>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -231,7 +232,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     <#=objectClass.Name#>ObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -248,6 +249,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     AttributeBits mDirty = kNone;
 <# } #>
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
 <# } #>

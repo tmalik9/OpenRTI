@@ -75,10 +75,11 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
     // Attribute handles
     // attribute HLAprivilegeToDeleteObject : no data type
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IHLAobjectRoot>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IHLAobjectRoot>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -118,7 +119,7 @@ class HLAobjectRoot : public IHLAobjectRoot
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     HLAobjectRootObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -184,10 +185,11 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     // attribute Value : HLAopaqueData
     rti1516ev::AttributeHandle mValueAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<ISystemVariable>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<ISystemVariable>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -250,7 +252,7 @@ class SystemVariable : public ISystemVariable
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     SystemVariableObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -264,6 +266,7 @@ class SystemVariable : public ISystemVariable
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -328,10 +331,11 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     // attribute Value : HLAopaqueData
     rti1516ev::AttributeHandle mValueAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IValueEntity>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IValueEntity>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -394,7 +398,7 @@ class ValueEntity : public IValueEntity
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     ValueEntityObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -408,6 +412,7 @@ class ValueEntity : public IValueEntity
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -480,10 +485,11 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     // attribute DOSourceMemberDataBytes : HLAopaqueData
     rti1516ev::AttributeHandle mDOSourceMemberDataBytesAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IDOMemberSource>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IDOMemberSource>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -552,7 +558,7 @@ class DOMemberSource : public IDOMemberSource
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     DOMemberSourceObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -566,6 +572,7 @@ class DOMemberSource : public IDOMemberSource
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -638,10 +645,11 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     // attribute DOTargetMemberConnectionType : HLAASCIIstring
     rti1516ev::AttributeHandle mDOTargetMemberConnectionTypeAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IDOMemberTarget>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IDOMemberTarget>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -707,7 +715,7 @@ class DOMemberTarget : public IDOMemberTarget
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     DOMemberTargetObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -721,6 +729,7 @@ class DOMemberTarget : public IDOMemberTarget
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -787,10 +796,11 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     // attribute NetworkID : HLAASCIIstring
     rti1516ev::AttributeHandle mNetworkIDAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IBusManagement>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IBusManagement>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -850,7 +860,7 @@ class BusManagement : public IBusManagement
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     BusManagementObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -940,10 +950,11 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     // attribute SendMessagesAsRx : HLAboolean
     rti1516ev::AttributeHandle mSendMessagesAsRxAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IBusManagementCan>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IBusManagementCan>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -1018,7 +1029,7 @@ class BusManagementCan : public IBusManagementCan
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     BusManagementCanObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -1032,6 +1043,7 @@ class BusManagementCan : public IBusManagementCan
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -1110,10 +1122,11 @@ class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClas
     // attribute SendMessagesAsRx : HLAboolean
     rti1516ev::AttributeHandle mSendMessagesAsRxAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IBusManagementEthernet>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IBusManagementEthernet>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -1182,7 +1195,7 @@ class BusManagementEthernet : public IBusManagementEthernet
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     BusManagementEthernetObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -1196,6 +1209,7 @@ class BusManagementEthernet : public IBusManagementEthernet
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -1342,10 +1356,11 @@ class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
     // attribute gSyncFrameIDCountMax : HLAoctet
     rti1516ev::AttributeHandle mgSyncFrameIDCountMaxAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IFlexRayCluster>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IFlexRayCluster>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -1468,7 +1483,7 @@ class FlexRayCluster : public IFlexRayCluster
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     FlexRayClusterObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -1482,6 +1497,7 @@ class FlexRayCluster : public IFlexRayCluster
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -1590,10 +1606,11 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     // attribute DeviceID : HLAASCIIstring
     rti1516ev::AttributeHandle mDeviceIDAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IBusController>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IBusController>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -1656,7 +1673,7 @@ class BusController : public IBusController
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     BusControllerObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -1770,10 +1787,11 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     // attribute SamplingMode : CanSamplingMode
     rti1516ev::AttributeHandle mSamplingModeAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IBusControllerCan>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IBusControllerCan>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -1866,7 +1884,7 @@ class BusControllerCan : public IBusControllerCan
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     BusControllerCanObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -1880,6 +1898,7 @@ class BusControllerCan : public IBusControllerCan
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -1968,10 +1987,11 @@ class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClas
     // attribute PortName : HLAASCIIstring
     rti1516ev::AttributeHandle mPortNameAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IBusControllerEthernet>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IBusControllerEthernet>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -2040,7 +2060,7 @@ class BusControllerEthernet : public IBusControllerEthernet
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     BusControllerEthernetObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -2054,6 +2074,7 @@ class BusControllerEthernet : public IBusControllerEthernet
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -2158,10 +2179,11 @@ class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObject
     // attribute wakeupStatus : FlexRayWakeupStatusType
     rti1516ev::AttributeHandle mwakeupStatusAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IFlexRayControllerStatus>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IFlexRayControllerStatus>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -2254,7 +2276,7 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     FlexRayControllerStatusObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -2268,6 +2290,7 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -2452,10 +2475,11 @@ class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
     // attribute pSamplesPerMicrotick : HLAoctet
     rti1516ev::AttributeHandle mpSamplesPerMicrotickAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IFlexRayController>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IFlexRayController>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -2596,7 +2620,7 @@ class FlexRayController : public IFlexRayController
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     FlexRayControllerObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -2610,6 +2634,7 @@ class FlexRayController : public IFlexRayController
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
@@ -2758,10 +2783,11 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
     // attribute HeaderCRC : HLAinteger16LE
     rti1516ev::AttributeHandle mHeaderCRCAttributeHandle;
     // this mutex guards the data structures below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
     std::map<std::wstring, std::shared_ptr<IFlexRaySendBuffer>> mObjectInstancesByName;
     std::map<rti1516ev::ObjectInstanceHandle, std::shared_ptr<IFlexRaySendBuffer>> mObjectInstancesByHandle;
 
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, DiscoverObjectInstanceCallback> mDiscoverCallbacks;
     uint32_t mLastDiscoverObjectInstanceCallbackToken = 0;
     std::map<uint32_t, RemoveObjectInstanceCallback> mRemoveObjectInstanceCallbacks;
@@ -2849,7 +2875,7 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
 
     rti1516ev::RTIambassador* mRtiAmbassador;
     // this mutex guards all of the fields below
-    mutable std::mutex mMutex;
+    mutable std::recursive_mutex mMutex;
 
     FlexRaySendBufferObjectClass* mObjectClass;
     std::wstring mObjectInstanceName;
@@ -2863,6 +2889,7 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     AttributeBits mLastUpdated = kNone;
     // to be sent with next UpdateModifiedAttributeValues
     AttributeBits mDirty = kNone;
+    mutable std::mutex mCallbackListMutex;
     std::map<uint32_t, UpdateCallback> mUpdateCallbacks;
     uint32_t mLastCallbackToken = 0;
     // Attribute value encoders
