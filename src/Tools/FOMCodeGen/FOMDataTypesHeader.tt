@@ -54,6 +54,11 @@ inline X* placement_new(void* addr, Types&& ... args)
 #endif
 
 // define our own simplified 'optional' types, similar to but independent of std::optional (since C++17) or boost::optional
+class bad_optional_access : public std::exception
+{
+public:
+  virtual const char* what() const noexcept override { return ("Bad optional access"); }
+};
 #pragma warning(push)
 #pragma warning(disable: 4324) // MSVC: 'struct_name' : structure was padded due to __declspec(align())
 // (empty) base template
@@ -75,18 +80,32 @@ template<typename T> struct optional<T, true>
   ~optional() { if(_valid) destroy(); }
 
   // check for value presence
-  bool operator ! () const { return !_valid; }
+  bool has_value() const { return _valid; }
   explicit operator bool() const { return _valid; }
+  bool operator ! () const { return !_valid; }
 
   // assign
   optional& operator = (optional const& rhs) { return assign(rhs); }
   optional& operator = (T const& w) { return assign(w); }
 
-  // get value
-  const T& operator * () const { return *get(); }
-  T& operator * () { return *get(); }
+  // unchecked access to value
+  const T& operator * () const & { return *get(); }
+  T& operator * () & { return *get(); }
   T const* operator -> () const { return get(); }
   T* operator -> () { return get(); }
+  // checked access to value
+  constexpr const T& value() const & {
+    if (!_valid) {
+      throw bad_optional_access{};
+    }
+    return *get();
+  }
+  constexpr T& value() & {
+    if (!_valid) {
+      throw bad_optional_access{};
+    }
+    return *get();
+  }
 private:
   template<typename Other>
   void create(const Other& w) { placement_new<T>(_value, w); }
@@ -114,7 +133,7 @@ private:
 template<typename T> struct optional<const T&, false>
 {
   // constructors
-  optional() : _valid(false) {}
+  optional() : _valid(false), _pointer() {}
   optional(const optional& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }
   optional(const T& rhs): _valid(true), _pointer(&rhs) { }
   template<typename Other>
@@ -126,8 +145,9 @@ template<typename T> struct optional<const T&, false>
   ~optional() { }
 
   // check for value presence
-  bool operator ! () const { return !_valid; }
+  bool has_value() const { return _valid; }
   explicit operator bool() const { return _valid; }
+  bool operator ! () const { return !_valid; }
 
   // assign
   optional& operator = (const optional& rhs) {
@@ -140,9 +160,22 @@ template<typename T> struct optional<const T&, false>
     _pointer = &w;
     return *this;
   }
-  // get value
-  T const& operator * () const { return *get(); }
-  T const* operator -> () const { return get(); }
+  // unchecked access to value
+  T const& operator * () const & { return *get(); }
+  T const* operator -> () const & { return get(); }
+  // checked access to value
+  constexpr const T& value() const & {
+    if (!_valid) {
+      throw bad_optional_access{};
+    }
+    return *get();
+  }
+  constexpr T& value() & {
+    if (!_valid) {
+      throw bad_optional_access{};
+    }
+    return *get();
+  }
 private:
   const T* get() const {
     assert(_valid && "no optional value");
@@ -167,8 +200,9 @@ template<typename T> struct optional<T, false>
   ~optional() { }
 
   // check for value presence
-  bool operator ! () const { return !_valid; }
+  bool has_value() const { return _valid; }
   explicit operator bool() const { return _valid; }
+  bool operator ! () const { return !_valid; }
 
   // assign
   optional& operator = (const optional& rhs) {
@@ -181,9 +215,22 @@ template<typename T> struct optional<T, false>
     _value = w;
     return *this;
   }
-  // get value
-  T const& operator * () const { return _value; }
+  // unchecked access to value
+  T const& operator * () const & { return _value; }
   T const* operator -> () const { return &_value; }
+  // checked access to value
+  constexpr const T& value() const & {
+    if (!_valid) {
+      throw bad_optional_access{};
+    }
+    return _value;
+  }
+  constexpr T& value() & {
+    if (!_valid) {
+      throw bad_optional_access{};
+    }
+    return _value;
+  }
 private:
   bool _valid;
   T _value;
