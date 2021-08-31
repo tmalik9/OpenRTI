@@ -94,13 +94,13 @@ template<typename T> struct optional<T, true>
   T const* operator -> () const { return get(); }
   T* operator -> () { return get(); }
   // checked access to value
-  constexpr const T& value() const & {
+  const T& value() const & {
     if (!_valid) {
       throw bad_optional_access{};
     }
     return *get();
   }
-  constexpr T& value() & {
+  T& value() & {
     if (!_valid) {
       throw bad_optional_access{};
     }
@@ -164,13 +164,13 @@ template<typename T> struct optional<const T&, false>
   T const& operator * () const & { return *get(); }
   T const* operator -> () const & { return get(); }
   // checked access to value
-  constexpr const T& value() const & {
+  const T& value() const & {
     if (!_valid) {
       throw bad_optional_access{};
     }
     return *get();
   }
-  constexpr T& value() & {
+  T& value() & {
     if (!_valid) {
       throw bad_optional_access{};
     }
@@ -219,13 +219,13 @@ template<typename T> struct optional<T, false>
   T const& operator * () const & { return _value; }
   T const* operator -> () const { return &_value; }
   // checked access to value
-  constexpr const T& value() const & {
+  const T& value() const & {
     if (!_valid) {
       throw bad_optional_access{};
     }
     return _value;
   }
-  constexpr T& value() & {
+  T& value() & {
     if (!_valid) {
       throw bad_optional_access{};
     }

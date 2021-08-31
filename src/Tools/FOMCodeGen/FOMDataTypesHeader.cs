@@ -197,72 +197,72 @@ foreach (var namespacePart in FOM.Namespace)
                     "hecked access to value\r\n  const T& operator * () const & { return *get(); }\r\n  T" +
                     "& operator * () & { return *get(); }\r\n  T const* operator -> () const { return g" +
                     "et(); }\r\n  T* operator -> () { return get(); }\r\n  // checked access to value\r\n  " +
-                    "constexpr const T& value() const & {\r\n    if (!_valid) {\r\n      throw bad_option" +
-                    "al_access{};\r\n    }\r\n    return *get();\r\n  }\r\n  constexpr T& value() & {\r\n    if" +
-                    " (!_valid) {\r\n      throw bad_optional_access{};\r\n    }\r\n    return *get();\r\n  }" +
-                    "\r\nprivate:\r\n  template<typename Other>\r\n  void create(const Other& w) { placemen" +
-                    "t_new<T>(_value, w); }\r\n  void create(const optional& rhs) { if(_valid) create(*" +
-                    "rhs.get()); }\r\n  void destroy() { get()->~T(); }\r\n  T const* get() const { asser" +
-                    "t(_valid && \"no optional value\"); return reinterpret_cast< const T* >(_value); }" +
-                    "\r\n  T* get() { assert(_valid && \"no optional value\"); return reinterpret_cast< T" +
-                    "* >(_value); }\r\n  void cleanup() { destroy(); _valid = false; }\r\n  optional& ass" +
-                    "ign(const T& w) {\r\n    if(_valid) *get() = w;\r\n    else create(w), _valid = true" +
-                    ";\r\n    return *this;\r\n  }\r\n  optional& assign(const optional& rhs) {\r\n    if(rhs" +
-                    "._valid) return assign(*rhs.get());\r\n    if(!_valid) return *this;\r\n    cleanup(" +
-                    ");\r\n    return *this;\r\n  }\r\n  bool _valid;\r\n  alignas(alignof(T)) uint8_t _value" +
-                    "[sizeof(T)];\r\n};\r\n// Specialization for const-ref parameters, implemented by hol" +
-                    "ding a pointer to the original variable.\r\n// Note that non-const references are " +
-                    "*not* supported (but could be easily added)!\r\ntemplate<typename T> struct option" +
-                    "al<const T&, false>\r\n{\r\n  // constructors\r\n  optional() : _valid(false), _pointe" +
-                    "r() {}\r\n  optional(const optional& rhs): _valid(rhs._valid), _pointer(rhs._point" +
-                    "er) { }\r\n  optional(const T& rhs): _valid(true), _pointer(&rhs) { }\r\n  template<" +
-                    "typename Other>\r\n  optional(const Other& rhs): _valid(true), _pointer(&rhs) { }\r" +
-                    "\n  template<typename Other>\r\n  optional(const optional<Other>& rhs): _valid(rhs." +
-                    "_valid), _pointer(rhs._pointer) { }\r\n\r\n  // destructor\r\n  ~optional() { }\r\n\r\n  /" +
-                    "/ check for value presence\r\n  bool has_value() const { return _valid; }\r\n  expli" +
-                    "cit operator bool() const { return _valid; }\r\n  bool operator ! () const { retur" +
-                    "n !_valid; }\r\n\r\n  // assign\r\n  optional& operator = (const optional& rhs) {\r\n   " +
-                    " _valid = rhs._valid;\r\n    _pointer = rhs._pointer;\r\n    return *this;\r\n  }\r\n  o" +
-                    "ptional& operator = (const T& w) {\r\n    _valid = true;\r\n    _pointer = &w;\r\n    " +
-                    "return *this;\r\n  }\r\n  // unchecked access to value\r\n  T const& operator * () con" +
-                    "st & { return *get(); }\r\n  T const* operator -> () const & { return get(); }\r\n  " +
-                    "// checked access to value\r\n  constexpr const T& value() const & {\r\n    if (!_va" +
-                    "lid) {\r\n      throw bad_optional_access{};\r\n    }\r\n    return *get();\r\n  }\r\n  co" +
-                    "nstexpr T& value() & {\r\n    if (!_valid) {\r\n      throw bad_optional_access{};\r\n" +
-                    "    }\r\n    return *get();\r\n  }\r\nprivate:\r\n  const T* get() const {\r\n    assert(_" +
-                    "valid && \"no optional value\");\r\n    return _pointer;\r\n  }\r\n  bool _valid;\r\n  con" +
-                    "st T* _pointer = nullptr;\r\n};\r\n// Specialization for everything else, which incl" +
-                    "udes fundamental types and pointer types.\r\ntemplate<typename T> struct optional<" +
-                    "T, false>\r\n{\r\n  // constructors\r\n  optional() : _valid(false), _value() {}\r\n  op" +
-                    "tional(const optional& rhs): _valid(rhs._valid), _value(rhs._value) { }\r\n  optio" +
-                    "nal(const T& rhs): _valid(true), _value(rhs) { }\r\n  template<typename Other>\r\n  " +
-                    "optional(const Other& rhs): _valid(true), _value(rhs) { }\r\n  template<typename O" +
-                    "ther>\r\n  optional(const optional<Other>& rhs): _valid(rhs._valid), _value(rhs._v" +
-                    "alue) { }\r\n\r\n  // destructor\r\n  ~optional() { }\r\n\r\n  // check for value presence" +
-                    "\r\n  bool has_value() const { return _valid; }\r\n  explicit operator bool() const " +
-                    "{ return _valid; }\r\n  bool operator ! () const { return !_valid; }\r\n\r\n  // assig" +
-                    "n\r\n  optional& operator = (const optional& rhs) {\r\n    _valid = rhs._valid;\r\n   " +
-                    " _value = rhs._value;\r\n    return *this;\r\n  }\r\n  optional& operator = (const T& " +
-                    "w) {\r\n    _valid = true;\r\n    _value = w;\r\n    return *this;\r\n  }\r\n  // unchecke" +
-                    "d access to value\r\n  T const& operator * () const & { return _value; }\r\n  T cons" +
-                    "t* operator -> () const { return &_value; }\r\n  // checked access to value\r\n  con" +
-                    "stexpr const T& value() const & {\r\n    if (!_valid) {\r\n      throw bad_optional_" +
-                    "access{};\r\n    }\r\n    return _value;\r\n  }\r\n  constexpr T& value() & {\r\n    if (!" +
-                    "_valid) {\r\n      throw bad_optional_access{};\r\n    }\r\n    return _value;\r\n  }\r\np" +
-                    "rivate:\r\n  bool _valid;\r\n  T _value;\r\n};\r\n#pragma warning(pop)\r\n\r\n// extended re" +
-                    "ceive order type, includes \'interpolated\' for application-generated timestamps\r\n" +
-                    "enum class OrderType { RECEIVE, TIMESTAMP, INTERPOLATED };\r\n\r\ntemplate<typename " +
-                    "char_type, typename traits_type>\r\nstd::basic_ostream<char_type, traits_type>&\r\no" +
-                    "perator<<(std::basic_ostream<char_type, traits_type>& os, OrderType value)\r\n{\r\n " +
-                    " switch (value)\r\n  {\r\n    case OrderType::RECEIVE: os << \"RECEIVE\"; break;\r\n    " +
-                    "case OrderType::TIMESTAMP: os << \"TIMESTAMP\"; break;\r\n    case OrderType::INTERP" +
-                    "OLATED: os << \"INTERPOLATED\"; break;\r\n  }\r\n  return os;\r\n}\r\n\r\ninline std::string" +
-                    " to_string(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderType::RECEI" +
-                    "VE: return \"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return \"TIMESTAMP\";\r\n    c" +
-                    "ase OrderType::INTERPOLATED: return \"INTERPOLATED\";\r\n  }\r\n}\r\n\r\ninline std::wstri" +
-                    "ng to_wstring(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderType::RE" +
-                    "CEIVE: return L\"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return L\"TIMESTAMP\";\r\n" +
-                    "    case OrderType::INTERPOLATED: return L\"INTERPOLATED\";\r\n  }\r\n}\r\n");
+                    "const T& value() const & {\r\n    if (!_valid) {\r\n      throw bad_optional_access{" +
+                    "};\r\n    }\r\n    return *get();\r\n  }\r\n  T& value() & {\r\n    if (!_valid) {\r\n      " +
+                    "throw bad_optional_access{};\r\n    }\r\n    return *get();\r\n  }\r\nprivate:\r\n  templa" +
+                    "te<typename Other>\r\n  void create(const Other& w) { placement_new<T>(_value, w);" +
+                    " }\r\n  void create(const optional& rhs) { if(_valid) create(*rhs.get()); }\r\n  voi" +
+                    "d destroy() { get()->~T(); }\r\n  T const* get() const { assert(_valid && \"no opti" +
+                    "onal value\"); return reinterpret_cast< const T* >(_value); }\r\n  T* get() { asser" +
+                    "t(_valid && \"no optional value\"); return reinterpret_cast< T* >(_value); }\r\n  vo" +
+                    "id cleanup() { destroy(); _valid = false; }\r\n  optional& assign(const T& w) {\r\n " +
+                    "   if(_valid) *get() = w;\r\n    else create(w), _valid = true;\r\n    return *this;" +
+                    "\r\n  }\r\n  optional& assign(const optional& rhs) {\r\n    if(rhs._valid) return assi" +
+                    "gn(*rhs.get());\r\n    if(!_valid) return *this;\r\n    cleanup();\r\n    return *this" +
+                    ";\r\n  }\r\n  bool _valid;\r\n  alignas(alignof(T)) uint8_t _value[sizeof(T)];\r\n};\r\n//" +
+                    " Specialization for const-ref parameters, implemented by holding a pointer to th" +
+                    "e original variable.\r\n// Note that non-const references are *not* supported (but" +
+                    " could be easily added)!\r\ntemplate<typename T> struct optional<const T&, false>\r" +
+                    "\n{\r\n  // constructors\r\n  optional() : _valid(false), _pointer() {}\r\n  optional(c" +
+                    "onst optional& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }\r\n  optional(" +
+                    "const T& rhs): _valid(true), _pointer(&rhs) { }\r\n  template<typename Other>\r\n  o" +
+                    "ptional(const Other& rhs): _valid(true), _pointer(&rhs) { }\r\n  template<typename" +
+                    " Other>\r\n  optional(const optional<Other>& rhs): _valid(rhs._valid), _pointer(rh" +
+                    "s._pointer) { }\r\n\r\n  // destructor\r\n  ~optional() { }\r\n\r\n  // check for value pr" +
+                    "esence\r\n  bool has_value() const { return _valid; }\r\n  explicit operator bool() " +
+                    "const { return _valid; }\r\n  bool operator ! () const { return !_valid; }\r\n\r\n  //" +
+                    " assign\r\n  optional& operator = (const optional& rhs) {\r\n    _valid = rhs._valid" +
+                    ";\r\n    _pointer = rhs._pointer;\r\n    return *this;\r\n  }\r\n  optional& operator = " +
+                    "(const T& w) {\r\n    _valid = true;\r\n    _pointer = &w;\r\n    return *this;\r\n  }\r\n" +
+                    "  // unchecked access to value\r\n  T const& operator * () const & { return *get()" +
+                    "; }\r\n  T const* operator -> () const & { return get(); }\r\n  // checked access to" +
+                    " value\r\n  const T& value() const & {\r\n    if (!_valid) {\r\n      throw bad_option" +
+                    "al_access{};\r\n    }\r\n    return *get();\r\n  }\r\n  T& value() & {\r\n    if (!_valid)" +
+                    " {\r\n      throw bad_optional_access{};\r\n    }\r\n    return *get();\r\n  }\r\nprivate:" +
+                    "\r\n  const T* get() const {\r\n    assert(_valid && \"no optional value\");\r\n    retu" +
+                    "rn _pointer;\r\n  }\r\n  bool _valid;\r\n  const T* _pointer = nullptr;\r\n};\r\n// Specia" +
+                    "lization for everything else, which includes fundamental types and pointer types" +
+                    ".\r\ntemplate<typename T> struct optional<T, false>\r\n{\r\n  // constructors\r\n  optio" +
+                    "nal() : _valid(false), _value() {}\r\n  optional(const optional& rhs): _valid(rhs." +
+                    "_valid), _value(rhs._value) { }\r\n  optional(const T& rhs): _valid(true), _value(" +
+                    "rhs) { }\r\n  template<typename Other>\r\n  optional(const Other& rhs): _valid(true)" +
+                    ", _value(rhs) { }\r\n  template<typename Other>\r\n  optional(const optional<Other>&" +
+                    " rhs): _valid(rhs._valid), _value(rhs._value) { }\r\n\r\n  // destructor\r\n  ~optiona" +
+                    "l() { }\r\n\r\n  // check for value presence\r\n  bool has_value() const { return _val" +
+                    "id; }\r\n  explicit operator bool() const { return _valid; }\r\n  bool operator ! ()" +
+                    " const { return !_valid; }\r\n\r\n  // assign\r\n  optional& operator = (const optiona" +
+                    "l& rhs) {\r\n    _valid = rhs._valid;\r\n    _value = rhs._value;\r\n    return *this;" +
+                    "\r\n  }\r\n  optional& operator = (const T& w) {\r\n    _valid = true;\r\n    _value = w" +
+                    ";\r\n    return *this;\r\n  }\r\n  // unchecked access to value\r\n  T const& operator *" +
+                    " () const & { return _value; }\r\n  T const* operator -> () const { return &_value" +
+                    "; }\r\n  // checked access to value\r\n  const T& value() const & {\r\n    if (!_valid" +
+                    ") {\r\n      throw bad_optional_access{};\r\n    }\r\n    return _value;\r\n  }\r\n  T& va" +
+                    "lue() & {\r\n    if (!_valid) {\r\n      throw bad_optional_access{};\r\n    }\r\n    re" +
+                    "turn _value;\r\n  }\r\nprivate:\r\n  bool _valid;\r\n  T _value;\r\n};\r\n#pragma warning(po" +
+                    "p)\r\n\r\n// extended receive order type, includes \'interpolated\' for application-ge" +
+                    "nerated timestamps\r\nenum class OrderType { RECEIVE, TIMESTAMP, INTERPOLATED };\r\n" +
+                    "\r\ntemplate<typename char_type, typename traits_type>\r\nstd::basic_ostream<char_ty" +
+                    "pe, traits_type>&\r\noperator<<(std::basic_ostream<char_type, traits_type>& os, Or" +
+                    "derType value)\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderType::RECEIVE: os << \"RE" +
+                    "CEIVE\"; break;\r\n    case OrderType::TIMESTAMP: os << \"TIMESTAMP\"; break;\r\n    ca" +
+                    "se OrderType::INTERPOLATED: os << \"INTERPOLATED\"; break;\r\n  }\r\n  return os;\r\n}\r\n" +
+                    "\r\ninline std::string to_string(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    c" +
+                    "ase OrderType::RECEIVE: return \"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return" +
+                    " \"TIMESTAMP\";\r\n    case OrderType::INTERPOLATED: return \"INTERPOLATED\";\r\n  }\r\n}\r" +
+                    "\n\r\ninline std::wstring to_wstring(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n  " +
+                    "  case OrderType::RECEIVE: return L\"RECEIVE\";\r\n    case OrderType::TIMESTAMP: re" +
+                    "turn L\"TIMESTAMP\";\r\n    case OrderType::INTERPOLATED: return L\"INTERPOLATED\";\r\n " +
+                    " }\r\n}\r\n");
             
             #line 275 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.DataTypeForwardDeclarations));
