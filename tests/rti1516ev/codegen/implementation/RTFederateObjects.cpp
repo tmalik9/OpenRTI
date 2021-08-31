@@ -252,13 +252,20 @@ void HLAobjectRootObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHand
 
 // object instances of type 'HLAobjectRoot'
 HLAobjectRoot::HLAobjectRoot()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 HLAobjectRoot::HLAobjectRoot(HLAobjectRootObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -599,13 +606,20 @@ void SystemVariableObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHan
 
 // object instances of type 'SystemVariable'
 SystemVariable::SystemVariable()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 SystemVariable::SystemVariable(SystemVariableObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -1127,13 +1141,20 @@ void ValueEntityObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHandle
 
 // object instances of type 'ValueEntity'
 ValueEntity::ValueEntity()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 ValueEntity::ValueEntity(ValueEntityObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -1661,13 +1682,20 @@ void DOMemberSourceObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHan
 
 // object instances of type 'DOMemberSource'
 DOMemberSource::DOMemberSource()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 DOMemberSource::DOMemberSource(DOMemberSourceObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -2274,13 +2302,20 @@ void DOMemberTargetObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHan
 
 // object instances of type 'DOMemberTarget'
 DOMemberTarget::DOMemberTarget()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 DOMemberTarget::DOMemberTarget(DOMemberTargetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -2843,13 +2878,20 @@ void BusManagementObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHand
 
 // object instances of type 'BusManagement'
 BusManagement::BusManagement()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 BusManagement::BusManagement(BusManagementObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -3355,13 +3397,20 @@ void BusManagementCanObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceH
 
 // object instances of type 'BusManagementCan'
 BusManagementCan::BusManagementCan()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 BusManagementCan::BusManagementCan(BusManagementCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -4051,13 +4100,20 @@ void BusManagementEthernetObjectClass::EraseObjectInstance(rti1516ev::ObjectInst
 
 // object instances of type 'BusManagementEthernet'
 BusManagementEthernet::BusManagementEthernet()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 BusManagementEthernet::BusManagementEthernet(BusManagementEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -4719,13 +4775,20 @@ void FlexRayClusterObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHan
 
 // object instances of type 'FlexRayCluster'
 FlexRayCluster::FlexRayCluster()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 FlexRayCluster::FlexRayCluster(FlexRayClusterObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -6070,13 +6133,20 @@ void BusControllerObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceHand
 
 // object instances of type 'BusController'
 BusController::BusController()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 BusController::BusController(BusControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -6639,13 +6709,20 @@ void BusControllerCanObjectClass::EraseObjectInstance(rti1516ev::ObjectInstanceH
 
 // object instances of type 'BusControllerCan'
 BusControllerCan::BusControllerCan()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 BusControllerCan::BusControllerCan(BusControllerCanObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -7579,13 +7656,20 @@ void BusControllerEthernetObjectClass::EraseObjectInstance(rti1516ev::ObjectInst
 
 // object instances of type 'BusControllerEthernet'
 BusControllerEthernet::BusControllerEthernet()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 BusControllerEthernet::BusControllerEthernet(BusControllerEthernetObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -8215,13 +8299,20 @@ void FlexRayControllerStatusObjectClass::EraseObjectInstance(rti1516ev::ObjectIn
 
 // object instances of type 'FlexRayControllerStatus'
 FlexRayControllerStatus::FlexRayControllerStatus()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 FlexRayControllerStatus::FlexRayControllerStatus(FlexRayControllerStatusObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -9227,13 +9318,20 @@ void FlexRayControllerObjectClass::EraseObjectInstance(rti1516ev::ObjectInstance
 
 // object instances of type 'FlexRayController'
 FlexRayController::FlexRayController()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 FlexRayController::FlexRayController(FlexRayControllerObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
@@ -10845,13 +10943,20 @@ void FlexRaySendBufferObjectClass::EraseObjectInstance(rti1516ev::ObjectInstance
 
 // object instances of type 'FlexRaySendBuffer'
 FlexRaySendBuffer::FlexRaySendBuffer()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 FlexRaySendBuffer::FlexRaySendBuffer(FlexRaySendBufferObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 

@@ -329,13 +329,20 @@ void <#=objectClass.Name#>ObjectClass::EraseObjectInstance(rti1516ev::ObjectInst
 
 // object instances of type '<#=objectClass.Name#>'
 <#=objectClass.Name#>::<#=objectClass.Name#>()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 <#=objectClass.Name#>::<#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
