@@ -232,13 +232,14 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::Create
     throw rti1516ev::ObjectClassNotPublished(L"<#=objectClass.Name#>");
   }
   std::shared_ptr<<#=objectClass.Name#>> newObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
       std::lock_guard<std::recursive_mutex> lock(mMutex);
       rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
       newObject->mObjectInstanceHandle = instanceHandle;
       newObject->mIsOwner = true;
-      mObjectInstancesByHandle.insert(std::make_pair(instanceHandle, newObject));
+      InsertObjectInstanceHandle(newObject, instanceHandle);
       createdCallback(newObject, true);
     }
     else
@@ -246,7 +247,6 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::Create
       createdCallback(newObject, false);
     }
   });
-  mObjectInstancesByName.insert(std::make_pair(instanceName, newObject));
   return newObject;
 }
 
@@ -329,13 +329,20 @@ void <#=objectClass.Name#>ObjectClass::EraseObjectInstance(rti1516ev::ObjectInst
 
 // object instances of type '<#=objectClass.Name#>'
 <#=objectClass.Name#>::<#=objectClass.Name#>()
+  : mRtiAmbassador()
+  , mObjectClass()
+  , mObjectInstanceName()
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
 <#=objectClass.Name#>::<#=objectClass.Name#>(<#=objectClass.Name#>ObjectClass* objectClass, const std::wstring& instanceName, rti1516ev::RTIambassador* rtiAmbassador)
-  : mObjectClass(objectClass)
+  : mRtiAmbassador(rtiAmbassador)
+  , mObjectClass(objectClass)
   , mObjectInstanceName(instanceName)
-  , mRtiAmbassador(rtiAmbassador)
+  , mObjectInstanceHandle()
+  , mIsOwner(false)
 {
 }
 
