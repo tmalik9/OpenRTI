@@ -828,8 +828,14 @@ class ");
     AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
-    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
-");
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes, optional<");
+            
+            #line 216 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
+            
+            #line default
+            #line hidden
+            this.Write("> time);\r\n");
             
             #line 217 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
  } 
@@ -1054,7 +1060,14 @@ class ");
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes);
     void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
-    void ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles);
+    void ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles, optional<");
+            
+            #line 290 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
+            
+            #line default
+            #line hidden
+            this.Write(@"> time);
     void ObjectInstanceNameReservationSucceeded(std::wstring const & theObjectInstanceName);
     void ObjectInstanceNameReservationFailed(std::wstring const & theObjectInstanceName);
     void RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback);

@@ -78,10 +78,7 @@ if(MSVC)
 	
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4290")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4290")
-  if(CMAKE_CL_64)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-  endif()
+  add_compile_options(/bigobj)
 endif()
 
 if(MINGW OR CYGWIN)

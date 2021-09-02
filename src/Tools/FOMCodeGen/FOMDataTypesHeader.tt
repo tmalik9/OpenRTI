@@ -54,6 +54,16 @@ inline X* placement_new(void* addr, Types&& ... args)
 #endif
 
 // define our own simplified 'optional' types, similar to but independent of std::optional (since C++17) or boost::optional
+
+struct nullopt_t
+{
+  enum class _Construct { _Token };
+  explicit constexpr nullopt_t(_Construct) { }
+};
+
+/// Tag to disengage optional objects.
+constexpr nullopt_t nullopt { nullopt_t::_Construct::_Token };
+
 class bad_optional_access : public std::exception
 {
 public:
@@ -61,14 +71,18 @@ public:
 };
 #pragma warning(push)
 #pragma warning(disable: 4324) // MSVC: 'struct_name' : structure was padded due to __declspec(align())
+
 // (empty) base template
-template<typename T, bool X=std::is_class<T>::value > struct optional {};
-// specialization for classes and structs used by-value, w. in-place copy-construction
+template<typename T, bool=std::is_class<T>::value > struct optional {};
+
+// Specialization for classes and structs used by-value, w. in-place copy-construction.
+// This implementation is limited to copy-constructible and default-destructible classes!
 template<typename T> struct optional<T, true>
 {
   static_assert(!std::is_reference< T >::value, "reference is not supported as optional value");
   // constructors
-  optional() : _valid(false) {}
+  optional() noexcept : _valid(false) {}
+  constexpr optional(nullopt_t) noexcept : _valid(false) {}
   optional(const optional& rhs): _valid(rhs._valid) { create(rhs); }
   optional(const T& w): _valid(true) { create(w); }
   template<typename Other>
@@ -108,11 +122,11 @@ template<typename T> struct optional<T, true>
   }
 private:
   template<typename Other>
-  void create(const Other& w) { placement_new<T>(_value, w); }
+  void create(const Other& w) { placement_new<T>(&_value, w); }
   void create(const optional& rhs) { if(_valid) create(*rhs.get()); }
   void destroy() { get()->~T(); }
-  T const* get() const { assert(_valid && "no optional value"); return reinterpret_cast< const T* >(_value); }
-  T* get() { assert(_valid && "no optional value"); return reinterpret_cast< T* >(_value); }
+  T const* get() const { assert(_valid && "no optional value"); return reinterpret_cast< const T* >(&_value); }
+  T* get() { assert(_valid && "no optional value"); return reinterpret_cast< T* >(&_value); }
   void cleanup() { destroy(); _valid = false; }
   optional& assign(const T& w) {
     if(_valid) *get() = w;
@@ -126,16 +140,20 @@ private:
     return *this;
   }
   bool _valid;
-  alignas(alignof(T)) uint8_t _value[sizeof(T)];
+	union {
+    char _dummy;
+    typename std::remove_cv<T>::type _value;
+  };
 };
 // Specialization for const-ref parameters, implemented by holding a pointer to the original variable.
 // Note that non-const references are *not* supported (but could be easily added)!
 template<typename T> struct optional<const T&, false>
 {
   // constructors
-  optional() : _valid(false), _pointer() {}
+  optional() noexcept : _valid(false), _pointer() {}
+  constexpr optional(nullopt_t) noexcept : _valid(false), _pointer() {}
   optional(const optional& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }
-  optional(const T& rhs): _valid(true), _pointer(&rhs) { }
+  optional(const T& rhs) noexcept : _valid(true), _pointer(&rhs) { }
   template<typename Other>
   optional(const Other& rhs): _valid(true), _pointer(&rhs) { }
   template<typename Other>
@@ -188,9 +206,10 @@ private:
 template<typename T> struct optional<T, false>
 {
   // constructors
-  optional() : _valid(false), _value() {}
+  optional() noexcept : _valid(false), _value() {}
+  constexpr optional(nullopt_t) noexcept : _valid(false), _value() {}
   optional(const optional& rhs): _valid(rhs._valid), _value(rhs._value) { }
-  optional(const T& rhs): _valid(true), _value(rhs) { }
+  optional(const T& rhs) : _valid(true), _value(rhs) { }
   template<typename Other>
   optional(const Other& rhs): _valid(true), _value(rhs) { }
   template<typename Other>
@@ -236,6 +255,24 @@ private:
   T _value;
 };
 #pragma warning(pop)
+
+class InvalidLogicalTime : public std::logic_error
+{
+  public:
+    InvalidLogicalTime(const std::string& what_arg) : std::logic_error(what_arg) {}
+};
+
+class NotConnected : public std::logic_error
+{
+  public:
+    NotConnected() : std::logic_error("not connected") {}
+};
+
+class NotInitialized : public std::logic_error
+{
+  public:
+    NotInitialized() : std::logic_error("class registry not initialized") {}
+};
 
 // extended receive order type, includes 'interpolated' for application-generated timestamps
 enum class OrderType { RECEIVE, TIMESTAMP, INTERPOLATED };
