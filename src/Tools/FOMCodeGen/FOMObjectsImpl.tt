@@ -809,6 +809,10 @@ void ObjectClassRegistry::Finalize()
 
 void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
   bool first = true;
@@ -830,6 +834,10 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
 
 void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
   bool firstInRemoveObjectInstance = true;
@@ -851,6 +859,10 @@ void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle t
 
 void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
   bool firstInClassRegistryReflectAttributeValues = true;
@@ -875,6 +887,10 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 
 void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
   bool firstInClassRegistryReflectAttributeValuesWithTime = true;
@@ -899,6 +915,10 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 
 void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles, optional<<#=FOM.NativeTimeType#>> time)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
 <# 
   bool firstInClassRegistryProvideAttributeValues = true;
   foreach (var objectClass in FOM.ObjectClasses)
@@ -932,6 +952,10 @@ void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObje
 
 void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   auto iter = mObjectInstanceNameReservationCallbacks.find(theObjectInstanceName);
   if (iter != mObjectInstanceNameReservationCallbacks.end())
   {
@@ -942,6 +966,10 @@ void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstr
 
 void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   auto iter = mObjectInstanceNameReservationCallbacks.find(theObjectInstanceName);
   if (iter != mObjectInstanceNameReservationCallbacks.end())
   {

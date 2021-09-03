@@ -5990,6 +5990,10 @@ void InteractionClassRegistry::Finalize()
 
 void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass, const rti1516ev::ParameterHandleValueMap & parameters)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   if (theInteractionClass == mHLAinteractionRootInteractionClass->GetInteractionClassHandle())
   {
     mHLAinteractionRootInteractionClass->ReceiveInteraction(parameters);
@@ -6081,6 +6085,10 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
                                                   const rti1516ev::LogicalTime& time,
                                                   OrderType orderType)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   if (theInteractionClass == mHLAinteractionRootInteractionClass->GetInteractionClassHandle())
   {
     mHLAinteractionRootInteractionClass->ReceiveInteraction(parameters, time, orderType);

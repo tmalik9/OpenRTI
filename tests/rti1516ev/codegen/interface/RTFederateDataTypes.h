@@ -49,8 +49,6 @@ class bad_optional_access : public std::exception
 public:
   virtual const char* what() const noexcept override { return ("Bad optional access"); }
 };
-#pragma warning(push)
-#pragma warning(disable: 4324) // MSVC: 'struct_name' : structure was padded due to __declspec(align())
 
 // (empty) base template
 template<typename T, bool=std::is_class<T>::value > struct optional {};
@@ -234,7 +232,6 @@ private:
   bool _valid;
   T _value;
 };
-#pragma warning(pop)
 
 class InvalidLogicalTime : public std::logic_error
 {

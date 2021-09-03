@@ -12282,6 +12282,10 @@ void ObjectClassRegistry::Finalize()
 
 void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
   if (mHLAobjectRootObjectClass != nullptr && theObjectClass == mHLAobjectRootObjectClass->GetObjectClassHandle())
   {
@@ -12347,6 +12351,10 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
 
 void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
   if (mHLAobjectRootObjectClass != nullptr && theObjectClass == mHLAobjectRootObjectClass->GetObjectClassHandle())
   {
@@ -12412,6 +12420,10 @@ void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle t
 
 void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
   if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
@@ -12473,6 +12485,10 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 
 void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
   if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
@@ -12534,6 +12550,10 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 
 void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles, optional<int64_t> time)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
     auto objectInstance = std::static_pointer_cast<SystemVariable>(mSystemVariableObjectClass->GetObjectInstance(theObject));
@@ -12656,6 +12676,10 @@ void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObje
 
 void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   auto iter = mObjectInstanceNameReservationCallbacks.find(theObjectInstanceName);
   if (iter != mObjectInstanceNameReservationCallbacks.end())
   {
@@ -12666,6 +12690,10 @@ void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstr
 
 void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   auto iter = mObjectInstanceNameReservationCallbacks.find(theObjectInstanceName);
   if (iter != mObjectInstanceNameReservationCallbacks.end())
   {
