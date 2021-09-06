@@ -128,7 +128,7 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
     // Revisit this area of code at some time.
     return 0;
 #else
-    DebugPrintf("sendmsg failed with EMSGSIZE, iovlen=%d bytelen=%d\n", iovlen, bytelen);
+    DebugPrintf("sendmsg failed with EMSGSIZE, iovlen=%lu bytelen=%lu\n", iovlen, bytelen);
     return -1;
 #endif
     }

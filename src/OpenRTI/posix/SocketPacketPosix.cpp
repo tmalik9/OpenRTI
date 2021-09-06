@@ -26,6 +26,7 @@
 #include "SocketAddressPrivateDataPosix.h"
 #include "SocketPrivateDataPosix.h"
 #include "ErrnoPosix.h"
+#include <limits.h>
 
 namespace OpenRTI {
 
@@ -40,6 +41,8 @@ SocketPacket::send(const SocketAddress& socketAddress, const ConstBufferRange& b
   size_t numPendingBuffers = std::distance(bufferRange.first.iterator(), bufferRange.second.iterator());
 #endif
   size_t maxIovlen = numPendingBuffers;
+  if (maxIovlen > IOV_MAX)
+    maxIovlen = IOV_MAX;
   struct iovec* iov = static_cast<struct iovec*>(alloca(maxIovlen*sizeof(struct iovec)));
   size_t iovlen = 0;
 #else
