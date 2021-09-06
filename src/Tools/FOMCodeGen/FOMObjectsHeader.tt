@@ -213,7 +213,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     AttributeBits GetModifiedAttributes() const override;
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes);
     void ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
-    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes);
+    void ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributes, optional<<#=FOM.NativeTimeType#>> time);
 <# } #>
   protected:
     friend class <#=objectClass.Name#>ObjectClass;
@@ -287,7 +287,7 @@ class ObjectClassRegistry : public IObjectClassRegistry
     void RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject);
     void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes);
     void ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType);
-    void ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles);
+    void ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles, optional<<#=FOM.NativeTimeType#>> time);
     void ObjectInstanceNameReservationSucceeded(std::wstring const & theObjectInstanceName);
     void ObjectInstanceNameReservationFailed(std::wstring const & theObjectInstanceName);
     void RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback);

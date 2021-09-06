@@ -176,102 +176,112 @@ foreach (var namespacePart in FOM.Namespace)
                     "ment_new(void* addr, Types&& ... args)\r\n{\r\n  return new (addr) X(std::forward<Ty" +
                     "pes>(args)...);\r\n}\r\n#pragma pop_macro(\"new\")\r\n#define _PLACEMENT_NEW_DEFINED\r\n#e" +
                     "ndif\r\n\r\n// define our own simplified \'optional\' types, similar to but independen" +
-                    "t of std::optional (since C++17) or boost::optional\r\nclass bad_optional_access :" +
-                    " public std::exception\r\n{\r\npublic:\r\n  virtual const char* what() const noexcept " +
-                    "override { return (\"Bad optional access\"); }\r\n};\r\n#pragma warning(push)\r\n#pragma" +
-                    " warning(disable: 4324) // MSVC: \'struct_name\' : structure was padded due to __d" +
-                    "eclspec(align())\r\n// (empty) base template\r\ntemplate<typename T, bool X=std::is_" +
-                    "class<T>::value > struct optional {};\r\n// specialization for classes and structs" +
-                    " used by-value, w. in-place copy-construction\r\ntemplate<typename T> struct optio" +
-                    "nal<T, true>\r\n{\r\n  static_assert(!std::is_reference< T >::value, \"reference is n" +
-                    "ot supported as optional value\");\r\n  // constructors\r\n  optional() : _valid(fals" +
-                    "e) {}\r\n  optional(const optional& rhs): _valid(rhs._valid) { create(rhs); }\r\n  o" +
-                    "ptional(const T& w): _valid(true) { create(w); }\r\n  template<typename Other>\r\n  " +
-                    "optional(const Other& w): _valid(true) { create(w); }\r\n  template<typename Other" +
-                    ">\r\n  optional(const optional<Other>& rhs): _valid(rhs._valid) { create(rhs._valu" +
-                    "e); }\r\n\r\n  // destructor\r\n  ~optional() { if(_valid) destroy(); }\r\n\r\n  // check " +
-                    "for value presence\r\n  bool has_value() const { return _valid; }\r\n  explicit oper" +
-                    "ator bool() const { return _valid; }\r\n  bool operator ! () const { return !_vali" +
-                    "d; }\r\n\r\n  // assign\r\n  optional& operator = (optional const& rhs) { return assig" +
-                    "n(rhs); }\r\n  optional& operator = (T const& w) { return assign(w); }\r\n\r\n  // unc" +
-                    "hecked access to value\r\n  const T& operator * () const & { return *get(); }\r\n  T" +
-                    "& operator * () & { return *get(); }\r\n  T const* operator -> () const { return g" +
-                    "et(); }\r\n  T* operator -> () { return get(); }\r\n  // checked access to value\r\n  " +
-                    "const T& value() const & {\r\n    if (!_valid) {\r\n      throw bad_optional_access{" +
-                    "};\r\n    }\r\n    return *get();\r\n  }\r\n  T& value() & {\r\n    if (!_valid) {\r\n      " +
-                    "throw bad_optional_access{};\r\n    }\r\n    return *get();\r\n  }\r\nprivate:\r\n  templa" +
-                    "te<typename Other>\r\n  void create(const Other& w) { placement_new<T>(_value, w);" +
-                    " }\r\n  void create(const optional& rhs) { if(_valid) create(*rhs.get()); }\r\n  voi" +
-                    "d destroy() { get()->~T(); }\r\n  T const* get() const { assert(_valid && \"no opti" +
-                    "onal value\"); return reinterpret_cast< const T* >(_value); }\r\n  T* get() { asser" +
-                    "t(_valid && \"no optional value\"); return reinterpret_cast< T* >(_value); }\r\n  vo" +
-                    "id cleanup() { destroy(); _valid = false; }\r\n  optional& assign(const T& w) {\r\n " +
-                    "   if(_valid) *get() = w;\r\n    else create(w), _valid = true;\r\n    return *this;" +
-                    "\r\n  }\r\n  optional& assign(const optional& rhs) {\r\n    if(rhs._valid) return assi" +
-                    "gn(*rhs.get());\r\n    if(!_valid) return *this;\r\n    cleanup();\r\n    return *this" +
-                    ";\r\n  }\r\n  bool _valid;\r\n  alignas(alignof(T)) uint8_t _value[sizeof(T)];\r\n};\r\n//" +
-                    " Specialization for const-ref parameters, implemented by holding a pointer to th" +
-                    "e original variable.\r\n// Note that non-const references are *not* supported (but" +
-                    " could be easily added)!\r\ntemplate<typename T> struct optional<const T&, false>\r" +
-                    "\n{\r\n  // constructors\r\n  optional() : _valid(false), _pointer() {}\r\n  optional(c" +
-                    "onst optional& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }\r\n  optional(" +
-                    "const T& rhs): _valid(true), _pointer(&rhs) { }\r\n  template<typename Other>\r\n  o" +
-                    "ptional(const Other& rhs): _valid(true), _pointer(&rhs) { }\r\n  template<typename" +
-                    " Other>\r\n  optional(const optional<Other>& rhs): _valid(rhs._valid), _pointer(rh" +
-                    "s._pointer) { }\r\n\r\n  // destructor\r\n  ~optional() { }\r\n\r\n  // check for value pr" +
-                    "esence\r\n  bool has_value() const { return _valid; }\r\n  explicit operator bool() " +
-                    "const { return _valid; }\r\n  bool operator ! () const { return !_valid; }\r\n\r\n  //" +
-                    " assign\r\n  optional& operator = (const optional& rhs) {\r\n    _valid = rhs._valid" +
-                    ";\r\n    _pointer = rhs._pointer;\r\n    return *this;\r\n  }\r\n  optional& operator = " +
-                    "(const T& w) {\r\n    _valid = true;\r\n    _pointer = &w;\r\n    return *this;\r\n  }\r\n" +
-                    "  // unchecked access to value\r\n  T const& operator * () const & { return *get()" +
-                    "; }\r\n  T const* operator -> () const & { return get(); }\r\n  // checked access to" +
-                    " value\r\n  const T& value() const & {\r\n    if (!_valid) {\r\n      throw bad_option" +
-                    "al_access{};\r\n    }\r\n    return *get();\r\n  }\r\n  T& value() & {\r\n    if (!_valid)" +
-                    " {\r\n      throw bad_optional_access{};\r\n    }\r\n    return *get();\r\n  }\r\nprivate:" +
-                    "\r\n  const T* get() const {\r\n    assert(_valid && \"no optional value\");\r\n    retu" +
-                    "rn _pointer;\r\n  }\r\n  bool _valid;\r\n  const T* _pointer = nullptr;\r\n};\r\n// Specia" +
-                    "lization for everything else, which includes fundamental types and pointer types" +
-                    ".\r\ntemplate<typename T> struct optional<T, false>\r\n{\r\n  // constructors\r\n  optio" +
-                    "nal() : _valid(false), _value() {}\r\n  optional(const optional& rhs): _valid(rhs." +
-                    "_valid), _value(rhs._value) { }\r\n  optional(const T& rhs): _valid(true), _value(" +
-                    "rhs) { }\r\n  template<typename Other>\r\n  optional(const Other& rhs): _valid(true)" +
-                    ", _value(rhs) { }\r\n  template<typename Other>\r\n  optional(const optional<Other>&" +
-                    " rhs): _valid(rhs._valid), _value(rhs._value) { }\r\n\r\n  // destructor\r\n  ~optiona" +
-                    "l() { }\r\n\r\n  // check for value presence\r\n  bool has_value() const { return _val" +
-                    "id; }\r\n  explicit operator bool() const { return _valid; }\r\n  bool operator ! ()" +
-                    " const { return !_valid; }\r\n\r\n  // assign\r\n  optional& operator = (const optiona" +
-                    "l& rhs) {\r\n    _valid = rhs._valid;\r\n    _value = rhs._value;\r\n    return *this;" +
-                    "\r\n  }\r\n  optional& operator = (const T& w) {\r\n    _valid = true;\r\n    _value = w" +
-                    ";\r\n    return *this;\r\n  }\r\n  // unchecked access to value\r\n  T const& operator *" +
-                    " () const & { return _value; }\r\n  T const* operator -> () const { return &_value" +
-                    "; }\r\n  // checked access to value\r\n  const T& value() const & {\r\n    if (!_valid" +
-                    ") {\r\n      throw bad_optional_access{};\r\n    }\r\n    return _value;\r\n  }\r\n  T& va" +
-                    "lue() & {\r\n    if (!_valid) {\r\n      throw bad_optional_access{};\r\n    }\r\n    re" +
-                    "turn _value;\r\n  }\r\nprivate:\r\n  bool _valid;\r\n  T _value;\r\n};\r\n#pragma warning(po" +
-                    "p)\r\n\r\n// extended receive order type, includes \'interpolated\' for application-ge" +
-                    "nerated timestamps\r\nenum class OrderType { RECEIVE, TIMESTAMP, INTERPOLATED };\r\n" +
-                    "\r\ntemplate<typename char_type, typename traits_type>\r\nstd::basic_ostream<char_ty" +
-                    "pe, traits_type>&\r\noperator<<(std::basic_ostream<char_type, traits_type>& os, Or" +
-                    "derType value)\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderType::RECEIVE: os << \"RE" +
-                    "CEIVE\"; break;\r\n    case OrderType::TIMESTAMP: os << \"TIMESTAMP\"; break;\r\n    ca" +
-                    "se OrderType::INTERPOLATED: os << \"INTERPOLATED\"; break;\r\n  }\r\n  return os;\r\n}\r\n" +
-                    "\r\ninline std::string to_string(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    c" +
-                    "ase OrderType::RECEIVE: return \"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return" +
-                    " \"TIMESTAMP\";\r\n    case OrderType::INTERPOLATED: return \"INTERPOLATED\";\r\n  }\r\n}\r" +
-                    "\n\r\ninline std::wstring to_wstring(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n  " +
-                    "  case OrderType::RECEIVE: return L\"RECEIVE\";\r\n    case OrderType::TIMESTAMP: re" +
-                    "turn L\"TIMESTAMP\";\r\n    case OrderType::INTERPOLATED: return L\"INTERPOLATED\";\r\n " +
-                    " }\r\n}\r\n");
+                    "t of std::optional (since C++17) or boost::optional\r\n\r\nstruct nullopt_t\n{\n  enum" +
+                    " class _Construct { _Token };\n  explicit constexpr nullopt_t(_Construct) { }\n};\n" +
+                    "\n/// Tag to disengage optional objects.\nconstexpr nullopt_t nullopt { nullopt_t:" +
+                    ":_Construct::_Token };\n\r\nclass bad_optional_access : public std::exception\r\n{\r\np" +
+                    "ublic:\r\n  virtual const char* what() const noexcept override { return (\"Bad opti" +
+                    "onal access\"); }\r\n};\r\n\r\n// (empty) base template\r\ntemplate<typename T, bool=std:" +
+                    ":is_class<T>::value > struct optional {};\r\n\r\n// Specialization for classes and s" +
+                    "tructs used by-value, w. in-place copy-construction.\r\n// This implementation is " +
+                    "limited to copy-constructible and default-destructible classes!\r\ntemplate<typena" +
+                    "me T> struct optional<T, true>\r\n{\r\n  static_assert(!std::is_reference< T >::valu" +
+                    "e, \"reference is not supported as optional value\");\r\n  // constructors\r\n  option" +
+                    "al() noexcept : _valid(false) {}\r\n  constexpr optional(nullopt_t) noexcept : _va" +
+                    "lid(false) {}\r\n  optional(const optional& rhs): _valid(rhs._valid) { create(rhs)" +
+                    "; }\r\n  optional(const T& w): _valid(true) { create(w); }\r\n  template<typename Ot" +
+                    "her>\r\n  optional(const Other& w): _valid(true) { create(w); }\r\n  template<typena" +
+                    "me Other>\r\n  optional(const optional<Other>& rhs): _valid(rhs._valid) { create(r" +
+                    "hs._value); }\r\n\r\n  // destructor\r\n  ~optional() { if(_valid) destroy(); }\r\n\r\n  /" +
+                    "/ check for value presence\r\n  bool has_value() const { return _valid; }\r\n  expli" +
+                    "cit operator bool() const { return _valid; }\r\n  bool operator ! () const { retur" +
+                    "n !_valid; }\r\n\r\n  // assign\r\n  optional& operator = (optional const& rhs) { retu" +
+                    "rn assign(rhs); }\r\n  optional& operator = (T const& w) { return assign(w); }\r\n\r\n" +
+                    "  // unchecked access to value\r\n  const T& operator * () const & { return *get()" +
+                    "; }\r\n  T& operator * () & { return *get(); }\r\n  T const* operator -> () const { " +
+                    "return get(); }\r\n  T* operator -> () { return get(); }\r\n  // checked access to v" +
+                    "alue\r\n  const T& value() const & {\r\n    if (!_valid) {\r\n      throw bad_optional" +
+                    "_access{};\r\n    }\r\n    return *get();\r\n  }\r\n  T& value() & {\r\n    if (!_valid) {" +
+                    "\r\n      throw bad_optional_access{};\r\n    }\r\n    return *get();\r\n  }\r\nprivate:\r\n" +
+                    "  template<typename Other>\r\n  void create(const Other& w) { placement_new<T>(&_v" +
+                    "alue, w); }\r\n  void create(const optional& rhs) { if(_valid) create(*rhs.get());" +
+                    " }\r\n  void destroy() { get()->~T(); }\r\n  T const* get() const { assert(_valid &&" +
+                    " \"no optional value\"); return reinterpret_cast< const T* >(&_value); }\r\n  T* get" +
+                    "() { assert(_valid && \"no optional value\"); return reinterpret_cast< T* >(&_valu" +
+                    "e); }\r\n  void cleanup() { destroy(); _valid = false; }\r\n  optional& assign(const" +
+                    " T& w) {\r\n    if(_valid) *get() = w;\r\n    else create(w), _valid = true;\r\n    re" +
+                    "turn *this;\r\n  }\r\n  optional& assign(const optional& rhs) {\r\n    if(rhs._valid) " +
+                    "return assign(*rhs.get());\r\n    if(!_valid) return *this;\r\n    cleanup();\r\n    r" +
+                    "eturn *this;\r\n  }\r\n  bool _valid;\r\n\tunion {\r\n    char _dummy;\r\n    typename std:" +
+                    ":remove_cv<T>::type _value;\r\n  };\r\n};\r\n// Specialization for const-ref parameter" +
+                    "s, implemented by holding a pointer to the original variable.\r\n// Note that non-" +
+                    "const references are *not* supported (but could be easily added)!\r\ntemplate<type" +
+                    "name T> struct optional<const T&, false>\r\n{\r\n  // constructors\r\n  optional() noe" +
+                    "xcept : _valid(false), _pointer() {}\r\n  constexpr optional(nullopt_t) noexcept :" +
+                    " _valid(false), _pointer() {}\r\n  optional(const optional& rhs): _valid(rhs._vali" +
+                    "d), _pointer(rhs._pointer) { }\r\n  optional(const T& rhs) noexcept : _valid(true)" +
+                    ", _pointer(&rhs) { }\r\n  template<typename Other>\r\n  optional(const Other& rhs): " +
+                    "_valid(true), _pointer(&rhs) { }\r\n  template<typename Other>\r\n  optional(const o" +
+                    "ptional<Other>& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }\r\n\r\n  // des" +
+                    "tructor\r\n  ~optional() { }\r\n\r\n  // check for value presence\r\n  bool has_value() " +
+                    "const { return _valid; }\r\n  explicit operator bool() const { return _valid; }\r\n " +
+                    " bool operator ! () const { return !_valid; }\r\n\r\n  // assign\r\n  optional& operat" +
+                    "or = (const optional& rhs) {\r\n    _valid = rhs._valid;\r\n    _pointer = rhs._poin" +
+                    "ter;\r\n    return *this;\r\n  }\r\n  optional& operator = (const T& w) {\r\n    _valid " +
+                    "= true;\r\n    _pointer = &w;\r\n    return *this;\r\n  }\r\n  // unchecked access to va" +
+                    "lue\r\n  T const& operator * () const & { return *get(); }\r\n  T const* operator ->" +
+                    " () const & { return get(); }\r\n  // checked access to value\r\n  const T& value() " +
+                    "const & {\r\n    if (!_valid) {\r\n      throw bad_optional_access{};\r\n    }\r\n    re" +
+                    "turn *get();\r\n  }\r\n  T& value() & {\r\n    if (!_valid) {\r\n      throw bad_optiona" +
+                    "l_access{};\r\n    }\r\n    return *get();\r\n  }\r\nprivate:\r\n  const T* get() const {\r" +
+                    "\n    assert(_valid && \"no optional value\");\r\n    return _pointer;\r\n  }\r\n  bool _" +
+                    "valid;\r\n  const T* _pointer = nullptr;\r\n};\r\n// Specialization for everything els" +
+                    "e, which includes fundamental types and pointer types.\r\ntemplate<typename T> str" +
+                    "uct optional<T, false>\r\n{\r\n  // constructors\r\n  optional() noexcept : _valid(fal" +
+                    "se), _value() {}\r\n  constexpr optional(nullopt_t) noexcept : _valid(false), _val" +
+                    "ue() {}\r\n  optional(const optional& rhs): _valid(rhs._valid), _value(rhs._value)" +
+                    " { }\r\n  optional(const T& rhs) : _valid(true), _value(rhs) { }\r\n  template<typen" +
+                    "ame Other>\r\n  optional(const Other& rhs): _valid(true), _value(rhs) { }\r\n  templ" +
+                    "ate<typename Other>\r\n  optional(const optional<Other>& rhs): _valid(rhs._valid)," +
+                    " _value(rhs._value) { }\r\n\r\n  // destructor\r\n  ~optional() { }\r\n\r\n  // check for " +
+                    "value presence\r\n  bool has_value() const { return _valid; }\r\n  explicit operator" +
+                    " bool() const { return _valid; }\r\n  bool operator ! () const { return !_valid; }" +
+                    "\r\n\r\n  // assign\r\n  optional& operator = (const optional& rhs) {\r\n    _valid = rh" +
+                    "s._valid;\r\n    _value = rhs._value;\r\n    return *this;\r\n  }\r\n  optional& operato" +
+                    "r = (const T& w) {\r\n    _valid = true;\r\n    _value = w;\r\n    return *this;\r\n  }\r" +
+                    "\n  // unchecked access to value\r\n  T const& operator * () const & { return _valu" +
+                    "e; }\r\n  T const* operator -> () const { return &_value; }\r\n  // checked access t" +
+                    "o value\r\n  const T& value() const & {\r\n    if (!_valid) {\r\n      throw bad_optio" +
+                    "nal_access{};\r\n    }\r\n    return _value;\r\n  }\r\n  T& value() & {\r\n    if (!_valid" +
+                    ") {\r\n      throw bad_optional_access{};\r\n    }\r\n    return _value;\r\n  }\r\nprivate" +
+                    ":\r\n  bool _valid;\r\n  T _value;\r\n};\r\n\r\nclass InvalidLogicalTime : public std::log" +
+                    "ic_error\r\n{\r\n  public:\r\n    InvalidLogicalTime(const std::string& what_arg) : st" +
+                    "d::logic_error(what_arg) {}\r\n};\r\n\r\nclass NotConnected : public std::logic_error\r" +
+                    "\n{\r\n  public:\r\n    NotConnected() : std::logic_error(\"not connected\") {}\r\n};\r\n\r\n" +
+                    "class NotInitialized : public std::logic_error\r\n{\r\n  public:\r\n    NotInitialized" +
+                    "() : std::logic_error(\"class registry not initialized\") {}\r\n};\r\n\r\n// extended re" +
+                    "ceive order type, includes \'interpolated\' for application-generated timestamps\r\n" +
+                    "enum class OrderType { RECEIVE, TIMESTAMP, INTERPOLATED };\r\n\r\ntemplate<typename " +
+                    "char_type, typename traits_type>\r\nstd::basic_ostream<char_type, traits_type>&\r\no" +
+                    "perator<<(std::basic_ostream<char_type, traits_type>& os, OrderType value)\r\n{\r\n " +
+                    " switch (value)\r\n  {\r\n    case OrderType::RECEIVE: os << \"RECEIVE\"; break;\r\n    " +
+                    "case OrderType::TIMESTAMP: os << \"TIMESTAMP\"; break;\r\n    case OrderType::INTERP" +
+                    "OLATED: os << \"INTERPOLATED\"; break;\r\n  }\r\n  return os;\r\n}\r\n\r\ninline std::string" +
+                    " to_string(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderType::RECEI" +
+                    "VE: return \"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return \"TIMESTAMP\";\r\n    c" +
+                    "ase OrderType::INTERPOLATED: return \"INTERPOLATED\";\r\n  }\r\n}\r\n\r\ninline std::wstri" +
+                    "ng to_wstring(OrderType value)\r\n{\r\n  switch (value)\r\n  {\r\n    case OrderType::RE" +
+                    "CEIVE: return L\"RECEIVE\";\r\n    case OrderType::TIMESTAMP: return L\"TIMESTAMP\";\r\n" +
+                    "    case OrderType::INTERPOLATED: return L\"INTERPOLATED\";\r\n  }\r\n}\r\n");
             
-            #line 275 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 301 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.DataTypeForwardDeclarations));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 278 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 304 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
 foreach (var dataType in FOM.DataTypes)
 {
@@ -284,35 +294,35 @@ foreach (var dataType in FOM.DataTypes)
             #line default
             #line hidden
             
-            #line 286 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 312 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 287 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 313 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("typedef ");
             
-            #line 288 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 314 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(simpleDataType.Representation.CPPType));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 288 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 314 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(simpleDataType.Name));
             
             #line default
             #line hidden
             this.Write(";\r\n\r\n");
             
-            #line 290 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 316 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 } // if (dataType is FOMParser.SimpleDataType)
   else if (dataType is FOMParser.FixedRecordDataType)
   {
@@ -323,75 +333,75 @@ foreach (var dataType in FOM.DataTypes)
             #line default
             #line hidden
             
-            #line 296 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 322 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Comment));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 297 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 323 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
   } 
             
             #line default
             #line hidden
             this.Write("class ");
             
-            #line 298 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 324 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Name));
             
             #line default
             #line hidden
             
-            #line 298 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 324 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.BaseClass != null ? " : public " + fixedRecordDataType.BaseClass.Name : ""));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n  public:\r\n    virtual ~");
             
-            #line 301 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 327 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(fixedRecordDataType.Name));
             
             #line default
             #line hidden
             this.Write("() noexcept {}\r\n");
             
-            #line 302 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 328 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  if (fixedRecordDataType.BaseClass == null) { 
             
             #line default
             #line hidden
             this.Write("    virtual uint32_t getVersion() const = 0;\r\n");
             
-            #line 304 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 330 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
   } 
             
             #line default
             #line hidden
             
-            #line 305 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 331 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  foreach (var field in fixedRecordDataType.Fields) { 
             
             #line default
             #line hidden
             this.Write("    virtual void Set");
             
-            #line 306 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 332 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(");
             
-            #line 306 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 332 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.ParameterCppType));
             
             #line default
             #line hidden
             this.Write(" value) = 0;\r\n");
             
-            #line 307 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 333 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  if (field.DataType is FOMParser.ArrayDataType) {
      var arrayDataType = field.DataType as FOMParser.ArrayDataType;
 
@@ -400,63 +410,63 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    virtual void Set");
             
-            #line 310 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 336 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("(const ");
             
-            #line 310 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 336 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(arrayDataType.DataType.CPPType));
             
             #line default
             #line hidden
             this.Write("* value, size_t size) = 0;\r\n");
             
-            #line 311 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 337 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  } 
             
             #line default
             #line hidden
             this.Write("    virtual ");
             
-            #line 312 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 338 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.DataType.ReturnCppType));
             
             #line default
             #line hidden
             this.Write(" Get");
             
-            #line 312 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 338 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("() const = 0;\r\n    virtual bool Is");
             
-            #line 313 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 339 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(field.Name));
             
             #line default
             #line hidden
             this.Write("Available() const = 0;\r\n");
             
-            #line 314 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 340 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
  } // foreach fixedRecordDataType.Fields 
             
             #line default
             #line hidden
             this.Write("\r\n}; // class ");
             
-            #line 316 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 342 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 318 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 344 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
   } // if (dataType is FOMParser.FixedRecordDataType)
   else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
@@ -468,21 +478,21 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("enum class ");
             
-            #line 324 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 350 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 324 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 350 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeratedDataType.Representation.CPPType));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n");
             
-            #line 326 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 352 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
@@ -492,21 +502,21 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("      ");
             
-            #line 330 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 356 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 330 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 356 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Value));
             
             #line default
             #line hidden
             this.Write(",\r\n");
             
-            #line 331 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 357 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -515,7 +525,7 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("}; // enum ");
             
-            #line 334 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 360 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
@@ -523,14 +533,14 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("\r\n\r\ntemplate<typename char_type, typename traits_type>\r\nstd::basic_ostream<char_t" +
                     "ype, traits_type>&\r\noperator<<(std::basic_ostream<char_type, traits_type>& os, ");
             
-            #line 338 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 364 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(" value)\r\n{\r\n  switch (value)\r\n  {\r\n");
             
-            #line 342 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 368 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
@@ -540,28 +550,28 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    case ");
             
-            #line 346 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 372 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("::");
             
-            #line 346 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 372 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(": os << \"");
             
-            #line 346 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 372 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write("\"; break;\r\n");
             
-            #line 347 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 373 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -570,21 +580,21 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    default: os << \"<invalid ");
             
-            #line 350 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 376 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(">\"; break;\r\n  }\r\n  return os;\r\n}\r\n\r\ninline std::string to_string(");
             
-            #line 355 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 381 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(" value)\r\n{\r\n  switch (value)\r\n  {\r\n");
             
-            #line 359 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 385 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
@@ -594,28 +604,28 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    case ");
             
-            #line 363 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 389 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("::");
             
-            #line 363 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 389 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(": return \"");
             
-            #line 363 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 389 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write("\";\r\n");
             
-            #line 364 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 390 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -624,21 +634,21 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    default: return \"<invalid ");
             
-            #line 367 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 393 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(">\";\r\n  }\r\n}\r\n\r\ninline std::wstring to_wstring(");
             
-            #line 371 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 397 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(" value)\r\n{\r\n  switch (value)\r\n  {\r\n");
             
-            #line 375 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 401 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
@@ -648,28 +658,28 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    case ");
             
-            #line 379 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 405 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("::");
             
-            #line 379 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 405 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(": return L\"");
             
-            #line 379 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 405 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write("\";\r\n");
             
-            #line 380 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 406 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -678,14 +688,14 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    default: return L\"<invalid ");
             
-            #line 383 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 409 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(">\";\r\n  }\r\n}\r\n\r\n");
             
-            #line 387 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 413 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
   } // if (dataType is FOMParser.EnumeratedDataType)
 } // foreach (var dataType in FOM.DataTypes.Values)
@@ -695,7 +705,7 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("\r\n");
             
-            #line 392 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 418 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
 foreach (var namespacePart in FOM.Namespace)
 {
@@ -705,14 +715,14 @@ foreach (var namespacePart in FOM.Namespace)
             #line hidden
             this.Write("} // namespace ");
             
-            #line 396 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 422 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 397 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 423 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
   } 
             
             #line default

@@ -27,6 +27,16 @@ foreach (var namespacePart in FOM.Namespace)
 #>
 namespace <#=namespacePart#> {
 <#  } #>
+
+inline std::string to_string(const std::wstring& str)
+{
+  if (str.empty()) return std::string();
+  const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
+  std::vector<char> stringBuffer(str.length());
+  CType.narrow(str.data(), str.data() + str.length(), '_', &stringBuffer[0]);
+  return std::string(&stringBuffer[0], stringBuffer.size());
+}
+
 <# 
 foreach (var interactionClass in FOM.InteractionClasses)
 {
@@ -143,7 +153,13 @@ void <#=interactionClass.Name#>InteractionClass::send(<#=interactionClass.CppPar
 <#  } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
-  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+  try {
+    mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData());
+  }
+  catch (const rti1516ev::Exception& e)
+  {
+    throw std::runtime_error(to_string(e.what()));
+  }
 }
 
 void <#=interactionClass.Name#>InteractionClass::sendWithTime(<#=interactionClass.CppParameterList#><# if (interactionClass.HasValidParameters) {#>, <#}#><#=FOM.NativeTimeType#> time)
@@ -164,7 +180,17 @@ void <#=interactionClass.Name#>InteractionClass::sendWithTime(<#=interactionClas
 <#  } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
-  mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(time));
+  try {
+    mRtiAmbassador->sendInteraction(GetInteractionClassHandle(), parameters, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(time));
+  }
+  catch (const rti1516ev::InvalidLogicalTime& e)
+  {
+    throw InvalidLogicalTime(to_string(e.what()));
+  }
+  catch (const rti1516ev::Exception& e)
+  {
+    throw std::runtime_error(to_string(e.what()));
+  }
 }
 
 void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&<#if (interactionClass.HasValidParameters) {#> parameters <#}#>)
@@ -312,6 +338,10 @@ void InteractionClassRegistry::Finalize()
 
 void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass, const rti1516ev::ParameterHandleValueMap & parameters)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
 <# 
   bool firstInClassRegistryReceiveInteractionParameter = true;
   foreach (var interactionClass in FOM.InteractionClasses)
@@ -335,6 +365,10 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
                                                   const rti1516ev::LogicalTime& time,
                                                   OrderType orderType)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
 <# 
   bool firstInClassRegistryReceiveWithTimeParameter = true;
   foreach (var interactionClass in FOM.InteractionClasses)

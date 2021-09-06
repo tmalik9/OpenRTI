@@ -20,6 +20,15 @@ foreach (var namespacePart in FOM.Namespace)
 namespace <#=namespacePart#> {
 <#  } #>
 
+inline std::string to_string(const std::wstring& str)
+{
+  if (str.empty()) return std::string();
+  const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
+  std::vector<char> stringBuffer(str.length());
+  CType.narrow(str.data(), str.data() + str.length(), '_', &stringBuffer[0]);
+  return std::string(&stringBuffer[0], stringBuffer.size());
+}
+
 <# 
 foreach (var objectClass in FOM.ObjectClasses)
 {
@@ -354,10 +363,7 @@ void <#=objectClass.Name#>ObjectClass::EraseObjectInstance(rti1516ev::ObjectInst
     {
       mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
     }
-    catch (const rti1516ev::NotConnected&)
-    {
-    }
-    catch (const rti1516ev::FederateNotExecutionMember&)
+    catch (const rti1516ev::Exception&)
     {
     }
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
@@ -388,11 +394,9 @@ void <#=objectClass.Name#>::Release()
       {
         mRtiAmbassador->deleteObjectInstance(mObjectInstanceHandle, rti1516ev::VariableLengthData());
       }
-      catch (const rti1516ev::NotConnected&)
+      catch (const rti1516ev::Exception&)
       {
-      }
-      catch (const rti1516ev::FederateNotExecutionMember&)
-      {
+        // ignore - must execute rest of function
       }
       mIsOwner = false;
     }
@@ -506,7 +510,17 @@ void <#=objectClass.Name#>::UpdateAllAttributeValues()
   if (mObjectInstanceHandle.isValid())
   {
     rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+    if (!attributes.empty())
+    {
+      try {
+        mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+        mDirty = kNone;
+      }
+      catch (const rti1516ev::Exception& e)
+      {
+        throw std::runtime_error(to_string(e.what()));
+      }
+    }
   }
 }
 
@@ -515,7 +529,18 @@ void <#=objectClass.Name#>::UpdateAllAttributeValues(<#=FOM.NativeTimeType#> tim
   if (mObjectInstanceHandle.isValid())
   {
     rti1516ev::AttributeHandleValueMap attributes = GetAllAttributeValues();
-    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(time));
+    try {
+      mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(time));
+      mDirty = kNone;
+    }
+    catch (const rti1516ev::InvalidLogicalTime& e)
+    {
+      throw InvalidLogicalTime(to_string(e.what()));
+    }
+    catch (const rti1516ev::Exception& e)
+    {
+      throw std::runtime_error(to_string(e.what()));
+    }
   }
 }
 
@@ -524,8 +549,17 @@ void <#=objectClass.Name#>::UpdateModifiedAttributeValues()
   if (mObjectInstanceHandle.isValid())
   {
     rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
-    mDirty = kNone;
+    if (!attributes.empty())
+    {
+      try {
+        mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData());
+        mDirty = kNone;
+      }
+      catch (const rti1516ev::Exception& e)
+      {
+        throw std::runtime_error(to_string(e.what()));
+      }
+    }
   }
 }
 
@@ -534,8 +568,21 @@ void <#=objectClass.Name#>::UpdateModifiedAttributeValues(<#=FOM.NativeTimeType#
   if (mObjectInstanceHandle.isValid())
   {
     rti1516ev::AttributeHandleValueMap attributes = GetModifiedAttributeValues();
-    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(time));
-    mDirty = kNone;
+    if (!attributes.empty())
+    {
+      try {
+        mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, attributes, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(time));
+        mDirty = kNone;
+      }
+      catch (const rti1516ev::InvalidLogicalTime& e)
+      {
+        throw InvalidLogicalTime(to_string(e.what()));
+      }
+      catch (const rti1516ev::Exception& e)
+      {
+        throw std::runtime_error(to_string(e.what()));
+      }
+    }
   }
 }
 
@@ -656,7 +703,7 @@ void <#=objectClass.Name#>::RequestAllAttributeValues()
 }
 
 // provide requested attributes set since last sent update
-void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles)
+void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHandleSet& attributeHandles, optional<<#=FOM.NativeTimeType#>> time)
 {
   rti1516ev::AttributeHandleValueMap updateAttributes;
   {
@@ -688,7 +735,10 @@ void <#=objectClass.Name#>::ProvideAttributeValues(const rti1516ev::AttributeHan
 #>
     } // for (auto& attributeHandleValue : attributes)
   } // scope of lock_guard
-  mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
+  if (time)
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData(), <#=FOM.LogicalTimeType#>(*time));
+  else
+    mRtiAmbassador->updateAttributeValues(mObjectInstanceHandle, updateAttributes, rti1516ev::VariableLengthData());
 } // <#=objectClass.Name#>::ReflectAttributeValues
 
 <# if (objectClass.ChildClasses.Count == 0) { #>
@@ -759,6 +809,10 @@ void ObjectClassRegistry::Finalize()
 
 void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
   bool first = true;
@@ -780,6 +834,10 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
 
 void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
   bool firstInRemoveObjectInstance = true;
@@ -801,6 +859,10 @@ void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle t
 
 void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
   bool firstInClassRegistryReflectAttributeValues = true;
@@ -825,6 +887,10 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 
 void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
 <# 
   bool firstInClassRegistryReflectAttributeValuesWithTime = true;
@@ -847,8 +913,12 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 #>
 }
 
-void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles)
+void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles, optional<<#=FOM.NativeTimeType#>> time)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
 <# 
   bool firstInClassRegistryProvideAttributeValues = true;
   foreach (var objectClass in FOM.ObjectClasses)
@@ -865,7 +935,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
     auto objectInstance = std::static_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
-      objectInstance->ProvideAttributeValues(attributeHandles);
+      objectInstance->ProvideAttributeValues(attributeHandles, time);
     }
   }
 <#  
@@ -882,6 +952,10 @@ void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObje
 
 void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstring& theObjectInstanceName)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   auto iter = mObjectInstanceNameReservationCallbacks.find(theObjectInstanceName);
   if (iter != mObjectInstanceNameReservationCallbacks.end())
   {
@@ -892,6 +966,10 @@ void ObjectClassRegistry::ObjectInstanceNameReservationSucceeded(const std::wstr
 
 void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring& theObjectInstanceName)
 {
+  if (mRtiAmbassador == nullptr)
+  {
+    throw NotInitialized();
+  }
   auto iter = mObjectInstanceNameReservationCallbacks.find(theObjectInstanceName);
   if (iter != mObjectInstanceNameReservationCallbacks.end())
   {

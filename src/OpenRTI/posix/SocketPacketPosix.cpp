@@ -26,6 +26,7 @@
 #include "SocketAddressPrivateDataPosix.h"
 #include "SocketPrivateDataPosix.h"
 #include "ErrnoPosix.h"
+#include <limits.h>
 
 namespace OpenRTI {
 
@@ -35,11 +36,13 @@ SocketPacket::send(const SocketAddress& socketAddress, const ConstBufferRange& b
   size_t bytelen = 0;
 #ifdef OpenRTI_HAVE_ALLOCA
 #if defined(__sun)
-  size_t numPengingBuffers = 100;
+  size_t numPendingBuffers = 100;
 #else
-  size_t numPengingBuffers = std::distance(bufferRange.first.iterator(), bufferRange.second.iterator());
+  size_t numPendingBuffers = std::distance(bufferRange.first.iterator(), bufferRange.second.iterator());
 #endif
-  size_t maxIovlen = numPengingBuffers;
+  size_t maxIovlen = numPendingBuffers;
+  if (maxIovlen > IOV_MAX)
+    maxIovlen = IOV_MAX;
   struct iovec* iov = static_cast<struct iovec*>(alloca(maxIovlen*sizeof(struct iovec)));
   size_t iovlen = 0;
 #else

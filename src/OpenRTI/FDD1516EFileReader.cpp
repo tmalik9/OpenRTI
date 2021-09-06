@@ -416,7 +416,7 @@ void
 FDD1516EContentHandler::endElement(const char* /*uri*/, const char* name, const char* /*qName*/)
 {
   auto currentContext = _contextStack.front();
-  std::string characters = _characterData;
+  std::string characters = trim(_characterData);
   _characterData.clear();
 
   if (name != currentContext->getName())
@@ -456,8 +456,7 @@ FDD1516EContentHandler::endElement(const char* /*uri*/, const char* name, const 
 void
 FDD1516EContentHandler::characters(const char* data, unsigned length)
 {
-  //_characterData.append(data, length);
-  _characterData = std::string(data, length);
+  _characterData.append(data, length);
 }
 
 FOMStringModule2
