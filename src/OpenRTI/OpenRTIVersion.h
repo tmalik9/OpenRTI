@@ -10,12 +10,12 @@
 #define OPENRTI_MINOR_NUMBER_STRING      "0"
 
 // Buildnumber of OPENRTI library
-#define OPENRTI_BUILD_NUMBER              1
-#define OPENRTI_BUILD_NUMBER_STRING      "1"
+#define OPENRTI_BUILD_NUMBER              2
+#define OPENRTI_BUILD_NUMBER_STRING      "2"
 
 // Patchnumber of OPENRTI library
-#define OPENRTI_PATCH_NUMBER              18
-#define OPENRTI_PATCH_NUMBER_STRING      "18"
+#define OPENRTI_PATCH_NUMBER              0
+#define OPENRTI_PATCH_NUMBER_STRING      "0"
 
 #define YEAR_STRING                     "2021"
 
