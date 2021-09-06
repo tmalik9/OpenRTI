@@ -25,10 +25,12 @@
 #ifdef OpenRTI_HAVE_ALLOCA
 #include <alloca.h>
 #endif
+#include <limits.h>
 
 #include "ErrnoPosix.h"
 #include "SocketAddressPrivateDataPosix.h"
 #include "SocketPrivateDataPosix.h"
+#include "dprintf.h"
 
 namespace OpenRTI {
 
@@ -39,11 +41,13 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
   size_t sendBufferSize = this->sendBufferSize(); /* FIXME Use the real send buffer size instead */
 #ifdef OpenRTI_HAVE_ALLOCA
 #if defined(__sun)
-  size_t numPengingBuffers = 100;
+  size_t numPendingBuffers = 100;
 #else
-  size_t numPengingBuffers = std::distance(bufferRange.first.iterator(), bufferRange.second.iterator());
+  size_t numPendingBuffers = std::distance(bufferRange.first.iterator(), bufferRange.second.iterator());
 #endif
-  size_t maxIovlen = numPengingBuffers;
+  size_t maxIovlen = numPendingBuffers;
+  if (maxIovlen > IOV_MAX)
+    maxIovlen = IOV_MAX;
   struct iovec* iov = static_cast<struct iovec*>(alloca(maxIovlen*sizeof(struct iovec)));
   size_t iovlen = 0;
 #else
@@ -117,16 +121,17 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
 
   // Hmm, not sure if we should do so - not yet message based sockets in use
   // FIXME here in a stream socket implementation !!!
-  if (errorNumber == EMSGSIZE)
+  if (errorNumber == EMSGSIZE) {
 #if defined(__APPLE__)
     // On macos, I get spurious EMSGSIZE errors where the same call
     // works the next time it is issued. So, just treat that as EAGAIN on macos.
     // Revisit this area of code at some time.
     return 0;
 #else
+    DebugPrintf("sendmsg failed with EMSGSIZE, iovlen=%lu bytelen=%lu\n", iovlen, bytelen);
     return -1;
 #endif
-
+    }
   // Also not sure - currently this is an exception when the connection is just closed below us
   // Note that this should not happen during any controlled shutdown of a client
   if (errorNumber == ECONNRESET || errorNumber == EPIPE)
@@ -143,11 +148,11 @@ SocketStream::recv(const BufferRange& bufferRange, bool peek)
   size_t readBufferSize = 64*1024; /* FIXME Use the real read buffer size instead */
 #ifdef OpenRTI_HAVE_ALLOCA
 #if defined(__sun)
-  size_t numPengingBuffers = 100;
+  size_t numPendingBuffers = 100;
 #else
-  size_t numPengingBuffers = std::distance(bufferRange.first.iterator(), bufferRange.second.iterator());
+  size_t numPendingBuffers = std::distance(bufferRange.first.iterator(), bufferRange.second.iterator());
 #endif
-  size_t maxIovlen = numPengingBuffers;
+  size_t maxIovlen = numPendingBuffers;
   struct iovec* iov = static_cast<struct iovec*>(alloca(maxIovlen*sizeof(struct iovec)));
   size_t iovlen = 0;
 #else
