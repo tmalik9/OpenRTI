@@ -138,14 +138,23 @@ rti1516ev::AttributeHandleSet <#=objectClass.Name#>ObjectClass::GetAllAttributeH
 void <#=objectClass.Name#>ObjectClass::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName)
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
-  assert(mObjectInstancesByName.find(objectInstanceName) == mObjectInstancesByName.end());
   assert(mObjectInstancesByHandle.find(objectInstanceHandle) == mObjectInstancesByHandle.end());
-  std::shared_ptr<<#=objectClass.Name#>> newObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
-  newObject->mObjectInstanceHandle = objectInstanceHandle;
-  newObject->mIsOwner = false;
-  InsertObjectInstanceName(newObject, objectInstanceName);
-  InsertObjectInstanceHandle(newObject, objectInstanceHandle);
-  ExecuteDiscoverObjectInstanceCallbacks(newObject);
+  std::shared_ptr<<#=objectClass.Name#>> discoveredObject;
+  auto objectInstanceIter = mObjectInstancesByName.find(objectInstanceName);
+  if (objectInstanceIter == mObjectInstancesByName.end())
+  {
+    discoveredObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, objectInstanceName, mRtiAmbassador));
+    InsertObjectInstanceName(discoveredObject, objectInstanceName);
+  }
+  else
+  {
+    // Federate currently tries to reserve an object that was already created by another federate
+    discoveredObject = std::dynamic_pointer_cast<<#=objectClass.Name#>>(objectInstanceIter->second);
+  }
+  discoveredObject->mObjectInstanceHandle = objectInstanceHandle;
+  discoveredObject->mIsOwner = false;
+  InsertObjectInstanceHandle(discoveredObject, objectInstanceHandle);
+  ExecuteDiscoverObjectInstanceCallbacks(discoveredObject);
 }
 
 void <#=objectClass.Name#>ObjectClass::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle)
