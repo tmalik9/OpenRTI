@@ -19,15 +19,15 @@ namespace Encodings {
 } // namespace MyFederation
 
 Additional parameters include:
--p: include a line '#include "stdafx.h"' in the generated .cpp files
--d: 'dry run', execute everything, but do not write output files. Can be used for FOM consistency checking
--o <dir>: specify an output directory, other than the current directory
--oi <dir>: specify an output directory for the generated interface header files, deviating from the output directory.
--I <dir>: specify a compiler include directory. This option may be specified several times.
-          This is used in conjunction with -o and -oi, to help the code generator produce the appropriate 
-		  relative #include paths in the implementation and header files.
-		  The same list of include directories present on the compiler command line should be specified to the code generator,
-		  such that the generated code need not be adapted manually to match the build settings.
+-p: include a line '#include "stdafx.h"' in the generated .cpp files  
+-d: 'dry run', execute everything, but do not write output files. Can be used for FOM consistency checking  
+-o <dir>: specify an output directory, other than the current directory  
+-oi <dir>: specify an output directory for the generated interface header files, deviating from the output directory.  
+-I <dir>: specify a compiler include directory. This option may be specified several times.  
+          This is used in conjunction with -o and -oi, to help the code generator produce the appropriate   
+		  relative #include paths in the implementation and header files.  
+		  The same list of include directories present on the compiler command line should be specified to the code generator,  
+		  such that the generated code need not be adapted manually to match the build settings.  
 		  
 ## Output
 Each <FOM>.xml will produce 9 files:

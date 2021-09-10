@@ -6,12 +6,14 @@ All credits for imeplementing and maintaining the original OpenRTI framework go 
 
 The compatibility to HLA13 and rti1516, and their respective client libraries, have been removed from this fork.
 Instead, a superset of the functionality given by rti1516e has been created, using the namespace rti1516ev (as 'enhanced by vector').
+
 The following features *from the rti1516e HLA standard* have been complemented:
 * partial MOM/MIM implementation, with the basic federation/federate objects, and information request/report interactions.
 * several additions to the data encoding classes
 * support for data type definitions in the FOM
 * full thread-safety of the RTI ambassador
 * HLA_IMMEDIATE mode (callbacks are delivered automatically by a RTI-owned thread)
+
 The following features *not present in the rti1516e HLA standard* have been added:
 * pass a notification handle to the RTI ambassador, to be signalled when callbacks are queued
 * unsubscribe from object instance updates
