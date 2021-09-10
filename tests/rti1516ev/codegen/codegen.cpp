@@ -198,6 +198,7 @@ public:
 };
 
 using NDistSimIB::NRTFederateEncoding::optional;
+using NDistSimIB::NRTFederateEncoding::nullopt;
 bool testRTFederate(int argc, char* argv[])
 {
   OpenRTI::Options options(argc, argv);
@@ -290,7 +291,7 @@ bool testRTFederate(int argc, char* argv[])
     optional<bool> IsRequest,
     optional<std::string> ChannelName,
     optional<NDistSimIB::NRTFederateEncoding::BusType> BusType,
-    optional<rti1516ev::HLAhandle> RequestingFederate,
+    optional<NDistSimIB::NRTFederateEncoding::IBusController*> RequestingFederate,
     optional<NDistSimIB::NRTFederateEncoding::IBusController*> Sender,
     optional<NDistSimIB::NRTFederateEncoding::IBusController*> Receiver,
     optional<int32_t> Id,
@@ -424,13 +425,13 @@ bool testRTFederate(int argc, char* argv[])
 
   received = false;
   canFrame.SetDir(NDistSimIB::NRTFederateEncoding::DirMask::kMskTx);
-  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), busControllerCan.get(), busControllerCan.get(), 0x100, canFrame);
+  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, busControllerCan.get(), busControllerCan.get(), busControllerCan.get(), 0x100, canFrame);
   while (!received)
     ambassador.getRtiAmbassador()->evokeCallback(0.5);
 
   received = false;
   canFrameCopy.SetDir(NDistSimIB::NRTFederateEncoding::DirMask::kMskRx);
-  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, ambassador.getFederateHandle(), busControllerCan.get(), busControllerCan.get(), 0x100, canFrameCopy);
+  canMessageInteractionClass->send(false, std::string("CAN1"), NDistSimIB::NRTFederateEncoding::BusType::kBtCAN, busControllerCan.get(), busControllerCan.get(), busControllerCan.get(), 0x100, canFrameCopy);
   while (!received)
     ambassador.getRtiAmbassador()->evokeCallback(0.5);
 

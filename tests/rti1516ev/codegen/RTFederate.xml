@@ -18,6 +18,27 @@
         <ownership>NoTransfer</ownership>
       </attribute>
       <objectClass>
+        <name>Participant</name>
+        <attribute>
+          <name>Name</name>
+          <dataType>HLAunicodeString</dataType>
+          <order>TimeStamp</order>
+          <transportation>HLAreliable</transportation>
+        </attribute>
+        <attribute>
+          <name>Id</name>
+          <dataType>HLAinteger32LE</dataType>
+          <order>TimeStamp</order>
+          <transportation>HLAreliable</transportation>
+        </attribute>
+        <attribute>
+          <name>State</name>
+          <dataType>SimulationState</dataType>
+          <order>TimeStamp</order>
+          <transportation>HLAreliable</transportation>
+        </attribute>
+      </objectClass>
+      <objectClass>
         <name>SystemVariable</name>
         <attribute>
           <name>Value</name>
@@ -273,6 +294,7 @@
         <attribute><name>Channel</name><dataType>FlexRayChannel</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
         <attribute><name>PPIndicator</name><dataType>HLAboolean</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
         <attribute><name>HeaderCRC</name><dataType>HLAinteger16LE</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
+        <attribute><name>PayloadLengthInWords</name><dataType>HLAoctet</dataType><order>TimeStamp</order><transportation>HLAreliable</transportation></attribute>
       </objectClass>
     </objectClass>
   </objects>
@@ -325,24 +347,6 @@
         </parameter>
       </interactionClass>
       <interactionClass>
-        <name>DOMemberTransmitData</name>
-        <order>TimeStamp</order>
-        <transportation>HLAreliable</transportation>
-        <sharing>PublishSubscribe</sharing>
-        <parameter>
-          <name>ObjInstanceHandle</name>
-          <dataType class="DOMemberSource">HLAobjectInstanceHandle</dataType>
-        </parameter>
-        <parameter>
-          <name>ConnectionType</name>
-          <dataType>HLAASCIIstring</dataType>
-        </parameter>
-        <parameter>
-          <name>DataBytes</name>
-          <dataType>HLAopaqueData</dataType>
-        </parameter>
-      </interactionClass>
-      <interactionClass>
         <name>SystemVariableUpdate</name>
         <order>TimeStamp</order>
         <transportation>HLAreliable</transportation>
@@ -392,30 +396,13 @@
         <name>BusMessage</name>
         <order>TimeStamp</order>
         <transportation>HLAreliable</transportation>
-        <parameter>
-          <name>IsRequest</name>
-          <dataType>HLAboolean</dataType>
-        </parameter>
-        <parameter>
-          <name>ChannelName</name>
-          <dataType>HLAASCIIstring</dataType>
-        </parameter>
-        <parameter>
-          <name>BusType</name>
-          <dataType>BusType</dataType>
-        </parameter>
-        <parameter>
-          <name>RequestingFederate</name>
-          <dataType>HLAhandle</dataType>
-        </parameter>
-        <parameter>
-          <name>Sender</name>
-          <dataType class="BusController">HLAobjectInstanceHandle</dataType>
-        </parameter>
-        <parameter>
-          <name>Receiver</name>
-          <dataType class="BusController">HLAobjectInstanceHandle</dataType>
-        </parameter>
+        <parameter><name>IsRequest</name><dataType>HLAboolean</dataType></parameter>
+        <parameter><name>ChannelName</name><dataType>HLAASCIIstring</dataType></parameter>
+        <parameter><name>BusType</name><dataType>BusType</dataType></parameter>
+        <parameter><name>RequestingFederate</name><dataType class="BusController">HLAobjectInstanceHandle</dataType></parameter>
+        <parameter><name>Sender</name><dataType class="BusController">HLAobjectInstanceHandle</dataType></parameter>
+        <parameter><name>Receiver</name><dataType class="BusController">HLAobjectInstanceHandle</dataType></parameter>
+        
         <interactionClass>
           <name>EthPacket</name>
           <order>TimeStamp</order>
@@ -520,6 +507,7 @@
           <transportation>HLAreliable</transportation>
           <sharing>PublishSubscribe</sharing>
           <parameter><name>FrameID</name><dataType>HLAinteger16LE</dataType></parameter>
+          <parameter><name>FlexRayChannel</name><dataType>FlexRayChannel</dataType></parameter>
           <parameter><name>PayloadPreambleIndicator</name><dataType>HLAboolean</dataType></parameter>
           <parameter><name>Header</name><dataType>FlexRayHeader</dataType></parameter>
           <parameter><name>Payload</name><dataType>FlexRayPayload</dataType></parameter>
@@ -565,6 +553,60 @@
       </simpleData>
     </simpleDataTypes>
     <enumeratedDataTypes>
+      <!--
+      enum class FederateState : uint8_t {
+      Idle,
+      Connected,
+      ReadyToRun,
+      Initializing,
+      Initialized,
+      Running,
+      Stopping,
+      Stopped,
+      Error
+      };
+      -->
+      <enumeratedData>
+        <name>SimulationState</name>
+        <representation>HLAoctet</representation>
+        <enumerator>
+          <name>Idle</name>
+          <value>0</value>
+        </enumerator>
+        <enumerator>
+          <name>Connected</name>
+          <value>1</value>
+        </enumerator>
+        <enumerator>
+          <name>Initializing</name>
+          <value>2</value>
+        </enumerator>
+        <enumerator>
+          <name>Initialized</name>
+          <value>3</value>
+        </enumerator>
+        <enumerator>
+          <name>ReadyToRun</name>
+          <value>4</value>
+        </enumerator>
+        <enumerator>
+          <name>Running</name>
+          <value>5</value>
+        </enumerator>
+        <enumerator>
+          <name>Stopping</name>
+          <value>6</value>
+        </enumerator>
+        <enumerator>
+          <name>Stopped</name>
+          <value>7</value>
+        </enumerator>
+        <enumerator>
+          <name>Error</name>
+          <value>8</value>
+        </enumerator>
+      </enumeratedData>
+
       <!--
       kBtInvalid  = 0,
       kBtCAN      = 1,
@@ -854,7 +896,7 @@ kLinkError     = 4  // Link is in error state (e.g. auto-negotiation failed)
         <enumerator><name>DEFERRED_HALT</name><value>1</value></enumerator>
         <enumerator><name>FREEZE</name><value>2</value></enumerator>
         <enumerator><name>ALLOW_COLDSTART</name><value>3</value></enumerator>
-        <enumerator><name>ALL_SLOTS</name><value>4</value></enumerator>
+        <enumerator><name>CHI_CMD_ALL_SLOTS</name><value>4</value></enumerator>
         <enumerator><name>WAKEUP</name><value>5</value></enumerator>
       </enumeratedData>
       <enumeratedData><name>FlexRayTransmissionMode</name>
@@ -887,27 +929,27 @@ kLinkError     = 4  // Link is in error state (e.g. auto-negotiation failed)
       </enumeratedData>
       <enumeratedData><name>FlexRayStartupStateType</name>
         <representation>HLAoctet</representation>
-        <enumerator><name>Undefined</name><value>0</value></enumerator>
-        <enumerator><name>ColdStartListen</name><value>1</value></enumerator>
-        <enumerator><name>IntegrationColdstartCheck</name><value>2</value></enumerator>
-        <enumerator><name>ColdStartJoin</name><value>3</value></enumerator>
-        <enumerator><name>ColdStartCollisionResolution</name><value>4</value></enumerator>
-        <enumerator><name>ColdStartConsistencyCheck</name><value>5</value></enumerator>
-        <enumerator><name>IntegrationListen</name><value>6</value></enumerator>
-        <enumerator><name>InitializeSchedule</name><value>7</value></enumerator>
-        <enumerator><name>IntegrationConsistencyCheck</name><value>8</value></enumerator>
-        <enumerator><name>ColdStartGap</name><value>9</value></enumerator>
-        <enumerator><name>ExternalStartup</name><value>10</value></enumerator>
+        <enumerator><name>StartupStateUndefined</name><value>0</value></enumerator>
+        <enumerator><name>StartupStateColdStartListen</name><value>1</value></enumerator>
+        <enumerator><name>StartupStateIntegrationColdstartCheck</name><value>2</value></enumerator>
+        <enumerator><name>StartupStateColdStartJoin</name><value>3</value></enumerator>
+        <enumerator><name>StartupStateColdStartCollisionResolution</name><value>4</value></enumerator>
+        <enumerator><name>StartupStateColdStartConsistencyCheck</name><value>5</value></enumerator>
+        <enumerator><name>StartupStateIntegrationListen</name><value>6</value></enumerator>
+        <enumerator><name>StartupStateInitializeSchedule</name><value>7</value></enumerator>
+        <enumerator><name>StartupStateIntegrationConsistencyCheck</name><value>8</value></enumerator>
+        <enumerator><name>StartupStateColdStartGap</name><value>9</value></enumerator>
+        <enumerator><name>StartupStateExternalStartup</name><value>10</value></enumerator>
       </enumeratedData>
       <enumeratedData><name>FlexRayWakeupStatusType</name>
         <representation>HLAoctet</representation>
-        <enumerator><name>Undefined</name><value>0</value></enumerator>
-        <enumerator><name>ReceivedHeader</name><value>1</value></enumerator>
-        <enumerator><name>ReceivedWup</name><value>2</value></enumerator>
-        <enumerator><name>CollisionHeader</name><value>3</value></enumerator>
-        <enumerator><name>CollisionWup</name><value>4</value></enumerator>
-        <enumerator><name>CollisionUnknown</name><value>5</value></enumerator>
-        <enumerator><name>Transmitted</name><value>6</value></enumerator>
+        <enumerator><name>WakeupStatusUndefined</name><value>0</value></enumerator>
+        <enumerator><name>WakeupStatusReceivedHeader</name><value>1</value></enumerator>
+        <enumerator><name>WakeupStatusReceivedWup</name><value>2</value></enumerator>
+        <enumerator><name>WakeupStatusCollisionHeader</name><value>3</value></enumerator>
+        <enumerator><name>WakeupStatusCollisionWup</name><value>4</value></enumerator>
+        <enumerator><name>WakeupStatusCollisionUnknown</name><value>5</value></enumerator>
+        <enumerator><name>WakeupStatusTransmitted</name><value>6</value></enumerator>
       </enumeratedData>
       <enumeratedData><name>FlexRayClockPeriod</name>
         <representation>HLAoctet</representation>
@@ -1205,14 +1247,6 @@ actual number of bytes used.
         <field><name>payloadLength</name><version>1</version><dataType>HLAoctet</dataType><semantics/></field>
         <field><name>HeaderCRC</name><version>1</version><dataType>HLAinteger16LE</dataType><semantics/></field>
         <field><name>Cycle</name><version>1</version><dataType>HLAoctet</dataType><semantics/></field>
-      </fixedRecordData>
-      <fixedRecordData>
-        <name>FlexRayFrame</name>
-        <version>1</version>
-        <encoding>HLAfixedRecord</encoding>
-        <semantics>FlexRay Frame</semantics>
-        <!--<include>FlexRayHeader</include>-->
-        <include>FlexRayPayload</include>
       </fixedRecordData>
     </fixedRecordDataTypes>
     <variantRecordDataTypes/>

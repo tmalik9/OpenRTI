@@ -110,11 +110,11 @@ void <#=interactionClass.Name#>InteractionClass::Subscribe(<#=interactionClass.C
   {
     if (parameter.DataType != null)
     { #>
-    if (<#=parameter.Name#>)
-    {
-      <#= parameter.ToEncoderExpression() #>
-      parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
-    }
+  if (<#=parameter.Name#>)
+  {
+    <#= parameter.ToEncoderExpression() #>
+    parameters.insert(std::make_pair(Get<#=parameter.Name#>ParameterHandle(), <#=parameter.Name#>Encoder.encode()));
+  }
 <#  
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
@@ -213,6 +213,7 @@ void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti151
     if (parameter.DataType != null) {
       var parameterName = (parameter.Name != parameter.DataType.Name ? parameter.Name : parameter.Name + "P");
 #>
+<# // IMPORTANT NOTE: the decoders must stay in the function's scope, otherwise the optionals declared above may become invalid #>
   <#=parameter.DataType.Encoding#> <#=parameter.Name#>Decoder;
   rti1516ev::ParameterHandleValueMap::const_iterator <#=parameter.Name#>Iter = parameters.find(Get<#=parameter.Name#>ParameterHandle());
   if (<#=parameter.Name#>Iter != parameters.end())
@@ -224,7 +225,7 @@ void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti151
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
-  for (auto& entry : _receiveCallbacks) {
+  for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
 <#    if (callArguments1.Count > 0) { #>
     callback(<#=string.Join(", ", callArguments1)#>, <#=timeArgument1#>, optional<OrderType>());
@@ -267,7 +268,7 @@ void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti151
     } // if (parameter.DataType != null)
   } // foreach (var parameter in interactionClass.Parameters)
 #>
-  for (auto& entry : _receiveCallbacks) {
+  for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
 <#    if (callArguments2.Count > 0) { #>
     callback(<#=string.Join(", ", callArguments2)#>, <#=timeArgument2#>, orderType);
@@ -280,8 +281,8 @@ void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti151
 
 uint32_t <#=interactionClass.Name#>InteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = _receiveCallbacksNextKey++;
-  _receiveCallbacks.insert(std::make_pair(key, callback));
+  uint32_t key = mReceiveCallbacksNextKey++;
+  mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
 }
 

@@ -485,7 +485,7 @@ namespace FOMCodeGen
             
             #line default
             #line hidden
-            this.Write("    std::map<uint32_t, ReceiveCallback> _receiveCallbacks;\r\n    uint32_t _receive" +
+            this.Write("    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;\r\n    uint32_t mReceive" +
                     "CallbacksNextKey = 0;\r\n};\r\n\r\n");
             
             #line 116 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"

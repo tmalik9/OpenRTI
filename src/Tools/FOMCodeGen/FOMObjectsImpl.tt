@@ -214,14 +214,22 @@ std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::GetObj
 std::shared_ptr<I<#=objectClass.Name#>> <#=objectClass.Name#>ObjectClass::CreateObjectInstance(const std::wstring& instanceName)
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
+  if (!mPublished)
+  {
+    throw rti1516ev::ObjectClassNotPublished(L"<#=objectClass.Name#>");
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
   auto iter = mObjectInstancesByName.find(instanceName);
   if (iter != mObjectInstancesByName.end())
   {
     return nullptr;
-  }
-  if (!mPublished)
-  {
-    throw rti1516ev::ObjectClassNotPublished(L"<#=objectClass.Name#>");
   }
   std::shared_ptr<<#=objectClass.Name#>> newObject = std::shared_ptr<<#=objectClass.Name#>>(mCreatorFunction(this, instanceName, mRtiAmbassador));
   InsertObjectInstanceName(newObject, instanceName);
