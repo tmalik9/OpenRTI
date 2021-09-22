@@ -98,20 +98,20 @@ void HLAinteractionRootInteractionClass::sendWithTime(int64_t time)
   }
 }
 
-void HLAinteractionRootInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&)
+void HLAinteractionRootInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&, bool sentBySelf)
 {
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(optional<int64_t>(), optional<OrderType>());
+    callback(optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void HLAinteractionRootInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&, const rti1516ev::LogicalTime& time, OrderType orderType)
+void HLAinteractionRootInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&, const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
 
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -211,20 +211,20 @@ void MeasurementInitInteractionClass::sendWithTime(int64_t time)
   }
 }
 
-void MeasurementInitInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&)
+void MeasurementInitInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&, bool sentBySelf)
 {
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(optional<int64_t>(), optional<OrderType>());
+    callback(optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void MeasurementInitInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&, const rti1516ev::LogicalTime& time, OrderType orderType)
+void MeasurementInitInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&, const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
 
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -346,7 +346,7 @@ void MeasurementStopInteractionClass::sendWithTime(optional<std::wstring> NextFe
   }
 }
 
-void MeasurementStopInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void MeasurementStopInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<std::wstring> NextFederationSuffix;
   rti1516ev::HLAunicodeString NextFederationSuffixDecoder;
@@ -358,11 +358,11 @@ void MeasurementStopInteractionClass::ReceiveInteraction(const rti1516ev::Parame
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(NextFederationSuffix, optional<int64_t>(), optional<OrderType>());
+    callback(NextFederationSuffix, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void MeasurementStopInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void MeasurementStopInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<std::wstring> NextFederationSuffix;
 
@@ -375,7 +375,7 @@ void MeasurementStopInteractionClass::ReceiveInteraction(const rti1516ev::Parame
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(NextFederationSuffix, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(NextFederationSuffix, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -497,7 +497,7 @@ void KeyEventInteractionClass::sendWithTime(optional<int32_t> KeyCode, int64_t t
   }
 }
 
-void KeyEventInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void KeyEventInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<int32_t> KeyCode;
   rti1516ev::HLAinteger32LE KeyCodeDecoder;
@@ -509,11 +509,11 @@ void KeyEventInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHand
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(KeyCode, optional<int64_t>(), optional<OrderType>());
+    callback(KeyCode, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void KeyEventInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void KeyEventInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<int32_t> KeyCode;
 
@@ -526,7 +526,7 @@ void KeyEventInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHand
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(KeyCode, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(KeyCode, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -665,7 +665,7 @@ void TextLogInteractionClass::sendWithTime(optional<std::wstring> Sender, option
   }
 }
 
-void TextLogInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void TextLogInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<std::wstring> Sender;
   optional<std::wstring> Text;
@@ -685,11 +685,11 @@ void TextLogInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandl
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Sender, Text, optional<int64_t>(), optional<OrderType>());
+    callback(Sender, Text, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void TextLogInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void TextLogInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<std::wstring> Sender;
   optional<std::wstring> Text;
@@ -710,7 +710,7 @@ void TextLogInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandl
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Sender, Text, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(Sender, Text, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -884,7 +884,7 @@ void SystemVariableUpdateInteractionClass::sendWithTime(optional<std::string> Id
   }
 }
 
-void SystemVariableUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void SystemVariableUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<std::string> Id;
   optional<const std::vector<uint8_t>&> Value;
@@ -920,11 +920,11 @@ void SystemVariableUpdateInteractionClass::ReceiveInteraction(const rti1516ev::P
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Id, Value, Client, HasChanged, optional<int64_t>(), optional<OrderType>());
+    callback(Id, Value, Client, HasChanged, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void SystemVariableUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void SystemVariableUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<std::string> Id;
   optional<const std::vector<uint8_t>&> Value;
@@ -961,7 +961,7 @@ void SystemVariableUpdateInteractionClass::ReceiveInteraction(const rti1516ev::P
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Id, Value, Client, HasChanged, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(Id, Value, Client, HasChanged, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -1086,7 +1086,7 @@ void SystemVariableModificationInteractionClass::sendWithTime(optional<const std
   }
 }
 
-void SystemVariableModificationInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void SystemVariableModificationInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<const std::vector<uint8_t>&> Value;
   rti1516ev::HLAopaqueData ValueDecoder;
@@ -1098,11 +1098,11 @@ void SystemVariableModificationInteractionClass::ReceiveInteraction(const rti151
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Value, optional<int64_t>(), optional<OrderType>());
+    callback(Value, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void SystemVariableModificationInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void SystemVariableModificationInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<const std::vector<uint8_t>&> Value;
 
@@ -1115,7 +1115,7 @@ void SystemVariableModificationInteractionClass::ReceiveInteraction(const rti151
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Value, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(Value, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -1254,7 +1254,7 @@ void ValueEntityUpdateInteractionClass::sendWithTime(optional<const std::vector<
   }
 }
 
-void ValueEntityUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void ValueEntityUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<const std::vector<uint8_t>&> Id;
   optional<const std::vector<uint8_t>&> Value;
@@ -1274,11 +1274,11 @@ void ValueEntityUpdateInteractionClass::ReceiveInteraction(const rti1516ev::Para
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Id, Value, optional<int64_t>(), optional<OrderType>());
+    callback(Id, Value, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void ValueEntityUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void ValueEntityUpdateInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<const std::vector<uint8_t>&> Id;
   optional<const std::vector<uint8_t>&> Value;
@@ -1299,7 +1299,7 @@ void ValueEntityUpdateInteractionClass::ReceiveInteraction(const rti1516ev::Para
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Id, Value, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(Id, Value, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -1507,7 +1507,7 @@ void BusMessageInteractionClass::sendWithTime(optional<bool> IsRequest, optional
   }
 }
 
-void BusMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void BusMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -1559,11 +1559,11 @@ void BusMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHa
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void BusMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void BusMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -1616,7 +1616,7 @@ void BusMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHa
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -1850,7 +1850,7 @@ void EthPacketInteractionClass::sendWithTime(optional<bool> IsRequest, optional<
   }
 }
 
-void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -1918,11 +1918,11 @@ void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -1991,7 +1991,7 @@ void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -2210,7 +2210,7 @@ void EthPacketErrorInteractionClass::sendWithTime(optional<bool> IsRequest, opti
   }
 }
 
-void EthPacketErrorInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void EthPacketErrorInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -2270,11 +2270,11 @@ void EthPacketErrorInteractionClass::ReceiveInteraction(const rti1516ev::Paramet
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void EthPacketErrorInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void EthPacketErrorInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -2335,7 +2335,7 @@ void EthPacketErrorInteractionClass::ReceiveInteraction(const rti1516ev::Paramet
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -2553,7 +2553,7 @@ void EthPacketErrorForwardedInteractionClass::sendWithTime(optional<bool> IsRequ
   }
 }
 
-void EthPacketErrorForwardedInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void EthPacketErrorForwardedInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -2613,11 +2613,11 @@ void EthPacketErrorForwardedInteractionClass::ReceiveInteraction(const rti1516ev
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void EthPacketErrorForwardedInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void EthPacketErrorForwardedInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -2678,7 +2678,7 @@ void EthPacketErrorForwardedInteractionClass::ReceiveInteraction(const rti1516ev
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -2913,7 +2913,7 @@ void EthForwardedPacketInteractionClass::sendWithTime(optional<bool> IsRequest, 
   }
 }
 
-void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -2981,11 +2981,11 @@ void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::Par
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -3054,7 +3054,7 @@ void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::Par
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -3290,7 +3290,7 @@ void EthStatusInteractionClass::sendWithTime(optional<bool> IsRequest, optional<
   }
 }
 
-void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -3358,11 +3358,11 @@ void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -3431,7 +3431,7 @@ void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, PortName, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -3667,7 +3667,7 @@ void CANMessageInteractionClass::sendWithTime(optional<bool> IsRequest, optional
   }
 }
 
-void CANMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void CANMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -3735,11 +3735,11 @@ void CANMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHa
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Id, Frame, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Id, Frame, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void CANMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void CANMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -3808,7 +3808,7 @@ void CANMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHa
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Id, Frame, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Id, Frame, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -4027,7 +4027,7 @@ void CANErrorFrameInteractionClass::sendWithTime(optional<bool> IsRequest, optio
   }
 }
 
-void CANErrorFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void CANErrorFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -4087,11 +4087,11 @@ void CANErrorFrameInteractionClass::ReceiveInteraction(const rti1516ev::Paramete
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void CANErrorFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void CANErrorFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -4152,7 +4152,7 @@ void CANErrorFrameInteractionClass::ReceiveInteraction(const rti1516ev::Paramete
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Frame, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -4387,7 +4387,7 @@ void FlexRaySymbolInteractionClass::sendWithTime(optional<bool> IsRequest, optio
   }
 }
 
-void FlexRaySymbolInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void FlexRaySymbolInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -4455,11 +4455,11 @@ void FlexRaySymbolInteractionClass::ReceiveInteraction(const rti1516ev::Paramete
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, SymbolPattern, FlexRayChannelP, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, SymbolPattern, FlexRayChannelP, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void FlexRaySymbolInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void FlexRaySymbolInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -4528,7 +4528,7 @@ void FlexRaySymbolInteractionClass::ReceiveInteraction(const rti1516ev::Paramete
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, SymbolPattern, FlexRayChannelP, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, SymbolPattern, FlexRayChannelP, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -4747,7 +4747,7 @@ void FlexRayCycleStartInteractionClass::sendWithTime(optional<bool> IsRequest, o
   }
 }
 
-void FlexRayCycleStartInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void FlexRayCycleStartInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -4807,11 +4807,11 @@ void FlexRayCycleStartInteractionClass::ReceiveInteraction(const rti1516ev::Para
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Cycle, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Cycle, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void FlexRayCycleStartInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void FlexRayCycleStartInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -4872,7 +4872,7 @@ void FlexRayCycleStartInteractionClass::ReceiveInteraction(const rti1516ev::Para
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Cycle, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, Cycle, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -5158,7 +5158,7 @@ void FlexRayFrameInteractionClass::sendWithTime(optional<bool> IsRequest, option
   }
 }
 
-void FlexRayFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void FlexRayFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -5250,11 +5250,11 @@ void FlexRayFrameInteractionClass::ReceiveInteraction(const rti1516ev::Parameter
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, FrameID, FlexRayChannelP, PayloadPreambleIndicator, Header, Payload, optional<int64_t>(), optional<OrderType>());
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, FrameID, FlexRayChannelP, PayloadPreambleIndicator, Header, Payload, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void FlexRayFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void FlexRayFrameInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<bool> IsRequest;
   optional<std::string> ChannelName;
@@ -5347,7 +5347,7 @@ void FlexRayFrameInteractionClass::ReceiveInteraction(const rti1516ev::Parameter
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, FrameID, FlexRayChannelP, PayloadPreambleIndicator, Header, Payload, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(IsRequest, ChannelName, BusTypeP, RequestingFederate, Sender, Receiver, FrameID, FlexRayChannelP, PayloadPreambleIndicator, Header, Payload, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -5513,7 +5513,7 @@ void PythonCommandInteractionClass::sendWithTime(optional<const std::vector<uint
   }
 }
 
-void PythonCommandInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters )
+void PythonCommandInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , bool sentBySelf)
 {
   optional<const std::vector<uint8_t>&> Code;
   optional<const std::vector<uint8_t>&> Target;
@@ -5541,11 +5541,11 @@ void PythonCommandInteractionClass::ReceiveInteraction(const rti1516ev::Paramete
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Code, Target, RefID, optional<int64_t>(), optional<OrderType>());
+    callback(Code, Target, RefID, optional<int64_t>(), optional<OrderType>(), sentBySelf);
   }
 }
 
-void PythonCommandInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType)
+void PythonCommandInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap& parameters , const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
   optional<const std::vector<uint8_t>&> Code;
   optional<const std::vector<uint8_t>&> Target;
@@ -5574,7 +5574,7 @@ void PythonCommandInteractionClass::ReceiveInteraction(const rti1516ev::Paramete
   }
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
-    callback(Code, Target, RefID, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType);
+    callback(Code, Target, RefID, static_cast<const rti1516ev::HLAinteger64Time&>(time).getTime(), orderType, sentBySelf);
   }
 }
 
@@ -5794,7 +5794,9 @@ void InteractionClassRegistry::Finalize()
   mRtiAmbassador = nullptr;
 } // Initialize
 
-void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass, const rti1516ev::ParameterHandleValueMap & parameters)
+void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass,
+                                                  const rti1516ev::ParameterHandleValueMap & parameters,
+                                                  bool sentBySelf)
 {
   if (mRtiAmbassador == nullptr)
   {
@@ -5802,90 +5804,91 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   }
   if (theInteractionClass == mHLAinteractionRootInteractionClass->GetInteractionClassHandle())
   {
-    mHLAinteractionRootInteractionClass->ReceiveInteraction(parameters);
+    mHLAinteractionRootInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mMeasurementInitInteractionClass->GetInteractionClassHandle())
   {
-    mMeasurementInitInteractionClass->ReceiveInteraction(parameters);
+    mMeasurementInitInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mMeasurementStopInteractionClass->GetInteractionClassHandle())
   {
-    mMeasurementStopInteractionClass->ReceiveInteraction(parameters);
+    mMeasurementStopInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mKeyEventInteractionClass->GetInteractionClassHandle())
   {
-    mKeyEventInteractionClass->ReceiveInteraction(parameters);
+    mKeyEventInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mTextLogInteractionClass->GetInteractionClassHandle())
   {
-    mTextLogInteractionClass->ReceiveInteraction(parameters);
+    mTextLogInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mSystemVariableUpdateInteractionClass->GetInteractionClassHandle())
   {
-    mSystemVariableUpdateInteractionClass->ReceiveInteraction(parameters);
+    mSystemVariableUpdateInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mSystemVariableModificationInteractionClass->GetInteractionClassHandle())
   {
-    mSystemVariableModificationInteractionClass->ReceiveInteraction(parameters);
+    mSystemVariableModificationInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mValueEntityUpdateInteractionClass->GetInteractionClassHandle())
   {
-    mValueEntityUpdateInteractionClass->ReceiveInteraction(parameters);
+    mValueEntityUpdateInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mBusMessageInteractionClass->GetInteractionClassHandle())
   {
-    mBusMessageInteractionClass->ReceiveInteraction(parameters);
+    mBusMessageInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mEthPacketInteractionClass->GetInteractionClassHandle())
   {
-    mEthPacketInteractionClass->ReceiveInteraction(parameters);
+    mEthPacketInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mEthPacketErrorInteractionClass->GetInteractionClassHandle())
   {
-    mEthPacketErrorInteractionClass->ReceiveInteraction(parameters);
+    mEthPacketErrorInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mEthPacketErrorForwardedInteractionClass->GetInteractionClassHandle())
   {
-    mEthPacketErrorForwardedInteractionClass->ReceiveInteraction(parameters);
+    mEthPacketErrorForwardedInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mEthForwardedPacketInteractionClass->GetInteractionClassHandle())
   {
-    mEthForwardedPacketInteractionClass->ReceiveInteraction(parameters);
+    mEthForwardedPacketInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mEthStatusInteractionClass->GetInteractionClassHandle())
   {
-    mEthStatusInteractionClass->ReceiveInteraction(parameters);
+    mEthStatusInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mCANMessageInteractionClass->GetInteractionClassHandle())
   {
-    mCANMessageInteractionClass->ReceiveInteraction(parameters);
+    mCANMessageInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mCANErrorFrameInteractionClass->GetInteractionClassHandle())
   {
-    mCANErrorFrameInteractionClass->ReceiveInteraction(parameters);
+    mCANErrorFrameInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mFlexRaySymbolInteractionClass->GetInteractionClassHandle())
   {
-    mFlexRaySymbolInteractionClass->ReceiveInteraction(parameters);
+    mFlexRaySymbolInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mFlexRayCycleStartInteractionClass->GetInteractionClassHandle())
   {
-    mFlexRayCycleStartInteractionClass->ReceiveInteraction(parameters);
+    mFlexRayCycleStartInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mFlexRayFrameInteractionClass->GetInteractionClassHandle())
   {
-    mFlexRayFrameInteractionClass->ReceiveInteraction(parameters);
+    mFlexRayFrameInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
   else if (theInteractionClass == mPythonCommandInteractionClass->GetInteractionClassHandle())
   {
-    mPythonCommandInteractionClass->ReceiveInteraction(parameters);
+    mPythonCommandInteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
 }
 
 void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass,
                                                   const rti1516ev::ParameterHandleValueMap & parameters,
                                                   const rti1516ev::LogicalTime& time,
-                                                  OrderType orderType)
+                                                  OrderType orderType,
+                                                  bool sentBySelf)
 {
   if (mRtiAmbassador == nullptr)
   {
@@ -5893,83 +5896,83 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   }
   if (theInteractionClass == mHLAinteractionRootInteractionClass->GetInteractionClassHandle())
   {
-    mHLAinteractionRootInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mHLAinteractionRootInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mMeasurementInitInteractionClass->GetInteractionClassHandle())
   {
-    mMeasurementInitInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mMeasurementInitInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mMeasurementStopInteractionClass->GetInteractionClassHandle())
   {
-    mMeasurementStopInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mMeasurementStopInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mKeyEventInteractionClass->GetInteractionClassHandle())
   {
-    mKeyEventInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mKeyEventInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mTextLogInteractionClass->GetInteractionClassHandle())
   {
-    mTextLogInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mTextLogInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mSystemVariableUpdateInteractionClass->GetInteractionClassHandle())
   {
-    mSystemVariableUpdateInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mSystemVariableUpdateInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mSystemVariableModificationInteractionClass->GetInteractionClassHandle())
   {
-    mSystemVariableModificationInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mSystemVariableModificationInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mValueEntityUpdateInteractionClass->GetInteractionClassHandle())
   {
-    mValueEntityUpdateInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mValueEntityUpdateInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mBusMessageInteractionClass->GetInteractionClassHandle())
   {
-    mBusMessageInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mBusMessageInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mEthPacketInteractionClass->GetInteractionClassHandle())
   {
-    mEthPacketInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mEthPacketInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mEthPacketErrorInteractionClass->GetInteractionClassHandle())
   {
-    mEthPacketErrorInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mEthPacketErrorInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mEthPacketErrorForwardedInteractionClass->GetInteractionClassHandle())
   {
-    mEthPacketErrorForwardedInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mEthPacketErrorForwardedInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mEthForwardedPacketInteractionClass->GetInteractionClassHandle())
   {
-    mEthForwardedPacketInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mEthForwardedPacketInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mEthStatusInteractionClass->GetInteractionClassHandle())
   {
-    mEthStatusInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mEthStatusInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mCANMessageInteractionClass->GetInteractionClassHandle())
   {
-    mCANMessageInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mCANMessageInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mCANErrorFrameInteractionClass->GetInteractionClassHandle())
   {
-    mCANErrorFrameInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mCANErrorFrameInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mFlexRaySymbolInteractionClass->GetInteractionClassHandle())
   {
-    mFlexRaySymbolInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mFlexRaySymbolInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mFlexRayCycleStartInteractionClass->GetInteractionClassHandle())
   {
-    mFlexRayCycleStartInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mFlexRayCycleStartInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mFlexRayFrameInteractionClass->GetInteractionClassHandle())
   {
-    mFlexRayFrameInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mFlexRayFrameInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
   else if (theInteractionClass == mPythonCommandInteractionClass->GetInteractionClassHandle())
   {
-    mPythonCommandInteractionClass->ReceiveInteraction(parameters, time, orderType);
+    mPythonCommandInteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
 }
 

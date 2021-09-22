@@ -193,7 +193,7 @@ void <#=interactionClass.Name#>InteractionClass::sendWithTime(<#=interactionClas
   }
 }
 
-void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&<#if (interactionClass.HasValidParameters) {#> parameters <#}#>)
+void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&<#if (interactionClass.HasValidParameters) {#> parameters <#}#>, bool sentBySelf)
 {
 <#
   List<string> callArguments1 = new List<string>();
@@ -228,14 +228,14 @@ void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti151
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
 <#    if (callArguments1.Count > 0) { #>
-    callback(<#=string.Join(", ", callArguments1)#>, <#=timeArgument1#>, optional<OrderType>());
+    callback(<#=string.Join(", ", callArguments1)#>, <#=timeArgument1#>, optional<OrderType>(), sentBySelf);
 <#    } else {#>
-    callback(<#=timeArgument1#>, optional<OrderType>());
+    callback(<#=timeArgument1#>, optional<OrderType>(), sentBySelf);
 <#    }#>
   }
 }
 
-void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&<#if (interactionClass.HasValidParameters) {#> parameters <#}#>, const rti1516ev::LogicalTime& time, OrderType orderType)
+void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandleValueMap&<#if (interactionClass.HasValidParameters) {#> parameters <#}#>, const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)
 {
 <#
 {
@@ -271,9 +271,9 @@ void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti151
   for (auto& entry : mReceiveCallbacks) {
     auto& callback = entry.second;
 <#    if (callArguments2.Count > 0) { #>
-    callback(<#=string.Join(", ", callArguments2)#>, <#=timeArgument2#>, orderType);
+    callback(<#=string.Join(", ", callArguments2)#>, <#=timeArgument2#>, orderType, sentBySelf);
 <#    } else {#>
-    callback(<#=timeArgument2#>, orderType);
+    callback(<#=timeArgument2#>, orderType, sentBySelf);
 <#    }#>
 <#}#>
   }
@@ -337,7 +337,9 @@ void InteractionClassRegistry::Finalize()
   mRtiAmbassador = nullptr;
 } // Initialize
 
-void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass, const rti1516ev::ParameterHandleValueMap & parameters)
+void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass,
+                                                  const rti1516ev::ParameterHandleValueMap & parameters,
+                                                  bool sentBySelf)
 {
   if (mRtiAmbassador == nullptr)
   {
@@ -354,7 +356,7 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
 <#  } // if
     firstInClassRegistryReceiveInteractionParameter = false; #>
   {
-    m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters);
+    m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters, sentBySelf);
   }
 <#  
 } // foreach 
@@ -364,7 +366,8 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
 void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass,
                                                   const rti1516ev::ParameterHandleValueMap & parameters,
                                                   const rti1516ev::LogicalTime& time,
-                                                  OrderType orderType)
+                                                  OrderType orderType,
+                                                  bool sentBySelf)
 {
   if (mRtiAmbassador == nullptr)
   {
@@ -381,7 +384,7 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
 <#  } // if (firstInClassRegistryReceiveWithTimeParameter)
     firstInClassRegistryReceiveWithTimeParameter = false; #>
   {
-    m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters, time, orderType);
+    m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);
   }
 <#} // foreach #>
 }

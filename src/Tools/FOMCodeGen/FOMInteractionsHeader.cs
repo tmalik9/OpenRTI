@@ -209,8 +209,8 @@ namespace FOMCodeGen
     uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
 
     // internal
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, OrderType receivedOrder);
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, bool sentBySelf);
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, OrderType receivedOrder, bool sentBySelf);
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
 ");
             
@@ -541,8 +541,8 @@ class InteractionClassRegistry : public IInteractionClassRegistry
             #line default
             #line hidden
             this.Write(@"
-    void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters);
-    void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime&, OrderType orderType);
+    void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters, bool sentBySelf);
+    void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime&, OrderType orderType, bool sentBySelf);
 
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;

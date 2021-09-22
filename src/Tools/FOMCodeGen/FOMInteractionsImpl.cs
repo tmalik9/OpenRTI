@@ -623,7 +623,7 @@ if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
-            this.Write(")\r\n{\r\n");
+            this.Write(", bool sentBySelf)\r\n{\r\n");
             
             #line 198 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
 
@@ -771,7 +771,7 @@ if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
-            this.Write(", optional<OrderType>());\r\n");
+            this.Write(", optional<OrderType>(), sentBySelf);\r\n");
             
             #line 232 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
     } else {
@@ -785,7 +785,7 @@ if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
-            this.Write(", optional<OrderType>());\r\n");
+            this.Write(", optional<OrderType>(), sentBySelf);\r\n");
             
             #line 234 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
     }
@@ -813,7 +813,7 @@ if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
-            this.Write(", const rti1516ev::LogicalTime& time, OrderType orderType)\r\n{\r\n");
+            this.Write(", const rti1516ev::LogicalTime& time, OrderType orderType, bool sentBySelf)\r\n{\r\n");
             
             #line 240 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
 
@@ -957,7 +957,7 @@ if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
-            this.Write(", orderType);\r\n");
+            this.Write(", orderType, sentBySelf);\r\n");
             
             #line 275 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
     } else {
@@ -971,7 +971,7 @@ if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
-            this.Write(", orderType);\r\n");
+            this.Write(", orderType, sentBySelf);\r\n");
             
             #line 277 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
     }
@@ -1162,7 +1162,9 @@ void InteractionClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassado
             this.Write(@"  mRtiAmbassador = nullptr;
 } // Initialize
 
-void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass, const rti1516ev::ParameterHandleValueMap & parameters)
+void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass,
+                                                  const rti1516ev::ParameterHandleValueMap & parameters,
+                                                  bool sentBySelf)
 {
   if (mRtiAmbassador == nullptr)
   {
@@ -1170,7 +1172,7 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   }
 ");
             
-            #line 346 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 348 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
  
   bool firstInClassRegistryReceiveInteractionParameter = true;
   foreach (var interactionClass in FOM.InteractionClasses)
@@ -1181,20 +1183,6 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
             #line hidden
             this.Write("  if (theInteractionClass == m");
             
-            #line 351 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("InteractionClass->GetInteractionClassHandle())\r\n");
-            
-            #line 352 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
-  } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (theInteractionClass == m");
-            
             #line 353 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
@@ -1203,6 +1191,20 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
             this.Write("InteractionClass->GetInteractionClassHandle())\r\n");
             
             #line 354 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+  } else { 
+            
+            #line default
+            #line hidden
+            this.Write("  else if (theInteractionClass == m");
+            
+            #line 355 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("InteractionClass->GetInteractionClassHandle())\r\n");
+            
+            #line 356 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
   } // if
     firstInClassRegistryReceiveInteractionParameter = false; 
             
@@ -1210,14 +1212,14 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
             #line hidden
             this.Write("  {\r\n    m");
             
-            #line 357 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 359 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
-            this.Write("InteractionClass->ReceiveInteraction(parameters);\r\n  }\r\n");
+            this.Write("InteractionClass->ReceiveInteraction(parameters, sentBySelf);\r\n  }\r\n");
             
-            #line 359 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 361 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
   
 } // foreach 
 
@@ -1229,7 +1231,8 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
 void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass,
                                                   const rti1516ev::ParameterHandleValueMap & parameters,
                                                   const rti1516ev::LogicalTime& time,
-                                                  OrderType orderType)
+                                                  OrderType orderType,
+                                                  bool sentBySelf)
 {
   if (mRtiAmbassador == nullptr)
   {
@@ -1237,7 +1240,7 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   }
 ");
             
-            #line 373 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 376 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
  
   bool firstInClassRegistryReceiveWithTimeParameter = true;
   foreach (var interactionClass in FOM.InteractionClasses)
@@ -1248,28 +1251,28 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
             #line hidden
             this.Write("  if (theInteractionClass == m");
             
-            #line 378 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 381 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass->GetInteractionClassHandle())\r\n");
             
-            #line 379 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 382 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
   } else { 
             
             #line default
             #line hidden
             this.Write("  else if (theInteractionClass == m");
             
-            #line 380 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 383 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass->GetInteractionClassHandle())\r\n");
             
-            #line 381 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 384 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
   } // if (firstInClassRegistryReceiveWithTimeParameter)
     firstInClassRegistryReceiveWithTimeParameter = false; 
             
@@ -1277,35 +1280,36 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
             #line hidden
             this.Write("  {\r\n    m");
             
-            #line 384 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 387 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
-            this.Write("InteractionClass->ReceiveInteraction(parameters, time, orderType);\r\n  }\r\n");
+            this.Write("InteractionClass->ReceiveInteraction(parameters, time, orderType, sentBySelf);\r\n " +
+                    " }\r\n");
             
-            #line 386 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 389 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
 } // foreach 
             
             #line default
             #line hidden
             this.Write("}\r\n\r\n");
             
-            #line 389 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 392 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
  foreach (var namespacePart in FOM.Namespace) { 
             
             #line default
             #line hidden
             this.Write("} // namespace ");
             
-            #line 390 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 393 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 391 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
+            #line 394 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsImpl.tt"
  } 
             
             #line default

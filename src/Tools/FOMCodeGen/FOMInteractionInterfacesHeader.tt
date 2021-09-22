@@ -60,7 +60,7 @@ class I<#=interactionClass.Name#>InteractionClass
     virtual void sendWithTime(<#=interactionClass.CppParameterList#><# if (interactionClass.HasValidParameters) {#>, <#}#><#=FOM.NativeTimeType#> time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(<#=interactionClass.CppParameterList#><# if (interactionClass.HasValidParameters) {#>, <#}#>optional<<#=FOM.NativeTimeType#>> time, optional<OrderType> orderType)>;
+    using ReceiveCallback = std::function<void(<#=interactionClass.CppParameterList#><# if (interactionClass.HasValidParameters) {#>, <#}#>optional<<#=FOM.NativeTimeType#>> time, optional<OrderType> orderType, bool sentBySelf)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
