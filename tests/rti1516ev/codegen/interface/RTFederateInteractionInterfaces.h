@@ -36,7 +36,7 @@ class IHLAinteractionRootInteractionClass
     virtual void sendWithTime(int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -58,7 +58,7 @@ class IMeasurementInitInteractionClass
     virtual void sendWithTime(int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -84,7 +84,7 @@ class IMeasurementStopInteractionClass
     virtual void sendWithTime(optional<std::wstring> NextFederationSuffix, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<std::wstring> NextFederationSuffix, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<std::wstring> NextFederationSuffix, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -110,7 +110,7 @@ class IKeyEventInteractionClass
     virtual void sendWithTime(optional<int32_t> KeyCode, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<int32_t> KeyCode, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<int32_t> KeyCode, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -136,7 +136,7 @@ class ITextLogInteractionClass
     virtual void sendWithTime(optional<std::wstring> Sender, optional<std::wstring> Text, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<std::wstring> Sender, optional<std::wstring> Text, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<std::wstring> Sender, optional<std::wstring> Text, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -162,7 +162,7 @@ class ISystemVariableUpdateInteractionClass
     virtual void sendWithTime(optional<std::string> Id, optional<const std::vector<uint8_t>&> Value, optional<int32_t> Client, optional<bool> HasChanged, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<std::string> Id, optional<const std::vector<uint8_t>&> Value, optional<int32_t> Client, optional<bool> HasChanged, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<std::string> Id, optional<const std::vector<uint8_t>&> Value, optional<int32_t> Client, optional<bool> HasChanged, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -188,7 +188,7 @@ class ISystemVariableModificationInteractionClass
     virtual void sendWithTime(optional<const std::vector<uint8_t>&> Value, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<const std::vector<uint8_t>&> Value, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<const std::vector<uint8_t>&> Value, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -214,7 +214,7 @@ class IValueEntityUpdateInteractionClass
     virtual void sendWithTime(optional<const std::vector<uint8_t>&> Id, optional<const std::vector<uint8_t>&> Value, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<const std::vector<uint8_t>&> Id, optional<const std::vector<uint8_t>&> Value, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<const std::vector<uint8_t>&> Id, optional<const std::vector<uint8_t>&> Value, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -240,7 +240,7 @@ class IBusMessageInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -266,7 +266,7 @@ class IEthPacketInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacket&> Frame, optional<std::string> PortName, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacket&> Frame, optional<std::string> PortName, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacket&> Frame, optional<std::string> PortName, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -292,7 +292,7 @@ class IEthPacketErrorInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketError&> Frame, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketError&> Frame, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketError&> Frame, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -318,7 +318,7 @@ class IEthPacketErrorForwardedInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketErrorForwarded&> Frame, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketErrorForwarded&> Frame, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketErrorForwarded&> Frame, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -344,7 +344,7 @@ class IEthForwardedPacketInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketForwarded&> Frame, optional<std::string> PortName, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketForwarded&> Frame, optional<std::string> PortName, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketForwarded&> Frame, optional<std::string> PortName, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -370,7 +370,7 @@ class IEthStatusInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetStatus&> Frame, optional<std::string> PortName, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetStatus&> Frame, optional<std::string> PortName, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetStatus&> Frame, optional<std::string> PortName, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -396,7 +396,7 @@ class ICANMessageInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int32_t> Id, optional<const CANFrame&> Frame, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int32_t> Id, optional<const CANFrame&> Frame, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int32_t> Id, optional<const CANFrame&> Frame, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -422,7 +422,7 @@ class ICANErrorFrameInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const std::vector<uint8_t>&> Frame, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const std::vector<uint8_t>&> Frame, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const std::vector<uint8_t>&> Frame, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -448,7 +448,7 @@ class IFlexRaySymbolInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<FlexRaySymbolPattern> SymbolPattern, optional<FlexRayChannel> FlexRayChannel, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<FlexRaySymbolPattern> SymbolPattern, optional<FlexRayChannel> FlexRayChannel, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<FlexRaySymbolPattern> SymbolPattern, optional<FlexRayChannel> FlexRayChannel, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -474,7 +474,7 @@ class IFlexRayCycleStartInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<uint8_t> Cycle, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<uint8_t> Cycle, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<uint8_t> Cycle, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -500,7 +500,7 @@ class IFlexRayFrameInteractionClass
     virtual void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int16_t> FrameID, optional<FlexRayChannel> FlexRayChannel, optional<bool> PayloadPreambleIndicator, optional<const FlexRayHeader&> Header, optional<const FlexRayPayload&> Payload, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int16_t> FrameID, optional<FlexRayChannel> FlexRayChannel, optional<bool> PayloadPreambleIndicator, optional<const FlexRayHeader&> Header, optional<const FlexRayPayload&> Payload, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int16_t> FrameID, optional<FlexRayChannel> FlexRayChannel, optional<bool> PayloadPreambleIndicator, optional<const FlexRayHeader&> Header, optional<const FlexRayPayload&> Payload, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 
@@ -526,7 +526,7 @@ class IPythonCommandInteractionClass
     virtual void sendWithTime(optional<const std::vector<uint8_t>&> Code, optional<const std::vector<uint8_t>&> Target, optional<const std::vector<uint8_t>&> RefID, int64_t time) = 0;
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
-    using ReceiveCallback = std::function<void(optional<const std::vector<uint8_t>&> Code, optional<const std::vector<uint8_t>&> Target, optional<const std::vector<uint8_t>&> RefID, optional<int64_t> time, optional<OrderType> orderType, bool sentBySelf)>;
+    using ReceiveCallback = std::function<void(optional<const std::vector<uint8_t>&> Code, optional<const std::vector<uint8_t>&> Target, optional<const std::vector<uint8_t>&> RefID, optional<int64_t> time, optional<OrderType> orderType)>;
     virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
 };
 

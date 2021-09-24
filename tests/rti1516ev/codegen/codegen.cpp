@@ -174,7 +174,7 @@ public:
                                     rti1516ev::TransportationType,
                                     rti1516ev::SupplementalReceiveInfo theReceiveInfo) override
   {
-    interactionClassRegistry.ReceiveInteraction(interaction, parameters, theReceiveInfo.producingFederate == getFederateHandle());
+    interactionClassRegistry.ReceiveInteraction(interaction, parameters);
   }
   NDistSimIB::NRTFederateEncoding::ObjectClassRegistry objectClassRegistry;
   NDistSimIB::NRTFederateEncoding::InteractionClassRegistry interactionClassRegistry;
@@ -273,7 +273,7 @@ bool testRTFederate(int argc, char* argv[])
 
   // publish/subscribe & send MeasurementInit interaction
   auto* measurementInitInteractionClass = ambassador.interactionClassRegistry.GetMeasurementInitInteractionClass();
-  measurementInitInteractionClass->RegisterReceiveCallback([&received](optional<int64_t> time, optional<NDistSimIB::NRTFederateEncoding::OrderType> orderType, bool sentBySelf)
+  measurementInitInteractionClass->RegisterReceiveCallback([&received](optional<int64_t> time, optional<NDistSimIB::NRTFederateEncoding::OrderType> orderType)
   {
     std::cout << "received MeasurementInit:" << std::endl;
     received = true;
@@ -296,8 +296,7 @@ bool testRTFederate(int argc, char* argv[])
     optional<NDistSimIB::NRTFederateEncoding::IBusController*> Receiver,
     optional<int32_t> Id,
     optional<const NDistSimIB::NRTFederateEncoding::CANFrame&> Frame,
-    optional<int64_t> time, optional<NDistSimIB::NRTFederateEncoding::OrderType> order,
-    bool sentBySelf)
+    optional<int64_t> time, optional<NDistSimIB::NRTFederateEncoding::OrderType> order)
   {
     std::cout << "received CANFrame:" << std::endl;
     if (Id) std::cout << "Id = " << std::hex << *Id << std::dec << std::endl;

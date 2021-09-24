@@ -49,8 +49,8 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
 
     // internal
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, bool sentBySelf);
-    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, OrderType receivedOrder, bool sentBySelf);
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
+    void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, OrderType receivedOrder);
     rti1516ev::InteractionClassHandle GetInteractionClassHandle() const { return mInteractionClassHandle; }
 <#   if (interactionClass.BaseClass != null) { #>
     <#=interactionClass.Name#>InteractionClass(rti1516ev::RTIambassador* rtiAmbassador, InteractionClassRegistry* interactionClassRegistry, <#=interactionClass.BaseClass.Name#>InteractionClass* baseClass);
@@ -129,8 +129,8 @@ class InteractionClassRegistry : public IInteractionClassRegistry
     I<#=interactionClass.Name#>InteractionClass* Get<#=interactionClass.Name#>InteractionClass() const override { return m<#=interactionClass.Name#>InteractionClass.get(); }
 <# } #>
 
-    void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters, bool sentBySelf);
-    void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime&, OrderType orderType, bool sentBySelf);
+    void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters);
+    void ReceiveInteraction(rti1516ev::InteractionClassHandle theInteraction, const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime&, OrderType orderType);
 
   private:
     rti1516ev::RTIambassador* mRtiAmbassador;

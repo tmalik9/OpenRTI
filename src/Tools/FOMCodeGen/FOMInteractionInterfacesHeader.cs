@@ -307,8 +307,8 @@ namespace FOMCodeGen
             
             #line default
             #line hidden
-            this.Write("> time, optional<OrderType> orderType, bool sentBySelf)>;\r\n    virtual uint32_t R" +
-                    "egisterReceiveCallback(ReceiveCallback callback) = 0;\r\n};\r\n\r\n");
+            this.Write("> time, optional<OrderType> orderType)>;\r\n    virtual uint32_t RegisterReceiveCal" +
+                    "lback(ReceiveCallback callback) = 0;\r\n};\r\n\r\n");
             
             #line 67 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  } // foreach (var interactionClass in FOM.InteractionClasses) 
