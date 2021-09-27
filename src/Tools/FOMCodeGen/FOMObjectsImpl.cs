@@ -2357,7 +2357,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             
             #line default
             #line hidden
-            this.Write("  {\r\n    std::static_pointer_cast<");
+            this.Write("  {\r\n    std::dynamic_pointer_cast<");
             
             #line 897 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
@@ -2447,7 +2447,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             
             #line default
             #line hidden
-            this.Write("  {\r\n    std::static_pointer_cast<");
+            this.Write("  {\r\n    std::dynamic_pointer_cast<");
             
             #line 925 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
@@ -2538,7 +2538,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
             
             #line default
             #line hidden
-            this.Write("  {\r\n    auto objectInstance = std::static_pointer_cast<");
+            this.Write("  {\r\n    auto objectInstance = std::dynamic_pointer_cast<");
             
             #line 952 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));

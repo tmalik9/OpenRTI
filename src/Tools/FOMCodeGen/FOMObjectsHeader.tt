@@ -36,6 +36,15 @@ namespace <#=namespacePart#> {
 
 class ObjectClassRegistry;
 
+// The instance implementation classes are disjunct inheritance-wise.
+// So we need some common, internal functions, aggregated in an internal interface.
+class IObjectImplBase
+{
+  public:
+    virtual rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const = 0;
+};
+
+
 <# 
 foreach (var objectClass in FOM.ObjectClasses)
 {
@@ -155,7 +164,8 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class <#=objectClass.Name#> : public I<#=objectClass.Name#>
+
+class <#=objectClass.Name#> : public virtual I<#=objectClass.Name#>, public IObjectImplBase
 {
   public:
 
@@ -167,7 +177,7 @@ class <#=objectClass.Name#> : public I<#=objectClass.Name#>
     I<#=objectClass.Name#>ObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;

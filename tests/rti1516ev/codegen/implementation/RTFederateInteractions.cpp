@@ -1391,17 +1391,17 @@ void BusMessageInteractionClass::Subscribe(optional<bool> IsRequest, optional<st
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   mRtiAmbassador->subscribeInteractionClassWithFilter(mInteractionClassHandle, parameters);
@@ -1439,17 +1439,17 @@ void BusMessageInteractionClass::send(optional<bool> IsRequest, optional<std::st
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   try {
@@ -1481,17 +1481,17 @@ void BusMessageInteractionClass::sendWithTime(optional<bool> IsRequest, optional
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   try {
@@ -1704,17 +1704,17 @@ void EthPacketInteractionClass::Subscribe(optional<bool> IsRequest, optional<std
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -1762,17 +1762,17 @@ void EthPacketInteractionClass::send(optional<bool> IsRequest, optional<std::str
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -1814,17 +1814,17 @@ void EthPacketInteractionClass::sendWithTime(optional<bool> IsRequest, optional<
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -2079,17 +2079,17 @@ void EthPacketErrorInteractionClass::Subscribe(optional<bool> IsRequest, optiona
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -2132,17 +2132,17 @@ void EthPacketErrorInteractionClass::send(optional<bool> IsRequest, optional<std
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -2179,17 +2179,17 @@ void EthPacketErrorInteractionClass::sendWithTime(optional<bool> IsRequest, opti
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -2422,17 +2422,17 @@ void EthPacketErrorForwardedInteractionClass::Subscribe(optional<bool> IsRequest
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -2475,17 +2475,17 @@ void EthPacketErrorForwardedInteractionClass::send(optional<bool> IsRequest, opt
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -2522,17 +2522,17 @@ void EthPacketErrorForwardedInteractionClass::sendWithTime(optional<bool> IsRequ
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -2767,17 +2767,17 @@ void EthForwardedPacketInteractionClass::Subscribe(optional<bool> IsRequest, opt
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -2825,17 +2825,17 @@ void EthForwardedPacketInteractionClass::send(optional<bool> IsRequest, optional
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -2877,17 +2877,17 @@ void EthForwardedPacketInteractionClass::sendWithTime(optional<bool> IsRequest, 
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -3144,17 +3144,17 @@ void EthStatusInteractionClass::Subscribe(optional<bool> IsRequest, optional<std
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -3202,17 +3202,17 @@ void EthStatusInteractionClass::send(optional<bool> IsRequest, optional<std::str
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -3254,17 +3254,17 @@ void EthStatusInteractionClass::sendWithTime(optional<bool> IsRequest, optional<
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -3521,17 +3521,17 @@ void CANMessageInteractionClass::Subscribe(optional<bool> IsRequest, optional<st
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Id)
@@ -3579,17 +3579,17 @@ void CANMessageInteractionClass::send(optional<bool> IsRequest, optional<std::st
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Id)
@@ -3631,17 +3631,17 @@ void CANMessageInteractionClass::sendWithTime(optional<bool> IsRequest, optional
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Id)
@@ -3896,17 +3896,17 @@ void CANErrorFrameInteractionClass::Subscribe(optional<bool> IsRequest, optional
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -3949,17 +3949,17 @@ void CANErrorFrameInteractionClass::send(optional<bool> IsRequest, optional<std:
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -3996,17 +3996,17 @@ void CANErrorFrameInteractionClass::sendWithTime(optional<bool> IsRequest, optio
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Frame)
@@ -4241,17 +4241,17 @@ void FlexRaySymbolInteractionClass::Subscribe(optional<bool> IsRequest, optional
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (SymbolPattern)
@@ -4299,17 +4299,17 @@ void FlexRaySymbolInteractionClass::send(optional<bool> IsRequest, optional<std:
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (SymbolPattern)
@@ -4351,17 +4351,17 @@ void FlexRaySymbolInteractionClass::sendWithTime(optional<bool> IsRequest, optio
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (SymbolPattern)
@@ -4616,17 +4616,17 @@ void FlexRayCycleStartInteractionClass::Subscribe(optional<bool> IsRequest, opti
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Cycle)
@@ -4669,17 +4669,17 @@ void FlexRayCycleStartInteractionClass::send(optional<bool> IsRequest, optional<
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Cycle)
@@ -4716,17 +4716,17 @@ void FlexRayCycleStartInteractionClass::sendWithTime(optional<bool> IsRequest, o
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (Cycle)
@@ -4967,17 +4967,17 @@ void FlexRayFrameInteractionClass::Subscribe(optional<bool> IsRequest, optional<
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (FrameID)
@@ -5040,17 +5040,17 @@ void FlexRayFrameInteractionClass::send(optional<bool> IsRequest, optional<std::
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (FrameID)
@@ -5107,17 +5107,17 @@ void FlexRayFrameInteractionClass::sendWithTime(optional<bool> IsRequest, option
   }
   if (RequestingFederate)
   {
-    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(static_cast<BusController*>(*RequestingFederate)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle RequestingFederateEncoder(dynamic_cast<IObjectImplBase*>(*RequestingFederate)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetRequestingFederateParameterHandle(), RequestingFederateEncoder.encode()));
   }
   if (Sender)
   {
-    rti1516ev::HLAobjectInstanceHandle SenderEncoder(static_cast<BusController*>(*Sender)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle SenderEncoder(dynamic_cast<IObjectImplBase*>(*Sender)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetSenderParameterHandle(), SenderEncoder.encode()));
   }
   if (Receiver)
   {
-    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(static_cast<BusController*>(*Receiver)->GetObjectInstanceHandle());
+    rti1516ev::HLAobjectInstanceHandle ReceiverEncoder(dynamic_cast<IObjectImplBase*>(*Receiver)->GetObjectInstanceHandle());
     parameters.insert(std::make_pair(GetReceiverParameterHandle(), ReceiverEncoder.encode()));
   }
   if (FrameID)

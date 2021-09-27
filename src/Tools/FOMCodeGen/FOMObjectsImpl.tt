@@ -894,7 +894,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 <#    } // if
       firstInClassRegistryReflectAttributeValues = false; #>
   {
-    std::static_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
 <#  
     } // if (objectClass.hasValidAttributes)
@@ -922,7 +922,7 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
 <#    } // if
       firstInClassRegistryReflectAttributeValuesWithTime = false; #>
   {
-    std::static_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
 <#  
     } // if (objectClass.hasValidAttributes)
@@ -949,7 +949,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
 <#    } // if
       firstInClassRegistryProvideAttributeValues = false; #>
   {
-    auto objectInstance = std::static_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);

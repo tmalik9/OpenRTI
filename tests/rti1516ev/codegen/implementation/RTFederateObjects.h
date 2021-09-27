@@ -24,6 +24,15 @@ namespace NRTFederateEncoding {
 
 class ObjectClassRegistry;
 
+// The instance implementation classes are disjunct inheritance-wise.
+// So we need some common, internal functions, aggregated in an internal interface.
+class IObjectImplBase
+{
+  public:
+    virtual rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const = 0;
+};
+
+
 class HLAobjectRoot;
 class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
 {
@@ -86,7 +95,8 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class HLAobjectRoot : public IHLAobjectRoot
+
+class HLAobjectRoot : public virtual IHLAobjectRoot, public IObjectImplBase
 {
   public:
 
@@ -98,7 +108,7 @@ class HLAobjectRoot : public IHLAobjectRoot
     IHLAobjectRootObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -204,7 +214,8 @@ class ParticipantObjectClass : public IParticipantObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class Participant : public IParticipant
+
+class Participant : public virtual IParticipant, public IObjectImplBase
 {
   public:
 
@@ -216,7 +227,7 @@ class Participant : public IParticipant
     IParticipantObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -360,7 +371,8 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class SystemVariable : public ISystemVariable
+
+class SystemVariable : public virtual ISystemVariable, public IObjectImplBase
 {
   public:
 
@@ -372,7 +384,7 @@ class SystemVariable : public ISystemVariable
     ISystemVariableObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -506,7 +518,8 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class ValueEntity : public IValueEntity
+
+class ValueEntity : public virtual IValueEntity, public IObjectImplBase
 {
   public:
 
@@ -518,7 +531,7 @@ class ValueEntity : public IValueEntity
     IValueEntityObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -660,7 +673,8 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class DOMemberSource : public IDOMemberSource
+
+class DOMemberSource : public virtual IDOMemberSource, public IObjectImplBase
 {
   public:
 
@@ -672,7 +686,7 @@ class DOMemberSource : public IDOMemberSource
     IDOMemberSourceObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -820,7 +834,8 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class DOMemberTarget : public IDOMemberTarget
+
+class DOMemberTarget : public virtual IDOMemberTarget, public IObjectImplBase
 {
   public:
 
@@ -832,7 +847,7 @@ class DOMemberTarget : public IDOMemberTarget
     IDOMemberTargetObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -971,7 +986,8 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class BusManagement : public IBusManagement
+
+class BusManagement : public virtual IBusManagement, public IObjectImplBase
 {
   public:
 
@@ -983,7 +999,7 @@ class BusManagement : public IBusManagement
     IBusManagementObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -1125,7 +1141,8 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class BusManagementCan : public IBusManagementCan
+
+class BusManagementCan : public virtual IBusManagementCan, public IObjectImplBase
 {
   public:
 
@@ -1137,7 +1154,7 @@ class BusManagementCan : public IBusManagementCan
     IBusManagementCanObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -1297,7 +1314,8 @@ class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClas
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class BusManagementEthernet : public IBusManagementEthernet
+
+class BusManagementEthernet : public virtual IBusManagementEthernet, public IObjectImplBase
 {
   public:
 
@@ -1309,7 +1327,7 @@ class BusManagementEthernet : public IBusManagementEthernet
     IBusManagementEthernetObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -1531,7 +1549,8 @@ class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class FlexRayCluster : public IFlexRayCluster
+
+class FlexRayCluster : public virtual IFlexRayCluster, public IObjectImplBase
 {
   public:
 
@@ -1543,7 +1562,7 @@ class FlexRayCluster : public IFlexRayCluster
     IFlexRayClusterObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -1781,7 +1800,8 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class BusController : public IBusController
+
+class BusController : public virtual IBusController, public IObjectImplBase
 {
   public:
 
@@ -1793,7 +1813,7 @@ class BusController : public IBusController
     IBusControllerObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -1962,7 +1982,8 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class BusControllerCan : public IBusControllerCan
+
+class BusControllerCan : public virtual IBusControllerCan, public IObjectImplBase
 {
   public:
 
@@ -1974,7 +1995,7 @@ class BusControllerCan : public IBusControllerCan
     IBusControllerCanObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -2162,7 +2183,8 @@ class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClas
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class BusControllerEthernet : public IBusControllerEthernet
+
+class BusControllerEthernet : public virtual IBusControllerEthernet, public IObjectImplBase
 {
   public:
 
@@ -2174,7 +2196,7 @@ class BusControllerEthernet : public IBusControllerEthernet
     IBusControllerEthernetObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -2354,7 +2376,8 @@ class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObject
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class FlexRayControllerStatus : public IFlexRayControllerStatus
+
+class FlexRayControllerStatus : public virtual IFlexRayControllerStatus, public IObjectImplBase
 {
   public:
 
@@ -2366,7 +2389,7 @@ class FlexRayControllerStatus : public IFlexRayControllerStatus
     IFlexRayControllerStatusObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -2650,7 +2673,8 @@ class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class FlexRayController : public IFlexRayController
+
+class FlexRayController : public virtual IFlexRayController, public IObjectImplBase
 {
   public:
 
@@ -2662,7 +2686,7 @@ class FlexRayController : public IFlexRayController
     IFlexRayControllerObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;
@@ -2962,7 +2986,8 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
     uint32_t mLastRemoveObjectInstanceCallbackToken = 0;
 };
 
-class FlexRaySendBuffer : public IFlexRaySendBuffer
+
+class FlexRaySendBuffer : public virtual IFlexRaySendBuffer, public IObjectImplBase
 {
   public:
 
@@ -2974,7 +2999,7 @@ class FlexRaySendBuffer : public IFlexRaySendBuffer
     IFlexRaySendBufferObjectClass* GetObjectClass() const { return mObjectClass; }
     ObjectClassRegistry* GetObjectClassRegistry() const { return mObjectClass->GetObjectClassRegistry(); }
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
-    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const { return mObjectInstanceHandle; }
+    rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
     bool IsOwner() const override;
     void Release() override;

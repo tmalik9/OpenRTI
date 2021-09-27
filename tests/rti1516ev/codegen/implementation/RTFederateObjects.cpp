@@ -12499,7 +12499,7 @@ void FlexRaySendBuffer::SetSender(IFlexRayController* newValue)
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
   // CanTranslateToCpp=True
-  mSender.set(static_cast<FlexRayController*>(newValue)->GetObjectInstanceHandle());
+  mSender.set(dynamic_cast<FlexRayController*>(newValue)->GetObjectInstanceHandle());
   mDirty |= kSenderBit;
   mValuesSet |= kSenderBit;
 }
@@ -13424,63 +13424,63 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
   if (mParticipantObjectClass != nullptr && theObjectClass == mParticipantObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<Participant>(mParticipantObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<Participant>(mParticipantObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<SystemVariable>(mSystemVariableObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<SystemVariable>(mSystemVariableObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mValueEntityObjectClass != nullptr && theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<ValueEntity>(mValueEntityObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<ValueEntity>(mValueEntityObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mDOMemberSourceObjectClass != nullptr && theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<DOMemberSource>(mDOMemberSourceObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<DOMemberSource>(mDOMemberSourceObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mDOMemberTargetObjectClass != nullptr && theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<DOMemberTarget>(mDOMemberTargetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<DOMemberTarget>(mDOMemberTargetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mBusManagementObjectClass != nullptr && theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusManagement>(mBusManagementObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<BusManagement>(mBusManagementObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mBusManagementCanObjectClass != nullptr && theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusManagementCan>(mBusManagementCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<BusManagementCan>(mBusManagementCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mBusManagementEthernetObjectClass != nullptr && theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusManagementEthernet>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<BusManagementEthernet>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mFlexRayClusterObjectClass != nullptr && theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<FlexRayCluster>(mFlexRayClusterObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<FlexRayCluster>(mFlexRayClusterObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mBusControllerObjectClass != nullptr && theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusController>(mBusControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<BusController>(mBusControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mBusControllerCanObjectClass != nullptr && theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusControllerCan>(mBusControllerCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<BusControllerCan>(mBusControllerCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mBusControllerEthernetObjectClass != nullptr && theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusControllerEthernet>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<BusControllerEthernet>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mFlexRayControllerStatusObjectClass != nullptr && theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<FlexRayControllerStatus>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<FlexRayControllerStatus>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mFlexRayControllerObjectClass != nullptr && theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<FlexRayController>(mFlexRayControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<FlexRayController>(mFlexRayControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
   else if (mFlexRaySendBufferObjectClass != nullptr && theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<FlexRaySendBuffer>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    std::dynamic_pointer_cast<FlexRaySendBuffer>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
   }
 }
 
@@ -13493,63 +13493,63 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
   if (mParticipantObjectClass != nullptr && theObjectClass == mParticipantObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<Participant>(mParticipantObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<Participant>(mParticipantObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<SystemVariable>(mSystemVariableObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<SystemVariable>(mSystemVariableObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mValueEntityObjectClass != nullptr && theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<ValueEntity>(mValueEntityObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<ValueEntity>(mValueEntityObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mDOMemberSourceObjectClass != nullptr && theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<DOMemberSource>(mDOMemberSourceObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<DOMemberSource>(mDOMemberSourceObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mDOMemberTargetObjectClass != nullptr && theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<DOMemberTarget>(mDOMemberTargetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<DOMemberTarget>(mDOMemberTargetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mBusManagementObjectClass != nullptr && theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusManagement>(mBusManagementObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<BusManagement>(mBusManagementObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mBusManagementCanObjectClass != nullptr && theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusManagementCan>(mBusManagementCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<BusManagementCan>(mBusManagementCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mBusManagementEthernetObjectClass != nullptr && theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusManagementEthernet>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<BusManagementEthernet>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mFlexRayClusterObjectClass != nullptr && theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<FlexRayCluster>(mFlexRayClusterObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<FlexRayCluster>(mFlexRayClusterObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mBusControllerObjectClass != nullptr && theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusController>(mBusControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<BusController>(mBusControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mBusControllerCanObjectClass != nullptr && theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusControllerCan>(mBusControllerCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<BusControllerCan>(mBusControllerCanObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mBusControllerEthernetObjectClass != nullptr && theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<BusControllerEthernet>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<BusControllerEthernet>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mFlexRayControllerStatusObjectClass != nullptr && theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<FlexRayControllerStatus>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<FlexRayControllerStatus>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mFlexRayControllerObjectClass != nullptr && theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<FlexRayController>(mFlexRayControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<FlexRayController>(mFlexRayControllerObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
   else if (mFlexRaySendBufferObjectClass != nullptr && theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
   {
-    std::static_pointer_cast<FlexRaySendBuffer>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    std::dynamic_pointer_cast<FlexRaySendBuffer>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
   }
 }
 
@@ -13561,7 +13561,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   if (mParticipantObjectClass != nullptr && theObjectClass == mParticipantObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<Participant>(mParticipantObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<Participant>(mParticipantObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13569,7 +13569,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mSystemVariableObjectClass != nullptr && theObjectClass == mSystemVariableObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<SystemVariable>(mSystemVariableObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<SystemVariable>(mSystemVariableObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13577,7 +13577,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mValueEntityObjectClass != nullptr && theObjectClass == mValueEntityObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<ValueEntity>(mValueEntityObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<ValueEntity>(mValueEntityObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13585,7 +13585,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mDOMemberSourceObjectClass != nullptr && theObjectClass == mDOMemberSourceObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<DOMemberSource>(mDOMemberSourceObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<DOMemberSource>(mDOMemberSourceObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13593,7 +13593,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mDOMemberTargetObjectClass != nullptr && theObjectClass == mDOMemberTargetObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<DOMemberTarget>(mDOMemberTargetObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<DOMemberTarget>(mDOMemberTargetObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13601,7 +13601,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mBusManagementObjectClass != nullptr && theObjectClass == mBusManagementObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<BusManagement>(mBusManagementObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<BusManagement>(mBusManagementObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13609,7 +13609,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mBusManagementCanObjectClass != nullptr && theObjectClass == mBusManagementCanObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<BusManagementCan>(mBusManagementCanObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<BusManagementCan>(mBusManagementCanObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13617,7 +13617,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mBusManagementEthernetObjectClass != nullptr && theObjectClass == mBusManagementEthernetObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<BusManagementEthernet>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<BusManagementEthernet>(mBusManagementEthernetObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13625,7 +13625,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mFlexRayClusterObjectClass != nullptr && theObjectClass == mFlexRayClusterObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<FlexRayCluster>(mFlexRayClusterObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<FlexRayCluster>(mFlexRayClusterObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13633,7 +13633,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mBusControllerObjectClass != nullptr && theObjectClass == mBusControllerObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<BusController>(mBusControllerObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<BusController>(mBusControllerObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13641,7 +13641,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mBusControllerCanObjectClass != nullptr && theObjectClass == mBusControllerCanObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<BusControllerCan>(mBusControllerCanObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<BusControllerCan>(mBusControllerCanObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13649,7 +13649,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mBusControllerEthernetObjectClass != nullptr && theObjectClass == mBusControllerEthernetObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<BusControllerEthernet>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<BusControllerEthernet>(mBusControllerEthernetObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13657,7 +13657,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mFlexRayControllerStatusObjectClass != nullptr && theObjectClass == mFlexRayControllerStatusObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<FlexRayControllerStatus>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<FlexRayControllerStatus>(mFlexRayControllerStatusObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13665,7 +13665,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mFlexRayControllerObjectClass != nullptr && theObjectClass == mFlexRayControllerObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<FlexRayController>(mFlexRayControllerObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<FlexRayController>(mFlexRayControllerObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
@@ -13673,7 +13673,7 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   }
   else if (mFlexRaySendBufferObjectClass != nullptr && theObjectClass == mFlexRaySendBufferObjectClass->GetObjectClassHandle())
   {
-    auto objectInstance = std::static_pointer_cast<FlexRaySendBuffer>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject));
+    auto objectInstance = std::dynamic_pointer_cast<FlexRaySendBuffer>(mFlexRaySendBufferObjectClass->GetObjectInstance(theObject));
     if (objectInstance != nullptr)
     {
       objectInstance->ProvideAttributeValues(attributeHandles, time);
