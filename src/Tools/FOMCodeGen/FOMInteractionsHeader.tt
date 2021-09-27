@@ -109,8 +109,8 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     rti1516ev::ParameterHandle m<#=parameter.Name#>ParameterHandle;
 <#} // foreach (var parameter in interactionClass.Parameters)
 #>
-    std::map<uint32_t, ReceiveCallback> _receiveCallbacks;
-    uint32_t _receiveCallbacksNextKey = 0;
+    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
+    uint32_t mReceiveCallbacksNextKey = 0;
 };
 
 <# } // foreach (var interactionClass in FOM.InteractionClasses) #> 

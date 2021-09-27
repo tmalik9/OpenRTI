@@ -100,7 +100,7 @@ namespace FOMCodeGen
           var objectInstanceHandleType = DataType as ObjectInstanceHandleType;
           if (objectInstanceHandleType.ObjectClass != null)
           {
-            return string.Format("{0} {1}Encoder(static_cast<{2}*>(*{1})->GetObjectInstanceHandle());"
+            return string.Format("{0} {1}Encoder(dynamic_cast<IObjectImplBase*>(*{1})->GetObjectInstanceHandle());"
               , DataType.Encoding, Name, objectInstanceHandleType.ObjectClass.Name);
           }
           else
@@ -436,7 +436,7 @@ namespace FOMCodeGen
       }
       public override string CppSetter(string var, string value)
       {
-        return var + ".set(static_cast<" + ObjectClass.Name + "*>(" + value + ")->GetObjectInstanceHandle())";
+        return var + ".set(dynamic_cast<" + ObjectClass.Name + "*>(" + value + ")->GetObjectInstanceHandle())";
       }
 
       public override string CPPType

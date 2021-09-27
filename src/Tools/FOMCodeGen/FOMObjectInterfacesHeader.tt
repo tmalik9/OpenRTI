@@ -43,23 +43,37 @@ foreach (var objectClass in FOM.ObjectClasses)
 {
 #>
 class I<#=objectClass.Name#>;
+// I<#=objectClass.Name#>ObjectClass represents the HLA object class <#=objectClass.QualifiedName#>.
+// Instances of I<#=objectClass.Name#> represent the corresponding HLA object instances.
 class I<#=objectClass.Name#>ObjectClass
 {
   public:
     using DiscoverObjectInstanceCallback = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>)>;
     using RemoveObjectInstanceCallback = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>)>;
     using ObjectCreatedCallbackType = std::function<void(std::shared_ptr<I<#=objectClass.Name#>>, bool success)>;
+    // Publish/unpublish this object class. Creating object instances requires publishing the object class.
     virtual void Publish() = 0;
     virtual void Unpublish() = 0;
+    // Subscribe/unsubscribe this object class. Taking part in object discovery and receiving attribute updates requires subscribing the object class.
+    // Note that the appropriate callbacks should have been registered *before* subscribing to the object class.
     virtual void Subscribe(bool deliverToSelf) = 0;
     virtual void Unsubscribe() = 0;
+    // Return an existing object instance by name, or nullptr if not existant.
     virtual std::shared_ptr<I<#=objectClass.Name#>> GetObjectInstance(const std::wstring& instanceName) = 0;
+    // Create an instance of I<#=objectClass.Name#>. Returns nullptr if the object instance already exists.
+    // If another federate has already created an object instance with the same name and the same object class,
+    // the discover object instance mechanism will reuse the object returned by 'create object instance'.
+    // A discover object instance callback should be installed by the application to appropriately handle this case.
     virtual std::shared_ptr<I<#=objectClass.Name#>> CreateObjectInstance(const std::wstring& instanceName) = 0;
+    // Create an instance of I<#=objectClass.Name#>, and notify the application about having completed the HLA object registration.
+    // The callback's 'success' parameter indicates whether the object instance name could successfully be reserved for the object.
     virtual std::shared_ptr<I<#=objectClass.Name#>> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
 
+    // install a discover object instance callback for this HLA object class
     virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
     virtual void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) = 0;
 
+    // install a remove object instance callback for the HLA object class
     virtual uint32_t RegisterRemoveObjectInstanceCallback(RemoveObjectInstanceCallback callback) = 0;
     virtual void UnregisterRemoveObjectInstanceCallback(uint32_t callbackToken) = 0;
 };

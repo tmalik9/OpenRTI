@@ -187,91 +187,122 @@ namespace FOMCodeGen
             
             #line default
             #line hidden
-            this.Write("class I");
+            this.Write("// I");
             
             #line 39 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
-            this.Write("InteractionClass\r\n{\r\n  public:\r\n    virtual void Publish() = 0;\r\n    virtual void" +
-                    " Unpublish() = 0;\r\n    virtual void Subscribe(bool deliverToSelf) = 0;\r\n");
+            this.Write("InteractionClass represents the HLA interaction class ");
             
-            #line 45 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 39 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.QualifiedName));
+            
+            #line default
+            #line hidden
+            this.Write(".\r\nclass I");
+            
+            #line 40 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write(@"InteractionClass
+{
+  public:
+    // Publish/unpublish the interaction class. Sending an interaction of this class requires publishing the interaction class.
+    virtual void Publish() = 0;
+    virtual void Unpublish() = 0;
+    // Subscribe the interaction class. Receiving interactions requires having subscribed to this interaction class.
+    // Note that the appropriate callbacks should have been registered *before* subscribing to the interaction class.
+    virtual void Subscribe(bool deliverToSelf) = 0;
+");
+            
+            #line 49 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
-            this.Write("    virtual void Subscribe(");
+            this.Write(@"    // Subscribe the interaction class with filter values. Only interactions with parameters matching the given values will be received.
+    // Filtered subscriptions may be issued several times with differing value tuples. 'nullopt' may be used as a wildcard, matching
+    // any incoming value.
+    virtual void Subscribe(");
             
-            #line 46 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 53 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.CppParameterList));
             
             #line default
             #line hidden
             this.Write(", bool deliverToSelf) = 0;\r\n");
             
-            #line 47 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 54 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
 }
             
             #line default
             #line hidden
-            this.Write("    virtual void Unsubscribe() = 0;\r\n    virtual void send(");
+            this.Write(@"    // Unsubscribe the interaction class, cancelling reception of interactions. Calling Unsubscribe will also clear all filtered subscriptions, if any.
+    virtual void Unsubscribe() = 0;
+    // Send an interaction as receive order message.
+    virtual void send(");
             
-            #line 49 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 58 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.CppParameterList));
             
             #line default
             #line hidden
-            this.Write(") = 0;\r\n    virtual void sendWithTime(");
+            this.Write(") = 0;\r\n    // Send a time stamped interaction.\r\n    virtual void sendWithTime(");
             
-            #line 50 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 60 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.CppParameterList));
             
             #line default
             #line hidden
             
-            #line 50 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 60 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
             this.Write(", ");
             
-            #line 50 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 60 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
 }
             
             #line default
             #line hidden
             
-            #line 50 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 60 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
             
             #line default
             #line hidden
-            this.Write(" time) = 0;\r\n    using ReceiveCallback = std::function<void(");
+            this.Write(@" time) = 0;
+    // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
+    // the optional order type will indicate the source of the time stamp.
+    using ReceiveCallback = std::function<void(");
             
-            #line 51 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 63 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.CppParameterList));
             
             #line default
             #line hidden
             
-            #line 51 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 63 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  if (interactionClass.HasValidParameters) {
             
             #line default
             #line hidden
             this.Write(", ");
             
-            #line 51 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 63 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
 }
             
             #line default
             #line hidden
             this.Write("optional<");
             
-            #line 51 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 63 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
             
             #line default
@@ -279,35 +310,35 @@ namespace FOMCodeGen
             this.Write("> time, optional<OrderType> orderType)>;\r\n    virtual uint32_t RegisterReceiveCal" +
                     "lback(ReceiveCallback callback) = 0;\r\n};\r\n\r\n");
             
-            #line 55 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 67 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  } // foreach (var interactionClass in FOM.InteractionClasses) 
             
             #line default
             #line hidden
             this.Write("\r\nclass IInteractionClassRegistry\r\n{\r\n  public:\r\n");
             
-            #line 60 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 72 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  foreach (var interactionClass in FOM.InteractionClasses) { 
             
             #line default
             #line hidden
             this.Write("    virtual I");
             
-            #line 61 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 73 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass* Get");
             
-            #line 61 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 73 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass() const = 0;\r\n");
             
-            #line 62 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 74 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  } 
             
             #line default
@@ -315,21 +346,21 @@ namespace FOMCodeGen
             this.Write("  protected:\r\n    virtual ~IInteractionClassRegistry() {}\r\n}; // class IInteracti" +
                     "onClassRegistry\r\n\r\n");
             
-            #line 67 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 79 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  foreach (var namespacePart in FOM.Namespace) { 
             
             #line default
             #line hidden
             this.Write("} // namespace ");
             
-            #line 68 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 80 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 69 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 81 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  } 
             
             #line default
