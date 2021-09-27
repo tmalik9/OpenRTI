@@ -66,7 +66,7 @@ template<typename T> struct optional<T, true>
   template<typename Other>
   optional(const Other& w): _valid(true) { create(w); }
   template<typename Other>
-  optional(const optional<Other>& rhs): _valid(rhs._valid) { create(rhs._value); }
+  optional(const optional<Other>& rhs): _valid(rhs.has_value()) { if (rhs.has_value()) create(rhs.value()); }
 
   // destructor
   ~optional() { if(_valid) destroy(); }
@@ -119,7 +119,6 @@ private:
   }
   bool _valid;
 	union {
-    char _dummy;
     typename std::remove_cv<T>::type _value;
   };
 };
@@ -135,7 +134,7 @@ template<typename T> struct optional<const T&, false>
   template<typename Other>
   optional(const Other& rhs): _valid(true), _pointer(&rhs) { }
   template<typename Other>
-  optional(const optional<Other>& rhs): _valid(rhs._valid), _pointer(rhs._pointer) { }
+  optional(const optional<Other>& rhs): _valid(rhs.has_value()), _pointer(rhs.operator->()) { }
 
   // destructor
   ~optional() { }
@@ -191,7 +190,7 @@ template<typename T> struct optional<T, false>
   template<typename Other>
   optional(const Other& rhs): _valid(true), _value(rhs) { }
   template<typename Other>
-  optional(const optional<Other>& rhs): _valid(rhs._valid), _value(rhs._value) { }
+  optional(const optional<Other>& rhs): _valid(rhs.has_value()), _value(rhs.operator*()) { }
 
   // destructor
   ~optional() { }
