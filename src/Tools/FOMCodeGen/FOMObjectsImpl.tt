@@ -640,7 +640,7 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
   mLastUpdated = kNone;
 } // <#=objectClass.Name#>::ReflectAttributeValues
 
-void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "theTime" : "/* theTime */" #>, OrderType <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "orderType" : "/* orderType */"#>)
+void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHandleValueMap& attributes, const rti1516ev::LogicalTime& <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "time" : "/* time */" #>, OrderType <#= (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "orderType" : "/* orderType */"#>)
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
   for (auto& attributeHandleValue : attributes)
@@ -672,7 +672,7 @@ void <#=objectClass.Name#>::ReflectAttributeValues(const rti1516ev::AttributeHan
   } // for (auto& attributeHandleValue : attributes)
   mValuesReceived |= mLastUpdated;
 <# if (objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) { #>
-  ExecuteUpdateCallbacks(static_cast<const <#=FOM.LogicalTimeType#>&>(theTime).getTime(), orderType);
+  ExecuteUpdateCallbacks(static_cast<const <#=FOM.LogicalTimeType#>&>(time).getTime(), orderType);
 <# } #>
   mLastUpdated = kNone;
 } // <#=objectClass.Name#>::ReflectAttributeValues
@@ -782,11 +782,9 @@ void <#=objectClass.Name#>::ExecuteUpdateCallbacks(optional<<#=FOM.NativeTimeTyp
     callback(std::static_pointer_cast<I<#=objectClass.Name#>>(shared_from_this()), time, orderType);
   }
 }
-
 <# } // if (objectClass.ChildClasses.Count == 0) #>
 <# } // if (objectClass.HasValidAttributes) #>
-
-<# } // foreach (var objectClass in FOM.ObjectClasses) #> 
+<# } // foreach (var objectClass in FOM.ObjectClasses) #>
 
 ObjectClassRegistry::ObjectClassRegistry()
   : mRtiAmbassador(nullptr)
@@ -809,6 +807,40 @@ void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 <#   } else { #>
     m<#=objectClass.Name#>ObjectClass = std::unique_ptr<<#=objectClass.Name#>ObjectClass>(new <#=objectClass.Name#>ObjectClass(mRtiAmbassador, this));
 <#   } // if #>
+    mDiscoverCallbacks.insert(std::make_pair(
+      m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle(),
+      [this](rti1516ev::ObjectInstanceHandle objectInstanceHandle, const std::wstring& objectInstanceName) {
+        m<#=objectClass.Name#>ObjectClass->DiscoverObjectInstance(objectInstanceHandle, objectInstanceName);
+      }));
+    mRemoveCallbacks.insert(std::make_pair(
+      m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle(),
+      [this](rti1516ev::ObjectInstanceHandle objectInstanceHandle) {
+        m<#=objectClass.Name#>ObjectClass->RemoveObjectInstance(objectInstanceHandle);
+      }));
+<#   if (objectClass.HasValidAttributes) { #>
+    mReflectCallbacks.insert(std::make_pair(
+      m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle(),
+      [this](rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes) {
+        auto objectInstance = std::dynamic_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject));
+        if (objectInstance != nullptr) {
+          objectInstance->ReflectAttributeValues(attributes);
+        }
+      }));
+    mReflectWithTimeCallbacks.insert(std::make_pair(
+      m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle(),
+      [this](rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& time, OrderType orderType) {
+        auto objectInstance = std::dynamic_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject));
+        objectInstance->ReflectAttributeValues(attributes, time, orderType);
+      }));
+    mProvideCallbacks.insert(std::make_pair(
+      m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle(),
+      [this](rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles, optional<int64_t> time) {
+        auto objectInstance = std::dynamic_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject));
+        if (objectInstance != nullptr) {
+          objectInstance->ProvideAttributeValues(attributeHandles, time);
+        }
+      }));
+<#   } // if (objectClass.HasValidAttributes) #>
   }
   catch (const rti1516ev::NameNotFound&)
   {
@@ -818,6 +850,11 @@ void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
 
 void ObjectClassRegistry::Finalize()
 {
+  mDiscoverCallbacks.clear();
+  mRemoveCallbacks.clear();
+  mReflectCallbacks.clear();
+  mReflectWithTimeCallbacks.clear();
+  mProvideCallbacks.clear();
 <# foreach (var objectClass in FOM.ReverseObjectClasses) { #>
   m<#=objectClass.Name#>ObjectClass.reset();
 <# } // foreach #>
@@ -831,22 +868,11 @@ void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle
     throw NotInitialized();
   }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-<# 
-  bool first = true;
-  foreach (var objectClass in FOM.ObjectClasses)
+  auto iter = mDiscoverCallbacks.find(theObjectClass);
+  if (iter != mDiscoverCallbacks.end())
   {
-#>
-<#  if (first) { #>
-  if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<# } else { #>
-  else if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<# } // if
-   first=false;
-#>
-  {
-    m<#=objectClass.Name#>ObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);
+    iter->second(theObject, theObjectInstanceName);
   }
-<# } // foreach #>
 }
 
 void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
@@ -856,22 +882,11 @@ void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle t
     throw NotInitialized();
   }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-<# 
-  bool firstInRemoveObjectInstance = true;
-  foreach (var objectClass in FOM.ObjectClasses)
+  auto iter = mRemoveCallbacks.find(theObjectClass);
+  if (iter != mRemoveCallbacks.end())
   {
-#>
-<#  if (firstInRemoveObjectInstance) { #>
-  if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<# } else { #>
-  else if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<# } // if
-   firstInRemoveObjectInstance=false;
-#>
-  {
-    m<#=objectClass.Name#>ObjectClass->RemoveObjectInstance(theObject);
+    iter->second(theObject);
   }
-<# } // foreach #>
 }
 
 void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
@@ -881,53 +896,25 @@ void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle
     throw NotInitialized();
   }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-<# 
-  bool firstInClassRegistryReflectAttributeValues = true;
-  foreach (var objectClass in FOM.ObjectClasses)
+  auto iter = mReflectCallbacks.find(theObjectClass);
+  if (iter != mReflectCallbacks.end())
   {
-    if (objectClass.HasValidAttributes)
-    { 
-      if (firstInClassRegistryReflectAttributeValues) { #>
-  if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<#    } else { #>
-  else if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<#    } // if
-      firstInClassRegistryReflectAttributeValues = false; #>
-  {
-    std::dynamic_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);
+    iter->second(theObject, attributes);
   }
-<#  
-    } // if (objectClass.hasValidAttributes)
-} // foreach 
-#>
 }
 
-void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
+void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& time, OrderType orderType)
 {
   if (mRtiAmbassador == nullptr)
   {
     throw NotInitialized();
   }
   rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-<# 
-  bool firstInClassRegistryReflectAttributeValuesWithTime = true;
-  foreach (var objectClass in FOM.ObjectClasses)
+  auto iter = mReflectWithTimeCallbacks.find(theObjectClass);
+  if (iter != mReflectWithTimeCallbacks.end())
   {
-    if (objectClass.HasValidAttributes)
-    { 
-      if (firstInClassRegistryReflectAttributeValuesWithTime) { #>
-  if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<#    } else { #>
-  else if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<#    } // if
-      firstInClassRegistryReflectAttributeValuesWithTime = false; #>
-  {
-    std::dynamic_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, theTime, orderType);
+    iter->second(theObject, attributes, time, orderType);
   }
-<#  
-    } // if (objectClass.hasValidAttributes)
-} // foreach 
-#>
 }
 
 void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& attributeHandles, optional<<#=FOM.NativeTimeType#>> time)
@@ -936,29 +923,11 @@ void ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandle th
   {
     throw NotInitialized();
   }
-<# 
-  bool firstInClassRegistryProvideAttributeValues = true;
-  foreach (var objectClass in FOM.ObjectClasses)
+  auto iter = mProvideCallbacks.find(theObjectClass);
+  if (iter != mProvideCallbacks.end())
   {
-    if (objectClass.HasValidAttributes)
-    { 
-      if (firstInClassRegistryProvideAttributeValues) { #>
-  if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<#    } else { #>
-  else if (m<#=objectClass.Name#>ObjectClass != nullptr && theObjectClass == m<#=objectClass.Name#>ObjectClass->GetObjectClassHandle())
-<#    } // if
-      firstInClassRegistryProvideAttributeValues = false; #>
-  {
-    auto objectInstance = std::dynamic_pointer_cast<<#=objectClass.Name#>>(m<#=objectClass.Name#>ObjectClass->GetObjectInstance(theObject));
-    if (objectInstance != nullptr)
-    {
-      objectInstance->ProvideAttributeValues(attributeHandles, time);
-    }
+    iter->second(theObject, attributeHandles, time);
   }
-<#  
-    } // if (objectClass.hasValidAttributes)
-} // foreach 
-#>
 }
 
 void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)

@@ -575,9 +575,13 @@ class InteractionClassRegistry : public IInteractionClassRegistry
             
             #line default
             #line hidden
-            this.Write("}; // class InteractionClassRegistry\r\n\r\n");
+            this.Write(@"    std::map<rti1516ev::InteractionClassHandle, std::function<void(const rti1516ev::ParameterHandleValueMap&)>> mReceiveCallbacks;
+    std::map<rti1516ev::InteractionClassHandle, std::function<void(const rti1516ev::ParameterHandleValueMap&, const rti1516ev::LogicalTime&, OrderType)>> mReceiveWithTimeCallbacks;
+}; // class InteractionClassRegistry
+
+");
             
-            #line 143 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 145 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
 
 foreach (var namespacePart in FOM.Namespace)
 {
@@ -587,14 +591,14 @@ foreach (var namespacePart in FOM.Namespace)
             #line hidden
             this.Write("} // namespace ");
             
-            #line 147 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 149 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 148 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
+            #line 150 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionsHeader.tt"
   } 
             
             #line default

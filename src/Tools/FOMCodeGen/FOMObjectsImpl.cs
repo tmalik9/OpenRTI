@@ -1604,7 +1604,7 @@ void ");
                     "nst rti1516ev::LogicalTime& ");
             
             #line 643 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture((objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "theTime" : "/* theTime */"));
+            this.Write(this.ToStringHelper.ToStringWithCulture((objectClass.HasValidAttributes && objectClass.ChildClasses.Count == 0) ? "time" : "/* time */"));
             
             #line default
             #line hidden
@@ -1706,7 +1706,7 @@ void ");
             
             #line default
             #line hidden
-            this.Write("&>(theTime).getTime(), orderType);\r\n");
+            this.Write("&>(time).getTime(), orderType);\r\n");
             
             #line 676 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } 
@@ -1977,594 +1977,308 @@ void ");
             
             #line default
             #line hidden
-            this.Write(">(shared_from_this()), time, orderType);\r\n  }\r\n}\r\n\r\n");
+            this.Write(">(shared_from_this()), time, orderType);\r\n  }\r\n}\r\n");
             
-            #line 786 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 785 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // if (objectClass.ChildClasses.Count == 0) 
             
             #line default
             #line hidden
             
-            #line 787 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 786 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // if (objectClass.HasValidAttributes) 
             
             #line default
             #line hidden
-            this.Write("\r\n");
             
-            #line 789 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 787 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // foreach (var objectClass in FOM.ObjectClasses) 
             
             #line default
             #line hidden
-            this.Write(@" 
-
-ObjectClassRegistry::ObjectClassRegistry()
-  : mRtiAmbassador(nullptr)
-{
-}
-
-ObjectClassRegistry::~ObjectClassRegistry()
-{
-}
-
-void ObjectClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassador)
-{
-  mRtiAmbassador = rtiAmbassador;
-");
+            this.Write("\r\nObjectClassRegistry::ObjectClassRegistry()\r\n  : mRtiAmbassador(nullptr)\r\n{\r\n}\r\n" +
+                    "\r\nObjectClassRegistry::~ObjectClassRegistry()\r\n{\r\n}\r\n\r\nvoid ObjectClassRegistry:" +
+                    ":Initialize(rti1516ev::RTIambassador* rtiAmbassador)\r\n{\r\n  mRtiAmbassador = rtiA" +
+                    "mbassador;\r\n");
             
-            #line 803 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 801 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  foreach (var objectClass in FOM.ObjectClasses) { 
             
             #line default
             #line hidden
             this.Write("  try\r\n  {\r\n");
             
-            #line 806 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 804 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
    if (objectClass.BaseClass != null) { 
             
             #line default
             #line hidden
             this.Write("    assert(m");
             
-            #line 807 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 805 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.BaseClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass.get() != nullptr);\r\n    m");
             
-            #line 808 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 806 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass = std::unique_ptr<");
             
-            #line 808 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 806 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass>(new ");
             
-            #line 808 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 806 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass(mRtiAmbassador, this, m");
             
-            #line 808 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 806 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.BaseClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass.get()));\r\n");
             
-            #line 809 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 807 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
    } else { 
             
             #line default
             #line hidden
             this.Write("    m");
             
-            #line 810 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 808 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass = std::unique_ptr<");
             
-            #line 810 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 808 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass>(new ");
             
-            #line 810 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 808 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
             this.Write("ObjectClass(mRtiAmbassador, this));\r\n");
             
-            #line 811 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 809 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
    } // if 
             
             #line default
             #line hidden
-            this.Write("  }\r\n  catch (const rti1516ev::NameNotFound&)\r\n  {\r\n  }\r\n");
+            this.Write("    mDiscoverCallbacks.insert(std::make_pair(\r\n      m");
+            
+            #line 811 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass->GetObjectClassHandle(),\r\n      [this](rti1516ev::ObjectInstanceHandl" +
+                    "e objectInstanceHandle, const std::wstring& objectInstanceName) {\r\n        m");
+            
+            #line 813 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass->DiscoverObjectInstance(objectInstanceHandle, objectInstanceName);\r\n " +
+                    "     }));\r\n    mRemoveCallbacks.insert(std::make_pair(\r\n      m");
             
             #line 816 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } // foreach 
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
-            this.Write("} // Initialize\r\n\r\nvoid ObjectClassRegistry::Finalize()\r\n{\r\n");
+            this.Write("ObjectClass->GetObjectClassHandle(),\r\n      [this](rti1516ev::ObjectInstanceHandl" +
+                    "e objectInstanceHandle) {\r\n        m");
             
-            #line 821 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- foreach (var objectClass in FOM.ReverseObjectClasses) { 
+            #line 818 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
-            this.Write("  m");
+            this.Write("ObjectClass->RemoveObjectInstance(objectInstanceHandle);\r\n      }));\r\n");
+            
+            #line 820 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+   if (objectClass.HasValidAttributes) { 
+            
+            #line default
+            #line hidden
+            this.Write("    mReflectCallbacks.insert(std::make_pair(\r\n      m");
             
             #line 822 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
-            this.Write("ObjectClass.reset();\r\n");
+            this.Write("ObjectClass->GetObjectClassHandle(),\r\n      [this](rti1516ev::ObjectInstanceHandl" +
+                    "e theObject, const rti1516ev::AttributeHandleValueMap & attributes) {\r\n        a" +
+                    "uto objectInstance = std::dynamic_pointer_cast<");
             
-            #line 823 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } // foreach 
-            
-            #line default
-            #line hidden
-            this.Write(@"  mRtiAmbassador = nullptr;
-} // Initialize
-
-void ObjectClassRegistry::DiscoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & theObjectInstanceName)
-{
-  if (mRtiAmbassador == nullptr)
-  {
-    throw NotInitialized();
-  }
-  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-");
-            
-            #line 834 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- 
-  bool first = true;
-  foreach (var objectClass in FOM.ObjectClasses)
-  {
-
-            
-            #line default
-            #line hidden
-            
-            #line 839 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-  if (first) { 
-            
-            #line default
-            #line hidden
-            this.Write("  if (m");
-            
-            #line 840 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 824 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
+            this.Write(">(m");
             
-            #line 840 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 824 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
+            this.Write("ObjectClass->GetObjectInstance(theObject));\r\n        if (objectInstance != nullpt" +
+                    "r) {\r\n          objectInstance->ReflectAttributeValues(attributes);\r\n        }\r\n" +
+                    "      }));\r\n    mReflectWithTimeCallbacks.insert(std::make_pair(\r\n      m");
             
-            #line 841 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (m");
-            
-            #line 842 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 830 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
+            this.Write(@"ObjectClass->GetObjectClassHandle(),
+      [this](rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& time, OrderType orderType) {
+        auto objectInstance = std::dynamic_pointer_cast<");
             
-            #line 842 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 832 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
+            this.Write(">(m");
+            
+            #line 832 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass->GetObjectInstance(theObject));\r\n        objectInstance->ReflectAttri" +
+                    "buteValues(attributes, time, orderType);\r\n      }));\r\n    mProvideCallbacks.inse" +
+                    "rt(std::make_pair(\r\n      m");
+            
+            #line 836 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass->GetObjectClassHandle(),\r\n      [this](rti1516ev::ObjectInstanceHandl" +
+                    "e theObject, const rti1516ev::AttributeHandleSet& attributeHandles, optional<int" +
+                    "64_t> time) {\r\n        auto objectInstance = std::dynamic_pointer_cast<");
+            
+            #line 838 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write(">(m");
+            
+            #line 838 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
+            
+            #line default
+            #line hidden
+            this.Write("ObjectClass->GetObjectInstance(theObject));\r\n        if (objectInstance != nullpt" +
+                    "r) {\r\n          objectInstance->ProvideAttributeValues(attributeHandles, time);\r" +
+                    "\n        }\r\n      }));\r\n");
             
             #line 843 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } // if
-   first=false;
-
+   } // if (objectClass.HasValidAttributes) 
             
             #line default
             #line hidden
-            this.Write("  {\r\n    m");
+            this.Write("  }\r\n  catch (const rti1516ev::NameNotFound&)\r\n  {\r\n  }\r\n");
             
-            #line 847 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->DiscoverObjectInstance(theObject, theObjectInstanceName);\r\n  }\r\n");
-            
-            #line 849 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 848 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // foreach 
             
             #line default
             #line hidden
-            this.Write(@"}
-
-void ObjectClassRegistry::RemoveObjectInstance(rti1516ev::ObjectInstanceHandle theObject)
-{
-  if (mRtiAmbassador == nullptr)
-  {
-    throw NotInitialized();
-  }
-  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-");
+            this.Write("} // Initialize\r\n\r\nvoid ObjectClassRegistry::Finalize()\r\n{\r\n  mDiscoverCallbacks." +
+                    "clear();\r\n  mRemoveCallbacks.clear();\r\n  mReflectCallbacks.clear();\r\n  mReflectW" +
+                    "ithTimeCallbacks.clear();\r\n  mProvideCallbacks.clear();\r\n");
+            
+            #line 858 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+ foreach (var objectClass in FOM.ReverseObjectClasses) { 
+            
+            #line default
+            #line hidden
+            this.Write("  m");
             
             #line 859 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- 
-  bool firstInRemoveObjectInstance = true;
-  foreach (var objectClass in FOM.ObjectClasses)
-  {
-
-            
-            #line default
-            #line hidden
-            
-            #line 864 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-  if (firstInRemoveObjectInstance) { 
-            
-            #line default
-            #line hidden
-            this.Write("  if (m");
-            
-            #line 865 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
             
             #line default
             #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
+            this.Write("ObjectClass.reset();\r\n");
             
-            #line 865 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 866 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (m");
-            
-            #line 867 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
-            
-            #line 867 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 868 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- } // if
-   firstInRemoveObjectInstance=false;
-
-            
-            #line default
-            #line hidden
-            this.Write("  {\r\n    m");
-            
-            #line 872 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->RemoveObjectInstance(theObject);\r\n  }\r\n");
-            
-            #line 874 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 860 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } // foreach 
             
             #line default
             #line hidden
-            this.Write(@"}
-
-void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes)
-{
-  if (mRtiAmbassador == nullptr)
-  {
-    throw NotInitialized();
-  }
-  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-");
-            
-            #line 884 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- 
-  bool firstInClassRegistryReflectAttributeValues = true;
-  foreach (var objectClass in FOM.ObjectClasses)
-  {
-    if (objectClass.HasValidAttributes)
-    { 
-      if (firstInClassRegistryReflectAttributeValues) { 
-            
-            #line default
-            #line hidden
-            this.Write("  if (m");
-            
-            #line 891 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
-            
-            #line 891 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 892 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-    } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (m");
-            
-            #line 893 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
-            
-            #line 893 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 894 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-    } // if
-      firstInClassRegistryReflectAttributeValues = false; 
-            
-            #line default
-            #line hidden
-            this.Write("  {\r\n    std::dynamic_pointer_cast<");
-            
-            #line 897 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write(">(m");
-            
-            #line 897 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes);\r\n" +
-                    "  }\r\n");
-            
-            #line 899 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-  
-    } // if (objectClass.hasValidAttributes)
-} // foreach 
-
-            
-            #line default
-            #line hidden
-            this.Write(@"}
-
-void ObjectClassRegistry::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& theTime, OrderType orderType)
-{
-  if (mRtiAmbassador == nullptr)
-  {
-    throw NotInitialized();
-  }
-  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);
-");
-            
-            #line 912 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- 
-  bool firstInClassRegistryReflectAttributeValuesWithTime = true;
-  foreach (var objectClass in FOM.ObjectClasses)
-  {
-    if (objectClass.HasValidAttributes)
-    { 
-      if (firstInClassRegistryReflectAttributeValuesWithTime) { 
-            
-            #line default
-            #line hidden
-            this.Write("  if (m");
-            
-            #line 919 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
-            
-            #line 919 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
+            this.Write("  mRtiAmbassador = nullptr;\r\n} // Initialize\r\n\r\nvoid ObjectClassRegistry::Discove" +
+                    "rObjectInstance(rti1516ev::ObjectInstanceHandle theObject, std::wstring const & " +
+                    "theObjectInstanceName)\r\n{\r\n  if (mRtiAmbassador == nullptr)\r\n  {\r\n    throw NotI" +
+                    "nitialized();\r\n  }\r\n  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassad" +
+                    "or->getKnownObjectClassHandle(theObject);\r\n  auto iter = mDiscoverCallbacks.find" +
+                    "(theObjectClass);\r\n  if (iter != mDiscoverCallbacks.end())\r\n  {\r\n    iter->secon" +
+                    "d(theObject, theObjectInstanceName);\r\n  }\r\n}\r\n\r\nvoid ObjectClassRegistry::Remove" +
+                    "ObjectInstance(rti1516ev::ObjectInstanceHandle theObject)\r\n{\r\n  if (mRtiAmbassad" +
+                    "or == nullptr)\r\n  {\r\n    throw NotInitialized();\r\n  }\r\n  rti1516ev::ObjectClassH" +
+                    "andle theObjectClass = mRtiAmbassador->getKnownObjectClassHandle(theObject);\r\n  " +
+                    "auto iter = mRemoveCallbacks.find(theObjectClass);\r\n  if (iter != mRemoveCallbac" +
+                    "ks.end())\r\n  {\r\n    iter->second(theObject);\r\n  }\r\n}\r\n\r\nvoid ObjectClassRegistry" +
+                    "::ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti151" +
+                    "6ev::AttributeHandleValueMap & attributes)\r\n{\r\n  if (mRtiAmbassador == nullptr)\r" +
+                    "\n  {\r\n    throw NotInitialized();\r\n  }\r\n  rti1516ev::ObjectClassHandle theObject" +
+                    "Class = mRtiAmbassador->getKnownObjectClassHandle(theObject);\r\n  auto iter = mRe" +
+                    "flectCallbacks.find(theObjectClass);\r\n  if (iter != mReflectCallbacks.end())\r\n  " +
+                    "{\r\n    iter->second(theObject, attributes);\r\n  }\r\n}\r\n\r\nvoid ObjectClassRegistry:" +
+                    ":ReflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject, const rti1516" +
+                    "ev::AttributeHandleValueMap & attributes, const rti1516ev::LogicalTime& time, Or" +
+                    "derType orderType)\r\n{\r\n  if (mRtiAmbassador == nullptr)\r\n  {\r\n    throw NotIniti" +
+                    "alized();\r\n  }\r\n  rti1516ev::ObjectClassHandle theObjectClass = mRtiAmbassador->" +
+                    "getKnownObjectClassHandle(theObject);\r\n  auto iter = mReflectWithTimeCallbacks.f" +
+                    "ind(theObjectClass);\r\n  if (iter != mReflectWithTimeCallbacks.end())\r\n  {\r\n    i" +
+                    "ter->second(theObject, attributes, time, orderType);\r\n  }\r\n}\r\n\r\nvoid ObjectClass" +
+                    "Registry::ProvideAttributeValues(rti1516ev::ObjectClassHandle theObjectClass, rt" +
+                    "i1516ev::ObjectInstanceHandle theObject, const rti1516ev::AttributeHandleSet& at" +
+                    "tributeHandles, optional<");
             
             #line 920 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-    } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (m");
-            
-            #line 921 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
-            
-            #line 921 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 922 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-    } // if
-      firstInClassRegistryReflectAttributeValuesWithTime = false; 
-            
-            #line default
-            #line hidden
-            this.Write("  {\r\n    std::dynamic_pointer_cast<");
-            
-            #line 925 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write(">(m");
-            
-            #line 925 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectInstance(theObject))->ReflectAttributeValues(attributes, th" +
-                    "eTime, orderType);\r\n  }\r\n");
-            
-            #line 927 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-  
-    } // if (objectClass.hasValidAttributes)
-} // foreach 
-
-            
-            #line default
-            #line hidden
-            this.Write("}\r\n\r\nvoid ObjectClassRegistry::ProvideAttributeValues(rti1516ev::ObjectClassHandl" +
-                    "e theObjectClass, rti1516ev::ObjectInstanceHandle theObject, const rti1516ev::At" +
-                    "tributeHandleSet& attributeHandles, optional<");
-            
-            #line 933 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(FOM.NativeTimeType));
             
             #line default
             #line hidden
-            this.Write("> time)\r\n{\r\n  if (mRtiAmbassador == nullptr)\r\n  {\r\n    throw NotInitialized();\r\n " +
-                    " }\r\n");
-            
-            #line 939 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
- 
-  bool firstInClassRegistryProvideAttributeValues = true;
-  foreach (var objectClass in FOM.ObjectClasses)
+            this.Write(@"> time)
+{
+  if (mRtiAmbassador == nullptr)
   {
-    if (objectClass.HasValidAttributes)
-    { 
-      if (firstInClassRegistryProvideAttributeValues) { 
-            
-            #line default
-            #line hidden
-            this.Write("  if (m");
-            
-            #line 946 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
-            
-            #line 946 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 947 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-    } else { 
-            
-            #line default
-            #line hidden
-            this.Write("  else if (m");
-            
-            #line 948 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass != nullptr && theObjectClass == m");
-            
-            #line 948 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectClassHandle())\r\n");
-            
-            #line 949 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-    } // if
-      firstInClassRegistryProvideAttributeValues = false; 
-            
-            #line default
-            #line hidden
-            this.Write("  {\r\n    auto objectInstance = std::dynamic_pointer_cast<");
-            
-            #line 952 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write(">(m");
-            
-            #line 952 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objectClass.Name));
-            
-            #line default
-            #line hidden
-            this.Write("ObjectClass->GetObjectInstance(theObject));\r\n    if (objectInstance != nullptr)\r\n" +
-                    "    {\r\n      objectInstance->ProvideAttributeValues(attributeHandles, time);\r\n  " +
-                    "  }\r\n  }\r\n");
-            
-            #line 958 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
-  
-    } // if (objectClass.hasValidAttributes)
-} // foreach 
-
-            
-            #line default
-            #line hidden
-            this.Write(@"}
+    throw NotInitialized();
+  }
+  auto iter = mProvideCallbacks.find(theObjectClass);
+  if (iter != mProvideCallbacks.end())
+  {
+    iter->second(theObject, attributeHandles, time);
+  }
+}
 
 void ObjectClassRegistry::RegisterObjectInstanceName(const std::wstring& theObjectInstanceName, std::function<void(bool)> completionCallback)
 {
@@ -2602,21 +2316,21 @@ void ObjectClassRegistry::ObjectInstanceNameReservationFailed(const std::wstring
 
 ");
             
-            #line 998 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 967 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  foreach (var namespacePart in FOM.Namespace) { 
             
             #line default
             #line hidden
             this.Write("} // namespace ");
             
-            #line 999 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 968 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 1000 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
+            #line 969 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMObjectsImpl.tt"
  } 
             
             #line default

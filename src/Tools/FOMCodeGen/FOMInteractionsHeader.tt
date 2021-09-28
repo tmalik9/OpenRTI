@@ -138,6 +138,8 @@ class InteractionClassRegistry : public IInteractionClassRegistry
 <# foreach (var interactionClass in FOM.InteractionClasses) { #>
     std::unique_ptr<<#=interactionClass.Name#>InteractionClass> m<#=interactionClass.Name#>InteractionClass;
 <# } #>
+    std::map<rti1516ev::InteractionClassHandle, std::function<void(const rti1516ev::ParameterHandleValueMap&)>> mReceiveCallbacks;
+    std::map<rti1516ev::InteractionClassHandle, std::function<void(const rti1516ev::ParameterHandleValueMap&, const rti1516ev::LogicalTime&, OrderType)>> mReceiveWithTimeCallbacks;
 }; // class InteractionClassRegistry
 
 <#

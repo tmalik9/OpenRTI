@@ -322,6 +322,16 @@ void InteractionClassRegistry::Initialize(rti1516ev::RTIambassador* rtiAmbassado
 <#    } else { #>
     m<#=interactionClass.Name#>InteractionClass = std::unique_ptr<<#=interactionClass.Name#>InteractionClass>(new <#=interactionClass.Name#>InteractionClass(mRtiAmbassador, this));
 <#    } // if #>
+    mReceiveCallbacks.insert(std::make_pair(
+      m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle(),
+      [this](const rti1516ev::ParameterHandleValueMap & parameters) {
+        m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters);
+      }));
+    mReceiveWithTimeCallbacks.insert(std::make_pair(
+      m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle(),
+      [this](const rti1516ev::ParameterHandleValueMap & parameters, const rti1516ev::LogicalTime& time, OrderType orderType) {
+        m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters, time, orderType);
+      }));
   }
   catch (const rti1516ev::NameNotFound&)
   {
@@ -343,22 +353,11 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   {
     throw NotInitialized();
   }
-<# 
-  bool firstInClassRegistryReceiveInteractionParameter = true;
-  foreach (var interactionClass in FOM.InteractionClasses)
+  auto iter = mReceiveCallbacks.find(theInteractionClass);
+  if (iter != mReceiveCallbacks.end())
   {
-    if (firstInClassRegistryReceiveInteractionParameter) { #>
-  if (theInteractionClass == m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle())
-<#  } else { #>
-  else if (theInteractionClass == m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle())
-<#  } // if
-    firstInClassRegistryReceiveInteractionParameter = false; #>
-  {
-    m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters);
+    iter->second(parameters);
   }
-<#  
-} // foreach 
-#>
 }
 
 void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHandle theInteractionClass,
@@ -370,20 +369,11 @@ void InteractionClassRegistry::ReceiveInteraction(rti1516ev::InteractionClassHan
   {
     throw NotInitialized();
   }
-<# 
-  bool firstInClassRegistryReceiveWithTimeParameter = true;
-  foreach (var interactionClass in FOM.InteractionClasses)
+  auto iter = mReceiveWithTimeCallbacks.find(theInteractionClass);
+  if (iter != mReceiveWithTimeCallbacks.end())
   {
-    if (firstInClassRegistryReceiveWithTimeParameter) { #>
-  if (theInteractionClass == m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle())
-<#  } else { #>
-  else if (theInteractionClass == m<#=interactionClass.Name#>InteractionClass->GetInteractionClassHandle())
-<#  } // if (firstInClassRegistryReceiveWithTimeParameter)
-    firstInClassRegistryReceiveWithTimeParameter = false; #>
-  {
-    m<#=interactionClass.Name#>InteractionClass->ReceiveInteraction(parameters, time, orderType);
+    iter->second(parameters, time, orderType);
   }
-<#} // foreach #>
 }
 
 <# foreach (var namespacePart in FOM.Namespace) { #>
