@@ -37,7 +37,10 @@ class IHLAinteractionRootInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IMeasurementInitInteractionClass represents the HLA interaction class HLAinteractionRoot.MeasurementInit.
@@ -59,7 +62,10 @@ class IMeasurementInitInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IMeasurementStopInteractionClass represents the HLA interaction class HLAinteractionRoot.MeasurementStop.
@@ -85,7 +91,10 @@ class IMeasurementStopInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<std::wstring> NextFederationSuffix, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IKeyEventInteractionClass represents the HLA interaction class HLAinteractionRoot.KeyEvent.
@@ -111,7 +120,10 @@ class IKeyEventInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<int32_t> KeyCode, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // ITextLogInteractionClass represents the HLA interaction class HLAinteractionRoot.TextLog.
@@ -137,7 +149,10 @@ class ITextLogInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<std::wstring> Sender, optional<std::wstring> Text, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // ISystemVariableUpdateInteractionClass represents the HLA interaction class HLAinteractionRoot.SystemVariableUpdate.
@@ -163,7 +178,10 @@ class ISystemVariableUpdateInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<std::string> Id, optional<const std::vector<uint8_t>&> Value, optional<int32_t> Client, optional<bool> HasChanged, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // ISystemVariableModificationInteractionClass represents the HLA interaction class HLAinteractionRoot.SystemVariableModification.
@@ -189,7 +207,10 @@ class ISystemVariableModificationInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<const std::vector<uint8_t>&> Value, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IValueEntityUpdateInteractionClass represents the HLA interaction class HLAinteractionRoot.ValueEntityUpdate.
@@ -215,7 +236,10 @@ class IValueEntityUpdateInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<const std::vector<uint8_t>&> Id, optional<const std::vector<uint8_t>&> Value, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IBusMessageInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.
@@ -241,7 +265,10 @@ class IBusMessageInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IEthPacketInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.EthPacket.
@@ -267,7 +294,10 @@ class IEthPacketInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacket&> Frame, optional<std::string> PortName, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IEthPacketErrorInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.EthPacketError.
@@ -293,7 +323,10 @@ class IEthPacketErrorInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketError&> Frame, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IEthPacketErrorForwardedInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.EthPacketErrorForwarded.
@@ -319,7 +352,10 @@ class IEthPacketErrorForwardedInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketErrorForwarded&> Frame, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IEthForwardedPacketInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.EthForwardedPacket.
@@ -345,7 +381,10 @@ class IEthForwardedPacketInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketForwarded&> Frame, optional<std::string> PortName, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IEthStatusInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.EthStatus.
@@ -371,7 +410,10 @@ class IEthStatusInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetStatus&> Frame, optional<std::string> PortName, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // ICANMessageInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.CANMessage.
@@ -397,7 +439,10 @@ class ICANMessageInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int32_t> Id, optional<const CANFrame&> Frame, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // ICANErrorFrameInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.CANErrorFrame.
@@ -423,7 +468,10 @@ class ICANErrorFrameInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const std::vector<uint8_t>&> Frame, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IFlexRaySymbolInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.FlexRaySymbol.
@@ -449,7 +497,10 @@ class IFlexRaySymbolInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<FlexRaySymbolPattern> SymbolPattern, optional<FlexRayChannel> FlexRayChannel, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IFlexRayCycleStartInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.FlexRayCycleStart.
@@ -475,7 +526,10 @@ class IFlexRayCycleStartInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<uint8_t> Cycle, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IFlexRayFrameInteractionClass represents the HLA interaction class HLAinteractionRoot.BusMessage.FlexRayFrame.
@@ -501,7 +555,10 @@ class IFlexRayFrameInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int16_t> FrameID, optional<FlexRayChannel> FlexRayChannel, optional<bool> PayloadPreambleIndicator, optional<const FlexRayHeader&> Header, optional<const FlexRayPayload&> Payload, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 // IPythonCommandInteractionClass represents the HLA interaction class HLAinteractionRoot.PythonCommand.
@@ -527,7 +584,10 @@ class IPythonCommandInteractionClass
     // Register an interaction callback. The optional time stamp will be delivered by the application. When the time stamp is valid,
     // the optional order type will indicate the source of the time stamp.
     using ReceiveCallback = std::function<void(optional<const std::vector<uint8_t>&> Code, optional<const std::vector<uint8_t>&> Target, optional<const std::vector<uint8_t>&> RefID, optional<int64_t> time, optional<OrderType> orderType)>;
-    virtual uint32_t RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
 };
 
 

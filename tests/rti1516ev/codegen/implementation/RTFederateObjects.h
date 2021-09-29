@@ -4,6 +4,8 @@
 
 #include <vector>
 #include <mutex>
+#include <future>
+
 #include "RTI/Handle.h"
 #include "RTI/RTIambassador.h"
 #include "RTI/encoding/BasicDataElements.h"
@@ -46,6 +48,8 @@ class HLAobjectRootObjectClass : public IHLAobjectRootObjectClass
     std::shared_ptr<IHLAobjectRoot> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IHLAobjectRoot> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IHLAobjectRoot> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IHLAobjectRoot> RestoreObjectInstance(std::shared_ptr<IHLAobjectRoot>) override;
+    std::shared_ptr<IHLAobjectRoot> RestoreObjectInstance(std::shared_ptr<IHLAobjectRoot>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IHLAobjectRoot> newObjectInstance);
@@ -109,6 +113,7 @@ class HLAobjectRoot : public virtual IHLAobjectRoot, public IObjectImplBase
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -134,6 +139,8 @@ class HLAobjectRoot : public virtual IHLAobjectRoot, public IObjectImplBase
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // Attribute value encoders
     // attribute HLAprivilegeToDeleteObject : no data type
 };
@@ -152,6 +159,8 @@ class ParticipantObjectClass : public IParticipantObjectClass
     std::shared_ptr<IParticipant> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IParticipant> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IParticipant> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IParticipant> RestoreObjectInstance(std::shared_ptr<IParticipant>) override;
+    std::shared_ptr<IParticipant> RestoreObjectInstance(std::shared_ptr<IParticipant>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IParticipant> newObjectInstance);
@@ -228,6 +237,7 @@ class Participant : public virtual IParticipant, public IObjectImplBase
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -282,6 +292,8 @@ class Participant : public virtual IParticipant, public IObjectImplBase
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -317,6 +329,8 @@ class SystemVariableObjectClass : public ISystemVariableObjectClass
     std::shared_ptr<ISystemVariable> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<ISystemVariable> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<ISystemVariable> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<ISystemVariable> RestoreObjectInstance(std::shared_ptr<ISystemVariable>) override;
+    std::shared_ptr<ISystemVariable> RestoreObjectInstance(std::shared_ptr<ISystemVariable>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<ISystemVariable> newObjectInstance);
@@ -385,6 +399,7 @@ class SystemVariable : public virtual ISystemVariable, public IObjectImplBase
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -433,6 +448,8 @@ class SystemVariable : public virtual ISystemVariable, public IObjectImplBase
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -464,6 +481,8 @@ class ValueEntityObjectClass : public IValueEntityObjectClass
     std::shared_ptr<IValueEntity> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IValueEntity> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IValueEntity> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IValueEntity> RestoreObjectInstance(std::shared_ptr<IValueEntity>) override;
+    std::shared_ptr<IValueEntity> RestoreObjectInstance(std::shared_ptr<IValueEntity>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IValueEntity> newObjectInstance);
@@ -532,6 +551,7 @@ class ValueEntity : public virtual IValueEntity, public IObjectImplBase
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -580,6 +600,8 @@ class ValueEntity : public virtual IValueEntity, public IObjectImplBase
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -611,6 +633,8 @@ class DOMemberSourceObjectClass : public IDOMemberSourceObjectClass
     std::shared_ptr<IDOMemberSource> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IDOMemberSource> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IDOMemberSource> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IDOMemberSource> RestoreObjectInstance(std::shared_ptr<IDOMemberSource>) override;
+    std::shared_ptr<IDOMemberSource> RestoreObjectInstance(std::shared_ptr<IDOMemberSource>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IDOMemberSource> newObjectInstance);
@@ -687,6 +711,7 @@ class DOMemberSource : public virtual IDOMemberSource, public IObjectImplBase
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -741,6 +766,8 @@ class DOMemberSource : public virtual IDOMemberSource, public IObjectImplBase
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -776,6 +803,8 @@ class DOMemberTargetObjectClass : public IDOMemberTargetObjectClass
     std::shared_ptr<IDOMemberTarget> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IDOMemberTarget> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IDOMemberTarget> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IDOMemberTarget> RestoreObjectInstance(std::shared_ptr<IDOMemberTarget>) override;
+    std::shared_ptr<IDOMemberTarget> RestoreObjectInstance(std::shared_ptr<IDOMemberTarget>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IDOMemberTarget> newObjectInstance);
@@ -848,6 +877,7 @@ class DOMemberTarget : public virtual IDOMemberTarget, public IObjectImplBase
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -899,6 +929,8 @@ class DOMemberTarget : public virtual IDOMemberTarget, public IObjectImplBase
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -932,6 +964,8 @@ class BusManagementObjectClass : public IBusManagementObjectClass
     std::shared_ptr<IBusManagement> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusManagement> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusManagement> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IBusManagement> RestoreObjectInstance(std::shared_ptr<IBusManagement>) override;
+    std::shared_ptr<IBusManagement> RestoreObjectInstance(std::shared_ptr<IBusManagement>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusManagement> newObjectInstance);
@@ -1000,6 +1034,7 @@ class BusManagement : public virtual IBusManagement, public IObjectImplBase
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1045,6 +1080,8 @@ class BusManagement : public virtual IBusManagement, public IObjectImplBase
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -1073,6 +1110,8 @@ class BusManagementCanObjectClass : public IBusManagementCanObjectClass
     std::shared_ptr<IBusManagementCan> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusManagementCan> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusManagementCan> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IBusManagementCan> RestoreObjectInstance(std::shared_ptr<IBusManagementCan>) override;
+    std::shared_ptr<IBusManagementCan> RestoreObjectInstance(std::shared_ptr<IBusManagementCan>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusManagementCan> newObjectInstance);
@@ -1155,6 +1194,7 @@ class BusManagementCan : public virtual IBusManagementCan, public IObjectImplBas
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1215,6 +1255,8 @@ class BusManagementCan : public virtual IBusManagementCan, public IObjectImplBas
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -1254,6 +1296,8 @@ class BusManagementEthernetObjectClass : public IBusManagementEthernetObjectClas
     std::shared_ptr<IBusManagementEthernet> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusManagementEthernet> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusManagementEthernet> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IBusManagementEthernet> RestoreObjectInstance(std::shared_ptr<IBusManagementEthernet>) override;
+    std::shared_ptr<IBusManagementEthernet> RestoreObjectInstance(std::shared_ptr<IBusManagementEthernet>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusManagementEthernet> newObjectInstance);
@@ -1328,6 +1372,7 @@ class BusManagementEthernet : public virtual IBusManagementEthernet, public IObj
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1382,6 +1427,8 @@ class BusManagementEthernet : public virtual IBusManagementEthernet, public IObj
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -1417,6 +1464,8 @@ class FlexRayClusterObjectClass : public IFlexRayClusterObjectClass
     std::shared_ptr<IFlexRayCluster> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IFlexRayCluster> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IFlexRayCluster> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IFlexRayCluster> RestoreObjectInstance(std::shared_ptr<IFlexRayCluster>) override;
+    std::shared_ptr<IFlexRayCluster> RestoreObjectInstance(std::shared_ptr<IFlexRayCluster>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IFlexRayCluster> newObjectInstance);
@@ -1563,6 +1612,7 @@ class FlexRayCluster : public virtual IFlexRayCluster, public IObjectImplBase
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1671,6 +1721,8 @@ class FlexRayCluster : public virtual IFlexRayCluster, public IObjectImplBase
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -1742,6 +1794,8 @@ class BusControllerObjectClass : public IBusControllerObjectClass
     std::shared_ptr<IBusController> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusController> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusController> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IBusController> RestoreObjectInstance(std::shared_ptr<IBusController>) override;
+    std::shared_ptr<IBusController> RestoreObjectInstance(std::shared_ptr<IBusController>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusController> newObjectInstance);
@@ -1814,6 +1868,7 @@ class BusController : public virtual IBusController, public IObjectImplBase
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -1862,6 +1917,8 @@ class BusController : public virtual IBusController, public IObjectImplBase
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -1892,6 +1949,8 @@ class BusControllerCanObjectClass : public IBusControllerCanObjectClass
     std::shared_ptr<IBusControllerCan> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusControllerCan> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusControllerCan> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IBusControllerCan> RestoreObjectInstance(std::shared_ptr<IBusControllerCan>) override;
+    std::shared_ptr<IBusControllerCan> RestoreObjectInstance(std::shared_ptr<IBusControllerCan>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusControllerCan> newObjectInstance);
@@ -1996,6 +2055,7 @@ class BusControllerCan : public virtual IBusControllerCan, public IObjectImplBas
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -2074,6 +2134,8 @@ class BusControllerCan : public virtual IBusControllerCan, public IObjectImplBas
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -2125,6 +2187,8 @@ class BusControllerEthernetObjectClass : public IBusControllerEthernetObjectClas
     std::shared_ptr<IBusControllerEthernet> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusControllerEthernet> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IBusControllerEthernet> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IBusControllerEthernet> RestoreObjectInstance(std::shared_ptr<IBusControllerEthernet>) override;
+    std::shared_ptr<IBusControllerEthernet> RestoreObjectInstance(std::shared_ptr<IBusControllerEthernet>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IBusControllerEthernet> newObjectInstance);
@@ -2197,6 +2261,7 @@ class BusControllerEthernet : public virtual IBusControllerEthernet, public IObj
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -2251,6 +2316,8 @@ class BusControllerEthernet : public virtual IBusControllerEthernet, public IObj
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -2286,6 +2353,8 @@ class FlexRayControllerStatusObjectClass : public IFlexRayControllerStatusObject
     std::shared_ptr<IFlexRayControllerStatus> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IFlexRayControllerStatus> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IFlexRayControllerStatus> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IFlexRayControllerStatus> RestoreObjectInstance(std::shared_ptr<IFlexRayControllerStatus>) override;
+    std::shared_ptr<IFlexRayControllerStatus> RestoreObjectInstance(std::shared_ptr<IFlexRayControllerStatus>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IFlexRayControllerStatus> newObjectInstance);
@@ -2390,6 +2459,7 @@ class FlexRayControllerStatus : public virtual IFlexRayControllerStatus, public 
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -2468,6 +2538,8 @@ class FlexRayControllerStatus : public virtual IFlexRayControllerStatus, public 
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -2519,6 +2591,8 @@ class FlexRayControllerObjectClass : public IFlexRayControllerObjectClass
     std::shared_ptr<IFlexRayController> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IFlexRayController> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IFlexRayController> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IFlexRayController> RestoreObjectInstance(std::shared_ptr<IFlexRayController>) override;
+    std::shared_ptr<IFlexRayController> RestoreObjectInstance(std::shared_ptr<IFlexRayController>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IFlexRayController> newObjectInstance);
@@ -2687,6 +2761,7 @@ class FlexRayController : public virtual IFlexRayController, public IObjectImplB
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -2813,6 +2888,8 @@ class FlexRayController : public virtual IFlexRayController, public IObjectImplB
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter
@@ -2896,6 +2973,8 @@ class FlexRaySendBufferObjectClass : public IFlexRaySendBufferObjectClass
     std::shared_ptr<IFlexRaySendBuffer> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IFlexRaySendBuffer> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<IFlexRaySendBuffer> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<IFlexRaySendBuffer> RestoreObjectInstance(std::shared_ptr<IFlexRaySendBuffer>) override;
+    std::shared_ptr<IFlexRaySendBuffer> RestoreObjectInstance(std::shared_ptr<IFlexRaySendBuffer>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<IFlexRaySendBuffer> newObjectInstance);
@@ -3000,6 +3079,7 @@ class FlexRaySendBuffer : public virtual IFlexRaySendBuffer, public IObjectImplB
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
     // attribute HLAprivilegeToDeleteObject : no data type
@@ -3076,6 +3156,8 @@ class FlexRaySendBuffer : public virtual IFlexRaySendBuffer, public IObjectImplB
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;
     // modified by any attribute setter

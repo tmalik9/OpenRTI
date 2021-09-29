@@ -115,11 +115,20 @@ void HLAinteractionRootInteractionClass::ReceiveInteraction(const rti1516ev::Par
   }
 }
 
-uint32_t HLAinteractionRootInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+HLAinteractionRootInteractionClass::ReceiveCallbackHandle HLAinteractionRootInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void HLAinteractionRootInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet HLAinteractionRootInteractionClass::GetAllParameterHandles()
@@ -228,11 +237,20 @@ void MeasurementInitInteractionClass::ReceiveInteraction(const rti1516ev::Parame
   }
 }
 
-uint32_t MeasurementInitInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+MeasurementInitInteractionClass::ReceiveCallbackHandle MeasurementInitInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void MeasurementInitInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet MeasurementInitInteractionClass::GetAllParameterHandles()
@@ -379,11 +397,20 @@ void MeasurementStopInteractionClass::ReceiveInteraction(const rti1516ev::Parame
   }
 }
 
-uint32_t MeasurementStopInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+MeasurementStopInteractionClass::ReceiveCallbackHandle MeasurementStopInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void MeasurementStopInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet MeasurementStopInteractionClass::GetAllParameterHandles()
@@ -530,11 +557,20 @@ void KeyEventInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHand
   }
 }
 
-uint32_t KeyEventInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+KeyEventInteractionClass::ReceiveCallbackHandle KeyEventInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void KeyEventInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet KeyEventInteractionClass::GetAllParameterHandles()
@@ -714,11 +750,20 @@ void TextLogInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHandl
   }
 }
 
-uint32_t TextLogInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+TextLogInteractionClass::ReceiveCallbackHandle TextLogInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void TextLogInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet TextLogInteractionClass::GetAllParameterHandles()
@@ -965,11 +1010,20 @@ void SystemVariableUpdateInteractionClass::ReceiveInteraction(const rti1516ev::P
   }
 }
 
-uint32_t SystemVariableUpdateInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+SystemVariableUpdateInteractionClass::ReceiveCallbackHandle SystemVariableUpdateInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void SystemVariableUpdateInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet SystemVariableUpdateInteractionClass::GetAllParameterHandles()
@@ -1119,11 +1173,20 @@ void SystemVariableModificationInteractionClass::ReceiveInteraction(const rti151
   }
 }
 
-uint32_t SystemVariableModificationInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+SystemVariableModificationInteractionClass::ReceiveCallbackHandle SystemVariableModificationInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void SystemVariableModificationInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet SystemVariableModificationInteractionClass::GetAllParameterHandles()
@@ -1303,11 +1366,20 @@ void ValueEntityUpdateInteractionClass::ReceiveInteraction(const rti1516ev::Para
   }
 }
 
-uint32_t ValueEntityUpdateInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+ValueEntityUpdateInteractionClass::ReceiveCallbackHandle ValueEntityUpdateInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void ValueEntityUpdateInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet ValueEntityUpdateInteractionClass::GetAllParameterHandles()
@@ -1620,11 +1692,20 @@ void BusMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHa
   }
 }
 
-uint32_t BusMessageInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+BusMessageInteractionClass::ReceiveCallbackHandle BusMessageInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void BusMessageInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet BusMessageInteractionClass::GetAllParameterHandles()
@@ -1995,11 +2076,20 @@ void EthPacketInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   }
 }
 
-uint32_t EthPacketInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+EthPacketInteractionClass::ReceiveCallbackHandle EthPacketInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void EthPacketInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet EthPacketInteractionClass::GetAllParameterHandles()
@@ -2339,11 +2429,20 @@ void EthPacketErrorInteractionClass::ReceiveInteraction(const rti1516ev::Paramet
   }
 }
 
-uint32_t EthPacketErrorInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+EthPacketErrorInteractionClass::ReceiveCallbackHandle EthPacketErrorInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void EthPacketErrorInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet EthPacketErrorInteractionClass::GetAllParameterHandles()
@@ -2682,11 +2781,20 @@ void EthPacketErrorForwardedInteractionClass::ReceiveInteraction(const rti1516ev
   }
 }
 
-uint32_t EthPacketErrorForwardedInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+EthPacketErrorForwardedInteractionClass::ReceiveCallbackHandle EthPacketErrorForwardedInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void EthPacketErrorForwardedInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet EthPacketErrorForwardedInteractionClass::GetAllParameterHandles()
@@ -3058,11 +3166,20 @@ void EthForwardedPacketInteractionClass::ReceiveInteraction(const rti1516ev::Par
   }
 }
 
-uint32_t EthForwardedPacketInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+EthForwardedPacketInteractionClass::ReceiveCallbackHandle EthForwardedPacketInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void EthForwardedPacketInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet EthForwardedPacketInteractionClass::GetAllParameterHandles()
@@ -3435,11 +3552,20 @@ void EthStatusInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHan
   }
 }
 
-uint32_t EthStatusInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+EthStatusInteractionClass::ReceiveCallbackHandle EthStatusInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void EthStatusInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet EthStatusInteractionClass::GetAllParameterHandles()
@@ -3812,11 +3938,20 @@ void CANMessageInteractionClass::ReceiveInteraction(const rti1516ev::ParameterHa
   }
 }
 
-uint32_t CANMessageInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+CANMessageInteractionClass::ReceiveCallbackHandle CANMessageInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void CANMessageInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet CANMessageInteractionClass::GetAllParameterHandles()
@@ -4156,11 +4291,20 @@ void CANErrorFrameInteractionClass::ReceiveInteraction(const rti1516ev::Paramete
   }
 }
 
-uint32_t CANErrorFrameInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+CANErrorFrameInteractionClass::ReceiveCallbackHandle CANErrorFrameInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void CANErrorFrameInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet CANErrorFrameInteractionClass::GetAllParameterHandles()
@@ -4532,11 +4676,20 @@ void FlexRaySymbolInteractionClass::ReceiveInteraction(const rti1516ev::Paramete
   }
 }
 
-uint32_t FlexRaySymbolInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+FlexRaySymbolInteractionClass::ReceiveCallbackHandle FlexRaySymbolInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void FlexRaySymbolInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet FlexRaySymbolInteractionClass::GetAllParameterHandles()
@@ -4876,11 +5029,20 @@ void FlexRayCycleStartInteractionClass::ReceiveInteraction(const rti1516ev::Para
   }
 }
 
-uint32_t FlexRayCycleStartInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+FlexRayCycleStartInteractionClass::ReceiveCallbackHandle FlexRayCycleStartInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void FlexRayCycleStartInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet FlexRayCycleStartInteractionClass::GetAllParameterHandles()
@@ -5351,11 +5513,20 @@ void FlexRayFrameInteractionClass::ReceiveInteraction(const rti1516ev::Parameter
   }
 }
 
-uint32_t FlexRayFrameInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+FlexRayFrameInteractionClass::ReceiveCallbackHandle FlexRayFrameInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void FlexRayFrameInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet FlexRayFrameInteractionClass::GetAllParameterHandles()
@@ -5578,11 +5749,20 @@ void PythonCommandInteractionClass::ReceiveInteraction(const rti1516ev::Paramete
   }
 }
 
-uint32_t PythonCommandInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+PythonCommandInteractionClass::ReceiveCallbackHandle PythonCommandInteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void PythonCommandInteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet PythonCommandInteractionClass::GetAllParameterHandles()

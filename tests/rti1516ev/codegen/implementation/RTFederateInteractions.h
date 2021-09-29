@@ -36,7 +36,8 @@ class HLAinteractionRootInteractionClass : public IHLAinteractionRootInteraction
     void Unsubscribe() override;
     void send() override;
     void sendWithTime(int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -52,8 +53,8 @@ class HLAinteractionRootInteractionClass : public IHLAinteractionRootInteraction
     bool mPublished = false;
     bool mSubscribed = false;
     // Parameter handles
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class MeasurementInit;
@@ -71,7 +72,8 @@ class MeasurementInitInteractionClass : public IMeasurementInitInteractionClass
     void Unsubscribe() override;
     void send() override;
     void sendWithTime(int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -92,8 +94,8 @@ class MeasurementInitInteractionClass : public IMeasurementInitInteractionClass
     // Parameter handles
     // parameter Dummy : no data type
     rti1516ev::ParameterHandle mDummyParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class MeasurementStop;
@@ -112,7 +114,8 @@ class MeasurementStopInteractionClass : public IMeasurementStopInteractionClass
     void Unsubscribe() override;
     void send(optional<std::wstring> NextFederationSuffix) override;
     void sendWithTime(optional<std::wstring> NextFederationSuffix, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -133,8 +136,8 @@ class MeasurementStopInteractionClass : public IMeasurementStopInteractionClass
     // Parameter handles
     // parameter NextFederationSuffix : HLAunicodeString
     rti1516ev::ParameterHandle mNextFederationSuffixParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class KeyEvent;
@@ -153,7 +156,8 @@ class KeyEventInteractionClass : public IKeyEventInteractionClass
     void Unsubscribe() override;
     void send(optional<int32_t> KeyCode) override;
     void sendWithTime(optional<int32_t> KeyCode, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -174,8 +178,8 @@ class KeyEventInteractionClass : public IKeyEventInteractionClass
     // Parameter handles
     // parameter KeyCode : HLAinteger32LE
     rti1516ev::ParameterHandle mKeyCodeParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class TextLog;
@@ -194,7 +198,8 @@ class TextLogInteractionClass : public ITextLogInteractionClass
     void Unsubscribe() override;
     void send(optional<std::wstring> Sender, optional<std::wstring> Text) override;
     void sendWithTime(optional<std::wstring> Sender, optional<std::wstring> Text, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -219,8 +224,8 @@ class TextLogInteractionClass : public ITextLogInteractionClass
     rti1516ev::ParameterHandle mSenderParameterHandle;
     // parameter Text : HLAunicodeString
     rti1516ev::ParameterHandle mTextParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class SystemVariableUpdate;
@@ -239,7 +244,8 @@ class SystemVariableUpdateInteractionClass : public ISystemVariableUpdateInterac
     void Unsubscribe() override;
     void send(optional<std::string> Id, optional<const std::vector<uint8_t>&> Value, optional<int32_t> Client, optional<bool> HasChanged) override;
     void sendWithTime(optional<std::string> Id, optional<const std::vector<uint8_t>&> Value, optional<int32_t> Client, optional<bool> HasChanged, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -272,8 +278,8 @@ class SystemVariableUpdateInteractionClass : public ISystemVariableUpdateInterac
     rti1516ev::ParameterHandle mClientParameterHandle;
     // parameter HasChanged : HLAboolean
     rti1516ev::ParameterHandle mHasChangedParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class SystemVariableModification;
@@ -292,7 +298,8 @@ class SystemVariableModificationInteractionClass : public ISystemVariableModific
     void Unsubscribe() override;
     void send(optional<const std::vector<uint8_t>&> Value) override;
     void sendWithTime(optional<const std::vector<uint8_t>&> Value, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -313,8 +320,8 @@ class SystemVariableModificationInteractionClass : public ISystemVariableModific
     // Parameter handles
     // parameter Value : HLAopaqueData
     rti1516ev::ParameterHandle mValueParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class ValueEntityUpdate;
@@ -333,7 +340,8 @@ class ValueEntityUpdateInteractionClass : public IValueEntityUpdateInteractionCl
     void Unsubscribe() override;
     void send(optional<const std::vector<uint8_t>&> Id, optional<const std::vector<uint8_t>&> Value) override;
     void sendWithTime(optional<const std::vector<uint8_t>&> Id, optional<const std::vector<uint8_t>&> Value, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -358,8 +366,8 @@ class ValueEntityUpdateInteractionClass : public IValueEntityUpdateInteractionCl
     rti1516ev::ParameterHandle mIdParameterHandle;
     // parameter Value : HLAopaqueData
     rti1516ev::ParameterHandle mValueParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class BusMessage;
@@ -378,7 +386,8 @@ class BusMessageInteractionClass : public IBusMessageInteractionClass
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -419,8 +428,8 @@ class BusMessageInteractionClass : public IBusMessageInteractionClass
     rti1516ev::ParameterHandle mSenderParameterHandle;
     // parameter Receiver : HLAobjectInstanceHandle.BusController
     rti1516ev::ParameterHandle mReceiverParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class EthPacket;
@@ -439,7 +448,8 @@ class EthPacketInteractionClass : public IEthPacketInteractionClass
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacket&> Frame, optional<std::string> PortName) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacket&> Frame, optional<std::string> PortName, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -476,8 +486,8 @@ class EthPacketInteractionClass : public IEthPacketInteractionClass
     rti1516ev::ParameterHandle mFrameParameterHandle;
     // parameter PortName : HLAASCIIstring
     rti1516ev::ParameterHandle mPortNameParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class EthPacketError;
@@ -496,7 +506,8 @@ class EthPacketErrorInteractionClass : public IEthPacketErrorInteractionClass
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketError&> Frame) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketError&> Frame, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -529,8 +540,8 @@ class EthPacketErrorInteractionClass : public IEthPacketErrorInteractionClass
     // Parameter handles
     // parameter Frame : EthernetPacketError
     rti1516ev::ParameterHandle mFrameParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class EthPacketErrorForwarded;
@@ -549,7 +560,8 @@ class EthPacketErrorForwardedInteractionClass : public IEthPacketErrorForwardedI
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketErrorForwarded&> Frame) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketErrorForwarded&> Frame, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -582,8 +594,8 @@ class EthPacketErrorForwardedInteractionClass : public IEthPacketErrorForwardedI
     // Parameter handles
     // parameter Frame : EthernetPacketErrorForwarded
     rti1516ev::ParameterHandle mFrameParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class EthForwardedPacket;
@@ -602,7 +614,8 @@ class EthForwardedPacketInteractionClass : public IEthForwardedPacketInteraction
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketForwarded&> Frame, optional<std::string> PortName) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetPacketForwarded&> Frame, optional<std::string> PortName, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -639,8 +652,8 @@ class EthForwardedPacketInteractionClass : public IEthForwardedPacketInteraction
     rti1516ev::ParameterHandle mFrameParameterHandle;
     // parameter PortName : HLAASCIIstring
     rti1516ev::ParameterHandle mPortNameParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class EthStatus;
@@ -659,7 +672,8 @@ class EthStatusInteractionClass : public IEthStatusInteractionClass
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetStatus&> Frame, optional<std::string> PortName) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const EthernetStatus&> Frame, optional<std::string> PortName, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -696,8 +710,8 @@ class EthStatusInteractionClass : public IEthStatusInteractionClass
     rti1516ev::ParameterHandle mFrameParameterHandle;
     // parameter PortName : HLAASCIIstring
     rti1516ev::ParameterHandle mPortNameParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class CANMessage;
@@ -716,7 +730,8 @@ class CANMessageInteractionClass : public ICANMessageInteractionClass
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int32_t> Id, optional<const CANFrame&> Frame) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int32_t> Id, optional<const CANFrame&> Frame, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -753,8 +768,8 @@ class CANMessageInteractionClass : public ICANMessageInteractionClass
     rti1516ev::ParameterHandle mIdParameterHandle;
     // parameter Frame : CANFrame
     rti1516ev::ParameterHandle mFrameParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class CANErrorFrame;
@@ -773,7 +788,8 @@ class CANErrorFrameInteractionClass : public ICANErrorFrameInteractionClass
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const std::vector<uint8_t>&> Frame) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<const std::vector<uint8_t>&> Frame, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -806,8 +822,8 @@ class CANErrorFrameInteractionClass : public ICANErrorFrameInteractionClass
     // Parameter handles
     // parameter Frame : HLAopaqueData
     rti1516ev::ParameterHandle mFrameParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class FlexRaySymbol;
@@ -826,7 +842,8 @@ class FlexRaySymbolInteractionClass : public IFlexRaySymbolInteractionClass
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<FlexRaySymbolPattern> SymbolPattern, optional<FlexRayChannel> FlexRayChannel) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<FlexRaySymbolPattern> SymbolPattern, optional<FlexRayChannel> FlexRayChannel, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -863,8 +880,8 @@ class FlexRaySymbolInteractionClass : public IFlexRaySymbolInteractionClass
     rti1516ev::ParameterHandle mSymbolPatternParameterHandle;
     // parameter FlexRayChannel : FlexRayChannel
     rti1516ev::ParameterHandle mFlexRayChannelParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class FlexRayCycleStart;
@@ -883,7 +900,8 @@ class FlexRayCycleStartInteractionClass : public IFlexRayCycleStartInteractionCl
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<uint8_t> Cycle) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<uint8_t> Cycle, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -916,8 +934,8 @@ class FlexRayCycleStartInteractionClass : public IFlexRayCycleStartInteractionCl
     // Parameter handles
     // parameter Cycle : HLAoctet
     rti1516ev::ParameterHandle mCycleParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class FlexRayFrame;
@@ -936,7 +954,8 @@ class FlexRayFrameInteractionClass : public IFlexRayFrameInteractionClass
     void Unsubscribe() override;
     void send(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int16_t> FrameID, optional<FlexRayChannel> FlexRayChannel, optional<bool> PayloadPreambleIndicator, optional<const FlexRayHeader&> Header, optional<const FlexRayPayload&> Payload) override;
     void sendWithTime(optional<bool> IsRequest, optional<std::string> ChannelName, optional<BusType> BusType, optional<IBusController*> RequestingFederate, optional<IBusController*> Sender, optional<IBusController*> Receiver, optional<int16_t> FrameID, optional<FlexRayChannel> FlexRayChannel, optional<bool> PayloadPreambleIndicator, optional<const FlexRayHeader&> Header, optional<const FlexRayPayload&> Payload, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -985,8 +1004,8 @@ class FlexRayFrameInteractionClass : public IFlexRayFrameInteractionClass
     rti1516ev::ParameterHandle mHeaderParameterHandle;
     // parameter Payload : FlexRayPayload
     rti1516ev::ParameterHandle mPayloadParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 class PythonCommand;
@@ -1005,7 +1024,8 @@ class PythonCommandInteractionClass : public IPythonCommandInteractionClass
     void Unsubscribe() override;
     void send(optional<const std::vector<uint8_t>&> Code, optional<const std::vector<uint8_t>&> Target, optional<const std::vector<uint8_t>&> RefID) override;
     void sendWithTime(optional<const std::vector<uint8_t>&> Code, optional<const std::vector<uint8_t>&> Target, optional<const std::vector<uint8_t>&> RefID, int64_t time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -1034,8 +1054,8 @@ class PythonCommandInteractionClass : public IPythonCommandInteractionClass
     rti1516ev::ParameterHandle mTargetParameterHandle;
     // parameter RefID : HLAopaqueData
     rti1516ev::ParameterHandle mRefIDParameterHandle;
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
  

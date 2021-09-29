@@ -9,6 +9,8 @@
 
 #include <vector>
 #include <mutex>
+#include <future>
+
 #include "RTI/Handle.h"
 #include "RTI/RTIambassador.h"
 #include "RTI/encoding/BasicDataElements.h"
@@ -62,6 +64,8 @@ class <#=objectClass.Name#>ObjectClass : public I<#=objectClass.Name#>ObjectClas
     std::shared_ptr<I<#=objectClass.Name#>> GetObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<I<#=objectClass.Name#>> CreateObjectInstance(const std::wstring& instanceName) override;
     std::shared_ptr<I<#=objectClass.Name#>> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) override;
+    std::shared_ptr<I<#=objectClass.Name#>> RestoreObjectInstance(std::shared_ptr<I<#=objectClass.Name#>>) override;
+    std::shared_ptr<I<#=objectClass.Name#>> RestoreObjectInstance(std::shared_ptr<I<#=objectClass.Name#>>, ObjectCreatedCallbackType createdCallback) override;
     uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) override;
     void UnregisterDiscoverObjectInstanceCallback(uint32_t callbackToken) override;
     void ExecuteDiscoverObjectInstanceCallbacks(std::shared_ptr<I<#=objectClass.Name#>> newObjectInstance);
@@ -178,6 +182,7 @@ class <#=objectClass.Name#> : public virtual I<#=objectClass.Name#>, public IObj
     std::wstring GetObjectInstanceName() const override { return mObjectInstanceName; }
     rti1516ev::ObjectInstanceHandle GetObjectInstanceHandle() const override { return mObjectInstanceHandle; }
     bool IsValid() const override;
+    bool WaitForObjectValid() override;
     bool IsOwner() const override;
     void Release() override;
 <#
@@ -247,6 +252,8 @@ class <#=objectClass.Name#> : public virtual I<#=objectClass.Name#>, public IObj
     std::wstring mObjectInstanceName;
     rti1516ev::ObjectInstanceHandle mObjectInstanceHandle;
     bool mIsOwner = false;
+    std::promise<bool> mCreatedPromise;
+    std::future<bool>  mCreatedFuture;
 <# if (objectClass.HasValidAttributes) { #>
     // modified by any ReflectAttributeValues in the past
     AttributeBits mValuesReceived = kNone;

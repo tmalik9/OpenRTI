@@ -279,11 +279,20 @@ void <#=interactionClass.Name#>InteractionClass::ReceiveInteraction(const rti151
   }
 }
 
-uint32_t <#=interactionClass.Name#>InteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
+<#=interactionClass.Name#>InteractionClass::ReceiveCallbackHandle <#=interactionClass.Name#>InteractionClass::RegisterReceiveCallback(ReceiveCallback callback)
 {
-  uint32_t key = mReceiveCallbacksNextKey++;
+  ReceiveCallbackHandle key = mReceiveCallbacksNextKey++;
   mReceiveCallbacks.insert(std::make_pair(key, callback));
   return key;
+}
+
+void <#=interactionClass.Name#>InteractionClass::UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle)
+{
+  auto iter = mReceiveCallbacks.find(callbackHandle);
+  if (iter != mReceiveCallbacks.end())
+  {
+    mReceiveCallbacks.erase(iter);
+  }
 }
 
 rti1516ev::ParameterHandleSet <#=interactionClass.Name#>InteractionClass::GetAllParameterHandles()

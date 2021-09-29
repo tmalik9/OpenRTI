@@ -164,6 +164,8 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
     return nullptr;
   }
   std::shared_ptr<HLAobjectRoot> newObject = std::shared_ptr<HLAobjectRoot>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -173,6 +175,7 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -190,6 +193,8 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
     throw rti1516ev::ObjectClassNotPublished(L"HLAobjectRoot");
   }
   std::shared_ptr<HLAobjectRoot> newObject = std::shared_ptr<HLAobjectRoot>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -204,8 +209,98 @@ std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::CreateObjectInstance(c
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::RestoreObjectInstance(std::shared_ptr<IHLAobjectRoot> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<HLAobjectRoot>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IHLAobjectRoot> HLAobjectRootObjectClass::RestoreObjectInstance(std::shared_ptr<IHLAobjectRoot> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<HLAobjectRoot>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t HLAobjectRootObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -317,6 +412,11 @@ bool HLAobjectRoot::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool HLAobjectRoot::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool HLAobjectRoot::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -342,6 +442,8 @@ void HLAobjectRoot::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -532,6 +634,8 @@ std::shared_ptr<IParticipant> ParticipantObjectClass::CreateObjectInstance(const
     return nullptr;
   }
   std::shared_ptr<Participant> newObject = std::shared_ptr<Participant>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -541,6 +645,7 @@ std::shared_ptr<IParticipant> ParticipantObjectClass::CreateObjectInstance(const
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -558,6 +663,8 @@ std::shared_ptr<IParticipant> ParticipantObjectClass::CreateObjectInstance(const
     throw rti1516ev::ObjectClassNotPublished(L"Participant");
   }
   std::shared_ptr<Participant> newObject = std::shared_ptr<Participant>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -572,8 +679,98 @@ std::shared_ptr<IParticipant> ParticipantObjectClass::CreateObjectInstance(const
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IParticipant> ParticipantObjectClass::RestoreObjectInstance(std::shared_ptr<IParticipant> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<Participant>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IParticipant> ParticipantObjectClass::RestoreObjectInstance(std::shared_ptr<IParticipant> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<Participant>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t ParticipantObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -688,6 +885,11 @@ bool Participant::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool Participant::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool Participant::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -713,6 +915,8 @@ void Participant::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -1205,6 +1409,8 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
     return nullptr;
   }
   std::shared_ptr<SystemVariable> newObject = std::shared_ptr<SystemVariable>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -1214,6 +1420,7 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -1231,6 +1438,8 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
     throw rti1516ev::ObjectClassNotPublished(L"SystemVariable");
   }
   std::shared_ptr<SystemVariable> newObject = std::shared_ptr<SystemVariable>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -1245,8 +1454,98 @@ std::shared_ptr<ISystemVariable> SystemVariableObjectClass::CreateObjectInstance
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<ISystemVariable> SystemVariableObjectClass::RestoreObjectInstance(std::shared_ptr<ISystemVariable> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<SystemVariable>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<ISystemVariable> SystemVariableObjectClass::RestoreObjectInstance(std::shared_ptr<ISystemVariable> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<SystemVariable>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t SystemVariableObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -1361,6 +1660,11 @@ bool SystemVariable::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool SystemVariable::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool SystemVariable::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -1386,6 +1690,8 @@ void SystemVariable::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -1796,6 +2102,8 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
     return nullptr;
   }
   std::shared_ptr<ValueEntity> newObject = std::shared_ptr<ValueEntity>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -1805,6 +2113,7 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -1822,6 +2131,8 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
     throw rti1516ev::ObjectClassNotPublished(L"ValueEntity");
   }
   std::shared_ptr<ValueEntity> newObject = std::shared_ptr<ValueEntity>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -1836,8 +2147,98 @@ std::shared_ptr<IValueEntity> ValueEntityObjectClass::CreateObjectInstance(const
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IValueEntity> ValueEntityObjectClass::RestoreObjectInstance(std::shared_ptr<IValueEntity> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<ValueEntity>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IValueEntity> ValueEntityObjectClass::RestoreObjectInstance(std::shared_ptr<IValueEntity> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<ValueEntity>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t ValueEntityObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -1952,6 +2353,11 @@ bool ValueEntity::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool ValueEntity::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool ValueEntity::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -1977,6 +2383,8 @@ void ValueEntity::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -2393,6 +2801,8 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
     return nullptr;
   }
   std::shared_ptr<DOMemberSource> newObject = std::shared_ptr<DOMemberSource>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -2402,6 +2812,7 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -2419,6 +2830,8 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberSource");
   }
   std::shared_ptr<DOMemberSource> newObject = std::shared_ptr<DOMemberSource>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -2433,8 +2846,98 @@ std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::CreateObjectInstance
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::RestoreObjectInstance(std::shared_ptr<IDOMemberSource> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<DOMemberSource>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IDOMemberSource> DOMemberSourceObjectClass::RestoreObjectInstance(std::shared_ptr<IDOMemberSource> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<DOMemberSource>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t DOMemberSourceObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -2549,6 +3052,11 @@ bool DOMemberSource::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool DOMemberSource::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool DOMemberSource::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -2574,6 +3082,8 @@ void DOMemberSource::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -3069,6 +3579,8 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
     return nullptr;
   }
   std::shared_ptr<DOMemberTarget> newObject = std::shared_ptr<DOMemberTarget>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -3078,6 +3590,7 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -3095,6 +3608,8 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
     throw rti1516ev::ObjectClassNotPublished(L"DOMemberTarget");
   }
   std::shared_ptr<DOMemberTarget> newObject = std::shared_ptr<DOMemberTarget>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -3109,8 +3624,98 @@ std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::CreateObjectInstance
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::RestoreObjectInstance(std::shared_ptr<IDOMemberTarget> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<DOMemberTarget>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IDOMemberTarget> DOMemberTargetObjectClass::RestoreObjectInstance(std::shared_ptr<IDOMemberTarget> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<DOMemberTarget>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t DOMemberTargetObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -3225,6 +3830,11 @@ bool DOMemberTarget::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool DOMemberTarget::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool DOMemberTarget::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -3250,6 +3860,8 @@ void DOMemberTarget::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -3701,6 +4313,8 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
     return nullptr;
   }
   std::shared_ptr<BusManagement> newObject = std::shared_ptr<BusManagement>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -3710,6 +4324,7 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -3727,6 +4342,8 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
     throw rti1516ev::ObjectClassNotPublished(L"BusManagement");
   }
   std::shared_ptr<BusManagement> newObject = std::shared_ptr<BusManagement>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -3741,8 +4358,98 @@ std::shared_ptr<IBusManagement> BusManagementObjectClass::CreateObjectInstance(c
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IBusManagement> BusManagementObjectClass::RestoreObjectInstance(std::shared_ptr<IBusManagement> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusManagement>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IBusManagement> BusManagementObjectClass::RestoreObjectInstance(std::shared_ptr<IBusManagement> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusManagement>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t BusManagementObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -3857,6 +4564,11 @@ bool BusManagement::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool BusManagement::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool BusManagement::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -3882,6 +4594,8 @@ void BusManagement::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -4277,6 +4991,8 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
     return nullptr;
   }
   std::shared_ptr<BusManagementCan> newObject = std::shared_ptr<BusManagementCan>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -4286,6 +5002,7 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -4303,6 +5020,8 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementCan");
   }
   std::shared_ptr<BusManagementCan> newObject = std::shared_ptr<BusManagementCan>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -4317,8 +5036,98 @@ std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::CreateObjectInst
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::RestoreObjectInstance(std::shared_ptr<IBusManagementCan> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusManagementCan>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IBusManagementCan> BusManagementCanObjectClass::RestoreObjectInstance(std::shared_ptr<IBusManagementCan> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusManagementCan>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t BusManagementCanObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -4433,6 +5242,11 @@ bool BusManagementCan::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool BusManagementCan::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool BusManagementCan::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -4458,6 +5272,8 @@ void BusManagementCan::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -5036,6 +5852,8 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
     return nullptr;
   }
   std::shared_ptr<BusManagementEthernet> newObject = std::shared_ptr<BusManagementEthernet>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -5045,6 +5863,7 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -5062,6 +5881,8 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
     throw rti1516ev::ObjectClassNotPublished(L"BusManagementEthernet");
   }
   std::shared_ptr<BusManagementEthernet> newObject = std::shared_ptr<BusManagementEthernet>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -5076,8 +5897,98 @@ std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::Create
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::RestoreObjectInstance(std::shared_ptr<IBusManagementEthernet> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusManagementEthernet>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IBusManagementEthernet> BusManagementEthernetObjectClass::RestoreObjectInstance(std::shared_ptr<IBusManagementEthernet> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusManagementEthernet>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t BusManagementEthernetObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -5192,6 +6103,11 @@ bool BusManagementEthernet::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool BusManagementEthernet::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool BusManagementEthernet::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -5217,6 +6133,8 @@ void BusManagementEthernet::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -5767,6 +6685,8 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
     return nullptr;
   }
   std::shared_ptr<FlexRayCluster> newObject = std::shared_ptr<FlexRayCluster>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -5776,6 +6696,7 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -5793,6 +6714,8 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayCluster");
   }
   std::shared_ptr<FlexRayCluster> newObject = std::shared_ptr<FlexRayCluster>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -5807,8 +6730,98 @@ std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::CreateObjectInstance
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::RestoreObjectInstance(std::shared_ptr<IFlexRayCluster> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<FlexRayCluster>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IFlexRayCluster> FlexRayClusterObjectClass::RestoreObjectInstance(std::shared_ptr<IFlexRayCluster> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<FlexRayCluster>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t FlexRayClusterObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -5923,6 +6936,11 @@ bool FlexRayCluster::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool FlexRayCluster::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool FlexRayCluster::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -5948,6 +6966,8 @@ void FlexRayCluster::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -7181,6 +8201,8 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
     return nullptr;
   }
   std::shared_ptr<BusController> newObject = std::shared_ptr<BusController>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -7190,6 +8212,7 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -7207,6 +8230,8 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
     throw rti1516ev::ObjectClassNotPublished(L"BusController");
   }
   std::shared_ptr<BusController> newObject = std::shared_ptr<BusController>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -7221,8 +8246,98 @@ std::shared_ptr<IBusController> BusControllerObjectClass::CreateObjectInstance(c
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IBusController> BusControllerObjectClass::RestoreObjectInstance(std::shared_ptr<IBusController> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusController>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IBusController> BusControllerObjectClass::RestoreObjectInstance(std::shared_ptr<IBusController> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusController>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t BusControllerObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -7337,6 +8452,11 @@ bool BusController::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool BusController::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool BusController::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -7362,6 +8482,8 @@ void BusController::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -7814,6 +8936,8 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
     return nullptr;
   }
   std::shared_ptr<BusControllerCan> newObject = std::shared_ptr<BusControllerCan>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -7823,6 +8947,7 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -7840,6 +8965,8 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerCan");
   }
   std::shared_ptr<BusControllerCan> newObject = std::shared_ptr<BusControllerCan>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -7854,8 +8981,98 @@ std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::CreateObjectInst
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::RestoreObjectInstance(std::shared_ptr<IBusControllerCan> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusControllerCan>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IBusControllerCan> BusControllerCanObjectClass::RestoreObjectInstance(std::shared_ptr<IBusControllerCan> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusControllerCan>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t BusControllerCanObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -7970,6 +9187,11 @@ bool BusControllerCan::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool BusControllerCan::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool BusControllerCan::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -7995,6 +9217,8 @@ void BusControllerCan::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -8817,6 +10041,8 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
     return nullptr;
   }
   std::shared_ptr<BusControllerEthernet> newObject = std::shared_ptr<BusControllerEthernet>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -8826,6 +10052,7 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -8843,6 +10070,8 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
     throw rti1516ev::ObjectClassNotPublished(L"BusControllerEthernet");
   }
   std::shared_ptr<BusControllerEthernet> newObject = std::shared_ptr<BusControllerEthernet>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -8857,8 +10086,98 @@ std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::Create
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::RestoreObjectInstance(std::shared_ptr<IBusControllerEthernet> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusControllerEthernet>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IBusControllerEthernet> BusControllerEthernetObjectClass::RestoreObjectInstance(std::shared_ptr<IBusControllerEthernet> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<BusControllerEthernet>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t BusControllerEthernetObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -8973,6 +10292,11 @@ bool BusControllerEthernet::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool BusControllerEthernet::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool BusControllerEthernet::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -8998,6 +10322,8 @@ void BusControllerEthernet::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -9516,6 +10842,8 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
     return nullptr;
   }
   std::shared_ptr<FlexRayControllerStatus> newObject = std::shared_ptr<FlexRayControllerStatus>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -9525,6 +10853,7 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -9542,6 +10871,8 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayControllerStatus");
   }
   std::shared_ptr<FlexRayControllerStatus> newObject = std::shared_ptr<FlexRayControllerStatus>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -9556,8 +10887,98 @@ std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::Cr
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::RestoreObjectInstance(std::shared_ptr<IFlexRayControllerStatus> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<FlexRayControllerStatus>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IFlexRayControllerStatus> FlexRayControllerStatusObjectClass::RestoreObjectInstance(std::shared_ptr<IFlexRayControllerStatus> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<FlexRayControllerStatus>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t FlexRayControllerStatusObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -9672,6 +11093,11 @@ bool FlexRayControllerStatus::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool FlexRayControllerStatus::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool FlexRayControllerStatus::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -9697,6 +11123,8 @@ void FlexRayControllerStatus::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -10591,6 +12019,8 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
     return nullptr;
   }
   std::shared_ptr<FlexRayController> newObject = std::shared_ptr<FlexRayController>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -10600,6 +12030,7 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -10617,6 +12048,8 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
     throw rti1516ev::ObjectClassNotPublished(L"FlexRayController");
   }
   std::shared_ptr<FlexRayController> newObject = std::shared_ptr<FlexRayController>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -10631,8 +12064,98 @@ std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::CreateObjectIn
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::RestoreObjectInstance(std::shared_ptr<IFlexRayController> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<FlexRayController>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IFlexRayController> FlexRayControllerObjectClass::RestoreObjectInstance(std::shared_ptr<IFlexRayController> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<FlexRayController>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t FlexRayControllerObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -10747,6 +12270,11 @@ bool FlexRayController::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool FlexRayController::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool FlexRayController::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -10772,6 +12300,8 @@ void FlexRayController::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
@@ -12275,6 +13805,8 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
     return nullptr;
   }
   std::shared_ptr<FlexRaySendBuffer> newObject = std::shared_ptr<FlexRaySendBuffer>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName](bool success) {
     if (success) {
@@ -12284,6 +13816,7 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
       newObject->mIsOwner = true;
       InsertObjectInstanceHandle(newObject, instanceHandle);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
 }
@@ -12301,6 +13834,8 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
     throw rti1516ev::ObjectClassNotPublished(L"FlexRaySendBuffer");
   }
   std::shared_ptr<FlexRaySendBuffer> newObject = std::shared_ptr<FlexRaySendBuffer>(mCreatorFunction(this, instanceName, mRtiAmbassador));
+  newObject->mCreatedPromise = std::promise<bool>();
+  newObject->mCreatedFuture = newObject->mCreatedPromise.get_future();
   InsertObjectInstanceName(newObject, instanceName);
   mRegistry->RegisterObjectInstanceName(instanceName, [this, newObject, instanceName, createdCallback](bool success) {
     if (success) {
@@ -12315,8 +13850,98 @@ std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::CreateObjectIn
     {
       createdCallback(newObject, false);
     }
+    newObject->mCreatedPromise.set_value(success);
   });
   return newObject;
+}
+
+std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::RestoreObjectInstance(std::shared_ptr<IFlexRaySendBuffer> deadObject)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<FlexRaySendBuffer>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
+}
+
+std::shared_ptr<IFlexRaySendBuffer> FlexRaySendBufferObjectClass::RestoreObjectInstance(std::shared_ptr<IFlexRaySendBuffer> deadObject, ObjectCreatedCallbackType createdCallback)
+{
+  std::lock_guard<std::recursive_mutex> lock(mMutex);
+  std::wstring instanceName = deadObject->GetObjectInstanceName();
+  auto iter = mObjectInstancesByName.find(instanceName);
+  if (iter != mObjectInstancesByName.end())
+  {
+    // object already exists
+    return nullptr;
+  }
+  if (!mPublished)
+  {
+    Publish();
+  }
+  try {
+    /* auto existingObjectInstance =*/ mRtiAmbassador->getObjectInstanceHandle(instanceName);
+    // object already exists, but has not been created by the class registry - indicate failure
+    return nullptr;
+  }
+  catch (const rti1516ev::ObjectInstanceNotKnown&)
+  {
+    // continue
+  }
+  auto deadObjectImpl = std::dynamic_pointer_cast<FlexRaySendBuffer>(deadObject);
+  deadObjectImpl->mRtiAmbassador = mRtiAmbassador;
+  deadObjectImpl->mObjectClass = this;
+  deadObjectImpl->mCreatedPromise = std::promise<bool>();
+  deadObjectImpl->mCreatedFuture = deadObjectImpl->mCreatedPromise.get_future();
+  InsertObjectInstanceName(deadObjectImpl, instanceName);
+  mRegistry->RegisterObjectInstanceName(instanceName, [this, deadObjectImpl, instanceName, createdCallback](bool success) {
+    if (success) {
+      std::lock_guard<std::recursive_mutex> lock(mMutex);
+      rti1516ev::ObjectInstanceHandle instanceHandle = mRtiAmbassador->registerObjectInstance(mObjectClassHandle, instanceName);
+      deadObjectImpl->mObjectInstanceHandle = instanceHandle;
+      deadObjectImpl->mIsOwner = true;
+      InsertObjectInstanceHandle(deadObjectImpl, instanceHandle);
+      createdCallback(deadObjectImpl, true);
+    }
+    else
+    {
+      createdCallback(deadObjectImpl, false);
+    }
+    deadObjectImpl->mCreatedPromise.set_value(success);
+  });
+  return deadObject;
 }
 
 uint32_t FlexRaySendBufferObjectClass::RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback)
@@ -12431,6 +14056,11 @@ bool FlexRaySendBuffer::IsValid() const
   return mObjectInstanceHandle.isValid();
 }
 
+bool FlexRaySendBuffer::WaitForObjectValid()
+{
+  return mCreatedFuture.get();
+}
+
 bool FlexRaySendBuffer::IsOwner() const
 {
   std::lock_guard<std::recursive_mutex> lock(mMutex);
@@ -12456,6 +14086,8 @@ void FlexRaySendBuffer::Release()
     }
     mObjectClass->EraseObjectInstance(mObjectInstanceHandle, mObjectInstanceName);
     mObjectInstanceHandle = rti1516ev::ObjectInstanceHandle();
+    mObjectClass = nullptr;
+    mRtiAmbassador = nullptr;
   }
 }
 
