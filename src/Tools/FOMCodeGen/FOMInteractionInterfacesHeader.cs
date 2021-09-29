@@ -307,38 +307,44 @@ namespace FOMCodeGen
             
             #line default
             #line hidden
-            this.Write("> time, optional<OrderType> orderType)>;\r\n    virtual uint32_t RegisterReceiveCal" +
-                    "lback(ReceiveCallback callback) = 0;\r\n};\r\n\r\n");
+            this.Write(@"> time, optional<OrderType> orderType)>;
+    using ReceiveCallbackHandle = uint32_t;
+    constexpr static ReceiveCallbackHandle kInvalidCallbackHandle = 0xffffffff;
+    virtual ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) = 0;
+    virtual void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) = 0;
+};
+
+");
             
-            #line 67 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 70 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  } // foreach (var interactionClass in FOM.InteractionClasses) 
             
             #line default
             #line hidden
             this.Write("\r\nclass IInteractionClassRegistry\r\n{\r\n  public:\r\n");
             
-            #line 72 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 75 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  foreach (var interactionClass in FOM.InteractionClasses) { 
             
             #line default
             #line hidden
             this.Write("    virtual I");
             
-            #line 73 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 76 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass* Get");
             
-            #line 73 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 76 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(interactionClass.Name));
             
             #line default
             #line hidden
             this.Write("InteractionClass() const = 0;\r\n");
             
-            #line 74 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 77 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  } 
             
             #line default
@@ -346,21 +352,21 @@ namespace FOMCodeGen
             this.Write("  protected:\r\n    virtual ~IInteractionClassRegistry() {}\r\n}; // class IInteracti" +
                     "onClassRegistry\r\n\r\n");
             
-            #line 79 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 82 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  foreach (var namespacePart in FOM.Namespace) { 
             
             #line default
             #line hidden
             this.Write("} // namespace ");
             
-            #line 80 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 83 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 81 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
+            #line 84 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMInteractionInterfacesHeader.tt"
  } 
             
             #line default

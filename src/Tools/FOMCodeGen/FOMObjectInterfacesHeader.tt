@@ -68,6 +68,14 @@ class I<#=objectClass.Name#>ObjectClass
     // Create an instance of I<#=objectClass.Name#>, and notify the application about having completed the HLA object registration.
     // The callback's 'success' parameter indicates whether the object instance name could successfully be reserved for the object.
     virtual std::shared_ptr<I<#=objectClass.Name#>> CreateObjectInstance(const std::wstring& instanceName, ObjectCreatedCallbackType createdCallback) = 0;
+    // Restore a 'dead' instance of I<#=objectClass.Name#>. Returns nullptr if the object instance already exists.
+    // If another federate has already created an object instance with the same name and the same object class,
+    // the discover object instance mechanism will reuse the object returned by 'create object instance'.
+    // A discover object instance callback should be installed by the application to appropriately handle this case.
+    virtual std::shared_ptr<I<#=objectClass.Name#>> RestoreObjectInstance(std::shared_ptr<I<#=objectClass.Name#>> existingObject) = 0;
+    // Restore a 'dead' instance of I<#=objectClass.Name#>, and notify the application about having completed the HLA object registration.
+    // The callback's 'success' parameter indicates whether the object instance name could successfully be reserved for the object.
+    virtual std::shared_ptr<I<#=objectClass.Name#>> RestoreObjectInstance(std::shared_ptr<I<#=objectClass.Name#>> existingObject, ObjectCreatedCallbackType createdCallback) = 0;
 
     // install a discover object instance callback for this HLA object class
     virtual uint32_t RegisterDiscoverObjectInstanceCallback(DiscoverObjectInstanceCallback callback) = 0;
@@ -133,6 +141,9 @@ class I<#=objectClass.Name#><#
     virtual std::wstring GetObjectInstanceName() const = 0;
     // has this object a valid HLA object instance handle?
     virtual bool IsValid() const = 0;
+    // After having called CreateObjectInstance, wait until object registration completed.
+    // Returns false if the object registration failed.
+    virtual bool WaitForObjectValid() = 0;
     // has this object been created by this federate?
     virtual bool IsOwner() const = 0;
     // Delete the object from HLA and the class registry.

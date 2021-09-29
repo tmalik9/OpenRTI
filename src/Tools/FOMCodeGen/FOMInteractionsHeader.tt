@@ -46,7 +46,8 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     void Unsubscribe() override;
     void send(<#=interactionClass.CppParameterList#>) override;
     void sendWithTime(<#=interactionClass.CppParameterList#><# if (interactionClass.HasValidParameters) {#>, <#}#><#=FOM.NativeTimeType#> time) override;
-    uint32_t RegisterReceiveCallback(ReceiveCallback callback) override;
+    ReceiveCallbackHandle RegisterReceiveCallback(ReceiveCallback callback) override;
+    void UnregisterReceiveCallback(ReceiveCallbackHandle callbackHandle) override;
 
     // internal
     void ReceiveInteraction(const rti1516ev::ParameterHandleValueMap & parameters);
@@ -109,8 +110,8 @@ class <#=interactionClass.Name#>InteractionClass : public I<#=interactionClass.N
     rti1516ev::ParameterHandle m<#=parameter.Name#>ParameterHandle;
 <#} // foreach (var parameter in interactionClass.Parameters)
 #>
-    std::map<uint32_t, ReceiveCallback> mReceiveCallbacks;
-    uint32_t mReceiveCallbacksNextKey = 0;
+    std::map<ReceiveCallbackHandle, ReceiveCallback> mReceiveCallbacks;
+    ReceiveCallbackHandle mReceiveCallbacksNextKey = 0;
 };
 
 <# } // foreach (var interactionClass in FOM.InteractionClasses) #> 
@@ -138,6 +139,8 @@ class InteractionClassRegistry : public IInteractionClassRegistry
 <# foreach (var interactionClass in FOM.InteractionClasses) { #>
     std::unique_ptr<<#=interactionClass.Name#>InteractionClass> m<#=interactionClass.Name#>InteractionClass;
 <# } #>
+    std::map<rti1516ev::InteractionClassHandle, std::function<void(const rti1516ev::ParameterHandleValueMap&)>> mReceiveCallbacks;
+    std::map<rti1516ev::InteractionClassHandle, std::function<void(const rti1516ev::ParameterHandleValueMap&, const rti1516ev::LogicalTime&, OrderType)>> mReceiveWithTimeCallbacks;
 }; // class InteractionClassRegistry
 
 <#
