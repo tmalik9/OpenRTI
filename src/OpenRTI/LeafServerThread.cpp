@@ -89,7 +89,7 @@ LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& 
       auto version = leafServerThread->_server->getProtocolVersion();
       serverThreadOptions["version"] = std::list<std::string>{std::to_string(version)};
     }
-    SharedPtr<AbstractConnect> connect = leafServerThread->connect(serverThreadOptions);
+    SharedPtr<AbstractConnect> connect = leafServerThread->connect(serverThreadOptions, timeoutMilliSeconds);
     /// Even if we have a server it might have already decided to stop working.
     /// If it is working it is guaranteed to get at least a connect to this server thread.
     if (connect.valid())
@@ -131,7 +131,7 @@ LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& 
   i->second->_iterator = i;
   i->second->start();
   serverThreadOptions["version"] = std::list<std::string>{std::to_string(server->getProtocolVersion())};
-  return i->second->connect(serverThreadOptions);
+  return i->second->connect(serverThreadOptions, timeoutMilliSeconds);
 }
 
 void
@@ -204,9 +204,9 @@ LeafServerThread::~LeafServerThread() noexcept
 }
 
 SharedPtr<AbstractConnect>
-LeafServerThread::connect(const StringStringListMap& clientOptions)
+LeafServerThread::connect(const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds)
 {
-  return _server->postConnect(clientOptions);
+  return _server->postConnect(clientOptions, timeoutMilliSeconds);
 }
 
 

@@ -38,7 +38,7 @@ public:
   void postShutdown();
 
   /// Connect to this particular thread.
-  SharedPtr<AbstractConnect> connect(const StringStringListMap& clientOptions);
+  SharedPtr<AbstractConnect> connect(const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
 
   /// Call this to get a connect to a possibly new leaf server.
   static SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);

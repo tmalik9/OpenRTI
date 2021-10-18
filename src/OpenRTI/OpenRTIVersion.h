@@ -10,8 +10,8 @@
 #define OPENRTI_MINOR_NUMBER_STRING      "0"
 
 // Buildnumber of OPENRTI library
-#define OPENRTI_BUILD_NUMBER              5
-#define OPENRTI_BUILD_NUMBER_STRING      "5"
+#define OPENRTI_BUILD_NUMBER              6
+#define OPENRTI_BUILD_NUMBER_STRING      "6"
 
 // Patchnumber of OPENRTI library
 #define OPENRTI_PATCH_NUMBER              0

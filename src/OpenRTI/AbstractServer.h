@@ -57,7 +57,7 @@ public:
   { _postDone(); }
 
   /// Connect to the server - independent of the actual implementation
-  SharedPtr<AbstractConnect> postConnect(const StringStringListMap& clientOptions);
+  SharedPtr<AbstractConnect> postConnect(const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
   SharedPtr<AbstractConnect> sendConnect(const StringStringListMap& clientOptions, bool parent);
   SharedPtr<AbstractConnect> sendDirectConnect(SharedPtr<AbstractMessageSender> sender, const StringStringListMap& clientOptions);
 
@@ -87,7 +87,7 @@ protected:
   virtual void _postOperation(const SharedPtr<_Operation>& operation) = 0;
 
   // From a different thread, connect/disconnect to the server
-  ConnectHandle _postConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& clientOptions);
+  ConnectHandle _postConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
   void _postDisconnect(const ConnectHandle& connectHandle);
   // From a different thread, shut down the server
   void _postDone();
