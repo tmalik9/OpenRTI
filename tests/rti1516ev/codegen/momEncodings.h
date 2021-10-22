@@ -1,5 +1,5 @@
 
-// Code automatically generated from D:\vfs\CANoe\release\15.2\Projects_Source\OpenRTI-rti1516ev\tests\rti1516ev\codegen\\mom.xml, do not edit
+// Code automatically generated from D:\vfs\OpenRTI-2.0.0.5\tests\rti1516ev\codegen\\mom.xml, do not edit
 
 #pragma once
 
@@ -22,6 +22,36 @@ class HLAobjectClassBasedCountEncoding;
 class HLAinteractionCountEncoding;
 class HLAsynchPointFederateEncoding;
 
+// simple data type HLAcount
+using HLAcountEncoding=rti1516ev::HLAinteger32BE;
+// simple data type HLAseconds
+using HLAsecondsEncoding=rti1516ev::HLAinteger32BE;
+// simple data type HLAmsec
+using HLAmsecEncoding=rti1516ev::HLAinteger32BE;
+// simple data type HLAnormalizedFederateHandle
+using HLAnormalizedFederateHandleEncoding=rti1516ev::HLAinteger32BE;
+// simple data type HLAindex
+using HLAindexEncoding=rti1516ev::HLAinteger32BE;
+// simple data type HLAinteger64Time
+using HLAinteger64TimeEncoding=rti1516ev::HLAinteger64BE;
+// simple data type HLAfloat64Time
+using HLAfloat64TimeEncoding=rti1516ev::HLAfloat64BE;
+// enumerated data type HLAfederateState
+using HLAfederateStateEncoding=rti1516ev::HLAinteger32BE;
+// enumerated data type HLAtimeState
+using HLAtimeStateEncoding=rti1516ev::HLAinteger32BE;
+// enumerated data type HLAownership
+using HLAownershipEncoding=rti1516ev::HLAinteger32BE;
+// enumerated data type HLAresignAction
+using HLAresignActionEncoding=rti1516ev::HLAinteger32BE;
+// enumerated data type HLAorderType
+using HLAorderTypeEncoding=rti1516ev::HLAinteger32BE;
+// enumerated data type HLAswitch
+using HLAswitchEncoding=rti1516ev::HLAinteger32BE;
+// enumerated data type HLAsynchPointStatus
+using HLAsynchPointStatusEncoding=rti1516ev::HLAinteger32BE;
+// enumerated data type HLAnormalizedServiceGroup
+using HLAnormalizedServiceGroupEncoding=rti1516ev::HLAinteger32BE;
 // fixed array of simple type HLAbyte
 class HLAtokenEncoding : public rti1516ev::HLAfixedArray
 {
@@ -30,6 +60,10 @@ class HLAtokenEncoding : public rti1516ev::HLAfixedArray
     // cardinality is 0, no settable contents
   private:
 }; // class HLAtoken
+// simple data type HLAtransportationName
+using HLAtransportationNameEncoding=rti1516ev::HLAunicodeString;
+// simple data type HLAupdateRateName
+using HLAupdateRateNameEncoding=rti1516ev::HLAunicodeString;
 // An encoded logical time. An empty array shall indicate that the values is not defined
 //             
 // variable array of simple type HLAbyte

@@ -169,7 +169,7 @@ public:
   virtual ~_ConnectOperation();
 
   void operator()(AbstractServer& serverLoop) override;
-  void wait();
+  void wait(uint32_t timeoutMilliSeconds);
   const ConnectHandle& getConnectHandle() const;
 
 private:
@@ -205,11 +205,20 @@ AbstractServer::_ConnectOperation::operator()(AbstractServer& serverLoop)
 }
 
 void
-AbstractServer::_ConnectOperation::wait()
+AbstractServer::_ConnectOperation::wait(uint32_t timeoutMilliSeconds)
 {
   ScopeLock scopeLock(_mutex);
+  auto timeout = (timeoutMilliSeconds == static_cast<uint32_t>(-1) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds));
+  AbsTimeout absTimeout(timeout);
   while (!_done)
-    _condition.wait(scopeLock);
+  {
+    _condition.wait_until(scopeLock, absTimeout);
+    if (absTimeout.isExpired())
+    {
+      _connectHandle = ConnectHandle::invalid();
+      break;
+    }
+  }
 }
 
 const ConnectHandle&
@@ -378,10 +387,10 @@ AbstractServer::getServerNode()
 }
 
 SharedPtr<AbstractConnect>
-AbstractServer::postConnect(const StringStringListMap& clientOptions)
+AbstractServer::postConnect(const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds)
 {
   SharedPtr<ThreadMessageQueue> messageQueue = MakeShared<ThreadMessageQueue>();
-  ConnectHandle connectHandle = _postConnect(messageQueue->getMessageSender(), clientOptions);
+  ConnectHandle connectHandle = _postConnect(messageQueue->getMessageSender(), clientOptions, timeoutMilliSeconds);
   if (!connectHandle.valid())
     return SharedPtr<AbstractConnect>();
   SharedPtr<AbstractMessageSender> messageSender;
@@ -461,12 +470,12 @@ AbstractServer::_sendDone(bool done)
 }
 
 ConnectHandle
-AbstractServer::_postConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& clientOptions)
+AbstractServer::_postConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds)
 {
   SharedPtr<_ConnectOperation> connectOperation;
   connectOperation = MakeShared<_ConnectOperation>(messageSender, clientOptions);
   _postOperation(connectOperation);
-  connectOperation->wait();
+  connectOperation->wait(timeoutMilliSeconds);
   return connectOperation->getConnectHandle();
 }
 
