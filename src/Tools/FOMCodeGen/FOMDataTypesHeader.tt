@@ -317,7 +317,7 @@ foreach (var dataType in FOM.DataTypes)
     if (dataType.Comment != null && dataType.Comment != "")
     {#>
 <#=dataType.Comment#>
-<# } #>
+<#  } #>
 typedef <#=simpleDataType.Representation.CPPType#> <#=simpleDataType.Name#>;
 
 <#} // if (dataType is FOMParser.SimpleDataType)
@@ -353,13 +353,19 @@ class <#=fixedRecordDataType.Name#><#=fixedRecordDataType.BaseClass != null ? " 
   else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
   {
     var enumeratedDataType = dataType as FOMParser.EnumeratedDataType;
-#>
+    if (dataType.Comment != null && dataType.Comment != "")
+    {#>
+<#=dataType.Comment#>
+<#  } #>
 enum class <#=dataType.Name#> : <#=enumeratedDataType.Representation.CPPType#>
 {
 <#
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
-#>
+      if (enumerator.Comment != null)
+      {#>
+      <#=enumerator.Comment#>
+<#  } #>
       <#=enumerator.Name#> = <#=enumerator.Value#>,
 <#
     } // foreach enumeratedDataType.Enumerators.Values

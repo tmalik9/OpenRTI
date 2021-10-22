@@ -303,7 +303,7 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("\r\n");
             
             #line 312 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
- } 
+  } 
             
             #line default
             #line hidden
@@ -473,51 +473,80 @@ foreach (var dataType in FOM.DataTypes)
   else if (dataType is FOMParser.EnumeratedDataType && dataType.Generate)
   {
     var enumeratedDataType = dataType as FOMParser.EnumeratedDataType;
-
+    if (dataType.Comment != null && dataType.Comment != "")
+    {
+            
+            #line default
+            #line hidden
+            
+            #line 350 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Comment));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 351 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+  } 
             
             #line default
             #line hidden
             this.Write("enum class ");
             
-            #line 349 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 352 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(" : ");
             
-            #line 349 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 352 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumeratedDataType.Representation.CPPType));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n");
             
-            #line 351 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 354 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
-
+      if (enumerator.Comment != null)
+      {
             
             #line default
             #line hidden
             this.Write("      ");
             
-            #line 355 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 359 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Comment));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 360 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+  } 
+            
+            #line default
+            #line hidden
+            this.Write("      ");
+            
+            #line 361 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(" = ");
             
-            #line 355 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 361 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Value));
             
             #line default
             #line hidden
             this.Write(",\r\n");
             
-            #line 356 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 362 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -526,7 +555,7 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("}; // enum ");
             
-            #line 359 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 365 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
@@ -534,14 +563,14 @@ foreach (var dataType in FOM.DataTypes)
             this.Write("\r\n\r\ntemplate<typename char_type, typename traits_type>\r\nstd::basic_ostream<char_t" +
                     "ype, traits_type>&\r\noperator<<(std::basic_ostream<char_type, traits_type>& os, ");
             
-            #line 363 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 369 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(" value)\r\n{\r\n  switch (value)\r\n  {\r\n");
             
-            #line 367 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 373 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
@@ -551,28 +580,28 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    case ");
             
-            #line 371 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 377 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("::");
             
-            #line 371 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 377 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(": os << \"");
             
-            #line 371 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 377 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write("\"; break;\r\n");
             
-            #line 372 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 378 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -581,21 +610,21 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    default: os << \"<invalid ");
             
-            #line 375 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 381 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(">\"; break;\r\n  }\r\n  return os;\r\n}\r\n\r\ninline std::string to_string(");
             
-            #line 380 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 386 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(" value)\r\n{\r\n  switch (value)\r\n  {\r\n");
             
-            #line 384 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 390 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
@@ -605,28 +634,28 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    case ");
             
-            #line 388 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 394 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("::");
             
-            #line 388 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 394 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(": return \"");
             
-            #line 388 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 394 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write("\";\r\n");
             
-            #line 389 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 395 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -635,21 +664,21 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    default: return \"<invalid ");
             
-            #line 392 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 398 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(">\";\r\n  }\r\n}\r\n\r\ninline std::wstring to_wstring(");
             
-            #line 396 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 402 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(" value)\r\n{\r\n  switch (value)\r\n  {\r\n");
             
-            #line 400 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 406 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     foreach (var enumerator in enumeratedDataType.Enumerators.Values)
     {
@@ -659,28 +688,28 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    case ");
             
-            #line 404 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 410 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write("::");
             
-            #line 404 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 410 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write(": return L\"");
             
-            #line 404 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 410 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(enumerator.Name));
             
             #line default
             #line hidden
             this.Write("\";\r\n");
             
-            #line 405 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 411 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
     } // foreach enumeratedDataType.Enumerators.Values
 
@@ -689,14 +718,14 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("    default: return L\"<invalid ");
             
-            #line 408 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 414 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dataType.Name));
             
             #line default
             #line hidden
             this.Write(">\";\r\n  }\r\n}\r\n\r\n");
             
-            #line 412 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 418 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
   } // if (dataType is FOMParser.EnumeratedDataType)
 } // foreach (var dataType in FOM.DataTypes.Values)
@@ -706,7 +735,7 @@ foreach (var dataType in FOM.DataTypes)
             #line hidden
             this.Write("\r\n");
             
-            #line 417 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 423 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
 
 foreach (var namespacePart in FOM.Namespace)
 {
@@ -716,14 +745,14 @@ foreach (var namespacePart in FOM.Namespace)
             #line hidden
             this.Write("} // namespace ");
             
-            #line 421 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 427 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(namespacePart));
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 422 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
+            #line 428 "D:\vfs\OpenRTI\src\Tools\FOMCodeGen\FOMDataTypesHeader.tt"
   } 
             
             #line default

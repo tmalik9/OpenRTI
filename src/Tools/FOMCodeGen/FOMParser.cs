@@ -492,15 +492,28 @@ namespace FOMCodeGen
     // A member of a enumeration
     public class Enumerator
     {
-      public Enumerator(string name, string value)
+      public Enumerator(string name, string value, string comment)
       {
         Name = name;
         Value = value;
+        Comment = comment;
       }
       public string Name { get; set; }
       public string Value { get; set; }
+      public string Comment
+      {
+        get
+        {
+          if (_comment != null && _comment != "")
+            return FormatAsComment(_comment);
+          else
+            return null;
+        }
+        set { if (value != "NA") _comment = value; }
+      }
+      private string _comment;
     }
-    // An enumeration type
+      // An enumeration type
     public class EnumeratedDataType : DataType
     {
       public EnumeratedDataType(string name, BasicDataRepresentation representation) : base(name)
@@ -918,7 +931,10 @@ namespace FOMCodeGen
       {
         string enumeratorName = enumeratorNode["name"].FirstChild.InnerText;
         string enumeratorValue = enumeratorNode["value"].FirstChild.InnerText;
-        enumeratedDataType.Enumerators.Add(enumeratorName, new Enumerator(enumeratorName, enumeratorValue));
+        string enumeratorComment = null;
+        if (enumeratorNode["semantics"] != null && enumeratorNode["semantics"].FirstChild != null)
+          enumeratorComment = enumeratorNode["semantics"].FirstChild.InnerText;
+        enumeratedDataType.Enumerators.Add(enumeratorName, new Enumerator(enumeratorName, enumeratorValue, enumeratorComment));
       }
       enumeratedDataType.Generate = (enumeratedDataTypeNode["nocode"] == null);
       if (enumeratedDataTypeNode["semantics"] != null && enumeratedDataTypeNode["semantics"].FirstChild != null)
