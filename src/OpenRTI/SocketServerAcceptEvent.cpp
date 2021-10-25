@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketServerAcceptEvent.h"
 
 #include "InitialServerStreamProtocol.h"
@@ -34,7 +35,7 @@ SocketServerAcceptEvent::SocketServerAcceptEvent(const SharedPtr<SocketServer>& 
 {
 }
 
-SocketServerAcceptEvent::~SocketServerAcceptEvent()
+SocketServerAcceptEvent::~SocketServerAcceptEvent() noexcept
 {
 }
 
@@ -47,8 +48,8 @@ SocketServerAcceptEvent::read(SocketEventDispatcher& dispatcher)
 
   /// IDEA: peek into the read data to see if this is an OpenRTI or a HTTP request
 
-  SharedPtr<ProtocolSocketEvent> protocolSocketEvent = new ProtocolSocketEvent(s);
-  protocolSocketEvent->setProtocolLayer(new InitialServerStreamProtocol(_abstractServer));
+  SharedPtr<ProtocolSocketEvent> protocolSocketEvent = MakeShared<ProtocolSocketEvent>(s);
+  protocolSocketEvent->setProtocolLayer(MakeShared<InitialServerStreamProtocol>(_abstractServer));
   dispatcher.insert(protocolSocketEvent);
 }
 
@@ -63,6 +64,11 @@ SocketServerAcceptEvent::write(SocketEventDispatcher&)
 {
 }
 
+void SocketServerAcceptEvent::error(const Exception& e)
+{
+
+}
+
 bool
 SocketServerAcceptEvent::getEnableWrite() const
 {
@@ -73,6 +79,12 @@ SocketServer*
 SocketServerAcceptEvent::getSocket() const
 {
   return _socketServer.get();
+}
+
+
+size_t SocketServerAcceptEvent::getBytesQueued() const
+{
+  return 0;
 }
 
 } // namespace OpenRTI

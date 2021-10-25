@@ -33,9 +33,9 @@ public:
   void bind(const std::string& file);
   void listen(int backlog = 20);
 
-  virtual SocketPipe* accept();
+  virtual SharedPtr<SocketStream> accept() override;
 
-  virtual void close();
+  virtual void close() override;
 
 protected:
   virtual ~SocketServerPipe();

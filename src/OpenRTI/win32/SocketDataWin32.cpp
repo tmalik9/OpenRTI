@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketData.h"
 
 namespace OpenRTI {
@@ -26,7 +27,7 @@ SocketData::SocketData(PrivateData* privateData) :
 {
 }
 
-SocketData::~SocketData()
+SocketData::~SocketData() noexcept
 {
 }
 

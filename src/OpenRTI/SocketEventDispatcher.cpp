@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketEventDispatcher.h"
 
 #include "AbstractSocketEvent.h"
@@ -83,6 +84,7 @@ SocketEventDispatcher::write(const SharedPtr<AbstractSocketEvent>& socketEvent)
   }
 }
 
+/*
 void
 SocketEventDispatcher::timeout(const SharedPtr<AbstractSocketEvent>& socketEvent)
 {
@@ -100,5 +102,7 @@ SocketEventDispatcher::timeout(const SharedPtr<AbstractSocketEvent>& socketEvent
     erase(socketEvent);
   }
 }
+*/
+
 
 } // namespace OpenRTI

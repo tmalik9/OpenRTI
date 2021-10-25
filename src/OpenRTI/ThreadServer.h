@@ -31,11 +31,12 @@ public:
   ThreadServer(const SharedPtr<AbstractServerNode>& serverNode);
   virtual ~ThreadServer();
 
-  virtual int exec();
+  int exec() override;
+  uint32_t getProtocolVersion() const override;
 
 protected:
-  virtual void _postMessage(const _MessageConnectHandlePair& messageConnectHandlePair);
-  virtual void _postOperation(const SharedPtr<_Operation>& operation);
+  void _postMessage(const _MessageConnectHandlePair& messageConnectHandlePair) override;
+  void _postOperation(const SharedPtr<_Operation>& operation) override;
 
 private:
   ThreadServer(const ThreadServer&) = delete;

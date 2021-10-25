@@ -29,11 +29,11 @@ class SocketServerTCP;
 
 class OPENRTI_API SocketTCP : public SocketStream {
 public:
-  SocketTCP();
+  SocketTCP() noexcept;
 
   void connect(const SocketAddress& address);
-  virtual void cork(bool enable);
-  virtual void shutdown();
+  void cork(bool enable) override;
+  void shutdown() override;
 
 protected:
   SocketTCP(PrivateData* privateData);

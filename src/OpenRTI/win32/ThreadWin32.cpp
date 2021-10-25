@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Thread.h"
 
 #ifndef NOMINMAX
@@ -25,27 +26,44 @@
 #include <windows.h>
 #include "Exception.h"
 #include "Export.h"
+#include <processthreadsapi.h>
+#include <vector>
+#include <locale>
 
 namespace OpenRTI {
 
+inline std::wstring to_wstring(const std::string& str)
+{
+  if (str.empty()) return std::wstring();
+  const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
+  std::vector<wchar_t> wideStringBuffer(str.length());
+  CType.widen(str.data(), str.data() + str.length(), &wideStringBuffer[0]);
+  return std::wstring(&wideStringBuffer[0], wideStringBuffer.size());
+}
+
 struct OPENRTI_LOCAL Thread::PrivateData {
-  PrivateData() :
-    _handle(INVALID_HANDLE_VALUE)
+  PrivateData() : _handle(INVALID_HANDLE_VALUE)
   {
   }
-  ~PrivateData()
+  PrivateData(const PrivateData&) = delete;
+  ~PrivateData() noexcept
   {
-    if (_handle == INVALID_HANDLE_VALUE)
-      return;
-    CloseHandle(_handle);
-    _handle = INVALID_HANDLE_VALUE;
+    try {
+      if (_handle == INVALID_HANDLE_VALUE)
+        return;
+      CloseHandle(_handle);
+      _handle = INVALID_HANDLE_VALUE;
+    }
+    catch (...)
+    {
+    }
   }
 
   static DWORD WINAPI start_routine(LPVOID data)
   {
-    Thread* thread = reinterpret_cast<Thread*>(data);
+    Thread* thread = static_cast<Thread*>(data);
     thread->run();
-    if (!Thread::put(thread))
+    if (!Thread::decRef(thread))
       Thread::destruct(thread);
     return 0;
   }
@@ -54,16 +72,23 @@ struct OPENRTI_LOCAL Thread::PrivateData {
   {
     if (_handle != INVALID_HANDLE_VALUE)
       return false;
-    get(&thread);
+    incRef(&thread);
     _handle = CreateThread(0, 0, start_routine, &thread, 0, 0);
     if (_handle == INVALID_HANDLE_VALUE) {
-      put(&thread);
+      decRef(&thread);
       return false;
     }
+#if defined(_WIN32_WINNT_WIN10) && (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
+    if (!thread.getName().empty())
+    {
+      HRESULT r;
+      r = SetThreadDescription(GetCurrentThread(), to_wstring(thread.getName()).c_str());
+    }
+#endif
     return true;
   }
 
-  void wait()
+  void wait() noexcept
   {
     if (_handle == INVALID_HANDLE_VALUE)
       return;
@@ -77,19 +102,19 @@ struct OPENRTI_LOCAL Thread::PrivateData {
   HANDLE _handle;
 };
 
-Thread::Thread(void) :
+Thread::Thread() noexcept :
   _privateData(new PrivateData)
 {
 }
 
-Thread::~Thread(void)
+Thread::~Thread() noexcept
 {
   OpenRTIAssert(!Thread::count(this));
   delete _privateData;
   _privateData = 0;
 }
 
-void Thread::destruct(Thread* thread)
+void Thread::destruct(Thread* thread) noexcept
 {
   delete thread;
 }
@@ -101,7 +126,7 @@ Thread::start()
 }
 
 void
-Thread::wait()
+Thread::wait() noexcept
 {
   _privateData->wait();
 }

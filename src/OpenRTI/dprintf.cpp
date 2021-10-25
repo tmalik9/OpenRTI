@@ -1,15 +1,19 @@
 
 
+#include "DebugNew.h"
 #ifndef linux
 #include <Windows.h>
 #endif
 
 #include <cstdio>
 #include "dprintf.h"
+#include <iostream>
 
-bool sEnableDebugPrintf = true;
+namespace OpenRTI {
 
-void DebugPrintf(const char* fmt, ...)
+OPENRTI_API bool sEnableDebugPrintf = true;
+OPENRTI_API bool sDebugToConsole = false;
+OPENRTI_API void DebugPrintf(__format_string const char* fmt, ...)
 {
 #ifndef linux
   if (sEnableDebugPrintf)
@@ -21,7 +25,7 @@ void DebugPrintf(const char* fmt, ...)
     va_start(args, fmt);
     DWORD threadId = ::GetCurrentThreadId();
     DWORD processId = ::GetCurrentProcessId();
-    int bufsize1 = _scprintf("[%d:%d] ", processId, threadId);
+    int bufsize1 = _scprintf("[%ul:%ul] ", processId, threadId);
     int bufsize2 = _vscprintf(fmt, args);
     if (bufsize2 < 0)
     {
@@ -31,8 +35,8 @@ void DebugPrintf(const char* fmt, ...)
     }
     int bufsize = bufsize1 + bufsize2 + 1;
 
-    char* buffer = (char*)malloc(bufsize);
-    _snprintf(buffer, bufsize1, "[%d:%d] ", processId, threadId);
+    char* buffer = new char[bufsize];
+    _snprintf(buffer, bufsize1, "[%ul:%ul] ", processId, threadId);
     if (!errorState)
     {
       _vsnprintf(buffer + bufsize1, bufsize2 + 1, fmt, args);
@@ -44,38 +48,44 @@ void DebugPrintf(const char* fmt, ...)
     va_end(args);
     //fputs(buffer, stdout);
     OutputDebugStringA(buffer);
-    free(buffer);
+    if (sDebugToConsole)
+    {
+      std::cout << buffer;
+    }
+    delete [] buffer;
   }
 #endif
 }
 
-std::string string_vprintf(const char* fmt, va_list args)
+OPENRTI_API std::string string_vprintf(const char* fmt, va_list args)
 {
 #ifndef linux
   int bufsiz = _vscprintf(fmt, args) + 1;
-  char* buffer = (char*)malloc(bufsiz);
+  char* buffer = new char[bufsiz];
   _vsnprintf(buffer, bufsiz, fmt, args);
   std::string result(buffer);
-  free(buffer);
+  delete [] buffer;
   return result;
 #else
   return "";
 #endif
 }
 
-std::string string_printf(const char* fmt, ...)
+OPENRTI_API std::string string_printf(__format_string const char* fmt, ...)
 {
 #ifndef linux
   va_list args;
   va_start(args, fmt);
   int bufsiz = _vscprintf(fmt, args) + 1;
-  char* buffer = (char*)malloc(bufsiz);
+  char* buffer = new char[bufsiz];
   _vsnprintf(buffer, bufsiz, fmt, args);
   va_end(args);
   std::string result(buffer);
-  free(buffer);
+  delete [] buffer;
   return result;
 #else
   return "";
 #endif
 }
+
+} // namespace OpenRTI

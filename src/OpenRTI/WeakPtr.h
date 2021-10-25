@@ -32,92 +32,111 @@ inline bool operator<(const WeakPtr<T>& p1, const WeakPtr<T>& p2);
 
 template<typename T>
 class OPENRTI_LOCAL WeakPtr {
-public:
-  WeakPtr(void)
-  { }
-  WeakPtr(const WeakPtr& p) : mWeakData(p.mWeakData)
-  { }
-  template<typename U>
-  WeakPtr(const SharedPtr<U>& p)
-  { SharedPtr<T> sharedPtr = p; assign(sharedPtr.get()); }
-  template<typename U>
-  WeakPtr(const WeakPtr<U>& p)
-  { SharedPtr<T> sharedPtr = p.lock(); assign(sharedPtr.get()); }
-  WeakPtr(T* ptr) // OpenRTI_DEPRECATED // Hmm, shall we??
-  { assign(ptr); }
-  ~WeakPtr(void)
-  { }
+  public:
+    WeakPtr() { }
+    WeakPtr(const WeakPtr& p) : mWeakData(p.mWeakData) { }
+    template<typename U>
+    WeakPtr(const SharedPtr<U>& p) {
+      SharedPtr<T> sharedPtr = p;
+      assign(sharedPtr.get());
+    }
+    template<typename U>
+    WeakPtr(const WeakPtr<U>& p) {
+      SharedPtr<T> sharedPtr = p.lock();
+      assign(sharedPtr.get());
+    }
+    WeakPtr(T* ptr) { assign(ptr); }
+    ~WeakPtr() { }
 
-  template<typename U>
-  WeakPtr& operator=(const SharedPtr<U>& p)
-  { SharedPtr<T> sharedPtr = p; assign(sharedPtr.get()); return *this; }
-  template<typename U>
-  WeakPtr& operator=(const WeakPtr<U>& p)
-  { SharedPtr<T> sharedPtr = p.lock(); assign(sharedPtr.get()); return *this; }
-  WeakPtr& operator=(const WeakPtr& p)
-  { mWeakData = p.mWeakData; return *this; }
+    template<typename U>
+    WeakPtr& operator=(const SharedPtr<U>& p) {
+      SharedPtr<T> sharedPtr = p;
+      assign(sharedPtr.get());
+      return *this;
+    }
+    template<typename U>
+    WeakPtr& operator=(const WeakPtr<U>& p) {
+      SharedPtr<T> sharedPtr = p.lock();
+      assign(sharedPtr.get());
+      return *this;
+    }
+    WeakPtr& operator=(const WeakPtr& p) {
+      mWeakData = p.mWeakData;
+      return *this;
+    }
 
-  SharedPtr<T> lock(void) const
-  {
-    if (!mWeakData.valid())
-      return SharedPtr<T>();
-    SharedPtr<T> sharedPtr;
-    sharedPtr.assignNonRef(static_cast<T*>(mWeakData->getWeakReferenced()));
-    return sharedPtr;
-  }
+    SharedPtr<T> lock() const {
+      if (!mWeakData.valid())
+        return SharedPtr<T>();
+      SharedPtr<T> sharedPtr;
+      sharedPtr.assignNonRef(static_cast<T*>(mWeakData->getWeakReferenced()));
+      return sharedPtr;
+    }
 
-  void clear()
-  { mWeakData = 0; }
-  WeakPtr& swap(WeakPtr& weakPtr)
-  { mWeakData.swap(weakPtr.mWeakData); return *this; }
+    void reset() { mWeakData = 0; }
+    WeakPtr& swap(WeakPtr& weakPtr) {
+      mWeakData.swap(weakPtr.mWeakData);
+      return *this;
+    }
 
-private:
-  void assign(T* p)
-  {
-    if (p)
-      mWeakData = p->mWeakData;
-    else
-      mWeakData = 0;
-  }
+  private:
+    void assign(T* p) {
+      if (p)
+        mWeakData = p->mWeakData;
+      else
+        mWeakData = 0;
+    }
 
-  // The indirect reference itself.
-  SharedPtr<WeakReferenced::WeakData> mWeakData;
+    // The indirect reference itself.
+    SharedPtr<WeakReferenced::WeakData> mWeakData;
 
-  template<typename S>
-  friend bool operator==(const WeakPtr<S>& p1, const WeakPtr<S>& p2);
-  template<typename S>
-  friend bool operator<(const WeakPtr<S>& p1, const WeakPtr<S>& p2);
+    template<typename S>
+    friend bool operator==(const WeakPtr<S>& p1, const WeakPtr<S>& p2);
+    template<typename S>
+    friend bool operator<(const WeakPtr<S>& p1, const WeakPtr<S>& p2);
 };
 
 template<typename T>
 inline bool
 operator==(const WeakPtr<T>& p1, const WeakPtr<T>& p2)
-{ return p1.mWeakData == p2.mWeakData; }
+{
+  return p1.mWeakData == p2.mWeakData;
+}
 
 template<typename T>
 inline bool
 operator!=(const WeakPtr<T>& p1, const WeakPtr<T>& p2)
-{ return !(p1 == p2); }
+{
+  return !(p1 == p2);
+}
 
 template<typename T>
 inline bool
 operator<(const WeakPtr<T>& p1, const WeakPtr<T>& p2)
-{ return p1.mWeakData < p2.mWeakData; }
+{
+  return p1.mWeakData < p2.mWeakData;
+}
 
 template<typename T>
 inline bool
 operator>(const WeakPtr<T>& p1, const WeakPtr<T>& p2)
-{ return p2 < p1; }
+{
+  return p2 < p1;
+}
 
 template<typename T>
 inline bool
 operator<=(const WeakPtr<T>& p1, const WeakPtr<T>& p2)
-{ return !(p1 > p2); }
+{
+  return !(p1 > p2);
+}
 
 template<typename T>
 inline bool
 operator>=(const WeakPtr<T>& p1, const WeakPtr<T>& p2)
-{ return !(p1 < p2); }
+{
+  return !(p1 < p2);
+}
 
 } // namespace OpenRTI
 

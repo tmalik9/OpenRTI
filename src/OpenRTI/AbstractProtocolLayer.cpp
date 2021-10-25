@@ -17,15 +17,16 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractProtocolLayer.h"
 
 namespace OpenRTI {
 
-AbstractProtocolLayer::AbstractProtocolLayer()
+AbstractProtocolLayer::AbstractProtocolLayer() noexcept
 {
 }
 
-AbstractProtocolLayer::~AbstractProtocolLayer()
+AbstractProtocolLayer::~AbstractProtocolLayer() noexcept
 {
 }
 

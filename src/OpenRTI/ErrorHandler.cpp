@@ -17,27 +17,28 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ErrorHandler.h"
 
 namespace OpenRTI {
 namespace XML {
 
-ErrorHandler::~ErrorHandler(void)
+ErrorHandler::~ErrorHandler()
 {
 }
 
 void
-ErrorHandler::error(const char* msg, unsigned line, unsigned col)
+ErrorHandler::error(const char* /*msg*/, unsigned /*line*/, unsigned /*col*/)
 {
 }
 
 void
-ErrorHandler::fatalError(const char* msg, unsigned line, unsigned col)
+ErrorHandler::fatalError(const char* /*msg*/, unsigned /*line*/, unsigned /*col*/)
 {
 }
 
 void
-ErrorHandler::warning(const char* msg, unsigned line, unsigned col)
+ErrorHandler::warning(const char* /*msg*/, unsigned /*line*/, unsigned /*col*/)
 {
 }
 

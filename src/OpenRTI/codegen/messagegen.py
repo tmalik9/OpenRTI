@@ -70,13 +70,27 @@ class SourceStream(object):
 
 ###############################################################################
 class DataType(object):
-    def __init__(self, name, hasSwap):
+    def __init__(self, typeMap, name, hasSwap, parentObject=None):
         self.__name = name
         self.__hasSwap = hasSwap
         self._hasPayload = None
+        self.__parentObject = parentObject
+        self.__typeMap = typeMap;
 
     def getName(self):
         return self.__name
+
+    def getType(self, name):
+      return self.__typeMap.getType(name)
+
+    def getParentObject(self):
+        return self.__parentObject
+
+    def getParentObjectType(self):
+        return "ServerModel::" + self.__parentObject
+
+    def getParentObjectParameter(self):
+        return self.__parentObject[0].lower() + self.__parentObject[1:]
 
     def isMessage(self):
         return False
@@ -105,17 +119,32 @@ class DataType(object):
     def writeStreamOut(self, sourceStream):
         pass
 
+    def writeStreamOutDecl(self, sourceStream):
+        pass
+
+    def writePrettyPrint(self, sourceStream):
+        pass
+
+    def writePrettyPrintDecl(self, sourceStream):
+        pass
+
+    def writeByteSize(self, sourceStream):
+        pass
+
+    def writeByteSizeDecl(self, sourceStream):
+        pass
+
     def writeToString(self, sourceStream):
         pass
 
 ###############################################################################
 class CDataType(DataType):
-    def __init__(self, name, encoding, ctype):
+    def __init__(self, typeMap, name, encoding, ctype, parentObject="Federation"):
         if ctype == 'VariableLengthData' or ctype == 'std::string':
             hasSwap = True
         else:
             hasSwap = False
-        DataType.__init__(self, name, hasSwap)
+        DataType.__init__(self, typeMap, name, hasSwap, parentObject)
         self.__encoding = encoding
         self.__ctype = ctype
 
@@ -142,12 +171,12 @@ class CDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeC' + component)(self, sourceStream)
 
-
 ###############################################################################
 class EnumLabel(object):
-    def __init__(self, name, value):
+    def __init__(self, name, value, repr):
         self.__name = name
         self.__value = value
+        self.__repr = repr
 
     def getName(self):
         return self.__name
@@ -155,13 +184,19 @@ class EnumLabel(object):
     def getValue(self):
         return self.__value
 
+    def getRepr(self):
+        return self.__repr
+
 class EnumDataType(DataType):
-    def __init__(self, name):
-        DataType.__init__(self, name, False)
+    def __init__(self, typeMap, name):
+        DataType.__init__(self, typeMap, name, False)
         self.__enumList = []
 
-    def addEnum(self, name, value):
-        self.__enumList.append(EnumLabel(name, value))
+    def addEnum(self, name, value, repr=None):
+        if repr is None:
+            self.__enumList.append(EnumLabel(name, value, name))
+        else:
+            self.__enumList.append(EnumLabel(name, value, repr))
 
     def getEnumList(self):
         return self.__enumList
@@ -189,16 +224,36 @@ class EnumDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeEnum' + component)(self, sourceStream)
 
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
-        sourceStream.writeline('// EnumDataType ' + self.getName())
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  switch (value) {')
         for enum in self.__enumList:
-            sourceStream.writeline('  case {enum}: os << "{enum}"; break;'.format(enum = enum.getName()))
+            sourceStream.writeline('  case {enum}: os << "{repr}"; break;'.format(enum = enum.getName(), repr=enum.getRepr()))
         sourceStream.writeline('  }')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writePrettyPrint(self, sourceStream):
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, ServerModel::Federation* )'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << value;')
         sourceStream.writeline('  return os;')
         sourceStream.writeline('}')
         sourceStream.writeline()
@@ -206,17 +261,24 @@ class EnumDataType(DataType):
         sourceStream.writeline('{')
         sourceStream.writeline('  switch (value) {')
         for enum in self.__enumList:
-            sourceStream.writeline('  case {enum}: return "{enum}";'.format(enum = enum.getName()))
+            sourceStream.writeline('  case {enum}: return "{repr}";'.format(enum = enum.getName(), repr=enum.getRepr()))
         sourceStream.writeline('  default: return "<Invalid {name}>";'.format(name = self.getName()))
         sourceStream.writeline('  }')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline constexpr size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline(' return sizeof(value); // sizeof()'.format(name = self.getName()))
         sourceStream.writeline('}')
         sourceStream.writeline()
 
 
 ###############################################################################
 class VectorDataType(DataType):
-    def __init__(self, name, scalarTypeName):
-        DataType.__init__(self, name, True)
+    def __init__(self, typeMap, name, scalarTypeName, parentObject):
+        DataType.__init__(self, typeMap, name, True, parentObject)
         self.__scalarTypeName = scalarTypeName
 
     def getScalarTypeName(self):
@@ -238,13 +300,24 @@ class VectorDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeVector' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
         sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = name))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{ ";')
         sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
@@ -259,11 +332,59 @@ class VectorDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writePrettyPrint(self, sourceStream):
+        name = self.getName();
+        sourceStream.writeline('std::ostream&')
+        parentObject=self.getParentObject()
+        if parentObject is None:
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value)'.format(name = name))
+        else:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter})'.format(
+              name = name, parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
+        sourceStream.writeline('  if (i != value.end()) {')
+        if parentObject is None:
+            sourceStream.writeline('    os << *i;')
+        else:
+            sourceStream.writeline('    prettyprint(os, *i, {parentObjectParameter});'.format(parentObjectParameter=parentObjectParameter))
+
+        sourceStream.writeline('    while (++i != value.end()) {')
+        if parentObject is None:
+            sourceStream.writeline('      os << ", " << *i;')
+        else:
+            sourceStream.writeline('      os << ", "; prettyprint(os, *i, {parentObjectParameter});'.format(parentObjectParameter=parentObjectParameter))
+        sourceStream.writeline('    }')
+        sourceStream.writeline('  }')
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = 0;');
+        sourceStream.writeline('for (auto& item : value)');
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('result += byteSize(item);');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline()
 
 ###############################################################################
 class SetDataType(DataType):
-    def __init__(self, name, scalarTypeName):
-        DataType.__init__(self, name, True)
+    def __init__(self, typeMap, name, scalarTypeName):
+        DataType.__init__(self, typeMap, name, True)
         self.__scalarTypeName = scalarTypeName
 
     def getScalarTypeName(self):
@@ -285,13 +406,24 @@ class SetDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeSet' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
-        sourceStream.writeline('// ' + str(self))
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = name))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{ ";')
         sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
@@ -306,11 +438,45 @@ class SetDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writePrettyPrint(self, sourceStream):
+        name = self.getName();
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, ServerModel::Federation* federation)'.format(name = name))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
+        sourceStream.writeline('  if (i != value.end()) {')
+        sourceStream.writeline('    prettyprint(os, *i, federation);')
+        sourceStream.writeline('    while (++i != value.end()) {')
+        sourceStream.writeline('      os << ", "; prettyprint(os, *i, federation);')
+        sourceStream.writeline('    }')
+        sourceStream.writeline('  }')
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = 0;');
+        sourceStream.writeline('for (auto& item : value)');
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('result += byteSize(item);');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
 
 ###############################################################################
 class MapDataType(DataType):
-    def __init__(self, name, keyTypeName, valueTypeName):
-        DataType.__init__(self, name, True)
+    def __init__(self, typeMap, name, keyTypeName, valueTypeName):
+        DataType.__init__(self, typeMap, name, True)
         self.__keyTypeName = keyTypeName
         self.__valueTypeName = valueTypeName
         self.__keyHasPayload = None
@@ -349,13 +515,24 @@ class MapDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeMap' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         # FIXME, make the std::* containers with a template
         name = self.getName();
-        sourceStream.writeline('// ' + str(self))
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = name))
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = name))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{ ";')
         sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
@@ -370,11 +547,46 @@ class MapDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writePrettyPrint(self, sourceStream):
+        name = self.getName();
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, ServerModel::Federation* federation)'.format(name = name))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  {name}::const_iterator i = value.begin();'.format(name = name))
+        sourceStream.writeline('  if (i != value.end()) {')
+        sourceStream.writeline('    prettyprint(os, i->first, federation); os << ": "; prettyprint(os, i->second, federation);')
+        sourceStream.writeline('    while (++i != value.end()) {')
+        sourceStream.writeline('      prettyprint(os, i->first, federation); os << ": "; prettyprint(os, i->second, federation);')
+        sourceStream.writeline('    }')
+        sourceStream.writeline('  }')
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = 0;');
+        sourceStream.writeline('for (auto& item : value)');
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('result += byteSize(item.first);');
+        sourceStream.writeline('result += byteSize(item.second);');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
 
 ###############################################################################
 class PairDataType(DataType):
-    def __init__(self, name, firstTypeName, secondTypeName):
-        DataType.__init__(self, name, False)
+    def __init__(self, typeMap, name, firstTypeName, secondTypeName):
+        DataType.__init__(self, typeMap, name, False)
         self.__firstTypeName = firstTypeName
         self.__secondTypeName = secondTypeName
         self.__firstHasPayload = None
@@ -414,11 +626,22 @@ class PairDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writePair' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
-        sourceStream.writeline('// ' + str(self))
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& value)'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  os << "{ ";')
         sourceStream.writeline('  os << "first: " << value.first << ", ";')
@@ -428,15 +651,149 @@ class PairDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writePrettyPrint(self, sourceStream):
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const {name}& value, ServerModel::Federation* federation)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  os << "first: "; prettyprint(os, value.first, federation); os << ", ";')
+        sourceStream.writeline('  os << "second: "; prettyprint(os, value.second, federation); os << ", ";')
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('return byteSize(value.first) + byteSize(value.second);');
+        sourceStream.popIndent()
+        sourceStream.writeline('}')
+        sourceStream.writeline()
 
 ###############################################################################
 class StructField(object):
-    def __init__(self, name, typeName, hideOnPrint=False):
+    def __init__(self, name, typeName, abstract=False, override=False, hideOnPrint=False):
+        if abstract and override:
+            raise Exception('abstract and override can\'t be used together, field {0}'.format(name))
         self.__name = name
         self.__typeName = typeName
         self.__hasSwap = False
+        self.__abstract = abstract
+        self.__override = override
         self._hasPayload = None
         self._hideOnPrint = hideOnPrint
+
+
+    def getName(self):
+        return self.__name
+
+    def getLowerName(self):
+        return self.__name[0].lower() + self.__name[1:len(self.__name)]
+
+    def getUpperName(self):
+        return self.__name[0].upper() + self.__name[1:len(self.__name)]
+
+    def getMemberName(self):
+        return '_' + self.getLowerName()
+
+    def getTypeName(self):
+        return self.__typeName
+
+    def resolveHasPayloadAndHasSwap(self, typeMap):
+        t = typeMap.getType(self.getTypeName())
+        if t is None:
+            raise Exception("struct field type not defined: field={0} {1}".format(self.getName(), self.getTypeName()))
+        t.resolveHasPayloadAndHasSwap(typeMap)
+        self._hasPayload = t.hasPayload()
+
+        self.__hasSwap = t.hasSwap()
+
+    def hasPayload(self):
+        return self._hasPayload
+
+    def hideOnPrint(self):
+        return self._hideOnPrint
+
+    def writeSetter(self, sourceStream, valuePrefix):
+        upperName = self.getUpperName()
+        typeName = self.getTypeName()
+        memberName = self.getMemberName()
+        if self.__abstract:
+            sourceStream.writeline('virtual void set{upperName}(const {typeName}& value) noexcept = 0;'.format(upperName = upperName, typeName = typeName))
+            sourceStream.writeline('virtual void set{upperName}({typeName}&& value) noexcept = 0;'.format(upperName = upperName, typeName = typeName))
+        else:
+            override=""
+            if self.__override:
+                override = " override"
+            sourceStream.writeline('void set{upperName}(const {typeName}& value) noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
+            sourceStream.writeline('{{ {prefix}{memberName} = value; }}'.format(memberName = memberName, prefix = valuePrefix))
+            sourceStream.writeline('void set{upperName}({typeName}&& value) noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
+            sourceStream.writeline('{{ {prefix}{memberName} = std::move(value); }}'.format(memberName = memberName, prefix = valuePrefix))
+
+    def writeGetter(self, sourceStream, valuePrefix):
+        upperName = self.getUpperName()
+        typeName = self.getTypeName()
+        memberName = self.getMemberName()
+        if self.__abstract:
+            sourceStream.writeline('virtual {typeName}& get{upperName}() noexcept = 0;'.format(upperName = upperName, typeName = typeName))
+        else:
+            override=""
+            if self.__override:
+                override = " override"
+            sourceStream.writeline('{typeName}& get{upperName}() noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
+            sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
+
+    def writeConstGetter(self, sourceStream, valuePrefix):
+        upperName = self.getUpperName()
+        typeName = self.getTypeName()
+        memberName = self.getMemberName()
+        if self.__abstract:
+            sourceStream.writeline('virtual const {typeName}& get{upperName}() const noexcept = 0;'.format(upperName = upperName, typeName = typeName))
+        else:
+            override=""
+            if self.__override:
+                override = " override"
+            sourceStream.writeline('const {typeName}& get{upperName}() const noexcept{override}'.format(upperName = upperName, typeName = typeName, override=override))
+            sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
+
+    def writeMemberInstance(self, sourceStream):
+        if not self.__abstract:
+            typeName = self.getTypeName()
+            memberName = self.getMemberName()
+            initializer = ''
+            if typeName == 'Bool':
+                initializer = ' = false'
+            elif typeName == 'Unsigned':
+                initializer = ' = 0'
+            else:
+                typeOfField = typeMap.getType(typeName)
+                if type(typeOfField) is EnumDataType:
+                    firstValue = typeOfField.getEnumList()[0].getName()
+                    initializer = ' = ' + firstValue
+            sourceStream.writeline('{typeName} {memberName}{initializer};'.format(typeName = typeName, memberName = memberName, initializer=initializer))
+
+    def writeSwap(self, sourceStream, value):
+        if not self.__abstract:
+            memberName = self.getMemberName()
+            if self.__hasSwap:
+                sourceStream.writeline('{memberName}.swap({value}.{memberName});'.format(memberName = memberName, value = value))
+            else:
+                sourceStream.writeline('std::swap({memberName}, {value}.{memberName});'.format(memberName = memberName, value = value))
+
+class StructConstField(object):
+    def __init__(self, name, typeName, value=None, abstract=False, override=False, hideOnPrint=False):
+        self.__name = name
+        self.__typeName = typeName
+        self.__hasSwap = False
+        self.__value = value
+        self.__abstract = abstract
+        self.__override = override
+        self._hasPayload = None
+        self._hideOnPrint = hideOnPrint
+        if value is None and abstract is False:
+            raise Exception("value must be specified: field {0}".format(name))
 
     def getName(self):
         return self.__name
@@ -461,70 +818,87 @@ class StructField(object):
         self.__hasSwap = t.hasSwap()
 
     def hasPayload(self):
-        return self._hasPayload
+        return False
 
     def hideOnPrint(self):
         return self._hideOnPrint
 
     def writeSetter(self, sourceStream, valuePrefix):
-        upperName = self.getUpperName()
-        typeName = self.getTypeName()
-        memberName = self.getMemberName()
-        sourceStream.writeline('void set{upperName}(const {typeName}& value)'.format(upperName = upperName, typeName = typeName))
-        sourceStream.writeline('{{ {prefix}{memberName} = value; }}'.format(memberName = memberName, prefix = valuePrefix))
-        sourceStream.writelineNoIndent('#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference')
-        sourceStream.writeline('void set{upperName}({typeName}&& value)'.format(upperName = upperName, typeName = typeName))
-        sourceStream.writeline('{{ {prefix}{memberName} = std::move(value); }}'.format(memberName = memberName, prefix = valuePrefix))
-        sourceStream.writelineNoIndent('#endif')
+        pass
 
     def writeGetter(self, sourceStream, valuePrefix):
-        upperName = self.getUpperName()
-        typeName = self.getTypeName()
-        memberName = self.getMemberName()
-        sourceStream.writeline('{typeName}& get{upperName}()'.format(upperName = upperName, typeName = typeName))
-        sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
+        pass
 
     def writeConstGetter(self, sourceStream, valuePrefix):
         upperName = self.getUpperName()
         typeName = self.getTypeName()
         memberName = self.getMemberName()
-        sourceStream.writeline('const {typeName}& get{upperName}() const'.format(upperName = upperName, typeName = typeName))
-        sourceStream.writeline('{{ return {prefix}{memberName}; }}'.format(memberName = memberName, prefix = valuePrefix))
+        if self.__abstract:
+            sourceStream.writeline('virtual const {typeName} get{upperName}() const noexcept = 0;'.format(upperName = upperName, typeName = typeName))
+        else:
+            override=""
+            if self.__override:
+                override = " override"
+            sourceStream.writeline('const {typeName} get{upperName}() const noexcept{override} {{ return {value}; }}'.format(upperName = upperName, typeName = typeName, value = self.__value, override=override))
 
     def writeMemberInstance(self, sourceStream):
-        typeName = self.getTypeName()
-        memberName = self.getMemberName()
-        sourceStream.writeline('{typeName} {memberName};'.format(typeName = typeName, memberName = memberName))
+        pass
 
     def writeSwap(self, sourceStream, value):
-        memberName = self.getMemberName()
-        if self.__hasSwap:
-            sourceStream.writeline('{memberName}.swap({value}.{memberName});'.format(memberName = memberName, value = value))
-        else:
-            sourceStream.writeline('std::swap({memberName}, {value}.{memberName});'.format(memberName = memberName, value = value))
+        pass
 
 ###############################################################################
 class StructDataType(DataType):
-    def __init__(self, name, parentTypeName = None):
-        DataType.__init__(self, name, True)
+    def __init__(self, typeMap, name, abstract=None, parentObject = None, parentTypeName = None):
+        DataType.__init__(self, typeMap, name, hasSwap=True, parentObject=parentObject)
         self.__parentTypeName = parentTypeName
         self.__fieldList = []
         self.__cow = False
+        if abstract is not None and abstract.lower() == 'true':
+            self.__abstract = True
+        else:
+            self.__abstract = False
 
     def setCopyOnWrite(self, cow):
+        if self.__abstract and cow:
+            raise Exception('copyOnWrite and abstract can\'t be used together')
         self.__cow = cow
 
     def getCopyOnWrite(self):
         return self.__cow
 
-    def addField(self, name, typeName, hideOnPrint=False):
-        self.__fieldList.append(StructField(name, typeName, hideOnPrint))
+    def addField(self, name, typeName, const=None, value=None, hideOnPrint=False):
+        override = False
+        if not self.__abstract and self.getParentType():
+            parentType = self.getParentType()
+            fields = parentType.getFieldList()
+            for field in fields:
+                if field.getName() == name:
+                    override = True
+        if const is not None and const.lower() == 'true':
+            self.__fieldList.append(StructConstField(name, typeName, value, abstract=self.__abstract, override=override, hideOnPrint=hideOnPrint))
+        else:
+            self.__fieldList.append(StructField(name, typeName, abstract=self.__abstract, override=override, hideOnPrint=hideOnPrint))
 
     def getFieldList(self):
         return self.__fieldList
 
+    def getNonConstFieldList(self):
+        result = []
+        for field in self.__fieldList:
+            if type(field) is StructField:
+                result .append(field)
+        return result
+
     def getParentTypeName(self):
         return self.__parentTypeName
+
+    def getParentType(self):
+        if self.__parentTypeName:
+            return self.getType(self.__parentTypeName)
+
+    def isAbstract(self):
+        return self.__abstract
 
     def resolveHasPayloadAndHasSwap(self, typeMap):
         for field in self.__fieldList:
@@ -544,29 +918,50 @@ class StructDataType(DataType):
         sourceStream.pushIndent()
 
         if self.__cow:
-            sourceStream.writeline('{name}() : '.format(name = self.getName()))
-            sourceStream.writeline('  _impl(new Implementation())')
+            sourceStream.writeline('{name}() noexcept'.format(name = self.getName()))
+            sourceStream.writeline(' : _impl(MakeShared<Implementation>())')
             sourceStream.writeline('{ }')
             valuePrefix = 'getImpl().'
             constValuePrefix = 'getConstImpl().'
         else:
-            fieldCount = len(self.getFieldList())
-            if fieldCount == 0:
-                sourceStream.writeline('{name}()'.format(name = self.getName()))
-            else:
-                sourceStream.writeline('{name}() :'.format(name = self.getName()))
-            sourceStream.pushIndent()
-            index = 0
-            for field in self.getFieldList():
-                line = '{memberName}()'.format(memberName = field.getMemberName())
-                index = index + 1
-                if index < fieldCount:
-                    line += ','
-                sourceStream.writeline(line)
-            sourceStream.popIndent()
-            sourceStream.writeline('{ }')
+            # default constructor
+            sourceStream.writeline('{name}()'.format(name = self.getName()) + ' = default;')
+
+            fields = self.getNonConstFieldList()
+            fieldCount = len(fields)
+            if not self.__abstract and fieldCount > 0:
+                sourceStream.writeline('{name}('.format(name = self.getName()))
+                sourceStream.pushIndent()
+                index = 0
+                for field in fields:
+                    line = '{fieldTypeName} {paramName}'.format(paramName = field.getLowerName(), fieldTypeName=field.getTypeName())
+                    index = index + 1
+                    if index < fieldCount:
+                        line += ','
+                    else:
+                        line += ') noexcept'
+                    sourceStream.writeline(line)
+                index = 0
+                sourceStream.pushIndent()
+                for field in fields:
+                    if (index == 0): 
+                        line = ': '
+                    else:
+                        line =', '
+                    line += '{memberName}({paramName})'.format(paramName = field.getLowerName(), memberName = field.getMemberName())
+                    index = index + 1
+                    sourceStream.writeline(line)
+                sourceStream.popIndent()
+                sourceStream.writeline('{ }')
+                sourceStream.popIndent()
             valuePrefix = ''
             constValuePrefix = ''
+
+        sourceStream.writeline('{name}(const {name}&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}({name}&&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('virtual ~{name}() noexcept = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}& operator=(const {name}&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}& operator=({name}&&) = default;'.format(name = self.getName()))
 
         for field in self.__fieldList:
             field.writeSetter(sourceStream, valuePrefix)
@@ -574,7 +969,7 @@ class StructDataType(DataType):
             field.writeConstGetter(sourceStream, constValuePrefix)
             sourceStream.writeline()
 
-        sourceStream.writeline('{name}& swap({name}& rhs)'.format(name = self.getName()))
+        sourceStream.writeline('{name}& swap({name}& rhs) noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         if self.__cow:
@@ -586,7 +981,7 @@ class StructDataType(DataType):
         sourceStream.popIndent()
         sourceStream.writeline('}')
 
-        sourceStream.writeline('bool operator==(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator==(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         if self.__cow:
             sourceStream.writeline('  if (_impl.get() == rhs._impl.get())')
@@ -596,7 +991,7 @@ class StructDataType(DataType):
             sourceStream.writeline('  if (get{upperName}() != rhs.get{upperName}()) return false;'.format(upperName = upperName))
         sourceStream.writeline('  return true;')
         sourceStream.writeline('}')
-        sourceStream.writeline('bool operator<(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator<(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         if self.__cow:
             sourceStream.writeline('  if (_impl.get() == rhs._impl.get())')
@@ -607,60 +1002,62 @@ class StructDataType(DataType):
             sourceStream.writeline('  if (rhs.get{upperName}() < get{upperName}()) return false;'.format(upperName = upperName))
         sourceStream.writeline('  return false;')
         sourceStream.writeline('}')
-        sourceStream.writeline('bool operator!=(const {name}& rhs) const'.format(name = self.getName()))
-        sourceStream.writeline('{ return !operator==(rhs); }')
-        sourceStream.writeline('bool operator>(const {name}& rhs) const'.format(name = self.getName()))
+        #sourceStream.writeline('bool operator!=(const {name}& rhs) const noexcept'.format(name = self.getName()))
+        #sourceStream.writeline('{ return !operator==(rhs); }')
+        sourceStream.writeline('bool operator>(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return rhs.operator<(*this); }')
-        sourceStream.writeline('bool operator>=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator>=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator<(rhs); }')
-        sourceStream.writeline('bool operator<=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator<=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator>(rhs); }')
 
-        sourceStream.popIndent()
-        sourceStream.writeline('private:')
-        sourceStream.pushIndent()
-
-        if self.__cow:
-            sourceStream.writeline('struct OPENRTI_API Implementation : public Referenced {')
+        if not self.isAbstract():
+            sourceStream.popIndent()
+            sourceStream.writeline('private:')
             sourceStream.pushIndent()
 
-            fieldCount = len(self.getFieldList())
-            if fieldCount == 0:
-                sourceStream.writeline('Implementation()'.format(name = self.getName()))
-            else:
-                sourceStream.writeline('Implementation() :'.format(name = self.getName()))
-            sourceStream.pushIndent()
-            index = 0
-            for field in self.getFieldList():
-                line = '{memberName}()'.format(memberName = field.getMemberName())
-                index = index + 1
-                if index < fieldCount:
-                    line += ','
-                sourceStream.writeline(line)
-            sourceStream.popIndent()
-            sourceStream.writeline('{ }')
- 
-            
-        for field in self.__fieldList:
-            field.writeMemberInstance(sourceStream)
+            if self.__cow:
+                sourceStream.writeline('struct OPENRTI_API Implementation final : public Referenced {')
+                sourceStream.pushIndent()
 
-        if self.__cow:
-            sourceStream.popIndent()
-            sourceStream.writeline('};')
-            sourceStream.writeline()
-            sourceStream.writeline('const Implementation& getConstImpl() const')
-            sourceStream.writeline('{')
-            sourceStream.writeline('  return *_impl;')
-            sourceStream.writeline('}')
-            sourceStream.writeline()
-            sourceStream.writeline('Implementation& getImpl()')
-            sourceStream.writeline('{')
-            sourceStream.writeline('  if (1 < Referenced::count(_impl.get()))')
-            sourceStream.writeline('    _impl = new Implementation(*_impl);')
-            sourceStream.writeline('  return *_impl;')
-            sourceStream.writeline('}')
-            sourceStream.writeline()
-            sourceStream.writeline('SharedPtr<Implementation> _impl;')
+                nonConstFields = self.getNonConstFieldList()
+                fieldCount = len(nonConstFields)
+                if fieldCount == 0:
+                    sourceStream.writeline('Implementation() noexcept'.format(name = self.getName()))
+                else:
+                    sourceStream.writeline('Implementation() noexcept :'.format(name = self.getName()))
+                sourceStream.pushIndent()
+                index = 0
+                for field in nonConstFields:
+                    if type(field) is StructField:
+                        line = '{memberName}()'.format(memberName = field.getMemberName())
+                        index = index + 1
+                        if index < fieldCount:
+                            line += ','
+                        sourceStream.writeline(line)
+                sourceStream.popIndent()
+                sourceStream.writeline('{ }')
+
+            for field in self.__fieldList:
+                field.writeMemberInstance(sourceStream)
+
+            if self.__cow:
+                sourceStream.popIndent()
+                sourceStream.writeline('};')
+                sourceStream.writeline()
+                sourceStream.writeline('const Implementation& getConstImpl() const')
+                sourceStream.writeline('{')
+                sourceStream.writeline('  return *_impl;')
+                sourceStream.writeline('}')
+                sourceStream.writeline()
+                sourceStream.writeline('Implementation& getImpl()')
+                sourceStream.writeline('{')
+                sourceStream.writeline('  if (1 < Referenced::count(_impl.get()))')
+                sourceStream.writeline('    _impl = MakeShared<Implementation>(*_impl);')
+                sourceStream.writeline('  return *_impl;')
+                sourceStream.writeline('}')
+                sourceStream.writeline()
+                sourceStream.writeline('SharedPtr<Implementation> _impl;')
 
         sourceStream.popIndent()
         sourceStream.writeline('};')
@@ -669,13 +1066,29 @@ class StructDataType(DataType):
     def writeComponent(self, component, sourceStream, messageEncoding):
         getattr(messageEncoding, 'writeStruct' + component)(self, sourceStream)
 
+    def writePrettyPrintDecl(self, sourceStream):
+        if not self.getParentObject() is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=self.getParentObjectParameter()
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value, {parentObjectType}* {parentObjectParameter});'.format(
+            name = self.getName(), parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('std::ostream& prettyprint(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
+    def writeStreamOutDecl(self, sourceStream):
+        sourceStream.writeline('std::ostream& operator<<(std::ostream& os, const {name}& value);'.format(name = self.getName()))
+
     def writeStreamOut(self, sourceStream):
         sourceStream.writeline('// ' + type(self).__name__ + " " + self.getName())
-        sourceStream.writeline('template<typename char_type, typename traits_type>')
-        sourceStream.writeline('std::basic_ostream<char_type, traits_type>&')
-        sourceStream.writeline('operator<<(std::basic_ostream<char_type, traits_type>& os, const {name}& value)'.format(name = self.getName()))
+        valueParameterName = ""
+        for field in self.__fieldList:
+            if not field.hideOnPrint():
+                valueParameterName = " value"
+                break;
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('operator<<(std::ostream& os, const {name}& {value})'.format(name = self.getName(), value=valueParameterName))
         sourceStream.writeline('{')
-        sourceStream.writeline('  os << "{ ";')
+        sourceStream.writeline('  os << "{name} {{ ";'.format(name = self.getName()))
         count = 0
         for field in self.__fieldList:
             count = count + 1
@@ -690,9 +1103,86 @@ class StructDataType(DataType):
                 sourceStream.writeline('  //os << "{lowerName}: " << value.get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
                 if count != len(self.__fieldList):
                     sourceStream.writeline('  //os << ", ";')
-            
+
         sourceStream.writeline('  os << " }";')
         sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writePrettyPrint(self, sourceStream):
+        parentObject=self.getParentObject()
+        valueParameterName = ""
+        if not parentObject is None:
+            parentObjectType=self.getParentObjectType()
+            parentObjectParameter=""
+            fieldParents = set()
+            for field in self.__fieldList:
+                fieldType=self.getType(field.getTypeName())
+                if not field.hideOnPrint():
+                    if not fieldType.getParentObject() is None:
+                        parentObjectParameter = self.getParentObjectParameter();
+                        if fieldType.getParentObject() != self.getParentObject():
+                            fieldValue=""
+                            fieldParentObject=fieldType.getParentObject()
+                            fieldParentObjectType=fieldType.getParentObjectType()
+                            fieldParentObjectParameter=fieldType.getParentObjectParameter()
+                            s = "{fieldParentObjectType}* {fieldParentObjectParameter} = {parentObjectParameter}->get{fieldParentObject}(value.get{fieldParentObject}Handle());".format(
+                                fieldParentObject=fieldParentObject,
+                                fieldParentObjectType=fieldParentObjectType, 
+                                fieldParentObjectParameter=fieldParentObjectParameter,
+                                parentObjectParameter=parentObjectParameter,
+                                fieldValue=fieldValue)
+                            fieldParents.add(s)
+        sourceStream.writeline('std::ostream&')
+        for field in self.__fieldList:
+            if not field.hideOnPrint():
+                valueParameterName = " value"
+                break;
+        if not parentObject is None:
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}&{value}, {parentObjectType}* {parentObjectParameter})'.format(
+                name = self.getName(), value=valueParameterName, parentObjectType=parentObjectType, parentObjectParameter=parentObjectParameter))
+        else:
+            sourceStream.writeline('prettyprint(std::ostream& os, const {name}&{value})'.format(name = self.getName(), value=valueParameterName))
+
+        sourceStream.writeline('{')
+        if not parentObject is None:
+            for fieldParent in fieldParents:
+                sourceStream.writeline("  " + fieldParent)
+        sourceStream.writeline('  os << "{name} {{ ";'.format(name = self.getName()))
+        count = 0
+        for field in self.__fieldList:
+            count = count + 1
+            lowerName = field.getLowerName()
+            upperName = field.getUpperName()
+            if not field.hideOnPrint():
+                fieldType=self.getType(field.getTypeName())
+                if not parentObject is None and not fieldType.getParentObject() is None:
+                    fieldParentObjectType=fieldType.getParentObjectType()
+                    fieldParentObjectParameter=fieldType.getParentObjectParameter()
+                    sourceStream.writeline('  os << "{lowerName}: "; prettyprint(os, value.get{upperName}(), {fieldParentObjectParameter});'.format(
+                        lowerName = lowerName, upperName = upperName, fieldParentObjectParameter=fieldParentObjectParameter) + "//" + fieldType.getName() + " parent=" + fieldType.getParentObject())
+                else:
+                    sourceStream.writeline('  os << "{lowerName}: "<< value.get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
+                if count != len(self.__fieldList):
+                    sourceStream.writeline('  os << ", ";')
+            else:
+                sourceStream.writeline('  // ' + type(field).__name__ + " " + field.getLowerName() + " (hidden)")
+
+        sourceStream.writeline('  os << " }";')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeByteSize(self, sourceStream):
+        sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = 0;');
+        for field in self.getFieldList():
+            fieldName = field.getName()
+            sourceStream.writeline('result += byteSize(value.get{fieldName}());'.format(fieldName = fieldName))
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent();
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -708,13 +1198,122 @@ class StructDataType(DataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+    def writeEncoder(self, sourceStream):
+        if not self.isAbstract():
+            name = self.getName()
+            valueParameterName=""
+            if len(self.getFieldList()) > 0:
+                valueParameterName = " value"
+            sourceStream.writeline('void write{name}(const {name}&{value})'.format(name = name, value=valueParameterName))
+            sourceStream.writeline('{')
+            for field in self.getFieldList():
+                fieldName = field.getName()
+                typeName = field.getTypeName()
+                if type(field) is StructField:
+                    sourceStream.writeline('  write{typeName}({value}.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName, value=valueParameterName))
+                else:
+                    sourceStream.writeline('  write{typeName}({value}.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName, value=valueParameterName))
+            sourceStream.writeline('}')
+            sourceStream.writeline()
+
+    def writeDecoder(self, sourceStream):
+        if not self.isAbstract():
+            name = self.getName()
+            valueParameterName=""
+            if len(self.getFieldList()) > 0:
+                valueParameterName = " value"
+            sourceStream.writeline('void read{name}({name}&{value})'.format(name = name, value=valueParameterName))
+            sourceStream.writeline('{')
+            for field in self.getFieldList():
+                fieldName = field.getName()
+                typeName = field.getTypeName()
+                if type(field) is StructField:
+                    sourceStream.writeline('  read{typeName}({value}.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName, value=valueParameterName))
+                else:
+                    sourceStream.writeline('  {typeName} _dummy{typeName};'.format(typeName = typeName, fieldName = fieldName))
+                    sourceStream.writeline('  read{typeName}(_dummy{typeName});'.format(typeName = typeName, fieldName = fieldName))
+
+            sourceStream.writeline('}')
+            sourceStream.writeline()
+
 ###############################################################################
 class MessageDataType(StructDataType):
-    def __init__(self, name, parentTypeName = None):
-        StructDataType.__init__(self, name, parentTypeName)
+    __opcodeMap = {
+        'ConnectionLostMessage' : 1,
+        'CreateFederationExecutionRequestMessage' : 2,
+        'CreateFederationExecutionResponseMessage' : 3,
+        'DestroyFederationExecutionRequestMessage' : 4,
+        'DestroyFederationExecutionResponseMessage' : 5,
+        'EnumerateFederationExecutionsRequestMessage' : 6,
+        'EnumerateFederationExecutionsResponseMessage' : 7,
+        'InsertFederationExecutionMessage' : 8,
+        'ShutdownFederationExecutionMessage' : 9,
+        'EraseFederationExecutionMessage' : 10,
+        'ReleaseFederationHandleMessage' : 11,
+        'InsertModulesMessage' : 12,
+        'JoinFederationExecutionRequestMessage' : 13,
+        'JoinFederationExecutionResponseMessage' : 14,
+        'ResignFederationExecutionRequestMessage' : 15,
+        'JoinFederateNotifyMessage' : 16,
+        'ResignFederateNotifyMessage' : 17,
+        'ChangeAutomaticResignDirectiveMessage' : 18,
+        'RegisterFederationSynchronizationPointMessage' : 30,
+        'RegisterFederationSynchronizationPointResponseMessage' : 31,
+        'AnnounceSynchronizationPointMessage' : 32,
+        'SynchronizationPointAchievedMessage' : 33,
+        'FederationSynchronizedMessage' : 34,
+        'EnableTimeRegulationRequestMessage' : 40,
+        'EnableTimeRegulationResponseMessage' : 41,
+        'DisableTimeRegulationRequestMessage' : 42,
+        'CommitLowerBoundTimeStampMessage' : 43,
+        'CommitLowerBoundTimeStampResponseMessage' : 44,
+        'LockedByNextMessageRequestMessage' : 45,
+        'InsertRegionMessage' : 46,
+        'CommitRegionMessage' : 47,
+        'EraseRegionMessage' : 48,
+        'ChangeInteractionClassPublicationMessage' : 50,
+        'ChangeObjectClassPublicationMessage' : 51,
+        'ChangeInteractionClassSubscriptionMessage' : 52,
+        'ChangeObjectClassSubscriptionMessage' : 53,
+        'ObjectInstanceHandlesRequestMessage' : 60,
+        'ObjectInstanceHandlesResponseMessage' : 61,
+        'ReleaseMultipleObjectInstanceNameHandlePairsMessage' : 62,
+        'ReserveObjectInstanceNameRequestMessage' : 63,
+        'ReserveObjectInstanceNameResponseMessage' : 64,
+        'ReserveMultipleObjectInstanceNameRequestMessage' : 65,
+        'ReserveMultipleObjectInstanceNameResponseMessage' : 66,
+        'InteractionMessage' : 80,
+        'TimeStampedInteractionMessage' : 81,
+        'InsertObjectInstanceMessage' : 90,
+        'DeleteObjectInstanceMessage' : 91,
+        'TimeStampedDeleteObjectInstanceMessage' : 92,
+        # obsolete 'LocalDeleteObjectInstanceMessage' : 93,
+        'DestroyObjectInstanceMessage' : 94,
+        'AttributeUpdateMessage' : 94,
+        'TimeStampedAttributeUpdateMessage' : 96,
+        'RequestAttributeUpdateMessage' : 97,
+        'RequestClassAttributeUpdateMessage' : 98,
+        'ChangeObjectInstanceSubscriptionMessage' : 99,
+        'EnableTimeConstrainedNotifyMessage' : 100,
+        'DisableTimeConstrainedNotifyMessage' : 101,
+        'QueryAttributeOwnershipRequestMessage' : 102,
+        'QueryAttributeOwnershipResponseMessage' : 103,
+        'CreateFederationExecutionRequest2Message' : 104,
+        'JoinFederationExecutionRequest2Message' : 105,
+        'InsertModules2Message' : 106,
+        'InsertObjectInstanceWithRegionsMessage' : 107,
+    }
+    def getMessageOpcode(messageName):
+        if messageName in MessageDataType.__opcodeMap:
+            return MessageDataType.__opcodeMap[messageName]
+        else:
+            return None
+
+    def __init__(self, typeMap, name, parentTypeName = None):
+        StructDataType.__init__(self, typeMap, name, parentObject='Federation', parentTypeName=parentTypeName)
         self.__reliableExpression = None
         self.__objectInstanceExpression = None
-         
+
     def isMessage(self):
         return True
 
@@ -737,37 +1336,48 @@ class MessageDataType(StructDataType):
         if self.getParentTypeName() is None:
             sourceStream.writeline('class OPENRTI_API {name} {{'.format(name = self.getName()))
         else:
-            sourceStream.writeline('class OPENRTI_API {name} : public {parentTypeName} {{'.format(name = self.getName(), parentTypeName = self.getParentTypeName()))
+            sourceStream.writeline('class OPENRTI_API {name} final : public {parentTypeName} {{'.format(name = self.getName(), parentTypeName = self.getParentTypeName()))
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
-        sourceStream.writeline('{name}();'.format(name = self.getName()))
-        sourceStream.writeline('virtual ~{name}();'.format(name = self.getName()))
+        sourceStream.writeline('{name}() noexcept {{}};'.format(name = self.getName()))
+        sourceStream.writeline('{name}(const {name}&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}({name}&&) noexcept = default;'.format(name = self.getName()))
+        sourceStream.writeline('virtual ~{name}() noexcept = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}& operator=(const {name}&) = default;'.format(name = self.getName()))
+        sourceStream.writeline('{name}& operator=({name}&&) = default;'.format(name = self.getName()))
 
         sourceStream.writeline()
-        sourceStream.writeline('virtual const char* getTypeName() const;')
-        sourceStream.writeline('virtual void out(std::ostream& os) const;')
-        sourceStream.writeline('virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;')
+        sourceStream.writeline('virtual const char* getTypeName() const noexcept override;')
+        opcode = MessageDataType.getMessageOpcode(self.getName())
+        if not opcode is None:
+            sourceStream.writeline('static const int OpCode = {opcode};'.format(opcode=opcode))
+        else:
+            print("MessageDataType.writeDeclaration: no opcode:", self.getName())
+        sourceStream.writeline('virtual void out(std::ostream& os) const override;')
+        sourceStream.writeline('virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;')
+        sourceStream.writeline('virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;')
+        sourceStream.writeline('virtual size_t messageSize() const noexcept override;')
         sourceStream.writeline()
 
-        sourceStream.writeline('virtual bool operator==(const AbstractMessage& rhs) const;')
-        sourceStream.writeline('bool operator==(const {name}& rhs) const;'.format(name = self.getName()))
-        sourceStream.writeline('bool operator<(const {name}& rhs) const;'.format(name = self.getName()))
-        sourceStream.writeline('bool operator!=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator==(const AbstractMessage& rhs) const noexcept override;')
+        sourceStream.writeline('bool operator==(const {name}& rhs) const noexcept;'.format(name = self.getName()))
+        sourceStream.writeline('bool operator<(const {name}& rhs) const noexcept;'.format(name = self.getName()))
+        sourceStream.writeline('bool operator!=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator==(rhs); }')
-        sourceStream.writeline('bool operator>(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator>(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return rhs.operator<(*this); }')
-        sourceStream.writeline('bool operator>=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator>=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator<(rhs); }')
-        sourceStream.writeline('bool operator<=(const {name}& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('bool operator<=(const {name}& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{ return !operator>(rhs); }')
         sourceStream.writeline()
 
         if self.getReliableExpression():
-            sourceStream.writeline('virtual bool getReliable() const;')
+            sourceStream.writeline('bool getReliable() const noexcept override;')
             sourceStream.writeline()
 
         if self.getObjectInstanceExpression():
-            sourceStream.writeline('virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;')
+            sourceStream.writeline('virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;')
             sourceStream.writeline()
 
         for field in self.getFieldList():
@@ -789,28 +1399,8 @@ class MessageDataType(StructDataType):
 
     def writeImplementation(self, sourceStream):
         fieldCount = len(self.getFieldList())
-        if fieldCount == 0:
-            sourceStream.writeline('{name}::{name}()'.format(name = self.getName()))
-        else:
-            sourceStream.writeline('{name}::{name}() :'.format(name = self.getName()))
-        sourceStream.pushIndent()
-        index = 0
-        for field in self.getFieldList():
-            line = '{memberName}()'.format(memberName = field.getMemberName())
-            index = index + 1
-            if index < fieldCount:
-                line += ','
-            sourceStream.writeline(line)
-        sourceStream.popIndent()
-        sourceStream.writeline('{')
-        sourceStream.writeline('}')
-        sourceStream.writeline()
-        sourceStream.writeline('{name}::~{name}()'.format(name = self.getName()))
-        sourceStream.writeline('{')
-        sourceStream.writeline('}')
-        sourceStream.writeline()
         sourceStream.writeline('const char*')
-        sourceStream.writeline('{name}::getTypeName() const'.format(name = self.getName()))
+        sourceStream.writeline('{name}::getTypeName() const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  return "{name}";'.format(name = self.getName()))
         sourceStream.writeline('}')
@@ -818,7 +1408,33 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('void')
         sourceStream.writeline('{name}::out(std::ostream& os) const'.format(name = self.getName()))
         sourceStream.writeline('{')
-        sourceStream.writeline('  os << "{name} " << *this;'.format(name = self.getName()))
+        sourceStream.writeline('  os << "{name} {{ ";'.format(name = self.getName()))
+        count = 0
+        fields = self.getFieldList()
+        for field in fields:
+            count = count + 1
+            lowerName = field.getLowerName()
+            upperName = field.getUpperName()
+            if not field.hideOnPrint():
+                sourceStream.writeline('  os << "{lowerName}: " << get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
+                if count != len(fields):
+                    sourceStream.writeline('  os << ", ";')
+            else:
+                sourceStream.writeline('  // ' + type(field).__name__ + " " + field.getLowerName() + " (hidden)")
+                sourceStream.writeline('  //os << "{lowerName}: " << get{upperName}();'.format(lowerName = lowerName, upperName = upperName))
+                if count != len(fields):
+                    sourceStream.writeline('  //os << ", ";')
+
+        sourceStream.writeline('  os << " }";')
+        # sourceStream.writeline('  os << "{name} " << *this;'.format(name = self.getName()))
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+        parentDecl=self.getParentTypeName()
+        sourceStream.writeline('void')
+        sourceStream.writeline('{name}::out(std::ostream& os, ServerModel::Federation* federation) const'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  prettyprint(os, *this, federation);')
+        # sourceStream.writeline('  os << "{name} " << *this;'.format(name = self.getName()))
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -829,8 +1445,21 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
 
+        sourceStream.writeline('size_t')
+        sourceStream.writeline('{name}::messageSize() const noexcept'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = {parentTypeName}::messageSize();'.format(parentTypeName = self.getParentTypeName()));
+        for field in fields:
+            fieldName = field.getName()
+            sourceStream.writeline('result += byteSize(get{fieldName}());'.format(fieldName = fieldName))
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent();
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
         sourceStream.writeline('bool')
-        sourceStream.writeline('{name}::operator==(const AbstractMessage& rhs) const'.format(name = self.getName()))
+        sourceStream.writeline('{name}::operator==(const AbstractMessage& rhs) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         sourceStream.writeline('  const {name}* message = dynamic_cast<const {name}*>(&rhs);'.format(name = self.getName()))
         sourceStream.writeline('  if (!message)')
@@ -839,7 +1468,10 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
         sourceStream.writeline('bool')
-        sourceStream.writeline('{name}::operator==(const {name}& rhs) const'.format(name = self.getName()))
+        if len(fields) > 0:
+            sourceStream.writeline('{name}::operator==(const {name}& rhs) const noexcept'.format(name = self.getName()))
+        else:
+            sourceStream.writeline('{name}::operator==(const {name}&) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
         for field in self.getFieldList():
             upperName = field.getUpperName()
@@ -848,9 +1480,12 @@ class MessageDataType(StructDataType):
         sourceStream.writeline('}')
         sourceStream.writeline()
         sourceStream.writeline('bool')
-        sourceStream.writeline('{name}::operator<(const {name}& rhs) const'.format(name = self.getName()))
+        if len(fields) > 0:
+            sourceStream.writeline('{name}::operator<(const {name}& rhs) const noexcept'.format(name = self.getName()))
+        else:
+            sourceStream.writeline('{name}::operator<(const {name}&) const noexcept'.format(name = self.getName()))
         sourceStream.writeline('{')
-        for field in self.getFieldList():
+        for field in fields:
             upperName = field.getUpperName()
             sourceStream.writeline('  if (get{upperName}() < rhs.get{upperName}()) return true;'.format(upperName = upperName))
             sourceStream.writeline('  if (rhs.get{upperName}() < get{upperName}()) return false;'.format(upperName = upperName))
@@ -860,7 +1495,7 @@ class MessageDataType(StructDataType):
         if self.getReliableExpression():
             sourceStream.writeline()
             sourceStream.writeline('bool')
-            sourceStream.writeline('{name}::getReliable() const'.format(name = self.getName()))
+            sourceStream.writeline('{name}::getReliable() const noexcept'.format(name = self.getName()))
             sourceStream.writeline('{')
             sourceStream.writeline('  return {expression};'.format(expression = self.getReliableExpression()))
             sourceStream.writeline('}')
@@ -868,13 +1503,33 @@ class MessageDataType(StructDataType):
         if self.getObjectInstanceExpression():
             sourceStream.writeline()
             sourceStream.writeline('ObjectInstanceHandle')
-            sourceStream.writeline('{name}::getObjectInstanceHandleForMessage() const'.format(name = self.getName()))
+            sourceStream.writeline('{name}::getObjectInstanceHandleForMessage() const noexcept'.format(name = self.getName()))
             sourceStream.writeline('{')
             sourceStream.writeline('  return {expression};'.format(expression = self.getObjectInstanceExpression()))
             sourceStream.writeline('}')
 
         sourceStream.writeline()
 
+    def writeToString(self, sourceStream):
+        pass
+ 
+    def writeByteSize(self, sourceStream):
+        fields = self.getFieldList();
+        if len(fields) > 0:
+            sourceStream.writeline('inline size_t byteSize(const {name}& value) noexcept'.format(name = self.getName()))
+        else:
+            sourceStream.writeline('inline size_t byteSize(const {name}&) noexcept'.format(name = self.getName()))
+
+        sourceStream.writeline('{')
+        sourceStream.pushIndent()
+        sourceStream.writeline('size_t result = sizeof(AbstractMessage);');
+        for field in self.getFieldList():
+            fieldName = field.getName()
+            sourceStream.writeline('result += byteSize(value.get{fieldName}());'.format(fieldName = fieldName))
+        sourceStream.writeline('return result;');
+        sourceStream.popIndent();
+        sourceStream.writeline('}')
+        sourceStream.writeline()
 
 ###############################################################################
 class MessageEncoding(object):
@@ -882,72 +1537,9 @@ class MessageEncoding(object):
         self.__name = name
         # Currently this is common, but as the first incompatible change starts
         # override this in the encodings
-        self.__opcodeMap = {
-            'ConnectionLostMessage' : 1,
-            'CreateFederationExecutionRequestMessage' : 2,
-            'CreateFederationExecutionResponseMessage' : 3,
-            'DestroyFederationExecutionRequestMessage' : 4,
-            'DestroyFederationExecutionResponseMessage' : 5,
-            'EnumerateFederationExecutionsRequestMessage' : 6,
-            'EnumerateFederationExecutionsResponseMessage' : 7,
-            'InsertFederationExecutionMessage' : 8,
-            'ShutdownFederationExecutionMessage' : 9,
-            'EraseFederationExecutionMessage' : 10,
-            'ReleaseFederationHandleMessage' : 11,
-            'InsertModulesMessage' : 12,
-            'JoinFederationExecutionRequestMessage' : 13,
-            'JoinFederationExecutionResponseMessage' : 14,
-            'ResignFederationExecutionRequestMessage' : 15,
-            'JoinFederateNotifyMessage' : 16,
-            'ResignFederateNotifyMessage' : 17,
-            'ChangeAutomaticResignDirectiveMessage' : 18,
-            'RegisterFederationSynchronizationPointMessage' : 30,
-            'RegisterFederationSynchronizationPointResponseMessage' : 31,
-            'AnnounceSynchronizationPointMessage' : 32,
-            'SynchronizationPointAchievedMessage' : 33,
-            'FederationSynchronizedMessage' : 34,
-            'EnableTimeRegulationRequestMessage' : 40,
-            'EnableTimeRegulationResponseMessage' : 41,
-            'DisableTimeRegulationRequestMessage' : 42,
-            'CommitLowerBoundTimeStampMessage' : 43,
-            'CommitLowerBoundTimeStampResponseMessage' : 44,
-            'LockedByNextMessageRequestMessage' : 45,
-            'InsertRegionMessage' : 46,
-            'CommitRegionMessage' : 47,
-            'EraseRegionMessage' : 48,
-            'ChangeInteractionClassPublicationMessage' : 50,
-            'ChangeObjectClassPublicationMessage' : 51,
-            'ChangeInteractionClassSubscriptionMessage' : 52,
-            'ChangeObjectClassSubscriptionMessage' : 53,
-            'ObjectInstanceHandlesRequestMessage' : 60,
-            'ObjectInstanceHandlesResponseMessage' : 61,
-            'ReleaseMultipleObjectInstanceNameHandlePairsMessage' : 62,
-            'ReserveObjectInstanceNameRequestMessage' : 63,
-            'ReserveObjectInstanceNameResponseMessage' : 64,
-            'ReserveMultipleObjectInstanceNameRequestMessage' : 65,
-            'ReserveMultipleObjectInstanceNameResponseMessage' : 66,
-            'InteractionMessage' : 80,
-            'TimeStampedInteractionMessage' : 81,
-            'InsertObjectInstanceMessage' : 90,
-            'DeleteObjectInstanceMessage' : 91,
-            'TimeStampedDeleteObjectInstanceMessage' : 92,
-            # obsolete 'LocalDeleteObjectInstanceMessage' : 93,
-            'DestroyObjectInstanceMessage' : 94,
-            'AttributeUpdateMessage' : 94,
-            'TimeStampedAttributeUpdateMessage' : 96,
-            'RequestAttributeUpdateMessage' : 97,
-            'RequestClassAttributeUpdateMessage' : 98,
-            'ChangeObjectInstanceSubscriptionMessage' : 99
-        }
 
     def getName(self):
         return self.__name
-
-    def getMessageOpcode(self, messageName):
-        if messageName in self.__opcodeMap:
-            return self.__opcodeMap[messageName]
-        else:
-            return None
 
     def writeCEncoder(self, dataType, sourceStream):
         name = dataType.getName()
@@ -1208,26 +1800,10 @@ class MessageEncoding(object):
 
 
     def writeStructEncoder(self, dataType, sourceStream):
-        name = dataType.getName()
-        sourceStream.writeline('void write{name}(const {name}& value)'.format(name = name))
-        sourceStream.writeline('{')
-        for field in dataType.getFieldList():
-            fieldName = field.getName()
-            typeName = field.getTypeName()
-            sourceStream.writeline('  write{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
-        sourceStream.writeline('}')
-        sourceStream.writeline()
+        dataType.writeEncoder(sourceStream)
 
     def writeStructDecoder(self, dataType, sourceStream):
-        name = dataType.getName()
-        sourceStream.writeline('void read{name}({name}& value)'.format(name = name))
-        sourceStream.writeline('{')
-        for field in dataType.getFieldList():
-            fieldName = field.getName()
-            typeName = field.getTypeName()
-            sourceStream.writeline('  read{typeName}(value.get{fieldName}());'.format(typeName = typeName, fieldName = fieldName))
-        sourceStream.writeline('}')
-        sourceStream.writeline()
+        dataType.writeDecoder(sourceStream)
 
     def writeStructPayloadDecoder(self, dataType, sourceStream):
         if not dataType.hasPayload():
@@ -1249,6 +1825,7 @@ class MessageEncoding(object):
         sourceStream.writeline('#ifndef OpenRTI_' + encodingName + 'MessageEncoding_h')
         sourceStream.writeline('#define OpenRTI_' + encodingName + 'MessageEncoding_h')
         sourceStream.writeline()
+        sourceStream.writeline('#include "DebugNew.h"')
         sourceStream.writeline('#include "AbstractMessageEncoding.h"')
         sourceStream.writeline('#include "Export.h"')
         sourceStream.writeline()
@@ -1258,17 +1835,17 @@ class MessageEncoding(object):
         sourceStream.writeline('class OPENRTI_LOCAL ' + encodingName + 'MessageEncoding : public AbstractMessageEncoding {')
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
-        sourceStream.writeline(encodingName + 'MessageEncoding();')
-        sourceStream.writeline('virtual ~' + encodingName + 'MessageEncoding();')
+        sourceStream.writeline(encodingName + 'MessageEncoding() noexcept;')
+        sourceStream.writeline('virtual ~' + encodingName + 'MessageEncoding() noexcept;')
         sourceStream.writeline()
 
-        sourceStream.writeline('virtual const char* getName() const;')
+        sourceStream.writeline('const char* getName() const override;')
         sourceStream.writeline()
 
-        sourceStream.writeline('virtual void readPacket(const Buffer& buffer);')
+        sourceStream.writeline('void readPacket(const Buffer& buffer) override;')
         sourceStream.writeline('void decodeBody(const VariableLengthData& variableLengthData);')
         sourceStream.writeline('void decodePayload(const Buffer::const_iterator& i);')
-        sourceStream.writeline('virtual void writeMessage(const AbstractMessage& message);')
+        sourceStream.writeline('void writeMessage(const AbstractMessage& message) override;')
         sourceStream.writeline()
 
         sourceStream.popIndent()
@@ -1293,6 +1870,7 @@ class MessageEncoding(object):
         encodingClass = encodingName + 'MessageEncoding'
         sourceStream.writeCopyright()
         sourceStream.writeline()
+        sourceStream.writeline('#include "DebugNew.h"')
         sourceStream.writeline('#include "' + encodingName + 'MessageEncoding.h"')
         sourceStream.writeline('#include "AbstractMessageEncoding.h"')
         sourceStream.writeline('#include "DecodeDataStream.h"')
@@ -1302,7 +1880,7 @@ class MessageEncoding(object):
         sourceStream.writeline('#include "AbstractNetworkStatistics.h"')
         sourceStream.writeline()
         sourceStream.writeline('#ifndef __CPlusPlusStd')
-        sourceStream.writeline('#error "must include "OpenRTIConfig.h!"')
+        sourceStream.writeline('#error "must include OpenRTIConfig.h!"')
         sourceStream.writeline('#endif')
         sourceStream.writeline()
 
@@ -1348,8 +1926,9 @@ class MessageEncoding(object):
 
         for t in messageMap.getTypeList():
             messageName = t.getName()
-            opcode = self.getMessageOpcode(messageName)
+            opcode = MessageDataType.getMessageOpcode(messageName)
             if opcode is None:
+                if isinstance(t, MessageDataType): print("MessageEncoding.writeEncodingImplementation(encode): no opcode:", t.getName())
                 continue
             sourceStream.writeline('void')
             sourceStream.writeline('encode(' + encodingClass + '& messageEncoding, const {messageName}& message) const'.format(messageName = messageName))
@@ -1357,12 +1936,25 @@ class MessageEncoding(object):
             sourceStream.pushIndent()
             sourceStream.writeline('EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());')
             sourceStream.writeline('EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);')
-            sourceStream.writeline('encodeStream.writeUInt16Compressed({opcode});'.format(opcode = opcode))
+            sourceStream.writeline('encodeStream.writeUInt16Compressed({messageName}::OpCode);'.format(messageName = messageName))
             sourceStream.writeline('encodeStream.write{messageName}(message);'.format(messageName = messageName))
             sourceStream.writeline('headerStream.writeUInt32BE(uint32_t(encodeStream.size()));')
             sourceStream.popIndent()
             sourceStream.writeline('}')
             sourceStream.writeline()
+
+            #sourceStream.writeline('size_t')
+            #sourceStream.writeline('encodedSize(' + encodingClass + '& messageEncoding, const {messageName}& message) const'.format(messageName = messageName))
+            #sourceStream.writeline('{')
+            #sourceStream.pushIndent()
+            #sourceStream.writeline('size_t result = 0;')
+            #sourceStream.writeline('result += 2;')
+            #sourceStream.writeline('// encodeStream.write{messageName}(message);'.format(messageName = messageName))
+            #sourceStream.writeline('result += 4;')
+            #sourceStream.writeline('return result;')
+            #sourceStream.popIndent()
+            #sourceStream.writeline('}')
+            #sourceStream.writeline()
 
         sourceStream.popIndent()
         sourceStream.writeline('private:')
@@ -1409,11 +2001,11 @@ class MessageEncoding(object):
         sourceStream.writeline()
 
 
-        sourceStream.writeline(encodingName + 'MessageEncoding::' + encodingName + 'MessageEncoding()')
+        sourceStream.writeline(encodingName + 'MessageEncoding::' + encodingName + 'MessageEncoding() noexcept')
         sourceStream.writeline('{')
         sourceStream.writeline('}')
         sourceStream.writeline()
-        sourceStream.writeline(encodingName + 'MessageEncoding::~' + encodingName + 'MessageEncoding()')
+        sourceStream.writeline(encodingName + 'MessageEncoding::~' + encodingName + 'MessageEncoding() noexcept')
         sourceStream.writeline('{')
         sourceStream.writeline('}')
         sourceStream.writeline()
@@ -1439,7 +2031,7 @@ class MessageEncoding(object):
         sourceStream.writeline('} else {')
         sourceStream.writeline('  decodePayload(i);')
         sourceStream.writeline('}')
-        sourceStream.writeline('if (getInputBufferComplete())')
+        sourceStream.writeline('if (getInputBufferComplete() && _message != nullptr)')
         sourceStream.writeline('{')
         sourceStream.pushIndent()
         sourceStream.writelineNoIndent('#ifdef ENABLE_NETWORKSTATISTICS')
@@ -1462,12 +2054,13 @@ class MessageEncoding(object):
 
         for t in messageMap.getTypeList():
             messageName = t.getName()
-            opcode = self.getMessageOpcode(messageName)
+            opcode = MessageDataType.getMessageOpcode(messageName)
             if opcode is None:
+                if isinstance(t, MessageDataType): print("MessageEncoding.writeEncodingImplementation(decodeBody): no opcode:", t.getName())
                 continue
-            sourceStream.writeline('case {opcode}:'.format(opcode = opcode))
+            sourceStream.writeline('case {messageName}::OpCode:'.format(messageName = messageName))
             sourceStream.pushIndent()
-            sourceStream.writeline('_message = new {messageName};'.format(messageName = messageName))
+            sourceStream.writeline('_message = MakeShared<{messageName}>();'.format(messageName = messageName))
             sourceStream.writeline('decodeStream.read{messageName}(static_cast<{messageName}&>(*_message));'.format(messageName = messageName))
             sourceStream.writeline('break;')
             sourceStream.popIndent()
@@ -1490,12 +2083,13 @@ class MessageEncoding(object):
         sourceStream.writeline('switch (opcode) {')
         for t in messageMap.getTypeList():
             messageName = t.getName()
-            opcode = self.getMessageOpcode(messageName)
+            opcode = MessageDataType.getMessageOpcode(messageName)
             if opcode is None:
+                if isinstance(t, MessageDataType): print("MessageEncoding.writeEncodingImplementation(decodePayload): no opcode:", t.getName())
                 continue
             if not t.hasPayload():
                 continue
-            sourceStream.writeline('case {opcode}:'.format(opcode = opcode))
+            sourceStream.writeline('case {messageName}::OpCode:'.format(messageName = messageName))
             sourceStream.pushIndent()
             sourceStream.writeline('payloadDecoder.readPayload{messageName}(static_cast<{messageName}&>(*_message));'.format(messageName = messageName))
             sourceStream.writeline('break;')
@@ -1513,7 +2107,7 @@ class MessageEncoding(object):
         sourceStream.pushIndent()
         sourceStream.writeline('message.dispatchFunctor(DispatchFunctor(*this));')
         sourceStream.writelineNoIndent('#ifdef ENABLE_NETWORKSTATISTICS')
-        sourceStream.writeline('GetNetworkStatistics().MessageSent(message->getTypeName());')
+        sourceStream.writeline('GetNetworkStatistics().MessageSent(message.getTypeName());')
         sourceStream.writelineNoIndent('#endif')
         sourceStream.popIndent()
         sourceStream.writeline('}')
@@ -1545,7 +2139,7 @@ class TypeMap(object):
         self.__typeMap = {}
         for node in root.getchildren():
             if node.tag == 'message':
-                message = MessageDataType(node.get('type') + 'Message', 'AbstractMessage')
+                message = MessageDataType(self, node.get('type') + 'Message', parentTypeName='AbstractMessage')
                 for field in node.getchildren():
                     if field.tag == 'field':
                         hide = field.get('hide')
@@ -1554,7 +2148,7 @@ class TypeMap(object):
                                 hide = True
                             else:
                                 hide = False
-                        message.addField(field.get('name'), field.get('type'), hide)
+                        message.addField(field.get('name'), field.get('type'), hideOnPrint=hide)
                     elif field.tag == 'reliable':
                         message.setReliableExpression(field.get('expression'))
                     elif field.tag == 'objectInstance':
@@ -1565,33 +2159,35 @@ class TypeMap(object):
             elif node.tag == 'type':
                 typeName = node.get('type')
                 if typeName == 'enum':
-                    enum = EnumDataType(node.get('name'))
+                    enum = EnumDataType(self, node.get('name'))
                     for enumerant in node.getchildren():
                         if enumerant.tag == 'enumerant':
-                            enum.addEnum(enumerant.get('name'), enumerant.get('value'))
+                            enum.addEnum(enumerant.get('name'), enumerant.get('value'), enumerant.get('repr'))
                     self.addType(enum)
 
                 elif typeName == 'vector':
-                    self.addType(VectorDataType(node.get('name'), node.get('scalar')))
+                    scalarTypeName = node.get('scalar')
+                    scalarType = self.__typeMap[scalarTypeName]
+                    self.addType(VectorDataType(self, node.get('name'), scalarTypeName, scalarType.getParentObject()))
 
                 elif typeName == 'set':
-                    self.addType(SetDataType(node.get('name'), node.get('scalar')))
+                    self.addType(SetDataType(self, node.get('name'), node.get('scalar')))
 
                 elif typeName == 'map':
-                    self.addType(MapDataType(node.get('name'), node.get('key'), node.get('value')))
+                    self.addType(MapDataType(self, node.get('name'), node.get('key'), node.get('value')))
 
                 elif typeName == 'pair':
-                    self.addType(PairDataType(node.get('name'), node.get('first'), node.get('second')))
+                    self.addType(PairDataType(self, node.get('name'), node.get('first'), node.get('second')))
 
                 elif typeName == 'struct':
-                    struct = StructDataType(node.get('name'))
+                    struct = StructDataType(self, node.get('name'), abstract=node.get('abstract'), parentObject=node.get('parent'), parentTypeName=node.get('base'))
                     struct.setCopyOnWrite(node.get('copyOnWrite') == 'true')
                     for field in node.getchildren():
                         if field.tag == 'field':
-                            struct.addField(field.get('name'), field.get('type'))
+                            struct.addField(field.get('name'), field.get('type'), const=field.get('const'), value=field.get('value'))
                     self.addType(struct)
                 else:
-                    dataType = CDataType(node.get('name'), node.get('encoding'), node.get('ctype'))
+                    dataType = CDataType(self, node.get('name'), node.get('encoding'), node.get('ctype'), node.get('parent'))
                     self.addType(dataType)
             #node = node.next
 
@@ -1606,7 +2202,9 @@ class TypeMap(object):
         return self.__typeList
 
     def getType(self, name):
-        return self.__typeMap[name]
+        if name in self.__typeMap:
+            return self.__typeMap[name]
+        return None
 
     def writeDeclaration(self, sourceStream):
         sourceStream.writeCopyright()
@@ -1622,22 +2220,42 @@ class TypeMap(object):
         sourceStream.writeline('#include "VariableLengthData.h"')
         sourceStream.writeline()
         sourceStream.writeline('#ifndef __CPlusPlusStd')
-        sourceStream.writeline('#error "must include "OpenRTIConfig.h!"')
+        sourceStream.writeline('#error "must include OpenRTIConfig.h!"')
         sourceStream.writeline('#endif')
         sourceStream.writeline()
         sourceStream.writeline('namespace OpenRTI {')
+
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeForwardDeclaration(sourceStream)
+
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeDeclaration(sourceStream)
+
         sourceStream.writeline()
         for t in self.__typeList:
-            t.writeStreamOut(sourceStream)
+            t.writeStreamOutDecl(sourceStream)
+
+        sourceStream.writeline()
+        sourceStream.writeline('template<typename T, typename ParentObjectClass>')
+        sourceStream.writeline('std::ostream&')
+        sourceStream.writeline('prettyprint(std::ostream& os, const T& value, ParentObjectClass*)')
+        sourceStream.writeline('{')
+        sourceStream.writeline('  os << value;')
+        sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+        for t in self.__typeList:
+            t.writePrettyPrintDecl(sourceStream)
+
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeToString(sourceStream)
+        sourceStream.writeline()
+        for t in self.__typeList:
+            t.writeByteSize(sourceStream)
         sourceStream.writeline('} // namespace OpenRTI')
         sourceStream.writeline()
         sourceStream.writeline('#endif')
@@ -1645,17 +2263,23 @@ class TypeMap(object):
     def writeImplementation(self, sourceStream):
         sourceStream.writeCopyright()
         sourceStream.writeline()
+        sourceStream.writeline('#include "DebugNew.h"')
         sourceStream.writeline('#include "Message.h"')
         sourceStream.writeline()
         sourceStream.writeline('#include <ostream>')
         sourceStream.writeline('#include "AbstractMessage.h"')
         sourceStream.writeline('#include "AbstractMessageDispatcher.h"')
         sourceStream.writeline('#include "StringUtils.h"')
+        sourceStream.writeline('#include "ServerModel.h"')
         sourceStream.writeline()
         sourceStream.writeline('namespace OpenRTI {')
         sourceStream.writeline()
         for t in self.__typeList:
             t.writeImplementation(sourceStream)
+        for t in self.__typeList:
+            t.writeStreamOut(sourceStream)
+            t.writePrettyPrint(sourceStream)
+        sourceStream.writeline()
         sourceStream.writeline('} // namespace OpenRTI')
 
     def writeDispatcher(self, sourceStream):
@@ -1678,7 +2302,7 @@ class TypeMap(object):
         sourceStream.writeline('class OPENRTI_LOCAL AbstractMessageDispatcher {')
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
-        sourceStream.writeline('virtual ~AbstractMessageDispatcher() {}')
+        sourceStream.writeline('virtual ~AbstractMessageDispatcher() noexcept {}')
         sourceStream.writeline()
 
         for t in self.__typeList:
@@ -1695,13 +2319,13 @@ class TypeMap(object):
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
         sourceStream.writeline('FunctorMessageDispatcher(T& t) : _t(t) {}')
-        sourceStream.writeline('virtual ~FunctorMessageDispatcher() {}')
+        sourceStream.writeline('virtual ~FunctorMessageDispatcher() noexcept {}')
         sourceStream.writeline()
 
         for t in self.__typeList:
             if not t.isMessage():
                 continue
-            sourceStream.writeline('virtual void accept(const {name}& message) const {{ _t(message); }}'.format(name = t.getName()))
+            sourceStream.writeline('virtual void accept(const {name}& message) const override {{ _t(message); }}'.format(name = t.getName()))
 
         sourceStream.popIndent()
         sourceStream.writeline('private:')
@@ -1716,13 +2340,13 @@ class TypeMap(object):
         sourceStream.writeline('public:')
         sourceStream.pushIndent()
         sourceStream.writeline('ConstFunctorMessageDispatcher(const T& t) : _t(t) {}')
-        sourceStream.writeline('virtual ~ConstFunctorMessageDispatcher() {}')
+        sourceStream.writeline('virtual ~ConstFunctorMessageDispatcher() noexcept {}')
         sourceStream.writeline()
 
         for t in self.__typeList:
             if not t.isMessage():
                 continue
-            sourceStream.writeline('virtual void accept(const {name}& message) const {{ _t(message); }}'.format(name = t.getName()))
+            sourceStream.writeline('virtual void accept(const {name}& message) const override {{ _t(message); }}'.format(name = t.getName()))
 
         sourceStream.popIndent()
         sourceStream.writeline('private:')
@@ -1788,10 +2412,15 @@ elif outputMode == 'MessageEncodingImplementation':
     typeMap.writeEncodingImplementation(SourceStream(SourceStream(sys.stdout)), messageEncoding)
 else:
     # This is the shortcut for 'just do all output into the current directory'
+    print('write ' + 'Message.h')
     typeMap.writeDeclaration(SourceStream(open('Message.h', 'w+')))
+    print('write ' + 'Message.cpp')
     typeMap.writeImplementation(SourceStream(open('Message.cpp', 'w+')))
+    print('write ' + 'AbstractMessageDispatcher.h')
     typeMap.writeDispatcher(SourceStream(open('AbstractMessageDispatcher.h', 'w+')))
 
     messageEncoding = TightBE1MessageEncoding()
+    print('write ' + 'TightBE1MessageEncoding.h')
     typeMap.writeEncodingDeclaration(SourceStream(open('TightBE1MessageEncoding.h', 'w+')), messageEncoding)
+    print('write ' + 'TightBE1MessageEncoding.cpp')
     typeMap.writeEncodingImplementation(SourceStream(open('TightBE1MessageEncoding.cpp', 'w+')), messageEncoding)

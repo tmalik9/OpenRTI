@@ -23,19 +23,19 @@
 
 namespace OpenRTI {
 
-Thread::Thread(void) :
-  _privateData(new PrivateData)
+Thread::Thread(void) noexcept 
+  : _privateData(new PrivateData)
 {
 }
 
-Thread::~Thread(void)
+Thread::~Thread(void) noexcept
 {
   OpenRTIAssert(!Thread::count(this));
   delete _privateData;
   _privateData = 0;
 }
 
-void Thread::destruct(Thread* thread)
+void Thread::destruct(Thread* thread) noexcept
 {
   delete thread;
 }
@@ -47,7 +47,7 @@ Thread::start()
 }
 
 void
-Thread::wait()
+Thread::wait() noexcept
 {
   _privateData->wait();
 }

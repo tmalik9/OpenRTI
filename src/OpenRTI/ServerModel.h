@@ -29,6 +29,7 @@
 #include "HandleAllocator.h"
 #include "IntrusiveList.h"
 #include "IntrusiveUnorderedMap.h"
+#include "VariableLengthDataTuple.h"
 #include "Referenced.h"
 #include "RegionSet.h"
 #include "ServerOptions.h"
@@ -36,7 +37,14 @@
 #include "Types.h"
 #include "LogStream.h"
 
+#include <memory>
+
 namespace OpenRTI {
+
+class MomServer;
+class AbstractServer;
+struct AbstractFederateMetrics;
+
 namespace ServerModel {
 
 // Helper return type for some publish/subscribe stuff.
@@ -115,8 +123,7 @@ class OPENRTI_LOCAL BroadcastConnectHandleSet {
   }
 
   // Returns if any existing connect in this server node publishes this
-  bool empty() const
-  { return _connectHandleSet.empty(); }
+  bool empty() const noexcept { return _connectHandleSet.empty(); }
 
   // Returns if the given connect handle publishes this
   bool contains(const ConnectHandle& connectHandle) const
@@ -132,8 +139,7 @@ class OPENRTI_LOCAL BroadcastConnectHandleSet {
     return false;
   }
 
-  const ConnectHandleSet& getConnectHandleSet() const
-  { return _connectHandleSet; }
+  const ConnectHandleSet& getConnectHandleSet() const noexcept { return _connectHandleSet; }
 
  private:
   ConnectHandleSet _connectHandleSet;
@@ -220,9 +226,12 @@ public:
     return Unsubscribed;
   }
 
+  // FIXME This returns only the passive subscriptions
   const ConnectHandleSet& getSubscribedConnectHandleSet() const
   { return _subscribedConnects.getConnectHandleSet(); }
-  void getSubscribedAndIntersectingConnectHandleSet(ConnectHandleSet& connectHandleSet, const RegionSet& regionSet) const
+
+  // FIXME This returns only the passive subscriptions
+  void getSubscribedAndIntersectingConnectHandleSet(ConnectHandleSet& connectHandleSet, const RegionSet& /*regionSet*/) const
   { connectHandleSet = _subscribedConnects.getConnectHandleSet(); }
 
   void removeConnect(const ConnectHandle& connectHandle)
@@ -230,9 +239,9 @@ public:
     // FIXME, should not use this
     setSubscriptionType(connectHandle, Unsubscribed);
 
-    // The the unpublish must have happened before, so just make sure that it is empty
+    // The unpublish must have happened before, so just make sure that it is empty
     OpenRTIAssert(!_publishedConnects.contains(connectHandle));
-    // The the unsubscribe must have happened before, so just make sure that it is empty
+    // The unsubscribe must have happened before, so just make sure that it is empty
     OpenRTIAssert(!_activeSubscribedConnects.contains(connectHandle));
     OpenRTIAssert(!_subscribedConnects.contains(connectHandle));
   }
@@ -263,27 +272,6 @@ public:
 };
 
 ///// FIXME above here should also move into a clean referencing scheme to the connects and what not.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ////////////////////////////////////////////////////////////
 
 template<typename T, typename H>
@@ -313,16 +301,13 @@ public:
   typedef IntrusiveList<T, 0> FirstList;
 
 protected:
-  HandleListEntity()
-  { }
-  HandleListEntity(const H& handle) :
-    IntrusiveUnorderedMap<H, T>::Hook(handle)
+  HandleListEntity() noexcept { }
+  HandleListEntity(const H& handle)
+    : IntrusiveUnorderedMap<H, T>::Hook(handle)
   { }
 
-  const H& _getHandle() const
-  { return HandleMap::Hook::getKey(); }
-  void _setHandle(const H& handle)
-  { HandleMap::Hook::setKey(handle); }
+  const H& _getHandle() const { return HandleMap::Hook::getKey(); }
+  void _setHandle(const H& handle) { HandleMap::Hook::setKey(handle); }
 };
 
 ////////////////////////////////////////////////////////////
@@ -334,22 +319,17 @@ public:
   typedef IntrusiveUnorderedMap<S, T> StringMap;
 
 protected:
-  HandleStringEntity()
-  { }
-  HandleStringEntity(const H& handle, const S& name) :
-    IntrusiveUnorderedMap<H, T>::Hook(handle),
-    IntrusiveUnorderedMap<S, T>::Hook(name)
+  HandleStringEntity() noexcept { }
+  HandleStringEntity(const H& handle, const S& name)
+    : IntrusiveUnorderedMap<H, T>::Hook(handle)
+    , IntrusiveUnorderedMap<S, T>::Hook(name)
   { }
 
-  const H& _getHandle() const
-  { return HandleMap::Hook::getKey(); }
-  void _setHandle(const H& handle)
-  { HandleMap::Hook::setKey(handle); }
+  const H& _getHandle() const { return HandleMap::Hook::getKey(); }
+  void _setHandle(const H& handle) { HandleMap::Hook::setKey(handle); }
 
-  const S& _getString() const
-  { return StringMap::Hook::getKey(); }
-  void _setString(const S& string)
-  { StringMap::Hook::setKey(string); }
+  const S& _getString() const { return StringMap::Hook::getKey(); }
+  void _setString(const S& string) { StringMap::Hook::setKey(string); }
 };
 
 ////////////////////////////////////////////////////////////
@@ -386,8 +366,8 @@ public:
   DimensionHandleSet _dimensionHandleSet;
 
 private:
-  Region(const Region&);
-  Region& operator=(const Region&);
+  Region(const Region&) = delete;
+  Region& operator=(const Region&) = delete;
 };
 
 ////////////////////////////////////////////////////////////
@@ -402,28 +382,26 @@ public:
   InstanceAttribute(ObjectInstance& objectInstance, ClassAttribute& classAttribute);
   ~InstanceAttribute();
 
-  const AttributeHandle& getAttributeHandle() const
-  { return HandleEntity<InstanceAttribute, AttributeHandle>::_getHandle(); }
+  const AttributeHandle& getAttributeHandle() const {
+    return HandleEntity<InstanceAttribute, AttributeHandle>::_getHandle();
+  }
   void setAttributeHandle(const AttributeHandle& attributeHandle);
 
-  const ObjectInstance& getObjectInstance() const
-  { return _objectInstance; }
-  ObjectInstance& getObjectInstance()
-  { return _objectInstance; }
+  const ObjectInstance& getObjectInstance() const noexcept { return _objectInstance; }
+  ObjectInstance& getObjectInstance() noexcept { return _objectInstance; }
 
-  const ClassAttribute& getClassAttribute() const
-  { return _classAttribute; }
-  ClassAttribute& getClassAttribute()
-  { return _classAttribute; }
+  const ClassAttribute& getClassAttribute() const noexcept { return _classAttribute; }
+  ClassAttribute& getClassAttribute() noexcept { return _classAttribute; }
 
   /// Get the ConnectHandle this attribute is owned
-  const ConnectHandle& getOwnerConnectHandle() const
-  { return _ownerConnectHandle; }
+  const ConnectHandle& getOwnerConnectHandle() const noexcept { return _ownerConnectHandle; }
   void setOwnerConnectHandle(const ConnectHandle& connectHandle)
   {
     _receivingConnects.erase(connectHandle);
     _ownerConnectHandle = connectHandle;
   }
+  const FederateHandle& getOwnerFederate() const noexcept { return _ownerFederate; }
+  void setOwnerFederate(const FederateHandle& federateHandle);
 
   void removeConnect(const ConnectHandle& connectHandle);
 
@@ -433,6 +411,9 @@ public:
 
   /// The connect this attribute is owned by
   ConnectHandle _ownerConnectHandle;
+
+  /// The federate this attribute is owned by
+  FederateHandle _ownerFederate;
 
 private:
   InstanceAttribute(const InstanceAttribute&) = delete;
@@ -456,23 +437,18 @@ public:
   ~ObjectInstanceConnect();
 
   /// The connect handle to identify this connect
-  const ConnectHandle& getConnectHandle() const
-  { return HandleMap::Hook::getKey(); }
+  const ConnectHandle& getConnectHandle() const noexcept { return HandleMap::Hook::getKey(); }
   void setConnectHandle(const ConnectHandle& connectHandle);
 
-  const ObjectInstance& getObjectInstance() const
-  { return _objectInstance; }
-  ObjectInstance& getObjectInstance()
-  { return _objectInstance; }
+  const ObjectInstance& getObjectInstance() const noexcept { return _objectInstance; }
+  ObjectInstance& getObjectInstance() noexcept { return _objectInstance; }
 
-  const FederationConnect& getFederationConnect() const
-  { return _federationConnect; }
-  FederationConnect& getFederationConnect()
-  { return _federationConnect; }
+  const FederationConnect& getFederationConnect() const noexcept { return _federationConnect; }
+  FederationConnect& getFederationConnect() noexcept { return _federationConnect; }
 
 private:
-  ObjectInstanceConnect(const ObjectInstanceConnect&);
-  ObjectInstanceConnect& operator=(const ObjectInstanceConnect&);
+  ObjectInstanceConnect(const ObjectInstanceConnect&) = delete;
+  ObjectInstanceConnect& operator=(const ObjectInstanceConnect&) = delete;
 
   ObjectInstance& _objectInstance;
   FederationConnect& _federationConnect;
@@ -504,21 +480,15 @@ public:
   { return HandleStringEntity<ObjectInstance, ObjectInstanceHandle>::_getString(); }
   void setName(const std::string& name);
 
-  const Federation& getFederation() const
-  { return _federation; }
-  Federation& getFederation()
-  { return _federation; }
+  const Federation& getFederation() const noexcept { return _federation; }
+  Federation& getFederation() noexcept { return _federation; }
 
   //void insert(InstanceAttribute& instanceAttribute);
   InstanceAttribute* getInstanceAttribute(const AttributeHandle& attributeHandle);
   InstanceAttribute* getPrivilegeToDeleteInstanceAttribute();
-  InstanceAttribute::HandleMap& getAttributeHandleInstanceAttributeMap()
-  { return _attributeHandleInstanceAttributeMap; }
+  InstanceAttribute::HandleMap& getAttributeHandleInstanceAttributeMap() noexcept { return _attributeHandleInstanceAttributeMap; }
 
-  void insert(ObjectInstanceConnect& objectInstanceConnect)
-  { _connectHandleObjectInstanceConnectMap.insert(objectInstanceConnect); }
-  ObjectInstanceConnect::HandleMap& getConnectHandleObjectInstanceConnectMap()
-  { return _connectHandleObjectInstanceConnectMap; }
+  ObjectInstanceConnect::HandleMap& getConnectHandleObjectInstanceConnectMap() noexcept { return _connectHandleObjectInstanceConnectMap; }
   /// Mark the name handle pair also represented with this as used in the federationConnect
   void reference(FederationConnect& federationConnect);
   /// Releases the ObjectInstanceConnect entry belonging to the connectHandle
@@ -526,14 +496,14 @@ public:
 
   void removeConnect(const ConnectHandle& connectHandle);
 
-  ObjectClass* getObjectClass()
+  ObjectClass* getObjectClass() const
   { return _objectClass; }
   void setObjectClass(ObjectClass* objectClass);
 
   /// Return the connect that owns this object
   ConnectHandle getOwnerConnectHandle()
   {
-    InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
+    const InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
     if (!instanceAttribute)
       return ConnectHandle();
     return instanceAttribute->getOwnerConnectHandle();
@@ -546,9 +516,24 @@ public:
     instanceAttribute->setOwnerConnectHandle(connectHandle);
   }
 
+  FederateHandle getOwnerFederate()
+  {
+    const InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
+    if (!instanceAttribute)
+      return FederateHandle();
+    return instanceAttribute->getOwnerFederate();
+  }
+  void setOwnerFederate(const FederateHandle& federateHandle)
+  {
+    InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
+    if (!instanceAttribute)
+      return;
+    instanceAttribute->setOwnerFederate(federateHandle);
+  }
+
 private:
-  ObjectInstance(const ObjectInstance&);
-  ObjectInstance& operator=(const ObjectInstance&);
+  ObjectInstance(const ObjectInstance&) = delete;
+  ObjectInstance& operator=(const ObjectInstance&) = delete;
 
   Federation& _federation;
 
@@ -579,22 +564,17 @@ public:
   { return HandleListEntity<SynchronizationFederate, FederateHandle>::_getHandle(); }
   void setFederateHandle(const FederateHandle& federateHandle);
 
-  const Synchronization& getSynchronization() const
-  { return _synchronization; }
-  Synchronization& getSynchronization()
-  { return _synchronization; }
-  const Federate& getFederate() const
-  { return _federate; }
-  Federate& getFederate()
-  { return _federate; }
+  const Synchronization& getSynchronization() const noexcept { return _synchronization; }
+  Synchronization& getSynchronization() noexcept { return _synchronization; }
+  const Federate& getFederate() const noexcept { return _federate; }
+  Federate& getFederate() noexcept { return _federate; }
 
-  bool getSuccessful() const
-  { return _successful; }
+  bool getSuccessful() const noexcept { return _successful; }
   void setSuccessful(bool successful);
 
 private:
-  SynchronizationFederate(const SynchronizationFederate&);
-  SynchronizationFederate& operator=(const SynchronizationFederate&);
+  SynchronizationFederate(const SynchronizationFederate&) = delete;
+  SynchronizationFederate& operator=(const SynchronizationFederate&) = delete;
 
   Synchronization& _synchronization;
   Federate& _federate;
@@ -615,12 +595,10 @@ public:
   { return NameMap::Hook::getKey(); }
   void setLabel(const std::string& label);
 
-  const VariableLengthData& getTag() const
-  { return _tag; }
+  const VariableLengthData& getTag() const noexcept { return _tag; }
   void setTag(const VariableLengthData& tag);
 
-  bool getAddJoiningFederates() const
-  { return _addJoiningFederates; }
+  bool getAddJoiningFederates() const noexcept { return _addJoiningFederates; }
   void setAddJoiningFederates(bool addJoiningFederates);
 
   bool getIsWaitingFor(const FederateHandle& federateHandle);
@@ -638,8 +616,8 @@ public:
   SynchronizationFederate::HandleMap _achievedFederateSyncronizationMap;
 
 private:
-  Synchronization(const Synchronization&);
-  Synchronization& operator=(const Synchronization&);
+  Synchronization(const Synchronization&) = delete;
+  Synchronization& operator=(const Synchronization&) = delete;
 
   VariableLengthData _tag;
 
@@ -652,20 +630,19 @@ class NodeConnect;
 class Federation;
 class FederationConnect;
 
-class OPENRTI_LOCAL Federate : public HandleStringEntity<Federate, FederateHandle>, public IntrusiveList<Federate, 0>::Hook, public IntrusiveList<Federate, 1>::Hook {
+class OPENRTI_LOCAL Federate : public HandleStringEntity<Federate, FederateHandle>, public IntrusiveList<Federate, 0>::Hook, public IntrusiveList<Federate, 1>::Hook, public IntrusiveList<Federate, 2>::Hook {
 public:
   typedef HandleStringEntity<Federate, FederateHandle>::HandleMap HandleMap;
   typedef HandleStringEntity<Federate, FederateHandle>::StringMap NameMap;
   typedef IntrusiveList<Federate, 0> FirstList; // Used to access federates from the FederationConnect
-  typedef IntrusiveList<Federate, 1> SecondList; // Used to access time regulating federates from the FederationConnect
+  typedef IntrusiveList<Federate, 1> TimeRegulatingList; // Used to access time regulating federates from the FederationConnect
+  typedef IntrusiveList<Federate, 2> TimeConstrainedList; // Used to access time constrained federates from the FederationConnect
 
   Federate(Federation& federation);
   ~Federate();
 
-  const Federation& getFederation() const
-  { return _federation; }
-  Federation& getFederation()
-  { return _federation; }
+  const Federation& getFederation() const noexcept { return _federation; }
+  Federation& getFederation() noexcept { return _federation; }
 
   const std::string& getName() const
   { return HandleStringEntity<Federate, FederateHandle>::_getString(); }
@@ -679,12 +656,10 @@ public:
   { return _federateType; }
   void setFederateType(const std::string& federateType);
 
-  ResignAction getResignAction() const
-  { return _resignAction; }
+  ResignAction getResignAction() const noexcept { return _resignAction; }
   void setResignAction(ResignAction resignAction);
 
-  bool getResignPending() const
-  { return _resignPending; }
+  bool getResignPending() const noexcept { return _resignPending; }
   void setResignPending(bool resignPending);
 
   void insert(SynchronizationFederate& synchronizationFederate);
@@ -700,6 +675,7 @@ public:
   { return _regionHandleRegionMap; }
 
   bool getIsTimeRegulating() const;
+  bool getIsTimeConstrained() const;
 
   const VariableLengthData& getTimeAdvanceTimeStamp() const
   { return _timeAdvanceTimeStamp; }
@@ -721,30 +697,28 @@ public:
   FederationConnect* getFederationConnect() const
   { return _federationConnect; }
   ConnectHandle getConnectHandle() const;
+
+  void setIsInternal(bool isInternal) noexcept { _isInternal=isInternal; }
+  bool getIsInternal() const noexcept { return _isInternal; }
   void send(const SharedPtr<const AbstractMessage>& message);
 
 private:
-  Federate(const Federate&);
-  Federate& operator=(const Federate&);
+  Federate(const Federate&) = delete;
+  Federate& operator=(const Federate&) = delete;
 
   Federation& _federation;
-
   std::string _federateType;
-
   ResignAction _resignAction;
-
   bool _resignPending;
-
   FederationConnect* _federationConnect;
-
   SynchronizationFederate::FirstList _synchronizationFederateList;
-
   Region::HandleMap _regionHandleRegionMap;
 
   // Time constrained federates current state
   VariableLengthData _timeAdvanceTimeStamp;
   VariableLengthData _nextMessageTimeStamp;
   Unsigned _commitId;
+  bool _isInternal;
 };
 
 ////////////////////////////////////////////////////////////
@@ -767,8 +741,8 @@ public:
   { return _module; }
 
 private:
-  DimensionModule(const DimensionModule&);
-  DimensionModule& operator=(const DimensionModule&);
+  DimensionModule(const DimensionModule&) = delete;
+  DimensionModule& operator=(const DimensionModule&) = delete;
 
   Dimension& _dimension;
   Module& _module;
@@ -838,8 +812,8 @@ public:
   { _dimensionModuleList.push_back(dimensionModule); }
 
 private:
-  Dimension(const Dimension&);
-  Dimension& operator=(const Dimension&);
+  Dimension(const Dimension&) = delete;
+  Dimension& operator=(const Dimension&) = delete;
 
   Federation& _federation;
 
@@ -857,8 +831,8 @@ class UpdateRate;
 
 class OPENRTI_LOCAL UpdateRateModule : public ListPair<UpdateRateModule> {
 public:
-  UpdateRateModule(UpdateRate& updateRate, Module& module);
-  ~UpdateRateModule();
+  UpdateRateModule(UpdateRate& updateRate, Module& module) : _updateRate(updateRate), _module(module) { }
+  ~UpdateRateModule() {}
 
   const UpdateRate& getUpdateRate() const
   { return _updateRate; }
@@ -870,8 +844,11 @@ public:
   { return _module; }
 
 private:
-  UpdateRateModule(const UpdateRateModule&);
-  UpdateRateModule& operator=(const UpdateRateModule&);
+  UpdateRateModule() = delete;
+  UpdateRateModule(const UpdateRateModule&) = delete;
+  UpdateRateModule(UpdateRateModule&&) = delete;
+  UpdateRateModule& operator=(const UpdateRateModule&) = delete;
+  UpdateRateModule& operator=(UpdateRateModule&&) = delete;
 
   UpdateRate& _updateRate;
   Module& _module;
@@ -889,37 +866,596 @@ public:
   UpdateRate(Federation& federation);
   ~UpdateRate();
 
-  const Federation& getFederation() const
-  { return _federation; }
-  Federation& getFederation()
-  { return _federation; }
+  const Federation& getFederation() const { return _federation; }
+  Federation& getFederation() { return _federation; }
 
-  const std::string& getName() const
-  { return ModuleEntity<UpdateRate, UpdateRateHandle>::_getString(); }
-  void setName(const std::string& name);
+  const std::string& getName() const { return ModuleEntity<UpdateRate, UpdateRateHandle>::_getString(); }
 
-  const UpdateRateHandle& getUpdateRateHandle() const
-  { return ModuleEntity<UpdateRate, UpdateRateHandle>::_getHandle(); }
-  void setUpdateRateHandle(const UpdateRateHandle& updateRateHandle);
+  void setName(const std::string& name) { ModuleEntity<UpdateRate, UpdateRateHandle>::_setString(name); }
+
+  const UpdateRateHandle& getUpdateRateHandle() const { return ModuleEntity<UpdateRate, UpdateRateHandle>::_getHandle(); }
+  void setUpdateRateHandle(const UpdateRateHandle& updateRateHandle) { ModuleEntity<UpdateRate, UpdateRateHandle>::_setHandle(updateRateHandle); }
 
   const double& getRate() const
   { return _rate; }
   void setRate(const double& rate);
 
-  bool getIsReferencedByAnyModule() const;
+
+  bool getIsReferencedByAnyModule() const { return !_updateRateModuleList.empty(); }
 
   void insert(UpdateRateModule& updateRateModule)
   { _updateRateModuleList.push_back(updateRateModule); }
 
 private:
-  UpdateRate(const UpdateRate&);
-  UpdateRate& operator=(const UpdateRate&);
+  UpdateRate(const UpdateRate&) = delete;
+  UpdateRate& operator=(const UpdateRate&) = delete;
 
   Federation& _federation;
 
   double _rate;
 
   UpdateRateModule::SecondList _updateRateModuleList;
+};
+
+class BasicDataType;
+
+class OPENRTI_LOCAL BasicDataTypeModule : public ListPair<BasicDataTypeModule> {
+public:
+  BasicDataTypeModule(BasicDataType& simpleDataType, Module& module) : _basicDataType(simpleDataType), _module(module) {}
+  ~BasicDataTypeModule() {}
+
+  const BasicDataType& getBasicDataType() const
+  { return _basicDataType; }
+  BasicDataType& getBasicDataType()
+  { return _basicDataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  BasicDataTypeModule(const BasicDataTypeModule&) = delete;
+  BasicDataTypeModule& operator=(const BasicDataTypeModule&) = delete;
+
+  BasicDataType& _basicDataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL BasicDataType : public ModuleEntity<BasicDataType, BasicDataTypeHandle> {
+public:
+  typedef ModuleEntity<BasicDataType, BasicDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<BasicDataType, BasicDataTypeHandle>::StringMap NameMap;
+
+  BasicDataType(Federation& federation) : _federation(federation) { }
+  ~BasicDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<BasicDataType, BasicDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<BasicDataType, BasicDataTypeHandle>::_setString(name); }
+
+  const BasicDataTypeHandle& getHandle() const
+  { return ModuleEntity<BasicDataType,BasicDataTypeHandle>::_getHandle(); }
+  void setHandle(const BasicDataTypeHandle& simpleDataTypeHandle) { ModuleEntity<BasicDataType,BasicDataTypeHandle>::_setHandle(simpleDataTypeHandle); }
+
+  bool getIsReferencedByAnyModule() const { return !_basicDataTypeModuleList.empty(); }
+
+  void insert(BasicDataTypeModule& simpleDataTypeModule)
+  { _basicDataTypeModuleList.push_back(simpleDataTypeModule); }
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+  uint32_t getSize() const {
+    return _size;
+  }
+  void setSize(uint32_t val) {
+    _size = val;
+  }
+  OpenRTI::Endianness getEndian() const {
+    return _endian;
+  }
+  void setEndian(OpenRTI::Endianness val) {
+    _endian = val;
+  }
+private:
+  BasicDataType(const BasicDataType&) = delete;
+  BasicDataType(BasicDataType&&) = delete;
+  BasicDataType& operator=(const BasicDataType&) = delete;
+  BasicDataType& operator=(BasicDataType&&) = delete;
+
+  Federation& _federation;
+  uint32_t _size = 0;
+  Endianness _endian = Endianness::BigEndian;
+  BasicDataTypeModule::SecondList _basicDataTypeModuleList;
+};
+
+class SimpleDataType;
+
+class OPENRTI_LOCAL SimpleDataTypeModule : public ListPair<SimpleDataTypeModule> {
+public:
+  SimpleDataTypeModule(SimpleDataType& simpleDataType, Module& module) : _simpleDataType(simpleDataType), _module(module) {}
+  ~SimpleDataTypeModule() {}
+
+  const SimpleDataType& getSimpleDataType() const
+  { return _simpleDataType; }
+  SimpleDataType& getSimpleDataType()
+  { return _simpleDataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  SimpleDataTypeModule(const SimpleDataTypeModule&) = delete;
+  SimpleDataTypeModule& operator=(const SimpleDataTypeModule&) = delete;
+
+  SimpleDataType& _simpleDataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL SimpleDataType : public ModuleEntity<SimpleDataType, SimpleDataTypeHandle> {
+public:
+  typedef ModuleEntity<SimpleDataType, SimpleDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<SimpleDataType, SimpleDataTypeHandle>::StringMap NameMap;
+
+  SimpleDataType(Federation& federation) : _federation(federation) { }
+  ~SimpleDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<SimpleDataType, SimpleDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<SimpleDataType, SimpleDataTypeHandle>::_setString(name); }
+
+  const std::string& getRepresentation() const { return _representation; }
+  void setRepresentation(const std::string& s) { _representation = s; }
+
+  const SimpleDataTypeHandle& getHandle() const
+  { return ModuleEntity<SimpleDataType,SimpleDataTypeHandle>::_getHandle(); }
+  void setHandle(const SimpleDataTypeHandle& simpleDataTypeHandle) { ModuleEntity<SimpleDataType,SimpleDataTypeHandle>::_setHandle(simpleDataTypeHandle); }
+
+  bool getIsReferencedByAnyModule() const { return !_simpleDataTypeModuleList.empty(); }
+
+  void insert(SimpleDataTypeModule& simpleDataTypeModule)
+  { _simpleDataTypeModuleList.push_back(simpleDataTypeModule); }
+
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+private:
+  SimpleDataType(const SimpleDataType&) = delete;
+  SimpleDataType(SimpleDataType&&) = delete;
+  SimpleDataType& operator=(const SimpleDataType&) = delete;
+  SimpleDataType& operator=(SimpleDataType&&) = delete;
+
+  Federation& _federation;
+  std::string _representation;
+  SimpleDataTypeModule::SecondList _simpleDataTypeModuleList;
+};
+
+class EnumeratedDataType;
+
+class OPENRTI_LOCAL EnumeratedDataTypeModule : public ListPair<EnumeratedDataTypeModule> {
+public:
+  EnumeratedDataTypeModule(EnumeratedDataType& simpleDataType, Module& module) : _simpleDataType(simpleDataType), _module(module) {}
+  ~EnumeratedDataTypeModule() {}
+
+  const EnumeratedDataType& getEnumeratedDataType() const
+  { return _simpleDataType; }
+  EnumeratedDataType& getEnumeratedDataType()
+  { return _simpleDataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  EnumeratedDataTypeModule(const EnumeratedDataTypeModule&) = delete;
+  EnumeratedDataTypeModule(EnumeratedDataTypeModule&&) = delete;
+  EnumeratedDataTypeModule& operator=(const EnumeratedDataTypeModule&) = delete;
+  EnumeratedDataTypeModule& operator=(EnumeratedDataTypeModule&&) = delete;
+
+  EnumeratedDataType& _simpleDataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL Enumerator
+{
+public:
+  Enumerator(const std::string& name , uint32_t value) : _name(name), _value(value) {}
+
+  std::string getName() const {
+    return _name;
+  }
+  void setName(std::string val) {
+    _name = val;
+  }
+  uint32_t getValue() const {
+    return _value;
+  }
+  void setValue(uint32_t val) {
+    _value = val;
+  }
+  std::string _name;
+  uint32_t _value;
+};
+
+class OPENRTI_LOCAL EnumeratedDataType : public ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle> {
+public:
+  typedef ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle>::StringMap NameMap;
+
+  EnumeratedDataType(Federation& federation) : _federation(federation) { }
+  ~EnumeratedDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<EnumeratedDataType, EnumeratedDataTypeHandle>::_setString(name); }
+
+  const EnumeratedDataTypeHandle& getHandle() const
+  { return ModuleEntity<EnumeratedDataType,EnumeratedDataTypeHandle>::_getHandle(); }
+  void setHandle(const EnumeratedDataTypeHandle& simpleDataTypeHandle) { ModuleEntity<EnumeratedDataType,EnumeratedDataTypeHandle>::_setHandle(simpleDataTypeHandle); }
+
+  bool getIsReferencedByAnyModule() const { return !_simpleDataTypeModuleList.empty(); }
+
+  void insert(EnumeratedDataTypeModule& simpleDataTypeModule)
+  { _simpleDataTypeModuleList.push_back(simpleDataTypeModule); }
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+  void addEnumerator(const std::string name, uint32_t value)
+  {
+    _enumerators.push_back(Enumerator(name, value));
+  }
+  std::list<OpenRTI::ServerModel::Enumerator> getEnumerators() const {
+    return _enumerators;
+  }
+  void setEnumerators(std::list<OpenRTI::ServerModel::Enumerator> val) {
+    _enumerators = val;
+  }
+  std::string getRepresentation() const {
+    return _representation;
+  }
+  void setRepresentation(std::string val) {
+    _representation = val;
+  }
+private:
+  EnumeratedDataType(const EnumeratedDataType&) = delete;
+  EnumeratedDataType(EnumeratedDataType&&) = delete;
+  EnumeratedDataType& operator=(const EnumeratedDataType&) = delete;
+  EnumeratedDataType& operator=(EnumeratedDataType&&) = delete;
+
+  Federation& _federation;
+  std::list<Enumerator> _enumerators;
+  std::string _representation;
+
+  EnumeratedDataTypeModule::SecondList _simpleDataTypeModuleList;
+};
+
+class ArrayDataType;
+
+class OPENRTI_LOCAL ArrayDataTypeModule : public ListPair<ArrayDataTypeModule> {
+public:
+  ArrayDataTypeModule(ArrayDataType& simpleDataType, Module& module) : _dataType(simpleDataType), _module(module) {}
+  ~ArrayDataTypeModule() {}
+
+  const ArrayDataType& getArrayDataType() const
+  { return _dataType; }
+  ArrayDataType& getArrayDataType()
+  { return _dataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  ArrayDataTypeModule(const ArrayDataTypeModule&) = delete;
+  ArrayDataTypeModule& operator=(const ArrayDataTypeModule&) = delete;
+
+  ArrayDataType& _dataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL ArrayDataType : public ModuleEntity<ArrayDataType, ArrayDataTypeHandle> {
+public:
+  typedef ModuleEntity<ArrayDataType, ArrayDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<ArrayDataType, ArrayDataTypeHandle>::StringMap NameMap;
+
+  ArrayDataType(Federation& federation) : _federation(federation) { }
+  ~ArrayDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<ArrayDataType, ArrayDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<ArrayDataType, ArrayDataTypeHandle>::_setString(name); }
+
+  std::string getDataType() const noexcept { return _dataType; }
+  void setDataType(const std::string newValue) {
+    _dataType = newValue;
+  }
+
+  ArrayDataTypeEncoding getEncoding() const noexcept { return _encoding; }
+  void setEncoding(ArrayDataTypeEncoding newValue) noexcept {
+    _encoding = newValue;
+  }
+
+  std::string getCardinality() const {
+    return _cardinality;
+  }
+  void setCardinality(std::string val) {
+    _cardinality = val;
+  }
+
+  const ArrayDataTypeHandle& getHandle() const
+  { return ModuleEntity<ArrayDataType,ArrayDataTypeHandle>::_getHandle(); }
+  void setHandle(const ArrayDataTypeHandle& simpleDataTypeHandle) { ModuleEntity<ArrayDataType,ArrayDataTypeHandle>::_setHandle(simpleDataTypeHandle); }
+
+  bool getIsReferencedByAnyModule() const { return !_moduleList.empty(); }
+
+  void insert(ArrayDataTypeModule& dataTypeModule)
+  { _moduleList.push_back(dataTypeModule); }
+
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+private:
+  ArrayDataType(const ArrayDataType&) = delete;
+  ArrayDataType(ArrayDataType&&) = delete;
+  ArrayDataType& operator=(const ArrayDataType&) = delete;
+  ArrayDataType& operator=(ArrayDataType&&) = delete;
+
+  Federation& _federation;
+  std::string _dataType;
+  std::string _cardinality;
+  ArrayDataTypeEncoding _encoding = ArrayDataTypeEncoding::FixedArrayDataTypeEncoding;
+  ArrayDataTypeModule::SecondList _moduleList;
+};
+
+class FixedRecordDataType;
+
+class OPENRTI_LOCAL FixedRecordDataTypeModule : public ListPair<FixedRecordDataTypeModule> {
+public:
+  FixedRecordDataTypeModule(FixedRecordDataType& fixedRecordDataType, Module& module) : _dataType(fixedRecordDataType), _module(module) {}
+  ~FixedRecordDataTypeModule() {}
+
+  const FixedRecordDataType& getFixedRecordDataType() const
+  { return _dataType; }
+  FixedRecordDataType& getFixedRecordDataType()
+  { return _dataType; }
+  const Module& getModule() const
+  { return _module; }
+  Module& getModule()
+  { return _module; }
+
+private:
+  FixedRecordDataTypeModule(const FixedRecordDataTypeModule&) = delete;
+  FixedRecordDataTypeModule(FixedRecordDataTypeModule&&) = delete;
+  FixedRecordDataTypeModule& operator=(const FixedRecordDataTypeModule&) = delete;
+  FixedRecordDataTypeModule& operator=(FixedRecordDataTypeModule&&) = delete;
+
+  FixedRecordDataType& _dataType;
+  Module& _module;
+};
+
+class FixedRecordField
+{
+public:
+  FixedRecordField(const std::string name, const std::string& dataType, uint32_t version) : _name(name), _dataType(dataType), _version(version) {}
+  std::string getName() const {
+    return _name;
+  }
+  void setName(std::string val) {
+    _name = val;
+  }
+  std::string getDataType() const {
+    return _dataType;
+  }
+  void setDataType(std::string val) {
+    _dataType = val;
+  }
+  std::string _name;
+  std::string _dataType;
+  uint32_t _version;
+  uint32_t getVersion() const {
+    return _version;
+  }
+  void setVersion(uint32_t val) {
+    _version = val;
+  }
+};
+
+class OPENRTI_LOCAL FixedRecordDataType : public ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle> {
+public:
+  typedef ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle>::StringMap NameMap;
+
+  FixedRecordDataType(Federation& federation) : _federation(federation) { }
+  ~FixedRecordDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<FixedRecordDataType, FixedRecordDataTypeHandle>::_setString(name); }
+
+  const FixedRecordDataTypeHandle& getHandle() const
+  { return ModuleEntity<FixedRecordDataType,FixedRecordDataTypeHandle>::_getHandle(); }
+  void setHandle(const FixedRecordDataTypeHandle& handle) { ModuleEntity<FixedRecordDataType,FixedRecordDataTypeHandle>::_setHandle(handle); }
+
+  bool getIsReferencedByAnyModule() const { return !_fixedRecordDataTypeModuleList.empty(); }
+
+  void insert(FixedRecordDataTypeModule& module)
+  { _fixedRecordDataTypeModuleList.push_back(module); }
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+  void addField(const std::string name, const std::string& dataType, uint32_t version=0)
+  {
+    _fields.push_back(FixedRecordField(name, dataType, version));
+  }
+  std::list<OpenRTI::ServerModel::FixedRecordField> getFields() const {
+    return _fields;
+  }
+  void setFields(const std::list<OpenRTI::ServerModel::FixedRecordField>& val) {
+    _fields = val;
+  }
+  std::string getEncoding() const {
+    return _encoding;
+  }
+  void setEncoding(std::string val) {
+    _encoding = val;
+  }
+  std::string getInclude() const {
+    return _include;
+  }
+  void setInclude(std::string val) {
+    _include = val;
+  }
+  uint32_t getVersion() const {
+    return _version;
+  }
+  void setVersion(uint32_t val) {
+    _version = val;
+  }
+private:
+  FixedRecordDataType(const FixedRecordDataType&) = delete;
+  FixedRecordDataType(FixedRecordDataType&&) = delete;
+  FixedRecordDataType& operator=(const FixedRecordDataType&) = delete;
+  FixedRecordDataType& operator=(FixedRecordDataType&&) = delete;
+
+  Federation& _federation;
+
+  std::list<FixedRecordField> _fields;
+  std::string _encoding;
+  std::string _include;
+  uint32_t _version = 0;
+  FixedRecordDataTypeModule::SecondList _fixedRecordDataTypeModuleList;
+};
+
+class VariantRecordDataType;
+
+class OPENRTI_LOCAL VariantRecordDataTypeModule : public ListPair<VariantRecordDataTypeModule> {
+public:
+  VariantRecordDataTypeModule(VariantRecordDataType& simpleDataType, Module& module) : _variantRecordDataType(simpleDataType), _module(module) {}
+  ~VariantRecordDataTypeModule() {}
+
+  const VariantRecordDataType& getVariantRecordDataType() const { return _variantRecordDataType; }
+  VariantRecordDataType& getVariantRecordDataType() { return _variantRecordDataType; }
+  const Module& getModule() const { return _module; }
+  Module& getModule() { return _module; }
+
+private:
+  VariantRecordDataTypeModule(const VariantRecordDataTypeModule&) = delete;
+  VariantRecordDataTypeModule(VariantRecordDataTypeModule&&) = delete;
+  VariantRecordDataTypeModule& operator=(const VariantRecordDataTypeModule&) = delete;
+  VariantRecordDataTypeModule& operator=(VariantRecordDataTypeModule&&) = delete;
+
+  VariantRecordDataType& _variantRecordDataType;
+  Module& _module;
+};
+
+class OPENRTI_LOCAL VariantRecordAlternative
+{
+public:
+  VariantRecordAlternative(const std::string& name, const std::string& enumerator, const std::string& dataType)
+    : _enumerator(enumerator), _name(name), _dataType(dataType)
+  {
+  }
+  std::string getDataType() const {
+    return _dataType;
+  }
+  void setDataType(std::string val) {
+    _dataType = val;
+  }
+private:
+  std::string _enumerator;
+  std::string _name;
+  std::string _dataType;
+};
+
+class OPENRTI_LOCAL VariantRecordDataType : public ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle> {
+public:
+  typedef ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle>::HandleMap HandleMap;
+  typedef ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle>::StringMap NameMap;
+
+  VariantRecordDataType(Federation& federation) : _federation(federation) { }
+  ~VariantRecordDataType() {}
+
+  const Federation& getFederation() const
+  { return _federation; }
+  Federation& getFederation()
+  { return _federation; }
+
+  const std::string& getName() const
+  { return ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle>::_getString(); }
+  void setName(const std::string& name) { ModuleEntity<VariantRecordDataType, VariantRecordDataTypeHandle>::_setString(name); }
+
+  std::string getDataType() const {
+    return _dataType;
+  }
+  void setDataType(std::string val) {
+    _dataType = val;
+  }
+
+  const VariantRecordDataTypeHandle& getHandle() const { return ModuleEntity<VariantRecordDataType,VariantRecordDataTypeHandle>::_getHandle(); }
+  void setHandle(const VariantRecordDataTypeHandle& handle) {
+    ModuleEntity<VariantRecordDataType,VariantRecordDataTypeHandle>::_setHandle(handle);
+  }
+
+  bool getIsReferencedByAnyModule() const { return !_variantRecordDataTypeModuleList.empty(); }
+
+  void insert(VariantRecordDataTypeModule& module)
+  { _variantRecordDataTypeModuleList.push_back(module); }
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
+  std::string getDiscriminant() const {
+    return _discriminant;
+  }
+  void setDiscriminant(std::string val) {
+    _discriminant = val;
+  }
+  std::string getEncoding() const {
+    return _encoding;
+  }
+  void setEncoding(std::string val) {
+    _encoding = val;
+  }
+  std::list<OpenRTI::ServerModel::VariantRecordAlternative> getAlternatives() const {
+    return _alternatives;
+  }
+  void setAlternatives(const std::list<OpenRTI::ServerModel::VariantRecordAlternative>& val) {
+    _alternatives = val;
+  }
+  void setAlternatives(std::list<OpenRTI::ServerModel::VariantRecordAlternative>&& val) {
+    _alternatives = std::move(val);
+  }
+private:
+  VariantRecordDataType(const VariantRecordDataType&) = delete;
+  VariantRecordDataType(VariantRecordDataType&&) = delete;
+  VariantRecordDataType& operator=(const VariantRecordDataType&) = delete;
+  VariantRecordDataType& operator=(VariantRecordDataType&&) = delete;
+
+  Federation& _federation;
+
+  std::string _discriminant;
+  std::string _dataType;
+  std::string _encoding;
+  std::list<VariantRecordAlternative> _alternatives;
+
+  VariantRecordDataTypeModule::SecondList _variantRecordDataTypeModuleList;
 };
 
 ////////////////////////////////////////////////////////////
@@ -1025,6 +1561,9 @@ public:
   { return HandleStringEntity<ParameterDefinition, ParameterHandle>::_getString(); }
   void setName(const std::string& name);
 
+  const std::string& getDataType() const { return _dataType; }
+  void setDataType(const std::string& dataType) { _dataType = dataType; }
+
   const ParameterHandle& getParameterHandle() const
   { return HandleStringEntity<ParameterDefinition, ParameterHandle>::_getHandle(); }
   void setParameterHandle(const ParameterHandle& parameterHandle);
@@ -1039,6 +1578,8 @@ public:
   ClassParameter::FirstList& getClassParameterList()
   { return _classParameterList; }
 
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
 private:
   ParameterDefinition(const ParameterDefinition&);
   ParameterDefinition& operator=(const ParameterDefinition&);
@@ -1046,16 +1587,15 @@ private:
   InteractionClass& _interactionClass;
 
   ClassParameter::FirstList _classParameterList;
+  std::string _dataType;
 };
 
 ////////////////////////////////////////////////////////////
 
-// a set of unique values
-typedef std::set<VariableLengthData> VariableLengthDataSet;
+// a set of data vectors
 // associates parameter handles with filter value list
-typedef std::map<ParameterHandle, VariableLengthDataSet> ParameterFilterMap;
 // associates federates with parameter filter maps
-typedef std::map<ConnectHandle, ParameterFilterMap> ParameterFilterMapByConnect;
+typedef std::map<ConnectHandle, VariableLengthDataTupleSet> ParameterFilterMapByConnect;
 
 class OPENRTI_LOCAL InteractionClass : public ModuleClassEntity<InteractionClass, InteractionClassHandle>, public PublishSubscribe /*FIXME*/ {
 public:
@@ -1091,14 +1631,14 @@ public:
   InteractionClass* getParentInteractionClass();
   InteractionClassHandle getParentInteractionClassHandle() const;
 
-  ChildList& getChildInteractionClassList()
-  { return _childInteractionClassList; }
+  ChildList& getChildInteractionClassList() { return _childInteractionClassList; }
+  const ChildList& getChildInteractionClassList() const { return _childInteractionClassList; }
 
   bool getIsReferencedByAnyModule() const;
   bool getAreParametersReferencedByAnyModule() const;
 
   void eraseParameterDefinitions();
-  std::size_t getNumParameterDefinitions() const;
+  uint32_t getNumParameterDefinitions() const;
   ParameterHandle getFirstUnusedParameterHandle();
 
   void insert(ParameterDefinition& parameterDefinition);
@@ -1106,6 +1646,7 @@ public:
   ParameterDefinition* getParameterDefinition(const ParameterHandle& parameterHandle);
   ParameterDefinition::HandleMap& getParameterHandleParameterMap()
   { return _parameterHandleParameterMap; }
+  ParameterDefinition* findParameterDefinition(const ParameterHandle& parameterHandle);
 
   void insertClassParameterFor(ParameterDefinition& parameterDefinition);
   ClassParameter* getClassParameter(const ParameterHandle& parameterHandle);
@@ -1146,17 +1687,25 @@ public:
   }
 
   // returns true if the filter changes for given connect
-  bool updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues);
+  bool updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues, bool remove=false);
+  bool clearParameterFilters(const ConnectHandle& connectHandle);
   bool hasFilterSubscriptions() const;
-  bool isFiltered(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues) const;
-  ParameterValueVector getParameterFilters(const ConnectHandle& connectHandle);
+  bool hasFilterSubscriptions(const ConnectHandle& connectHandle) const;
+  bool isMatching(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilterValues) const;
+  std::list<ParameterValueVector> getParameterFilters(const ConnectHandle& connectHandle);
+
+  std::string DumpInteractionFilters();
+
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+  const ParameterFilterMapByConnect& getParameterFiltersByConnect() const { return _parameterFiltersByConnect; }
 private:
   InteractionClass(const InteractionClass&) = delete;
   InteractionClass& operator=(const InteractionClass&) = delete;
 
-  void Dump(const char* prefix, const VariableLengthDataSet& filterValues) const;
-  void Dump(const char* prefix, const ParameterFilterMapByConnect& filtersByFederate) const;
-  bool AddParameterFilterValues(ParameterFilterMap& filterMap, const ParameterValueVector& parameterFilters);
+  ParameterValueVector getParameterFilterPrototype() const;
+  void NormalizeFilterValues(const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVectorReturn, VariableLengthDataTuple& filterValueVectorReturn) const;
+  bool AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters);
+  bool RemoveParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters);
 
   Federation& _federation;
 
@@ -1173,6 +1722,7 @@ private:
   ParameterDefinition::NameMap _parameterNameParameterMap;
 
   ClassParameter::HandleMap _parameterHandleClassParameterMap;
+  ParameterHandleVector _parameterFilterKeyPrototype;
   ParameterFilterMapByConnect _parameterFiltersByConnect;
 };
 
@@ -1282,6 +1832,9 @@ public:
   { return HandleStringEntity<AttributeDefinition, AttributeHandle>::_getString(); }
   void setName(const std::string& name);
 
+  const std::string& getDataType() const { return _dataType; }
+  void setDataType(const std::string& dataType) { _dataType = dataType; }
+
   const AttributeHandle& getAttributeHandle() const
   { return HandleStringEntity<AttributeDefinition, AttributeHandle>::_getHandle(); }
   void setAttributeHandle(const AttributeHandle& attributeHandle);
@@ -1305,6 +1858,8 @@ public:
   { return _classAttributeList; }
 
 
+  void writeCurrentFDD(std::ostream& out, unsigned int level) const;
+
   // FIXME temporarily in this way
   DimensionHandleSet _dimensionHandleSet;
 
@@ -1318,6 +1873,7 @@ private:
   TransportationType _transportationType;
 
   ClassAttribute::FirstList _classAttributeList;
+  std::string _dataType;
 };
 
 ////////////////////////////////////////////////////////////
@@ -1347,14 +1903,14 @@ public:
   ObjectClass* getParentObjectClass();
   ObjectClassHandle getParentObjectClassHandle() const;
 
-  ChildList& getChildObjectClassList()
-  { return _childObjectClassList; }
+  ChildList& getChildObjectClassList() { return _childObjectClassList; }
+  const ChildList& getChildObjectClassList() const { return _childObjectClassList; }
 
   bool getIsReferencedByAnyModule() const;
   bool getAreAttributesReferencedByAnyModule() const;
 
   void eraseAttributeDefinitions();
-  std::size_t getNumAttributeDefinitions() const;
+  uint32_t getNumAttributeDefinitions() const;
   AttributeHandle getFirstUnusedAttributeHandle();
 
   void insert(AttributeDefinition& attributeDefinition);
@@ -1404,6 +1960,8 @@ public:
       i->accumulateAllPublications(connectHandleSet);
     }
   }
+
+  void writeCurrentFDD(std::ostream& out, unsigned int level = 2) const;
 
 private:
   ObjectClass(const ObjectClass&);
@@ -1462,7 +2020,7 @@ class OPENRTI_LOCAL Module : public HandleEntity<Module, ModuleHandle> {
 public:
   typedef HandleEntity<Module, ModuleHandle>::HandleMap HandleMap;
 
-  Module(Federation& federation);
+  Module(Federation& federation, const std::string& designator);
   ~Module();
 
   const Federation& getFederation() const
@@ -1478,6 +2036,9 @@ public:
   { return _content; }
   void setContent(const std::string& content);
 
+  const std::string& getDesignator() const
+  { return _designator; }
+
   bool getArtificialInteractionRoot() const
   { return _artificialInteractionRoot; }
   void setArtificialInteractionRoot(bool artificialInteractionRoot);
@@ -1492,37 +2053,75 @@ public:
   // insert into this module
   DimensionModule* insert(Dimension& dimension);
   UpdateRateModule* insert(UpdateRate& updateRate);
+
+  BasicDataTypeModule* insert(BasicDataType& dataType);
+  SimpleDataTypeModule* insert(SimpleDataType& dataType);
+  ArrayDataTypeModule* insert(ArrayDataType& dataType);
+  FixedRecordDataTypeModule* insert(FixedRecordDataType& dataType);
+  VariantRecordDataTypeModule* insert(VariantRecordDataType& dataType);
+
   InteractionClassModule* insert(InteractionClass& interactionClass);
   ParameterDefinitionModule* insertParameters(InteractionClass& interactionClass);
+  EnumeratedDataTypeModule* insert(EnumeratedDataType& dataType);
   ObjectClassModule* insert(ObjectClass& objectClass);
   AttributeDefinitionModule* insertAttributes(ObjectClass& objectClass);
 
-  void insert(DimensionModule& dimensionModule)
+  void insertModule(DimensionModule& dimensionModule)
   { _dimensionModuleList.push_back(dimensionModule); }
   DimensionModule::FirstList& getDimensionModuleList()
   { return _dimensionModuleList; }
 
-  void insert(UpdateRateModule& updateRateModule)
+  void insertModule(UpdateRateModule& updateRateModule)
   { _updateRateModuleList.push_back(updateRateModule); }
   UpdateRateModule::FirstList& getUpdateRateModuleList()
   { return _updateRateModuleList; }
 
-  void insert(InteractionClassModule& interactionClassModule)
+  void insertModule(BasicDataTypeModule& module)
+  { _basicDataTypeModuleList.push_back(module); }
+  BasicDataTypeModule::FirstList& getBasicDataTypeModuleList()
+  { return _basicDataTypeModuleList; }
+
+  void insertModule(SimpleDataTypeModule& module)
+  { _simpleDataTypeModuleList.push_back(module); }
+  SimpleDataTypeModule::FirstList& getSimpleDataTypeModuleList()
+  { return _simpleDataTypeModuleList; }
+
+  void insertModule(EnumeratedDataTypeModule& module)
+  { _enumeratedDataTypeModuleList.push_back(module); }
+  EnumeratedDataTypeModule::FirstList& getEnumeratedDataTypeModuleList()
+  { return _enumeratedDataTypeModuleList; }
+
+  void insertModule(ArrayDataTypeModule& module)
+  { _arrayDataTypeModuleList.push_back(module); }
+  ArrayDataTypeModule::FirstList& getArrayDataTypeModuleList()
+  { return _arrayDataTypeModuleList; }
+
+  void insertModule(FixedRecordDataTypeModule& fixedRecordDataTypeModule)
+  { _fixedRecordDataTypeModuleList.push_back(fixedRecordDataTypeModule); }
+  FixedRecordDataTypeModule::FirstList& getFixedRecordDataTypeModuleList()
+  { return _fixedRecordDataTypeModuleList; }
+
+  void insertModule(VariantRecordDataTypeModule& module)
+  { _variantRecordDataTypeModuleList.push_back(module); }
+  VariantRecordDataTypeModule::FirstList& getVariantRecordDataTypeModuleList()
+  { return _variantRecordDataTypeModuleList; }
+
+  void insertModule(InteractionClassModule& interactionClassModule)
   { _interactionClassModuleList.push_back(interactionClassModule); }
   InteractionClassModule::FirstList& getInteractionClassModuleList()
   { return _interactionClassModuleList; }
 
-  void insert(ParameterDefinitionModule& parameterDefinitionModule)
+  void insertModule(ParameterDefinitionModule& parameterDefinitionModule)
   { _parameterDefinitionModuleList.push_back(parameterDefinitionModule); }
   ParameterDefinitionModule::FirstList& getParameterDefinitionModuleList()
   { return _parameterDefinitionModuleList; }
 
-  void insert(ObjectClassModule& objectClassModule)
+  void insertModule(ObjectClassModule& objectClassModule)
   { _objectClassModuleList.push_back(objectClassModule); }
   ObjectClassModule::FirstList& getObjectClassModuleList()
   { return _objectClassModuleList; }
 
-  void insert(AttributeDefinitionModule& attributeDefinitionModule)
+  void insertModule(AttributeDefinitionModule& attributeDefinitionModule)
   { _attributeDefinitionModuleList.push_back(attributeDefinitionModule); }
   AttributeDefinitionModule::FirstList& getAttributeDefinitionModuleList()
   { return _attributeDefinitionModuleList; }
@@ -1534,7 +2133,7 @@ private:
   Federation& _federation;
 
   std::string _content;
-
+  std::string _designator;
   bool _artificialInteractionRoot;
   bool _artificialObjectRoot;
 
@@ -1542,6 +2141,15 @@ private:
   DimensionModule::FirstList _dimensionModuleList;
   // All update rates that are referenced by this module
   UpdateRateModule::FirstList _updateRateModuleList;
+
+  // All data types that are referenced by this module
+  BasicDataTypeModule::FirstList _basicDataTypeModuleList;
+  SimpleDataTypeModule::FirstList _simpleDataTypeModuleList;
+  EnumeratedDataTypeModule::FirstList _enumeratedDataTypeModuleList;
+  ArrayDataTypeModule::FirstList _arrayDataTypeModuleList;
+  FixedRecordDataTypeModule::FirstList _fixedRecordDataTypeModuleList;
+  VariantRecordDataTypeModule::FirstList _variantRecordDataTypeModuleList;
+
   // All interaction classes that are referenced by this module
   InteractionClassModule::FirstList _interactionClassModuleList;
   ParameterDefinitionModule::FirstList _parameterDefinitionModuleList;
@@ -1558,11 +2166,13 @@ class Federation;
 class OPENRTI_LOCAL FederationConnect :
     public IntrusiveUnorderedMap<ConnectHandle, FederationConnect>::Hook,
     public IntrusiveList<FederationConnect, 0>::Hook,
-    public IntrusiveList<FederationConnect, 1>::Hook {
+    public IntrusiveList<FederationConnect, 1>::Hook,
+    public IntrusiveList<FederationConnect, 2>::Hook {
 public:
   typedef IntrusiveUnorderedMap<ConnectHandle, FederationConnect> HandleMap;
   typedef IntrusiveList<FederationConnect, 0> FirstList; /// Used to access FederationConnects from a NodeConnect
-  typedef IntrusiveList<FederationConnect, 1> SecondList; /// Used to access time regulating connects from the federation
+  typedef IntrusiveList<FederationConnect, 1> TimeRegulatingList; /// Used to access time regulating connects from the federation
+  typedef IntrusiveList<FederationConnect, 2> TimeConstrainedList; /// Used to access time constrained connects from the federation
 
   FederationConnect(Federation& federation, NodeConnect& nodeConnect);
   ~FederationConnect();
@@ -1588,10 +2198,6 @@ public:
   bool getActive() const;
   void setActive(bool active);
 
-  /// If the federates behind this connect are allowed to get time regulating
-  bool getPermitTimeRegulation() const;
-  void setPermitTimeRegulation(bool permitTimeRegulation);
-
   /// The federates hidden behind this connect
   Federate::FirstList& getFederateList()
   { return _federateList; }
@@ -1604,14 +2210,25 @@ public:
     OpenRTIAssert(this == federate.getFederationConnect());
     _federateList.unlink(federate);
     federate.setFederationConnect(0);
+    //DebugPrintf("%s(this=%p federate=%s): %d federates left\n", __FUNCTION__, this, federate.getName().c_str(), _federateList.size());
+    //for (auto iter=_federateList.begin(); iter != _federateList.end(); iter++)
+    //{
+    //  DebugPrintf("\t%s %s\n",iter->getFederateHandle().toString().c_str(), iter->getName().c_str());
+    //}
   }
 
   /// The time regulating federates hidden behind this connect
-  Federate::SecondList& getTimeRegulatingFederateList()
+  Federate::TimeRegulatingList& getTimeRegulatingFederateList()
   { return _timeRegulatingFederateList; }
   bool getIsTimeRegulating() const;
   void insertTimeRegulating(Federate& federate);
   void eraseTimeRegulating(Federate& federate);
+
+  Federate::TimeConstrainedList& getTimeConstrainedFederateList()
+  { return _timeConstrainedFederateList; }
+  bool getIsTimeConstrained() const;
+  void insertTimeConstrained(Federate& federate);
+  void eraseTimeConstrained(Federate& federate);
 
   /// Object instance handle name pairs referenced by this connect
   void insert(ObjectInstanceConnect& objectInstanceConnect)
@@ -1622,6 +2239,7 @@ public:
   /// We can actually send something there
   void send(const SharedPtr<const AbstractMessage>& message);
 
+  void sendAndDeactivate(const SharedPtr<const AbstractMessage>& message);
 private:
   FederationConnect(const FederationConnect&) = delete;
   FederationConnect& operator=(const FederationConnect&) = delete;
@@ -1633,12 +2251,11 @@ private:
 
   bool _active;
 
-  bool _permitTimeRegulation;
-
   /// Federates behind this connect
   Federate::FirstList _federateList;
   /// Time regulating federates behind this connect
-  Federate::SecondList _timeRegulatingFederateList;
+  Federate::TimeRegulatingList _timeRegulatingFederateList;
+  Federate::TimeConstrainedList _timeConstrainedFederateList;
 
   // List of object instance handle/name references at this connect.
   ObjectInstanceConnect::FirstList _objectInstanceConnectList;
@@ -1649,6 +2266,7 @@ private:
 class Node;
 
 class OPENRTI_LOCAL Federation : public HandleStringEntity<Federation, FederationHandle> {
+private:
 public:
   typedef HandleStringEntity<Federation, FederationHandle>::HandleMap HandleMap;
   typedef HandleStringEntity<Federation, FederationHandle>::StringMap NameMap;
@@ -1707,6 +2325,13 @@ public:
   /// Access and modify object model modules
   void insert(Dimension& dimension);
   void insert(UpdateRate& updateRate);
+  void insert(BasicDataType& dataType);
+  void insert(SimpleDataType& dataType);
+  void insert(EnumeratedDataType& dataType);
+  void insert(ArrayDataType& dataType);
+  void insert(FixedRecordDataType& dataType);
+  void insert(VariantRecordDataType& dataType);
+
   void insert(InteractionClass& interactionClass);
   void insert(ObjectClass& objectClass);
   void insert(Module& module);
@@ -1715,30 +2340,47 @@ public:
   /// compatible with the existing one. Returns true if the entity was newly created.
   bool insertOrCheck(Module& module, const FOMStringDimension& stringDimension);
   bool insertOrCheck(Module& module, const FOMStringUpdateRate& stringUpdateRate);
+  bool insertOrCheck(Module& module, const FOMStringBasicDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringSimpleDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringEnumeratedDataType& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringArrayDataType2& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringFixedRecordDataType2& stringDataType);
+  bool insertOrCheck(Module& module, const FOMStringVariantRecordDataType2& stringDataType);
+
   bool insertOrCheck(Module& module, const FOMStringInteractionClass& stringInteractionClass);
   bool insertOrCheck(Module& module, const FOMStringObjectClass& stringObjectClass);
 
   /// This is for inserting the initial object model
-  ModuleHandle insert(const FOMStringModule& stringModule);
-  void insert(const FOMStringModuleList& stringModuleList);
-  void insert(ModuleHandleVector& moduleHandleVector, const FOMStringModuleList& stringModuleList);
+  ModuleHandle insert(const FOMStringModule2& stringModule);
+  void insert(const FOMStringModule2List& stringModuleList);
+
+  void insert(ModuleHandleVector& moduleHandleVector, const FOMStringModule2List& stringModuleList);
 
   /// Either insert a new entity or creates a new one.
   /// Throws a message error if an existing one does not match the provided.
   void insert(Module& module, const FOMDimension& fomDimension);
   void insert(Module& module, const FOMUpdateRate& fomUpdateRate);
+  void insert(Module& module, const FOMBasicDataType& fomDataType);
+  void insert(Module& module, const FOMSimpleDataType& fomDataType);
+  void insert(Module& module, const FOMEnumeratedDataType& fomDataType);
+  void insert(Module& module, const FOMArrayDataType& fomDataType);
+  void insert(Module& module, const FOMFixedRecordDataType& fomDataType);
+  void insert(Module& module, const FOMVariantRecordDataType& fomDataType);
   void insert(Module& module, const FOMInteractionClass& fomInteractionClass);
   void insert(Module& module, const FOMObjectClass& fomObjectClass);
+  void insert(Module& module, const FOMTransportationType& fomObjectClass);
 
   void insert(const FOMModule& fomModule);
   void insert(const FOMModuleList& fomModuleList);
+  void insert(const FOMModule2& fomModule);
+  void insert(const FOMModule2List& fomModuleList);
   void erase(const ModuleHandle& moduleHandle);
   void erase(Module& module);
 
   /// To push this to other server nodes, we need to collect the module data for the message.
   void getModuleList(FOMModuleList& moduleList) const;
   void getModuleList(FOMModuleList& moduleList, const ModuleHandleVector& moduleHandleVector) const;
-
+  void writeCurrentFDD(std::ostream& out) const;
   Module* getModule(const ModuleHandle& moduleHandle);
 
   Dimension* getDimension(const DimensionHandle& dimensionHandle);
@@ -1746,9 +2388,12 @@ public:
   InteractionClass* getInteractionClass(const InteractionClassHandle& interactionClassHandle);
   InteractionClass::HandleMap& getInteractionClassHandleInteractionClassMap()
   { return _interactionClassHandleInteractionClassMap; }
+  InteractionClassHandle getInteractionClassHandle(const std::string& fqInteractionClassName);
+
   ObjectClass* getObjectClass(const ObjectClassHandle& objectClassHandle);
   ObjectClass::HandleMap& getObjectClassHandleObjectClassMap()
   { return _objectClassHandleObjectClassMap; }
+  ObjectClassHandle getObjectClassHandle(const std::string& fqClassName);
 
   OrderType resolveOrderType(const std::string& orderType);
   TransportationType resolveTransportationType(const std::string& transportationType);
@@ -1771,14 +2416,20 @@ public:
 
   void insertTimeRegulating(Federate& federate);
   void eraseTimeRegulating(Federate& federate);
-  FederationConnect::SecondList& getTimeRegulatingFederationConnectList()
+  FederationConnect::TimeRegulatingList& getTimeRegulatingFederationConnectList()
   { return _timeRegulatingFederationConnectList; }
+
+  void insertTimeConstrained(Federate& federate);
+  void eraseTimeConstrained(Federate& federate);
+  FederationConnect::TimeConstrainedList& getTimeConstrainedFederationConnectList()
+  { return _timeConstrainedFederationConnectList; }
 
   /// FIXME simplify region communication, only commit and erase is needed.
   Region* getOrCreateRegion(const RegionHandle& regionHandle);
   Region* getRegion(const RegionHandle& regionHandle);
 
   void insert(ObjectInstance& objectInstance);
+  const ObjectInstance* getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle) const;
   ObjectInstance* getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle);
   void erase(ObjectInstance& objectInstance);
   ObjectInstance::HandleMap& getObjectInstanceHandleObjectInstanceMap()
@@ -1787,9 +2438,28 @@ public:
   /// FIXME
   ObjectInstance* insertObjectInstance(const ObjectInstanceHandle& objectInstanceHandle, const std::string& objectInstanceName);
 
-  /// Syncronization state FIXME
-  Synchronization::NameMap _synchronizationNameSynchronizationMap;
+  // when the federateHandle is valid, it's assumed to run in a root server
+  // otherwise it's a leaf server
+  void initializeMom(AbstractServer* server, FederateHandle federateHandle);
+  void resignMomServer();
+  SharedPtr<MomServer> getMomServer() const;
 
+  // federate metrics stuff
+  std::shared_ptr<AbstractFederateMetrics> getFederateMetrics(const ConnectHandle& connectHandle);
+  void interactionSent(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void interactionReceived(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void interactionClassSubscribed(const ConnectHandle& connectHandle, const InteractionClass* interactionClass, bool active);
+  void interactionClassUnsubscribed(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void interactionClassPublished(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void interactionClassUnpublished(const ConnectHandle& connectHandle, const InteractionClass* interactionClass);
+  void objectClassSubscribed(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes, bool active);
+  void objectClassUnsubscribed(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes);
+  void objectClassPublished(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes);
+  void objectClassUnpublished(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes);
+  void objectInstanceReflectionReceived(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance);
+  void objectInstanceUpdateSent(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance);
+  /// Synchronization state FIXME
+  Synchronization::NameMap _synchronizationNameSynchronizationMap;
 
 private:
   Federation(const Federation&) = delete;
@@ -1797,6 +2467,8 @@ private:
 
   /// The server node this Federation belongs to
   Node& _serverNode;
+  /// The MOM server of this federation
+  SharedPtr<MomServer> _momServer;
 
   /// The name of the logical time factory
   std::string _logicalTimeFactoryName;
@@ -1830,9 +2502,35 @@ private:
   UpdateRate::HandleMap _updateRateHandleUpdateRateMap;
   HandleAllocator<UpdateRateHandle> _updateRateHandleAllocator;
 
+  BasicDataType::NameMap               _basicDataTypeNameBasicDataTypeMap;
+  BasicDataType::HandleMap             _basicDataTypeHandleBasicDataTypeMap;
+  HandleAllocator<BasicDataTypeHandle> _basicDataTypeHandleAllocator;
+
+  SimpleDataType::NameMap               _simpleDataTypeNameSimpleDataTypeMap;
+  SimpleDataType::HandleMap             _simpleDataTypeHandleSimpleDataTypeMap;
+  HandleAllocator<SimpleDataTypeHandle> _simpleDataTypeHandleAllocator;
+
+  EnumeratedDataType::NameMap               _enumeratedDataTypeNameEnumeratedDataTypeMap;
+  EnumeratedDataType::HandleMap             _enumeratedDataTypeHandleEnumeratedDataTypeMap;
+  HandleAllocator<EnumeratedDataTypeHandle> _enumeratedDataTypeHandleAllocator;
+
+  ArrayDataType::NameMap               _arrayDataTypeNameArrayDataTypeMap;
+  ArrayDataType::HandleMap             _arrayDataTypeHandleArrayDataTypeMap;
+  HandleAllocator<ArrayDataTypeHandle> _arrayDataTypeHandleAllocator;
+
+  FixedRecordDataType::NameMap               _fixedRecordDataTypeNameFixedRecordDataTypeMap;
+  FixedRecordDataType::HandleMap             _fixedRecordDataTypeHandleFixedRecordDataTypeMap;
+  HandleAllocator<FixedRecordDataTypeHandle> _fixedRecordDataTypeHandleAllocator;
+
+  VariantRecordDataType::NameMap               _variantRecordDataTypeNameVariantRecordDataTypeMap;
+  VariantRecordDataType::HandleMap             _variantRecordDataTypeHandleVariantRecordDataTypeMap;
+  HandleAllocator<VariantRecordDataTypeHandle> _variantRecordDataTypeHandleAllocator;
+
   InteractionClass::NameMap _interactionClassNameInteractionClassMap;
   InteractionClass::HandleMap _interactionClassHandleInteractionClassMap;
   HandleAllocator<InteractionClassHandle> _interactionClassHandleAllocator;
+
+  HandleAllocator<ParameterHandle> _parameterHandleAllocator;
 
   ObjectClass::NameMap _objectClassNameObjectClassMap;
   ObjectClass::HandleMap _objectClassHandleObjectClassMap;
@@ -1845,7 +2543,8 @@ private:
   HandleAllocator<FederateHandle> _federateHandleAllocator;
 
   // Links the FederationConnects that have time regulating federates
-  FederationConnect::SecondList _timeRegulatingFederationConnectList;
+  FederationConnect::TimeRegulatingList _timeRegulatingFederationConnectList;
+  FederationConnect::TimeConstrainedList _timeConstrainedFederationConnectList;
 
   ObjectInstance::HandleMap _objectInstanceHandleObjectInstanceMap;
   ObjectInstance::NameMap _objectInstanceNameObjectInstanceMap;
@@ -1884,6 +2583,7 @@ public:
   const StringStringListMap& getOptions() const;
   void setOptions(const StringStringListMap& options);
 
+  uint32_t getVersion() const { return _version; }
   /// The federations using this connect
   FederationConnect::FirstList& getFederationConnectList()
   { return _federationConnectList; }
@@ -1902,7 +2602,7 @@ private:
   bool _isParentConnect;
 
   std::string _name;
-
+  uint32_t _version;
   SharedPtr<AbstractMessageSender> _messageSender;
 
   StringStringListMap _options;
@@ -1926,16 +2626,15 @@ public:
   const ConnectHandle& getParentConnectHandle() const
   { return _parentConnectHandle; }
 
+  const NodeConnect* getNodeConnect(const ConnectHandle& connectHandle) const;
   NodeConnect* getNodeConnect(const ConnectHandle& connectHandle);
-  NodeConnect* insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName);
+  NodeConnect* insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options);
   NodeConnect* insertParentNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options);
   void insert(NodeConnect& nodeConnect);
   void erase(const ConnectHandle& connectHandle);
   void erase(NodeConnect& nodeConnect);
 
   bool getFederationExecutionAlreadyExists(const std::string& federationName) const;
-  Federation* getFederation(const std::string& federationName);
-  Federation* getFederation(const FederationHandle& federationHandle);
   void insert(Federation& federation);
   void erase(Federation& federation);
   void insertName(Federation& federation);

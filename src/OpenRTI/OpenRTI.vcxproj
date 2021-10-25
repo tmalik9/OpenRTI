@@ -24,7 +24,6 @@
     <Platform>x64</Platform>
     <ProjectName>OpenRTI</ProjectName>
     <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -81,45 +80,48 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);.$(ProjectDir)xml\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnablePREfast>true</EnablePREfast>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);.$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnablePREfast>false</EnablePREfast>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);.$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <Optimization>MaxSpeed</Optimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);.$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)vsbuild;$(ProjectDir)xml;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <DisableSpecificWarnings>4290;5040</DisableSpecificWarnings>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <Optimization>MaxSpeed</Optimization>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;RTI_DISABLE_WARNINGS;_CRT_SECURE_NO_WARNINGS;WINVER=0x0502;_WIN32_WINNT=0x0502;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";OpenRTI_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OPENRTI_DLL;OPENRTI_DLL_EXPORTS;_CRT_SECURE_NO_WARNINGS;XML_STATIC;HAVE_MEMMOVE;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AbsTimeout.cpp" />
     <ClCompile Include="AbstractMessage.cpp" />
     <ClCompile Include="AbstractMessageEncoding.cpp" />
     <ClCompile Include="AbstractMessageSender.cpp" />
@@ -130,6 +132,7 @@
     <ClCompile Include="AbstractSocketEvent.cpp" />
     <ClCompile Include="Attributes.cpp" />
     <ClCompile Include="dprintf.cpp" />
+    <ClCompile Include="ImmediateCallbackDispatcher.cpp" />
     <ClCompile Include="InternalAmbassador.cpp" />
     <ClCompile Include="InternalTimeManagement.cpp" />
     <ClCompile Include="Federate.cpp" />
@@ -139,7 +142,6 @@
     <ClCompile Include="ExpatXMLReader.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="FDD1516EFileReader.cpp" />
-    <ClCompile Include="FDD1516FileReader.cpp" />
     <ClCompile Include="FEDFileReader.cpp" />
     <ClCompile Include="InitialClientStreamProtocol.cpp" />
     <ClCompile Include="InitialServerStreamProtocol.cpp" />
@@ -147,6 +149,20 @@
     <ClCompile Include="LogStream.cpp" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="MessageEncodingRegistry.cpp" />
+    <ClCompile Include="encoding\BasicDataElements.cpp" />
+    <ClCompile Include="encoding\DataElement.cpp" />
+    <ClCompile Include="encoding\HLAfixedArray.cpp" />
+    <ClCompile Include="encoding\HLAfixedRecord.cpp" />
+    <ClCompile Include="encoding\HLAhandle.cpp" />
+    <ClCompile Include="encoding\HLAopaqueData.cpp" />
+    <ClCompile Include="encoding\HLAvariableArray.cpp" />
+    <ClCompile Include="encoding\HLAvariantRecord.cpp" />
+    <ClCompile Include="mom\MomServer.cpp" />
+    <ClCompile Include="mom\MomFederate.cpp" />
+    <ClCompile Include="mom\MomFederateMetrics.cpp" />
+    <ClCompile Include="mom\MomFederation.cpp" />
+    <ClCompile Include="mom\MomInteractions.cpp" />
+    <ClCompile Include="mom\MomManager.cpp" />
     <ClCompile Include="NestedProtocolLayer.cpp" />
     <ClCompile Include="NetworkServer.cpp" />
     <ClCompile Include="NetworkStatistics.cpp" />
@@ -164,17 +180,15 @@
     <ClCompile Include="StringUtils.cpp" />
     <ClCompile Include="TightBE1MessageEncoding.cpp" />
     <ClCompile Include="ThreadServer.cpp" />
+    <ClCompile Include="TranslateTypes.cpp" />
     <ClCompile Include="URL.cpp" />
+    <ClCompile Include="VariableLengthDataTuple.cpp" />
     <ClCompile Include="WeakReferenced.cpp" />
     <ClCompile Include="win32\PerformanceCounterStopWatch.cpp" />
     <ClCompile Include="XMLReader.cpp" />
-    <ClCompile Include="win32\AtomicWin32.cpp" />
-    <ClCompile Include="win32\ClockWin32.cpp" />
-    <ClCompile Include="win32\ConditionWin32.cpp" />
     <ClCompile Include="win32\DynamicModuleWin32.cpp" />
     <ClCompile Include="win32\ErrnoWin32.cpp" />
     <ClCompile Include="win32\NetworkStatisticsWin32.cpp" />
-    <ClCompile Include="win32\MutexWin32.cpp" />
     <ClCompile Include="win32\SocketAddressWin32.cpp" />
     <ClCompile Include="win32\SocketDataWin32.cpp" />
     <ClCompile Include="win32\SocketEventDispatcherWin32.cpp" />
@@ -207,12 +221,48 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClInclude Include="AbsTimeout.h" />
+    <ClInclude Include="DebugNew.h" />
+    <ClInclude Include="encoding\BasicDataElements.h" />
+    <ClInclude Include="encoding\DataElement.h" />
+    <ClInclude Include="encoding\Encoding.h" />
+    <ClInclude Include="encoding\EncodingConfig.h" />
+    <ClInclude Include="encoding\EncodingExceptions.h" />
+    <ClInclude Include="encoding\HLAfixedArray.h" />
+    <ClInclude Include="encoding\HLAfixedRecord.h" />
+    <ClInclude Include="encoding\HLAhandle.h" />
+    <ClInclude Include="encoding\HLAopaqueData.h" />
+    <ClInclude Include="encoding\HLAvariableArray.h" />
+    <ClInclude Include="encoding\HLAvariantRecord.h" />
+    <ClInclude Include="ImmediateCallbackDispatcher.h" />
+    <ClInclude Include="mom\AbstractFederateMetrics.h" />
+    <ClInclude Include="mom\MomServer.h" />
+    <ClInclude Include="mom\MomFederate.h" />
+    <ClInclude Include="mom\MomFederateMetrics.h" />
+    <ClInclude Include="mom\MomFederation.h" />
+    <ClInclude Include="mom\MomInteractions.h" />
+    <ClInclude Include="mom\MomManager.h" />
+    <ClInclude Include="mom\MomTypes.h" />
     <ClInclude Include="OpenRTIVersion.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="TranslateTypes.h" />
+    <ClInclude Include="VariableLengthDataTuple.h" />
     <ClInclude Include="win32\PerformanceCounterStopWatch.h" />
+    <ClInclude Include="xml\ascii.h" />
+    <ClInclude Include="xml\asciitab.h" />
+    <ClInclude Include="xml\expat.h" />
+    <ClInclude Include="xml\expat_external.h" />
+    <ClInclude Include="xml\iasciitab.h" />
+    <ClInclude Include="xml\internal.h" />
+    <ClInclude Include="xml\latin1tab.h" />
+    <ClInclude Include="xml\nametab.h" />
+    <ClInclude Include="xml\utf8tab.h" />
+    <ClInclude Include="xml\winconfig.h" />
+    <ClInclude Include="xml\xmlrole.h" />
+    <ClInclude Include="xml\xmltok.h" />
     <ClInclude Include="xml\xmltok_impl.c">
       <FileType>CppHeader</FileType>
     </ClInclude>
+    <ClInclude Include="xml\xmltok_impl.h" />
     <ClInclude Include="xml\xmltok_ns.c">
       <FileType>CppHeader</FileType>
     </ClInclude>
@@ -229,7 +279,6 @@
     <ClInclude Include="AbstractMessageSender.h" />
     <ClInclude Include="AbstractNetworkStatistics.h" />
     <ClInclude Include="AbstractNotificationHandle.h" />
-    <ClInclude Include="AbstractProtocol.h" />
     <ClInclude Include="AbstractProtocolLayer.h" />
     <ClInclude Include="AbstractProtocolSocket.h" />
     <ClInclude Include="AbstractServer.h" />
@@ -252,7 +301,6 @@
     <ClInclude Include="ExpatXMLReader.h" />
     <ClInclude Include="Export.h" />
     <ClInclude Include="FDD1516EFileReader.h" />
-    <ClInclude Include="FDD1516FileReader.h" />
     <ClInclude Include="Federate.h" />
     <ClInclude Include="FederateHandleLowerBoundTimeStampMap.h" />
     <ClInclude Include="FEDFileReader.h" />
@@ -275,7 +323,7 @@
     <ClInclude Include="NestedProtocolLayer.h" />
     <ClInclude Include="NetworkServer.h" />
     <ClInclude Include="NetworkStatistics.h" />
-    <ClInclude Include="OpenRTIConfig.h" />
+    <ClInclude Include="vsbuild\OpenRTIConfig.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="ParenthesesReader.h" />
     <ClInclude Include="PooledMessageList.h" />
@@ -322,21 +370,26 @@
     <ClInclude Include="VariableLengthData.h" />
     <ClInclude Include="WeakPtr.h" />
     <ClInclude Include="WeakReferenced.h" />
-    <ClInclude Include="win32\ClockWin32.h" />
-    <ClInclude Include="win32\ConditionPrivateDataWin32.h" />
     <ClInclude Include="win32\ErrnoWin32.h" />
-    <ClInclude Include="win32\MutexPrivateDataWin32.h" />
     <ClInclude Include="win32\NetworkStatisticsWin32.h" />
     <ClInclude Include="win32\SocketAddressPrivateDataWin32.h" />
     <ClInclude Include="win32\SocketPrivateDataWin32.h" />
     <ClInclude Include="XMLReader.h" />
-    <ClInclude Include="ZLibProtocolLayer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />
+    <None Include="codegen\messagegen.py" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="OpenRTI.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="codegen\Message.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -28,17 +28,21 @@
 
 namespace OpenRTI {
 
-class OPENRTI_API Exception /*: public std::exception*/ {
+class OPENRTI_API Exception {
 public:
-  virtual ~Exception() throw();
+  virtual ~Exception() noexcept;
 
-  const char* what() const throw();
-  const std::string& getReason() const throw();
+  const char* what() const;
+  const std::string& getReason() const;
 
 protected:
   Exception(const char* type, const char* reason);
   Exception(const char* type, const std::string& reason);
-
+  Exception() = default;
+  Exception(const Exception&) = default;
+  Exception(Exception&&) = default;
+  Exception& operator=(const Exception&) = default;
+  Exception& operator=(Exception&&) = default;
 private:
   std::string _reason;
 };
@@ -47,7 +51,7 @@ class OPENRTI_API RTIinternalError : public Exception {
 public:
   RTIinternalError(const char* reason = 0);
   RTIinternalError(const std::string& reason);
-  virtual ~RTIinternalError() throw();
+  virtual ~RTIinternalError() noexcept;
 
 private:
   static void assertMessage(const char* file, unsigned line, const char* reason = 0);
@@ -64,11 +68,16 @@ private:
 #endif
 
 #define RTI_EXCEPTION(name) \
-class OPENRTI_API name : public Exception { \
-public: \
-  name(const char* reason = 0) : Exception( #name, reason) { }  \
-  name(const std::string& reason) : Exception( #name, reason) { } \
-  virtual ~name() throw() { } \
+class OPENRTI_API name : public Exception {                                \
+public:                                                                    \
+  name(const char* reason) noexcept : Exception( #name, reason) { }        \
+  name(const std::string& reason) noexcept : Exception( #name, reason) { } \
+  name() noexcept : Exception( #name, "") { }                              \
+  name(const name&) = default;                                             \
+  name(name&&) = default;                                                  \
+  name& operator=(const name&) = default;                                  \
+  name& operator=(name&&) = default;                                       \
+  virtual ~name() noexcept { }                                             \
 };
 
 // OpenRTI exceptions
@@ -77,10 +86,12 @@ RTI_EXCEPTION(TransportError) // unrecoverable errors on sockets or other transp
 RTI_EXCEPTION(HTTPError) // unrecoverable errors on http connects
 RTI_EXCEPTION(MessageError) // Inconsistent messages reaching a server
 
-// rti ambassador type exceptions, this is the list in rti1516e as this is the most advanced
+// rti ambassador type exceptions, this is the list in rti1516ev as this is the most advanced
 RTI_EXCEPTION(AlreadyConnected)
 RTI_EXCEPTION(AsynchronousDeliveryAlreadyDisabled)
 RTI_EXCEPTION(AsynchronousDeliveryAlreadyEnabled)
+RTI_EXCEPTION(AllowPendingTimeInNextMessageRequestAlreadyDisabled)
+RTI_EXCEPTION(AllowPendingTimeInNextMessageRequestAlreadyEnabled)
 RTI_EXCEPTION(AttributeAcquisitionWasNotCanceled)
 RTI_EXCEPTION(AttributeAcquisitionWasNotRequested)
 RTI_EXCEPTION(AttributeAlreadyBeingAcquired)
@@ -178,6 +189,7 @@ RTI_EXCEPTION(ObjectClassRelevanceAdvisorySwitchIsOn)
 RTI_EXCEPTION(ObjectInstanceNameInUse)
 RTI_EXCEPTION(ObjectInstanceNameNotReserved)
 RTI_EXCEPTION(ObjectInstanceNotKnown)
+RTI_EXCEPTION(OperationTimeout)
 RTI_EXCEPTION(OwnershipAcquisitionPending)
 // RTI_EXCEPTION(RTIinternalError)
 RTI_EXCEPTION(RegionDoesNotContainSpecifiedDimension)
@@ -198,6 +210,7 @@ RTI_EXCEPTION(TimeRegulationIsNotEnabled)
 RTI_EXCEPTION(UnableToPerformSave)
 RTI_EXCEPTION(UnknownName)
 RTI_EXCEPTION(UnsupportedCallbackModel)
+RTI_EXCEPTION(EncoderException)
 RTI_EXCEPTION(InternalError)
 #undef RTI_EXCEPTION
 

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Federate.h"
 
 #include "InternalTimeManagement.h"
@@ -88,7 +89,7 @@ Federate::PublishSubscribe::setTransportationType(TransportationType transportat
 bool
 Federate::PublishSubscribe::setSubscriptionType(SubscriptionType subscriptionType)
 {
-  Log(ServerFederate, Info) << __FUNCTION__ << ": " << _name << ":" << subscriptionType << std::endl;
+  //Log(ServerFederate, Info) << __FUNCTION__ << ": " << _name << ":" << subscriptionType << std::endl;
 
   std::swap(_subscriptionType, subscriptionType);
   return _subscriptionType != subscriptionType;
@@ -177,13 +178,14 @@ Federate::InteractionClass::insertParameter(const FOMParameter& fomParameter)
     _parameterVector.resize(index + 1);
   if (_parameterVector[index].valid())
     return;
-  _parameterVector[index] = new Parameter;
+  _parameterVector[index] = MakeShared<Parameter>();
   Parameter* parameter = _parameterVector[index].get();
 
   _nameParameterHandleMap[fomParameter.getName()] = parameterHandle;
   _nameParameterHandleMap[_fqName + "." + fomParameter.getName()] = parameterHandle;
 
   parameter->setName(fomParameter.getName());
+  parameter->setDataType(fomParameter.getDataType());
 
   for (IntrusiveList<InteractionClass>::iterator i = _childInteractionClassList.begin();
        i != _childInteractionClassList.end(); ++i) {
@@ -199,6 +201,137 @@ Federate::InteractionClass::insertChildInteractionClass(InteractionClass& intera
   interactionClass._nameParameterHandleMap = _nameParameterHandleMap;
 
   _childInteractionClassList.push_back(interactionClass);
+}
+
+
+bool Federate::InteractionClass::setSubscriptionType(SubscriptionType subscriptionType, const ParameterValueVector& filterValues)
+{
+  if (!filterValues.empty())
+  {
+    bool filterChanged = updateParameterFilterValues(filterValues, subscriptionType == SubscriptionType::Unsubscribed);
+    if (subscriptionType == SubscriptionType::Unsubscribed)
+    {
+      if (!HasParameterFilters())
+      {
+        // we just emptied the parameter filter set - really unsubscribe
+        PublishSubscribe::setSubscriptionType(SubscriptionType::Unsubscribed);
+      }
+      // otherwise leave the subscription type intact
+    }
+    else
+    {
+      PublishSubscribe::setSubscriptionType(subscriptionType);
+    }
+    return filterChanged;
+  }
+  else
+  {
+    return PublishSubscribe::setSubscriptionType(subscriptionType);
+  }
+}
+
+void Federate::InteractionClass::NormalizeFilterValues(const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVector, VariableLengthDataTuple& filterValueTuple) const
+{
+  filterKeyVector = ParameterHandleVector(_parameterFilterKeyPrototype);
+  filterValueTuple = VariableLengthDataTuple(filterKeyVector.size());
+  int valueIndex = 0;
+  for (auto& filterKey : filterKeyVector)
+  {
+    auto where = std::find_if(parameterFilters.begin(), parameterFilters.end(),
+      [filterKey](ParameterValue parameterValue) { return parameterValue.getParameterHandle() == filterKey; });
+    if (where == parameterFilters.end())
+    {
+      filterKey = ParameterHandle();
+      filterValueTuple[valueIndex] = VariableLengthData();
+    }
+    else
+    {
+      filterValueTuple[valueIndex] = where->getValue();
+    }
+    valueIndex++;
+  }
+}
+
+bool Federate::InteractionClass::AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters)
+{
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple; // (filterKeyVector.size());
+  // update the _parameterFilterKeyPrototype, if necessary (new parameter handle specified in filter for the first time)
+  for (auto& item : parameterFilters)
+  {
+    if (std::find(_parameterFilterKeyPrototype.begin(), _parameterFilterKeyPrototype.end(), item.getParameterHandle()) == _parameterFilterKeyPrototype.end())
+    {
+      _parameterFilterKeyPrototype.push_back(item.getParameterHandle());
+    }
+  }
+  // bring the parameterFilters into a form matching _parameterFilterKeyPrototype. 
+  NormalizeFilterValues(parameterFilters, filterKeyVector, filterValueTuple);
+  if (!filterValueTuples.Contains(filterValueTuple))
+  {
+    filterValueTuples.Insert(filterValueTuple);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool Federate::InteractionClass::RemoveParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters)
+{
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple; // (filterKeyVector.size());
+  // update the _parameterFilterKeyPrototype, if necessary (new parameter handle specified in filter for the first time)
+  for (auto& item : parameterFilters)
+  {
+    if (std::find(_parameterFilterKeyPrototype.begin(), _parameterFilterKeyPrototype.end(), item.getParameterHandle()) == _parameterFilterKeyPrototype.end())
+    {
+      _parameterFilterKeyPrototype.push_back(item.getParameterHandle());
+    }
+  }
+  // bring the parameterFilters into a form matching _parameterFilterKeyPrototype. 
+  NormalizeFilterValues(parameterFilters, filterKeyVector, filterValueTuple);
+  if (filterValueTuples.Contains(filterValueTuple))
+  {
+    filterValueTuples.Erase(filterValueTuple);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+
+bool Federate::InteractionClass::HasParameterFilters() const
+{
+  return !_parameterFilterValues.empty();
+}
+
+bool Federate::InteractionClass::updateParameterFilterValues(const ParameterValueVector& parameterFilters, bool remove)
+{
+  bool result = false;
+  if (remove)
+  {
+    result = RemoveParameterFilterValues(_parameterFilterValues, parameterFilters);
+  }
+  else
+  {
+    result = AddParameterFilterValues(_parameterFilterValues, parameterFilters);
+  }
+  return result;
+}
+
+void Federate::InteractionClass::getFOMInteractionClass(FOMInteractionClass& fomInteractionClass)
+{
+  fomInteractionClass.setName(getName());
+  for (auto it : _nameParameterHandleMap)
+  {
+    FOMParameter fomParameter;
+    fomParameter.setName(it.first);
+    fomParameter.setParameterHandle(it.second);
+    fomInteractionClass.getParameterList().push_back(fomParameter);
+  }
 }
 
 Federate::ObjectClass::ObjectClass() :
@@ -256,6 +389,14 @@ Federate::ObjectClass::getAttributeHandle(const std::string& name) const
   return i->second;
 }
 
+std::string
+Federate::ObjectClass::getAttributeDataType(const AttributeHandle& attributeHandle)
+{
+  if (_attributeVector.size() <= attributeHandle.getHandle())
+    return "";
+  return _attributeVector[attributeHandle.getHandle()]->getDataType();
+}
+
 
 AttributeHandleVector Federate::ObjectClass::getAttributeHandles() const
 {
@@ -278,7 +419,7 @@ Federate::ObjectClass::insertAttribute(const FOMAttribute& fomAttribute)
     _attributeVector.resize(index + 1);
   if (_attributeVector[index].valid())
     return;
-  _attributeVector[index] = new Attribute;
+  _attributeVector[index] = MakeShared<Attribute>();
   Attribute* attribute = _attributeVector[index].get();
 
   _nameAttributeHandleMap[fomAttribute.getName()] = attributeHandle;
@@ -288,7 +429,7 @@ Federate::ObjectClass::insertAttribute(const FOMAttribute& fomAttribute)
   attribute->setOrderType(fomAttribute.getOrderType());
   attribute->setTransportationType(fomAttribute.getTransportationType());
   attribute->setDimensionHandleSet(fomAttribute.getDimensionHandleSet());
-
+  attribute->setDataType(fomAttribute.getDataType());
   for (IntrusiveList<ObjectClass>::iterator i = _childObjectClassList.begin();
        i != _childObjectClassList.end(); ++i) {
     i->insertAttribute(fomAttribute);
@@ -299,16 +440,16 @@ void
 Federate::ObjectClass::insertChildObjectClass(ObjectClass& objectClass)
 {
   objectClass._attributeVector.reserve(_attributeVector.size());
-  for (AttributeVector::const_iterator i = _attributeVector.begin();
-       i != _attributeVector.end(); ++i) {
-    if (i->valid()) {
-      objectClass._attributeVector.push_back(new Attribute(**i));
-    } else {
-      objectClass._attributeVector.push_back(0);
+  for (const SharedPtr<Attribute>& attributePtr : _attributeVector)
+  {
+    if (attributePtr.valid()) {
+      objectClass._attributeVector.push_back(MakeShared<Attribute>(*attributePtr));
+    }
+    else {
+      objectClass._attributeVector.push_back(SharedPtr<Attribute>());
     }
   }
   objectClass._nameAttributeHandleMap = _nameAttributeHandleMap;
-
   _childObjectClassList.push_back(objectClass);
 }
 
@@ -446,17 +587,17 @@ Federate::ObjectInstance::ObjectInstance(NameObjectInstanceHandleMap::iterator n
   _subscriptionType(Unsubscribed)
 {
   _objectClass = &objectClass;
-  size_t numAttributes = objectClass.getNumAttributes();
+  uint32_t numAttributes = objectClass.getNumAttributes();
   _instanceAttributeVector.reserve(numAttributes);
-  for (size_t k = 0; k < numAttributes; ++k) {
-    const Attribute* attribute = objectClass.getAttribute(k);
+  for (uint32_t k = 0; k < numAttributes; ++k) {
+    const Attribute* attribute = objectClass.getAttribute(AttributeHandle(k));
     if (attribute) {
       if (objectClass.isAttributePublished(AttributeHandle(k)))
-        _instanceAttributeVector.push_back(new InstanceAttribute(*attribute, owned));
+        _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>(new InstanceAttribute(*attribute, owned)));
       else
-        _instanceAttributeVector.push_back(new InstanceAttribute(*attribute, false));
+        _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>(new InstanceAttribute(*attribute, false)));
     } else {
-      _instanceAttributeVector.push_back(0);
+      _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>());
     }
   }
 }
@@ -505,7 +646,7 @@ Federate::ObjectInstance::isOwnedByFederate() const
 bool
 Federate::ObjectInstance::ownsAnyAttribute() const
 {
-  for (size_t i = 0; i < _instanceAttributeVector.size(); ++i) {
+  for (uint32_t i = 0; i < static_cast<uint32_t>(_instanceAttributeVector.size()); ++i) {
     const InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(i));
     if (!instanceAttribute)
       continue;
@@ -535,12 +676,7 @@ Federate::Federate() :
   _objectClassRelevanceAdvisorySwitchEnabled(false),
   _attributeRelevanceAdvisorySwitchEnabled(false),
   _attributeScopeAdvisorySwitchEnabled(false),
-  _interactionRelevanceAdvisorySwitchEnabled(false),
-  _permitTimeRegulation(true)
-{
-}
-
-Federate::~Federate()
+  _interactionRelevanceAdvisorySwitchEnabled(false)
 {
 }
 
@@ -602,12 +738,6 @@ void
 Federate::setInteractionRelevanceAdvisorySwitchEnabled(bool interactionRelevanceAdvisorySwitchEnabled)
 {
   _interactionRelevanceAdvisorySwitchEnabled = interactionRelevanceAdvisorySwitchEnabled;
-}
-
-void
-Federate::setPermitTimeRegulation(bool permitTimeRegulation)
-{
-  _permitTimeRegulation = permitTimeRegulation;
 }
 
 void
@@ -677,7 +807,7 @@ Federate::insertTransportationType(const std::string& name, TransportationType t
 {
   OpenRTIAssert(_nameTransportationTypeMap.find(name) == _nameTransportationTypeMap.end());
   _nameTransportationTypeMap[name] = transportationType;
-  // Only insert the first occurance of transportationType to the type to name map
+  // Only insert the first occurrence of transportationType to the type to name map
   // This way we should get the standard name back even if we map a custom transportation
   // type name to the same resulting transportation.
   _transportationTypeNameMap.insert(TransportationTypeNameMap::value_type(transportationType, name));
@@ -735,12 +865,12 @@ Federate::insertDimension(const std::string& name, const DimensionHandle& dimens
   size_t index = dimensionHandle.getHandle();
   if (_dimensionVector.size() <= index)
     _dimensionVector.resize(index + 1);
-  _dimensionVector[index] = new Dimension(name, upperBound);
+  _dimensionVector[index] = MakeShared<Dimension>(name, upperBound);
   _nameDimensionHandleMap[name] = dimensionHandle;
 }
 
 void
-Federate::insertRoutingSpace(const std::string& name, const SpaceHandle& spaceHandle, const DimensionHandleSet& dimensionHandles)
+Federate::insertRoutingSpace(const std::string& /*name*/, const SpaceHandle& /*spaceHandle*/, const DimensionHandleSet& /*dimensionHandles*/)
 {
   // FIXME implement for the HLA13 stuff, when the parser is there :)
 }
@@ -767,7 +897,7 @@ void
 Federate::insertRegion(const RegionHandle& regionHandle, const DimensionHandleSet& dimensionHandleSet)
 {
   OpenRTIAssert(_regionHandleRegionDataMap.find(regionHandle) == _regionHandleRegionDataMap.end());
-  _regionHandleRegionDataMap[regionHandle] = new RegionData(dimensionHandleSet);
+  _regionHandleRegionDataMap[regionHandle] = MakeShared<RegionData>(dimensionHandleSet);
 }
 
 void
@@ -871,7 +1001,7 @@ Federate::insertInteractionClass(const FOMInteractionClass& module, bool artific
   if (_interactionClassVector.size() <= index)
     _interactionClassVector.resize(index + 1);
   if (!_interactionClassVector[index].valid()) {
-    _interactionClassVector[index] = new InteractionClass;
+    _interactionClassVector[index] = MakeShared<InteractionClass>();
 
     InteractionClassHandle parentHandle = module.getParentInteractionClassHandle();
 
@@ -905,9 +1035,8 @@ Federate::insertInteractionClass(const FOMInteractionClass& module, bool artific
       parentClass->insertChildInteractionClass(*interactionClass);
     }
   }
-  for (FOMParameterList::const_iterator i = module.getParameterList().begin();
-       i != module.getParameterList().end(); ++i) {
-    _interactionClassVector[index]->insertParameter(*i);
+  for (auto& parameter : module.getParameterList()) {
+    _interactionClassVector[index]->insertParameter(parameter);
   }
 }
 
@@ -943,9 +1072,9 @@ Federate::insertObjectClass(const FOMObjectClass& module, bool artificialObjectR
   if (_objectClassVector.size() <= index)
     _objectClassVector.resize(index + 1);
   if (!_objectClassVector[index].valid()) {
-    _objectClassVector[index] = new ObjectClass;
+    _objectClassVector[index] = MakeShared<ObjectClass>();
     ObjectClass* objectClass = _objectClassVector[index].get();
-
+    objectClass->setClassHandle(module.getObjectClassHandle());
     ObjectClassHandle parentHandle = module.getParentObjectClassHandle();
 
     std::string fqName;
@@ -1016,7 +1145,7 @@ Federate::insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const 
   OpenRTIAssert(objectClass);
   NameObjectInstanceHandleMap::iterator i;
   i = _nameObjectInstanceHandleMap.insert(NameObjectInstanceHandleMap::value_type(name, objectInstanceHandle)).first;
-  SharedPtr<ObjectInstance> objectInstance = new ObjectInstance(i, *objectClass, owned);
+  SharedPtr<ObjectInstance> objectInstance = MakeShared<ObjectInstance>(i, *objectClass, owned);
   objectInstance->setObjectClassHandle(objectClassHandle);
   objectInstance->setSubscriptionType(SubscribedActive);
   _objectInstanceHandleMap.insert(ObjectInstanceHandleMap::value_type(objectInstanceHandle, objectInstance));
@@ -1027,7 +1156,7 @@ Federate::eraseObjectInstance(const ObjectInstanceHandle& objectInstanceHandle)
 {
   ObjectInstanceHandleMap::iterator i = _objectInstanceHandleMap.find(objectInstanceHandle);
   if (i == _objectInstanceHandleMap.end()) {
-    Log(FederateAmbassador, Warning) << "Federate: \"" << getFederateType() << "\": Cannot remove object instance with object handle: "
+    Log(FederateAmbassador, Warning) << "Federate: \"" << getFederateType() << "\": Cannot remove object instance with handle: "
                                      << objectInstanceHandle.getHandle() << std::endl;
     return;
   }
@@ -1122,7 +1251,7 @@ Federate::insertFederate(const FederateHandle& federateHandle, const std::string
   OpenRTIAssert(_federateHandleMap.find(federateHandle) == _federateHandleMap.end());
   NameFederateHandleMap::iterator i;
   i = _nameFederateHandleMap.insert(NameFederateHandleMap::value_type(name, federateHandle)).first;
-  SharedPtr<_Federate> federate = new _Federate(i);
+  SharedPtr<_Federate> federate = MakeShared<_Federate>(i);
   _federateHandleMap.insert(FederateHandleMap::value_type(federateHandle, federate));
 }
 
@@ -1131,7 +1260,7 @@ Federate::eraseFederate(const FederateHandle& federateHandle)
 {
   FederateHandleMap::iterator i = _federateHandleMap.find(federateHandle);
   if (i == _federateHandleMap.end()) {
-    Log(FederateAmbassador, Warning) << "Federate: \"" << getFederateType() << "\": Cannot remove object instance with object handle: "
+    Log(FederateAmbassador, Warning) << "Federate: name=\"" << getFederateName() << "\" type=\"" << getFederateType() << "\" : Cannot remove federate with handle: "
                                      << federateHandle.getHandle() << std::endl;
     return;
   }
@@ -1160,34 +1289,70 @@ Federate::synchronizationLabelAnnounced(const std::string& label) const
 void
 Federate::insertFOMModule(const FOMModule& module)
 {
-  for (FOMUpdateRateList::const_iterator i = module.getUpdateRateList().begin();
-       i != module.getUpdateRateList().end(); ++i)
-    insertUpdateRate(i->getName(), i->getRate());
-  for (FOMDimensionList::const_iterator i = module.getDimensionList().begin();
-       i != module.getDimensionList().end(); ++i)
-    insertDimension(i->getName(), i->getDimensionHandle(), i->getUpperBound());
-  for (FOMRoutingSpaceList::const_iterator i = module.getRoutingSpaceList().begin();
-       i != module.getRoutingSpaceList().end(); ++i)
-    insertRoutingSpace(i->getName(), i->getSpaceHandle(), i->getDimensionHandleSet());
-  for (FOMTransportationTypeList::const_iterator i = module.getTransportationTypeList().begin();
-       i != module.getTransportationTypeList().end(); ++i)
-    insertTransportationType(i->getName(), i->getTransportationType());
-  for (FOMInteractionClassList::const_iterator i = module.getInteractionClassList().begin();
-       i != module.getInteractionClassList().end(); ++i)
-    insertInteractionClass(*i, module.getArtificialInteractionRoot());
-  for (FOMObjectClassList::const_iterator i = module.getObjectClassList().begin();
-       i != module.getObjectClassList().end(); ++i)
-    insertObjectClass(*i, module.getArtificialObjectRoot());
-  for (FOMSwitchList::const_iterator i = module.getSwitchList().begin();
-       i != module.getSwitchList().end(); ++i)
-    applySwitch(*i);
+  for (auto& updateRate : module.getUpdateRateList())
+    insertUpdateRate(updateRate.getName(), updateRate.getRate());
+  for (auto& dimension : module.getDimensionList())
+    insertDimension(dimension.getName(), dimension.getDimensionHandle(), dimension.getUpperBound());
+  for (auto& routingSpace : module.getRoutingSpaceList())
+    insertRoutingSpace(routingSpace.getName(), routingSpace.getSpaceHandle(), routingSpace.getDimensionHandleSet());
+  for (auto& transportationType : module.getTransportationTypeList())
+    insertTransportationType(transportationType.getName(), transportationType.getTransportationType());
+  for (auto& interactionClass : module.getInteractionClassList())
+    insertInteractionClass(interactionClass, module.getArtificialInteractionRoot());
+  for (auto& objectClass : module.getObjectClassList())
+    insertObjectClass(objectClass, module.getArtificialObjectRoot());
+  for (auto& hlaSwitch : module.getSwitchList())
+    applySwitch(hlaSwitch);
+  _moduleMap.insert(std::make_pair(module.getModuleHandle(), module));
+}
+
+
+void Federate::insertFOMModule2(const FOMModule2& module)
+{
+  for (auto& updateRate : module.getUpdateRateList())
+    insertUpdateRate(updateRate.getName(), updateRate.getRate());
+  for (auto& dimension : module.getDimensionList())
+    insertDimension(dimension.getName(), dimension.getDimensionHandle(), dimension.getUpperBound());
+  for (auto& routingSpace : module.getRoutingSpaceList())
+    insertRoutingSpace(routingSpace.getName(), routingSpace.getSpaceHandle(), routingSpace.getDimensionHandleSet());
+  for (auto& transportationType : module.getTransportationTypeList())
+    insertTransportationType(transportationType.getName(), transportationType.getTransportationType());
+  for (auto& interactionClass : module.getInteractionClassList())
+    insertInteractionClass(interactionClass, module.getArtificialInteractionRoot());
+  for (auto& objectClass : module.getObjectClassList())
+    insertObjectClass(objectClass, module.getArtificialObjectRoot());
+  //for (auto& simpleDataType : module.getSimpleDataTypeList())
+  //  insertSimpleDataType(*i, module.getArtificialObjectRoot());
+  for (auto& hlaSwitch : module.getSwitchList())
+    applySwitch(hlaSwitch);
+  _moduleMap.insert(std::make_pair(module.getModuleHandle(), module));
 }
 
 void
 Federate::insertFOMModuleList(const FOMModuleList& moduleList)
 {
-  for (FOMModuleList::const_iterator i = moduleList.begin(); i != moduleList.end(); ++i)
-    insertFOMModule(*i);
+  for (auto& fomModule : moduleList)
+    insertFOMModule(fomModule);
+}
+
+void
+Federate::insertFOMModule2List(const FOMModule2List& moduleList)
+{
+  for (auto& fomModule2 : moduleList)
+    insertFOMModule2(fomModule2);
+}
+
+
+void Federate::getFOMModule(FOMModule& module)
+{
+  FOMInteractionClassList interactionClassList;
+  for (auto ic : _interactionClassVector)
+  {
+    FOMInteractionClass fomInteractionClass;
+    module.getInteractionClassList().push_back(fomInteractionClass);
+  }
+  FOMObjectClassList objectClassList;
+
 }
 
 }

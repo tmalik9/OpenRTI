@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "InternalAmbassador.h"
 
 #include "InternalTimeManagement.h"
@@ -28,6 +29,11 @@
 #include "Message.h"
 
 #include "dprintf.h"
+#include "AbstractServer.h"
+#include "ThreadLocal.h"
+#include "NetworkServer.h"
+#include "AbsTimeout.h"
+#include "ImmediateCallbackDispatcher.h"
 
 namespace OpenRTI {
 
@@ -44,10 +50,27 @@ private:
 };
 
 InternalAmbassador::InternalAmbassador()
+  : _callbacksEnabled(true)
 {
 }
 
-InternalAmbassador::~InternalAmbassador()
+
+void InternalAmbassador::enableImmediateProcessing()
+{
+  _callbackModel = HLA_IMMEDIATE;
+  _immediateCallbackDispatcher = MakeShared<ImmediateCallbackDispatcher>(*this);
+  _immediateCallbackDispatcher->start();
+}
+
+
+void InternalAmbassador::disableImmediateProcessing()
+{
+  _immediateCallbackDispatcher->stop();
+  _immediateCallbackDispatcher->wait();
+  _callbackModel = HLA_EVOKED;
+}
+
+InternalAmbassador::~InternalAmbassador() noexcept
 {
   try
   {
@@ -56,9 +79,9 @@ InternalAmbassador::~InternalAmbassador()
   }
   catch (Exception& e)
   {
-    CondDebugPrintf("%s: %S\n", e.getReason().c_str());
+    DebugPrintf("%s: %s\n", __FUNCTION__, e.getReason().c_str());
   }
-  _connect.clear();
+  _connect.reset();
 }
 
 bool
@@ -68,9 +91,9 @@ InternalAmbassador::isConnected() const
 }
 
 void
-InternalAmbassador::connect(const URL& url, const StringStringListMap& parameterMap)
+InternalAmbassador::connect(const URL& url, const StringStringListMap& parameterMap, uint32_t timeoutMilliSeconds)
 {
-  _connect = LeafServerThread::connect(url, parameterMap);
+  _connect = LeafServerThread::connect(url, parameterMap, timeoutMilliSeconds);
 }
 
 void
@@ -78,7 +101,14 @@ InternalAmbassador::disconnect()
 {
   OpenRTIAssert(_connect.valid());
   _connect->close();
-  _connect.clear();
+  _connect.reset();
+}
+
+
+void InternalAmbassador::shutdown()
+{
+  LeafServerThread::shutdown();
+  AbstractThreadLocal::shutdown();
 }
 
 void
@@ -89,16 +119,36 @@ InternalAmbassador::send(const SharedPtr<const AbstractMessage>& message)
 }
 
 bool
-InternalAmbassador::receiveAndDispatchInternalMessage(const Clock& abstime)
+InternalAmbassador::receiveAndDispatchInternalMessage(const AbsTimeout& timeout)
 {
   _InternalMessageDispatchFunctor functor(*this);
-  return receiveAndDispatch(abstime, functor);
+  return receiveAndDispatch(timeout, functor);
 }
 
 bool
-InternalAmbassador::_receiveAndDispatch(const Clock& abstime, const AbstractMessageDispatcher& dispatcher)
+InternalAmbassador::_receiveAndDispatch(const AbsTimeout& timeout, const AbstractMessageDispatcher& dispatcher)
 {
-  SharedPtr<const AbstractMessage> message = _connect->receive(abstime);
+  OpenRTIAssert(_connect.valid());
+  SharedPtr<const AbstractMessage> message = _connect->receive(timeout);
+  if (!message.valid())
+    return false;
+  message->dispatch(dispatcher);
+  return true;
+}
+
+bool
+InternalAmbassador::receiveAndDispatchInternalMessage()
+{
+  _InternalMessageDispatchFunctor functor(*this);
+  return receiveAndDispatch(functor);
+}
+
+bool
+InternalAmbassador::_receiveAndDispatch(const AbstractMessageDispatcher& dispatcher)
+{
+  if (!_connect.valid())
+    return false;
+  SharedPtr<const AbstractMessage> message = _connect->receive();
   if (!message.valid())
     return false;
   message->dispatch(dispatcher);
@@ -116,6 +166,8 @@ void
 InternalAmbassador::_flushReceiveAndDispatch(const AbstractMessageDispatcher& dispatcher)
 {
   for (;;) {
+    if (!_connect.valid())
+      break;
     SharedPtr<const AbstractMessage> message = _connect->receive();
     if (!message.valid())
       return;
@@ -124,9 +176,10 @@ InternalAmbassador::_flushReceiveAndDispatch(const AbstractMessageDispatcher& di
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const AbstractMessage&)
+InternalAmbassador::acceptInternalMessage(const AbstractMessage& message)
 {
-  throw RTIinternalError("Unexpected message in internal message processing!");
+  std::string msg = std::string("Unexpected message in internal message processing!") + message.toString();
+  throw RTIinternalError(msg);
 }
 
 void
@@ -147,19 +200,25 @@ InternalAmbassador::acceptInternalMessage(const EnumerateFederationExecutionsRes
 // }
 
 void
-InternalAmbassador::acceptInternalMessage(const ShutdownFederationExecutionMessage& message)
+InternalAmbassador::acceptInternalMessage(const ShutdownFederationExecutionMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const EraseFederationExecutionMessage& message)
+InternalAmbassador::acceptInternalMessage(const DestroyFederationExecutionResponseMessage& /*message*/)
+{
+  // spurious, after disconnect?
+}
+
+void
+InternalAmbassador::acceptInternalMessage(const EraseFederationExecutionMessage& /*message*/)
 {
   // FIXME?!
   // deleteFederate();
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ReleaseFederationHandleMessage& message)
+InternalAmbassador::acceptInternalMessage(const ReleaseFederationHandleMessage& /*message*/)
 {
 }
 
@@ -173,14 +232,12 @@ InternalAmbassador::acceptInternalMessage(const InsertModulesMessage& message)
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const JoinFederationExecutionResponseMessage& message)
+InternalAmbassador::acceptInternalMessage(const InsertModules2Message& message)
 {
   Federate* federate = getFederate();
   if (!federate)
     return;
-  federate->setFederateHandle(message.getFederateHandle());
-  federate->setFederateName(message.getFederateName());
-  federate->setFederateType(message.getFederateType());
+  federate->insertFOMModule2List(message.getFOMModule2List());
 }
 
 void
@@ -189,20 +246,26 @@ InternalAmbassador::acceptInternalMessage(const JoinFederateNotifyMessage& messa
   if (Federate* federate = getFederate())
     federate->insertFederate(message.getFederateHandle(), message.getFederateName());
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->acceptInternalMessage(*this, message);
+  }
 }
 
 void
 InternalAmbassador::acceptInternalMessage(const ResignFederateNotifyMessage& message)
 {
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->acceptInternalMessage(*this, message);
+  }
   if (Federate* federate = getFederate())
     federate->eraseFederate(message.getFederateHandle());
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeAutomaticResignDirectiveMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeAutomaticResignDirectiveMessage& /*message*/)
 {
 }
 
@@ -219,7 +282,7 @@ InternalAmbassador::acceptInternalMessage(const AnnounceSynchronizationPointMess
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const SynchronizationPointAchievedMessage& message)
+InternalAmbassador::acceptInternalMessage(const SynchronizationPointAchievedMessage& /*message*/)
 {
 }
 
@@ -233,42 +296,70 @@ void
 InternalAmbassador::acceptInternalMessage(const EnableTimeRegulationRequestMessage& message)
 {
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->acceptInternalMessage(*this, message);
+  }
 }
 
 void
 InternalAmbassador::acceptInternalMessage(const EnableTimeRegulationResponseMessage& message)
 {
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->acceptInternalMessage(*this, message);
+  }
 }
 
 void
 InternalAmbassador::acceptInternalMessage(const DisableTimeRegulationRequestMessage& message)
 {
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->acceptInternalMessage(*this, message);
+  }
+}
+
+void
+InternalAmbassador::acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& /*message*/)
+{
+}
+
+void
+InternalAmbassador::acceptInternalMessage(const DisableTimeConstrainedNotifyMessage& /*message*/)
+{
 }
 
 void
 InternalAmbassador::acceptInternalMessage(const CommitLowerBoundTimeStampMessage& message)
 {
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->acceptInternalMessage(*this, message);
+  }
 }
 
 void
 InternalAmbassador::acceptInternalMessage(const CommitLowerBoundTimeStampResponseMessage& message)
 {
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->acceptInternalMessage(*this, message);
+  }
 }
 
 void
 InternalAmbassador::acceptInternalMessage(const LockedByNextMessageRequestMessage& message)
 {
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->acceptInternalMessage(*this, message);
+  }
 }
 
 void
@@ -299,22 +390,22 @@ InternalAmbassador::acceptInternalMessage(const EraseRegionMessage& message)
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeInteractionClassPublicationMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeInteractionClassPublicationMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeObjectClassPublicationMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeObjectClassPublicationMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeInteractionClassSubscriptionMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeInteractionClassSubscriptionMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const ChangeObjectClassSubscriptionMessage& message)
+InternalAmbassador::acceptInternalMessage(const ChangeObjectClassSubscriptionMessage& /*message*/)
 {
 }
 
@@ -323,12 +414,22 @@ InternalAmbassador::acceptInternalMessage(const ChangeObjectInstanceSubscription
 {
   // probably the wrong place to do this -
   // maybe this should only get through when there is no subscriber left at all.
-  Federate::ObjectClass* objectClass = getFederate()->getObjectClass(message.getObjectClassHandle());
-  Federate::ObjectInstance* objectInstance = getFederate()->getObjectInstance(message.getObjectInstanceHandle());
+
+  ObjectClassHandle objectClassHandle = message.getObjectClassHandle();
+  ObjectInstanceHandle objectInstanceHandle = message.getObjectInstanceHandle();
+  const Federate::ObjectClass* objectClass = getFederate()->getObjectClass(objectClassHandle);
+  Federate::ObjectInstance* objectInstance = getFederate()->getObjectInstance(objectInstanceHandle);
+
+  // The object or class could be removed meanwhile
+  if (!objectInstance)
+    return;
+  if (!objectClass)
+    return;
+
   SubscriptionType subscriptionType = message.getSubscriptionType();
   if (objectInstance->setSubscriptionType(subscriptionType))
   {
-    SharedPtr<TurnUpdatesOnForInstanceMessage> updatesMessage = new TurnUpdatesOnForInstanceMessage;
+    SharedPtr<TurnUpdatesOnForInstanceMessage> updatesMessage = MakeShared<TurnUpdatesOnForInstanceMessage>();
     updatesMessage->setObjectInstanceHandle(message.getObjectInstanceHandle());
     updatesMessage->setAttributeHandles(objectClass->getAttributeHandles());
     updatesMessage->setOn(subscriptionType != Unsubscribed);
@@ -338,12 +439,12 @@ InternalAmbassador::acceptInternalMessage(const ChangeObjectInstanceSubscription
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const RegistrationForObjectClassMessage& message)
+InternalAmbassador::acceptInternalMessage(const RegistrationForObjectClassMessage& /*message*/)
 {
 }
 
 void
-InternalAmbassador::acceptInternalMessage(const TurnInteractionsOnMessage& message)
+InternalAmbassador::acceptInternalMessage(const TurnInteractionsOnMessage& /*message*/)
 {
 }
 
@@ -449,7 +550,7 @@ InternalAmbassador::acceptInternalMessage(const RequestClassAttributeUpdateMessa
       continue;
 
     SharedPtr<RequestAttributeUpdateMessage> request;
-    request = new RequestAttributeUpdateMessage;
+    request = MakeShared<RequestAttributeUpdateMessage>();
     request->setFederationHandle(federate->getFederationHandle());
     request->setObjectInstanceHandle(i->first);
     request->setAttributeHandles(message.getAttributeHandles());
@@ -458,11 +559,17 @@ InternalAmbassador::acceptInternalMessage(const RequestClassAttributeUpdateMessa
   }
 }
 
+
+void InternalAmbassador::acceptInternalMessage(const QueryAttributeOwnershipRequestMessage& /*message*/)
+{
+
+}
+
 class OPENRTI_LOCAL InternalAmbassador::_CreateFederationExecutionFunctor {
 public:
   _CreateFederationExecutionFunctor(InternalAmbassador& basicAmbassador) :
     _done(false),
-    _responseTypeStringPair(CreateFederationExecutionResponseRTIinternalError, std::string()),
+    _responseTypeStringPair(CreateFederationExecutionResponseTimeout, "Timeout while waiting for CreateFederationExecutionResponse"),
     _basicAmbassador(basicAmbassador)
   { }
   void operator()(const ConnectionLostMessage& message)
@@ -490,11 +597,13 @@ private:
 };
 
 std::pair<CreateFederationExecutionResponseType, std::string>
-InternalAmbassador::dispatchWaitCreateFederationExecutionResponse(const Clock& abstime)
+InternalAmbassador::dispatchWaitCreateFederationExecutionResponse(const AbsTimeout& timeout)
 {
   _CreateFederationExecutionFunctor functor(*this);
-  while (!functor._done && Clock::now() <= abstime)
-    receiveAndDispatch(abstime, functor);
+  disableCallbacks();
+  while (!functor._done && !timeout.isExpired())
+    receiveAndDispatch(timeout, functor);
+  enableCallbacks();
   return functor._responseTypeStringPair;
 }
 
@@ -528,20 +637,22 @@ private:
 };
 
 DestroyFederationExecutionResponseType
-InternalAmbassador::dispatchWaitDestroyFederationExecutionResponse(const Clock& abstime)
+InternalAmbassador::dispatchWaitDestroyFederationExecutionResponse(const AbsTimeout& timeout)
 {
   _DestroyFederationExecutionFunctor functor(*this);
-  while (!functor._done && Clock::now() <= abstime)
-    receiveAndDispatch(abstime, functor);
+  disableCallbacks();
+  while (!functor._done && !timeout.isExpired())
+    receiveAndDispatch(timeout, functor);
+  enableCallbacks();
   return functor._responseType;
 }
 
 class OPENRTI_LOCAL InternalAmbassador::_JoinFederationExecutionFunctor {
 public:
-  _JoinFederationExecutionFunctor(InternalAmbassador& basicAmbassador) :
+  _JoinFederationExecutionFunctor(InternalAmbassador& basicAmbassador, std::string federateName) :
     _done(false),
-    _response(JoinFederationExecutionResponseFederationExecutionDoesNotExist, std::string()),
-    _basicAmbassador(basicAmbassador)
+    _response(JoinFederationExecutionResponseTimeout, "Timeout while waiting for JoinFederationExecutionResponse" ),
+    _basicAmbassador(basicAmbassador), _federateName(federateName)
   { }
   void operator()(const ConnectionLostMessage& message)
   {
@@ -557,9 +668,16 @@ public:
   void operator()(const JoinFederationExecutionResponseMessage& message)
   {
     _basicAmbassador.acceptInternalMessage(message);
-    _response.first = message.getJoinFederationExecutionResponseType();
-    _response.second = message.getExceptionString();
-    _done = true;
+    if (message.getFederateName() == _federateName || (_federateName.empty() && message.getFederateName().compare(0, 11, "HLAfederate") == 0))
+    {
+      _response.first = message.getJoinFederationExecutionResponseType();
+      _response.second = message.getExceptionString();
+      _done = true;
+    }
+  }
+  void operator()(const CreateFederationExecutionResponseMessage& /*message*/)
+  {
+    // Could be a late response from a second call to createFederation, just ignore this
   }
   template<typename M>
   void operator()(const M& message) const
@@ -570,14 +688,17 @@ public:
 
 private:
   InternalAmbassador& _basicAmbassador;
+  std::string _federateName;
 };
 
 std::pair<JoinFederationExecutionResponseType, std::string>
-InternalAmbassador::dispatchWaitJoinFederationExecutionResponse(const Clock& abstime)
+InternalAmbassador::dispatchWaitJoinFederationExecutionResponse(const AbsTimeout& timeout, std::string federateName)
 {
-  _JoinFederationExecutionFunctor functor(*this);
-  while (!functor._done && Clock::now() <= abstime)
-    receiveAndDispatch(abstime, functor);
+  _JoinFederationExecutionFunctor functor(*this, federateName);
+  disableCallbacks();
+  while (!functor._done && !timeout.isExpired())
+    receiveAndDispatch(timeout, functor);
+  enableCallbacks();
   return functor._response;
 }
 
@@ -594,7 +715,7 @@ public:
   }
   void operator()(const EraseFederationExecutionMessage& message)
   {
-    SharedPtr<ReleaseFederationHandleMessage> release = new ReleaseFederationHandleMessage;
+    SharedPtr<ReleaseFederationHandleMessage> release = MakeShared<ReleaseFederationHandleMessage>();
     release->setFederationHandle(message.getFederationHandle());
     _basicAmbassador.send(release);
     _done = true;
@@ -610,11 +731,13 @@ private:
 };
 
 bool
-InternalAmbassador::dispatchWaitEraseFederationExecutionResponse(const Clock& abstime)
+InternalAmbassador::dispatchWaitEraseFederationExecutionResponse(const AbsTimeout& timeout)
 {
   _EraseFederationExecutionFunctor functor(*this);
-  while (!functor._done && Clock::now() <= abstime)
-    receiveAndDispatch(abstime, functor);
+  disableCallbacks();
+  while (!functor._done && !timeout.isExpired())
+    receiveAndDispatch(timeout, functor);
+  enableCallbacks();
   return functor._done;
 }
 
@@ -655,21 +778,21 @@ private:
 };
 
 ObjectInstanceHandle
-InternalAmbassador::dispatchWaitReserveObjectInstanceName(const Clock& abstime, const std::string& objectInstanceName)
+InternalAmbassador::dispatchWaitReserveObjectInstanceName(const AbsTimeout& timeout, const std::string& objectInstanceName)
 {
-  Federate* federate = getFederate();
+  const Federate* federate = getFederate();
   OpenRTIAssert(federate);
 
   SharedPtr<ReserveObjectInstanceNameRequestMessage> request;
-  request = new ReserveObjectInstanceNameRequestMessage;
+  request = MakeShared<ReserveObjectInstanceNameRequestMessage>();
   request->setFederationHandle(federate->getFederationHandle());
   request->setFederateHandle(federate->getFederateHandle());
   request->setName(objectInstanceName);
   send(request);
 
   _ReserveObjectInstanceNameFunctor functor(*this, objectInstanceName);
-  while (!functor._done && Clock::now() <= abstime)
-    receiveAndDispatch(abstime, functor);
+  while (!functor._done && !timeout.isExpired())
+    receiveAndDispatch(timeout, functor);
 
   return functor._objectInstanceHandle;
 }
@@ -678,31 +801,72 @@ void
 InternalAmbassador::queueTimeStampedMessage(const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback)
 {
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->queueTimeStampedMessage(*this, timeStamp, message, loopback);
+  }
 }
 
 void
 InternalAmbassador::queueReceiveOrderMessage(const AbstractMessage& message)
 {
-  //CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message.toString().c_str());
   if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     timeManagement->queueReceiveOrderMessage(*this, message);
+  }
 }
 
 bool
-InternalAmbassador::_dispatchCallbackMessage(AbstractMessageDispatcher& messageDispatcher)
+InternalAmbassador::_dispatchCallbackMessage(const AbstractMessageDispatcher& messageDispatcher)
 {
   if (!_callbackMessageList.empty()) {
     SharedPtr<const AbstractMessage> message;
-    message.swap(_callbackMessageList.front());
-    _messageListPool.splice(_messageListPool.begin(), _callbackMessageList, _callbackMessageList.begin());
-    CondDebugPrintf("%s: dispatch message=%s\n", __FUNCTION__, message->toString().c_str());
-    message->dispatch(messageDispatcher);
+    {
+      ScopeLock lock(_callbackMessageListMutex);
+      message.swap(_callbackMessageList.front());
+      _messageListPool.splice(_messageListPool.begin(), _callbackMessageList, _callbackMessageList.begin());
+    }
+    try
+    {
+      message->dispatch(messageDispatcher);
+    }
+    catch (const OpenRTI::Exception& e)
+    {
+      DebugPrintf("%s: OpenRTI::Exception %s\n", __FUNCTION__, e.what());
+    }
+    catch (const std::exception& e)
+    {
+      DebugPrintf("%s: exception %s\n", __FUNCTION__, e.what());
+    }
+    catch (...)
+    {
+      DebugPrintf("%s: unknown exception\n", __FUNCTION__);
+    }
     return true;
   }
   InternalTimeManagement* timeManagement = getTimeManagement();
-  if (timeManagement && timeManagement->dispatchCallback(messageDispatcher)) {
-    return true;
+  if (timeManagement != nullptr)
+  {
+    try
+    {
+      OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
+      if (timeManagement->dispatchCallback(messageDispatcher)) {
+        return true;
+      }
+    }
+    catch (const OpenRTI::Exception& e)
+    {
+      DebugPrintf("%s: OpenRTI::Exception %s\n", __FUNCTION__, e.what());
+    }
+    catch (const std::exception& e)
+    {
+      DebugPrintf("%s: exception %s\n", __FUNCTION__, e.what());
+    }
+    catch (...)
+    {
+      DebugPrintf("%s: unknown exception\n", __FUNCTION__);
+    }
   }
   return false;
 }
@@ -712,10 +876,18 @@ InternalAmbassador::_callbackMessageAvailable()
 {
   if (!_callbackMessageList.empty())
     return true;
+  OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
   InternalTimeManagement* timeManagement = getTimeManagement();
   if (timeManagement && timeManagement->callbackMessageAvailable())
     return true;
   return false;
+}
+
+
+uint32_t InternalAmbassador::getProtocolVersion() const
+{
+  const AbstractServer* server = _connect->getMessageSender()->getServer();
+  return server->getProtocolVersion();
 }
 
 void InternalAmbassador::_setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h)

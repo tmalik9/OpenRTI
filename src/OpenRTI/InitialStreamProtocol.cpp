@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "InitialStreamProtocol.h"
 
 #include "DecodeDataStream.h"
@@ -104,14 +105,6 @@ public:
       writeUInt8BE(*string++);
   }
 };
-
-InitialStreamProtocol::InitialStreamProtocol()
-{
-}
-
-InitialStreamProtocol::~InitialStreamProtocol()
-{
-}
 
 void
 InitialStreamProtocol::writeOptionMap(const StringStringListMap& stringStringListMap)
@@ -211,10 +204,36 @@ InitialStreamProtocol::getEnableWrite() const
   return StreamBufferProtocol::getEnableWrite();
 }
 
+size_t InitialStreamProtocol::getBytesQueued() const
+{
+  return 0;
+}
+
 void
 InitialStreamProtocol::error(const Exception& e)
 {
-  Log(MessageCoding, Warning) << "Unhandled exception during initials OpenRTI connection negotiation!" << std::endl;
+  Log(MessageCoding, Warning) << "Unhandled exception during initial OpenRTI connection negotiation:" << e.what() << std::endl;
+}
+
+
+bool InitialStreamProtocol::getCompatibleVersion(std::string& resultingVersion, const StringList& versions)
+{
+  for (auto compatibleVersion : getCompatibleVersions())
+  {
+    if (std::find(versions.begin(), versions.end(), compatibleVersion) != versions.end())
+    {
+      resultingVersion = compatibleVersion;
+      return true;
+    }
+  }
+  return false;
+}
+
+
+OpenRTI::StringList InitialStreamProtocol::getCompatibleVersions()
+{
+  static StringList compatibleVersions{"9", "8"};
+  return compatibleVersions;
 }
 
 void
@@ -230,7 +249,7 @@ InitialStreamProtocol::activateFollowupProtocol(AbstractProtocolSocket& protocol
     return;
   if (_followupProtocol.valid()) {
     protocolSocket.replaceProtocol(_followupProtocol);
-    _followupProtocol = 0;
+    _followupProtocol.reset();
   } else {
     // Ok, if we have no followup, there must be an error, so close.
     // FIXME throw????

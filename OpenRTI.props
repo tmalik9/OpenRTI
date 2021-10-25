@@ -1,14 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <BuildType>Local</BuildType>
+    <!-- <BuildType>CANoe</BuildType> -->
+  </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='x64'">
-    <BIN_DIR>$(SolutionDir)..\..\bin</BIN_DIR>
     <OBJ_DIR>$(SolutionDir)Obj64</OBJ_DIR>
     <SOURCE_DIR>.\</SOURCE_DIR>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" Condition="'$(Platform)'=='Win32'">
-    <BIN_DIR>$(SolutionDir)..\..\bin</BIN_DIR>
     <OBJ_DIR>$(SolutionDir)Obj32</OBJ_DIR>
     <SOURCE_DIR>.\</SOURCE_DIR>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(BuildType)'=='CANoe'">
+    <BIN_DIR>$(SolutionDir)..\..\bin</BIN_DIR>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(BuildType)'=='Local'">
+    <BIN_DIR>$(SolutionDir)bin</BIN_DIR>
   </PropertyGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
@@ -26,7 +34,7 @@
       <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;TIME64;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;TIME64;_CRT_SECURE_NO_WARNINGS;NOMINMAX;_WIN32_WINNT=_WIN32_WINNT_WIN7;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -36,9 +44,7 @@
     <Link>
       <AdditionalDependencies>delayimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(TargetDir)$(TargetName).map</MapFileName>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <ImportLibrary>$(TargetDir)$(TargetName).lib</ImportLibrary>
       <OutputFile>$(TargetPath)</OutputFile>
       <SubSystem>Console</SubSystem>
@@ -49,6 +55,9 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <BuildMacro Include="BuildType">
+      <Value>$(BuildType)</Value>
+    </BuildMacro>
     <BuildMacro Include="BIN_DIR">
       <Value>$(BIN_DIR)</Value>
     </BuildMacro>

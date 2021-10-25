@@ -29,15 +29,13 @@ namespace OpenRTI {
 
 // Just a set of options that might be configurable at some time from outside.
 // May be add some callback mechanism here: depending on the subnet??
-class OPENRTI_API ServerOptions : public Referenced {
+class OPENRTI_API ServerOptions final : public Referenced {
 public:
-  ServerOptions() :
-    _preferCompression(true), // Default to compression for now FIXME
-    _permitTimeRegulation(true)
+  ServerOptions() noexcept 
+    : _preferCompression(true) // Default to compression for now FIXME
   { }
 
-  const std::string& getServerName() const
-  { return _serverName; }
+  const std::string& getServerName() const noexcept { return _serverName; }
   void setServerName(const std::string& serverName)
   {
     _serverName = serverName;
@@ -61,11 +59,7 @@ public:
     _setServerPath(i->second);
   }
 
-  const std::string& getServerPath() const
-  { return _serverPath; }
-
-  bool getPermitTimeRegulation(/*FIXME add something where we can distinguish which client connect*/) const
-  { return _permitTimeRegulation; }
+  const std::string& getServerPath() const noexcept { return _serverPath; }
 
 private:
   void _setServerPath(const StringList& serverPath)
@@ -94,9 +88,6 @@ public:
   bool _preferCompression;
   // bool _preferTightEncoding;
   // bool _preferServerSideByteSwap;
-
-  /// See if this server permits us to have time regulating clients
-  bool _permitTimeRegulation;
 
   /// Connection options
   // bool _enableUDP;

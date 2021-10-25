@@ -37,9 +37,9 @@ public:
   typedef typename Traits::NativeLogicalTime NativeLogicalTime;
   typedef typename Traits::NativeLogicalTimeInterval NativeLogicalTimeInterval;
 
-  TimeManagement()
+  TimeManagement() noexcept
   { }
-  virtual ~TimeManagement()
+  virtual ~TimeManagement() noexcept
   { }
 
   virtual bool isLogicalTimeInThePast(const NativeLogicalTime& logicalTime) = 0;
@@ -59,7 +59,7 @@ public:
   virtual bool queryLITS(InternalAmbassador& ambassador, NativeLogicalTime& logicalTime) = 0;
   virtual void modifyLookahead(InternalAmbassador& ambassador, const NativeLogicalTimeInterval& nativeLookahead) = 0;
   virtual void queryLookahead(InternalAmbassador& ambassador, NativeLogicalTimeInterval& logicalTimeInterval) = 0;
-
+  using InternalTimeManagement::logicalTimeToString;
   virtual std::string logicalTimeToString(const NativeLogicalTime& nativeLogicalTime) = 0;
   virtual std::string logicalTimeIntervalToString(const NativeLogicalTimeInterval& nativeLogicalTimeInterval) = 0;
   virtual bool isPositiveLogicalTimeInterval(const NativeLogicalTimeInterval& nativeLogicalTimeInterval) = 0;

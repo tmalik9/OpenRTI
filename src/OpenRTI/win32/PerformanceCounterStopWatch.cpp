@@ -12,7 +12,6 @@ LONGLONG GetPerformanceCounterFrequency()
   QueryPerformanceFrequency( &nActualPerformanceFrequency );
   return nActualPerformanceFrequency.QuadPart;
 #elif defined (__linux__)
-#pragma message (__FILE__LINE__ "#System TODO: Implement me")
   return 0;
 #endif // _WIN32
 }
@@ -24,7 +23,6 @@ LONGLONG GetPerformanceCounterValue()
   QueryPerformanceCounter( &nActualPerformanceCounter );
   return nActualPerformanceCounter.QuadPart;
 #elif defined (__linux__)
-#pragma message (__FILE__LINE__ "#System TODO: Implement me")
   return 0;
 #endif // _WIN32
 }
@@ -64,7 +62,7 @@ LONGLONG GetPerformanceCounterStopWatchStartStopDuration()
 /*static*/ const VPerformanceCounterStopWatch::TTimeNs VPerformanceCounterStopWatch::StartStopDuration              = GetPerformanceCounterStopWatchStartStopDuration();
 
 VPerformanceCounterStopWatch::VPerformanceCounterStopWatch( bool bStartImmediately /*= false*/ )
-  : moPerformanceCounterValueStart( 0 ), _started(false)
+  : _started(false), moPerformanceCounterValueStart(0)
 {
   if( bStartImmediately )
   {

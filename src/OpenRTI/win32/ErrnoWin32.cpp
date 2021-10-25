@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ErrnoWin32.h"
 
 #ifndef NOMINMAX

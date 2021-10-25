@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketServerTCP.h"
 
 #include "ErrnoWin32.h"
@@ -91,7 +92,7 @@ SocketServerTCP::listen(int backlog)
     throw TransportError(errnoToUtf8(WSAGetLastError()));
 }
 
-SocketTCP*
+SharedPtr<SocketStream>
 SocketServerTCP::accept()
 {
   SOCKET fd = ::accept(_privateData->_socket, 0, 0);
@@ -136,7 +137,7 @@ SocketServerTCP::accept()
   pd->wsaStartup();
   pd->_socket = fd;
   pd->_notificationEvent = notificationEvent;
-  return new SocketTCP(pd);
+  return SharedPtr<SocketStream>(new SocketTCP(pd)); 
 }
 
 SocketServerTCP::~SocketServerTCP()

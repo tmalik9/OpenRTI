@@ -129,6 +129,16 @@ enum SwitchesType {
   ServiceReportingSwitchesType
 };
 
+enum ArrayDataTypeEncoding {
+  FixedArrayDataTypeEncoding,
+  VariableArrayDataTypeEncoding
+};
+
+enum Endianness {
+  BigEndian,
+  LittleEndian
+};
+
 typedef bool Bool;
 
 typedef std::string String;
@@ -215,7 +225,8 @@ enum CreateFederationExecutionResponseType {
   CreateFederationExecutionResponseErrorReadingFDD,
   CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory,
   CreateFederationExecutionResponseInconsistentFDD,
-  CreateFederationExecutionResponseRTIinternalError
+  CreateFederationExecutionResponseRTIinternalError,
+  CreateFederationExecutionResponseTimeout
 };
 
 enum DestroyFederationExecutionResponseType {
@@ -231,7 +242,8 @@ enum JoinFederationExecutionResponseType {
   JoinFederationExecutionResponseFederationExecutionDoesNotExist,
   JoinFederationExecutionResponseSaveInProgress,
   JoinFederationExecutionResponseRestoreInProgress,
-  JoinFederationExecutionResponseInconsistentFDD
+  JoinFederationExecutionResponseInconsistentFDD,
+  JoinFederationExecutionResponseTimeout
 };
 
 enum RegisterFederationSynchronizationPointResponseType {
@@ -241,6 +253,48 @@ enum RegisterFederationSynchronizationPointResponseType {
 };
 
 typedef std::map<String, StringVector> ConfigurationParameterMap;
+
+class FOMStringBasicDataType;
+typedef std::vector<FOMStringBasicDataType> FOMStringBasicDataTypeList;
+
+class FOMStringSimpleDataType;
+typedef std::vector<FOMStringSimpleDataType> FOMStringSimpleDataTypeList;
+
+class FOMStringEnumerator;
+typedef std::vector<FOMStringEnumerator> FOMStringEnumeratorList;
+
+class FOMStringEnumeratedDataType;
+typedef std::vector<FOMStringEnumeratedDataType> FOMStringEnumeratedDataTypeList;
+
+class FOMStringArrayDataType;
+typedef std::vector<FOMStringArrayDataType> FOMStringArrayDataTypeList;
+
+class FOMStringArrayDataType2;
+typedef std::vector<FOMStringArrayDataType2> FOMStringArrayDataType2List;
+
+class FOMStringFixedRecordField;
+typedef std::vector<FOMStringFixedRecordField> FOMStringFixedRecordFieldList;
+
+class FOMStringFixedRecordDataType;
+typedef std::vector<FOMStringFixedRecordDataType> FOMStringFixedRecordDataTypeList;
+
+class FOMStringFixedRecordField2;
+typedef std::vector<FOMStringFixedRecordField2> FOMStringFixedRecordField2List;
+
+class FOMStringFixedRecordDataType2;
+typedef std::vector<FOMStringFixedRecordDataType2> FOMStringFixedRecordDataType2List;
+
+class FOMStringVariantRecordAlternative;
+typedef std::vector<FOMStringVariantRecordAlternative> FOMStringVariantRecordAlternativeList;
+
+class FOMStringVariantRecordDataType;
+typedef std::vector<FOMStringVariantRecordDataType> FOMStringVariantRecordDataTypeList;
+
+class FOMStringVariantRecordAlternative2;
+typedef std::vector<FOMStringVariantRecordAlternative2> FOMStringVariantRecordAlternative2List;
+
+class FOMStringVariantRecordDataType2;
+typedef std::vector<FOMStringVariantRecordDataType2> FOMStringVariantRecordDataType2List;
 
 class FOMStringTransportationType;
 typedef std::vector<FOMStringTransportationType> FOMStringTransportationTypeList;
@@ -272,6 +326,9 @@ typedef std::vector<FOMStringSwitch> FOMStringSwitchList;
 class FOMStringModule;
 typedef std::vector<FOMStringModule> FOMStringModuleList;
 
+class FOMStringModule2;
+typedef std::vector<FOMStringModule2> FOMStringModule2List;
+
 class FOMTransportationType;
 typedef std::vector<FOMTransportationType> FOMTransportationTypeList;
 
@@ -299,11 +356,42 @@ typedef std::vector<FOMUpdateRate> FOMUpdateRateList;
 class FOMSwitch;
 typedef std::vector<FOMSwitch> FOMSwitchList;
 
+class FOMBasicDataType;
+typedef std::vector<FOMBasicDataType> FOMBasicDataTypeList;
+
+class FOMSimpleDataType;
+typedef std::vector<FOMSimpleDataType> FOMSimpleDataTypeList;
+
+class FOMEnumerator;
+typedef std::vector<FOMEnumerator> FOMEnumeratorList;
+
+class FOMEnumeratedDataType;
+typedef std::vector<FOMEnumeratedDataType> FOMEnumeratedDataTypeList;
+
+class FOMArrayDataType;
+typedef std::vector<FOMArrayDataType> FOMArrayDataTypeList;
+
+class FOMFixedRecordField;
+typedef std::vector<FOMFixedRecordField> FOMFixedRecordFieldList;
+
+class FOMFixedRecordDataType;
+typedef std::vector<FOMFixedRecordDataType> FOMFixedRecordDataTypeList;
+
+class FOMVariantRecordAlternative;
+typedef std::vector<FOMVariantRecordAlternative> FOMVariantRecordAlternativeList;
+
+class FOMVariantRecordDataType;
+typedef std::vector<FOMVariantRecordDataType> FOMVariantRecordDataTypeList;
+
 class FOMModule;
 typedef std::vector<FOMModule> FOMModuleList;
 
+class FOMModule2;
+typedef std::vector<FOMModule2> FOMModule2List;
+
 class ConnectionLostMessage;
 class CreateFederationExecutionRequestMessage;
+class CreateFederationExecutionRequest2Message;
 class CreateFederationExecutionResponseMessage;
 class DestroyFederationExecutionRequestMessage;
 class DestroyFederationExecutionResponseMessage;
@@ -314,7 +402,9 @@ class ShutdownFederationExecutionMessage;
 class EraseFederationExecutionMessage;
 class ReleaseFederationHandleMessage;
 class InsertModulesMessage;
+class InsertModules2Message;
 class JoinFederationExecutionRequestMessage;
+class JoinFederationExecutionRequest2Message;
 class JoinFederationExecutionResponseMessage;
 class ResignFederationExecutionLeafRequestMessage;
 class ResignFederationExecutionRequestMessage;
@@ -329,6 +419,8 @@ class FederationSynchronizedMessage;
 class EnableTimeRegulationRequestMessage;
 class EnableTimeRegulationResponseMessage;
 class DisableTimeRegulationRequestMessage;
+class EnableTimeConstrainedNotifyMessage;
+class DisableTimeConstrainedNotifyMessage;
 class CommitLowerBoundTimeStampMessage;
 class CommitLowerBoundTimeStampResponseMessage;
 class LockedByNextMessageRequestMessage;
@@ -363,6 +455,8 @@ class AttributeUpdateMessage;
 class TimeStampedAttributeUpdateMessage;
 class RequestAttributeUpdateMessage;
 class RequestClassAttributeUpdateMessage;
+class QueryAttributeOwnershipRequestMessage;
+class QueryAttributeOwnershipResponseMessage;
 
 typedef bool Bool;
 
@@ -398,45 +492,49 @@ typedef std::vector<FederateHandleBoolPair> FederateHandleBoolPairVector;
 
 class OPENRTI_API RangeBoundsValue {
 public:
-  RangeBoundsValue() :
-    _lowerBound(),
-    _upperBound()
-  { }
-  void setLowerBound(const Unsigned& value)
+  RangeBoundsValue() = default;
+  RangeBoundsValue(
+    Unsigned lowerBound,
+    Unsigned upperBound) noexcept
+      : _lowerBound(lowerBound)
+      , _upperBound(upperBound)
+    { }
+  RangeBoundsValue(const RangeBoundsValue&) = default;
+  RangeBoundsValue(RangeBoundsValue&&) = default;
+  virtual ~RangeBoundsValue() noexcept = default;
+  RangeBoundsValue& operator=(const RangeBoundsValue&) = default;
+  RangeBoundsValue& operator=(RangeBoundsValue&&) = default;
+  void setLowerBound(const Unsigned& value) noexcept
   { _lowerBound = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLowerBound(Unsigned&& value)
+  void setLowerBound(Unsigned&& value) noexcept
   { _lowerBound = std::move(value); }
-#endif
-  Unsigned& getLowerBound()
+  Unsigned& getLowerBound() noexcept
   { return _lowerBound; }
-  const Unsigned& getLowerBound() const
+  const Unsigned& getLowerBound() const noexcept
   { return _lowerBound; }
 
-  void setUpperBound(const Unsigned& value)
+  void setUpperBound(const Unsigned& value) noexcept
   { _upperBound = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpperBound(Unsigned&& value)
+  void setUpperBound(Unsigned&& value) noexcept
   { _upperBound = std::move(value); }
-#endif
-  Unsigned& getUpperBound()
+  Unsigned& getUpperBound() noexcept
   { return _upperBound; }
-  const Unsigned& getUpperBound() const
+  const Unsigned& getUpperBound() const noexcept
   { return _upperBound; }
 
-  RangeBoundsValue& swap(RangeBoundsValue& rhs)
+  RangeBoundsValue& swap(RangeBoundsValue& rhs) noexcept
   {
     std::swap(_lowerBound, rhs._lowerBound);
     std::swap(_upperBound, rhs._upperBound);
     return *this;
   }
-  bool operator==(const RangeBoundsValue& rhs) const
+  bool operator==(const RangeBoundsValue& rhs) const noexcept
   {
     if (getLowerBound() != rhs.getLowerBound()) return false;
     if (getUpperBound() != rhs.getUpperBound()) return false;
     return true;
   }
-  bool operator<(const RangeBoundsValue& rhs) const
+  bool operator<(const RangeBoundsValue& rhs) const noexcept
   {
     if (getLowerBound() < rhs.getLowerBound()) return true;
     if (rhs.getLowerBound() < getLowerBound()) return false;
@@ -444,17 +542,15 @@ public:
     if (rhs.getUpperBound() < getUpperBound()) return false;
     return false;
   }
-  bool operator!=(const RangeBoundsValue& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const RangeBoundsValue& rhs) const
+  bool operator>(const RangeBoundsValue& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RangeBoundsValue& rhs) const
+  bool operator>=(const RangeBoundsValue& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RangeBoundsValue& rhs) const
+  bool operator<=(const RangeBoundsValue& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  Unsigned _lowerBound;
-  Unsigned _upperBound;
+  Unsigned _lowerBound = 0;
+  Unsigned _upperBound = 0;
 };
 
 typedef std::pair<DimensionHandle, RangeBoundsValue> DimensionHandleRangeBoundsValuePair;
@@ -481,91 +577,114 @@ typedef std::pair<AttributeHandle, RegionValueList> AttributeHandleRegionValueLi
 
 class OPENRTI_API AttributeState {
 public:
-  AttributeState() :
-    _attributeHandle()
-  { }
-  void setAttributeHandle(const AttributeHandle& value)
+  AttributeState() = default;
+  AttributeState(
+    AttributeHandle attributeHandle,
+    FederateHandle ownerFederate) noexcept
+      : _attributeHandle(attributeHandle)
+      , _ownerFederate(ownerFederate)
+    { }
+  AttributeState(const AttributeState&) = default;
+  AttributeState(AttributeState&&) = default;
+  virtual ~AttributeState() noexcept = default;
+  AttributeState& operator=(const AttributeState&) = default;
+  AttributeState& operator=(AttributeState&&) = default;
+  void setAttributeHandle(const AttributeHandle& value) noexcept
   { _attributeHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandle(AttributeHandle&& value)
+  void setAttributeHandle(AttributeHandle&& value) noexcept
   { _attributeHandle = std::move(value); }
-#endif
-  AttributeHandle& getAttributeHandle()
+  AttributeHandle& getAttributeHandle() noexcept
   { return _attributeHandle; }
-  const AttributeHandle& getAttributeHandle() const
+  const AttributeHandle& getAttributeHandle() const noexcept
   { return _attributeHandle; }
 
-  AttributeState& swap(AttributeState& rhs)
+  void setOwnerFederate(const FederateHandle& value) noexcept
+  { _ownerFederate = value; }
+  void setOwnerFederate(FederateHandle&& value) noexcept
+  { _ownerFederate = std::move(value); }
+  FederateHandle& getOwnerFederate() noexcept
+  { return _ownerFederate; }
+  const FederateHandle& getOwnerFederate() const noexcept
+  { return _ownerFederate; }
+
+  AttributeState& swap(AttributeState& rhs) noexcept
   {
     std::swap(_attributeHandle, rhs._attributeHandle);
+    std::swap(_ownerFederate, rhs._ownerFederate);
     return *this;
   }
-  bool operator==(const AttributeState& rhs) const
+  bool operator==(const AttributeState& rhs) const noexcept
   {
     if (getAttributeHandle() != rhs.getAttributeHandle()) return false;
+    if (getOwnerFederate() != rhs.getOwnerFederate()) return false;
     return true;
   }
-  bool operator<(const AttributeState& rhs) const
+  bool operator<(const AttributeState& rhs) const noexcept
   {
     if (getAttributeHandle() < rhs.getAttributeHandle()) return true;
     if (rhs.getAttributeHandle() < getAttributeHandle()) return false;
+    if (getOwnerFederate() < rhs.getOwnerFederate()) return true;
+    if (rhs.getOwnerFederate() < getOwnerFederate()) return false;
     return false;
   }
-  bool operator!=(const AttributeState& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const AttributeState& rhs) const
+  bool operator>(const AttributeState& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AttributeState& rhs) const
+  bool operator>=(const AttributeState& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AttributeState& rhs) const
+  bool operator<=(const AttributeState& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   AttributeHandle _attributeHandle;
+  FederateHandle _ownerFederate;
 };
 
 typedef std::vector<AttributeState> AttributeStateVector;
 
 class OPENRTI_API ParameterValue {
 public:
-  ParameterValue() :
-    _parameterHandle(),
-    _value()
-  { }
-  void setParameterHandle(const ParameterHandle& value)
+  ParameterValue() = default;
+  ParameterValue(
+    ParameterHandle parameterHandle,
+    VariableLengthData value) noexcept
+      : _parameterHandle(parameterHandle)
+      , _value(value)
+    { }
+  ParameterValue(const ParameterValue&) = default;
+  ParameterValue(ParameterValue&&) = default;
+  virtual ~ParameterValue() noexcept = default;
+  ParameterValue& operator=(const ParameterValue&) = default;
+  ParameterValue& operator=(ParameterValue&&) = default;
+  void setParameterHandle(const ParameterHandle& value) noexcept
   { _parameterHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterHandle(ParameterHandle&& value)
+  void setParameterHandle(ParameterHandle&& value) noexcept
   { _parameterHandle = std::move(value); }
-#endif
-  ParameterHandle& getParameterHandle()
+  ParameterHandle& getParameterHandle() noexcept
   { return _parameterHandle; }
-  const ParameterHandle& getParameterHandle() const
+  const ParameterHandle& getParameterHandle() const noexcept
   { return _parameterHandle; }
 
-  void setValue(const VariableLengthData& value)
+  void setValue(const VariableLengthData& value) noexcept
   { _value = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setValue(VariableLengthData&& value)
+  void setValue(VariableLengthData&& value) noexcept
   { _value = std::move(value); }
-#endif
-  VariableLengthData& getValue()
+  VariableLengthData& getValue() noexcept
   { return _value; }
-  const VariableLengthData& getValue() const
+  const VariableLengthData& getValue() const noexcept
   { return _value; }
 
-  ParameterValue& swap(ParameterValue& rhs)
+  ParameterValue& swap(ParameterValue& rhs) noexcept
   {
     std::swap(_parameterHandle, rhs._parameterHandle);
     _value.swap(rhs._value);
     return *this;
   }
-  bool operator==(const ParameterValue& rhs) const
+  bool operator==(const ParameterValue& rhs) const noexcept
   {
     if (getParameterHandle() != rhs.getParameterHandle()) return false;
     if (getValue() != rhs.getValue()) return false;
     return true;
   }
-  bool operator<(const ParameterValue& rhs) const
+  bool operator<(const ParameterValue& rhs) const noexcept
   {
     if (getParameterHandle() < rhs.getParameterHandle()) return true;
     if (rhs.getParameterHandle() < getParameterHandle()) return false;
@@ -573,13 +692,11 @@ public:
     if (rhs.getValue() < getValue()) return false;
     return false;
   }
-  bool operator!=(const ParameterValue& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const ParameterValue& rhs) const
+  bool operator>(const ParameterValue& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ParameterValue& rhs) const
+  bool operator>=(const ParameterValue& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ParameterValue& rhs) const
+  bool operator<=(const ParameterValue& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   ParameterHandle _parameterHandle;
@@ -590,45 +707,49 @@ typedef std::vector<ParameterValue> ParameterValueVector;
 
 class OPENRTI_API AttributeValue {
 public:
-  AttributeValue() :
-    _attributeHandle(),
-    _value()
-  { }
-  void setAttributeHandle(const AttributeHandle& value)
+  AttributeValue() = default;
+  AttributeValue(
+    AttributeHandle attributeHandle,
+    VariableLengthData value) noexcept
+      : _attributeHandle(attributeHandle)
+      , _value(value)
+    { }
+  AttributeValue(const AttributeValue&) = default;
+  AttributeValue(AttributeValue&&) = default;
+  virtual ~AttributeValue() noexcept = default;
+  AttributeValue& operator=(const AttributeValue&) = default;
+  AttributeValue& operator=(AttributeValue&&) = default;
+  void setAttributeHandle(const AttributeHandle& value) noexcept
   { _attributeHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandle(AttributeHandle&& value)
+  void setAttributeHandle(AttributeHandle&& value) noexcept
   { _attributeHandle = std::move(value); }
-#endif
-  AttributeHandle& getAttributeHandle()
+  AttributeHandle& getAttributeHandle() noexcept
   { return _attributeHandle; }
-  const AttributeHandle& getAttributeHandle() const
+  const AttributeHandle& getAttributeHandle() const noexcept
   { return _attributeHandle; }
 
-  void setValue(const VariableLengthData& value)
+  void setValue(const VariableLengthData& value) noexcept
   { _value = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setValue(VariableLengthData&& value)
+  void setValue(VariableLengthData&& value) noexcept
   { _value = std::move(value); }
-#endif
-  VariableLengthData& getValue()
+  VariableLengthData& getValue() noexcept
   { return _value; }
-  const VariableLengthData& getValue() const
+  const VariableLengthData& getValue() const noexcept
   { return _value; }
 
-  AttributeValue& swap(AttributeValue& rhs)
+  AttributeValue& swap(AttributeValue& rhs) noexcept
   {
     std::swap(_attributeHandle, rhs._attributeHandle);
     _value.swap(rhs._value);
     return *this;
   }
-  bool operator==(const AttributeValue& rhs) const
+  bool operator==(const AttributeValue& rhs) const noexcept
   {
     if (getAttributeHandle() != rhs.getAttributeHandle()) return false;
     if (getValue() != rhs.getValue()) return false;
     return true;
   }
-  bool operator<(const AttributeValue& rhs) const
+  bool operator<(const AttributeValue& rhs) const noexcept
   {
     if (getAttributeHandle() < rhs.getAttributeHandle()) return true;
     if (rhs.getAttributeHandle() < getAttributeHandle()) return false;
@@ -636,13 +757,11 @@ public:
     if (rhs.getValue() < getValue()) return false;
     return false;
   }
-  bool operator!=(const AttributeValue& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const AttributeValue& rhs) const
+  bool operator>(const AttributeValue& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AttributeValue& rhs) const
+  bool operator>=(const AttributeValue& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AttributeValue& rhs) const
+  bool operator<=(const AttributeValue& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   AttributeHandle _attributeHandle;
@@ -661,45 +780,49 @@ typedef std::vector<FederateHandleRestoreStatusPair> FederateHandleRestoreStatus
 
 class OPENRTI_API FederationExecutionInformation {
 public:
-  FederationExecutionInformation() :
-    _federationExecutionName(),
-    _logicalTimeFactoryName()
-  { }
-  void setFederationExecutionName(const String& value)
+  FederationExecutionInformation() = default;
+  FederationExecutionInformation(
+    String federationExecutionName,
+    String logicalTimeFactoryName) noexcept
+      : _federationExecutionName(federationExecutionName)
+      , _logicalTimeFactoryName(logicalTimeFactoryName)
+    { }
+  FederationExecutionInformation(const FederationExecutionInformation&) = default;
+  FederationExecutionInformation(FederationExecutionInformation&&) = default;
+  virtual ~FederationExecutionInformation() noexcept = default;
+  FederationExecutionInformation& operator=(const FederationExecutionInformation&) = default;
+  FederationExecutionInformation& operator=(FederationExecutionInformation&&) = default;
+  void setFederationExecutionName(const String& value) noexcept
   { _federationExecutionName = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecutionName(String&& value)
+  void setFederationExecutionName(String&& value) noexcept
   { _federationExecutionName = std::move(value); }
-#endif
-  String& getFederationExecutionName()
+  String& getFederationExecutionName() noexcept
   { return _federationExecutionName; }
-  const String& getFederationExecutionName() const
+  const String& getFederationExecutionName() const noexcept
   { return _federationExecutionName; }
 
-  void setLogicalTimeFactoryName(const String& value)
+  void setLogicalTimeFactoryName(const String& value) noexcept
   { _logicalTimeFactoryName = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLogicalTimeFactoryName(String&& value)
+  void setLogicalTimeFactoryName(String&& value) noexcept
   { _logicalTimeFactoryName = std::move(value); }
-#endif
-  String& getLogicalTimeFactoryName()
+  String& getLogicalTimeFactoryName() noexcept
   { return _logicalTimeFactoryName; }
-  const String& getLogicalTimeFactoryName() const
+  const String& getLogicalTimeFactoryName() const noexcept
   { return _logicalTimeFactoryName; }
 
-  FederationExecutionInformation& swap(FederationExecutionInformation& rhs)
+  FederationExecutionInformation& swap(FederationExecutionInformation& rhs) noexcept
   {
     _federationExecutionName.swap(rhs._federationExecutionName);
     _logicalTimeFactoryName.swap(rhs._logicalTimeFactoryName);
     return *this;
   }
-  bool operator==(const FederationExecutionInformation& rhs) const
+  bool operator==(const FederationExecutionInformation& rhs) const noexcept
   {
     if (getFederationExecutionName() != rhs.getFederationExecutionName()) return false;
     if (getLogicalTimeFactoryName() != rhs.getLogicalTimeFactoryName()) return false;
     return true;
   }
-  bool operator<(const FederationExecutionInformation& rhs) const
+  bool operator<(const FederationExecutionInformation& rhs) const noexcept
   {
     if (getFederationExecutionName() < rhs.getFederationExecutionName()) return true;
     if (rhs.getFederationExecutionName() < getFederationExecutionName()) return false;
@@ -707,13 +830,11 @@ public:
     if (rhs.getLogicalTimeFactoryName() < getLogicalTimeFactoryName()) return false;
     return false;
   }
-  bool operator!=(const FederationExecutionInformation& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FederationExecutionInformation& rhs) const
+  bool operator>(const FederationExecutionInformation& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FederationExecutionInformation& rhs) const
+  bool operator>=(const FederationExecutionInformation& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FederationExecutionInformation& rhs) const
+  bool operator<=(const FederationExecutionInformation& rhs) const noexcept
   { return !operator>(rhs); }
 private:
   String _federationExecutionName;
@@ -728,35 +849,1480 @@ typedef std::vector<ObjectInstanceHandleNamePair> ObjectInstanceHandleNamePairVe
 
 typedef std::map<String, StringVector> ConfigurationParameterMap;
 
-class OPENRTI_API FOMStringTransportationType {
+class OPENRTI_API FOMStringBasicDataType {
 public:
-  FOMStringTransportationType() : 
-    _impl(new Implementation())
+  FOMStringBasicDataType() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMStringBasicDataType(const FOMStringBasicDataType&) = default;
+  FOMStringBasicDataType(FOMStringBasicDataType&&) = default;
+  virtual ~FOMStringBasicDataType() noexcept = default;
+  FOMStringBasicDataType& operator=(const FOMStringBasicDataType&) = default;
+  FOMStringBasicDataType& operator=(FOMStringBasicDataType&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  FOMStringTransportationType& swap(FOMStringTransportationType& rhs)
+  void setSize(const Unsigned& value) noexcept
+  { getImpl()._size = value; }
+  void setSize(Unsigned&& value) noexcept
+  { getImpl()._size = std::move(value); }
+  Unsigned& getSize() noexcept
+  { return getImpl()._size; }
+  const Unsigned& getSize() const noexcept
+  { return getConstImpl()._size; }
+
+  void setEndian(const Endianness& value) noexcept
+  { getImpl()._endian = value; }
+  void setEndian(Endianness&& value) noexcept
+  { getImpl()._endian = std::move(value); }
+  Endianness& getEndian() noexcept
+  { return getImpl()._endian; }
+  const Endianness& getEndian() const noexcept
+  { return getConstImpl()._endian; }
+
+  FOMStringBasicDataType& swap(FOMStringBasicDataType& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringTransportationType& rhs) const
+  bool operator==(const FOMStringBasicDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getSize() != rhs.getSize()) return false;
+    if (getEndian() != rhs.getEndian()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringBasicDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getSize() < rhs.getSize()) return true;
+    if (rhs.getSize() < getSize()) return false;
+    if (getEndian() < rhs.getEndian()) return true;
+    if (rhs.getEndian() < getEndian()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringBasicDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringBasicDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringBasicDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _size(),
+      _endian()
+    { }
+    String _name;
+    Unsigned _size = 0;
+    Endianness _endian = BigEndian;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringBasicDataType> FOMStringBasicDataTypeList;
+
+class OPENRTI_API FOMStringSimpleDataType {
+public:
+  FOMStringSimpleDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringSimpleDataType(const FOMStringSimpleDataType&) = default;
+  FOMStringSimpleDataType(FOMStringSimpleDataType&&) = default;
+  virtual ~FOMStringSimpleDataType() noexcept = default;
+  FOMStringSimpleDataType& operator=(const FOMStringSimpleDataType&) = default;
+  FOMStringSimpleDataType& operator=(FOMStringSimpleDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setRepresentation(const String& value) noexcept
+  { getImpl()._representation = value; }
+  void setRepresentation(String&& value) noexcept
+  { getImpl()._representation = std::move(value); }
+  String& getRepresentation() noexcept
+  { return getImpl()._representation; }
+  const String& getRepresentation() const noexcept
+  { return getConstImpl()._representation; }
+
+  FOMStringSimpleDataType& swap(FOMStringSimpleDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringSimpleDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getRepresentation() != rhs.getRepresentation()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringSimpleDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getRepresentation() < rhs.getRepresentation()) return true;
+    if (rhs.getRepresentation() < getRepresentation()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringSimpleDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringSimpleDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringSimpleDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _representation()
+    { }
+    String _name;
+    String _representation;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringSimpleDataType> FOMStringSimpleDataTypeList;
+
+class OPENRTI_API FOMStringEnumerator {
+public:
+  FOMStringEnumerator() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringEnumerator(const FOMStringEnumerator&) = default;
+  FOMStringEnumerator(FOMStringEnumerator&&) = default;
+  virtual ~FOMStringEnumerator() noexcept = default;
+  FOMStringEnumerator& operator=(const FOMStringEnumerator&) = default;
+  FOMStringEnumerator& operator=(FOMStringEnumerator&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setValue(const Unsigned& value) noexcept
+  { getImpl()._value = value; }
+  void setValue(Unsigned&& value) noexcept
+  { getImpl()._value = std::move(value); }
+  Unsigned& getValue() noexcept
+  { return getImpl()._value; }
+  const Unsigned& getValue() const noexcept
+  { return getConstImpl()._value; }
+
+  FOMStringEnumerator& swap(FOMStringEnumerator& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringEnumerator& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getValue() != rhs.getValue()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringEnumerator& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getValue() < rhs.getValue()) return true;
+    if (rhs.getValue() < getValue()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringEnumerator& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringEnumerator& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringEnumerator& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _value()
+    { }
+    String _name;
+    Unsigned _value = 0;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringEnumerator> FOMStringEnumeratorList;
+
+class OPENRTI_API FOMStringEnumeratedDataType {
+public:
+  FOMStringEnumeratedDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringEnumeratedDataType(const FOMStringEnumeratedDataType&) = default;
+  FOMStringEnumeratedDataType(FOMStringEnumeratedDataType&&) = default;
+  virtual ~FOMStringEnumeratedDataType() noexcept = default;
+  FOMStringEnumeratedDataType& operator=(const FOMStringEnumeratedDataType&) = default;
+  FOMStringEnumeratedDataType& operator=(FOMStringEnumeratedDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setRepresentation(const String& value) noexcept
+  { getImpl()._representation = value; }
+  void setRepresentation(String&& value) noexcept
+  { getImpl()._representation = std::move(value); }
+  String& getRepresentation() noexcept
+  { return getImpl()._representation; }
+  const String& getRepresentation() const noexcept
+  { return getConstImpl()._representation; }
+
+  void setEnumerators(const FOMStringEnumeratorList& value) noexcept
+  { getImpl()._enumerators = value; }
+  void setEnumerators(FOMStringEnumeratorList&& value) noexcept
+  { getImpl()._enumerators = std::move(value); }
+  FOMStringEnumeratorList& getEnumerators() noexcept
+  { return getImpl()._enumerators; }
+  const FOMStringEnumeratorList& getEnumerators() const noexcept
+  { return getConstImpl()._enumerators; }
+
+  FOMStringEnumeratedDataType& swap(FOMStringEnumeratedDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringEnumeratedDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getRepresentation() != rhs.getRepresentation()) return false;
+    if (getEnumerators() != rhs.getEnumerators()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringEnumeratedDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getRepresentation() < rhs.getRepresentation()) return true;
+    if (rhs.getRepresentation() < getRepresentation()) return false;
+    if (getEnumerators() < rhs.getEnumerators()) return true;
+    if (rhs.getEnumerators() < getEnumerators()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringEnumeratedDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringEnumeratedDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringEnumeratedDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _representation(),
+      _enumerators()
+    { }
+    String _name;
+    String _representation;
+    FOMStringEnumeratorList _enumerators;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringEnumeratedDataType> FOMStringEnumeratedDataTypeList;
+
+class OPENRTI_API FOMStringArrayDataType {
+public:
+  FOMStringArrayDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringArrayDataType(const FOMStringArrayDataType&) = default;
+  FOMStringArrayDataType(FOMStringArrayDataType&&) = default;
+  virtual ~FOMStringArrayDataType() noexcept = default;
+  FOMStringArrayDataType& operator=(const FOMStringArrayDataType&) = default;
+  FOMStringArrayDataType& operator=(FOMStringArrayDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setCardinality(const String& value) noexcept
+  { getImpl()._cardinality = value; }
+  void setCardinality(String&& value) noexcept
+  { getImpl()._cardinality = std::move(value); }
+  String& getCardinality() noexcept
+  { return getImpl()._cardinality; }
+  const String& getCardinality() const noexcept
+  { return getConstImpl()._cardinality; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  FOMStringArrayDataType& swap(FOMStringArrayDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringArrayDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getCardinality() != rhs.getCardinality()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringArrayDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getCardinality() < rhs.getCardinality()) return true;
+    if (rhs.getCardinality() < getCardinality()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringArrayDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringArrayDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringArrayDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType(),
+      _cardinality(),
+      _encoding()
+    { }
+    String _name;
+    String _dataType;
+    String _cardinality;
+    String _encoding;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringArrayDataType> FOMStringArrayDataTypeList;
+
+class OPENRTI_API FOMStringArrayDataType2 {
+public:
+  FOMStringArrayDataType2() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringArrayDataType2(const FOMStringArrayDataType2&) = default;
+  FOMStringArrayDataType2(FOMStringArrayDataType2&&) = default;
+  virtual ~FOMStringArrayDataType2() noexcept = default;
+  FOMStringArrayDataType2& operator=(const FOMStringArrayDataType2&) = default;
+  FOMStringArrayDataType2& operator=(FOMStringArrayDataType2&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setCardinality(const String& value) noexcept
+  { getImpl()._cardinality = value; }
+  void setCardinality(String&& value) noexcept
+  { getImpl()._cardinality = std::move(value); }
+  String& getCardinality() noexcept
+  { return getImpl()._cardinality; }
+  const String& getCardinality() const noexcept
+  { return getConstImpl()._cardinality; }
+
+  void setEncoding(const ArrayDataTypeEncoding& value) noexcept
+  { getImpl()._encoding = value; }
+  void setEncoding(ArrayDataTypeEncoding&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+  ArrayDataTypeEncoding& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const ArrayDataTypeEncoding& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  FOMStringArrayDataType2& swap(FOMStringArrayDataType2& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringArrayDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getCardinality() != rhs.getCardinality()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringArrayDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getCardinality() < rhs.getCardinality()) return true;
+    if (rhs.getCardinality() < getCardinality()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringArrayDataType2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringArrayDataType2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringArrayDataType2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType(),
+      _cardinality(),
+      _encoding()
+    { }
+    String _name;
+    String _dataType;
+    String _cardinality;
+    ArrayDataTypeEncoding _encoding = FixedArrayDataTypeEncoding;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringArrayDataType2> FOMStringArrayDataType2List;
+
+class OPENRTI_API FOMStringFixedRecordField {
+public:
+  FOMStringFixedRecordField() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringFixedRecordField(const FOMStringFixedRecordField&) = default;
+  FOMStringFixedRecordField(FOMStringFixedRecordField&&) = default;
+  virtual ~FOMStringFixedRecordField() noexcept = default;
+  FOMStringFixedRecordField& operator=(const FOMStringFixedRecordField&) = default;
+  FOMStringFixedRecordField& operator=(FOMStringFixedRecordField&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const Unsigned& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(Unsigned&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  Unsigned& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const Unsigned& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  FOMStringFixedRecordField& swap(FOMStringFixedRecordField& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringFixedRecordField& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringFixedRecordField& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringFixedRecordField& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringFixedRecordField& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringFixedRecordField& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType()
+    { }
+    String _name;
+    Unsigned _dataType = 0;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringFixedRecordField> FOMStringFixedRecordFieldList;
+
+class OPENRTI_API FOMStringFixedRecordDataType {
+public:
+  FOMStringFixedRecordDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringFixedRecordDataType(const FOMStringFixedRecordDataType&) = default;
+  FOMStringFixedRecordDataType(FOMStringFixedRecordDataType&&) = default;
+  virtual ~FOMStringFixedRecordDataType() noexcept = default;
+  FOMStringFixedRecordDataType& operator=(const FOMStringFixedRecordDataType&) = default;
+  FOMStringFixedRecordDataType& operator=(FOMStringFixedRecordDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  void setFields(const FOMStringFixedRecordFieldList& value) noexcept
+  { getImpl()._fields = value; }
+  void setFields(FOMStringFixedRecordFieldList&& value) noexcept
+  { getImpl()._fields = std::move(value); }
+  FOMStringFixedRecordFieldList& getFields() noexcept
+  { return getImpl()._fields; }
+  const FOMStringFixedRecordFieldList& getFields() const noexcept
+  { return getConstImpl()._fields; }
+
+  FOMStringFixedRecordDataType& swap(FOMStringFixedRecordDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringFixedRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getFields() != rhs.getFields()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringFixedRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getFields() < rhs.getFields()) return true;
+    if (rhs.getFields() < getFields()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringFixedRecordDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringFixedRecordDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringFixedRecordDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _encoding(),
+      _fields()
+    { }
+    String _name;
+    String _encoding;
+    FOMStringFixedRecordFieldList _fields;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringFixedRecordDataType> FOMStringFixedRecordDataTypeList;
+
+class OPENRTI_API FOMStringFixedRecordField2 {
+public:
+  FOMStringFixedRecordField2() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringFixedRecordField2(const FOMStringFixedRecordField2&) = default;
+  FOMStringFixedRecordField2(FOMStringFixedRecordField2&&) = default;
+  virtual ~FOMStringFixedRecordField2() noexcept = default;
+  FOMStringFixedRecordField2& operator=(const FOMStringFixedRecordField2&) = default;
+  FOMStringFixedRecordField2& operator=(FOMStringFixedRecordField2&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
+
+  FOMStringFixedRecordField2& swap(FOMStringFixedRecordField2& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringFixedRecordField2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringFixedRecordField2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringFixedRecordField2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringFixedRecordField2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringFixedRecordField2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType(),
+      _version()
+    { }
+    String _name;
+    String _dataType;
+    Unsigned _version = 0;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringFixedRecordField2> FOMStringFixedRecordField2List;
+
+class OPENRTI_API FOMStringFixedRecordDataType2 {
+public:
+  FOMStringFixedRecordDataType2() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringFixedRecordDataType2(const FOMStringFixedRecordDataType2&) = default;
+  FOMStringFixedRecordDataType2(FOMStringFixedRecordDataType2&&) = default;
+  virtual ~FOMStringFixedRecordDataType2() noexcept = default;
+  FOMStringFixedRecordDataType2& operator=(const FOMStringFixedRecordDataType2&) = default;
+  FOMStringFixedRecordDataType2& operator=(FOMStringFixedRecordDataType2&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  void setInclude(const String& value) noexcept
+  { getImpl()._include = value; }
+  void setInclude(String&& value) noexcept
+  { getImpl()._include = std::move(value); }
+  String& getInclude() noexcept
+  { return getImpl()._include; }
+  const String& getInclude() const noexcept
+  { return getConstImpl()._include; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
+
+  void setFields(const FOMStringFixedRecordField2List& value) noexcept
+  { getImpl()._fields = value; }
+  void setFields(FOMStringFixedRecordField2List&& value) noexcept
+  { getImpl()._fields = std::move(value); }
+  FOMStringFixedRecordField2List& getFields() noexcept
+  { return getImpl()._fields; }
+  const FOMStringFixedRecordField2List& getFields() const noexcept
+  { return getConstImpl()._fields; }
+
+  FOMStringFixedRecordDataType2& swap(FOMStringFixedRecordDataType2& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getInclude() != rhs.getInclude()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
+    if (getFields() != rhs.getFields()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getInclude() < rhs.getInclude()) return true;
+    if (rhs.getInclude() < getInclude()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
+    if (getFields() < rhs.getFields()) return true;
+    if (rhs.getFields() < getFields()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringFixedRecordDataType2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _encoding(),
+      _include(),
+      _version(),
+      _fields()
+    { }
+    String _name;
+    String _encoding;
+    String _include;
+    Unsigned _version = 0;
+    FOMStringFixedRecordField2List _fields;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringFixedRecordDataType2> FOMStringFixedRecordDataType2List;
+
+class OPENRTI_API FOMStringVariantRecordAlternative {
+public:
+  FOMStringVariantRecordAlternative() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringVariantRecordAlternative(const FOMStringVariantRecordAlternative&) = default;
+  FOMStringVariantRecordAlternative(FOMStringVariantRecordAlternative&&) = default;
+  virtual ~FOMStringVariantRecordAlternative() noexcept = default;
+  FOMStringVariantRecordAlternative& operator=(const FOMStringVariantRecordAlternative&) = default;
+  FOMStringVariantRecordAlternative& operator=(FOMStringVariantRecordAlternative&&) = default;
+  void setEnumerator(const String& value) noexcept
+  { getImpl()._enumerator = value; }
+  void setEnumerator(String&& value) noexcept
+  { getImpl()._enumerator = std::move(value); }
+  String& getEnumerator() noexcept
+  { return getImpl()._enumerator; }
+  const String& getEnumerator() const noexcept
+  { return getConstImpl()._enumerator; }
+
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const Unsigned& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(Unsigned&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  Unsigned& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const Unsigned& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  FOMStringVariantRecordAlternative& swap(FOMStringVariantRecordAlternative& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringVariantRecordAlternative& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getEnumerator() != rhs.getEnumerator()) return false;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringVariantRecordAlternative& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getEnumerator() < rhs.getEnumerator()) return true;
+    if (rhs.getEnumerator() < getEnumerator()) return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringVariantRecordAlternative& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringVariantRecordAlternative& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringVariantRecordAlternative& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _enumerator(),
+      _name(),
+      _dataType()
+    { }
+    String _enumerator;
+    String _name;
+    Unsigned _dataType = 0;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringVariantRecordAlternative> FOMStringVariantRecordAlternativeList;
+
+class OPENRTI_API FOMStringVariantRecordDataType {
+public:
+  FOMStringVariantRecordDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringVariantRecordDataType(const FOMStringVariantRecordDataType&) = default;
+  FOMStringVariantRecordDataType(FOMStringVariantRecordDataType&&) = default;
+  virtual ~FOMStringVariantRecordDataType() noexcept = default;
+  FOMStringVariantRecordDataType& operator=(const FOMStringVariantRecordDataType&) = default;
+  FOMStringVariantRecordDataType& operator=(FOMStringVariantRecordDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDiscriminant(const String& value) noexcept
+  { getImpl()._discriminant = value; }
+  void setDiscriminant(String&& value) noexcept
+  { getImpl()._discriminant = std::move(value); }
+  String& getDiscriminant() noexcept
+  { return getImpl()._discriminant; }
+  const String& getDiscriminant() const noexcept
+  { return getConstImpl()._discriminant; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setAlternatives(const FOMStringVariantRecordAlternativeList& value) noexcept
+  { getImpl()._alternatives = value; }
+  void setAlternatives(FOMStringVariantRecordAlternativeList&& value) noexcept
+  { getImpl()._alternatives = std::move(value); }
+  FOMStringVariantRecordAlternativeList& getAlternatives() noexcept
+  { return getImpl()._alternatives; }
+  const FOMStringVariantRecordAlternativeList& getAlternatives() const noexcept
+  { return getConstImpl()._alternatives; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  FOMStringVariantRecordDataType& swap(FOMStringVariantRecordDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringVariantRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDiscriminant() != rhs.getDiscriminant()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getAlternatives() != rhs.getAlternatives()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringVariantRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDiscriminant() < rhs.getDiscriminant()) return true;
+    if (rhs.getDiscriminant() < getDiscriminant()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getAlternatives() < rhs.getAlternatives()) return true;
+    if (rhs.getAlternatives() < getAlternatives()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringVariantRecordDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringVariantRecordDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringVariantRecordDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _discriminant(),
+      _dataType(),
+      _alternatives(),
+      _encoding()
+    { }
+    String _name;
+    String _discriminant;
+    String _dataType;
+    FOMStringVariantRecordAlternativeList _alternatives;
+    String _encoding;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringVariantRecordDataType> FOMStringVariantRecordDataTypeList;
+
+class OPENRTI_API FOMStringVariantRecordAlternative2 {
+public:
+  FOMStringVariantRecordAlternative2() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringVariantRecordAlternative2(const FOMStringVariantRecordAlternative2&) = default;
+  FOMStringVariantRecordAlternative2(FOMStringVariantRecordAlternative2&&) = default;
+  virtual ~FOMStringVariantRecordAlternative2() noexcept = default;
+  FOMStringVariantRecordAlternative2& operator=(const FOMStringVariantRecordAlternative2&) = default;
+  FOMStringVariantRecordAlternative2& operator=(FOMStringVariantRecordAlternative2&&) = default;
+  void setEnumerator(const String& value) noexcept
+  { getImpl()._enumerator = value; }
+  void setEnumerator(String&& value) noexcept
+  { getImpl()._enumerator = std::move(value); }
+  String& getEnumerator() noexcept
+  { return getImpl()._enumerator; }
+  const String& getEnumerator() const noexcept
+  { return getConstImpl()._enumerator; }
+
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  FOMStringVariantRecordAlternative2& swap(FOMStringVariantRecordAlternative2& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getEnumerator() != rhs.getEnumerator()) return false;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getEnumerator() < rhs.getEnumerator()) return true;
+    if (rhs.getEnumerator() < getEnumerator()) return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringVariantRecordAlternative2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _enumerator(),
+      _name(),
+      _dataType()
+    { }
+    String _enumerator;
+    String _name;
+    String _dataType;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringVariantRecordAlternative2> FOMStringVariantRecordAlternative2List;
+
+class OPENRTI_API FOMStringVariantRecordDataType2 {
+public:
+  FOMStringVariantRecordDataType2() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringVariantRecordDataType2(const FOMStringVariantRecordDataType2&) = default;
+  FOMStringVariantRecordDataType2(FOMStringVariantRecordDataType2&&) = default;
+  virtual ~FOMStringVariantRecordDataType2() noexcept = default;
+  FOMStringVariantRecordDataType2& operator=(const FOMStringVariantRecordDataType2&) = default;
+  FOMStringVariantRecordDataType2& operator=(FOMStringVariantRecordDataType2&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDiscriminant(const String& value) noexcept
+  { getImpl()._discriminant = value; }
+  void setDiscriminant(String&& value) noexcept
+  { getImpl()._discriminant = std::move(value); }
+  String& getDiscriminant() noexcept
+  { return getImpl()._discriminant; }
+  const String& getDiscriminant() const noexcept
+  { return getConstImpl()._discriminant; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setAlternatives(const FOMStringVariantRecordAlternative2List& value) noexcept
+  { getImpl()._alternatives = value; }
+  void setAlternatives(FOMStringVariantRecordAlternative2List&& value) noexcept
+  { getImpl()._alternatives = std::move(value); }
+  FOMStringVariantRecordAlternative2List& getAlternatives() noexcept
+  { return getImpl()._alternatives; }
+  const FOMStringVariantRecordAlternative2List& getAlternatives() const noexcept
+  { return getConstImpl()._alternatives; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  FOMStringVariantRecordDataType2& swap(FOMStringVariantRecordDataType2& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDiscriminant() != rhs.getDiscriminant()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getAlternatives() != rhs.getAlternatives()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDiscriminant() < rhs.getDiscriminant()) return true;
+    if (rhs.getDiscriminant() < getDiscriminant()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getAlternatives() < rhs.getAlternatives()) return true;
+    if (rhs.getAlternatives() < getAlternatives()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringVariantRecordDataType2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _discriminant(),
+      _dataType(),
+      _alternatives(),
+      _encoding()
+    { }
+    String _name;
+    String _discriminant;
+    String _dataType;
+    FOMStringVariantRecordAlternative2List _alternatives;
+    String _encoding;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringVariantRecordDataType2> FOMStringVariantRecordDataType2List;
+
+class OPENRTI_API FOMStringTransportationType {
+public:
+  FOMStringTransportationType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMStringTransportationType(const FOMStringTransportationType&) = default;
+  FOMStringTransportationType(FOMStringTransportationType&&) = default;
+  virtual ~FOMStringTransportationType() noexcept = default;
+  FOMStringTransportationType& operator=(const FOMStringTransportationType&) = default;
+  FOMStringTransportationType& operator=(FOMStringTransportationType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  FOMStringTransportationType& swap(FOMStringTransportationType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMStringTransportationType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
     return true;
   }
-  bool operator<(const FOMStringTransportationType& rhs) const
+  bool operator<(const FOMStringTransportationType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -764,17 +2330,15 @@ public:
     if (rhs.getName() < getName()) return false;
     return false;
   }
-  bool operator!=(const FOMStringTransportationType& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringTransportationType& rhs) const
+  bool operator>(const FOMStringTransportationType& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringTransportationType& rhs) const
+  bool operator>=(const FOMStringTransportationType& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringTransportationType& rhs) const
+  bool operator<=(const FOMStringTransportationType& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name()
     { }
     String _name;
@@ -788,7 +2352,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -799,37 +2363,38 @@ typedef std::vector<FOMStringTransportationType> FOMStringTransportationTypeList
 
 class OPENRTI_API FOMStringDimension {
 public:
-  FOMStringDimension() : 
-    _impl(new Implementation())
+  FOMStringDimension() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMStringDimension(const FOMStringDimension&) = default;
+  FOMStringDimension(FOMStringDimension&&) = default;
+  virtual ~FOMStringDimension() noexcept = default;
+  FOMStringDimension& operator=(const FOMStringDimension&) = default;
+  FOMStringDimension& operator=(FOMStringDimension&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setUpperBound(const Unsigned& value)
+  void setUpperBound(const Unsigned& value) noexcept
   { getImpl()._upperBound = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpperBound(Unsigned&& value)
+  void setUpperBound(Unsigned&& value) noexcept
   { getImpl()._upperBound = std::move(value); }
-#endif
-  Unsigned& getUpperBound()
+  Unsigned& getUpperBound() noexcept
   { return getImpl()._upperBound; }
-  const Unsigned& getUpperBound() const
+  const Unsigned& getUpperBound() const noexcept
   { return getConstImpl()._upperBound; }
 
-  FOMStringDimension& swap(FOMStringDimension& rhs)
+  FOMStringDimension& swap(FOMStringDimension& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringDimension& rhs) const
+  bool operator==(const FOMStringDimension& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -837,7 +2402,7 @@ public:
     if (getUpperBound() != rhs.getUpperBound()) return false;
     return true;
   }
-  bool operator<(const FOMStringDimension& rhs) const
+  bool operator<(const FOMStringDimension& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -847,22 +2412,20 @@ public:
     if (rhs.getUpperBound() < getUpperBound()) return false;
     return false;
   }
-  bool operator!=(const FOMStringDimension& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringDimension& rhs) const
+  bool operator>(const FOMStringDimension& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringDimension& rhs) const
+  bool operator>=(const FOMStringDimension& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringDimension& rhs) const
+  bool operator<=(const FOMStringDimension& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _upperBound()
     { }
     String _name;
-    Unsigned _upperBound;
+    Unsigned _upperBound = 0;
   };
 
   const Implementation& getConstImpl() const
@@ -873,7 +2436,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -884,37 +2447,38 @@ typedef std::vector<FOMStringDimension> FOMStringDimensionList;
 
 class OPENRTI_API FOMStringRoutingSpace {
 public:
-  FOMStringRoutingSpace() : 
-    _impl(new Implementation())
+  FOMStringRoutingSpace() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMStringRoutingSpace(const FOMStringRoutingSpace&) = default;
+  FOMStringRoutingSpace(FOMStringRoutingSpace&&) = default;
+  virtual ~FOMStringRoutingSpace() noexcept = default;
+  FOMStringRoutingSpace& operator=(const FOMStringRoutingSpace&) = default;
+  FOMStringRoutingSpace& operator=(FOMStringRoutingSpace&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDimensionSet(const StringSet& value)
+  void setDimensionSet(const StringSet& value) noexcept
   { getImpl()._dimensionSet = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionSet(StringSet&& value)
+  void setDimensionSet(StringSet&& value) noexcept
   { getImpl()._dimensionSet = std::move(value); }
-#endif
-  StringSet& getDimensionSet()
+  StringSet& getDimensionSet() noexcept
   { return getImpl()._dimensionSet; }
-  const StringSet& getDimensionSet() const
+  const StringSet& getDimensionSet() const noexcept
   { return getConstImpl()._dimensionSet; }
 
-  FOMStringRoutingSpace& swap(FOMStringRoutingSpace& rhs)
+  FOMStringRoutingSpace& swap(FOMStringRoutingSpace& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringRoutingSpace& rhs) const
+  bool operator==(const FOMStringRoutingSpace& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -922,7 +2486,7 @@ public:
     if (getDimensionSet() != rhs.getDimensionSet()) return false;
     return true;
   }
-  bool operator<(const FOMStringRoutingSpace& rhs) const
+  bool operator<(const FOMStringRoutingSpace& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -932,17 +2496,15 @@ public:
     if (rhs.getDimensionSet() < getDimensionSet()) return false;
     return false;
   }
-  bool operator!=(const FOMStringRoutingSpace& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringRoutingSpace& rhs) const
+  bool operator>(const FOMStringRoutingSpace& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringRoutingSpace& rhs) const
+  bool operator>=(const FOMStringRoutingSpace& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringRoutingSpace& rhs) const
+  bool operator<=(const FOMStringRoutingSpace& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dimensionSet()
     { }
@@ -958,7 +2520,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -969,54 +2531,69 @@ typedef std::vector<FOMStringRoutingSpace> FOMStringRoutingSpaceList;
 
 class OPENRTI_API FOMStringParameter {
 public:
-  FOMStringParameter() : 
-    _impl(new Implementation())
+  FOMStringParameter() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMStringParameter(const FOMStringParameter&) = default;
+  FOMStringParameter(FOMStringParameter&&) = default;
+  virtual ~FOMStringParameter() noexcept = default;
+  FOMStringParameter& operator=(const FOMStringParameter&) = default;
+  FOMStringParameter& operator=(FOMStringParameter&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  FOMStringParameter& swap(FOMStringParameter& rhs)
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  FOMStringParameter& swap(FOMStringParameter& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringParameter& rhs) const
+  bool operator==(const FOMStringParameter& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
     return true;
   }
-  bool operator<(const FOMStringParameter& rhs) const
+  bool operator<(const FOMStringParameter& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
     if (getName() < rhs.getName()) return true;
     if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
     return false;
   }
-  bool operator!=(const FOMStringParameter& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringParameter& rhs) const
+  bool operator>(const FOMStringParameter& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringParameter& rhs) const
+  bool operator>=(const FOMStringParameter& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringParameter& rhs) const
+  bool operator<=(const FOMStringParameter& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
-      _name()
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType()
     { }
     String _name;
+    String _dataType;
   };
 
   const Implementation& getConstImpl() const
@@ -1027,7 +2604,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1038,81 +2615,74 @@ typedef std::vector<FOMStringParameter> FOMStringParameterList;
 
 class OPENRTI_API FOMStringInteractionClass {
 public:
-  FOMStringInteractionClass() : 
-    _impl(new Implementation())
+  FOMStringInteractionClass() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const StringVector& value)
+  FOMStringInteractionClass(const FOMStringInteractionClass&) = default;
+  FOMStringInteractionClass(FOMStringInteractionClass&&) = default;
+  virtual ~FOMStringInteractionClass() noexcept = default;
+  FOMStringInteractionClass& operator=(const FOMStringInteractionClass&) = default;
+  FOMStringInteractionClass& operator=(FOMStringInteractionClass&&) = default;
+  void setName(const StringVector& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(StringVector&& value)
+  void setName(StringVector&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  StringVector& getName()
+  StringVector& getName() noexcept
   { return getImpl()._name; }
-  const StringVector& getName() const
+  const StringVector& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setOrderType(const String& value)
+  void setOrderType(const String& value) noexcept
   { getImpl()._orderType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(String&& value)
+  void setOrderType(String&& value) noexcept
   { getImpl()._orderType = std::move(value); }
-#endif
-  String& getOrderType()
+  String& getOrderType() noexcept
   { return getImpl()._orderType; }
-  const String& getOrderType() const
+  const String& getOrderType() const noexcept
   { return getConstImpl()._orderType; }
 
-  void setTransportationType(const String& value)
+  void setTransportationType(const String& value) noexcept
   { getImpl()._transportationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(String&& value)
+  void setTransportationType(String&& value) noexcept
   { getImpl()._transportationType = std::move(value); }
-#endif
-  String& getTransportationType()
+  String& getTransportationType() noexcept
   { return getImpl()._transportationType; }
-  const String& getTransportationType() const
+  const String& getTransportationType() const noexcept
   { return getConstImpl()._transportationType; }
 
-  void setRoutingSpace(const String& value)
+  void setRoutingSpace(const String& value) noexcept
   { getImpl()._routingSpace = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRoutingSpace(String&& value)
+  void setRoutingSpace(String&& value) noexcept
   { getImpl()._routingSpace = std::move(value); }
-#endif
-  String& getRoutingSpace()
+  String& getRoutingSpace() noexcept
   { return getImpl()._routingSpace; }
-  const String& getRoutingSpace() const
+  const String& getRoutingSpace() const noexcept
   { return getConstImpl()._routingSpace; }
 
-  void setDimensionSet(const StringSet& value)
+  void setDimensionSet(const StringSet& value) noexcept
   { getImpl()._dimensionSet = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionSet(StringSet&& value)
+  void setDimensionSet(StringSet&& value) noexcept
   { getImpl()._dimensionSet = std::move(value); }
-#endif
-  StringSet& getDimensionSet()
+  StringSet& getDimensionSet() noexcept
   { return getImpl()._dimensionSet; }
-  const StringSet& getDimensionSet() const
+  const StringSet& getDimensionSet() const noexcept
   { return getConstImpl()._dimensionSet; }
 
-  void setParameterList(const FOMStringParameterList& value)
+  void setParameterList(const FOMStringParameterList& value) noexcept
   { getImpl()._parameterList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterList(FOMStringParameterList&& value)
+  void setParameterList(FOMStringParameterList&& value) noexcept
   { getImpl()._parameterList = std::move(value); }
-#endif
-  FOMStringParameterList& getParameterList()
+  FOMStringParameterList& getParameterList() noexcept
   { return getImpl()._parameterList; }
-  const FOMStringParameterList& getParameterList() const
+  const FOMStringParameterList& getParameterList() const noexcept
   { return getConstImpl()._parameterList; }
 
-  FOMStringInteractionClass& swap(FOMStringInteractionClass& rhs)
+  FOMStringInteractionClass& swap(FOMStringInteractionClass& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringInteractionClass& rhs) const
+  bool operator==(const FOMStringInteractionClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1124,7 +2694,7 @@ public:
     if (getParameterList() != rhs.getParameterList()) return false;
     return true;
   }
-  bool operator<(const FOMStringInteractionClass& rhs) const
+  bool operator<(const FOMStringInteractionClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1142,17 +2712,15 @@ public:
     if (rhs.getParameterList() < getParameterList()) return false;
     return false;
   }
-  bool operator!=(const FOMStringInteractionClass& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringInteractionClass& rhs) const
+  bool operator>(const FOMStringInteractionClass& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringInteractionClass& rhs) const
+  bool operator>=(const FOMStringInteractionClass& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringInteractionClass& rhs) const
+  bool operator<=(const FOMStringInteractionClass& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _orderType(),
       _transportationType(),
@@ -1176,7 +2744,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1187,86 +2755,93 @@ typedef std::vector<FOMStringInteractionClass> FOMStringInteractionClassList;
 
 class OPENRTI_API FOMStringAttribute {
 public:
-  FOMStringAttribute() : 
-    _impl(new Implementation())
+  FOMStringAttribute() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMStringAttribute(const FOMStringAttribute&) = default;
+  FOMStringAttribute(FOMStringAttribute&&) = default;
+  virtual ~FOMStringAttribute() noexcept = default;
+  FOMStringAttribute& operator=(const FOMStringAttribute&) = default;
+  FOMStringAttribute& operator=(FOMStringAttribute&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setOrderType(const String& value)
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setOrderType(const String& value) noexcept
   { getImpl()._orderType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(String&& value)
+  void setOrderType(String&& value) noexcept
   { getImpl()._orderType = std::move(value); }
-#endif
-  String& getOrderType()
+  String& getOrderType() noexcept
   { return getImpl()._orderType; }
-  const String& getOrderType() const
+  const String& getOrderType() const noexcept
   { return getConstImpl()._orderType; }
 
-  void setTransportationType(const String& value)
+  void setTransportationType(const String& value) noexcept
   { getImpl()._transportationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(String&& value)
+  void setTransportationType(String&& value) noexcept
   { getImpl()._transportationType = std::move(value); }
-#endif
-  String& getTransportationType()
+  String& getTransportationType() noexcept
   { return getImpl()._transportationType; }
-  const String& getTransportationType() const
+  const String& getTransportationType() const noexcept
   { return getConstImpl()._transportationType; }
 
-  void setRoutingSpace(const String& value)
+  void setRoutingSpace(const String& value) noexcept
   { getImpl()._routingSpace = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRoutingSpace(String&& value)
+  void setRoutingSpace(String&& value) noexcept
   { getImpl()._routingSpace = std::move(value); }
-#endif
-  String& getRoutingSpace()
+  String& getRoutingSpace() noexcept
   { return getImpl()._routingSpace; }
-  const String& getRoutingSpace() const
+  const String& getRoutingSpace() const noexcept
   { return getConstImpl()._routingSpace; }
 
-  void setDimensionSet(const StringSet& value)
+  void setDimensionSet(const StringSet& value) noexcept
   { getImpl()._dimensionSet = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionSet(StringSet&& value)
+  void setDimensionSet(StringSet&& value) noexcept
   { getImpl()._dimensionSet = std::move(value); }
-#endif
-  StringSet& getDimensionSet()
+  StringSet& getDimensionSet() noexcept
   { return getImpl()._dimensionSet; }
-  const StringSet& getDimensionSet() const
+  const StringSet& getDimensionSet() const noexcept
   { return getConstImpl()._dimensionSet; }
 
-  FOMStringAttribute& swap(FOMStringAttribute& rhs)
+  FOMStringAttribute& swap(FOMStringAttribute& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringAttribute& rhs) const
+  bool operator==(const FOMStringAttribute& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
     if (getOrderType() != rhs.getOrderType()) return false;
     if (getTransportationType() != rhs.getTransportationType()) return false;
     if (getRoutingSpace() != rhs.getRoutingSpace()) return false;
     if (getDimensionSet() != rhs.getDimensionSet()) return false;
     return true;
   }
-  bool operator<(const FOMStringAttribute& rhs) const
+  bool operator<(const FOMStringAttribute& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
     if (getName() < rhs.getName()) return true;
     if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
     if (getOrderType() < rhs.getOrderType()) return true;
     if (rhs.getOrderType() < getOrderType()) return false;
     if (getTransportationType() < rhs.getTransportationType()) return true;
@@ -1277,24 +2852,24 @@ public:
     if (rhs.getDimensionSet() < getDimensionSet()) return false;
     return false;
   }
-  bool operator!=(const FOMStringAttribute& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringAttribute& rhs) const
+  bool operator>(const FOMStringAttribute& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringAttribute& rhs) const
+  bool operator>=(const FOMStringAttribute& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringAttribute& rhs) const
+  bool operator<=(const FOMStringAttribute& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
+      _dataType(),
       _orderType(),
       _transportationType(),
       _routingSpace(),
       _dimensionSet()
     { }
     String _name;
+    String _dataType;
     String _orderType;
     String _transportationType;
     String _routingSpace;
@@ -1309,7 +2884,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1320,37 +2895,38 @@ typedef std::vector<FOMStringAttribute> FOMStringAttributeList;
 
 class OPENRTI_API FOMStringObjectClass {
 public:
-  FOMStringObjectClass() : 
-    _impl(new Implementation())
+  FOMStringObjectClass() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const StringVector& value)
+  FOMStringObjectClass(const FOMStringObjectClass&) = default;
+  FOMStringObjectClass(FOMStringObjectClass&&) = default;
+  virtual ~FOMStringObjectClass() noexcept = default;
+  FOMStringObjectClass& operator=(const FOMStringObjectClass&) = default;
+  FOMStringObjectClass& operator=(FOMStringObjectClass&&) = default;
+  void setName(const StringVector& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(StringVector&& value)
+  void setName(StringVector&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  StringVector& getName()
+  StringVector& getName() noexcept
   { return getImpl()._name; }
-  const StringVector& getName() const
+  const StringVector& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setAttributeList(const FOMStringAttributeList& value)
+  void setAttributeList(const FOMStringAttributeList& value) noexcept
   { getImpl()._attributeList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeList(FOMStringAttributeList&& value)
+  void setAttributeList(FOMStringAttributeList&& value) noexcept
   { getImpl()._attributeList = std::move(value); }
-#endif
-  FOMStringAttributeList& getAttributeList()
+  FOMStringAttributeList& getAttributeList() noexcept
   { return getImpl()._attributeList; }
-  const FOMStringAttributeList& getAttributeList() const
+  const FOMStringAttributeList& getAttributeList() const noexcept
   { return getConstImpl()._attributeList; }
 
-  FOMStringObjectClass& swap(FOMStringObjectClass& rhs)
+  FOMStringObjectClass& swap(FOMStringObjectClass& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringObjectClass& rhs) const
+  bool operator==(const FOMStringObjectClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1358,7 +2934,7 @@ public:
     if (getAttributeList() != rhs.getAttributeList()) return false;
     return true;
   }
-  bool operator<(const FOMStringObjectClass& rhs) const
+  bool operator<(const FOMStringObjectClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1368,17 +2944,15 @@ public:
     if (rhs.getAttributeList() < getAttributeList()) return false;
     return false;
   }
-  bool operator!=(const FOMStringObjectClass& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringObjectClass& rhs) const
+  bool operator>(const FOMStringObjectClass& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringObjectClass& rhs) const
+  bool operator>=(const FOMStringObjectClass& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringObjectClass& rhs) const
+  bool operator<=(const FOMStringObjectClass& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _attributeList()
     { }
@@ -1394,7 +2968,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1405,37 +2979,38 @@ typedef std::vector<FOMStringObjectClass> FOMStringObjectClassList;
 
 class OPENRTI_API FOMStringUpdateRate {
 public:
-  FOMStringUpdateRate() : 
-    _impl(new Implementation())
+  FOMStringUpdateRate() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMStringUpdateRate(const FOMStringUpdateRate&) = default;
+  FOMStringUpdateRate(FOMStringUpdateRate&&) = default;
+  virtual ~FOMStringUpdateRate() noexcept = default;
+  FOMStringUpdateRate& operator=(const FOMStringUpdateRate&) = default;
+  FOMStringUpdateRate& operator=(FOMStringUpdateRate&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setRate(const Double& value)
+  void setRate(const Double& value) noexcept
   { getImpl()._rate = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRate(Double&& value)
+  void setRate(Double&& value) noexcept
   { getImpl()._rate = std::move(value); }
-#endif
-  Double& getRate()
+  Double& getRate() noexcept
   { return getImpl()._rate; }
-  const Double& getRate() const
+  const Double& getRate() const noexcept
   { return getConstImpl()._rate; }
 
-  FOMStringUpdateRate& swap(FOMStringUpdateRate& rhs)
+  FOMStringUpdateRate& swap(FOMStringUpdateRate& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringUpdateRate& rhs) const
+  bool operator==(const FOMStringUpdateRate& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1443,7 +3018,7 @@ public:
     if (getRate() != rhs.getRate()) return false;
     return true;
   }
-  bool operator<(const FOMStringUpdateRate& rhs) const
+  bool operator<(const FOMStringUpdateRate& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1453,17 +3028,15 @@ public:
     if (rhs.getRate() < getRate()) return false;
     return false;
   }
-  bool operator!=(const FOMStringUpdateRate& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringUpdateRate& rhs) const
+  bool operator>(const FOMStringUpdateRate& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringUpdateRate& rhs) const
+  bool operator>=(const FOMStringUpdateRate& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringUpdateRate& rhs) const
+  bool operator<=(const FOMStringUpdateRate& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _rate()
     { }
@@ -1479,7 +3052,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1490,37 +3063,38 @@ typedef std::vector<FOMStringUpdateRate> FOMStringUpdateRateList;
 
 class OPENRTI_API FOMStringSwitch {
 public:
-  FOMStringSwitch() : 
-    _impl(new Implementation())
+  FOMStringSwitch() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setSwitchesType(const SwitchesType& value)
+  FOMStringSwitch(const FOMStringSwitch&) = default;
+  FOMStringSwitch(FOMStringSwitch&&) = default;
+  virtual ~FOMStringSwitch() noexcept = default;
+  FOMStringSwitch& operator=(const FOMStringSwitch&) = default;
+  FOMStringSwitch& operator=(FOMStringSwitch&&) = default;
+  void setSwitchesType(const SwitchesType& value) noexcept
   { getImpl()._switchesType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSwitchesType(SwitchesType&& value)
+  void setSwitchesType(SwitchesType&& value) noexcept
   { getImpl()._switchesType = std::move(value); }
-#endif
-  SwitchesType& getSwitchesType()
+  SwitchesType& getSwitchesType() noexcept
   { return getImpl()._switchesType; }
-  const SwitchesType& getSwitchesType() const
+  const SwitchesType& getSwitchesType() const noexcept
   { return getConstImpl()._switchesType; }
 
-  void setEnabled(const Bool& value)
+  void setEnabled(const Bool& value) noexcept
   { getImpl()._enabled = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEnabled(Bool&& value)
+  void setEnabled(Bool&& value) noexcept
   { getImpl()._enabled = std::move(value); }
-#endif
-  Bool& getEnabled()
+  Bool& getEnabled() noexcept
   { return getImpl()._enabled; }
-  const Bool& getEnabled() const
+  const Bool& getEnabled() const noexcept
   { return getConstImpl()._enabled; }
 
-  FOMStringSwitch& swap(FOMStringSwitch& rhs)
+  FOMStringSwitch& swap(FOMStringSwitch& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringSwitch& rhs) const
+  bool operator==(const FOMStringSwitch& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1528,7 +3102,7 @@ public:
     if (getEnabled() != rhs.getEnabled()) return false;
     return true;
   }
-  bool operator<(const FOMStringSwitch& rhs) const
+  bool operator<(const FOMStringSwitch& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1538,22 +3112,20 @@ public:
     if (rhs.getEnabled() < getEnabled()) return false;
     return false;
   }
-  bool operator!=(const FOMStringSwitch& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringSwitch& rhs) const
+  bool operator>(const FOMStringSwitch& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringSwitch& rhs) const
+  bool operator>=(const FOMStringSwitch& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringSwitch& rhs) const
+  bool operator<=(const FOMStringSwitch& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _switchesType(),
       _enabled()
     { }
-    SwitchesType _switchesType;
-    Bool _enabled;
+    SwitchesType _switchesType = InteractionRelevanceAdvisorySwitchesType;
+    Bool _enabled = false;
   };
 
   const Implementation& getConstImpl() const
@@ -1564,7 +3136,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1575,129 +3147,159 @@ typedef std::vector<FOMStringSwitch> FOMStringSwitchList;
 
 class OPENRTI_API FOMStringModule {
 public:
-  FOMStringModule() : 
-    _impl(new Implementation())
+  FOMStringModule() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setContent(const String& value)
-  { getImpl()._content = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setContent(String&& value)
-  { getImpl()._content = std::move(value); }
-#endif
-  String& getContent()
-  { return getImpl()._content; }
-  const String& getContent() const
-  { return getConstImpl()._content; }
+  FOMStringModule(const FOMStringModule&) = default;
+  FOMStringModule(FOMStringModule&&) = default;
+  virtual ~FOMStringModule() noexcept = default;
+  FOMStringModule& operator=(const FOMStringModule&) = default;
+  FOMStringModule& operator=(FOMStringModule&&) = default;
+  void setDesignator(const String& value) noexcept
+  { getImpl()._designator = value; }
+  void setDesignator(String&& value) noexcept
+  { getImpl()._designator = std::move(value); }
+  String& getDesignator() noexcept
+  { return getImpl()._designator; }
+  const String& getDesignator() const noexcept
+  { return getConstImpl()._designator; }
 
-  void setTransportationTypeList(const FOMStringTransportationTypeList& value)
+  void setTransportationTypeList(const FOMStringTransportationTypeList& value) noexcept
   { getImpl()._transportationTypeList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationTypeList(FOMStringTransportationTypeList&& value)
+  void setTransportationTypeList(FOMStringTransportationTypeList&& value) noexcept
   { getImpl()._transportationTypeList = std::move(value); }
-#endif
-  FOMStringTransportationTypeList& getTransportationTypeList()
+  FOMStringTransportationTypeList& getTransportationTypeList() noexcept
   { return getImpl()._transportationTypeList; }
-  const FOMStringTransportationTypeList& getTransportationTypeList() const
+  const FOMStringTransportationTypeList& getTransportationTypeList() const noexcept
   { return getConstImpl()._transportationTypeList; }
 
-  void setDimensionList(const FOMStringDimensionList& value)
+  void setDimensionList(const FOMStringDimensionList& value) noexcept
   { getImpl()._dimensionList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionList(FOMStringDimensionList&& value)
+  void setDimensionList(FOMStringDimensionList&& value) noexcept
   { getImpl()._dimensionList = std::move(value); }
-#endif
-  FOMStringDimensionList& getDimensionList()
+  FOMStringDimensionList& getDimensionList() noexcept
   { return getImpl()._dimensionList; }
-  const FOMStringDimensionList& getDimensionList() const
+  const FOMStringDimensionList& getDimensionList() const noexcept
   { return getConstImpl()._dimensionList; }
 
-  void setRoutingSpaceList(const FOMStringRoutingSpaceList& value)
+  void setRoutingSpaceList(const FOMStringRoutingSpaceList& value) noexcept
   { getImpl()._routingSpaceList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRoutingSpaceList(FOMStringRoutingSpaceList&& value)
+  void setRoutingSpaceList(FOMStringRoutingSpaceList&& value) noexcept
   { getImpl()._routingSpaceList = std::move(value); }
-#endif
-  FOMStringRoutingSpaceList& getRoutingSpaceList()
+  FOMStringRoutingSpaceList& getRoutingSpaceList() noexcept
   { return getImpl()._routingSpaceList; }
-  const FOMStringRoutingSpaceList& getRoutingSpaceList() const
+  const FOMStringRoutingSpaceList& getRoutingSpaceList() const noexcept
   { return getConstImpl()._routingSpaceList; }
 
-  void setInteractionClassList(const FOMStringInteractionClassList& value)
+  void setInteractionClassList(const FOMStringInteractionClassList& value) noexcept
   { getImpl()._interactionClassList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassList(FOMStringInteractionClassList&& value)
+  void setInteractionClassList(FOMStringInteractionClassList&& value) noexcept
   { getImpl()._interactionClassList = std::move(value); }
-#endif
-  FOMStringInteractionClassList& getInteractionClassList()
+  FOMStringInteractionClassList& getInteractionClassList() noexcept
   { return getImpl()._interactionClassList; }
-  const FOMStringInteractionClassList& getInteractionClassList() const
+  const FOMStringInteractionClassList& getInteractionClassList() const noexcept
   { return getConstImpl()._interactionClassList; }
 
-  void setObjectClassList(const FOMStringObjectClassList& value)
+  void setObjectClassList(const FOMStringObjectClassList& value) noexcept
   { getImpl()._objectClassList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassList(FOMStringObjectClassList&& value)
+  void setObjectClassList(FOMStringObjectClassList&& value) noexcept
   { getImpl()._objectClassList = std::move(value); }
-#endif
-  FOMStringObjectClassList& getObjectClassList()
+  FOMStringObjectClassList& getObjectClassList() noexcept
   { return getImpl()._objectClassList; }
-  const FOMStringObjectClassList& getObjectClassList() const
+  const FOMStringObjectClassList& getObjectClassList() const noexcept
   { return getConstImpl()._objectClassList; }
 
-  void setUpdateRateList(const FOMStringUpdateRateList& value)
+  void setUpdateRateList(const FOMStringUpdateRateList& value) noexcept
   { getImpl()._updateRateList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpdateRateList(FOMStringUpdateRateList&& value)
+  void setUpdateRateList(FOMStringUpdateRateList&& value) noexcept
   { getImpl()._updateRateList = std::move(value); }
-#endif
-  FOMStringUpdateRateList& getUpdateRateList()
+  FOMStringUpdateRateList& getUpdateRateList() noexcept
   { return getImpl()._updateRateList; }
-  const FOMStringUpdateRateList& getUpdateRateList() const
+  const FOMStringUpdateRateList& getUpdateRateList() const noexcept
   { return getConstImpl()._updateRateList; }
 
-  void setSwitchList(const FOMStringSwitchList& value)
+  void setSwitchList(const FOMStringSwitchList& value) noexcept
   { getImpl()._switchList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSwitchList(FOMStringSwitchList&& value)
+  void setSwitchList(FOMStringSwitchList&& value) noexcept
   { getImpl()._switchList = std::move(value); }
-#endif
-  FOMStringSwitchList& getSwitchList()
+  FOMStringSwitchList& getSwitchList() noexcept
   { return getImpl()._switchList; }
-  const FOMStringSwitchList& getSwitchList() const
+  const FOMStringSwitchList& getSwitchList() const noexcept
   { return getConstImpl()._switchList; }
 
-  void setArtificialInteractionRoot(const Bool& value)
+  void setSimpleDataTypeList(const FOMStringSimpleDataTypeList& value) noexcept
+  { getImpl()._simpleDataTypeList = value; }
+  void setSimpleDataTypeList(FOMStringSimpleDataTypeList&& value) noexcept
+  { getImpl()._simpleDataTypeList = std::move(value); }
+  FOMStringSimpleDataTypeList& getSimpleDataTypeList() noexcept
+  { return getImpl()._simpleDataTypeList; }
+  const FOMStringSimpleDataTypeList& getSimpleDataTypeList() const noexcept
+  { return getConstImpl()._simpleDataTypeList; }
+
+  void setEnumeratedDataTypeList(const FOMStringEnumeratedDataTypeList& value) noexcept
+  { getImpl()._enumeratedDataTypeList = value; }
+  void setEnumeratedDataTypeList(FOMStringEnumeratedDataTypeList&& value) noexcept
+  { getImpl()._enumeratedDataTypeList = std::move(value); }
+  FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() noexcept
+  { return getImpl()._enumeratedDataTypeList; }
+  const FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() const noexcept
+  { return getConstImpl()._enumeratedDataTypeList; }
+
+  void setArrayDataTypeList(const FOMStringArrayDataTypeList& value) noexcept
+  { getImpl()._arrayDataTypeList = value; }
+  void setArrayDataTypeList(FOMStringArrayDataTypeList&& value) noexcept
+  { getImpl()._arrayDataTypeList = std::move(value); }
+  FOMStringArrayDataTypeList& getArrayDataTypeList() noexcept
+  { return getImpl()._arrayDataTypeList; }
+  const FOMStringArrayDataTypeList& getArrayDataTypeList() const noexcept
+  { return getConstImpl()._arrayDataTypeList; }
+
+  void setFixedRecordDataTypeList(const FOMStringFixedRecordDataTypeList& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = value; }
+  void setFixedRecordDataTypeList(FOMStringFixedRecordDataTypeList&& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = std::move(value); }
+  FOMStringFixedRecordDataTypeList& getFixedRecordDataTypeList() noexcept
+  { return getImpl()._fixedRecordDataTypeList; }
+  const FOMStringFixedRecordDataTypeList& getFixedRecordDataTypeList() const noexcept
+  { return getConstImpl()._fixedRecordDataTypeList; }
+
+  void setVariantRecordDataTypeList(const FOMStringVariantRecordDataTypeList& value) noexcept
+  { getImpl()._variantRecordDataTypeList = value; }
+  void setVariantRecordDataTypeList(FOMStringVariantRecordDataTypeList&& value) noexcept
+  { getImpl()._variantRecordDataTypeList = std::move(value); }
+  FOMStringVariantRecordDataTypeList& getVariantRecordDataTypeList() noexcept
+  { return getImpl()._variantRecordDataTypeList; }
+  const FOMStringVariantRecordDataTypeList& getVariantRecordDataTypeList() const noexcept
+  { return getConstImpl()._variantRecordDataTypeList; }
+
+  void setArtificialInteractionRoot(const Bool& value) noexcept
   { getImpl()._artificialInteractionRoot = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialInteractionRoot(Bool&& value)
+  void setArtificialInteractionRoot(Bool&& value) noexcept
   { getImpl()._artificialInteractionRoot = std::move(value); }
-#endif
-  Bool& getArtificialInteractionRoot()
+  Bool& getArtificialInteractionRoot() noexcept
   { return getImpl()._artificialInteractionRoot; }
-  const Bool& getArtificialInteractionRoot() const
+  const Bool& getArtificialInteractionRoot() const noexcept
   { return getConstImpl()._artificialInteractionRoot; }
 
-  void setArtificialObjectRoot(const Bool& value)
+  void setArtificialObjectRoot(const Bool& value) noexcept
   { getImpl()._artificialObjectRoot = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialObjectRoot(Bool&& value)
+  void setArtificialObjectRoot(Bool&& value) noexcept
   { getImpl()._artificialObjectRoot = std::move(value); }
-#endif
-  Bool& getArtificialObjectRoot()
+  Bool& getArtificialObjectRoot() noexcept
   { return getImpl()._artificialObjectRoot; }
-  const Bool& getArtificialObjectRoot() const
+  const Bool& getArtificialObjectRoot() const noexcept
   { return getConstImpl()._artificialObjectRoot; }
 
-  FOMStringModule& swap(FOMStringModule& rhs)
+  FOMStringModule& swap(FOMStringModule& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMStringModule& rhs) const
+  bool operator==(const FOMStringModule& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
-    if (getContent() != rhs.getContent()) return false;
+    if (getDesignator() != rhs.getDesignator()) return false;
     if (getTransportationTypeList() != rhs.getTransportationTypeList()) return false;
     if (getDimensionList() != rhs.getDimensionList()) return false;
     if (getRoutingSpaceList() != rhs.getRoutingSpaceList()) return false;
@@ -1705,16 +3307,21 @@ public:
     if (getObjectClassList() != rhs.getObjectClassList()) return false;
     if (getUpdateRateList() != rhs.getUpdateRateList()) return false;
     if (getSwitchList() != rhs.getSwitchList()) return false;
+    if (getSimpleDataTypeList() != rhs.getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() != rhs.getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() != rhs.getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() != rhs.getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() != rhs.getVariantRecordDataTypeList()) return false;
     if (getArtificialInteractionRoot() != rhs.getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
     return true;
   }
-  bool operator<(const FOMStringModule& rhs) const
+  bool operator<(const FOMStringModule& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
-    if (getContent() < rhs.getContent()) return true;
-    if (rhs.getContent() < getContent()) return false;
+    if (getDesignator() < rhs.getDesignator()) return true;
+    if (rhs.getDesignator() < getDesignator()) return false;
     if (getTransportationTypeList() < rhs.getTransportationTypeList()) return true;
     if (rhs.getTransportationTypeList() < getTransportationTypeList()) return false;
     if (getDimensionList() < rhs.getDimensionList()) return true;
@@ -1729,24 +3336,32 @@ public:
     if (rhs.getUpdateRateList() < getUpdateRateList()) return false;
     if (getSwitchList() < rhs.getSwitchList()) return true;
     if (rhs.getSwitchList() < getSwitchList()) return false;
+    if (getSimpleDataTypeList() < rhs.getSimpleDataTypeList()) return true;
+    if (rhs.getSimpleDataTypeList() < getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() < rhs.getEnumeratedDataTypeList()) return true;
+    if (rhs.getEnumeratedDataTypeList() < getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() < rhs.getArrayDataTypeList()) return true;
+    if (rhs.getArrayDataTypeList() < getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() < rhs.getFixedRecordDataTypeList()) return true;
+    if (rhs.getFixedRecordDataTypeList() < getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() < rhs.getVariantRecordDataTypeList()) return true;
+    if (rhs.getVariantRecordDataTypeList() < getVariantRecordDataTypeList()) return false;
     if (getArtificialInteractionRoot() < rhs.getArtificialInteractionRoot()) return true;
     if (rhs.getArtificialInteractionRoot() < getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() < rhs.getArtificialObjectRoot()) return true;
     if (rhs.getArtificialObjectRoot() < getArtificialObjectRoot()) return false;
     return false;
   }
-  bool operator!=(const FOMStringModule& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMStringModule& rhs) const
+  bool operator>(const FOMStringModule& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMStringModule& rhs) const
+  bool operator>=(const FOMStringModule& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMStringModule& rhs) const
+  bool operator<=(const FOMStringModule& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
-      _content(),
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _designator(),
       _transportationTypeList(),
       _dimensionList(),
       _routingSpaceList(),
@@ -1754,10 +3369,15 @@ private:
       _objectClassList(),
       _updateRateList(),
       _switchList(),
+      _simpleDataTypeList(),
+      _enumeratedDataTypeList(),
+      _arrayDataTypeList(),
+      _fixedRecordDataTypeList(),
+      _variantRecordDataTypeList(),
       _artificialInteractionRoot(),
       _artificialObjectRoot()
     { }
-    String _content;
+    String _designator;
     FOMStringTransportationTypeList _transportationTypeList;
     FOMStringDimensionList _dimensionList;
     FOMStringRoutingSpaceList _routingSpaceList;
@@ -1765,8 +3385,13 @@ private:
     FOMStringObjectClassList _objectClassList;
     FOMStringUpdateRateList _updateRateList;
     FOMStringSwitchList _switchList;
-    Bool _artificialInteractionRoot;
-    Bool _artificialObjectRoot;
+    FOMStringSimpleDataTypeList _simpleDataTypeList;
+    FOMStringEnumeratedDataTypeList _enumeratedDataTypeList;
+    FOMStringArrayDataTypeList _arrayDataTypeList;
+    FOMStringFixedRecordDataTypeList _fixedRecordDataTypeList;
+    FOMStringVariantRecordDataTypeList _variantRecordDataTypeList;
+    Bool _artificialInteractionRoot = false;
+    Bool _artificialObjectRoot = false;
   };
 
   const Implementation& getConstImpl() const
@@ -1777,7 +3402,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1786,39 +3411,320 @@ private:
 
 typedef std::vector<FOMStringModule> FOMStringModuleList;
 
-class OPENRTI_API FOMTransportationType {
+class OPENRTI_API FOMStringModule2 {
 public:
-  FOMTransportationType() : 
-    _impl(new Implementation())
+  FOMStringModule2() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
-  { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
-  { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
-  { return getImpl()._name; }
-  const String& getName() const
-  { return getConstImpl()._name; }
+  FOMStringModule2(const FOMStringModule2&) = default;
+  FOMStringModule2(FOMStringModule2&&) = default;
+  virtual ~FOMStringModule2() noexcept = default;
+  FOMStringModule2& operator=(const FOMStringModule2&) = default;
+  FOMStringModule2& operator=(FOMStringModule2&&) = default;
+  void setDesignator(const String& value) noexcept
+  { getImpl()._designator = value; }
+  void setDesignator(String&& value) noexcept
+  { getImpl()._designator = std::move(value); }
+  String& getDesignator() noexcept
+  { return getImpl()._designator; }
+  const String& getDesignator() const noexcept
+  { return getConstImpl()._designator; }
 
-  void setTransportationType(const TransportationType& value)
-  { getImpl()._transportationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
-  { getImpl()._transportationType = std::move(value); }
-#endif
-  TransportationType& getTransportationType()
-  { return getImpl()._transportationType; }
-  const TransportationType& getTransportationType() const
-  { return getConstImpl()._transportationType; }
+  void setTransportationTypeList(const FOMStringTransportationTypeList& value) noexcept
+  { getImpl()._transportationTypeList = value; }
+  void setTransportationTypeList(FOMStringTransportationTypeList&& value) noexcept
+  { getImpl()._transportationTypeList = std::move(value); }
+  FOMStringTransportationTypeList& getTransportationTypeList() noexcept
+  { return getImpl()._transportationTypeList; }
+  const FOMStringTransportationTypeList& getTransportationTypeList() const noexcept
+  { return getConstImpl()._transportationTypeList; }
 
-  FOMTransportationType& swap(FOMTransportationType& rhs)
+  void setDimensionList(const FOMStringDimensionList& value) noexcept
+  { getImpl()._dimensionList = value; }
+  void setDimensionList(FOMStringDimensionList&& value) noexcept
+  { getImpl()._dimensionList = std::move(value); }
+  FOMStringDimensionList& getDimensionList() noexcept
+  { return getImpl()._dimensionList; }
+  const FOMStringDimensionList& getDimensionList() const noexcept
+  { return getConstImpl()._dimensionList; }
+
+  void setRoutingSpaceList(const FOMStringRoutingSpaceList& value) noexcept
+  { getImpl()._routingSpaceList = value; }
+  void setRoutingSpaceList(FOMStringRoutingSpaceList&& value) noexcept
+  { getImpl()._routingSpaceList = std::move(value); }
+  FOMStringRoutingSpaceList& getRoutingSpaceList() noexcept
+  { return getImpl()._routingSpaceList; }
+  const FOMStringRoutingSpaceList& getRoutingSpaceList() const noexcept
+  { return getConstImpl()._routingSpaceList; }
+
+  void setInteractionClassList(const FOMStringInteractionClassList& value) noexcept
+  { getImpl()._interactionClassList = value; }
+  void setInteractionClassList(FOMStringInteractionClassList&& value) noexcept
+  { getImpl()._interactionClassList = std::move(value); }
+  FOMStringInteractionClassList& getInteractionClassList() noexcept
+  { return getImpl()._interactionClassList; }
+  const FOMStringInteractionClassList& getInteractionClassList() const noexcept
+  { return getConstImpl()._interactionClassList; }
+
+  void setObjectClassList(const FOMStringObjectClassList& value) noexcept
+  { getImpl()._objectClassList = value; }
+  void setObjectClassList(FOMStringObjectClassList&& value) noexcept
+  { getImpl()._objectClassList = std::move(value); }
+  FOMStringObjectClassList& getObjectClassList() noexcept
+  { return getImpl()._objectClassList; }
+  const FOMStringObjectClassList& getObjectClassList() const noexcept
+  { return getConstImpl()._objectClassList; }
+
+  void setUpdateRateList(const FOMStringUpdateRateList& value) noexcept
+  { getImpl()._updateRateList = value; }
+  void setUpdateRateList(FOMStringUpdateRateList&& value) noexcept
+  { getImpl()._updateRateList = std::move(value); }
+  FOMStringUpdateRateList& getUpdateRateList() noexcept
+  { return getImpl()._updateRateList; }
+  const FOMStringUpdateRateList& getUpdateRateList() const noexcept
+  { return getConstImpl()._updateRateList; }
+
+  void setSwitchList(const FOMStringSwitchList& value) noexcept
+  { getImpl()._switchList = value; }
+  void setSwitchList(FOMStringSwitchList&& value) noexcept
+  { getImpl()._switchList = std::move(value); }
+  FOMStringSwitchList& getSwitchList() noexcept
+  { return getImpl()._switchList; }
+  const FOMStringSwitchList& getSwitchList() const noexcept
+  { return getConstImpl()._switchList; }
+
+  void setBasicDataTypeList(const FOMStringBasicDataTypeList& value) noexcept
+  { getImpl()._basicDataTypeList = value; }
+  void setBasicDataTypeList(FOMStringBasicDataTypeList&& value) noexcept
+  { getImpl()._basicDataTypeList = std::move(value); }
+  FOMStringBasicDataTypeList& getBasicDataTypeList() noexcept
+  { return getImpl()._basicDataTypeList; }
+  const FOMStringBasicDataTypeList& getBasicDataTypeList() const noexcept
+  { return getConstImpl()._basicDataTypeList; }
+
+  void setSimpleDataTypeList(const FOMStringSimpleDataTypeList& value) noexcept
+  { getImpl()._simpleDataTypeList = value; }
+  void setSimpleDataTypeList(FOMStringSimpleDataTypeList&& value) noexcept
+  { getImpl()._simpleDataTypeList = std::move(value); }
+  FOMStringSimpleDataTypeList& getSimpleDataTypeList() noexcept
+  { return getImpl()._simpleDataTypeList; }
+  const FOMStringSimpleDataTypeList& getSimpleDataTypeList() const noexcept
+  { return getConstImpl()._simpleDataTypeList; }
+
+  void setEnumeratedDataTypeList(const FOMStringEnumeratedDataTypeList& value) noexcept
+  { getImpl()._enumeratedDataTypeList = value; }
+  void setEnumeratedDataTypeList(FOMStringEnumeratedDataTypeList&& value) noexcept
+  { getImpl()._enumeratedDataTypeList = std::move(value); }
+  FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() noexcept
+  { return getImpl()._enumeratedDataTypeList; }
+  const FOMStringEnumeratedDataTypeList& getEnumeratedDataTypeList() const noexcept
+  { return getConstImpl()._enumeratedDataTypeList; }
+
+  void setArrayDataTypeList(const FOMStringArrayDataType2List& value) noexcept
+  { getImpl()._arrayDataTypeList = value; }
+  void setArrayDataTypeList(FOMStringArrayDataType2List&& value) noexcept
+  { getImpl()._arrayDataTypeList = std::move(value); }
+  FOMStringArrayDataType2List& getArrayDataTypeList() noexcept
+  { return getImpl()._arrayDataTypeList; }
+  const FOMStringArrayDataType2List& getArrayDataTypeList() const noexcept
+  { return getConstImpl()._arrayDataTypeList; }
+
+  void setFixedRecordDataTypeList(const FOMStringFixedRecordDataType2List& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = value; }
+  void setFixedRecordDataTypeList(FOMStringFixedRecordDataType2List&& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = std::move(value); }
+  FOMStringFixedRecordDataType2List& getFixedRecordDataTypeList() noexcept
+  { return getImpl()._fixedRecordDataTypeList; }
+  const FOMStringFixedRecordDataType2List& getFixedRecordDataTypeList() const noexcept
+  { return getConstImpl()._fixedRecordDataTypeList; }
+
+  void setVariantRecordDataTypeList(const FOMStringVariantRecordDataType2List& value) noexcept
+  { getImpl()._variantRecordDataTypeList = value; }
+  void setVariantRecordDataTypeList(FOMStringVariantRecordDataType2List&& value) noexcept
+  { getImpl()._variantRecordDataTypeList = std::move(value); }
+  FOMStringVariantRecordDataType2List& getVariantRecordDataTypeList() noexcept
+  { return getImpl()._variantRecordDataTypeList; }
+  const FOMStringVariantRecordDataType2List& getVariantRecordDataTypeList() const noexcept
+  { return getConstImpl()._variantRecordDataTypeList; }
+
+  void setArtificialInteractionRoot(const Bool& value) noexcept
+  { getImpl()._artificialInteractionRoot = value; }
+  void setArtificialInteractionRoot(Bool&& value) noexcept
+  { getImpl()._artificialInteractionRoot = std::move(value); }
+  Bool& getArtificialInteractionRoot() noexcept
+  { return getImpl()._artificialInteractionRoot; }
+  const Bool& getArtificialInteractionRoot() const noexcept
+  { return getConstImpl()._artificialInteractionRoot; }
+
+  void setArtificialObjectRoot(const Bool& value) noexcept
+  { getImpl()._artificialObjectRoot = value; }
+  void setArtificialObjectRoot(Bool&& value) noexcept
+  { getImpl()._artificialObjectRoot = std::move(value); }
+  Bool& getArtificialObjectRoot() noexcept
+  { return getImpl()._artificialObjectRoot; }
+  const Bool& getArtificialObjectRoot() const noexcept
+  { return getConstImpl()._artificialObjectRoot; }
+
+  FOMStringModule2& swap(FOMStringModule2& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMTransportationType& rhs) const
+  bool operator==(const FOMStringModule2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getDesignator() != rhs.getDesignator()) return false;
+    if (getTransportationTypeList() != rhs.getTransportationTypeList()) return false;
+    if (getDimensionList() != rhs.getDimensionList()) return false;
+    if (getRoutingSpaceList() != rhs.getRoutingSpaceList()) return false;
+    if (getInteractionClassList() != rhs.getInteractionClassList()) return false;
+    if (getObjectClassList() != rhs.getObjectClassList()) return false;
+    if (getUpdateRateList() != rhs.getUpdateRateList()) return false;
+    if (getSwitchList() != rhs.getSwitchList()) return false;
+    if (getBasicDataTypeList() != rhs.getBasicDataTypeList()) return false;
+    if (getSimpleDataTypeList() != rhs.getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() != rhs.getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() != rhs.getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() != rhs.getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() != rhs.getVariantRecordDataTypeList()) return false;
+    if (getArtificialInteractionRoot() != rhs.getArtificialInteractionRoot()) return false;
+    if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
+    return true;
+  }
+  bool operator<(const FOMStringModule2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getDesignator() < rhs.getDesignator()) return true;
+    if (rhs.getDesignator() < getDesignator()) return false;
+    if (getTransportationTypeList() < rhs.getTransportationTypeList()) return true;
+    if (rhs.getTransportationTypeList() < getTransportationTypeList()) return false;
+    if (getDimensionList() < rhs.getDimensionList()) return true;
+    if (rhs.getDimensionList() < getDimensionList()) return false;
+    if (getRoutingSpaceList() < rhs.getRoutingSpaceList()) return true;
+    if (rhs.getRoutingSpaceList() < getRoutingSpaceList()) return false;
+    if (getInteractionClassList() < rhs.getInteractionClassList()) return true;
+    if (rhs.getInteractionClassList() < getInteractionClassList()) return false;
+    if (getObjectClassList() < rhs.getObjectClassList()) return true;
+    if (rhs.getObjectClassList() < getObjectClassList()) return false;
+    if (getUpdateRateList() < rhs.getUpdateRateList()) return true;
+    if (rhs.getUpdateRateList() < getUpdateRateList()) return false;
+    if (getSwitchList() < rhs.getSwitchList()) return true;
+    if (rhs.getSwitchList() < getSwitchList()) return false;
+    if (getBasicDataTypeList() < rhs.getBasicDataTypeList()) return true;
+    if (rhs.getBasicDataTypeList() < getBasicDataTypeList()) return false;
+    if (getSimpleDataTypeList() < rhs.getSimpleDataTypeList()) return true;
+    if (rhs.getSimpleDataTypeList() < getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() < rhs.getEnumeratedDataTypeList()) return true;
+    if (rhs.getEnumeratedDataTypeList() < getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() < rhs.getArrayDataTypeList()) return true;
+    if (rhs.getArrayDataTypeList() < getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() < rhs.getFixedRecordDataTypeList()) return true;
+    if (rhs.getFixedRecordDataTypeList() < getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() < rhs.getVariantRecordDataTypeList()) return true;
+    if (rhs.getVariantRecordDataTypeList() < getVariantRecordDataTypeList()) return false;
+    if (getArtificialInteractionRoot() < rhs.getArtificialInteractionRoot()) return true;
+    if (rhs.getArtificialInteractionRoot() < getArtificialInteractionRoot()) return false;
+    if (getArtificialObjectRoot() < rhs.getArtificialObjectRoot()) return true;
+    if (rhs.getArtificialObjectRoot() < getArtificialObjectRoot()) return false;
+    return false;
+  }
+  bool operator>(const FOMStringModule2& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMStringModule2& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMStringModule2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _designator(),
+      _transportationTypeList(),
+      _dimensionList(),
+      _routingSpaceList(),
+      _interactionClassList(),
+      _objectClassList(),
+      _updateRateList(),
+      _switchList(),
+      _basicDataTypeList(),
+      _simpleDataTypeList(),
+      _enumeratedDataTypeList(),
+      _arrayDataTypeList(),
+      _fixedRecordDataTypeList(),
+      _variantRecordDataTypeList(),
+      _artificialInteractionRoot(),
+      _artificialObjectRoot()
+    { }
+    String _designator;
+    FOMStringTransportationTypeList _transportationTypeList;
+    FOMStringDimensionList _dimensionList;
+    FOMStringRoutingSpaceList _routingSpaceList;
+    FOMStringInteractionClassList _interactionClassList;
+    FOMStringObjectClassList _objectClassList;
+    FOMStringUpdateRateList _updateRateList;
+    FOMStringSwitchList _switchList;
+    FOMStringBasicDataTypeList _basicDataTypeList;
+    FOMStringSimpleDataTypeList _simpleDataTypeList;
+    FOMStringEnumeratedDataTypeList _enumeratedDataTypeList;
+    FOMStringArrayDataType2List _arrayDataTypeList;
+    FOMStringFixedRecordDataType2List _fixedRecordDataTypeList;
+    FOMStringVariantRecordDataType2List _variantRecordDataTypeList;
+    Bool _artificialInteractionRoot = false;
+    Bool _artificialObjectRoot = false;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMStringModule2> FOMStringModule2List;
+
+class OPENRTI_API FOMTransportationType {
+public:
+  FOMTransportationType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMTransportationType(const FOMTransportationType&) = default;
+  FOMTransportationType(FOMTransportationType&&) = default;
+  virtual ~FOMTransportationType() noexcept = default;
+  FOMTransportationType& operator=(const FOMTransportationType&) = default;
+  FOMTransportationType& operator=(FOMTransportationType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setTransportationType(const TransportationType& value) noexcept
+  { getImpl()._transportationType = value; }
+  void setTransportationType(TransportationType&& value) noexcept
+  { getImpl()._transportationType = std::move(value); }
+  TransportationType& getTransportationType() noexcept
+  { return getImpl()._transportationType; }
+  const TransportationType& getTransportationType() const noexcept
+  { return getConstImpl()._transportationType; }
+
+  FOMTransportationType& swap(FOMTransportationType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMTransportationType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1826,7 +3732,7 @@ public:
     if (getTransportationType() != rhs.getTransportationType()) return false;
     return true;
   }
-  bool operator<(const FOMTransportationType& rhs) const
+  bool operator<(const FOMTransportationType& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1836,22 +3742,20 @@ public:
     if (rhs.getTransportationType() < getTransportationType()) return false;
     return false;
   }
-  bool operator!=(const FOMTransportationType& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMTransportationType& rhs) const
+  bool operator>(const FOMTransportationType& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMTransportationType& rhs) const
+  bool operator>=(const FOMTransportationType& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMTransportationType& rhs) const
+  bool operator<=(const FOMTransportationType& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _transportationType()
     { }
     String _name;
-    TransportationType _transportationType;
+    TransportationType _transportationType = RELIABLE;
   };
 
   const Implementation& getConstImpl() const
@@ -1862,7 +3766,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1873,48 +3777,47 @@ typedef std::vector<FOMTransportationType> FOMTransportationTypeList;
 
 class OPENRTI_API FOMDimension {
 public:
-  FOMDimension() : 
-    _impl(new Implementation())
+  FOMDimension() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMDimension(const FOMDimension&) = default;
+  FOMDimension(FOMDimension&&) = default;
+  virtual ~FOMDimension() noexcept = default;
+  FOMDimension& operator=(const FOMDimension&) = default;
+  FOMDimension& operator=(FOMDimension&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setDimensionHandle(const DimensionHandle& value)
+  void setDimensionHandle(const DimensionHandle& value) noexcept
   { getImpl()._dimensionHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionHandle(DimensionHandle&& value)
+  void setDimensionHandle(DimensionHandle&& value) noexcept
   { getImpl()._dimensionHandle = std::move(value); }
-#endif
-  DimensionHandle& getDimensionHandle()
+  DimensionHandle& getDimensionHandle() noexcept
   { return getImpl()._dimensionHandle; }
-  const DimensionHandle& getDimensionHandle() const
+  const DimensionHandle& getDimensionHandle() const noexcept
   { return getConstImpl()._dimensionHandle; }
 
-  void setUpperBound(const Unsigned& value)
+  void setUpperBound(const Unsigned& value) noexcept
   { getImpl()._upperBound = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpperBound(Unsigned&& value)
+  void setUpperBound(Unsigned&& value) noexcept
   { getImpl()._upperBound = std::move(value); }
-#endif
-  Unsigned& getUpperBound()
+  Unsigned& getUpperBound() noexcept
   { return getImpl()._upperBound; }
-  const Unsigned& getUpperBound() const
+  const Unsigned& getUpperBound() const noexcept
   { return getConstImpl()._upperBound; }
 
-  FOMDimension& swap(FOMDimension& rhs)
+  FOMDimension& swap(FOMDimension& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMDimension& rhs) const
+  bool operator==(const FOMDimension& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -1923,7 +3826,7 @@ public:
     if (getUpperBound() != rhs.getUpperBound()) return false;
     return true;
   }
-  bool operator<(const FOMDimension& rhs) const
+  bool operator<(const FOMDimension& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -1935,24 +3838,22 @@ public:
     if (rhs.getUpperBound() < getUpperBound()) return false;
     return false;
   }
-  bool operator!=(const FOMDimension& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMDimension& rhs) const
+  bool operator>(const FOMDimension& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMDimension& rhs) const
+  bool operator>=(const FOMDimension& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMDimension& rhs) const
+  bool operator<=(const FOMDimension& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _dimensionHandle(),
       _upperBound()
     { }
     String _name;
     DimensionHandle _dimensionHandle;
-    Unsigned _upperBound;
+    Unsigned _upperBound = 0;
   };
 
   const Implementation& getConstImpl() const
@@ -1963,7 +3864,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -1974,48 +3875,47 @@ typedef std::vector<FOMDimension> FOMDimensionList;
 
 class OPENRTI_API FOMRoutingSpace {
 public:
-  FOMRoutingSpace() : 
-    _impl(new Implementation())
+  FOMRoutingSpace() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMRoutingSpace(const FOMRoutingSpace&) = default;
+  FOMRoutingSpace(FOMRoutingSpace&&) = default;
+  virtual ~FOMRoutingSpace() noexcept = default;
+  FOMRoutingSpace& operator=(const FOMRoutingSpace&) = default;
+  FOMRoutingSpace& operator=(FOMRoutingSpace&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setSpaceHandle(const SpaceHandle& value)
+  void setSpaceHandle(const SpaceHandle& value) noexcept
   { getImpl()._spaceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSpaceHandle(SpaceHandle&& value)
+  void setSpaceHandle(SpaceHandle&& value) noexcept
   { getImpl()._spaceHandle = std::move(value); }
-#endif
-  SpaceHandle& getSpaceHandle()
+  SpaceHandle& getSpaceHandle() noexcept
   { return getImpl()._spaceHandle; }
-  const SpaceHandle& getSpaceHandle() const
+  const SpaceHandle& getSpaceHandle() const noexcept
   { return getConstImpl()._spaceHandle; }
 
-  void setDimensionHandleSet(const DimensionHandleSet& value)
+  void setDimensionHandleSet(const DimensionHandleSet& value) noexcept
   { getImpl()._dimensionHandleSet = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionHandleSet(DimensionHandleSet&& value)
+  void setDimensionHandleSet(DimensionHandleSet&& value) noexcept
   { getImpl()._dimensionHandleSet = std::move(value); }
-#endif
-  DimensionHandleSet& getDimensionHandleSet()
+  DimensionHandleSet& getDimensionHandleSet() noexcept
   { return getImpl()._dimensionHandleSet; }
-  const DimensionHandleSet& getDimensionHandleSet() const
+  const DimensionHandleSet& getDimensionHandleSet() const noexcept
   { return getConstImpl()._dimensionHandleSet; }
 
-  FOMRoutingSpace& swap(FOMRoutingSpace& rhs)
+  FOMRoutingSpace& swap(FOMRoutingSpace& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMRoutingSpace& rhs) const
+  bool operator==(const FOMRoutingSpace& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2024,7 +3924,7 @@ public:
     if (getDimensionHandleSet() != rhs.getDimensionHandleSet()) return false;
     return true;
   }
-  bool operator<(const FOMRoutingSpace& rhs) const
+  bool operator<(const FOMRoutingSpace& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2036,17 +3936,15 @@ public:
     if (rhs.getDimensionHandleSet() < getDimensionHandleSet()) return false;
     return false;
   }
-  bool operator!=(const FOMRoutingSpace& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMRoutingSpace& rhs) const
+  bool operator>(const FOMRoutingSpace& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMRoutingSpace& rhs) const
+  bool operator>=(const FOMRoutingSpace& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMRoutingSpace& rhs) const
+  bool operator<=(const FOMRoutingSpace& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _spaceHandle(),
       _dimensionHandleSet()
@@ -2064,7 +3962,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2075,69 +3973,82 @@ typedef std::vector<FOMRoutingSpace> FOMRoutingSpaceList;
 
 class OPENRTI_API FOMParameter {
 public:
-  FOMParameter() : 
-    _impl(new Implementation())
+  FOMParameter() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMParameter(const FOMParameter&) = default;
+  FOMParameter(FOMParameter&&) = default;
+  virtual ~FOMParameter() noexcept = default;
+  FOMParameter& operator=(const FOMParameter&) = default;
+  FOMParameter& operator=(FOMParameter&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setParameterHandle(const ParameterHandle& value)
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setParameterHandle(const ParameterHandle& value) noexcept
   { getImpl()._parameterHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterHandle(ParameterHandle&& value)
+  void setParameterHandle(ParameterHandle&& value) noexcept
   { getImpl()._parameterHandle = std::move(value); }
-#endif
-  ParameterHandle& getParameterHandle()
+  ParameterHandle& getParameterHandle() noexcept
   { return getImpl()._parameterHandle; }
-  const ParameterHandle& getParameterHandle() const
+  const ParameterHandle& getParameterHandle() const noexcept
   { return getConstImpl()._parameterHandle; }
 
-  FOMParameter& swap(FOMParameter& rhs)
+  FOMParameter& swap(FOMParameter& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMParameter& rhs) const
+  bool operator==(const FOMParameter& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
     if (getParameterHandle() != rhs.getParameterHandle()) return false;
     return true;
   }
-  bool operator<(const FOMParameter& rhs) const
+  bool operator<(const FOMParameter& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
     if (getName() < rhs.getName()) return true;
     if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
     if (getParameterHandle() < rhs.getParameterHandle()) return true;
     if (rhs.getParameterHandle() < getParameterHandle()) return false;
     return false;
   }
-  bool operator!=(const FOMParameter& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMParameter& rhs) const
+  bool operator>(const FOMParameter& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMParameter& rhs) const
+  bool operator>=(const FOMParameter& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMParameter& rhs) const
+  bool operator<=(const FOMParameter& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
+      _dataType(),
       _parameterHandle()
     { }
     String _name;
+    String _dataType;
     ParameterHandle _parameterHandle;
   };
 
@@ -2149,7 +4060,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2160,92 +4071,83 @@ typedef std::vector<FOMParameter> FOMParameterList;
 
 class OPENRTI_API FOMInteractionClass {
 public:
-  FOMInteractionClass() : 
-    _impl(new Implementation())
+  FOMInteractionClass() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMInteractionClass(const FOMInteractionClass&) = default;
+  FOMInteractionClass(FOMInteractionClass&&) = default;
+  virtual ~FOMInteractionClass() noexcept = default;
+  FOMInteractionClass& operator=(const FOMInteractionClass&) = default;
+  FOMInteractionClass& operator=(FOMInteractionClass&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { getImpl()._interactionClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { getImpl()._interactionClassHandle = std::move(value); }
-#endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return getImpl()._interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return getConstImpl()._interactionClassHandle; }
 
-  void setParentInteractionClassHandle(const InteractionClassHandle& value)
+  void setParentInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { getImpl()._parentInteractionClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParentInteractionClassHandle(InteractionClassHandle&& value)
+  void setParentInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { getImpl()._parentInteractionClassHandle = std::move(value); }
-#endif
-  InteractionClassHandle& getParentInteractionClassHandle()
+  InteractionClassHandle& getParentInteractionClassHandle() noexcept
   { return getImpl()._parentInteractionClassHandle; }
-  const InteractionClassHandle& getParentInteractionClassHandle() const
+  const InteractionClassHandle& getParentInteractionClassHandle() const noexcept
   { return getConstImpl()._parentInteractionClassHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { getImpl()._orderType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { getImpl()._orderType = std::move(value); }
-#endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return getImpl()._orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return getConstImpl()._orderType; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { getImpl()._transportationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { getImpl()._transportationType = std::move(value); }
-#endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return getImpl()._transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return getConstImpl()._transportationType; }
 
-  void setDimensionHandleSet(const DimensionHandleSet& value)
+  void setDimensionHandleSet(const DimensionHandleSet& value) noexcept
   { getImpl()._dimensionHandleSet = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionHandleSet(DimensionHandleSet&& value)
+  void setDimensionHandleSet(DimensionHandleSet&& value) noexcept
   { getImpl()._dimensionHandleSet = std::move(value); }
-#endif
-  DimensionHandleSet& getDimensionHandleSet()
+  DimensionHandleSet& getDimensionHandleSet() noexcept
   { return getImpl()._dimensionHandleSet; }
-  const DimensionHandleSet& getDimensionHandleSet() const
+  const DimensionHandleSet& getDimensionHandleSet() const noexcept
   { return getConstImpl()._dimensionHandleSet; }
 
-  void setParameterList(const FOMParameterList& value)
+  void setParameterList(const FOMParameterList& value) noexcept
   { getImpl()._parameterList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterList(FOMParameterList&& value)
+  void setParameterList(FOMParameterList&& value) noexcept
   { getImpl()._parameterList = std::move(value); }
-#endif
-  FOMParameterList& getParameterList()
+  FOMParameterList& getParameterList() noexcept
   { return getImpl()._parameterList; }
-  const FOMParameterList& getParameterList() const
+  const FOMParameterList& getParameterList() const noexcept
   { return getConstImpl()._parameterList; }
 
-  FOMInteractionClass& swap(FOMInteractionClass& rhs)
+  FOMInteractionClass& swap(FOMInteractionClass& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMInteractionClass& rhs) const
+  bool operator==(const FOMInteractionClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2258,7 +4160,7 @@ public:
     if (getParameterList() != rhs.getParameterList()) return false;
     return true;
   }
-  bool operator<(const FOMInteractionClass& rhs) const
+  bool operator<(const FOMInteractionClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2278,17 +4180,15 @@ public:
     if (rhs.getParameterList() < getParameterList()) return false;
     return false;
   }
-  bool operator!=(const FOMInteractionClass& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMInteractionClass& rhs) const
+  bool operator>(const FOMInteractionClass& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMInteractionClass& rhs) const
+  bool operator>=(const FOMInteractionClass& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMInteractionClass& rhs) const
+  bool operator<=(const FOMInteractionClass& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _interactionClassHandle(),
       _parentInteractionClassHandle(),
@@ -2300,8 +4200,8 @@ private:
     String _name;
     InteractionClassHandle _interactionClassHandle;
     InteractionClassHandle _parentInteractionClassHandle;
-    OrderType _orderType;
-    TransportationType _transportationType;
+    OrderType _orderType = RECEIVE;
+    TransportationType _transportationType = RELIABLE;
     DimensionHandleSet _dimensionHandleSet;
     FOMParameterList _parameterList;
   };
@@ -2314,7 +4214,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2325,86 +4225,93 @@ typedef std::vector<FOMInteractionClass> FOMInteractionClassList;
 
 class OPENRTI_API FOMAttribute {
 public:
-  FOMAttribute() : 
-    _impl(new Implementation())
+  FOMAttribute() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMAttribute(const FOMAttribute&) = default;
+  FOMAttribute(FOMAttribute&&) = default;
+  virtual ~FOMAttribute() noexcept = default;
+  FOMAttribute& operator=(const FOMAttribute&) = default;
+  FOMAttribute& operator=(FOMAttribute&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setAttributeHandle(const AttributeHandle& value)
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setAttributeHandle(const AttributeHandle& value) noexcept
   { getImpl()._attributeHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandle(AttributeHandle&& value)
+  void setAttributeHandle(AttributeHandle&& value) noexcept
   { getImpl()._attributeHandle = std::move(value); }
-#endif
-  AttributeHandle& getAttributeHandle()
+  AttributeHandle& getAttributeHandle() noexcept
   { return getImpl()._attributeHandle; }
-  const AttributeHandle& getAttributeHandle() const
+  const AttributeHandle& getAttributeHandle() const noexcept
   { return getConstImpl()._attributeHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { getImpl()._orderType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { getImpl()._orderType = std::move(value); }
-#endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return getImpl()._orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return getConstImpl()._orderType; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { getImpl()._transportationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { getImpl()._transportationType = std::move(value); }
-#endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return getImpl()._transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return getConstImpl()._transportationType; }
 
-  void setDimensionHandleSet(const DimensionHandleSet& value)
+  void setDimensionHandleSet(const DimensionHandleSet& value) noexcept
   { getImpl()._dimensionHandleSet = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionHandleSet(DimensionHandleSet&& value)
+  void setDimensionHandleSet(DimensionHandleSet&& value) noexcept
   { getImpl()._dimensionHandleSet = std::move(value); }
-#endif
-  DimensionHandleSet& getDimensionHandleSet()
+  DimensionHandleSet& getDimensionHandleSet() noexcept
   { return getImpl()._dimensionHandleSet; }
-  const DimensionHandleSet& getDimensionHandleSet() const
+  const DimensionHandleSet& getDimensionHandleSet() const noexcept
   { return getConstImpl()._dimensionHandleSet; }
 
-  FOMAttribute& swap(FOMAttribute& rhs)
+  FOMAttribute& swap(FOMAttribute& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMAttribute& rhs) const
+  bool operator==(const FOMAttribute& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
     if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
     if (getAttributeHandle() != rhs.getAttributeHandle()) return false;
     if (getOrderType() != rhs.getOrderType()) return false;
     if (getTransportationType() != rhs.getTransportationType()) return false;
     if (getDimensionHandleSet() != rhs.getDimensionHandleSet()) return false;
     return true;
   }
-  bool operator<(const FOMAttribute& rhs) const
+  bool operator<(const FOMAttribute& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
     if (getName() < rhs.getName()) return true;
     if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
     if (getAttributeHandle() < rhs.getAttributeHandle()) return true;
     if (rhs.getAttributeHandle() < getAttributeHandle()) return false;
     if (getOrderType() < rhs.getOrderType()) return true;
@@ -2415,27 +4322,27 @@ public:
     if (rhs.getDimensionHandleSet() < getDimensionHandleSet()) return false;
     return false;
   }
-  bool operator!=(const FOMAttribute& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMAttribute& rhs) const
+  bool operator>(const FOMAttribute& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMAttribute& rhs) const
+  bool operator>=(const FOMAttribute& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMAttribute& rhs) const
+  bool operator<=(const FOMAttribute& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
+      _dataType(),
       _attributeHandle(),
       _orderType(),
       _transportationType(),
       _dimensionHandleSet()
     { }
     String _name;
+    String _dataType;
     AttributeHandle _attributeHandle;
-    OrderType _orderType;
-    TransportationType _transportationType;
+    OrderType _orderType = RECEIVE;
+    TransportationType _transportationType = RELIABLE;
     DimensionHandleSet _dimensionHandleSet;
   };
 
@@ -2447,7 +4354,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2458,59 +4365,56 @@ typedef std::vector<FOMAttribute> FOMAttributeList;
 
 class OPENRTI_API FOMObjectClass {
 public:
-  FOMObjectClass() : 
-    _impl(new Implementation())
+  FOMObjectClass() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMObjectClass(const FOMObjectClass&) = default;
+  FOMObjectClass(FOMObjectClass&&) = default;
+  virtual ~FOMObjectClass() noexcept = default;
+  FOMObjectClass& operator=(const FOMObjectClass&) = default;
+  FOMObjectClass& operator=(FOMObjectClass&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { getImpl()._objectClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { getImpl()._objectClassHandle = std::move(value); }
-#endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return getImpl()._objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return getConstImpl()._objectClassHandle; }
 
-  void setParentObjectClassHandle(const ObjectClassHandle& value)
+  void setParentObjectClassHandle(const ObjectClassHandle& value) noexcept
   { getImpl()._parentObjectClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParentObjectClassHandle(ObjectClassHandle&& value)
+  void setParentObjectClassHandle(ObjectClassHandle&& value) noexcept
   { getImpl()._parentObjectClassHandle = std::move(value); }
-#endif
-  ObjectClassHandle& getParentObjectClassHandle()
+  ObjectClassHandle& getParentObjectClassHandle() noexcept
   { return getImpl()._parentObjectClassHandle; }
-  const ObjectClassHandle& getParentObjectClassHandle() const
+  const ObjectClassHandle& getParentObjectClassHandle() const noexcept
   { return getConstImpl()._parentObjectClassHandle; }
 
-  void setAttributeList(const FOMAttributeList& value)
+  void setAttributeList(const FOMAttributeList& value) noexcept
   { getImpl()._attributeList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeList(FOMAttributeList&& value)
+  void setAttributeList(FOMAttributeList&& value) noexcept
   { getImpl()._attributeList = std::move(value); }
-#endif
-  FOMAttributeList& getAttributeList()
+  FOMAttributeList& getAttributeList() noexcept
   { return getImpl()._attributeList; }
-  const FOMAttributeList& getAttributeList() const
+  const FOMAttributeList& getAttributeList() const noexcept
   { return getConstImpl()._attributeList; }
 
-  FOMObjectClass& swap(FOMObjectClass& rhs)
+  FOMObjectClass& swap(FOMObjectClass& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMObjectClass& rhs) const
+  bool operator==(const FOMObjectClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2520,7 +4424,7 @@ public:
     if (getAttributeList() != rhs.getAttributeList()) return false;
     return true;
   }
-  bool operator<(const FOMObjectClass& rhs) const
+  bool operator<(const FOMObjectClass& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2534,17 +4438,15 @@ public:
     if (rhs.getAttributeList() < getAttributeList()) return false;
     return false;
   }
-  bool operator!=(const FOMObjectClass& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMObjectClass& rhs) const
+  bool operator>(const FOMObjectClass& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMObjectClass& rhs) const
+  bool operator>=(const FOMObjectClass& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMObjectClass& rhs) const
+  bool operator<=(const FOMObjectClass& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _objectClassHandle(),
       _parentObjectClassHandle(),
@@ -2564,7 +4466,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2575,48 +4477,47 @@ typedef std::vector<FOMObjectClass> FOMObjectClassList;
 
 class OPENRTI_API FOMUpdateRate {
 public:
-  FOMUpdateRate() : 
-    _impl(new Implementation())
+  FOMUpdateRate() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setName(const String& value)
+  FOMUpdateRate(const FOMUpdateRate&) = default;
+  FOMUpdateRate(FOMUpdateRate&&) = default;
+  virtual ~FOMUpdateRate() noexcept = default;
+  FOMUpdateRate& operator=(const FOMUpdateRate&) = default;
+  FOMUpdateRate& operator=(FOMUpdateRate&&) = default;
+  void setName(const String& value) noexcept
   { getImpl()._name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { getImpl()._name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return getImpl()._name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return getConstImpl()._name; }
 
-  void setUpdateRateHandle(const UpdateRateHandle& value)
+  void setUpdateRateHandle(const UpdateRateHandle& value) noexcept
   { getImpl()._updateRateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpdateRateHandle(UpdateRateHandle&& value)
+  void setUpdateRateHandle(UpdateRateHandle&& value) noexcept
   { getImpl()._updateRateHandle = std::move(value); }
-#endif
-  UpdateRateHandle& getUpdateRateHandle()
+  UpdateRateHandle& getUpdateRateHandle() noexcept
   { return getImpl()._updateRateHandle; }
-  const UpdateRateHandle& getUpdateRateHandle() const
+  const UpdateRateHandle& getUpdateRateHandle() const noexcept
   { return getConstImpl()._updateRateHandle; }
 
-  void setRate(const Double& value)
+  void setRate(const Double& value) noexcept
   { getImpl()._rate = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRate(Double&& value)
+  void setRate(Double&& value) noexcept
   { getImpl()._rate = std::move(value); }
-#endif
-  Double& getRate()
+  Double& getRate() noexcept
   { return getImpl()._rate; }
-  const Double& getRate() const
+  const Double& getRate() const noexcept
   { return getConstImpl()._rate; }
 
-  FOMUpdateRate& swap(FOMUpdateRate& rhs)
+  FOMUpdateRate& swap(FOMUpdateRate& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMUpdateRate& rhs) const
+  bool operator==(const FOMUpdateRate& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2625,7 +4526,7 @@ public:
     if (getRate() != rhs.getRate()) return false;
     return true;
   }
-  bool operator<(const FOMUpdateRate& rhs) const
+  bool operator<(const FOMUpdateRate& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2637,17 +4538,15 @@ public:
     if (rhs.getRate() < getRate()) return false;
     return false;
   }
-  bool operator!=(const FOMUpdateRate& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMUpdateRate& rhs) const
+  bool operator>(const FOMUpdateRate& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMUpdateRate& rhs) const
+  bool operator>=(const FOMUpdateRate& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMUpdateRate& rhs) const
+  bool operator<=(const FOMUpdateRate& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _name(),
       _updateRateHandle(),
       _rate()
@@ -2665,7 +4564,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2676,37 +4575,38 @@ typedef std::vector<FOMUpdateRate> FOMUpdateRateList;
 
 class OPENRTI_API FOMSwitch {
 public:
-  FOMSwitch() : 
-    _impl(new Implementation())
+  FOMSwitch() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setSwitchesType(const SwitchesType& value)
+  FOMSwitch(const FOMSwitch&) = default;
+  FOMSwitch(FOMSwitch&&) = default;
+  virtual ~FOMSwitch() noexcept = default;
+  FOMSwitch& operator=(const FOMSwitch&) = default;
+  FOMSwitch& operator=(FOMSwitch&&) = default;
+  void setSwitchesType(const SwitchesType& value) noexcept
   { getImpl()._switchesType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSwitchesType(SwitchesType&& value)
+  void setSwitchesType(SwitchesType&& value) noexcept
   { getImpl()._switchesType = std::move(value); }
-#endif
-  SwitchesType& getSwitchesType()
+  SwitchesType& getSwitchesType() noexcept
   { return getImpl()._switchesType; }
-  const SwitchesType& getSwitchesType() const
+  const SwitchesType& getSwitchesType() const noexcept
   { return getConstImpl()._switchesType; }
 
-  void setEnabled(const Bool& value)
+  void setEnabled(const Bool& value) noexcept
   { getImpl()._enabled = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setEnabled(Bool&& value)
+  void setEnabled(Bool&& value) noexcept
   { getImpl()._enabled = std::move(value); }
-#endif
-  Bool& getEnabled()
+  Bool& getEnabled() noexcept
   { return getImpl()._enabled; }
-  const Bool& getEnabled() const
+  const Bool& getEnabled() const noexcept
   { return getConstImpl()._enabled; }
 
-  FOMSwitch& swap(FOMSwitch& rhs)
+  FOMSwitch& swap(FOMSwitch& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMSwitch& rhs) const
+  bool operator==(const FOMSwitch& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2714,7 +4614,7 @@ public:
     if (getEnabled() != rhs.getEnabled()) return false;
     return true;
   }
-  bool operator<(const FOMSwitch& rhs) const
+  bool operator<(const FOMSwitch& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2724,22 +4624,20 @@ public:
     if (rhs.getEnabled() < getEnabled()) return false;
     return false;
   }
-  bool operator!=(const FOMSwitch& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMSwitch& rhs) const
+  bool operator>(const FOMSwitch& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMSwitch& rhs) const
+  bool operator>=(const FOMSwitch& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMSwitch& rhs) const
+  bool operator<=(const FOMSwitch& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _switchesType(),
       _enabled()
     { }
-    SwitchesType _switchesType;
-    Bool _enabled;
+    SwitchesType _switchesType = InteractionRelevanceAdvisorySwitchesType;
+    Bool _enabled = false;
   };
 
   const Implementation& getConstImpl() const
@@ -2750,7 +4648,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2759,138 +4657,1129 @@ private:
 
 typedef std::vector<FOMSwitch> FOMSwitchList;
 
-class OPENRTI_API FOMModule {
+class OPENRTI_API FOMBasicDataType {
 public:
-  FOMModule() : 
-    _impl(new Implementation())
+  FOMBasicDataType() noexcept
+   : _impl(MakeShared<Implementation>())
   { }
-  void setModuleHandle(const ModuleHandle& value)
-  { getImpl()._moduleHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setModuleHandle(ModuleHandle&& value)
-  { getImpl()._moduleHandle = std::move(value); }
-#endif
-  ModuleHandle& getModuleHandle()
-  { return getImpl()._moduleHandle; }
-  const ModuleHandle& getModuleHandle() const
-  { return getConstImpl()._moduleHandle; }
+  FOMBasicDataType(const FOMBasicDataType&) = default;
+  FOMBasicDataType(FOMBasicDataType&&) = default;
+  virtual ~FOMBasicDataType() noexcept = default;
+  FOMBasicDataType& operator=(const FOMBasicDataType&) = default;
+  FOMBasicDataType& operator=(FOMBasicDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
 
-  void setTransportationTypeList(const FOMTransportationTypeList& value)
-  { getImpl()._transportationTypeList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationTypeList(FOMTransportationTypeList&& value)
-  { getImpl()._transportationTypeList = std::move(value); }
-#endif
-  FOMTransportationTypeList& getTransportationTypeList()
-  { return getImpl()._transportationTypeList; }
-  const FOMTransportationTypeList& getTransportationTypeList() const
-  { return getConstImpl()._transportationTypeList; }
+  void setSize(const Unsigned& value) noexcept
+  { getImpl()._size = value; }
+  void setSize(Unsigned&& value) noexcept
+  { getImpl()._size = std::move(value); }
+  Unsigned& getSize() noexcept
+  { return getImpl()._size; }
+  const Unsigned& getSize() const noexcept
+  { return getConstImpl()._size; }
 
-  void setDimensionList(const FOMDimensionList& value)
-  { getImpl()._dimensionList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDimensionList(FOMDimensionList&& value)
-  { getImpl()._dimensionList = std::move(value); }
-#endif
-  FOMDimensionList& getDimensionList()
-  { return getImpl()._dimensionList; }
-  const FOMDimensionList& getDimensionList() const
-  { return getConstImpl()._dimensionList; }
+  void setEndian(const Endianness& value) noexcept
+  { getImpl()._endian = value; }
+  void setEndian(Endianness&& value) noexcept
+  { getImpl()._endian = std::move(value); }
+  Endianness& getEndian() noexcept
+  { return getImpl()._endian; }
+  const Endianness& getEndian() const noexcept
+  { return getConstImpl()._endian; }
 
-  void setRoutingSpaceList(const FOMRoutingSpaceList& value)
-  { getImpl()._routingSpaceList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRoutingSpaceList(FOMRoutingSpaceList&& value)
-  { getImpl()._routingSpaceList = std::move(value); }
-#endif
-  FOMRoutingSpaceList& getRoutingSpaceList()
-  { return getImpl()._routingSpaceList; }
-  const FOMRoutingSpaceList& getRoutingSpaceList() const
-  { return getConstImpl()._routingSpaceList; }
+  void setHandle(const BasicDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+  void setHandle(BasicDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+  BasicDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const BasicDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
 
-  void setInteractionClassList(const FOMInteractionClassList& value)
-  { getImpl()._interactionClassList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassList(FOMInteractionClassList&& value)
-  { getImpl()._interactionClassList = std::move(value); }
-#endif
-  FOMInteractionClassList& getInteractionClassList()
-  { return getImpl()._interactionClassList; }
-  const FOMInteractionClassList& getInteractionClassList() const
-  { return getConstImpl()._interactionClassList; }
-
-  void setObjectClassList(const FOMObjectClassList& value)
-  { getImpl()._objectClassList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassList(FOMObjectClassList&& value)
-  { getImpl()._objectClassList = std::move(value); }
-#endif
-  FOMObjectClassList& getObjectClassList()
-  { return getImpl()._objectClassList; }
-  const FOMObjectClassList& getObjectClassList() const
-  { return getConstImpl()._objectClassList; }
-
-  void setUpdateRateList(const FOMUpdateRateList& value)
-  { getImpl()._updateRateList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpdateRateList(FOMUpdateRateList&& value)
-  { getImpl()._updateRateList = std::move(value); }
-#endif
-  FOMUpdateRateList& getUpdateRateList()
-  { return getImpl()._updateRateList; }
-  const FOMUpdateRateList& getUpdateRateList() const
-  { return getConstImpl()._updateRateList; }
-
-  void setSwitchList(const FOMSwitchList& value)
-  { getImpl()._switchList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSwitchList(FOMSwitchList&& value)
-  { getImpl()._switchList = std::move(value); }
-#endif
-  FOMSwitchList& getSwitchList()
-  { return getImpl()._switchList; }
-  const FOMSwitchList& getSwitchList() const
-  { return getConstImpl()._switchList; }
-
-  void setArtificialInteractionRoot(const Bool& value)
-  { getImpl()._artificialInteractionRoot = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialInteractionRoot(Bool&& value)
-  { getImpl()._artificialInteractionRoot = std::move(value); }
-#endif
-  Bool& getArtificialInteractionRoot()
-  { return getImpl()._artificialInteractionRoot; }
-  const Bool& getArtificialInteractionRoot() const
-  { return getConstImpl()._artificialInteractionRoot; }
-
-  void setArtificialObjectRoot(const Bool& value)
-  { getImpl()._artificialObjectRoot = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setArtificialObjectRoot(Bool&& value)
-  { getImpl()._artificialObjectRoot = std::move(value); }
-#endif
-  Bool& getArtificialObjectRoot()
-  { return getImpl()._artificialObjectRoot; }
-  const Bool& getArtificialObjectRoot() const
-  { return getConstImpl()._artificialObjectRoot; }
-
-  void setContent(const String& value)
-  { getImpl()._content = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setContent(String&& value)
-  { getImpl()._content = std::move(value); }
-#endif
-  String& getContent()
-  { return getImpl()._content; }
-  const String& getContent() const
-  { return getConstImpl()._content; }
-
-  FOMModule& swap(FOMModule& rhs)
+  FOMBasicDataType& swap(FOMBasicDataType& rhs) noexcept
   {
     _impl.swap(rhs._impl);
     return *this;
   }
-  bool operator==(const FOMModule& rhs) const
+  bool operator==(const FOMBasicDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getSize() != rhs.getSize()) return false;
+    if (getEndian() != rhs.getEndian()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMBasicDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getSize() < rhs.getSize()) return true;
+    if (rhs.getSize() < getSize()) return false;
+    if (getEndian() < rhs.getEndian()) return true;
+    if (rhs.getEndian() < getEndian()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMBasicDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMBasicDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMBasicDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _size(),
+      _endian(),
+      _handle()
+    { }
+    String _name;
+    Unsigned _size = 0;
+    Endianness _endian = BigEndian;
+    BasicDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMBasicDataType> FOMBasicDataTypeList;
+
+class OPENRTI_API FOMSimpleDataType {
+public:
+  FOMSimpleDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMSimpleDataType(const FOMSimpleDataType&) = default;
+  FOMSimpleDataType(FOMSimpleDataType&&) = default;
+  virtual ~FOMSimpleDataType() noexcept = default;
+  FOMSimpleDataType& operator=(const FOMSimpleDataType&) = default;
+  FOMSimpleDataType& operator=(FOMSimpleDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setRepresentation(const String& value) noexcept
+  { getImpl()._representation = value; }
+  void setRepresentation(String&& value) noexcept
+  { getImpl()._representation = std::move(value); }
+  String& getRepresentation() noexcept
+  { return getImpl()._representation; }
+  const String& getRepresentation() const noexcept
+  { return getConstImpl()._representation; }
+
+  void setHandle(const SimpleDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+  void setHandle(SimpleDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+  SimpleDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const SimpleDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMSimpleDataType& swap(FOMSimpleDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMSimpleDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getRepresentation() != rhs.getRepresentation()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMSimpleDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getRepresentation() < rhs.getRepresentation()) return true;
+    if (rhs.getRepresentation() < getRepresentation()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMSimpleDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMSimpleDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMSimpleDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _representation(),
+      _handle()
+    { }
+    String _name;
+    String _representation;
+    SimpleDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMSimpleDataType> FOMSimpleDataTypeList;
+
+class OPENRTI_API FOMEnumerator {
+public:
+  FOMEnumerator() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMEnumerator(const FOMEnumerator&) = default;
+  FOMEnumerator(FOMEnumerator&&) = default;
+  virtual ~FOMEnumerator() noexcept = default;
+  FOMEnumerator& operator=(const FOMEnumerator&) = default;
+  FOMEnumerator& operator=(FOMEnumerator&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setValue(const Unsigned& value) noexcept
+  { getImpl()._value = value; }
+  void setValue(Unsigned&& value) noexcept
+  { getImpl()._value = std::move(value); }
+  Unsigned& getValue() noexcept
+  { return getImpl()._value; }
+  const Unsigned& getValue() const noexcept
+  { return getConstImpl()._value; }
+
+  FOMEnumerator& swap(FOMEnumerator& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMEnumerator& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getValue() != rhs.getValue()) return false;
+    return true;
+  }
+  bool operator<(const FOMEnumerator& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getValue() < rhs.getValue()) return true;
+    if (rhs.getValue() < getValue()) return false;
+    return false;
+  }
+  bool operator>(const FOMEnumerator& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMEnumerator& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMEnumerator& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _value()
+    { }
+    String _name;
+    Unsigned _value = 0;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMEnumerator> FOMEnumeratorList;
+
+class OPENRTI_API FOMEnumeratedDataType {
+public:
+  FOMEnumeratedDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMEnumeratedDataType(const FOMEnumeratedDataType&) = default;
+  FOMEnumeratedDataType(FOMEnumeratedDataType&&) = default;
+  virtual ~FOMEnumeratedDataType() noexcept = default;
+  FOMEnumeratedDataType& operator=(const FOMEnumeratedDataType&) = default;
+  FOMEnumeratedDataType& operator=(FOMEnumeratedDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setRepresentation(const String& value) noexcept
+  { getImpl()._representation = value; }
+  void setRepresentation(String&& value) noexcept
+  { getImpl()._representation = std::move(value); }
+  String& getRepresentation() noexcept
+  { return getImpl()._representation; }
+  const String& getRepresentation() const noexcept
+  { return getConstImpl()._representation; }
+
+  void setEnumerators(const FOMEnumeratorList& value) noexcept
+  { getImpl()._enumerators = value; }
+  void setEnumerators(FOMEnumeratorList&& value) noexcept
+  { getImpl()._enumerators = std::move(value); }
+  FOMEnumeratorList& getEnumerators() noexcept
+  { return getImpl()._enumerators; }
+  const FOMEnumeratorList& getEnumerators() const noexcept
+  { return getConstImpl()._enumerators; }
+
+  void setHandle(const EnumeratedDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+  void setHandle(EnumeratedDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+  EnumeratedDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const EnumeratedDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMEnumeratedDataType& swap(FOMEnumeratedDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMEnumeratedDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getRepresentation() != rhs.getRepresentation()) return false;
+    if (getEnumerators() != rhs.getEnumerators()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMEnumeratedDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getRepresentation() < rhs.getRepresentation()) return true;
+    if (rhs.getRepresentation() < getRepresentation()) return false;
+    if (getEnumerators() < rhs.getEnumerators()) return true;
+    if (rhs.getEnumerators() < getEnumerators()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMEnumeratedDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMEnumeratedDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMEnumeratedDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _representation(),
+      _enumerators(),
+      _handle()
+    { }
+    String _name;
+    String _representation;
+    FOMEnumeratorList _enumerators;
+    EnumeratedDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMEnumeratedDataType> FOMEnumeratedDataTypeList;
+
+class OPENRTI_API FOMArrayDataType {
+public:
+  FOMArrayDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMArrayDataType(const FOMArrayDataType&) = default;
+  FOMArrayDataType(FOMArrayDataType&&) = default;
+  virtual ~FOMArrayDataType() noexcept = default;
+  FOMArrayDataType& operator=(const FOMArrayDataType&) = default;
+  FOMArrayDataType& operator=(FOMArrayDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setCardinality(const String& value) noexcept
+  { getImpl()._cardinality = value; }
+  void setCardinality(String&& value) noexcept
+  { getImpl()._cardinality = std::move(value); }
+  String& getCardinality() noexcept
+  { return getImpl()._cardinality; }
+  const String& getCardinality() const noexcept
+  { return getConstImpl()._cardinality; }
+
+  void setEncoding(const ArrayDataTypeEncoding& value) noexcept
+  { getImpl()._encoding = value; }
+  void setEncoding(ArrayDataTypeEncoding&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+  ArrayDataTypeEncoding& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const ArrayDataTypeEncoding& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  void setHandle(const ArrayDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+  void setHandle(ArrayDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+  ArrayDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const ArrayDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMArrayDataType& swap(FOMArrayDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMArrayDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getCardinality() != rhs.getCardinality()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMArrayDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getCardinality() < rhs.getCardinality()) return true;
+    if (rhs.getCardinality() < getCardinality()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMArrayDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMArrayDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMArrayDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType(),
+      _cardinality(),
+      _encoding(),
+      _handle()
+    { }
+    String _name;
+    String _dataType;
+    String _cardinality;
+    ArrayDataTypeEncoding _encoding = FixedArrayDataTypeEncoding;
+    ArrayDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMArrayDataType> FOMArrayDataTypeList;
+
+class OPENRTI_API FOMFixedRecordField {
+public:
+  FOMFixedRecordField() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMFixedRecordField(const FOMFixedRecordField&) = default;
+  FOMFixedRecordField(FOMFixedRecordField&&) = default;
+  virtual ~FOMFixedRecordField() noexcept = default;
+  FOMFixedRecordField& operator=(const FOMFixedRecordField&) = default;
+  FOMFixedRecordField& operator=(FOMFixedRecordField&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
+
+  FOMFixedRecordField& swap(FOMFixedRecordField& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMFixedRecordField& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
+    return true;
+  }
+  bool operator<(const FOMFixedRecordField& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
+    return false;
+  }
+  bool operator>(const FOMFixedRecordField& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMFixedRecordField& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMFixedRecordField& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _dataType(),
+      _version()
+    { }
+    String _name;
+    String _dataType;
+    Unsigned _version = 0;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMFixedRecordField> FOMFixedRecordFieldList;
+
+class OPENRTI_API FOMFixedRecordDataType {
+public:
+  FOMFixedRecordDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMFixedRecordDataType(const FOMFixedRecordDataType&) = default;
+  FOMFixedRecordDataType(FOMFixedRecordDataType&&) = default;
+  virtual ~FOMFixedRecordDataType() noexcept = default;
+  FOMFixedRecordDataType& operator=(const FOMFixedRecordDataType&) = default;
+  FOMFixedRecordDataType& operator=(FOMFixedRecordDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  void setInclude(const String& value) noexcept
+  { getImpl()._include = value; }
+  void setInclude(String&& value) noexcept
+  { getImpl()._include = std::move(value); }
+  String& getInclude() noexcept
+  { return getImpl()._include; }
+  const String& getInclude() const noexcept
+  { return getConstImpl()._include; }
+
+  void setVersion(const Unsigned& value) noexcept
+  { getImpl()._version = value; }
+  void setVersion(Unsigned&& value) noexcept
+  { getImpl()._version = std::move(value); }
+  Unsigned& getVersion() noexcept
+  { return getImpl()._version; }
+  const Unsigned& getVersion() const noexcept
+  { return getConstImpl()._version; }
+
+  void setFields(const FOMFixedRecordFieldList& value) noexcept
+  { getImpl()._fields = value; }
+  void setFields(FOMFixedRecordFieldList&& value) noexcept
+  { getImpl()._fields = std::move(value); }
+  FOMFixedRecordFieldList& getFields() noexcept
+  { return getImpl()._fields; }
+  const FOMFixedRecordFieldList& getFields() const noexcept
+  { return getConstImpl()._fields; }
+
+  void setHandle(const FixedRecordDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+  void setHandle(FixedRecordDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+  FixedRecordDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const FixedRecordDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMFixedRecordDataType& swap(FOMFixedRecordDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMFixedRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getInclude() != rhs.getInclude()) return false;
+    if (getVersion() != rhs.getVersion()) return false;
+    if (getFields() != rhs.getFields()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMFixedRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getInclude() < rhs.getInclude()) return true;
+    if (rhs.getInclude() < getInclude()) return false;
+    if (getVersion() < rhs.getVersion()) return true;
+    if (rhs.getVersion() < getVersion()) return false;
+    if (getFields() < rhs.getFields()) return true;
+    if (rhs.getFields() < getFields()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMFixedRecordDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMFixedRecordDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMFixedRecordDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _encoding(),
+      _include(),
+      _version(),
+      _fields(),
+      _handle()
+    { }
+    String _name;
+    String _encoding;
+    String _include;
+    Unsigned _version = 0;
+    FOMFixedRecordFieldList _fields;
+    FixedRecordDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMFixedRecordDataType> FOMFixedRecordDataTypeList;
+
+class OPENRTI_API FOMVariantRecordAlternative {
+public:
+  FOMVariantRecordAlternative() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMVariantRecordAlternative(const FOMVariantRecordAlternative&) = default;
+  FOMVariantRecordAlternative(FOMVariantRecordAlternative&&) = default;
+  virtual ~FOMVariantRecordAlternative() noexcept = default;
+  FOMVariantRecordAlternative& operator=(const FOMVariantRecordAlternative&) = default;
+  FOMVariantRecordAlternative& operator=(FOMVariantRecordAlternative&&) = default;
+  void setEnumerator(const String& value) noexcept
+  { getImpl()._enumerator = value; }
+  void setEnumerator(String&& value) noexcept
+  { getImpl()._enumerator = std::move(value); }
+  String& getEnumerator() noexcept
+  { return getImpl()._enumerator; }
+  const String& getEnumerator() const noexcept
+  { return getConstImpl()._enumerator; }
+
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  FOMVariantRecordAlternative& swap(FOMVariantRecordAlternative& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMVariantRecordAlternative& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getEnumerator() != rhs.getEnumerator()) return false;
+    if (getName() != rhs.getName()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    return true;
+  }
+  bool operator<(const FOMVariantRecordAlternative& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getEnumerator() < rhs.getEnumerator()) return true;
+    if (rhs.getEnumerator() < getEnumerator()) return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    return false;
+  }
+  bool operator>(const FOMVariantRecordAlternative& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMVariantRecordAlternative& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMVariantRecordAlternative& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _enumerator(),
+      _name(),
+      _dataType()
+    { }
+    String _enumerator;
+    String _name;
+    String _dataType;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMVariantRecordAlternative> FOMVariantRecordAlternativeList;
+
+class OPENRTI_API FOMVariantRecordDataType {
+public:
+  FOMVariantRecordDataType() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMVariantRecordDataType(const FOMVariantRecordDataType&) = default;
+  FOMVariantRecordDataType(FOMVariantRecordDataType&&) = default;
+  virtual ~FOMVariantRecordDataType() noexcept = default;
+  FOMVariantRecordDataType& operator=(const FOMVariantRecordDataType&) = default;
+  FOMVariantRecordDataType& operator=(FOMVariantRecordDataType&&) = default;
+  void setName(const String& value) noexcept
+  { getImpl()._name = value; }
+  void setName(String&& value) noexcept
+  { getImpl()._name = std::move(value); }
+  String& getName() noexcept
+  { return getImpl()._name; }
+  const String& getName() const noexcept
+  { return getConstImpl()._name; }
+
+  void setDiscriminant(const String& value) noexcept
+  { getImpl()._discriminant = value; }
+  void setDiscriminant(String&& value) noexcept
+  { getImpl()._discriminant = std::move(value); }
+  String& getDiscriminant() noexcept
+  { return getImpl()._discriminant; }
+  const String& getDiscriminant() const noexcept
+  { return getConstImpl()._discriminant; }
+
+  void setDataType(const String& value) noexcept
+  { getImpl()._dataType = value; }
+  void setDataType(String&& value) noexcept
+  { getImpl()._dataType = std::move(value); }
+  String& getDataType() noexcept
+  { return getImpl()._dataType; }
+  const String& getDataType() const noexcept
+  { return getConstImpl()._dataType; }
+
+  void setAlternatives(const FOMVariantRecordAlternativeList& value) noexcept
+  { getImpl()._alternatives = value; }
+  void setAlternatives(FOMVariantRecordAlternativeList&& value) noexcept
+  { getImpl()._alternatives = std::move(value); }
+  FOMVariantRecordAlternativeList& getAlternatives() noexcept
+  { return getImpl()._alternatives; }
+  const FOMVariantRecordAlternativeList& getAlternatives() const noexcept
+  { return getConstImpl()._alternatives; }
+
+  void setEncoding(const String& value) noexcept
+  { getImpl()._encoding = value; }
+  void setEncoding(String&& value) noexcept
+  { getImpl()._encoding = std::move(value); }
+  String& getEncoding() noexcept
+  { return getImpl()._encoding; }
+  const String& getEncoding() const noexcept
+  { return getConstImpl()._encoding; }
+
+  void setHandle(const VariantRecordDataTypeHandle& value) noexcept
+  { getImpl()._handle = value; }
+  void setHandle(VariantRecordDataTypeHandle&& value) noexcept
+  { getImpl()._handle = std::move(value); }
+  VariantRecordDataTypeHandle& getHandle() noexcept
+  { return getImpl()._handle; }
+  const VariantRecordDataTypeHandle& getHandle() const noexcept
+  { return getConstImpl()._handle; }
+
+  FOMVariantRecordDataType& swap(FOMVariantRecordDataType& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMVariantRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getName() != rhs.getName()) return false;
+    if (getDiscriminant() != rhs.getDiscriminant()) return false;
+    if (getDataType() != rhs.getDataType()) return false;
+    if (getAlternatives() != rhs.getAlternatives()) return false;
+    if (getEncoding() != rhs.getEncoding()) return false;
+    if (getHandle() != rhs.getHandle()) return false;
+    return true;
+  }
+  bool operator<(const FOMVariantRecordDataType& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getName() < rhs.getName()) return true;
+    if (rhs.getName() < getName()) return false;
+    if (getDiscriminant() < rhs.getDiscriminant()) return true;
+    if (rhs.getDiscriminant() < getDiscriminant()) return false;
+    if (getDataType() < rhs.getDataType()) return true;
+    if (rhs.getDataType() < getDataType()) return false;
+    if (getAlternatives() < rhs.getAlternatives()) return true;
+    if (rhs.getAlternatives() < getAlternatives()) return false;
+    if (getEncoding() < rhs.getEncoding()) return true;
+    if (rhs.getEncoding() < getEncoding()) return false;
+    if (getHandle() < rhs.getHandle()) return true;
+    if (rhs.getHandle() < getHandle()) return false;
+    return false;
+  }
+  bool operator>(const FOMVariantRecordDataType& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const FOMVariantRecordDataType& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const FOMVariantRecordDataType& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _name(),
+      _discriminant(),
+      _dataType(),
+      _alternatives(),
+      _encoding(),
+      _handle()
+    { }
+    String _name;
+    String _discriminant;
+    String _dataType;
+    FOMVariantRecordAlternativeList _alternatives;
+    String _encoding;
+    VariantRecordDataTypeHandle _handle;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMVariantRecordDataType> FOMVariantRecordDataTypeList;
+
+class OPENRTI_API FOMModule {
+public:
+  FOMModule() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMModule(const FOMModule&) = default;
+  FOMModule(FOMModule&&) = default;
+  virtual ~FOMModule() noexcept = default;
+  FOMModule& operator=(const FOMModule&) = default;
+  FOMModule& operator=(FOMModule&&) = default;
+  void setModuleHandle(const ModuleHandle& value) noexcept
+  { getImpl()._moduleHandle = value; }
+  void setModuleHandle(ModuleHandle&& value) noexcept
+  { getImpl()._moduleHandle = std::move(value); }
+  ModuleHandle& getModuleHandle() noexcept
+  { return getImpl()._moduleHandle; }
+  const ModuleHandle& getModuleHandle() const noexcept
+  { return getConstImpl()._moduleHandle; }
+
+  void setTransportationTypeList(const FOMTransportationTypeList& value) noexcept
+  { getImpl()._transportationTypeList = value; }
+  void setTransportationTypeList(FOMTransportationTypeList&& value) noexcept
+  { getImpl()._transportationTypeList = std::move(value); }
+  FOMTransportationTypeList& getTransportationTypeList() noexcept
+  { return getImpl()._transportationTypeList; }
+  const FOMTransportationTypeList& getTransportationTypeList() const noexcept
+  { return getConstImpl()._transportationTypeList; }
+
+  void setDimensionList(const FOMDimensionList& value) noexcept
+  { getImpl()._dimensionList = value; }
+  void setDimensionList(FOMDimensionList&& value) noexcept
+  { getImpl()._dimensionList = std::move(value); }
+  FOMDimensionList& getDimensionList() noexcept
+  { return getImpl()._dimensionList; }
+  const FOMDimensionList& getDimensionList() const noexcept
+  { return getConstImpl()._dimensionList; }
+
+  void setRoutingSpaceList(const FOMRoutingSpaceList& value) noexcept
+  { getImpl()._routingSpaceList = value; }
+  void setRoutingSpaceList(FOMRoutingSpaceList&& value) noexcept
+  { getImpl()._routingSpaceList = std::move(value); }
+  FOMRoutingSpaceList& getRoutingSpaceList() noexcept
+  { return getImpl()._routingSpaceList; }
+  const FOMRoutingSpaceList& getRoutingSpaceList() const noexcept
+  { return getConstImpl()._routingSpaceList; }
+
+  void setInteractionClassList(const FOMInteractionClassList& value) noexcept
+  { getImpl()._interactionClassList = value; }
+  void setInteractionClassList(FOMInteractionClassList&& value) noexcept
+  { getImpl()._interactionClassList = std::move(value); }
+  FOMInteractionClassList& getInteractionClassList() noexcept
+  { return getImpl()._interactionClassList; }
+  const FOMInteractionClassList& getInteractionClassList() const noexcept
+  { return getConstImpl()._interactionClassList; }
+
+  void setObjectClassList(const FOMObjectClassList& value) noexcept
+  { getImpl()._objectClassList = value; }
+  void setObjectClassList(FOMObjectClassList&& value) noexcept
+  { getImpl()._objectClassList = std::move(value); }
+  FOMObjectClassList& getObjectClassList() noexcept
+  { return getImpl()._objectClassList; }
+  const FOMObjectClassList& getObjectClassList() const noexcept
+  { return getConstImpl()._objectClassList; }
+
+  void setUpdateRateList(const FOMUpdateRateList& value) noexcept
+  { getImpl()._updateRateList = value; }
+  void setUpdateRateList(FOMUpdateRateList&& value) noexcept
+  { getImpl()._updateRateList = std::move(value); }
+  FOMUpdateRateList& getUpdateRateList() noexcept
+  { return getImpl()._updateRateList; }
+  const FOMUpdateRateList& getUpdateRateList() const noexcept
+  { return getConstImpl()._updateRateList; }
+
+  void setSwitchList(const FOMSwitchList& value) noexcept
+  { getImpl()._switchList = value; }
+  void setSwitchList(FOMSwitchList&& value) noexcept
+  { getImpl()._switchList = std::move(value); }
+  FOMSwitchList& getSwitchList() noexcept
+  { return getImpl()._switchList; }
+  const FOMSwitchList& getSwitchList() const noexcept
+  { return getConstImpl()._switchList; }
+
+  void setArtificialInteractionRoot(const Bool& value) noexcept
+  { getImpl()._artificialInteractionRoot = value; }
+  void setArtificialInteractionRoot(Bool&& value) noexcept
+  { getImpl()._artificialInteractionRoot = std::move(value); }
+  Bool& getArtificialInteractionRoot() noexcept
+  { return getImpl()._artificialInteractionRoot; }
+  const Bool& getArtificialInteractionRoot() const noexcept
+  { return getConstImpl()._artificialInteractionRoot; }
+
+  void setArtificialObjectRoot(const Bool& value) noexcept
+  { getImpl()._artificialObjectRoot = value; }
+  void setArtificialObjectRoot(Bool&& value) noexcept
+  { getImpl()._artificialObjectRoot = std::move(value); }
+  Bool& getArtificialObjectRoot() noexcept
+  { return getImpl()._artificialObjectRoot; }
+  const Bool& getArtificialObjectRoot() const noexcept
+  { return getConstImpl()._artificialObjectRoot; }
+
+  void setDesignator(const String& value) noexcept
+  { getImpl()._designator = value; }
+  void setDesignator(String&& value) noexcept
+  { getImpl()._designator = std::move(value); }
+  String& getDesignator() noexcept
+  { return getImpl()._designator; }
+  const String& getDesignator() const noexcept
+  { return getConstImpl()._designator; }
+
+  FOMModule& swap(FOMModule& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMModule& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return true;
@@ -2904,10 +5793,10 @@ public:
     if (getSwitchList() != rhs.getSwitchList()) return false;
     if (getArtificialInteractionRoot() != rhs.getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() != rhs.getArtificialObjectRoot()) return false;
-    if (getContent() != rhs.getContent()) return false;
+    if (getDesignator() != rhs.getDesignator()) return false;
     return true;
   }
-  bool operator<(const FOMModule& rhs) const
+  bool operator<(const FOMModule& rhs) const noexcept
   {
     if (_impl.get() == rhs._impl.get())
       return false;
@@ -2931,21 +5820,19 @@ public:
     if (rhs.getArtificialInteractionRoot() < getArtificialInteractionRoot()) return false;
     if (getArtificialObjectRoot() < rhs.getArtificialObjectRoot()) return true;
     if (rhs.getArtificialObjectRoot() < getArtificialObjectRoot()) return false;
-    if (getContent() < rhs.getContent()) return true;
-    if (rhs.getContent() < getContent()) return false;
+    if (getDesignator() < rhs.getDesignator()) return true;
+    if (rhs.getDesignator() < getDesignator()) return false;
     return false;
   }
-  bool operator!=(const FOMModule& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const FOMModule& rhs) const
+  bool operator>(const FOMModule& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FOMModule& rhs) const
+  bool operator>=(const FOMModule& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FOMModule& rhs) const
+  bool operator<=(const FOMModule& rhs) const noexcept
   { return !operator>(rhs); }
 private:
-  struct OPENRTI_API Implementation : public Referenced {
-    Implementation() :
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
       _moduleHandle(),
       _transportationTypeList(),
       _dimensionList(),
@@ -2956,7 +5843,7 @@ private:
       _switchList(),
       _artificialInteractionRoot(),
       _artificialObjectRoot(),
-      _content()
+      _designator()
     { }
     ModuleHandle _moduleHandle;
     FOMTransportationTypeList _transportationTypeList;
@@ -2966,9 +5853,9 @@ private:
     FOMObjectClassList _objectClassList;
     FOMUpdateRateList _updateRateList;
     FOMSwitchList _switchList;
-    Bool _artificialInteractionRoot;
-    Bool _artificialObjectRoot;
-    String _content;
+    Bool _artificialInteractionRoot = false;
+    Bool _artificialObjectRoot = false;
+    String _designator;
   };
 
   const Implementation& getConstImpl() const
@@ -2979,7 +5866,7 @@ private:
   Implementation& getImpl()
   {
     if (1 < Referenced::count(_impl.get()))
-      _impl = new Implementation(*_impl);
+      _impl = MakeShared<Implementation>(*_impl);
     return *_impl;
   }
 
@@ -2988,94 +5875,240 @@ private:
 
 typedef std::vector<FOMModule> FOMModuleList;
 
-class OPENRTI_API ConnectionLostMessage : public AbstractMessage {
+class OPENRTI_API FOMModule2 : public FOMModule {
 public:
-  ConnectionLostMessage();
-  virtual ~ConnectionLostMessage();
+  FOMModule2() noexcept
+   : _impl(MakeShared<Implementation>())
+  { }
+  FOMModule2(const FOMModule2&) = default;
+  FOMModule2(FOMModule2&&) = default;
+  virtual ~FOMModule2() noexcept = default;
+  FOMModule2& operator=(const FOMModule2&) = default;
+  FOMModule2& operator=(FOMModule2&&) = default;
+  void setBasicDataTypeList(const FOMBasicDataTypeList& value) noexcept
+  { getImpl()._basicDataTypeList = value; }
+  void setBasicDataTypeList(FOMBasicDataTypeList&& value) noexcept
+  { getImpl()._basicDataTypeList = std::move(value); }
+  FOMBasicDataTypeList& getBasicDataTypeList() noexcept
+  { return getImpl()._basicDataTypeList; }
+  const FOMBasicDataTypeList& getBasicDataTypeList() const noexcept
+  { return getConstImpl()._basicDataTypeList; }
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  void setSimpleDataTypeList(const FOMSimpleDataTypeList& value) noexcept
+  { getImpl()._simpleDataTypeList = value; }
+  void setSimpleDataTypeList(FOMSimpleDataTypeList&& value) noexcept
+  { getImpl()._simpleDataTypeList = std::move(value); }
+  FOMSimpleDataTypeList& getSimpleDataTypeList() noexcept
+  { return getImpl()._simpleDataTypeList; }
+  const FOMSimpleDataTypeList& getSimpleDataTypeList() const noexcept
+  { return getConstImpl()._simpleDataTypeList; }
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ConnectionLostMessage& rhs) const;
-  bool operator<(const ConnectionLostMessage& rhs) const;
-  bool operator!=(const ConnectionLostMessage& rhs) const
-  { return !operator==(rhs); }
-  bool operator>(const ConnectionLostMessage& rhs) const
+  void setEnumeratedDataTypeList(const FOMEnumeratedDataTypeList& value) noexcept
+  { getImpl()._enumeratedDataTypeList = value; }
+  void setEnumeratedDataTypeList(FOMEnumeratedDataTypeList&& value) noexcept
+  { getImpl()._enumeratedDataTypeList = std::move(value); }
+  FOMEnumeratedDataTypeList& getEnumeratedDataTypeList() noexcept
+  { return getImpl()._enumeratedDataTypeList; }
+  const FOMEnumeratedDataTypeList& getEnumeratedDataTypeList() const noexcept
+  { return getConstImpl()._enumeratedDataTypeList; }
+
+  void setArrayDataTypeList(const FOMArrayDataTypeList& value) noexcept
+  { getImpl()._arrayDataTypeList = value; }
+  void setArrayDataTypeList(FOMArrayDataTypeList&& value) noexcept
+  { getImpl()._arrayDataTypeList = std::move(value); }
+  FOMArrayDataTypeList& getArrayDataTypeList() noexcept
+  { return getImpl()._arrayDataTypeList; }
+  const FOMArrayDataTypeList& getArrayDataTypeList() const noexcept
+  { return getConstImpl()._arrayDataTypeList; }
+
+  void setFixedRecordDataTypeList(const FOMFixedRecordDataTypeList& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = value; }
+  void setFixedRecordDataTypeList(FOMFixedRecordDataTypeList&& value) noexcept
+  { getImpl()._fixedRecordDataTypeList = std::move(value); }
+  FOMFixedRecordDataTypeList& getFixedRecordDataTypeList() noexcept
+  { return getImpl()._fixedRecordDataTypeList; }
+  const FOMFixedRecordDataTypeList& getFixedRecordDataTypeList() const noexcept
+  { return getConstImpl()._fixedRecordDataTypeList; }
+
+  void setVariantRecordDataTypeList(const FOMVariantRecordDataTypeList& value) noexcept
+  { getImpl()._variantRecordDataTypeList = value; }
+  void setVariantRecordDataTypeList(FOMVariantRecordDataTypeList&& value) noexcept
+  { getImpl()._variantRecordDataTypeList = std::move(value); }
+  FOMVariantRecordDataTypeList& getVariantRecordDataTypeList() noexcept
+  { return getImpl()._variantRecordDataTypeList; }
+  const FOMVariantRecordDataTypeList& getVariantRecordDataTypeList() const noexcept
+  { return getConstImpl()._variantRecordDataTypeList; }
+
+  FOMModule2& swap(FOMModule2& rhs) noexcept
+  {
+    _impl.swap(rhs._impl);
+    return *this;
+  }
+  bool operator==(const FOMModule2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return true;
+    if (getBasicDataTypeList() != rhs.getBasicDataTypeList()) return false;
+    if (getSimpleDataTypeList() != rhs.getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() != rhs.getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() != rhs.getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() != rhs.getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() != rhs.getVariantRecordDataTypeList()) return false;
+    return true;
+  }
+  bool operator<(const FOMModule2& rhs) const noexcept
+  {
+    if (_impl.get() == rhs._impl.get())
+      return false;
+    if (getBasicDataTypeList() < rhs.getBasicDataTypeList()) return true;
+    if (rhs.getBasicDataTypeList() < getBasicDataTypeList()) return false;
+    if (getSimpleDataTypeList() < rhs.getSimpleDataTypeList()) return true;
+    if (rhs.getSimpleDataTypeList() < getSimpleDataTypeList()) return false;
+    if (getEnumeratedDataTypeList() < rhs.getEnumeratedDataTypeList()) return true;
+    if (rhs.getEnumeratedDataTypeList() < getEnumeratedDataTypeList()) return false;
+    if (getArrayDataTypeList() < rhs.getArrayDataTypeList()) return true;
+    if (rhs.getArrayDataTypeList() < getArrayDataTypeList()) return false;
+    if (getFixedRecordDataTypeList() < rhs.getFixedRecordDataTypeList()) return true;
+    if (rhs.getFixedRecordDataTypeList() < getFixedRecordDataTypeList()) return false;
+    if (getVariantRecordDataTypeList() < rhs.getVariantRecordDataTypeList()) return true;
+    if (rhs.getVariantRecordDataTypeList() < getVariantRecordDataTypeList()) return false;
+    return false;
+  }
+  bool operator>(const FOMModule2& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ConnectionLostMessage& rhs) const
+  bool operator>=(const FOMModule2& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ConnectionLostMessage& rhs) const
+  bool operator<=(const FOMModule2& rhs) const noexcept
+  { return !operator>(rhs); }
+private:
+  struct OPENRTI_API Implementation final : public Referenced {
+    Implementation() noexcept :
+      _basicDataTypeList(),
+      _simpleDataTypeList(),
+      _enumeratedDataTypeList(),
+      _arrayDataTypeList(),
+      _fixedRecordDataTypeList(),
+      _variantRecordDataTypeList()
+    { }
+    FOMBasicDataTypeList _basicDataTypeList;
+    FOMSimpleDataTypeList _simpleDataTypeList;
+    FOMEnumeratedDataTypeList _enumeratedDataTypeList;
+    FOMArrayDataTypeList _arrayDataTypeList;
+    FOMFixedRecordDataTypeList _fixedRecordDataTypeList;
+    FOMVariantRecordDataTypeList _variantRecordDataTypeList;
+  };
+
+  const Implementation& getConstImpl() const
+  {
+    return *_impl;
+  }
+
+  Implementation& getImpl()
+  {
+    if (1 < Referenced::count(_impl.get()))
+      _impl = MakeShared<Implementation>(*_impl);
+    return *_impl;
+  }
+
+  SharedPtr<Implementation> _impl;
+};
+
+typedef std::vector<FOMModule2> FOMModule2List;
+
+class OPENRTI_API ConnectionLostMessage final : public AbstractMessage {
+public:
+  ConnectionLostMessage() noexcept {};
+  ConnectionLostMessage(const ConnectionLostMessage&) = default;
+  ConnectionLostMessage(ConnectionLostMessage&&) noexcept = default;
+  virtual ~ConnectionLostMessage() noexcept = default;
+  ConnectionLostMessage& operator=(const ConnectionLostMessage&) = default;
+  ConnectionLostMessage& operator=(ConnectionLostMessage&&) = default;
+
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 1;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ConnectionLostMessage& rhs) const noexcept;
+  bool operator<(const ConnectionLostMessage& rhs) const noexcept;
+  bool operator!=(const ConnectionLostMessage& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const ConnectionLostMessage& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const ConnectionLostMessage& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const ConnectionLostMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFaultDescription(const String& value)
+  void setFaultDescription(const String& value) noexcept
   { _faultDescription = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFaultDescription(String&& value)
+  void setFaultDescription(String&& value) noexcept
   { _faultDescription = std::move(value); }
-#endif
-  String& getFaultDescription()
+  String& getFaultDescription() noexcept
   { return _faultDescription; }
-  const String& getFaultDescription() const
+  const String& getFaultDescription() const noexcept
   { return _faultDescription; }
 
 private:
   String _faultDescription;
 };
 
-class OPENRTI_API CreateFederationExecutionRequestMessage : public AbstractMessage {
+class OPENRTI_API CreateFederationExecutionRequestMessage final : public AbstractMessage {
 public:
-  CreateFederationExecutionRequestMessage();
-  virtual ~CreateFederationExecutionRequestMessage();
+  CreateFederationExecutionRequestMessage() noexcept {};
+  CreateFederationExecutionRequestMessage(const CreateFederationExecutionRequestMessage&) = default;
+  CreateFederationExecutionRequestMessage(CreateFederationExecutionRequestMessage&&) noexcept = default;
+  virtual ~CreateFederationExecutionRequestMessage() noexcept = default;
+  CreateFederationExecutionRequestMessage& operator=(const CreateFederationExecutionRequestMessage&) = default;
+  CreateFederationExecutionRequestMessage& operator=(CreateFederationExecutionRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 2;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CreateFederationExecutionRequestMessage& rhs) const;
-  bool operator<(const CreateFederationExecutionRequestMessage& rhs) const;
-  bool operator!=(const CreateFederationExecutionRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CreateFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator<(const CreateFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator!=(const CreateFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CreateFederationExecutionRequestMessage& rhs) const
+  bool operator>(const CreateFederationExecutionRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CreateFederationExecutionRequestMessage& rhs) const
+  bool operator>=(const CreateFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CreateFederationExecutionRequestMessage& rhs) const
+  bool operator<=(const CreateFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationExecution(const String& value)
+  void setFederationExecution(const String& value) noexcept
   { _federationExecution = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecution(String&& value)
+  void setFederationExecution(String&& value) noexcept
   { _federationExecution = std::move(value); }
-#endif
-  String& getFederationExecution()
+  String& getFederationExecution() noexcept
   { return _federationExecution; }
-  const String& getFederationExecution() const
+  const String& getFederationExecution() const noexcept
   { return _federationExecution; }
 
-  void setLogicalTimeFactoryName(const String& value)
+  void setLogicalTimeFactoryName(const String& value) noexcept
   { _logicalTimeFactoryName = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLogicalTimeFactoryName(String&& value)
+  void setLogicalTimeFactoryName(String&& value) noexcept
   { _logicalTimeFactoryName = std::move(value); }
-#endif
-  String& getLogicalTimeFactoryName()
+  String& getLogicalTimeFactoryName() noexcept
   { return _logicalTimeFactoryName; }
-  const String& getLogicalTimeFactoryName() const
+  const String& getLogicalTimeFactoryName() const noexcept
   { return _logicalTimeFactoryName; }
 
-  void setFOMStringModuleList(const FOMStringModuleList& value)
+  void setFOMStringModuleList(const FOMStringModuleList& value) noexcept
   { _fOMStringModuleList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFOMStringModuleList(FOMStringModuleList&& value)
+  void setFOMStringModuleList(FOMStringModuleList&& value) noexcept
   { _fOMStringModuleList = std::move(value); }
-#endif
-  FOMStringModuleList& getFOMStringModuleList()
+  FOMStringModuleList& getFOMStringModuleList() noexcept
   { return _fOMStringModuleList; }
-  const FOMStringModuleList& getFOMStringModuleList() const
+  const FOMStringModuleList& getFOMStringModuleList() const noexcept
   { return _fOMStringModuleList; }
 
 private:
@@ -3084,249 +6117,334 @@ private:
   FOMStringModuleList _fOMStringModuleList;
 };
 
-class OPENRTI_API CreateFederationExecutionResponseMessage : public AbstractMessage {
+class OPENRTI_API CreateFederationExecutionRequest2Message final : public AbstractMessage {
 public:
-  CreateFederationExecutionResponseMessage();
-  virtual ~CreateFederationExecutionResponseMessage();
+  CreateFederationExecutionRequest2Message() noexcept {};
+  CreateFederationExecutionRequest2Message(const CreateFederationExecutionRequest2Message&) = default;
+  CreateFederationExecutionRequest2Message(CreateFederationExecutionRequest2Message&&) noexcept = default;
+  virtual ~CreateFederationExecutionRequest2Message() noexcept = default;
+  CreateFederationExecutionRequest2Message& operator=(const CreateFederationExecutionRequest2Message&) = default;
+  CreateFederationExecutionRequest2Message& operator=(CreateFederationExecutionRequest2Message&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 104;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CreateFederationExecutionResponseMessage& rhs) const;
-  bool operator<(const CreateFederationExecutionResponseMessage& rhs) const;
-  bool operator!=(const CreateFederationExecutionResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CreateFederationExecutionRequest2Message& rhs) const noexcept;
+  bool operator<(const CreateFederationExecutionRequest2Message& rhs) const noexcept;
+  bool operator!=(const CreateFederationExecutionRequest2Message& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CreateFederationExecutionResponseMessage& rhs) const
+  bool operator>(const CreateFederationExecutionRequest2Message& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CreateFederationExecutionResponseMessage& rhs) const
+  bool operator>=(const CreateFederationExecutionRequest2Message& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CreateFederationExecutionResponseMessage& rhs) const
+  bool operator<=(const CreateFederationExecutionRequest2Message& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setCreateFederationExecutionResponseType(const CreateFederationExecutionResponseType& value)
+  void setFederationExecution(const String& value) noexcept
+  { _federationExecution = value; }
+  void setFederationExecution(String&& value) noexcept
+  { _federationExecution = std::move(value); }
+  String& getFederationExecution() noexcept
+  { return _federationExecution; }
+  const String& getFederationExecution() const noexcept
+  { return _federationExecution; }
+
+  void setLogicalTimeFactoryName(const String& value) noexcept
+  { _logicalTimeFactoryName = value; }
+  void setLogicalTimeFactoryName(String&& value) noexcept
+  { _logicalTimeFactoryName = std::move(value); }
+  String& getLogicalTimeFactoryName() noexcept
+  { return _logicalTimeFactoryName; }
+  const String& getLogicalTimeFactoryName() const noexcept
+  { return _logicalTimeFactoryName; }
+
+  void setFOMStringModuleList(const FOMStringModule2List& value) noexcept
+  { _fOMStringModuleList = value; }
+  void setFOMStringModuleList(FOMStringModule2List&& value) noexcept
+  { _fOMStringModuleList = std::move(value); }
+  FOMStringModule2List& getFOMStringModuleList() noexcept
+  { return _fOMStringModuleList; }
+  const FOMStringModule2List& getFOMStringModuleList() const noexcept
+  { return _fOMStringModuleList; }
+
+private:
+  String _federationExecution;
+  String _logicalTimeFactoryName;
+  FOMStringModule2List _fOMStringModuleList;
+};
+
+class OPENRTI_API CreateFederationExecutionResponseMessage final : public AbstractMessage {
+public:
+  CreateFederationExecutionResponseMessage() noexcept {};
+  CreateFederationExecutionResponseMessage(const CreateFederationExecutionResponseMessage&) = default;
+  CreateFederationExecutionResponseMessage(CreateFederationExecutionResponseMessage&&) noexcept = default;
+  virtual ~CreateFederationExecutionResponseMessage() noexcept = default;
+  CreateFederationExecutionResponseMessage& operator=(const CreateFederationExecutionResponseMessage&) = default;
+  CreateFederationExecutionResponseMessage& operator=(CreateFederationExecutionResponseMessage&&) = default;
+
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 3;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CreateFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator<(const CreateFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator!=(const CreateFederationExecutionResponseMessage& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const CreateFederationExecutionResponseMessage& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const CreateFederationExecutionResponseMessage& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const CreateFederationExecutionResponseMessage& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setCreateFederationExecutionResponseType(const CreateFederationExecutionResponseType& value) noexcept
   { _createFederationExecutionResponseType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCreateFederationExecutionResponseType(CreateFederationExecutionResponseType&& value)
+  void setCreateFederationExecutionResponseType(CreateFederationExecutionResponseType&& value) noexcept
   { _createFederationExecutionResponseType = std::move(value); }
-#endif
-  CreateFederationExecutionResponseType& getCreateFederationExecutionResponseType()
+  CreateFederationExecutionResponseType& getCreateFederationExecutionResponseType() noexcept
   { return _createFederationExecutionResponseType; }
-  const CreateFederationExecutionResponseType& getCreateFederationExecutionResponseType() const
+  const CreateFederationExecutionResponseType& getCreateFederationExecutionResponseType() const noexcept
   { return _createFederationExecutionResponseType; }
 
-  void setExceptionString(const String& value)
+  void setExceptionString(const String& value) noexcept
   { _exceptionString = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setExceptionString(String&& value)
+  void setExceptionString(String&& value) noexcept
   { _exceptionString = std::move(value); }
-#endif
-  String& getExceptionString()
+  String& getExceptionString() noexcept
   { return _exceptionString; }
-  const String& getExceptionString() const
+  const String& getExceptionString() const noexcept
   { return _exceptionString; }
 
 private:
-  CreateFederationExecutionResponseType _createFederationExecutionResponseType;
+  CreateFederationExecutionResponseType _createFederationExecutionResponseType = CreateFederationExecutionResponseSuccess;
   String _exceptionString;
 };
 
-class OPENRTI_API DestroyFederationExecutionRequestMessage : public AbstractMessage {
+class OPENRTI_API DestroyFederationExecutionRequestMessage final : public AbstractMessage {
 public:
-  DestroyFederationExecutionRequestMessage();
-  virtual ~DestroyFederationExecutionRequestMessage();
+  DestroyFederationExecutionRequestMessage() noexcept {};
+  DestroyFederationExecutionRequestMessage(const DestroyFederationExecutionRequestMessage&) = default;
+  DestroyFederationExecutionRequestMessage(DestroyFederationExecutionRequestMessage&&) noexcept = default;
+  virtual ~DestroyFederationExecutionRequestMessage() noexcept = default;
+  DestroyFederationExecutionRequestMessage& operator=(const DestroyFederationExecutionRequestMessage&) = default;
+  DestroyFederationExecutionRequestMessage& operator=(DestroyFederationExecutionRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 4;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const DestroyFederationExecutionRequestMessage& rhs) const;
-  bool operator<(const DestroyFederationExecutionRequestMessage& rhs) const;
-  bool operator!=(const DestroyFederationExecutionRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DestroyFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator<(const DestroyFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator!=(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const DestroyFederationExecutionRequestMessage& rhs) const
+  bool operator>(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const DestroyFederationExecutionRequestMessage& rhs) const
+  bool operator>=(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const DestroyFederationExecutionRequestMessage& rhs) const
+  bool operator<=(const DestroyFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationExecution(const String& value)
+  void setFederationExecution(const String& value) noexcept
   { _federationExecution = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecution(String&& value)
+  void setFederationExecution(String&& value) noexcept
   { _federationExecution = std::move(value); }
-#endif
-  String& getFederationExecution()
+  String& getFederationExecution() noexcept
   { return _federationExecution; }
-  const String& getFederationExecution() const
+  const String& getFederationExecution() const noexcept
   { return _federationExecution; }
 
 private:
   String _federationExecution;
 };
 
-class OPENRTI_API DestroyFederationExecutionResponseMessage : public AbstractMessage {
+class OPENRTI_API DestroyFederationExecutionResponseMessage final : public AbstractMessage {
 public:
-  DestroyFederationExecutionResponseMessage();
-  virtual ~DestroyFederationExecutionResponseMessage();
+  DestroyFederationExecutionResponseMessage() noexcept {};
+  DestroyFederationExecutionResponseMessage(const DestroyFederationExecutionResponseMessage&) = default;
+  DestroyFederationExecutionResponseMessage(DestroyFederationExecutionResponseMessage&&) noexcept = default;
+  virtual ~DestroyFederationExecutionResponseMessage() noexcept = default;
+  DestroyFederationExecutionResponseMessage& operator=(const DestroyFederationExecutionResponseMessage&) = default;
+  DestroyFederationExecutionResponseMessage& operator=(DestroyFederationExecutionResponseMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 5;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const DestroyFederationExecutionResponseMessage& rhs) const;
-  bool operator<(const DestroyFederationExecutionResponseMessage& rhs) const;
-  bool operator!=(const DestroyFederationExecutionResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DestroyFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator<(const DestroyFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator!=(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const DestroyFederationExecutionResponseMessage& rhs) const
+  bool operator>(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const DestroyFederationExecutionResponseMessage& rhs) const
+  bool operator>=(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const DestroyFederationExecutionResponseMessage& rhs) const
+  bool operator<=(const DestroyFederationExecutionResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setDestroyFederationExecutionResponseType(const DestroyFederationExecutionResponseType& value)
+  void setDestroyFederationExecutionResponseType(const DestroyFederationExecutionResponseType& value) noexcept
   { _destroyFederationExecutionResponseType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setDestroyFederationExecutionResponseType(DestroyFederationExecutionResponseType&& value)
+  void setDestroyFederationExecutionResponseType(DestroyFederationExecutionResponseType&& value) noexcept
   { _destroyFederationExecutionResponseType = std::move(value); }
-#endif
-  DestroyFederationExecutionResponseType& getDestroyFederationExecutionResponseType()
+  DestroyFederationExecutionResponseType& getDestroyFederationExecutionResponseType() noexcept
   { return _destroyFederationExecutionResponseType; }
-  const DestroyFederationExecutionResponseType& getDestroyFederationExecutionResponseType() const
+  const DestroyFederationExecutionResponseType& getDestroyFederationExecutionResponseType() const noexcept
   { return _destroyFederationExecutionResponseType; }
 
 private:
-  DestroyFederationExecutionResponseType _destroyFederationExecutionResponseType;
+  DestroyFederationExecutionResponseType _destroyFederationExecutionResponseType = DestroyFederationExecutionResponseSuccess;
 };
 
-class OPENRTI_API EnumerateFederationExecutionsRequestMessage : public AbstractMessage {
+class OPENRTI_API EnumerateFederationExecutionsRequestMessage final : public AbstractMessage {
 public:
-  EnumerateFederationExecutionsRequestMessage();
-  virtual ~EnumerateFederationExecutionsRequestMessage();
+  EnumerateFederationExecutionsRequestMessage() noexcept {};
+  EnumerateFederationExecutionsRequestMessage(const EnumerateFederationExecutionsRequestMessage&) = default;
+  EnumerateFederationExecutionsRequestMessage(EnumerateFederationExecutionsRequestMessage&&) noexcept = default;
+  virtual ~EnumerateFederationExecutionsRequestMessage() noexcept = default;
+  EnumerateFederationExecutionsRequestMessage& operator=(const EnumerateFederationExecutionsRequestMessage&) = default;
+  EnumerateFederationExecutionsRequestMessage& operator=(EnumerateFederationExecutionsRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 6;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EnumerateFederationExecutionsRequestMessage& rhs) const;
-  bool operator<(const EnumerateFederationExecutionsRequestMessage& rhs) const;
-  bool operator!=(const EnumerateFederationExecutionsRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept;
+  bool operator<(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept;
+  bool operator!=(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EnumerateFederationExecutionsRequestMessage& rhs) const
+  bool operator>(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EnumerateFederationExecutionsRequestMessage& rhs) const
+  bool operator>=(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EnumerateFederationExecutionsRequestMessage& rhs) const
+  bool operator<=(const EnumerateFederationExecutionsRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
 private:
 };
 
-class OPENRTI_API EnumerateFederationExecutionsResponseMessage : public AbstractMessage {
+class OPENRTI_API EnumerateFederationExecutionsResponseMessage final : public AbstractMessage {
 public:
-  EnumerateFederationExecutionsResponseMessage();
-  virtual ~EnumerateFederationExecutionsResponseMessage();
+  EnumerateFederationExecutionsResponseMessage() noexcept {};
+  EnumerateFederationExecutionsResponseMessage(const EnumerateFederationExecutionsResponseMessage&) = default;
+  EnumerateFederationExecutionsResponseMessage(EnumerateFederationExecutionsResponseMessage&&) noexcept = default;
+  virtual ~EnumerateFederationExecutionsResponseMessage() noexcept = default;
+  EnumerateFederationExecutionsResponseMessage& operator=(const EnumerateFederationExecutionsResponseMessage&) = default;
+  EnumerateFederationExecutionsResponseMessage& operator=(EnumerateFederationExecutionsResponseMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 7;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EnumerateFederationExecutionsResponseMessage& rhs) const;
-  bool operator<(const EnumerateFederationExecutionsResponseMessage& rhs) const;
-  bool operator!=(const EnumerateFederationExecutionsResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept;
+  bool operator<(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept;
+  bool operator!=(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EnumerateFederationExecutionsResponseMessage& rhs) const
+  bool operator>(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EnumerateFederationExecutionsResponseMessage& rhs) const
+  bool operator>=(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EnumerateFederationExecutionsResponseMessage& rhs) const
+  bool operator<=(const EnumerateFederationExecutionsResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationExecutionInformationVector(const FederationExecutionInformationVector& value)
+  void setFederationExecutionInformationVector(const FederationExecutionInformationVector& value) noexcept
   { _federationExecutionInformationVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecutionInformationVector(FederationExecutionInformationVector&& value)
+  void setFederationExecutionInformationVector(FederationExecutionInformationVector&& value) noexcept
   { _federationExecutionInformationVector = std::move(value); }
-#endif
-  FederationExecutionInformationVector& getFederationExecutionInformationVector()
+  FederationExecutionInformationVector& getFederationExecutionInformationVector() noexcept
   { return _federationExecutionInformationVector; }
-  const FederationExecutionInformationVector& getFederationExecutionInformationVector() const
+  const FederationExecutionInformationVector& getFederationExecutionInformationVector() const noexcept
   { return _federationExecutionInformationVector; }
 
 private:
   FederationExecutionInformationVector _federationExecutionInformationVector;
 };
 
-class OPENRTI_API InsertFederationExecutionMessage : public AbstractMessage {
+class OPENRTI_API InsertFederationExecutionMessage final : public AbstractMessage {
 public:
-  InsertFederationExecutionMessage();
-  virtual ~InsertFederationExecutionMessage();
+  InsertFederationExecutionMessage() noexcept {};
+  InsertFederationExecutionMessage(const InsertFederationExecutionMessage&) = default;
+  InsertFederationExecutionMessage(InsertFederationExecutionMessage&&) noexcept = default;
+  virtual ~InsertFederationExecutionMessage() noexcept = default;
+  InsertFederationExecutionMessage& operator=(const InsertFederationExecutionMessage&) = default;
+  InsertFederationExecutionMessage& operator=(InsertFederationExecutionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 8;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InsertFederationExecutionMessage& rhs) const;
-  bool operator<(const InsertFederationExecutionMessage& rhs) const;
-  bool operator!=(const InsertFederationExecutionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertFederationExecutionMessage& rhs) const noexcept;
+  bool operator<(const InsertFederationExecutionMessage& rhs) const noexcept;
+  bool operator!=(const InsertFederationExecutionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InsertFederationExecutionMessage& rhs) const
+  bool operator>(const InsertFederationExecutionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InsertFederationExecutionMessage& rhs) const
+  bool operator>=(const InsertFederationExecutionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InsertFederationExecutionMessage& rhs) const
+  bool operator<=(const InsertFederationExecutionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederationName(const String& value)
+  void setFederationName(const String& value) noexcept
   { _federationName = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationName(String&& value)
+  void setFederationName(String&& value) noexcept
   { _federationName = std::move(value); }
-#endif
-  String& getFederationName()
+  String& getFederationName() noexcept
   { return _federationName; }
-  const String& getFederationName() const
+  const String& getFederationName() const noexcept
   { return _federationName; }
 
-  void setLogicalTimeFactoryName(const String& value)
+  void setLogicalTimeFactoryName(const String& value) noexcept
   { _logicalTimeFactoryName = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLogicalTimeFactoryName(String&& value)
+  void setLogicalTimeFactoryName(String&& value) noexcept
   { _logicalTimeFactoryName = std::move(value); }
-#endif
-  String& getLogicalTimeFactoryName()
+  String& getLogicalTimeFactoryName() noexcept
   { return _logicalTimeFactoryName; }
-  const String& getLogicalTimeFactoryName() const
+  const String& getLogicalTimeFactoryName() const noexcept
   { return _logicalTimeFactoryName; }
 
-  void setConfigurationParameterMap(const ConfigurationParameterMap& value)
+  void setConfigurationParameterMap(const ConfigurationParameterMap& value) noexcept
   { _configurationParameterMap = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setConfigurationParameterMap(ConfigurationParameterMap&& value)
+  void setConfigurationParameterMap(ConfigurationParameterMap&& value) noexcept
   { _configurationParameterMap = std::move(value); }
-#endif
-  ConfigurationParameterMap& getConfigurationParameterMap()
+  ConfigurationParameterMap& getConfigurationParameterMap() noexcept
   { return _configurationParameterMap; }
-  const ConfigurationParameterMap& getConfigurationParameterMap() const
+  const ConfigurationParameterMap& getConfigurationParameterMap() const noexcept
   { return _configurationParameterMap; }
 
 private:
@@ -3336,155 +6454,173 @@ private:
   ConfigurationParameterMap _configurationParameterMap;
 };
 
-class OPENRTI_API ShutdownFederationExecutionMessage : public AbstractMessage {
+class OPENRTI_API ShutdownFederationExecutionMessage final : public AbstractMessage {
 public:
-  ShutdownFederationExecutionMessage();
-  virtual ~ShutdownFederationExecutionMessage();
+  ShutdownFederationExecutionMessage() noexcept {};
+  ShutdownFederationExecutionMessage(const ShutdownFederationExecutionMessage&) = default;
+  ShutdownFederationExecutionMessage(ShutdownFederationExecutionMessage&&) noexcept = default;
+  virtual ~ShutdownFederationExecutionMessage() noexcept = default;
+  ShutdownFederationExecutionMessage& operator=(const ShutdownFederationExecutionMessage&) = default;
+  ShutdownFederationExecutionMessage& operator=(ShutdownFederationExecutionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 9;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ShutdownFederationExecutionMessage& rhs) const;
-  bool operator<(const ShutdownFederationExecutionMessage& rhs) const;
-  bool operator!=(const ShutdownFederationExecutionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ShutdownFederationExecutionMessage& rhs) const noexcept;
+  bool operator<(const ShutdownFederationExecutionMessage& rhs) const noexcept;
+  bool operator!=(const ShutdownFederationExecutionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ShutdownFederationExecutionMessage& rhs) const
+  bool operator>(const ShutdownFederationExecutionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ShutdownFederationExecutionMessage& rhs) const
+  bool operator>=(const ShutdownFederationExecutionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ShutdownFederationExecutionMessage& rhs) const
+  bool operator<=(const ShutdownFederationExecutionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
 private:
   FederationHandle _federationHandle;
 };
 
-class OPENRTI_API EraseFederationExecutionMessage : public AbstractMessage {
+class OPENRTI_API EraseFederationExecutionMessage final : public AbstractMessage {
 public:
-  EraseFederationExecutionMessage();
-  virtual ~EraseFederationExecutionMessage();
+  EraseFederationExecutionMessage() noexcept {};
+  EraseFederationExecutionMessage(const EraseFederationExecutionMessage&) = default;
+  EraseFederationExecutionMessage(EraseFederationExecutionMessage&&) noexcept = default;
+  virtual ~EraseFederationExecutionMessage() noexcept = default;
+  EraseFederationExecutionMessage& operator=(const EraseFederationExecutionMessage&) = default;
+  EraseFederationExecutionMessage& operator=(EraseFederationExecutionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 10;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EraseFederationExecutionMessage& rhs) const;
-  bool operator<(const EraseFederationExecutionMessage& rhs) const;
-  bool operator!=(const EraseFederationExecutionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EraseFederationExecutionMessage& rhs) const noexcept;
+  bool operator<(const EraseFederationExecutionMessage& rhs) const noexcept;
+  bool operator!=(const EraseFederationExecutionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EraseFederationExecutionMessage& rhs) const
+  bool operator>(const EraseFederationExecutionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EraseFederationExecutionMessage& rhs) const
+  bool operator>=(const EraseFederationExecutionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EraseFederationExecutionMessage& rhs) const
+  bool operator<=(const EraseFederationExecutionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
 private:
   FederationHandle _federationHandle;
 };
 
-class OPENRTI_API ReleaseFederationHandleMessage : public AbstractMessage {
+class OPENRTI_API ReleaseFederationHandleMessage final : public AbstractMessage {
 public:
-  ReleaseFederationHandleMessage();
-  virtual ~ReleaseFederationHandleMessage();
+  ReleaseFederationHandleMessage() noexcept {};
+  ReleaseFederationHandleMessage(const ReleaseFederationHandleMessage&) = default;
+  ReleaseFederationHandleMessage(ReleaseFederationHandleMessage&&) noexcept = default;
+  virtual ~ReleaseFederationHandleMessage() noexcept = default;
+  ReleaseFederationHandleMessage& operator=(const ReleaseFederationHandleMessage&) = default;
+  ReleaseFederationHandleMessage& operator=(ReleaseFederationHandleMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 11;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReleaseFederationHandleMessage& rhs) const;
-  bool operator<(const ReleaseFederationHandleMessage& rhs) const;
-  bool operator!=(const ReleaseFederationHandleMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReleaseFederationHandleMessage& rhs) const noexcept;
+  bool operator<(const ReleaseFederationHandleMessage& rhs) const noexcept;
+  bool operator!=(const ReleaseFederationHandleMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReleaseFederationHandleMessage& rhs) const
+  bool operator>(const ReleaseFederationHandleMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReleaseFederationHandleMessage& rhs) const
+  bool operator>=(const ReleaseFederationHandleMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReleaseFederationHandleMessage& rhs) const
+  bool operator<=(const ReleaseFederationHandleMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
 private:
   FederationHandle _federationHandle;
 };
 
-class OPENRTI_API InsertModulesMessage : public AbstractMessage {
+class OPENRTI_API InsertModulesMessage final : public AbstractMessage {
 public:
-  InsertModulesMessage();
-  virtual ~InsertModulesMessage();
+  InsertModulesMessage() noexcept {};
+  InsertModulesMessage(const InsertModulesMessage&) = default;
+  InsertModulesMessage(InsertModulesMessage&&) noexcept = default;
+  virtual ~InsertModulesMessage() noexcept = default;
+  InsertModulesMessage& operator=(const InsertModulesMessage&) = default;
+  InsertModulesMessage& operator=(InsertModulesMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 12;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InsertModulesMessage& rhs) const;
-  bool operator<(const InsertModulesMessage& rhs) const;
-  bool operator!=(const InsertModulesMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertModulesMessage& rhs) const noexcept;
+  bool operator<(const InsertModulesMessage& rhs) const noexcept;
+  bool operator!=(const InsertModulesMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InsertModulesMessage& rhs) const
+  bool operator>(const InsertModulesMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InsertModulesMessage& rhs) const
+  bool operator>=(const InsertModulesMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InsertModulesMessage& rhs) const
+  bool operator<=(const InsertModulesMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFOMModuleList(const FOMModuleList& value)
+  void setFOMModuleList(const FOMModuleList& value) noexcept
   { _fOMModuleList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFOMModuleList(FOMModuleList&& value)
+  void setFOMModuleList(FOMModuleList&& value) noexcept
   { _fOMModuleList = std::move(value); }
-#endif
-  FOMModuleList& getFOMModuleList()
+  FOMModuleList& getFOMModuleList() noexcept
   { return _fOMModuleList; }
-  const FOMModuleList& getFOMModuleList() const
+  const FOMModuleList& getFOMModuleList() const noexcept
   { return _fOMModuleList; }
 
 private:
@@ -3492,81 +6628,138 @@ private:
   FOMModuleList _fOMModuleList;
 };
 
-class OPENRTI_API JoinFederationExecutionRequestMessage : public AbstractMessage {
+class OPENRTI_API InsertModules2Message final : public AbstractMessage {
 public:
-  JoinFederationExecutionRequestMessage();
-  virtual ~JoinFederationExecutionRequestMessage();
+  InsertModules2Message() noexcept {};
+  InsertModules2Message(const InsertModules2Message&) = default;
+  InsertModules2Message(InsertModules2Message&&) noexcept = default;
+  virtual ~InsertModules2Message() noexcept = default;
+  InsertModules2Message& operator=(const InsertModules2Message&) = default;
+  InsertModules2Message& operator=(InsertModules2Message&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 106;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const JoinFederationExecutionRequestMessage& rhs) const;
-  bool operator<(const JoinFederationExecutionRequestMessage& rhs) const;
-  bool operator!=(const JoinFederationExecutionRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertModules2Message& rhs) const noexcept;
+  bool operator<(const InsertModules2Message& rhs) const noexcept;
+  bool operator!=(const InsertModules2Message& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const JoinFederationExecutionRequestMessage& rhs) const
+  bool operator>(const InsertModules2Message& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const JoinFederationExecutionRequestMessage& rhs) const
+  bool operator>=(const InsertModules2Message& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const JoinFederationExecutionRequestMessage& rhs) const
+  bool operator<=(const InsertModules2Message& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationExecution(const String& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
+  { _federationHandle = value; }
+  void setFederationHandle(FederationHandle&& value) noexcept
+  { _federationHandle = std::move(value); }
+  FederationHandle& getFederationHandle() noexcept
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const noexcept
+  { return _federationHandle; }
+
+  void setFOMModule2List(const FOMModule2List& value) noexcept
+  { _fOMModule2List = value; }
+  void setFOMModule2List(FOMModule2List&& value) noexcept
+  { _fOMModule2List = std::move(value); }
+  FOMModule2List& getFOMModule2List() noexcept
+  { return _fOMModule2List; }
+  const FOMModule2List& getFOMModule2List() const noexcept
+  { return _fOMModule2List; }
+
+private:
+  FederationHandle _federationHandle;
+  FOMModule2List _fOMModule2List;
+};
+
+class OPENRTI_API JoinFederationExecutionRequestMessage final : public AbstractMessage {
+public:
+  JoinFederationExecutionRequestMessage() noexcept {};
+  JoinFederationExecutionRequestMessage(const JoinFederationExecutionRequestMessage&) = default;
+  JoinFederationExecutionRequestMessage(JoinFederationExecutionRequestMessage&&) noexcept = default;
+  virtual ~JoinFederationExecutionRequestMessage() noexcept = default;
+  JoinFederationExecutionRequestMessage& operator=(const JoinFederationExecutionRequestMessage&) = default;
+  JoinFederationExecutionRequestMessage& operator=(JoinFederationExecutionRequestMessage&&) = default;
+
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 13;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const JoinFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator<(const JoinFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator!=(const JoinFederationExecutionRequestMessage& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const JoinFederationExecutionRequestMessage& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const JoinFederationExecutionRequestMessage& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const JoinFederationExecutionRequestMessage& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setFederationExecution(const String& value) noexcept
   { _federationExecution = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationExecution(String&& value)
+  void setFederationExecution(String&& value) noexcept
   { _federationExecution = std::move(value); }
-#endif
-  String& getFederationExecution()
+  String& getFederationExecution() noexcept
   { return _federationExecution; }
-  const String& getFederationExecution() const
+  const String& getFederationExecution() const noexcept
   { return _federationExecution; }
 
-  void setFederateType(const String& value)
+  void setFederateType(const String& value) noexcept
   { _federateType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateType(String&& value)
+  void setFederateType(String&& value) noexcept
   { _federateType = std::move(value); }
-#endif
-  String& getFederateType()
+  String& getFederateType() noexcept
   { return _federateType; }
-  const String& getFederateType() const
+  const String& getFederateType() const noexcept
   { return _federateType; }
 
-  void setFederateName(const String& value)
+  void setFederateName(const String& value) noexcept
   { _federateName = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateName(String&& value)
+  void setFederateName(String&& value) noexcept
   { _federateName = std::move(value); }
-#endif
-  String& getFederateName()
+  String& getFederateName() noexcept
   { return _federateName; }
-  const String& getFederateName() const
+  const String& getFederateName() const noexcept
   { return _federateName; }
 
-  void setFOMStringModuleList(const FOMStringModuleList& value)
+  void setFOMStringModuleList(const FOMStringModuleList& value) noexcept
   { _fOMStringModuleList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFOMStringModuleList(FOMStringModuleList&& value)
+  void setFOMStringModuleList(FOMStringModuleList&& value) noexcept
   { _fOMStringModuleList = std::move(value); }
-#endif
-  FOMStringModuleList& getFOMStringModuleList()
+  FOMStringModuleList& getFOMStringModuleList() noexcept
   { return _fOMStringModuleList; }
-  const FOMStringModuleList& getFOMStringModuleList() const
+  const FOMStringModuleList& getFOMStringModuleList() const noexcept
   { return _fOMStringModuleList; }
 
-  void setConfigurationParameterMap(const ConfigurationParameterMap& value)
+  void setConfigurationParameterMap(const ConfigurationParameterMap& value) noexcept
   { _configurationParameterMap = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setConfigurationParameterMap(ConfigurationParameterMap&& value)
+  void setConfigurationParameterMap(ConfigurationParameterMap&& value) noexcept
   { _configurationParameterMap = std::move(value); }
-#endif
-  ConfigurationParameterMap& getConfigurationParameterMap()
+  ConfigurationParameterMap& getConfigurationParameterMap() noexcept
   { return _configurationParameterMap; }
-  const ConfigurationParameterMap& getConfigurationParameterMap() const
+  const ConfigurationParameterMap& getConfigurationParameterMap() const noexcept
   { return _configurationParameterMap; }
+
+  void setIsInternal(const Bool& value) noexcept
+  { _isInternal = value; }
+  void setIsInternal(Bool&& value) noexcept
+  { _isInternal = std::move(value); }
+  Bool& getIsInternal() noexcept
+  { return _isInternal; }
+  const Bool& getIsInternal() const noexcept
+  { return _isInternal; }
 
 private:
   String _federationExecution;
@@ -3574,205 +6767,295 @@ private:
   String _federateName;
   FOMStringModuleList _fOMStringModuleList;
   ConfigurationParameterMap _configurationParameterMap;
+  Bool _isInternal = false;
 };
 
-class OPENRTI_API JoinFederationExecutionResponseMessage : public AbstractMessage {
+class OPENRTI_API JoinFederationExecutionRequest2Message final : public AbstractMessage {
 public:
-  JoinFederationExecutionResponseMessage();
-  virtual ~JoinFederationExecutionResponseMessage();
+  JoinFederationExecutionRequest2Message() noexcept {};
+  JoinFederationExecutionRequest2Message(const JoinFederationExecutionRequest2Message&) = default;
+  JoinFederationExecutionRequest2Message(JoinFederationExecutionRequest2Message&&) noexcept = default;
+  virtual ~JoinFederationExecutionRequest2Message() noexcept = default;
+  JoinFederationExecutionRequest2Message& operator=(const JoinFederationExecutionRequest2Message&) = default;
+  JoinFederationExecutionRequest2Message& operator=(JoinFederationExecutionRequest2Message&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 105;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const JoinFederationExecutionResponseMessage& rhs) const;
-  bool operator<(const JoinFederationExecutionResponseMessage& rhs) const;
-  bool operator!=(const JoinFederationExecutionResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const JoinFederationExecutionRequest2Message& rhs) const noexcept;
+  bool operator<(const JoinFederationExecutionRequest2Message& rhs) const noexcept;
+  bool operator!=(const JoinFederationExecutionRequest2Message& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const JoinFederationExecutionResponseMessage& rhs) const
+  bool operator>(const JoinFederationExecutionRequest2Message& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const JoinFederationExecutionResponseMessage& rhs) const
+  bool operator>=(const JoinFederationExecutionRequest2Message& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const JoinFederationExecutionResponseMessage& rhs) const
+  bool operator<=(const JoinFederationExecutionRequest2Message& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
-  { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
-  { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
-  { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
-  { return _federationHandle; }
+  void setFederationExecution(const String& value) noexcept
+  { _federationExecution = value; }
+  void setFederationExecution(String&& value) noexcept
+  { _federationExecution = std::move(value); }
+  String& getFederationExecution() noexcept
+  { return _federationExecution; }
+  const String& getFederationExecution() const noexcept
+  { return _federationExecution; }
 
-  void setJoinFederationExecutionResponseType(const JoinFederationExecutionResponseType& value)
-  { _joinFederationExecutionResponseType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setJoinFederationExecutionResponseType(JoinFederationExecutionResponseType&& value)
-  { _joinFederationExecutionResponseType = std::move(value); }
-#endif
-  JoinFederationExecutionResponseType& getJoinFederationExecutionResponseType()
-  { return _joinFederationExecutionResponseType; }
-  const JoinFederationExecutionResponseType& getJoinFederationExecutionResponseType() const
-  { return _joinFederationExecutionResponseType; }
-
-  void setExceptionString(const String& value)
-  { _exceptionString = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setExceptionString(String&& value)
-  { _exceptionString = std::move(value); }
-#endif
-  String& getExceptionString()
-  { return _exceptionString; }
-  const String& getExceptionString() const
-  { return _exceptionString; }
-
-  void setFederateHandle(const FederateHandle& value)
-  { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
-  { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
-  { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
-  { return _federateHandle; }
-
-  void setFederateType(const String& value)
+  void setFederateType(const String& value) noexcept
   { _federateType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateType(String&& value)
+  void setFederateType(String&& value) noexcept
   { _federateType = std::move(value); }
-#endif
-  String& getFederateType()
+  String& getFederateType() noexcept
   { return _federateType; }
-  const String& getFederateType() const
+  const String& getFederateType() const noexcept
   { return _federateType; }
 
-  void setFederateName(const String& value)
+  void setFederateName(const String& value) noexcept
   { _federateName = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateName(String&& value)
+  void setFederateName(String&& value) noexcept
   { _federateName = std::move(value); }
-#endif
-  String& getFederateName()
+  String& getFederateName() noexcept
   { return _federateName; }
-  const String& getFederateName() const
+  const String& getFederateName() const noexcept
+  { return _federateName; }
+
+  void setFOMStringModuleList(const FOMStringModule2List& value) noexcept
+  { _fOMStringModuleList = value; }
+  void setFOMStringModuleList(FOMStringModule2List&& value) noexcept
+  { _fOMStringModuleList = std::move(value); }
+  FOMStringModule2List& getFOMStringModuleList() noexcept
+  { return _fOMStringModuleList; }
+  const FOMStringModule2List& getFOMStringModuleList() const noexcept
+  { return _fOMStringModuleList; }
+
+  void setConfigurationParameterMap(const ConfigurationParameterMap& value) noexcept
+  { _configurationParameterMap = value; }
+  void setConfigurationParameterMap(ConfigurationParameterMap&& value) noexcept
+  { _configurationParameterMap = std::move(value); }
+  ConfigurationParameterMap& getConfigurationParameterMap() noexcept
+  { return _configurationParameterMap; }
+  const ConfigurationParameterMap& getConfigurationParameterMap() const noexcept
+  { return _configurationParameterMap; }
+
+  void setIsInternal(const Bool& value) noexcept
+  { _isInternal = value; }
+  void setIsInternal(Bool&& value) noexcept
+  { _isInternal = std::move(value); }
+  Bool& getIsInternal() noexcept
+  { return _isInternal; }
+  const Bool& getIsInternal() const noexcept
+  { return _isInternal; }
+
+private:
+  String _federationExecution;
+  String _federateType;
+  String _federateName;
+  FOMStringModule2List _fOMStringModuleList;
+  ConfigurationParameterMap _configurationParameterMap;
+  Bool _isInternal = false;
+};
+
+class OPENRTI_API JoinFederationExecutionResponseMessage final : public AbstractMessage {
+public:
+  JoinFederationExecutionResponseMessage() noexcept {};
+  JoinFederationExecutionResponseMessage(const JoinFederationExecutionResponseMessage&) = default;
+  JoinFederationExecutionResponseMessage(JoinFederationExecutionResponseMessage&&) noexcept = default;
+  virtual ~JoinFederationExecutionResponseMessage() noexcept = default;
+  JoinFederationExecutionResponseMessage& operator=(const JoinFederationExecutionResponseMessage&) = default;
+  JoinFederationExecutionResponseMessage& operator=(JoinFederationExecutionResponseMessage&&) = default;
+
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 14;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const JoinFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator<(const JoinFederationExecutionResponseMessage& rhs) const noexcept;
+  bool operator!=(const JoinFederationExecutionResponseMessage& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const JoinFederationExecutionResponseMessage& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const JoinFederationExecutionResponseMessage& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const JoinFederationExecutionResponseMessage& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value) noexcept
+  { _federationHandle = value; }
+  void setFederationHandle(FederationHandle&& value) noexcept
+  { _federationHandle = std::move(value); }
+  FederationHandle& getFederationHandle() noexcept
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const noexcept
+  { return _federationHandle; }
+
+  void setJoinFederationExecutionResponseType(const JoinFederationExecutionResponseType& value) noexcept
+  { _joinFederationExecutionResponseType = value; }
+  void setJoinFederationExecutionResponseType(JoinFederationExecutionResponseType&& value) noexcept
+  { _joinFederationExecutionResponseType = std::move(value); }
+  JoinFederationExecutionResponseType& getJoinFederationExecutionResponseType() noexcept
+  { return _joinFederationExecutionResponseType; }
+  const JoinFederationExecutionResponseType& getJoinFederationExecutionResponseType() const noexcept
+  { return _joinFederationExecutionResponseType; }
+
+  void setExceptionString(const String& value) noexcept
+  { _exceptionString = value; }
+  void setExceptionString(String&& value) noexcept
+  { _exceptionString = std::move(value); }
+  String& getExceptionString() noexcept
+  { return _exceptionString; }
+  const String& getExceptionString() const noexcept
+  { return _exceptionString; }
+
+  void setFederateHandle(const FederateHandle& value) noexcept
+  { _federateHandle = value; }
+  void setFederateHandle(FederateHandle&& value) noexcept
+  { _federateHandle = std::move(value); }
+  FederateHandle& getFederateHandle() noexcept
+  { return _federateHandle; }
+  const FederateHandle& getFederateHandle() const noexcept
+  { return _federateHandle; }
+
+  void setFederateType(const String& value) noexcept
+  { _federateType = value; }
+  void setFederateType(String&& value) noexcept
+  { _federateType = std::move(value); }
+  String& getFederateType() noexcept
+  { return _federateType; }
+  const String& getFederateType() const noexcept
+  { return _federateType; }
+
+  void setFederateName(const String& value) noexcept
+  { _federateName = value; }
+  void setFederateName(String&& value) noexcept
+  { _federateName = std::move(value); }
+  String& getFederateName() noexcept
+  { return _federateName; }
+  const String& getFederateName() const noexcept
   { return _federateName; }
 
 private:
   FederationHandle _federationHandle;
-  JoinFederationExecutionResponseType _joinFederationExecutionResponseType;
+  JoinFederationExecutionResponseType _joinFederationExecutionResponseType = JoinFederationExecutionResponseSuccess;
   String _exceptionString;
   FederateHandle _federateHandle;
   String _federateType;
   String _federateName;
 };
 
-class OPENRTI_API ResignFederationExecutionLeafRequestMessage : public AbstractMessage {
+class OPENRTI_API ResignFederationExecutionLeafRequestMessage final : public AbstractMessage {
 public:
-  ResignFederationExecutionLeafRequestMessage();
-  virtual ~ResignFederationExecutionLeafRequestMessage();
+  ResignFederationExecutionLeafRequestMessage() noexcept {};
+  ResignFederationExecutionLeafRequestMessage(const ResignFederationExecutionLeafRequestMessage&) = default;
+  ResignFederationExecutionLeafRequestMessage(ResignFederationExecutionLeafRequestMessage&&) noexcept = default;
+  virtual ~ResignFederationExecutionLeafRequestMessage() noexcept = default;
+  ResignFederationExecutionLeafRequestMessage& operator=(const ResignFederationExecutionLeafRequestMessage&) = default;
+  ResignFederationExecutionLeafRequestMessage& operator=(ResignFederationExecutionLeafRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ResignFederationExecutionLeafRequestMessage& rhs) const;
-  bool operator<(const ResignFederationExecutionLeafRequestMessage& rhs) const;
-  bool operator!=(const ResignFederationExecutionLeafRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept;
+  bool operator<(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept;
+  bool operator!=(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ResignFederationExecutionLeafRequestMessage& rhs) const
+  bool operator>(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ResignFederationExecutionLeafRequestMessage& rhs) const
+  bool operator>=(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ResignFederationExecutionLeafRequestMessage& rhs) const
+  bool operator<=(const ResignFederationExecutionLeafRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setResignAction(const ResignAction& value)
+  void setResignAction(const ResignAction& value) noexcept
   { _resignAction = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setResignAction(ResignAction&& value)
+  void setResignAction(ResignAction&& value) noexcept
   { _resignAction = std::move(value); }
-#endif
-  ResignAction& getResignAction()
+  ResignAction& getResignAction() noexcept
   { return _resignAction; }
-  const ResignAction& getResignAction() const
+  const ResignAction& getResignAction() const noexcept
   { return _resignAction; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
-  ResignAction _resignAction;
+  ResignAction _resignAction = UNCONDITIONALLY_DIVEST_ATTRIBUTES;
 };
 
-class OPENRTI_API ResignFederationExecutionRequestMessage : public AbstractMessage {
+class OPENRTI_API ResignFederationExecutionRequestMessage final : public AbstractMessage {
 public:
-  ResignFederationExecutionRequestMessage();
-  virtual ~ResignFederationExecutionRequestMessage();
+  ResignFederationExecutionRequestMessage() noexcept {};
+  ResignFederationExecutionRequestMessage(const ResignFederationExecutionRequestMessage&) = default;
+  ResignFederationExecutionRequestMessage(ResignFederationExecutionRequestMessage&&) noexcept = default;
+  virtual ~ResignFederationExecutionRequestMessage() noexcept = default;
+  ResignFederationExecutionRequestMessage& operator=(const ResignFederationExecutionRequestMessage&) = default;
+  ResignFederationExecutionRequestMessage& operator=(ResignFederationExecutionRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 15;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ResignFederationExecutionRequestMessage& rhs) const;
-  bool operator<(const ResignFederationExecutionRequestMessage& rhs) const;
-  bool operator!=(const ResignFederationExecutionRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ResignFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator<(const ResignFederationExecutionRequestMessage& rhs) const noexcept;
+  bool operator!=(const ResignFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ResignFederationExecutionRequestMessage& rhs) const
+  bool operator>(const ResignFederationExecutionRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ResignFederationExecutionRequestMessage& rhs) const
+  bool operator>=(const ResignFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ResignFederationExecutionRequestMessage& rhs) const
+  bool operator<=(const ResignFederationExecutionRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
 private:
@@ -3780,119 +7063,131 @@ private:
   FederateHandle _federateHandle;
 };
 
-class OPENRTI_API JoinFederateNotifyMessage : public AbstractMessage {
+class OPENRTI_API JoinFederateNotifyMessage final : public AbstractMessage {
 public:
-  JoinFederateNotifyMessage();
-  virtual ~JoinFederateNotifyMessage();
+  JoinFederateNotifyMessage() noexcept {};
+  JoinFederateNotifyMessage(const JoinFederateNotifyMessage&) = default;
+  JoinFederateNotifyMessage(JoinFederateNotifyMessage&&) noexcept = default;
+  virtual ~JoinFederateNotifyMessage() noexcept = default;
+  JoinFederateNotifyMessage& operator=(const JoinFederateNotifyMessage&) = default;
+  JoinFederateNotifyMessage& operator=(JoinFederateNotifyMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 16;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const JoinFederateNotifyMessage& rhs) const;
-  bool operator<(const JoinFederateNotifyMessage& rhs) const;
-  bool operator!=(const JoinFederateNotifyMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const JoinFederateNotifyMessage& rhs) const noexcept;
+  bool operator<(const JoinFederateNotifyMessage& rhs) const noexcept;
+  bool operator!=(const JoinFederateNotifyMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const JoinFederateNotifyMessage& rhs) const
+  bool operator>(const JoinFederateNotifyMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const JoinFederateNotifyMessage& rhs) const
+  bool operator>=(const JoinFederateNotifyMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const JoinFederateNotifyMessage& rhs) const
+  bool operator<=(const JoinFederateNotifyMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setFederateType(const String& value)
+  void setFederateType(const String& value) noexcept
   { _federateType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateType(String&& value)
+  void setFederateType(String&& value) noexcept
   { _federateType = std::move(value); }
-#endif
-  String& getFederateType()
+  String& getFederateType() noexcept
   { return _federateType; }
-  const String& getFederateType() const
+  const String& getFederateType() const noexcept
   { return _federateType; }
 
-  void setFederateName(const String& value)
+  void setFederateName(const String& value) noexcept
   { _federateName = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateName(String&& value)
+  void setFederateName(String&& value) noexcept
   { _federateName = std::move(value); }
-#endif
-  String& getFederateName()
+  String& getFederateName() noexcept
   { return _federateName; }
-  const String& getFederateName() const
+  const String& getFederateName() const noexcept
   { return _federateName; }
+
+  void setIsInternal(const Bool& value) noexcept
+  { _isInternal = value; }
+  void setIsInternal(Bool&& value) noexcept
+  { _isInternal = std::move(value); }
+  Bool& getIsInternal() noexcept
+  { return _isInternal; }
+  const Bool& getIsInternal() const noexcept
+  { return _isInternal; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   String _federateType;
   String _federateName;
+  Bool _isInternal = false;
 };
 
-class OPENRTI_API ResignFederateNotifyMessage : public AbstractMessage {
+class OPENRTI_API ResignFederateNotifyMessage final : public AbstractMessage {
 public:
-  ResignFederateNotifyMessage();
-  virtual ~ResignFederateNotifyMessage();
+  ResignFederateNotifyMessage() noexcept {};
+  ResignFederateNotifyMessage(const ResignFederateNotifyMessage&) = default;
+  ResignFederateNotifyMessage(ResignFederateNotifyMessage&&) noexcept = default;
+  virtual ~ResignFederateNotifyMessage() noexcept = default;
+  ResignFederateNotifyMessage& operator=(const ResignFederateNotifyMessage&) = default;
+  ResignFederateNotifyMessage& operator=(ResignFederateNotifyMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 17;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ResignFederateNotifyMessage& rhs) const;
-  bool operator<(const ResignFederateNotifyMessage& rhs) const;
-  bool operator!=(const ResignFederateNotifyMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ResignFederateNotifyMessage& rhs) const noexcept;
+  bool operator<(const ResignFederateNotifyMessage& rhs) const noexcept;
+  bool operator!=(const ResignFederateNotifyMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ResignFederateNotifyMessage& rhs) const
+  bool operator>(const ResignFederateNotifyMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ResignFederateNotifyMessage& rhs) const
+  bool operator>=(const ResignFederateNotifyMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ResignFederateNotifyMessage& rhs) const
+  bool operator<=(const ResignFederateNotifyMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
 private:
@@ -3900,140 +7195,138 @@ private:
   FederateHandle _federateHandle;
 };
 
-class OPENRTI_API ChangeAutomaticResignDirectiveMessage : public AbstractMessage {
+class OPENRTI_API ChangeAutomaticResignDirectiveMessage final : public AbstractMessage {
 public:
-  ChangeAutomaticResignDirectiveMessage();
-  virtual ~ChangeAutomaticResignDirectiveMessage();
+  ChangeAutomaticResignDirectiveMessage() noexcept {};
+  ChangeAutomaticResignDirectiveMessage(const ChangeAutomaticResignDirectiveMessage&) = default;
+  ChangeAutomaticResignDirectiveMessage(ChangeAutomaticResignDirectiveMessage&&) noexcept = default;
+  virtual ~ChangeAutomaticResignDirectiveMessage() noexcept = default;
+  ChangeAutomaticResignDirectiveMessage& operator=(const ChangeAutomaticResignDirectiveMessage&) = default;
+  ChangeAutomaticResignDirectiveMessage& operator=(ChangeAutomaticResignDirectiveMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 18;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeAutomaticResignDirectiveMessage& rhs) const;
-  bool operator<(const ChangeAutomaticResignDirectiveMessage& rhs) const;
-  bool operator!=(const ChangeAutomaticResignDirectiveMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept;
+  bool operator<(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept;
+  bool operator!=(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeAutomaticResignDirectiveMessage& rhs) const
+  bool operator>(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeAutomaticResignDirectiveMessage& rhs) const
+  bool operator>=(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeAutomaticResignDirectiveMessage& rhs) const
+  bool operator<=(const ChangeAutomaticResignDirectiveMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setResignAction(const ResignAction& value)
+  void setResignAction(const ResignAction& value) noexcept
   { _resignAction = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setResignAction(ResignAction&& value)
+  void setResignAction(ResignAction&& value) noexcept
   { _resignAction = std::move(value); }
-#endif
-  ResignAction& getResignAction()
+  ResignAction& getResignAction() noexcept
   { return _resignAction; }
-  const ResignAction& getResignAction() const
+  const ResignAction& getResignAction() const noexcept
   { return _resignAction; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
-  ResignAction _resignAction;
+  ResignAction _resignAction = UNCONDITIONALLY_DIVEST_ATTRIBUTES;
 };
 
-class OPENRTI_API RegisterFederationSynchronizationPointMessage : public AbstractMessage {
+class OPENRTI_API RegisterFederationSynchronizationPointMessage final : public AbstractMessage {
 public:
-  RegisterFederationSynchronizationPointMessage();
-  virtual ~RegisterFederationSynchronizationPointMessage();
+  RegisterFederationSynchronizationPointMessage() noexcept {};
+  RegisterFederationSynchronizationPointMessage(const RegisterFederationSynchronizationPointMessage&) = default;
+  RegisterFederationSynchronizationPointMessage(RegisterFederationSynchronizationPointMessage&&) noexcept = default;
+  virtual ~RegisterFederationSynchronizationPointMessage() noexcept = default;
+  RegisterFederationSynchronizationPointMessage& operator=(const RegisterFederationSynchronizationPointMessage&) = default;
+  RegisterFederationSynchronizationPointMessage& operator=(RegisterFederationSynchronizationPointMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 30;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RegisterFederationSynchronizationPointMessage& rhs) const;
-  bool operator<(const RegisterFederationSynchronizationPointMessage& rhs) const;
-  bool operator!=(const RegisterFederationSynchronizationPointMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept;
+  bool operator<(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept;
+  bool operator!=(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RegisterFederationSynchronizationPointMessage& rhs) const
+  bool operator>(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RegisterFederationSynchronizationPointMessage& rhs) const
+  bool operator>=(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RegisterFederationSynchronizationPointMessage& rhs) const
+  bool operator<=(const RegisterFederationSynchronizationPointMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
-#endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setFederateHandleVector(const FederateHandleVector& value)
+  void setFederateHandleVector(const FederateHandleVector& value) noexcept
   { _federateHandleVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandleVector(FederateHandleVector&& value)
+  void setFederateHandleVector(FederateHandleVector&& value) noexcept
   { _federateHandleVector = std::move(value); }
-#endif
-  FederateHandleVector& getFederateHandleVector()
+  FederateHandleVector& getFederateHandleVector() noexcept
   { return _federateHandleVector; }
-  const FederateHandleVector& getFederateHandleVector() const
+  const FederateHandleVector& getFederateHandleVector() const noexcept
   { return _federateHandleVector; }
 
 private:
@@ -4044,214 +7337,211 @@ private:
   FederateHandleVector _federateHandleVector;
 };
 
-class OPENRTI_API RegisterFederationSynchronizationPointResponseMessage : public AbstractMessage {
+class OPENRTI_API RegisterFederationSynchronizationPointResponseMessage final : public AbstractMessage {
 public:
-  RegisterFederationSynchronizationPointResponseMessage();
-  virtual ~RegisterFederationSynchronizationPointResponseMessage();
+  RegisterFederationSynchronizationPointResponseMessage() noexcept {};
+  RegisterFederationSynchronizationPointResponseMessage(const RegisterFederationSynchronizationPointResponseMessage&) = default;
+  RegisterFederationSynchronizationPointResponseMessage(RegisterFederationSynchronizationPointResponseMessage&&) noexcept = default;
+  virtual ~RegisterFederationSynchronizationPointResponseMessage() noexcept = default;
+  RegisterFederationSynchronizationPointResponseMessage& operator=(const RegisterFederationSynchronizationPointResponseMessage&) = default;
+  RegisterFederationSynchronizationPointResponseMessage& operator=(RegisterFederationSynchronizationPointResponseMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 31;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RegisterFederationSynchronizationPointResponseMessage& rhs) const;
-  bool operator<(const RegisterFederationSynchronizationPointResponseMessage& rhs) const;
-  bool operator!=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept;
+  bool operator<(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept;
+  bool operator!=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+  bool operator>(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+  bool operator>=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const
+  bool operator<=(const RegisterFederationSynchronizationPointResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
-#endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setRegisterFederationSynchronizationPointResponseType(const RegisterFederationSynchronizationPointResponseType& value)
+  void setRegisterFederationSynchronizationPointResponseType(const RegisterFederationSynchronizationPointResponseType& value) noexcept
   { _registerFederationSynchronizationPointResponseType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRegisterFederationSynchronizationPointResponseType(RegisterFederationSynchronizationPointResponseType&& value)
+  void setRegisterFederationSynchronizationPointResponseType(RegisterFederationSynchronizationPointResponseType&& value) noexcept
   { _registerFederationSynchronizationPointResponseType = std::move(value); }
-#endif
-  RegisterFederationSynchronizationPointResponseType& getRegisterFederationSynchronizationPointResponseType()
+  RegisterFederationSynchronizationPointResponseType& getRegisterFederationSynchronizationPointResponseType() noexcept
   { return _registerFederationSynchronizationPointResponseType; }
-  const RegisterFederationSynchronizationPointResponseType& getRegisterFederationSynchronizationPointResponseType() const
+  const RegisterFederationSynchronizationPointResponseType& getRegisterFederationSynchronizationPointResponseType() const noexcept
   { return _registerFederationSynchronizationPointResponseType; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   String _label;
-  RegisterFederationSynchronizationPointResponseType _registerFederationSynchronizationPointResponseType;
+  RegisterFederationSynchronizationPointResponseType _registerFederationSynchronizationPointResponseType = RegisterFederationSynchronizationPointResponseSuccess;
 };
 
-class OPENRTI_API AnnounceSynchronizationPointMessage : public AbstractMessage {
+class OPENRTI_API AnnounceSynchronizationPointMessage final : public AbstractMessage {
 public:
-  AnnounceSynchronizationPointMessage();
-  virtual ~AnnounceSynchronizationPointMessage();
+  AnnounceSynchronizationPointMessage() noexcept {};
+  AnnounceSynchronizationPointMessage(const AnnounceSynchronizationPointMessage&) = default;
+  AnnounceSynchronizationPointMessage(AnnounceSynchronizationPointMessage&&) noexcept = default;
+  virtual ~AnnounceSynchronizationPointMessage() noexcept = default;
+  AnnounceSynchronizationPointMessage& operator=(const AnnounceSynchronizationPointMessage&) = default;
+  AnnounceSynchronizationPointMessage& operator=(AnnounceSynchronizationPointMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 32;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const AnnounceSynchronizationPointMessage& rhs) const;
-  bool operator<(const AnnounceSynchronizationPointMessage& rhs) const;
-  bool operator!=(const AnnounceSynchronizationPointMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const AnnounceSynchronizationPointMessage& rhs) const noexcept;
+  bool operator<(const AnnounceSynchronizationPointMessage& rhs) const noexcept;
+  bool operator!=(const AnnounceSynchronizationPointMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const AnnounceSynchronizationPointMessage& rhs) const
+  bool operator>(const AnnounceSynchronizationPointMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AnnounceSynchronizationPointMessage& rhs) const
+  bool operator>=(const AnnounceSynchronizationPointMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AnnounceSynchronizationPointMessage& rhs) const
+  bool operator<=(const AnnounceSynchronizationPointMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
-#endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setAddJoiningFederates(const Bool& value)
+  void setAddJoiningFederates(const Bool& value) noexcept
   { _addJoiningFederates = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAddJoiningFederates(Bool&& value)
+  void setAddJoiningFederates(Bool&& value) noexcept
   { _addJoiningFederates = std::move(value); }
-#endif
-  Bool& getAddJoiningFederates()
+  Bool& getAddJoiningFederates() noexcept
   { return _addJoiningFederates; }
-  const Bool& getAddJoiningFederates() const
+  const Bool& getAddJoiningFederates() const noexcept
   { return _addJoiningFederates; }
 
-  void setFederateHandleVector(const FederateHandleVector& value)
+  void setFederateHandleVector(const FederateHandleVector& value) noexcept
   { _federateHandleVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandleVector(FederateHandleVector&& value)
+  void setFederateHandleVector(FederateHandleVector&& value) noexcept
   { _federateHandleVector = std::move(value); }
-#endif
-  FederateHandleVector& getFederateHandleVector()
+  FederateHandleVector& getFederateHandleVector() noexcept
   { return _federateHandleVector; }
-  const FederateHandleVector& getFederateHandleVector() const
+  const FederateHandleVector& getFederateHandleVector() const noexcept
   { return _federateHandleVector; }
 
 private:
   FederationHandle _federationHandle;
   String _label;
   VariableLengthData _tag;
-  Bool _addJoiningFederates;
+  Bool _addJoiningFederates = false;
   FederateHandleVector _federateHandleVector;
 };
 
-class OPENRTI_API SynchronizationPointAchievedMessage : public AbstractMessage {
+class OPENRTI_API SynchronizationPointAchievedMessage final : public AbstractMessage {
 public:
-  SynchronizationPointAchievedMessage();
-  virtual ~SynchronizationPointAchievedMessage();
+  SynchronizationPointAchievedMessage() noexcept {};
+  SynchronizationPointAchievedMessage(const SynchronizationPointAchievedMessage&) = default;
+  SynchronizationPointAchievedMessage(SynchronizationPointAchievedMessage&&) noexcept = default;
+  virtual ~SynchronizationPointAchievedMessage() noexcept = default;
+  SynchronizationPointAchievedMessage& operator=(const SynchronizationPointAchievedMessage&) = default;
+  SynchronizationPointAchievedMessage& operator=(SynchronizationPointAchievedMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 33;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const SynchronizationPointAchievedMessage& rhs) const;
-  bool operator<(const SynchronizationPointAchievedMessage& rhs) const;
-  bool operator!=(const SynchronizationPointAchievedMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const SynchronizationPointAchievedMessage& rhs) const noexcept;
+  bool operator<(const SynchronizationPointAchievedMessage& rhs) const noexcept;
+  bool operator!=(const SynchronizationPointAchievedMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const SynchronizationPointAchievedMessage& rhs) const
+  bool operator>(const SynchronizationPointAchievedMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const SynchronizationPointAchievedMessage& rhs) const
+  bool operator>=(const SynchronizationPointAchievedMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const SynchronizationPointAchievedMessage& rhs) const
+  bool operator<=(const SynchronizationPointAchievedMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
-#endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value)
+  void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value) noexcept
   { _federateHandleBoolPairVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value)
+  void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value) noexcept
   { _federateHandleBoolPairVector = std::move(value); }
-#endif
-  FederateHandleBoolPairVector& getFederateHandleBoolPairVector()
+  FederateHandleBoolPairVector& getFederateHandleBoolPairVector() noexcept
   { return _federateHandleBoolPairVector; }
-  const FederateHandleBoolPairVector& getFederateHandleBoolPairVector() const
+  const FederateHandleBoolPairVector& getFederateHandleBoolPairVector() const noexcept
   { return _federateHandleBoolPairVector; }
 
 private:
@@ -4260,58 +7550,59 @@ private:
   FederateHandleBoolPairVector _federateHandleBoolPairVector;
 };
 
-class OPENRTI_API FederationSynchronizedMessage : public AbstractMessage {
+class OPENRTI_API FederationSynchronizedMessage final : public AbstractMessage {
 public:
-  FederationSynchronizedMessage();
-  virtual ~FederationSynchronizedMessage();
+  FederationSynchronizedMessage() noexcept {};
+  FederationSynchronizedMessage(const FederationSynchronizedMessage&) = default;
+  FederationSynchronizedMessage(FederationSynchronizedMessage&&) noexcept = default;
+  virtual ~FederationSynchronizedMessage() noexcept = default;
+  FederationSynchronizedMessage& operator=(const FederationSynchronizedMessage&) = default;
+  FederationSynchronizedMessage& operator=(FederationSynchronizedMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 34;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const FederationSynchronizedMessage& rhs) const;
-  bool operator<(const FederationSynchronizedMessage& rhs) const;
-  bool operator!=(const FederationSynchronizedMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const FederationSynchronizedMessage& rhs) const noexcept;
+  bool operator<(const FederationSynchronizedMessage& rhs) const noexcept;
+  bool operator!=(const FederationSynchronizedMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const FederationSynchronizedMessage& rhs) const
+  bool operator>(const FederationSynchronizedMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const FederationSynchronizedMessage& rhs) const
+  bool operator>=(const FederationSynchronizedMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const FederationSynchronizedMessage& rhs) const
+  bool operator<=(const FederationSynchronizedMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setLabel(const String& value)
+  void setLabel(const String& value) noexcept
   { _label = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLabel(String&& value)
+  void setLabel(String&& value) noexcept
   { _label = std::move(value); }
-#endif
-  String& getLabel()
+  String& getLabel() noexcept
   { return _label; }
-  const String& getLabel() const
+  const String& getLabel() const noexcept
   { return _label; }
 
-  void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value)
+  void setFederateHandleBoolPairVector(const FederateHandleBoolPairVector& value) noexcept
   { _federateHandleBoolPairVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value)
+  void setFederateHandleBoolPairVector(FederateHandleBoolPairVector&& value) noexcept
   { _federateHandleBoolPairVector = std::move(value); }
-#endif
-  FederateHandleBoolPairVector& getFederateHandleBoolPairVector()
+  FederateHandleBoolPairVector& getFederateHandleBoolPairVector() noexcept
   { return _federateHandleBoolPairVector; }
-  const FederateHandleBoolPairVector& getFederateHandleBoolPairVector() const
+  const FederateHandleBoolPairVector& getFederateHandleBoolPairVector() const noexcept
   { return _federateHandleBoolPairVector; }
 
 private:
@@ -4320,203 +7611,202 @@ private:
   FederateHandleBoolPairVector _federateHandleBoolPairVector;
 };
 
-class OPENRTI_API EnableTimeRegulationRequestMessage : public AbstractMessage {
+class OPENRTI_API EnableTimeRegulationRequestMessage final : public AbstractMessage {
 public:
-  EnableTimeRegulationRequestMessage();
-  virtual ~EnableTimeRegulationRequestMessage();
+  EnableTimeRegulationRequestMessage() noexcept {};
+  EnableTimeRegulationRequestMessage(const EnableTimeRegulationRequestMessage&) = default;
+  EnableTimeRegulationRequestMessage(EnableTimeRegulationRequestMessage&&) noexcept = default;
+  virtual ~EnableTimeRegulationRequestMessage() noexcept = default;
+  EnableTimeRegulationRequestMessage& operator=(const EnableTimeRegulationRequestMessage&) = default;
+  EnableTimeRegulationRequestMessage& operator=(EnableTimeRegulationRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 40;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EnableTimeRegulationRequestMessage& rhs) const;
-  bool operator<(const EnableTimeRegulationRequestMessage& rhs) const;
-  bool operator!=(const EnableTimeRegulationRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnableTimeRegulationRequestMessage& rhs) const noexcept;
+  bool operator<(const EnableTimeRegulationRequestMessage& rhs) const noexcept;
+  bool operator!=(const EnableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EnableTimeRegulationRequestMessage& rhs) const
+  bool operator>(const EnableTimeRegulationRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EnableTimeRegulationRequestMessage& rhs) const
+  bool operator>=(const EnableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EnableTimeRegulationRequestMessage& rhs) const
+  bool operator<=(const EnableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
-#endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setCommitId(const Unsigned& value)
+  void setCommitId(const Unsigned& value) noexcept
   { _commitId = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCommitId(Unsigned&& value)
+  void setCommitId(Unsigned&& value) noexcept
   { _commitId = std::move(value); }
-#endif
-  Unsigned& getCommitId()
+  Unsigned& getCommitId() noexcept
   { return _commitId; }
-  const Unsigned& getCommitId() const
+  const Unsigned& getCommitId() const noexcept
   { return _commitId; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   VariableLengthData _timeStamp;
-  Unsigned _commitId;
+  Unsigned _commitId = 0;
 };
 
-class OPENRTI_API EnableTimeRegulationResponseMessage : public AbstractMessage {
+class OPENRTI_API EnableTimeRegulationResponseMessage final : public AbstractMessage {
 public:
-  EnableTimeRegulationResponseMessage();
-  virtual ~EnableTimeRegulationResponseMessage();
+  EnableTimeRegulationResponseMessage() noexcept {};
+  EnableTimeRegulationResponseMessage(const EnableTimeRegulationResponseMessage&) = default;
+  EnableTimeRegulationResponseMessage(EnableTimeRegulationResponseMessage&&) noexcept = default;
+  virtual ~EnableTimeRegulationResponseMessage() noexcept = default;
+  EnableTimeRegulationResponseMessage& operator=(const EnableTimeRegulationResponseMessage&) = default;
+  EnableTimeRegulationResponseMessage& operator=(EnableTimeRegulationResponseMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 41;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EnableTimeRegulationResponseMessage& rhs) const;
-  bool operator<(const EnableTimeRegulationResponseMessage& rhs) const;
-  bool operator!=(const EnableTimeRegulationResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnableTimeRegulationResponseMessage& rhs) const noexcept;
+  bool operator<(const EnableTimeRegulationResponseMessage& rhs) const noexcept;
+  bool operator!=(const EnableTimeRegulationResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EnableTimeRegulationResponseMessage& rhs) const
+  bool operator>(const EnableTimeRegulationResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EnableTimeRegulationResponseMessage& rhs) const
+  bool operator>=(const EnableTimeRegulationResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EnableTimeRegulationResponseMessage& rhs) const
+  bool operator<=(const EnableTimeRegulationResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setRespondingFederateHandle(const FederateHandle& value)
+  void setRespondingFederateHandle(const FederateHandle& value) noexcept
   { _respondingFederateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRespondingFederateHandle(FederateHandle&& value)
+  void setRespondingFederateHandle(FederateHandle&& value) noexcept
   { _respondingFederateHandle = std::move(value); }
-#endif
-  FederateHandle& getRespondingFederateHandle()
+  FederateHandle& getRespondingFederateHandle() noexcept
   { return _respondingFederateHandle; }
-  const FederateHandle& getRespondingFederateHandle() const
+  const FederateHandle& getRespondingFederateHandle() const noexcept
   { return _respondingFederateHandle; }
 
-  void setTimeStampValid(const Bool& value)
+  void setTimeStampValid(const Bool& value) noexcept
   { _timeStampValid = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStampValid(Bool&& value)
+  void setTimeStampValid(Bool&& value) noexcept
   { _timeStampValid = std::move(value); }
-#endif
-  Bool& getTimeStampValid()
+  Bool& getTimeStampValid() noexcept
   { return _timeStampValid; }
-  const Bool& getTimeStampValid() const
+  const Bool& getTimeStampValid() const noexcept
   { return _timeStampValid; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
-#endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   FederateHandle _respondingFederateHandle;
-  Bool _timeStampValid;
+  Bool _timeStampValid = false;
   VariableLengthData _timeStamp;
 };
 
-class OPENRTI_API DisableTimeRegulationRequestMessage : public AbstractMessage {
+class OPENRTI_API DisableTimeRegulationRequestMessage final : public AbstractMessage {
 public:
-  DisableTimeRegulationRequestMessage();
-  virtual ~DisableTimeRegulationRequestMessage();
+  DisableTimeRegulationRequestMessage() noexcept {};
+  DisableTimeRegulationRequestMessage(const DisableTimeRegulationRequestMessage&) = default;
+  DisableTimeRegulationRequestMessage(DisableTimeRegulationRequestMessage&&) noexcept = default;
+  virtual ~DisableTimeRegulationRequestMessage() noexcept = default;
+  DisableTimeRegulationRequestMessage& operator=(const DisableTimeRegulationRequestMessage&) = default;
+  DisableTimeRegulationRequestMessage& operator=(DisableTimeRegulationRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 42;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const DisableTimeRegulationRequestMessage& rhs) const;
-  bool operator<(const DisableTimeRegulationRequestMessage& rhs) const;
-  bool operator!=(const DisableTimeRegulationRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DisableTimeRegulationRequestMessage& rhs) const noexcept;
+  bool operator<(const DisableTimeRegulationRequestMessage& rhs) const noexcept;
+  bool operator!=(const DisableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const DisableTimeRegulationRequestMessage& rhs) const
+  bool operator>(const DisableTimeRegulationRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const DisableTimeRegulationRequestMessage& rhs) const
+  bool operator>=(const DisableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const DisableTimeRegulationRequestMessage& rhs) const
+  bool operator<=(const DisableTimeRegulationRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
 private:
@@ -4524,335 +7814,455 @@ private:
   FederateHandle _federateHandle;
 };
 
-class OPENRTI_API CommitLowerBoundTimeStampMessage : public AbstractMessage {
+class OPENRTI_API EnableTimeConstrainedNotifyMessage final : public AbstractMessage {
 public:
-  CommitLowerBoundTimeStampMessage();
-  virtual ~CommitLowerBoundTimeStampMessage();
+  EnableTimeConstrainedNotifyMessage() noexcept {};
+  EnableTimeConstrainedNotifyMessage(const EnableTimeConstrainedNotifyMessage&) = default;
+  EnableTimeConstrainedNotifyMessage(EnableTimeConstrainedNotifyMessage&&) noexcept = default;
+  virtual ~EnableTimeConstrainedNotifyMessage() noexcept = default;
+  EnableTimeConstrainedNotifyMessage& operator=(const EnableTimeConstrainedNotifyMessage&) = default;
+  EnableTimeConstrainedNotifyMessage& operator=(EnableTimeConstrainedNotifyMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 100;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CommitLowerBoundTimeStampMessage& rhs) const;
-  bool operator<(const CommitLowerBoundTimeStampMessage& rhs) const;
-  bool operator!=(const CommitLowerBoundTimeStampMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept;
+  bool operator<(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept;
+  bool operator!=(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CommitLowerBoundTimeStampMessage& rhs) const
+  bool operator>(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CommitLowerBoundTimeStampMessage& rhs) const
+  bool operator>=(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CommitLowerBoundTimeStampMessage& rhs) const
+  bool operator<=(const EnableTimeConstrainedNotifyMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setTimeStamp(const VariableLengthData& value)
+private:
+  FederationHandle _federationHandle;
+  FederateHandle _federateHandle;
+};
+
+class OPENRTI_API DisableTimeConstrainedNotifyMessage final : public AbstractMessage {
+public:
+  DisableTimeConstrainedNotifyMessage() noexcept {};
+  DisableTimeConstrainedNotifyMessage(const DisableTimeConstrainedNotifyMessage&) = default;
+  DisableTimeConstrainedNotifyMessage(DisableTimeConstrainedNotifyMessage&&) noexcept = default;
+  virtual ~DisableTimeConstrainedNotifyMessage() noexcept = default;
+  DisableTimeConstrainedNotifyMessage& operator=(const DisableTimeConstrainedNotifyMessage&) = default;
+  DisableTimeConstrainedNotifyMessage& operator=(DisableTimeConstrainedNotifyMessage&&) = default;
+
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 101;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept;
+  bool operator<(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept;
+  bool operator!=(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const DisableTimeConstrainedNotifyMessage& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value) noexcept
+  { _federationHandle = value; }
+  void setFederationHandle(FederationHandle&& value) noexcept
+  { _federationHandle = std::move(value); }
+  FederationHandle& getFederationHandle() noexcept
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const noexcept
+  { return _federationHandle; }
+
+  void setFederateHandle(const FederateHandle& value) noexcept
+  { _federateHandle = value; }
+  void setFederateHandle(FederateHandle&& value) noexcept
+  { _federateHandle = std::move(value); }
+  FederateHandle& getFederateHandle() noexcept
+  { return _federateHandle; }
+  const FederateHandle& getFederateHandle() const noexcept
+  { return _federateHandle; }
+
+private:
+  FederationHandle _federationHandle;
+  FederateHandle _federateHandle;
+};
+
+class OPENRTI_API CommitLowerBoundTimeStampMessage final : public AbstractMessage {
+public:
+  CommitLowerBoundTimeStampMessage() noexcept {};
+  CommitLowerBoundTimeStampMessage(const CommitLowerBoundTimeStampMessage&) = default;
+  CommitLowerBoundTimeStampMessage(CommitLowerBoundTimeStampMessage&&) noexcept = default;
+  virtual ~CommitLowerBoundTimeStampMessage() noexcept = default;
+  CommitLowerBoundTimeStampMessage& operator=(const CommitLowerBoundTimeStampMessage&) = default;
+  CommitLowerBoundTimeStampMessage& operator=(CommitLowerBoundTimeStampMessage&&) = default;
+
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 43;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CommitLowerBoundTimeStampMessage& rhs) const noexcept;
+  bool operator<(const CommitLowerBoundTimeStampMessage& rhs) const noexcept;
+  bool operator!=(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const CommitLowerBoundTimeStampMessage& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value) noexcept
+  { _federationHandle = value; }
+  void setFederationHandle(FederationHandle&& value) noexcept
+  { _federationHandle = std::move(value); }
+  FederationHandle& getFederationHandle() noexcept
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const noexcept
+  { return _federationHandle; }
+
+  void setFederateHandle(const FederateHandle& value) noexcept
+  { _federateHandle = value; }
+  void setFederateHandle(FederateHandle&& value) noexcept
+  { _federateHandle = std::move(value); }
+  FederateHandle& getFederateHandle() noexcept
+  { return _federateHandle; }
+  const FederateHandle& getFederateHandle() const noexcept
+  { return _federateHandle; }
+
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
-#endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setCommitType(const LowerBoundTimeStampCommitType& value)
+  void setCommitType(const LowerBoundTimeStampCommitType& value) noexcept
   { _commitType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCommitType(LowerBoundTimeStampCommitType&& value)
+  void setCommitType(LowerBoundTimeStampCommitType&& value) noexcept
   { _commitType = std::move(value); }
-#endif
-  LowerBoundTimeStampCommitType& getCommitType()
+  LowerBoundTimeStampCommitType& getCommitType() noexcept
   { return _commitType; }
-  const LowerBoundTimeStampCommitType& getCommitType() const
+  const LowerBoundTimeStampCommitType& getCommitType() const noexcept
   { return _commitType; }
 
-  void setCommitId(const Unsigned& value)
+  void setCommitId(const Unsigned& value) noexcept
   { _commitId = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCommitId(Unsigned&& value)
+  void setCommitId(Unsigned&& value) noexcept
   { _commitId = std::move(value); }
-#endif
-  Unsigned& getCommitId()
+  Unsigned& getCommitId() noexcept
   { return _commitId; }
-  const Unsigned& getCommitId() const
+  const Unsigned& getCommitId() const noexcept
   { return _commitId; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   VariableLengthData _timeStamp;
-  LowerBoundTimeStampCommitType _commitType;
-  Unsigned _commitId;
+  LowerBoundTimeStampCommitType _commitType = TimeAdvanceCommit;
+  Unsigned _commitId = 0;
 };
 
-class OPENRTI_API CommitLowerBoundTimeStampResponseMessage : public AbstractMessage {
+class OPENRTI_API CommitLowerBoundTimeStampResponseMessage final : public AbstractMessage {
 public:
-  CommitLowerBoundTimeStampResponseMessage();
-  virtual ~CommitLowerBoundTimeStampResponseMessage();
+  CommitLowerBoundTimeStampResponseMessage() noexcept {};
+  CommitLowerBoundTimeStampResponseMessage(const CommitLowerBoundTimeStampResponseMessage&) = default;
+  CommitLowerBoundTimeStampResponseMessage(CommitLowerBoundTimeStampResponseMessage&&) noexcept = default;
+  virtual ~CommitLowerBoundTimeStampResponseMessage() noexcept = default;
+  CommitLowerBoundTimeStampResponseMessage& operator=(const CommitLowerBoundTimeStampResponseMessage&) = default;
+  CommitLowerBoundTimeStampResponseMessage& operator=(CommitLowerBoundTimeStampResponseMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 44;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CommitLowerBoundTimeStampResponseMessage& rhs) const;
-  bool operator<(const CommitLowerBoundTimeStampResponseMessage& rhs) const;
-  bool operator!=(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept;
+  bool operator<(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept;
+  bool operator!=(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+  bool operator>(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+  bool operator>=(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CommitLowerBoundTimeStampResponseMessage& rhs) const
+  bool operator<=(const CommitLowerBoundTimeStampResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setSendingFederateHandle(const FederateHandle& value)
+  void setSendingFederateHandle(const FederateHandle& value) noexcept
   { _sendingFederateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSendingFederateHandle(FederateHandle&& value)
+  void setSendingFederateHandle(FederateHandle&& value) noexcept
   { _sendingFederateHandle = std::move(value); }
-#endif
-  FederateHandle& getSendingFederateHandle()
+  FederateHandle& getSendingFederateHandle() noexcept
   { return _sendingFederateHandle; }
-  const FederateHandle& getSendingFederateHandle() const
+  const FederateHandle& getSendingFederateHandle() const noexcept
   { return _sendingFederateHandle; }
 
-  void setCommitId(const Unsigned& value)
+  void setCommitId(const Unsigned& value) noexcept
   { _commitId = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCommitId(Unsigned&& value)
+  void setCommitId(Unsigned&& value) noexcept
   { _commitId = std::move(value); }
-#endif
-  Unsigned& getCommitId()
+  Unsigned& getCommitId() noexcept
   { return _commitId; }
-  const Unsigned& getCommitId() const
+  const Unsigned& getCommitId() const noexcept
   { return _commitId; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   FederateHandle _sendingFederateHandle;
-  Unsigned _commitId;
+  Unsigned _commitId = 0;
 };
 
-class OPENRTI_API LockedByNextMessageRequestMessage : public AbstractMessage {
+class OPENRTI_API LockedByNextMessageRequestMessage final : public AbstractMessage {
 public:
-  LockedByNextMessageRequestMessage();
-  virtual ~LockedByNextMessageRequestMessage();
+  LockedByNextMessageRequestMessage() noexcept {};
+  LockedByNextMessageRequestMessage(const LockedByNextMessageRequestMessage&) = default;
+  LockedByNextMessageRequestMessage(LockedByNextMessageRequestMessage&&) noexcept = default;
+  virtual ~LockedByNextMessageRequestMessage() noexcept = default;
+  LockedByNextMessageRequestMessage& operator=(const LockedByNextMessageRequestMessage&) = default;
+  LockedByNextMessageRequestMessage& operator=(LockedByNextMessageRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 45;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const LockedByNextMessageRequestMessage& rhs) const;
-  bool operator<(const LockedByNextMessageRequestMessage& rhs) const;
-  bool operator!=(const LockedByNextMessageRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const LockedByNextMessageRequestMessage& rhs) const noexcept;
+  bool operator<(const LockedByNextMessageRequestMessage& rhs) const noexcept;
+  bool operator!=(const LockedByNextMessageRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const LockedByNextMessageRequestMessage& rhs) const
+  bool operator>(const LockedByNextMessageRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const LockedByNextMessageRequestMessage& rhs) const
+  bool operator>=(const LockedByNextMessageRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const LockedByNextMessageRequestMessage& rhs) const
+  bool operator<=(const LockedByNextMessageRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setSendingFederateHandle(const FederateHandle& value)
+  void setSendingFederateHandle(const FederateHandle& value) noexcept
   { _sendingFederateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSendingFederateHandle(FederateHandle&& value)
+  void setSendingFederateHandle(FederateHandle&& value) noexcept
   { _sendingFederateHandle = std::move(value); }
-#endif
-  FederateHandle& getSendingFederateHandle()
+  FederateHandle& getSendingFederateHandle() noexcept
   { return _sendingFederateHandle; }
-  const FederateHandle& getSendingFederateHandle() const
+  const FederateHandle& getSendingFederateHandle() const noexcept
   { return _sendingFederateHandle; }
 
-  void setLockedByNextMessage(const Bool& value)
+  void setLockedByNextMessage(const Bool& value) noexcept
   { _lockedByNextMessage = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setLockedByNextMessage(Bool&& value)
+  void setLockedByNextMessage(Bool&& value) noexcept
   { _lockedByNextMessage = std::move(value); }
-#endif
-  Bool& getLockedByNextMessage()
+  Bool& getLockedByNextMessage() noexcept
   { return _lockedByNextMessage; }
-  const Bool& getLockedByNextMessage() const
+  const Bool& getLockedByNextMessage() const noexcept
   { return _lockedByNextMessage; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _sendingFederateHandle;
-  Bool _lockedByNextMessage;
+  Bool _lockedByNextMessage = false;
 };
 
-class OPENRTI_API TimeConstrainedEnabledMessage : public AbstractMessage {
+class OPENRTI_API TimeConstrainedEnabledMessage final : public AbstractMessage {
 public:
-  TimeConstrainedEnabledMessage();
-  virtual ~TimeConstrainedEnabledMessage();
+  TimeConstrainedEnabledMessage() noexcept {};
+  TimeConstrainedEnabledMessage(const TimeConstrainedEnabledMessage&) = default;
+  TimeConstrainedEnabledMessage(TimeConstrainedEnabledMessage&&) noexcept = default;
+  virtual ~TimeConstrainedEnabledMessage() noexcept = default;
+  TimeConstrainedEnabledMessage& operator=(const TimeConstrainedEnabledMessage&) = default;
+  TimeConstrainedEnabledMessage& operator=(TimeConstrainedEnabledMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeConstrainedEnabledMessage& rhs) const;
-  bool operator<(const TimeConstrainedEnabledMessage& rhs) const;
-  bool operator!=(const TimeConstrainedEnabledMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeConstrainedEnabledMessage& rhs) const noexcept;
+  bool operator<(const TimeConstrainedEnabledMessage& rhs) const noexcept;
+  bool operator!=(const TimeConstrainedEnabledMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeConstrainedEnabledMessage& rhs) const
+  bool operator>(const TimeConstrainedEnabledMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeConstrainedEnabledMessage& rhs) const
+  bool operator>=(const TimeConstrainedEnabledMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeConstrainedEnabledMessage& rhs) const
+  bool operator<=(const TimeConstrainedEnabledMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
 private:
 };
 
-class OPENRTI_API TimeRegulationEnabledMessage : public AbstractMessage {
+class OPENRTI_API TimeRegulationEnabledMessage final : public AbstractMessage {
 public:
-  TimeRegulationEnabledMessage();
-  virtual ~TimeRegulationEnabledMessage();
+  TimeRegulationEnabledMessage() noexcept {};
+  TimeRegulationEnabledMessage(const TimeRegulationEnabledMessage&) = default;
+  TimeRegulationEnabledMessage(TimeRegulationEnabledMessage&&) noexcept = default;
+  virtual ~TimeRegulationEnabledMessage() noexcept = default;
+  TimeRegulationEnabledMessage& operator=(const TimeRegulationEnabledMessage&) = default;
+  TimeRegulationEnabledMessage& operator=(TimeRegulationEnabledMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeRegulationEnabledMessage& rhs) const;
-  bool operator<(const TimeRegulationEnabledMessage& rhs) const;
-  bool operator!=(const TimeRegulationEnabledMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeRegulationEnabledMessage& rhs) const noexcept;
+  bool operator<(const TimeRegulationEnabledMessage& rhs) const noexcept;
+  bool operator!=(const TimeRegulationEnabledMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeRegulationEnabledMessage& rhs) const
+  bool operator>(const TimeRegulationEnabledMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeRegulationEnabledMessage& rhs) const
+  bool operator>=(const TimeRegulationEnabledMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeRegulationEnabledMessage& rhs) const
+  bool operator<=(const TimeRegulationEnabledMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
 private:
 };
 
-class OPENRTI_API TimeAdvanceGrantedMessage : public AbstractMessage {
+class OPENRTI_API TimeAdvanceGrantedMessage final : public AbstractMessage {
 public:
-  TimeAdvanceGrantedMessage();
-  virtual ~TimeAdvanceGrantedMessage();
+  TimeAdvanceGrantedMessage() noexcept {};
+  TimeAdvanceGrantedMessage(const TimeAdvanceGrantedMessage&) = default;
+  TimeAdvanceGrantedMessage(TimeAdvanceGrantedMessage&&) noexcept = default;
+  virtual ~TimeAdvanceGrantedMessage() noexcept = default;
+  TimeAdvanceGrantedMessage& operator=(const TimeAdvanceGrantedMessage&) = default;
+  TimeAdvanceGrantedMessage& operator=(TimeAdvanceGrantedMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeAdvanceGrantedMessage& rhs) const;
-  bool operator<(const TimeAdvanceGrantedMessage& rhs) const;
-  bool operator!=(const TimeAdvanceGrantedMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeAdvanceGrantedMessage& rhs) const noexcept;
+  bool operator<(const TimeAdvanceGrantedMessage& rhs) const noexcept;
+  bool operator!=(const TimeAdvanceGrantedMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeAdvanceGrantedMessage& rhs) const
+  bool operator>(const TimeAdvanceGrantedMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeAdvanceGrantedMessage& rhs) const
+  bool operator>=(const TimeAdvanceGrantedMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeAdvanceGrantedMessage& rhs) const
+  bool operator<=(const TimeAdvanceGrantedMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
 private:
 };
 
-class OPENRTI_API InsertRegionMessage : public AbstractMessage {
+class OPENRTI_API InsertRegionMessage final : public AbstractMessage {
 public:
-  InsertRegionMessage();
-  virtual ~InsertRegionMessage();
+  InsertRegionMessage() noexcept {};
+  InsertRegionMessage(const InsertRegionMessage&) = default;
+  InsertRegionMessage(InsertRegionMessage&&) noexcept = default;
+  virtual ~InsertRegionMessage() noexcept = default;
+  InsertRegionMessage& operator=(const InsertRegionMessage&) = default;
+  InsertRegionMessage& operator=(InsertRegionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 46;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InsertRegionMessage& rhs) const;
-  bool operator<(const InsertRegionMessage& rhs) const;
-  bool operator!=(const InsertRegionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertRegionMessage& rhs) const noexcept;
+  bool operator<(const InsertRegionMessage& rhs) const noexcept;
+  bool operator!=(const InsertRegionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InsertRegionMessage& rhs) const
+  bool operator>(const InsertRegionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InsertRegionMessage& rhs) const
+  bool operator>=(const InsertRegionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InsertRegionMessage& rhs) const
+  bool operator<=(const InsertRegionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setRegionHandleDimensionHandleSetPairVector(const RegionHandleDimensionHandleSetPairVector& value)
+  void setRegionHandleDimensionHandleSetPairVector(const RegionHandleDimensionHandleSetPairVector& value) noexcept
   { _regionHandleDimensionHandleSetPairVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRegionHandleDimensionHandleSetPairVector(RegionHandleDimensionHandleSetPairVector&& value)
+  void setRegionHandleDimensionHandleSetPairVector(RegionHandleDimensionHandleSetPairVector&& value) noexcept
   { _regionHandleDimensionHandleSetPairVector = std::move(value); }
-#endif
-  RegionHandleDimensionHandleSetPairVector& getRegionHandleDimensionHandleSetPairVector()
+  RegionHandleDimensionHandleSetPairVector& getRegionHandleDimensionHandleSetPairVector() noexcept
   { return _regionHandleDimensionHandleSetPairVector; }
-  const RegionHandleDimensionHandleSetPairVector& getRegionHandleDimensionHandleSetPairVector() const
+  const RegionHandleDimensionHandleSetPairVector& getRegionHandleDimensionHandleSetPairVector() const noexcept
   { return _regionHandleDimensionHandleSetPairVector; }
 
 private:
@@ -4860,47 +8270,50 @@ private:
   RegionHandleDimensionHandleSetPairVector _regionHandleDimensionHandleSetPairVector;
 };
 
-class OPENRTI_API CommitRegionMessage : public AbstractMessage {
+class OPENRTI_API CommitRegionMessage final : public AbstractMessage {
 public:
-  CommitRegionMessage();
-  virtual ~CommitRegionMessage();
+  CommitRegionMessage() noexcept {};
+  CommitRegionMessage(const CommitRegionMessage&) = default;
+  CommitRegionMessage(CommitRegionMessage&&) noexcept = default;
+  virtual ~CommitRegionMessage() noexcept = default;
+  CommitRegionMessage& operator=(const CommitRegionMessage&) = default;
+  CommitRegionMessage& operator=(CommitRegionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 47;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const CommitRegionMessage& rhs) const;
-  bool operator<(const CommitRegionMessage& rhs) const;
-  bool operator!=(const CommitRegionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const CommitRegionMessage& rhs) const noexcept;
+  bool operator<(const CommitRegionMessage& rhs) const noexcept;
+  bool operator!=(const CommitRegionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const CommitRegionMessage& rhs) const
+  bool operator>(const CommitRegionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const CommitRegionMessage& rhs) const
+  bool operator>=(const CommitRegionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const CommitRegionMessage& rhs) const
+  bool operator<=(const CommitRegionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setRegionHandleRegionValuePairVector(const RegionHandleRegionValuePairVector& value)
+  void setRegionHandleRegionValuePairVector(const RegionHandleRegionValuePairVector& value) noexcept
   { _regionHandleRegionValuePairVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRegionHandleRegionValuePairVector(RegionHandleRegionValuePairVector&& value)
+  void setRegionHandleRegionValuePairVector(RegionHandleRegionValuePairVector&& value) noexcept
   { _regionHandleRegionValuePairVector = std::move(value); }
-#endif
-  RegionHandleRegionValuePairVector& getRegionHandleRegionValuePairVector()
+  RegionHandleRegionValuePairVector& getRegionHandleRegionValuePairVector() noexcept
   { return _regionHandleRegionValuePairVector; }
-  const RegionHandleRegionValuePairVector& getRegionHandleRegionValuePairVector() const
+  const RegionHandleRegionValuePairVector& getRegionHandleRegionValuePairVector() const noexcept
   { return _regionHandleRegionValuePairVector; }
 
 private:
@@ -4908,47 +8321,50 @@ private:
   RegionHandleRegionValuePairVector _regionHandleRegionValuePairVector;
 };
 
-class OPENRTI_API EraseRegionMessage : public AbstractMessage {
+class OPENRTI_API EraseRegionMessage final : public AbstractMessage {
 public:
-  EraseRegionMessage();
-  virtual ~EraseRegionMessage();
+  EraseRegionMessage() noexcept {};
+  EraseRegionMessage(const EraseRegionMessage&) = default;
+  EraseRegionMessage(EraseRegionMessage&&) noexcept = default;
+  virtual ~EraseRegionMessage() noexcept = default;
+  EraseRegionMessage& operator=(const EraseRegionMessage&) = default;
+  EraseRegionMessage& operator=(EraseRegionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 48;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const EraseRegionMessage& rhs) const;
-  bool operator<(const EraseRegionMessage& rhs) const;
-  bool operator!=(const EraseRegionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const EraseRegionMessage& rhs) const noexcept;
+  bool operator<(const EraseRegionMessage& rhs) const noexcept;
+  bool operator!=(const EraseRegionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const EraseRegionMessage& rhs) const
+  bool operator>(const EraseRegionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const EraseRegionMessage& rhs) const
+  bool operator>=(const EraseRegionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const EraseRegionMessage& rhs) const
+  bool operator<=(const EraseRegionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setRegionHandleVector(const RegionHandleVector& value)
+  void setRegionHandleVector(const RegionHandleVector& value) noexcept
   { _regionHandleVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setRegionHandleVector(RegionHandleVector&& value)
+  void setRegionHandleVector(RegionHandleVector&& value) noexcept
   { _regionHandleVector = std::move(value); }
-#endif
-  RegionHandleVector& getRegionHandleVector()
+  RegionHandleVector& getRegionHandleVector() noexcept
   { return _regionHandleVector; }
-  const RegionHandleVector& getRegionHandleVector() const
+  const RegionHandleVector& getRegionHandleVector() const noexcept
   { return _regionHandleVector; }
 
 private:
@@ -4956,930 +8372,915 @@ private:
   RegionHandleVector _regionHandleVector;
 };
 
-class OPENRTI_API ChangeInteractionClassPublicationMessage : public AbstractMessage {
+class OPENRTI_API ChangeInteractionClassPublicationMessage final : public AbstractMessage {
 public:
-  ChangeInteractionClassPublicationMessage();
-  virtual ~ChangeInteractionClassPublicationMessage();
+  ChangeInteractionClassPublicationMessage() noexcept {};
+  ChangeInteractionClassPublicationMessage(const ChangeInteractionClassPublicationMessage&) = default;
+  ChangeInteractionClassPublicationMessage(ChangeInteractionClassPublicationMessage&&) noexcept = default;
+  virtual ~ChangeInteractionClassPublicationMessage() noexcept = default;
+  ChangeInteractionClassPublicationMessage& operator=(const ChangeInteractionClassPublicationMessage&) = default;
+  ChangeInteractionClassPublicationMessage& operator=(ChangeInteractionClassPublicationMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 50;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeInteractionClassPublicationMessage& rhs) const;
-  bool operator<(const ChangeInteractionClassPublicationMessage& rhs) const;
-  bool operator!=(const ChangeInteractionClassPublicationMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeInteractionClassPublicationMessage& rhs) const noexcept;
+  bool operator<(const ChangeInteractionClassPublicationMessage& rhs) const noexcept;
+  bool operator!=(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeInteractionClassPublicationMessage& rhs) const
+  bool operator>(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeInteractionClassPublicationMessage& rhs) const
+  bool operator>=(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeInteractionClassPublicationMessage& rhs) const
+  bool operator<=(const ChangeInteractionClassPublicationMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setPublicationType(const PublicationType& value)
+  void setPublicationType(const PublicationType& value) noexcept
   { _publicationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setPublicationType(PublicationType&& value)
+  void setPublicationType(PublicationType&& value) noexcept
   { _publicationType = std::move(value); }
-#endif
-  PublicationType& getPublicationType()
+  PublicationType& getPublicationType() noexcept
   { return _publicationType; }
-  const PublicationType& getPublicationType() const
+  const PublicationType& getPublicationType() const noexcept
   { return _publicationType; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
-#endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
 private:
   FederationHandle _federationHandle;
-  PublicationType _publicationType;
+  PublicationType _publicationType = Unpublished;
   InteractionClassHandle _interactionClassHandle;
 };
 
-class OPENRTI_API ChangeObjectClassPublicationMessage : public AbstractMessage {
+class OPENRTI_API ChangeObjectClassPublicationMessage final : public AbstractMessage {
 public:
-  ChangeObjectClassPublicationMessage();
-  virtual ~ChangeObjectClassPublicationMessage();
+  ChangeObjectClassPublicationMessage() noexcept {};
+  ChangeObjectClassPublicationMessage(const ChangeObjectClassPublicationMessage&) = default;
+  ChangeObjectClassPublicationMessage(ChangeObjectClassPublicationMessage&&) noexcept = default;
+  virtual ~ChangeObjectClassPublicationMessage() noexcept = default;
+  ChangeObjectClassPublicationMessage& operator=(const ChangeObjectClassPublicationMessage&) = default;
+  ChangeObjectClassPublicationMessage& operator=(ChangeObjectClassPublicationMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 51;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeObjectClassPublicationMessage& rhs) const;
-  bool operator<(const ChangeObjectClassPublicationMessage& rhs) const;
-  bool operator!=(const ChangeObjectClassPublicationMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeObjectClassPublicationMessage& rhs) const noexcept;
+  bool operator<(const ChangeObjectClassPublicationMessage& rhs) const noexcept;
+  bool operator!=(const ChangeObjectClassPublicationMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeObjectClassPublicationMessage& rhs) const
+  bool operator>(const ChangeObjectClassPublicationMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeObjectClassPublicationMessage& rhs) const
+  bool operator>=(const ChangeObjectClassPublicationMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeObjectClassPublicationMessage& rhs) const
+  bool operator<=(const ChangeObjectClassPublicationMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setPublicationType(const PublicationType& value)
+  void setPublicationType(const PublicationType& value) noexcept
   { _publicationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setPublicationType(PublicationType&& value)
+  void setPublicationType(PublicationType&& value) noexcept
   { _publicationType = std::move(value); }
-#endif
-  PublicationType& getPublicationType()
+  PublicationType& getPublicationType() noexcept
   { return _publicationType; }
-  const PublicationType& getPublicationType() const
+  const PublicationType& getPublicationType() const noexcept
   { return _publicationType; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
-#endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
-#endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
 private:
   FederationHandle _federationHandle;
-  PublicationType _publicationType;
+  PublicationType _publicationType = Unpublished;
   ObjectClassHandle _objectClassHandle;
   AttributeHandleVector _attributeHandles;
 };
 
-class OPENRTI_API ChangeInteractionClassSubscriptionMessage : public AbstractMessage {
+class OPENRTI_API ChangeInteractionClassSubscriptionMessage final : public AbstractMessage {
 public:
-  ChangeInteractionClassSubscriptionMessage();
-  virtual ~ChangeInteractionClassSubscriptionMessage();
+  ChangeInteractionClassSubscriptionMessage() noexcept {};
+  ChangeInteractionClassSubscriptionMessage(const ChangeInteractionClassSubscriptionMessage&) = default;
+  ChangeInteractionClassSubscriptionMessage(ChangeInteractionClassSubscriptionMessage&&) noexcept = default;
+  virtual ~ChangeInteractionClassSubscriptionMessage() noexcept = default;
+  ChangeInteractionClassSubscriptionMessage& operator=(const ChangeInteractionClassSubscriptionMessage&) = default;
+  ChangeInteractionClassSubscriptionMessage& operator=(ChangeInteractionClassSubscriptionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 52;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeInteractionClassSubscriptionMessage& rhs) const;
-  bool operator<(const ChangeInteractionClassSubscriptionMessage& rhs) const;
-  bool operator!=(const ChangeInteractionClassSubscriptionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept;
+  bool operator<(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept;
+  bool operator!=(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeInteractionClassSubscriptionMessage& rhs) const
+  bool operator>(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeInteractionClassSubscriptionMessage& rhs) const
+  bool operator>=(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeInteractionClassSubscriptionMessage& rhs) const
+  bool operator<=(const ChangeInteractionClassSubscriptionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setSubscriptionType(const SubscriptionType& value)
+  void setSubscriptionType(const SubscriptionType& value) noexcept
   { _subscriptionType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSubscriptionType(SubscriptionType&& value)
+  void setSubscriptionType(SubscriptionType&& value) noexcept
   { _subscriptionType = std::move(value); }
-#endif
-  SubscriptionType& getSubscriptionType()
+  SubscriptionType& getSubscriptionType() noexcept
   { return _subscriptionType; }
-  const SubscriptionType& getSubscriptionType() const
+  const SubscriptionType& getSubscriptionType() const noexcept
   { return _subscriptionType; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
-#endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
-  void setParameterFilterValues(const ParameterValueVector& value)
+  void setParameterFilterValues(const ParameterValueVector& value) noexcept
   { _parameterFilterValues = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterFilterValues(ParameterValueVector&& value)
+  void setParameterFilterValues(ParameterValueVector&& value) noexcept
   { _parameterFilterValues = std::move(value); }
-#endif
-  ParameterValueVector& getParameterFilterValues()
+  ParameterValueVector& getParameterFilterValues() noexcept
   { return _parameterFilterValues; }
-  const ParameterValueVector& getParameterFilterValues() const
+  const ParameterValueVector& getParameterFilterValues() const noexcept
   { return _parameterFilterValues; }
 
 private:
   FederationHandle _federationHandle;
-  SubscriptionType _subscriptionType;
+  SubscriptionType _subscriptionType = Unsubscribed;
   InteractionClassHandle _interactionClassHandle;
   ParameterValueVector _parameterFilterValues;
 };
 
-class OPENRTI_API ChangeObjectClassSubscriptionMessage : public AbstractMessage {
+class OPENRTI_API ChangeObjectClassSubscriptionMessage final : public AbstractMessage {
 public:
-  ChangeObjectClassSubscriptionMessage();
-  virtual ~ChangeObjectClassSubscriptionMessage();
+  ChangeObjectClassSubscriptionMessage() noexcept {};
+  ChangeObjectClassSubscriptionMessage(const ChangeObjectClassSubscriptionMessage&) = default;
+  ChangeObjectClassSubscriptionMessage(ChangeObjectClassSubscriptionMessage&&) noexcept = default;
+  virtual ~ChangeObjectClassSubscriptionMessage() noexcept = default;
+  ChangeObjectClassSubscriptionMessage& operator=(const ChangeObjectClassSubscriptionMessage&) = default;
+  ChangeObjectClassSubscriptionMessage& operator=(ChangeObjectClassSubscriptionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 53;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeObjectClassSubscriptionMessage& rhs) const;
-  bool operator<(const ChangeObjectClassSubscriptionMessage& rhs) const;
-  bool operator!=(const ChangeObjectClassSubscriptionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept;
+  bool operator<(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept;
+  bool operator!=(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeObjectClassSubscriptionMessage& rhs) const
+  bool operator>(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeObjectClassSubscriptionMessage& rhs) const
+  bool operator>=(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeObjectClassSubscriptionMessage& rhs) const
+  bool operator<=(const ChangeObjectClassSubscriptionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setSubscriptionType(const SubscriptionType& value)
+  void setSubscriptionType(const SubscriptionType& value) noexcept
   { _subscriptionType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSubscriptionType(SubscriptionType&& value)
+  void setSubscriptionType(SubscriptionType&& value) noexcept
   { _subscriptionType = std::move(value); }
-#endif
-  SubscriptionType& getSubscriptionType()
+  SubscriptionType& getSubscriptionType() noexcept
   { return _subscriptionType; }
-  const SubscriptionType& getSubscriptionType() const
+  const SubscriptionType& getSubscriptionType() const noexcept
   { return _subscriptionType; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
-#endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
-#endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
 private:
   FederationHandle _federationHandle;
-  SubscriptionType _subscriptionType;
+  SubscriptionType _subscriptionType = Unsubscribed;
   ObjectClassHandle _objectClassHandle;
   AttributeHandleVector _attributeHandles;
 };
 
-class OPENRTI_API ChangeObjectInstanceSubscriptionMessage : public AbstractMessage {
+class OPENRTI_API ChangeObjectInstanceSubscriptionMessage final : public AbstractMessage {
 public:
-  ChangeObjectInstanceSubscriptionMessage();
-  virtual ~ChangeObjectInstanceSubscriptionMessage();
+  ChangeObjectInstanceSubscriptionMessage() noexcept {};
+  ChangeObjectInstanceSubscriptionMessage(const ChangeObjectInstanceSubscriptionMessage&) = default;
+  ChangeObjectInstanceSubscriptionMessage(ChangeObjectInstanceSubscriptionMessage&&) noexcept = default;
+  virtual ~ChangeObjectInstanceSubscriptionMessage() noexcept = default;
+  ChangeObjectInstanceSubscriptionMessage& operator=(const ChangeObjectInstanceSubscriptionMessage&) = default;
+  ChangeObjectInstanceSubscriptionMessage& operator=(ChangeObjectInstanceSubscriptionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 99;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ChangeObjectInstanceSubscriptionMessage& rhs) const;
-  bool operator<(const ChangeObjectInstanceSubscriptionMessage& rhs) const;
-  bool operator!=(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept;
+  bool operator<(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept;
+  bool operator!=(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  bool operator>(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  bool operator>=(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ChangeObjectInstanceSubscriptionMessage& rhs) const
+  bool operator<=(const ChangeObjectInstanceSubscriptionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setSubscriptionType(const SubscriptionType& value)
+  void setSubscriptionType(const SubscriptionType& value) noexcept
   { _subscriptionType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSubscriptionType(SubscriptionType&& value)
+  void setSubscriptionType(SubscriptionType&& value) noexcept
   { _subscriptionType = std::move(value); }
-#endif
-  SubscriptionType& getSubscriptionType()
+  SubscriptionType& getSubscriptionType() noexcept
   { return _subscriptionType; }
-  const SubscriptionType& getSubscriptionType() const
+  const SubscriptionType& getSubscriptionType() const noexcept
   { return _subscriptionType; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
-#endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
-#endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
 private:
   FederationHandle _federationHandle;
-  SubscriptionType _subscriptionType;
+  SubscriptionType _subscriptionType = Unsubscribed;
   ObjectClassHandle _objectClassHandle;
   ObjectInstanceHandle _objectInstanceHandle;
 };
 
-class OPENRTI_API RegistrationForObjectClassMessage : public AbstractMessage {
+class OPENRTI_API RegistrationForObjectClassMessage final : public AbstractMessage {
 public:
-  RegistrationForObjectClassMessage();
-  virtual ~RegistrationForObjectClassMessage();
+  RegistrationForObjectClassMessage() noexcept {};
+  RegistrationForObjectClassMessage(const RegistrationForObjectClassMessage&) = default;
+  RegistrationForObjectClassMessage(RegistrationForObjectClassMessage&&) noexcept = default;
+  virtual ~RegistrationForObjectClassMessage() noexcept = default;
+  RegistrationForObjectClassMessage& operator=(const RegistrationForObjectClassMessage&) = default;
+  RegistrationForObjectClassMessage& operator=(RegistrationForObjectClassMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RegistrationForObjectClassMessage& rhs) const;
-  bool operator<(const RegistrationForObjectClassMessage& rhs) const;
-  bool operator!=(const RegistrationForObjectClassMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RegistrationForObjectClassMessage& rhs) const noexcept;
+  bool operator<(const RegistrationForObjectClassMessage& rhs) const noexcept;
+  bool operator!=(const RegistrationForObjectClassMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RegistrationForObjectClassMessage& rhs) const
+  bool operator>(const RegistrationForObjectClassMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RegistrationForObjectClassMessage& rhs) const
+  bool operator>=(const RegistrationForObjectClassMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RegistrationForObjectClassMessage& rhs) const
+  bool operator<=(const RegistrationForObjectClassMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
-#endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setStart(const Bool& value)
+  void setStart(const Bool& value) noexcept
   { _start = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setStart(Bool&& value)
+  void setStart(Bool&& value) noexcept
   { _start = std::move(value); }
-#endif
-  Bool& getStart()
+  Bool& getStart() noexcept
   { return _start; }
-  const Bool& getStart() const
+  const Bool& getStart() const noexcept
   { return _start; }
 
 private:
   ObjectClassHandle _objectClassHandle;
-  Bool _start;
+  Bool _start = false;
 };
 
-class OPENRTI_API AttributesInScopeMessage : public AbstractMessage {
+class OPENRTI_API AttributesInScopeMessage final : public AbstractMessage {
 public:
-  AttributesInScopeMessage();
-  virtual ~AttributesInScopeMessage();
+  AttributesInScopeMessage() noexcept {};
+  AttributesInScopeMessage(const AttributesInScopeMessage&) = default;
+  AttributesInScopeMessage(AttributesInScopeMessage&&) noexcept = default;
+  virtual ~AttributesInScopeMessage() noexcept = default;
+  AttributesInScopeMessage& operator=(const AttributesInScopeMessage&) = default;
+  AttributesInScopeMessage& operator=(AttributesInScopeMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const AttributesInScopeMessage& rhs) const;
-  bool operator<(const AttributesInScopeMessage& rhs) const;
-  bool operator!=(const AttributesInScopeMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const AttributesInScopeMessage& rhs) const noexcept;
+  bool operator<(const AttributesInScopeMessage& rhs) const noexcept;
+  bool operator!=(const AttributesInScopeMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const AttributesInScopeMessage& rhs) const
+  bool operator>(const AttributesInScopeMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AttributesInScopeMessage& rhs) const
+  bool operator>=(const AttributesInScopeMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AttributesInScopeMessage& rhs) const
+  bool operator<=(const AttributesInScopeMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
-#endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
-#endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
-  void setInScope(const Bool& value)
+  void setInScope(const Bool& value) noexcept
   { _inScope = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInScope(Bool&& value)
+  void setInScope(Bool&& value) noexcept
   { _inScope = std::move(value); }
-#endif
-  Bool& getInScope()
+  Bool& getInScope() noexcept
   { return _inScope; }
-  const Bool& getInScope() const
+  const Bool& getInScope() const noexcept
   { return _inScope; }
 
 private:
   ObjectInstanceHandle _objectInstanceHandle;
   AttributeHandleVector _attributeHandles;
-  Bool _inScope;
+  Bool _inScope = false;
 };
 
-class OPENRTI_API TurnUpdatesOnForInstanceMessage : public AbstractMessage {
+class OPENRTI_API TurnUpdatesOnForInstanceMessage final : public AbstractMessage {
 public:
-  TurnUpdatesOnForInstanceMessage();
-  virtual ~TurnUpdatesOnForInstanceMessage();
+  TurnUpdatesOnForInstanceMessage() noexcept {};
+  TurnUpdatesOnForInstanceMessage(const TurnUpdatesOnForInstanceMessage&) = default;
+  TurnUpdatesOnForInstanceMessage(TurnUpdatesOnForInstanceMessage&&) noexcept = default;
+  virtual ~TurnUpdatesOnForInstanceMessage() noexcept = default;
+  TurnUpdatesOnForInstanceMessage& operator=(const TurnUpdatesOnForInstanceMessage&) = default;
+  TurnUpdatesOnForInstanceMessage& operator=(TurnUpdatesOnForInstanceMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TurnUpdatesOnForInstanceMessage& rhs) const;
-  bool operator<(const TurnUpdatesOnForInstanceMessage& rhs) const;
-  bool operator!=(const TurnUpdatesOnForInstanceMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept;
+  bool operator<(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept;
+  bool operator!=(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TurnUpdatesOnForInstanceMessage& rhs) const
+  bool operator>(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TurnUpdatesOnForInstanceMessage& rhs) const
+  bool operator>=(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TurnUpdatesOnForInstanceMessage& rhs) const
+  bool operator<=(const TurnUpdatesOnForInstanceMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
-#endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
-#endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
-  void setUpdateRate(const String& value)
+  void setUpdateRate(const String& value) noexcept
   { _updateRate = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setUpdateRate(String&& value)
+  void setUpdateRate(String&& value) noexcept
   { _updateRate = std::move(value); }
-#endif
-  String& getUpdateRate()
+  String& getUpdateRate() noexcept
   { return _updateRate; }
-  const String& getUpdateRate() const
+  const String& getUpdateRate() const noexcept
   { return _updateRate; }
 
-  void setOn(const Bool& value)
+  void setOn(const Bool& value) noexcept
   { _on = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOn(Bool&& value)
+  void setOn(Bool&& value) noexcept
   { _on = std::move(value); }
-#endif
-  Bool& getOn()
+  Bool& getOn() noexcept
   { return _on; }
-  const Bool& getOn() const
+  const Bool& getOn() const noexcept
   { return _on; }
 
 private:
   ObjectInstanceHandle _objectInstanceHandle;
   AttributeHandleVector _attributeHandles;
   String _updateRate;
-  Bool _on;
+  Bool _on = false;
 };
 
-class OPENRTI_API TurnInteractionsOnMessage : public AbstractMessage {
+class OPENRTI_API TurnInteractionsOnMessage final : public AbstractMessage {
 public:
-  TurnInteractionsOnMessage();
-  virtual ~TurnInteractionsOnMessage();
+  TurnInteractionsOnMessage() noexcept {};
+  TurnInteractionsOnMessage(const TurnInteractionsOnMessage&) = default;
+  TurnInteractionsOnMessage(TurnInteractionsOnMessage&&) noexcept = default;
+  virtual ~TurnInteractionsOnMessage() noexcept = default;
+  TurnInteractionsOnMessage& operator=(const TurnInteractionsOnMessage&) = default;
+  TurnInteractionsOnMessage& operator=(TurnInteractionsOnMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TurnInteractionsOnMessage& rhs) const;
-  bool operator<(const TurnInteractionsOnMessage& rhs) const;
-  bool operator!=(const TurnInteractionsOnMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TurnInteractionsOnMessage& rhs) const noexcept;
+  bool operator<(const TurnInteractionsOnMessage& rhs) const noexcept;
+  bool operator!=(const TurnInteractionsOnMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TurnInteractionsOnMessage& rhs) const
+  bool operator>(const TurnInteractionsOnMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TurnInteractionsOnMessage& rhs) const
+  bool operator>=(const TurnInteractionsOnMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TurnInteractionsOnMessage& rhs) const
+  bool operator<=(const TurnInteractionsOnMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
-#endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
-  void setOn(const Bool& value)
+  void setOn(const Bool& value) noexcept
   { _on = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOn(Bool&& value)
+  void setOn(Bool&& value) noexcept
   { _on = std::move(value); }
-#endif
-  Bool& getOn()
+  Bool& getOn() noexcept
   { return _on; }
-  const Bool& getOn() const
+  const Bool& getOn() const noexcept
   { return _on; }
 
 private:
   InteractionClassHandle _interactionClassHandle;
-  Bool _on;
+  Bool _on = false;
 };
 
-class OPENRTI_API InteractionMessage : public AbstractMessage {
+class OPENRTI_API InteractionMessage final : public AbstractMessage {
 public:
-  InteractionMessage();
-  virtual ~InteractionMessage();
+  InteractionMessage() noexcept {};
+  InteractionMessage(const InteractionMessage&) = default;
+  InteractionMessage(InteractionMessage&&) noexcept = default;
+  virtual ~InteractionMessage() noexcept = default;
+  InteractionMessage& operator=(const InteractionMessage&) = default;
+  InteractionMessage& operator=(InteractionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 80;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InteractionMessage& rhs) const;
-  bool operator<(const InteractionMessage& rhs) const;
-  bool operator!=(const InteractionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InteractionMessage& rhs) const noexcept;
+  bool operator<(const InteractionMessage& rhs) const noexcept;
+  bool operator!=(const InteractionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InteractionMessage& rhs) const
+  bool operator>(const InteractionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InteractionMessage& rhs) const
+  bool operator>=(const InteractionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InteractionMessage& rhs) const
+  bool operator<=(const InteractionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual bool getReliable() const;
+  bool getReliable() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
-#endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { _transportationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { _transportationType = std::move(value); }
-#endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return _transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return _transportationType; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setParameterValues(const ParameterValueVector& value)
+  void setParameterValues(const ParameterValueVector& value) noexcept
   { _parameterValues = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterValues(ParameterValueVector&& value)
+  void setParameterValues(ParameterValueVector&& value) noexcept
   { _parameterValues = std::move(value); }
-#endif
-  ParameterValueVector& getParameterValues()
+  ParameterValueVector& getParameterValues() noexcept
   { return _parameterValues; }
-  const ParameterValueVector& getParameterValues() const
+  const ParameterValueVector& getParameterValues() const noexcept
   { return _parameterValues; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   InteractionClassHandle _interactionClassHandle;
-  TransportationType _transportationType;
+  TransportationType _transportationType = RELIABLE;
   VariableLengthData _tag;
   ParameterValueVector _parameterValues;
 };
 
-class OPENRTI_API TimeStampedInteractionMessage : public AbstractMessage {
+class OPENRTI_API TimeStampedInteractionMessage final : public AbstractMessage {
 public:
-  TimeStampedInteractionMessage();
-  virtual ~TimeStampedInteractionMessage();
+  TimeStampedInteractionMessage() noexcept {};
+  TimeStampedInteractionMessage(const TimeStampedInteractionMessage&) = default;
+  TimeStampedInteractionMessage(TimeStampedInteractionMessage&&) noexcept = default;
+  virtual ~TimeStampedInteractionMessage() noexcept = default;
+  TimeStampedInteractionMessage& operator=(const TimeStampedInteractionMessage&) = default;
+  TimeStampedInteractionMessage& operator=(TimeStampedInteractionMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 81;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeStampedInteractionMessage& rhs) const;
-  bool operator<(const TimeStampedInteractionMessage& rhs) const;
-  bool operator!=(const TimeStampedInteractionMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeStampedInteractionMessage& rhs) const noexcept;
+  bool operator<(const TimeStampedInteractionMessage& rhs) const noexcept;
+  bool operator!=(const TimeStampedInteractionMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeStampedInteractionMessage& rhs) const
+  bool operator>(const TimeStampedInteractionMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeStampedInteractionMessage& rhs) const
+  bool operator>=(const TimeStampedInteractionMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeStampedInteractionMessage& rhs) const
+  bool operator<=(const TimeStampedInteractionMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual bool getReliable() const;
+  bool getReliable() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setInteractionClassHandle(const InteractionClassHandle& value)
+  void setInteractionClassHandle(const InteractionClassHandle& value) noexcept
   { _interactionClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setInteractionClassHandle(InteractionClassHandle&& value)
+  void setInteractionClassHandle(InteractionClassHandle&& value) noexcept
   { _interactionClassHandle = std::move(value); }
-#endif
-  InteractionClassHandle& getInteractionClassHandle()
+  InteractionClassHandle& getInteractionClassHandle() noexcept
   { return _interactionClassHandle; }
-  const InteractionClassHandle& getInteractionClassHandle() const
+  const InteractionClassHandle& getInteractionClassHandle() const noexcept
   { return _interactionClassHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { _orderType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { _orderType = std::move(value); }
-#endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return _orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return _orderType; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { _transportationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { _transportationType = std::move(value); }
-#endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return _transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return _transportationType; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
-#endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setMessageRetractionHandle(const MessageRetractionHandle& value)
+  void setMessageRetractionHandle(const MessageRetractionHandle& value) noexcept
   { _messageRetractionHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setMessageRetractionHandle(MessageRetractionHandle&& value)
+  void setMessageRetractionHandle(MessageRetractionHandle&& value) noexcept
   { _messageRetractionHandle = std::move(value); }
-#endif
-  MessageRetractionHandle& getMessageRetractionHandle()
+  MessageRetractionHandle& getMessageRetractionHandle() noexcept
   { return _messageRetractionHandle; }
-  const MessageRetractionHandle& getMessageRetractionHandle() const
+  const MessageRetractionHandle& getMessageRetractionHandle() const noexcept
   { return _messageRetractionHandle; }
 
-  void setParameterValues(const ParameterValueVector& value)
+  void setParameterValues(const ParameterValueVector& value) noexcept
   { _parameterValues = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setParameterValues(ParameterValueVector&& value)
+  void setParameterValues(ParameterValueVector&& value) noexcept
   { _parameterValues = std::move(value); }
-#endif
-  ParameterValueVector& getParameterValues()
+  ParameterValueVector& getParameterValues() noexcept
   { return _parameterValues; }
-  const ParameterValueVector& getParameterValues() const
+  const ParameterValueVector& getParameterValues() const noexcept
   { return _parameterValues; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   InteractionClassHandle _interactionClassHandle;
-  OrderType _orderType;
-  TransportationType _transportationType;
+  OrderType _orderType = RECEIVE;
+  TransportationType _transportationType = RELIABLE;
   VariableLengthData _tag;
   VariableLengthData _timeStamp;
   MessageRetractionHandle _messageRetractionHandle;
   ParameterValueVector _parameterValues;
 };
 
-class OPENRTI_API ObjectInstanceHandlesRequestMessage : public AbstractMessage {
+class OPENRTI_API ObjectInstanceHandlesRequestMessage final : public AbstractMessage {
 public:
-  ObjectInstanceHandlesRequestMessage();
-  virtual ~ObjectInstanceHandlesRequestMessage();
+  ObjectInstanceHandlesRequestMessage() noexcept {};
+  ObjectInstanceHandlesRequestMessage(const ObjectInstanceHandlesRequestMessage&) = default;
+  ObjectInstanceHandlesRequestMessage(ObjectInstanceHandlesRequestMessage&&) noexcept = default;
+  virtual ~ObjectInstanceHandlesRequestMessage() noexcept = default;
+  ObjectInstanceHandlesRequestMessage& operator=(const ObjectInstanceHandlesRequestMessage&) = default;
+  ObjectInstanceHandlesRequestMessage& operator=(ObjectInstanceHandlesRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 60;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ObjectInstanceHandlesRequestMessage& rhs) const;
-  bool operator<(const ObjectInstanceHandlesRequestMessage& rhs) const;
-  bool operator!=(const ObjectInstanceHandlesRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept;
+  bool operator<(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept;
+  bool operator!=(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ObjectInstanceHandlesRequestMessage& rhs) const
+  bool operator>(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ObjectInstanceHandlesRequestMessage& rhs) const
+  bool operator>=(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ObjectInstanceHandlesRequestMessage& rhs) const
+  bool operator<=(const ObjectInstanceHandlesRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setCount(const Unsigned& value)
+  void setCount(const Unsigned& value) noexcept
   { _count = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setCount(Unsigned&& value)
+  void setCount(Unsigned&& value) noexcept
   { _count = std::move(value); }
-#endif
-  Unsigned& getCount()
+  Unsigned& getCount() noexcept
   { return _count; }
-  const Unsigned& getCount() const
+  const Unsigned& getCount() const noexcept
   { return _count; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
-  Unsigned _count;
+  Unsigned _count = 0;
 };
 
-class OPENRTI_API ObjectInstanceHandlesResponseMessage : public AbstractMessage {
+class OPENRTI_API ObjectInstanceHandlesResponseMessage final : public AbstractMessage {
 public:
-  ObjectInstanceHandlesResponseMessage();
-  virtual ~ObjectInstanceHandlesResponseMessage();
+  ObjectInstanceHandlesResponseMessage() noexcept {};
+  ObjectInstanceHandlesResponseMessage(const ObjectInstanceHandlesResponseMessage&) = default;
+  ObjectInstanceHandlesResponseMessage(ObjectInstanceHandlesResponseMessage&&) noexcept = default;
+  virtual ~ObjectInstanceHandlesResponseMessage() noexcept = default;
+  ObjectInstanceHandlesResponseMessage& operator=(const ObjectInstanceHandlesResponseMessage&) = default;
+  ObjectInstanceHandlesResponseMessage& operator=(ObjectInstanceHandlesResponseMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 61;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ObjectInstanceHandlesResponseMessage& rhs) const;
-  bool operator<(const ObjectInstanceHandlesResponseMessage& rhs) const;
-  bool operator!=(const ObjectInstanceHandlesResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept;
+  bool operator<(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept;
+  bool operator!=(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ObjectInstanceHandlesResponseMessage& rhs) const
+  bool operator>(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ObjectInstanceHandlesResponseMessage& rhs) const
+  bool operator>=(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ObjectInstanceHandlesResponseMessage& rhs) const
+  bool operator<=(const ObjectInstanceHandlesResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value)
+  void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value) noexcept
   { _objectInstanceHandleNamePairVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value)
+  void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value) noexcept
   { _objectInstanceHandleNamePairVector = std::move(value); }
-#endif
-  ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector()
+  ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() noexcept
   { return _objectInstanceHandleNamePairVector; }
-  const ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() const
+  const ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() const noexcept
   { return _objectInstanceHandleNamePairVector; }
 
 private:
@@ -5888,47 +9289,50 @@ private:
   ObjectInstanceHandleNamePairVector _objectInstanceHandleNamePairVector;
 };
 
-class OPENRTI_API ReleaseMultipleObjectInstanceNameHandlePairsMessage : public AbstractMessage {
+class OPENRTI_API ReleaseMultipleObjectInstanceNameHandlePairsMessage final : public AbstractMessage {
 public:
-  ReleaseMultipleObjectInstanceNameHandlePairsMessage();
-  virtual ~ReleaseMultipleObjectInstanceNameHandlePairsMessage();
+  ReleaseMultipleObjectInstanceNameHandlePairsMessage() noexcept {};
+  ReleaseMultipleObjectInstanceNameHandlePairsMessage(const ReleaseMultipleObjectInstanceNameHandlePairsMessage&) = default;
+  ReleaseMultipleObjectInstanceNameHandlePairsMessage(ReleaseMultipleObjectInstanceNameHandlePairsMessage&&) noexcept = default;
+  virtual ~ReleaseMultipleObjectInstanceNameHandlePairsMessage() noexcept = default;
+  ReleaseMultipleObjectInstanceNameHandlePairsMessage& operator=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage&) = default;
+  ReleaseMultipleObjectInstanceNameHandlePairsMessage& operator=(ReleaseMultipleObjectInstanceNameHandlePairsMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 62;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const;
-  bool operator<(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const;
-  bool operator!=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept;
+  bool operator<(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept;
+  bool operator!=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+  bool operator>(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+  bool operator>=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const
+  bool operator<=(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectInstanceHandleVector(const ObjectInstanceHandleVector& value)
+  void setObjectInstanceHandleVector(const ObjectInstanceHandleVector& value) noexcept
   { _objectInstanceHandleVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandleVector(ObjectInstanceHandleVector&& value)
+  void setObjectInstanceHandleVector(ObjectInstanceHandleVector&& value) noexcept
   { _objectInstanceHandleVector = std::move(value); }
-#endif
-  ObjectInstanceHandleVector& getObjectInstanceHandleVector()
+  ObjectInstanceHandleVector& getObjectInstanceHandleVector() noexcept
   { return _objectInstanceHandleVector; }
-  const ObjectInstanceHandleVector& getObjectInstanceHandleVector() const
+  const ObjectInstanceHandleVector& getObjectInstanceHandleVector() const noexcept
   { return _objectInstanceHandleVector; }
 
 private:
@@ -5936,190 +9340,201 @@ private:
   ObjectInstanceHandleVector _objectInstanceHandleVector;
 };
 
-class OPENRTI_API ReserveObjectInstanceNameRequestMessage : public AbstractMessage {
+class OPENRTI_API ReserveObjectInstanceNameRequestMessage final : public AbstractMessage {
 public:
-  ReserveObjectInstanceNameRequestMessage();
-  virtual ~ReserveObjectInstanceNameRequestMessage();
+  ReserveObjectInstanceNameRequestMessage() noexcept {};
+  ReserveObjectInstanceNameRequestMessage(const ReserveObjectInstanceNameRequestMessage&) = default;
+  ReserveObjectInstanceNameRequestMessage(ReserveObjectInstanceNameRequestMessage&&) noexcept = default;
+  virtual ~ReserveObjectInstanceNameRequestMessage() noexcept = default;
+  ReserveObjectInstanceNameRequestMessage& operator=(const ReserveObjectInstanceNameRequestMessage&) = default;
+  ReserveObjectInstanceNameRequestMessage& operator=(ReserveObjectInstanceNameRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 63;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReserveObjectInstanceNameRequestMessage& rhs) const;
-  bool operator<(const ReserveObjectInstanceNameRequestMessage& rhs) const;
-  bool operator!=(const ReserveObjectInstanceNameRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept;
+  bool operator<(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept;
+  bool operator!=(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReserveObjectInstanceNameRequestMessage& rhs) const
+  bool operator>(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReserveObjectInstanceNameRequestMessage& rhs) const
+  bool operator>=(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReserveObjectInstanceNameRequestMessage& rhs) const
+  bool operator<=(const ReserveObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { _name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { _name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return _name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return _name; }
+
+  void setIsInternal(const Bool& value) noexcept
+  { _isInternal = value; }
+  void setIsInternal(Bool&& value) noexcept
+  { _isInternal = std::move(value); }
+  Bool& getIsInternal() noexcept
+  { return _isInternal; }
+  const Bool& getIsInternal() const noexcept
+  { return _isInternal; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   String _name;
+  Bool _isInternal = false;
 };
 
-class OPENRTI_API ReserveObjectInstanceNameResponseMessage : public AbstractMessage {
+class OPENRTI_API ReserveObjectInstanceNameResponseMessage final : public AbstractMessage {
 public:
-  ReserveObjectInstanceNameResponseMessage();
-  virtual ~ReserveObjectInstanceNameResponseMessage();
+  ReserveObjectInstanceNameResponseMessage() noexcept {};
+  ReserveObjectInstanceNameResponseMessage(const ReserveObjectInstanceNameResponseMessage&) = default;
+  ReserveObjectInstanceNameResponseMessage(ReserveObjectInstanceNameResponseMessage&&) noexcept = default;
+  virtual ~ReserveObjectInstanceNameResponseMessage() noexcept = default;
+  ReserveObjectInstanceNameResponseMessage& operator=(const ReserveObjectInstanceNameResponseMessage&) = default;
+  ReserveObjectInstanceNameResponseMessage& operator=(ReserveObjectInstanceNameResponseMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 64;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReserveObjectInstanceNameResponseMessage& rhs) const;
-  bool operator<(const ReserveObjectInstanceNameResponseMessage& rhs) const;
-  bool operator!=(const ReserveObjectInstanceNameResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept;
+  bool operator<(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept;
+  bool operator!=(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReserveObjectInstanceNameResponseMessage& rhs) const
+  bool operator>(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReserveObjectInstanceNameResponseMessage& rhs) const
+  bool operator>=(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReserveObjectInstanceNameResponseMessage& rhs) const
+  bool operator<=(const ReserveObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandleNamePair(const ObjectInstanceHandleNamePair& value)
+  void setObjectInstanceHandleNamePair(const ObjectInstanceHandleNamePair& value) noexcept
   { _objectInstanceHandleNamePair = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandleNamePair(ObjectInstanceHandleNamePair&& value)
+  void setObjectInstanceHandleNamePair(ObjectInstanceHandleNamePair&& value) noexcept
   { _objectInstanceHandleNamePair = std::move(value); }
-#endif
-  ObjectInstanceHandleNamePair& getObjectInstanceHandleNamePair()
+  ObjectInstanceHandleNamePair& getObjectInstanceHandleNamePair() noexcept
   { return _objectInstanceHandleNamePair; }
-  const ObjectInstanceHandleNamePair& getObjectInstanceHandleNamePair() const
+  const ObjectInstanceHandleNamePair& getObjectInstanceHandleNamePair() const noexcept
   { return _objectInstanceHandleNamePair; }
 
-  void setSuccess(const Bool& value)
+  void setSuccess(const Bool& value) noexcept
   { _success = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSuccess(Bool&& value)
+  void setSuccess(Bool&& value) noexcept
   { _success = std::move(value); }
-#endif
-  Bool& getSuccess()
+  Bool& getSuccess() noexcept
   { return _success; }
-  const Bool& getSuccess() const
+  const Bool& getSuccess() const noexcept
   { return _success; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   ObjectInstanceHandleNamePair _objectInstanceHandleNamePair;
-  Bool _success;
+  Bool _success = false;
 };
 
-class OPENRTI_API ReserveMultipleObjectInstanceNameRequestMessage : public AbstractMessage {
+class OPENRTI_API ReserveMultipleObjectInstanceNameRequestMessage final : public AbstractMessage {
 public:
-  ReserveMultipleObjectInstanceNameRequestMessage();
-  virtual ~ReserveMultipleObjectInstanceNameRequestMessage();
+  ReserveMultipleObjectInstanceNameRequestMessage() noexcept {};
+  ReserveMultipleObjectInstanceNameRequestMessage(const ReserveMultipleObjectInstanceNameRequestMessage&) = default;
+  ReserveMultipleObjectInstanceNameRequestMessage(ReserveMultipleObjectInstanceNameRequestMessage&&) noexcept = default;
+  virtual ~ReserveMultipleObjectInstanceNameRequestMessage() noexcept = default;
+  ReserveMultipleObjectInstanceNameRequestMessage& operator=(const ReserveMultipleObjectInstanceNameRequestMessage&) = default;
+  ReserveMultipleObjectInstanceNameRequestMessage& operator=(ReserveMultipleObjectInstanceNameRequestMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 65;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const;
-  bool operator<(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const;
-  bool operator!=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept;
+  bool operator<(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept;
+  bool operator!=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+  bool operator>(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+  bool operator>=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const
+  bool operator<=(const ReserveMultipleObjectInstanceNameRequestMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setNameList(const StringVector& value)
+  void setNameList(const StringVector& value) noexcept
   { _nameList = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setNameList(StringVector&& value)
+  void setNameList(StringVector&& value) noexcept
   { _nameList = std::move(value); }
-#endif
-  StringVector& getNameList()
+  StringVector& getNameList() noexcept
   { return _nameList; }
-  const StringVector& getNameList() const
+  const StringVector& getNameList() const noexcept
   { return _nameList; }
 
 private:
@@ -6128,154 +9543,150 @@ private:
   StringVector _nameList;
 };
 
-class OPENRTI_API ReserveMultipleObjectInstanceNameResponseMessage : public AbstractMessage {
+class OPENRTI_API ReserveMultipleObjectInstanceNameResponseMessage final : public AbstractMessage {
 public:
-  ReserveMultipleObjectInstanceNameResponseMessage();
-  virtual ~ReserveMultipleObjectInstanceNameResponseMessage();
+  ReserveMultipleObjectInstanceNameResponseMessage() noexcept {};
+  ReserveMultipleObjectInstanceNameResponseMessage(const ReserveMultipleObjectInstanceNameResponseMessage&) = default;
+  ReserveMultipleObjectInstanceNameResponseMessage(ReserveMultipleObjectInstanceNameResponseMessage&&) noexcept = default;
+  virtual ~ReserveMultipleObjectInstanceNameResponseMessage() noexcept = default;
+  ReserveMultipleObjectInstanceNameResponseMessage& operator=(const ReserveMultipleObjectInstanceNameResponseMessage&) = default;
+  ReserveMultipleObjectInstanceNameResponseMessage& operator=(ReserveMultipleObjectInstanceNameResponseMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 66;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const;
-  bool operator<(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const;
-  bool operator!=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept;
+  bool operator<(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept;
+  bool operator!=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+  bool operator>(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+  bool operator>=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const
+  bool operator<=(const ReserveMultipleObjectInstanceNameResponseMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value)
+  void setObjectInstanceHandleNamePairVector(const ObjectInstanceHandleNamePairVector& value) noexcept
   { _objectInstanceHandleNamePairVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value)
+  void setObjectInstanceHandleNamePairVector(ObjectInstanceHandleNamePairVector&& value) noexcept
   { _objectInstanceHandleNamePairVector = std::move(value); }
-#endif
-  ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector()
+  ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() noexcept
   { return _objectInstanceHandleNamePairVector; }
-  const ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() const
+  const ObjectInstanceHandleNamePairVector& getObjectInstanceHandleNamePairVector() const noexcept
   { return _objectInstanceHandleNamePairVector; }
 
-  void setSuccess(const Bool& value)
+  void setSuccess(const Bool& value) noexcept
   { _success = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setSuccess(Bool&& value)
+  void setSuccess(Bool&& value) noexcept
   { _success = std::move(value); }
-#endif
-  Bool& getSuccess()
+  Bool& getSuccess() noexcept
   { return _success; }
-  const Bool& getSuccess() const
+  const Bool& getSuccess() const noexcept
   { return _success; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   ObjectInstanceHandleNamePairVector _objectInstanceHandleNamePairVector;
-  Bool _success;
+  Bool _success = false;
 };
 
-class OPENRTI_API InsertObjectInstanceMessage : public AbstractMessage {
+class OPENRTI_API InsertObjectInstanceMessage final : public AbstractMessage {
 public:
-  InsertObjectInstanceMessage();
-  virtual ~InsertObjectInstanceMessage();
+  InsertObjectInstanceMessage() noexcept {};
+  InsertObjectInstanceMessage(const InsertObjectInstanceMessage&) = default;
+  InsertObjectInstanceMessage(InsertObjectInstanceMessage&&) noexcept = default;
+  virtual ~InsertObjectInstanceMessage() noexcept = default;
+  InsertObjectInstanceMessage& operator=(const InsertObjectInstanceMessage&) = default;
+  InsertObjectInstanceMessage& operator=(InsertObjectInstanceMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 90;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const InsertObjectInstanceMessage& rhs) const;
-  bool operator<(const InsertObjectInstanceMessage& rhs) const;
-  bool operator!=(const InsertObjectInstanceMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const InsertObjectInstanceMessage& rhs) const noexcept;
+  bool operator<(const InsertObjectInstanceMessage& rhs) const noexcept;
+  bool operator!=(const InsertObjectInstanceMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const InsertObjectInstanceMessage& rhs) const
+  bool operator>(const InsertObjectInstanceMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const InsertObjectInstanceMessage& rhs) const
+  bool operator>=(const InsertObjectInstanceMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const InsertObjectInstanceMessage& rhs) const
+  bool operator<=(const InsertObjectInstanceMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
-#endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
-#endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setName(const String& value)
+  void setName(const String& value) noexcept
   { _name = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setName(String&& value)
+  void setName(String&& value) noexcept
   { _name = std::move(value); }
-#endif
-  String& getName()
+  String& getName() noexcept
   { return _name; }
-  const String& getName() const
+  const String& getName() const noexcept
   { return _name; }
 
-  void setAttributeStateVector(const AttributeStateVector& value)
+  void setAttributeStateVector(const AttributeStateVector& value) noexcept
   { _attributeStateVector = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeStateVector(AttributeStateVector&& value)
+  void setAttributeStateVector(AttributeStateVector&& value) noexcept
   { _attributeStateVector = std::move(value); }
-#endif
-  AttributeStateVector& getAttributeStateVector()
+  AttributeStateVector& getAttributeStateVector() noexcept
   { return _attributeStateVector; }
-  const AttributeStateVector& getAttributeStateVector() const
+  const AttributeStateVector& getAttributeStateVector() const noexcept
   { return _attributeStateVector; }
 
 private:
@@ -6286,71 +9697,70 @@ private:
   AttributeStateVector _attributeStateVector;
 };
 
-class OPENRTI_API DeleteObjectInstanceMessage : public AbstractMessage {
+class OPENRTI_API DeleteObjectInstanceMessage final : public AbstractMessage {
 public:
-  DeleteObjectInstanceMessage();
-  virtual ~DeleteObjectInstanceMessage();
+  DeleteObjectInstanceMessage() noexcept {};
+  DeleteObjectInstanceMessage(const DeleteObjectInstanceMessage&) = default;
+  DeleteObjectInstanceMessage(DeleteObjectInstanceMessage&&) noexcept = default;
+  virtual ~DeleteObjectInstanceMessage() noexcept = default;
+  DeleteObjectInstanceMessage& operator=(const DeleteObjectInstanceMessage&) = default;
+  DeleteObjectInstanceMessage& operator=(DeleteObjectInstanceMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 91;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const DeleteObjectInstanceMessage& rhs) const;
-  bool operator<(const DeleteObjectInstanceMessage& rhs) const;
-  bool operator!=(const DeleteObjectInstanceMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const DeleteObjectInstanceMessage& rhs) const noexcept;
+  bool operator<(const DeleteObjectInstanceMessage& rhs) const noexcept;
+  bool operator!=(const DeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const DeleteObjectInstanceMessage& rhs) const
+  bool operator>(const DeleteObjectInstanceMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const DeleteObjectInstanceMessage& rhs) const
+  bool operator>=(const DeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const DeleteObjectInstanceMessage& rhs) const
+  bool operator<=(const DeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
-#endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
 private:
@@ -6360,205 +9770,193 @@ private:
   VariableLengthData _tag;
 };
 
-class OPENRTI_API TimeStampedDeleteObjectInstanceMessage : public AbstractMessage {
+class OPENRTI_API TimeStampedDeleteObjectInstanceMessage final : public AbstractMessage {
 public:
-  TimeStampedDeleteObjectInstanceMessage();
-  virtual ~TimeStampedDeleteObjectInstanceMessage();
+  TimeStampedDeleteObjectInstanceMessage() noexcept {};
+  TimeStampedDeleteObjectInstanceMessage(const TimeStampedDeleteObjectInstanceMessage&) = default;
+  TimeStampedDeleteObjectInstanceMessage(TimeStampedDeleteObjectInstanceMessage&&) noexcept = default;
+  virtual ~TimeStampedDeleteObjectInstanceMessage() noexcept = default;
+  TimeStampedDeleteObjectInstanceMessage& operator=(const TimeStampedDeleteObjectInstanceMessage&) = default;
+  TimeStampedDeleteObjectInstanceMessage& operator=(TimeStampedDeleteObjectInstanceMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 92;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeStampedDeleteObjectInstanceMessage& rhs) const;
-  bool operator<(const TimeStampedDeleteObjectInstanceMessage& rhs) const;
-  bool operator!=(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept;
+  bool operator<(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept;
+  bool operator!=(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+  bool operator>(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+  bool operator>=(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeStampedDeleteObjectInstanceMessage& rhs) const
+  bool operator<=(const TimeStampedDeleteObjectInstanceMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
-#endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { _orderType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { _orderType = std::move(value); }
-#endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return _orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return _orderType; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
-#endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setMessageRetractionHandle(const MessageRetractionHandle& value)
+  void setMessageRetractionHandle(const MessageRetractionHandle& value) noexcept
   { _messageRetractionHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setMessageRetractionHandle(MessageRetractionHandle&& value)
+  void setMessageRetractionHandle(MessageRetractionHandle&& value) noexcept
   { _messageRetractionHandle = std::move(value); }
-#endif
-  MessageRetractionHandle& getMessageRetractionHandle()
+  MessageRetractionHandle& getMessageRetractionHandle() noexcept
   { return _messageRetractionHandle; }
-  const MessageRetractionHandle& getMessageRetractionHandle() const
+  const MessageRetractionHandle& getMessageRetractionHandle() const noexcept
   { return _messageRetractionHandle; }
 
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   ObjectInstanceHandle _objectInstanceHandle;
-  OrderType _orderType;
+  OrderType _orderType = RECEIVE;
   VariableLengthData _tag;
   VariableLengthData _timeStamp;
   MessageRetractionHandle _messageRetractionHandle;
 };
 
-class OPENRTI_API AttributeUpdateMessage : public AbstractMessage {
+class OPENRTI_API AttributeUpdateMessage final : public AbstractMessage {
 public:
-  AttributeUpdateMessage();
-  virtual ~AttributeUpdateMessage();
+  AttributeUpdateMessage() noexcept {};
+  AttributeUpdateMessage(const AttributeUpdateMessage&) = default;
+  AttributeUpdateMessage(AttributeUpdateMessage&&) noexcept = default;
+  virtual ~AttributeUpdateMessage() noexcept = default;
+  AttributeUpdateMessage& operator=(const AttributeUpdateMessage&) = default;
+  AttributeUpdateMessage& operator=(AttributeUpdateMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 94;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const AttributeUpdateMessage& rhs) const;
-  bool operator<(const AttributeUpdateMessage& rhs) const;
-  bool operator!=(const AttributeUpdateMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const AttributeUpdateMessage& rhs) const noexcept;
+  bool operator<(const AttributeUpdateMessage& rhs) const noexcept;
+  bool operator!=(const AttributeUpdateMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const AttributeUpdateMessage& rhs) const
+  bool operator>(const AttributeUpdateMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const AttributeUpdateMessage& rhs) const
+  bool operator>=(const AttributeUpdateMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const AttributeUpdateMessage& rhs) const
+  bool operator<=(const AttributeUpdateMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual bool getReliable() const;
+  bool getReliable() const noexcept override;
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
-#endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { _transportationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { _transportationType = std::move(value); }
-#endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return _transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return _transportationType; }
 
-  void setAttributeValues(const AttributeValueVector& value)
+  void setAttributeValues(const AttributeValueVector& value) noexcept
   { _attributeValues = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeValues(AttributeValueVector&& value)
+  void setAttributeValues(AttributeValueVector&& value) noexcept
   { _attributeValues = std::move(value); }
-#endif
-  AttributeValueVector& getAttributeValues()
+  AttributeValueVector& getAttributeValues() noexcept
   { return _attributeValues; }
-  const AttributeValueVector& getAttributeValues() const
+  const AttributeValueVector& getAttributeValues() const noexcept
   { return _attributeValues; }
 
 private:
@@ -6566,132 +9964,121 @@ private:
   FederateHandle _federateHandle;
   ObjectInstanceHandle _objectInstanceHandle;
   VariableLengthData _tag;
-  TransportationType _transportationType;
+  TransportationType _transportationType = RELIABLE;
   AttributeValueVector _attributeValues;
 };
 
-class OPENRTI_API TimeStampedAttributeUpdateMessage : public AbstractMessage {
+class OPENRTI_API TimeStampedAttributeUpdateMessage final : public AbstractMessage {
 public:
-  TimeStampedAttributeUpdateMessage();
-  virtual ~TimeStampedAttributeUpdateMessage();
+  TimeStampedAttributeUpdateMessage() noexcept {};
+  TimeStampedAttributeUpdateMessage(const TimeStampedAttributeUpdateMessage&) = default;
+  TimeStampedAttributeUpdateMessage(TimeStampedAttributeUpdateMessage&&) noexcept = default;
+  virtual ~TimeStampedAttributeUpdateMessage() noexcept = default;
+  TimeStampedAttributeUpdateMessage& operator=(const TimeStampedAttributeUpdateMessage&) = default;
+  TimeStampedAttributeUpdateMessage& operator=(TimeStampedAttributeUpdateMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 96;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const TimeStampedAttributeUpdateMessage& rhs) const;
-  bool operator<(const TimeStampedAttributeUpdateMessage& rhs) const;
-  bool operator!=(const TimeStampedAttributeUpdateMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const TimeStampedAttributeUpdateMessage& rhs) const noexcept;
+  bool operator<(const TimeStampedAttributeUpdateMessage& rhs) const noexcept;
+  bool operator!=(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const TimeStampedAttributeUpdateMessage& rhs) const
+  bool operator>(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const TimeStampedAttributeUpdateMessage& rhs) const
+  bool operator>=(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const TimeStampedAttributeUpdateMessage& rhs) const
+  bool operator<=(const TimeStampedAttributeUpdateMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual bool getReliable() const;
+  bool getReliable() const noexcept override;
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setFederateHandle(const FederateHandle& value)
+  void setFederateHandle(const FederateHandle& value) noexcept
   { _federateHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederateHandle(FederateHandle&& value)
+  void setFederateHandle(FederateHandle&& value) noexcept
   { _federateHandle = std::move(value); }
-#endif
-  FederateHandle& getFederateHandle()
+  FederateHandle& getFederateHandle() noexcept
   { return _federateHandle; }
-  const FederateHandle& getFederateHandle() const
+  const FederateHandle& getFederateHandle() const noexcept
   { return _federateHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
-#endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
-  void setTimeStamp(const VariableLengthData& value)
+  void setTimeStamp(const VariableLengthData& value) noexcept
   { _timeStamp = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTimeStamp(VariableLengthData&& value)
+  void setTimeStamp(VariableLengthData&& value) noexcept
   { _timeStamp = std::move(value); }
-#endif
-  VariableLengthData& getTimeStamp()
+  VariableLengthData& getTimeStamp() noexcept
   { return _timeStamp; }
-  const VariableLengthData& getTimeStamp() const
+  const VariableLengthData& getTimeStamp() const noexcept
   { return _timeStamp; }
 
-  void setMessageRetractionHandle(const MessageRetractionHandle& value)
+  void setMessageRetractionHandle(const MessageRetractionHandle& value) noexcept
   { _messageRetractionHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setMessageRetractionHandle(MessageRetractionHandle&& value)
+  void setMessageRetractionHandle(MessageRetractionHandle&& value) noexcept
   { _messageRetractionHandle = std::move(value); }
-#endif
-  MessageRetractionHandle& getMessageRetractionHandle()
+  MessageRetractionHandle& getMessageRetractionHandle() noexcept
   { return _messageRetractionHandle; }
-  const MessageRetractionHandle& getMessageRetractionHandle() const
+  const MessageRetractionHandle& getMessageRetractionHandle() const noexcept
   { return _messageRetractionHandle; }
 
-  void setOrderType(const OrderType& value)
+  void setOrderType(const OrderType& value) noexcept
   { _orderType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setOrderType(OrderType&& value)
+  void setOrderType(OrderType&& value) noexcept
   { _orderType = std::move(value); }
-#endif
-  OrderType& getOrderType()
+  OrderType& getOrderType() noexcept
   { return _orderType; }
-  const OrderType& getOrderType() const
+  const OrderType& getOrderType() const noexcept
   { return _orderType; }
 
-  void setTransportationType(const TransportationType& value)
+  void setTransportationType(const TransportationType& value) noexcept
   { _transportationType = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTransportationType(TransportationType&& value)
+  void setTransportationType(TransportationType&& value) noexcept
   { _transportationType = std::move(value); }
-#endif
-  TransportationType& getTransportationType()
+  TransportationType& getTransportationType() noexcept
   { return _transportationType; }
-  const TransportationType& getTransportationType() const
+  const TransportationType& getTransportationType() const noexcept
   { return _transportationType; }
 
-  void setAttributeValues(const AttributeValueVector& value)
+  void setAttributeValues(const AttributeValueVector& value) noexcept
   { _attributeValues = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeValues(AttributeValueVector&& value)
+  void setAttributeValues(AttributeValueVector&& value) noexcept
   { _attributeValues = std::move(value); }
-#endif
-  AttributeValueVector& getAttributeValues()
+  AttributeValueVector& getAttributeValues() noexcept
   { return _attributeValues; }
-  const AttributeValueVector& getAttributeValues() const
+  const AttributeValueVector& getAttributeValues() const noexcept
   { return _attributeValues; }
 
 private:
@@ -6701,76 +10088,75 @@ private:
   VariableLengthData _tag;
   VariableLengthData _timeStamp;
   MessageRetractionHandle _messageRetractionHandle;
-  OrderType _orderType;
-  TransportationType _transportationType;
+  OrderType _orderType = RECEIVE;
+  TransportationType _transportationType = RELIABLE;
   AttributeValueVector _attributeValues;
 };
 
-class OPENRTI_API RequestAttributeUpdateMessage : public AbstractMessage {
+class OPENRTI_API RequestAttributeUpdateMessage final : public AbstractMessage {
 public:
-  RequestAttributeUpdateMessage();
-  virtual ~RequestAttributeUpdateMessage();
+  RequestAttributeUpdateMessage() noexcept {};
+  RequestAttributeUpdateMessage(const RequestAttributeUpdateMessage&) = default;
+  RequestAttributeUpdateMessage(RequestAttributeUpdateMessage&&) noexcept = default;
+  virtual ~RequestAttributeUpdateMessage() noexcept = default;
+  RequestAttributeUpdateMessage& operator=(const RequestAttributeUpdateMessage&) = default;
+  RequestAttributeUpdateMessage& operator=(RequestAttributeUpdateMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 97;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RequestAttributeUpdateMessage& rhs) const;
-  bool operator<(const RequestAttributeUpdateMessage& rhs) const;
-  bool operator!=(const RequestAttributeUpdateMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RequestAttributeUpdateMessage& rhs) const noexcept;
+  bool operator<(const RequestAttributeUpdateMessage& rhs) const noexcept;
+  bool operator!=(const RequestAttributeUpdateMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RequestAttributeUpdateMessage& rhs) const
+  bool operator>(const RequestAttributeUpdateMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RequestAttributeUpdateMessage& rhs) const
+  bool operator>=(const RequestAttributeUpdateMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RequestAttributeUpdateMessage& rhs) const
+  bool operator<=(const RequestAttributeUpdateMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const;
+  virtual ObjectInstanceHandle getObjectInstanceHandleForMessage() const noexcept override;
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectInstanceHandle(const ObjectInstanceHandle& value)
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
   { _objectInstanceHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectInstanceHandle(ObjectInstanceHandle&& value)
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
   { _objectInstanceHandle = std::move(value); }
-#endif
-  ObjectInstanceHandle& getObjectInstanceHandle()
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
   { return _objectInstanceHandle; }
-  const ObjectInstanceHandle& getObjectInstanceHandle() const
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
   { return _objectInstanceHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
-#endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
 private:
@@ -6780,69 +10166,68 @@ private:
   VariableLengthData _tag;
 };
 
-class OPENRTI_API RequestClassAttributeUpdateMessage : public AbstractMessage {
+class OPENRTI_API RequestClassAttributeUpdateMessage final : public AbstractMessage {
 public:
-  RequestClassAttributeUpdateMessage();
-  virtual ~RequestClassAttributeUpdateMessage();
+  RequestClassAttributeUpdateMessage() noexcept {};
+  RequestClassAttributeUpdateMessage(const RequestClassAttributeUpdateMessage&) = default;
+  RequestClassAttributeUpdateMessage(RequestClassAttributeUpdateMessage&&) noexcept = default;
+  virtual ~RequestClassAttributeUpdateMessage() noexcept = default;
+  RequestClassAttributeUpdateMessage& operator=(const RequestClassAttributeUpdateMessage&) = default;
+  RequestClassAttributeUpdateMessage& operator=(RequestClassAttributeUpdateMessage&&) = default;
 
-  virtual const char* getTypeName() const;
-  virtual void out(std::ostream& os) const;
-  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const;
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 98;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
 
-  virtual bool operator==(const AbstractMessage& rhs) const;
-  bool operator==(const RequestClassAttributeUpdateMessage& rhs) const;
-  bool operator<(const RequestClassAttributeUpdateMessage& rhs) const;
-  bool operator!=(const RequestClassAttributeUpdateMessage& rhs) const
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const RequestClassAttributeUpdateMessage& rhs) const noexcept;
+  bool operator<(const RequestClassAttributeUpdateMessage& rhs) const noexcept;
+  bool operator!=(const RequestClassAttributeUpdateMessage& rhs) const noexcept
   { return !operator==(rhs); }
-  bool operator>(const RequestClassAttributeUpdateMessage& rhs) const
+  bool operator>(const RequestClassAttributeUpdateMessage& rhs) const noexcept
   { return rhs.operator<(*this); }
-  bool operator>=(const RequestClassAttributeUpdateMessage& rhs) const
+  bool operator>=(const RequestClassAttributeUpdateMessage& rhs) const noexcept
   { return !operator<(rhs); }
-  bool operator<=(const RequestClassAttributeUpdateMessage& rhs) const
+  bool operator<=(const RequestClassAttributeUpdateMessage& rhs) const noexcept
   { return !operator>(rhs); }
 
-  void setFederationHandle(const FederationHandle& value)
+  void setFederationHandle(const FederationHandle& value) noexcept
   { _federationHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setFederationHandle(FederationHandle&& value)
+  void setFederationHandle(FederationHandle&& value) noexcept
   { _federationHandle = std::move(value); }
-#endif
-  FederationHandle& getFederationHandle()
+  FederationHandle& getFederationHandle() noexcept
   { return _federationHandle; }
-  const FederationHandle& getFederationHandle() const
+  const FederationHandle& getFederationHandle() const noexcept
   { return _federationHandle; }
 
-  void setObjectClassHandle(const ObjectClassHandle& value)
+  void setObjectClassHandle(const ObjectClassHandle& value) noexcept
   { _objectClassHandle = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setObjectClassHandle(ObjectClassHandle&& value)
+  void setObjectClassHandle(ObjectClassHandle&& value) noexcept
   { _objectClassHandle = std::move(value); }
-#endif
-  ObjectClassHandle& getObjectClassHandle()
+  ObjectClassHandle& getObjectClassHandle() noexcept
   { return _objectClassHandle; }
-  const ObjectClassHandle& getObjectClassHandle() const
+  const ObjectClassHandle& getObjectClassHandle() const noexcept
   { return _objectClassHandle; }
 
-  void setAttributeHandles(const AttributeHandleVector& value)
+  void setAttributeHandles(const AttributeHandleVector& value) noexcept
   { _attributeHandles = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setAttributeHandles(AttributeHandleVector&& value)
+  void setAttributeHandles(AttributeHandleVector&& value) noexcept
   { _attributeHandles = std::move(value); }
-#endif
-  AttributeHandleVector& getAttributeHandles()
+  AttributeHandleVector& getAttributeHandles() noexcept
   { return _attributeHandles; }
-  const AttributeHandleVector& getAttributeHandles() const
+  const AttributeHandleVector& getAttributeHandles() const noexcept
   { return _attributeHandles; }
 
-  void setTag(const VariableLengthData& value)
+  void setTag(const VariableLengthData& value) noexcept
   { _tag = value; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  void setTag(VariableLengthData&& value)
+  void setTag(VariableLengthData&& value) noexcept
   { _tag = std::move(value); }
-#endif
-  VariableLengthData& getTag()
+  VariableLengthData& getTag() noexcept
   { return _tag; }
-  const VariableLengthData& getTag() const
+  const VariableLengthData& getTag() const noexcept
   { return _tag; }
 
 private:
@@ -6852,2672 +10237,580 @@ private:
   VariableLengthData _tag;
 };
 
-
-// EnumDataType CallbackModel
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const CallbackModel& value)
-{
-  switch (value) {
-  case HLA_IMMEDIATE: os << "HLA_IMMEDIATE"; break;
-  case HLA_EVOKED: os << "HLA_EVOKED"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const CallbackModel& value)
-{
-  switch (value) {
-  case HLA_IMMEDIATE: return "HLA_IMMEDIATE";
-  case HLA_EVOKED: return "HLA_EVOKED";
-  default: return "<Invalid CallbackModel>";
-  }
-}
-
-// EnumDataType OrderType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const OrderType& value)
-{
-  switch (value) {
-  case RECEIVE: os << "RECEIVE"; break;
-  case TIMESTAMP: os << "TIMESTAMP"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const OrderType& value)
-{
-  switch (value) {
-  case RECEIVE: return "RECEIVE";
-  case TIMESTAMP: return "TIMESTAMP";
-  default: return "<Invalid OrderType>";
-  }
-}
-
-// EnumDataType TransportationType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const TransportationType& value)
-{
-  switch (value) {
-  case RELIABLE: os << "RELIABLE"; break;
-  case BEST_EFFORT: os << "BEST_EFFORT"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const TransportationType& value)
-{
-  switch (value) {
-  case RELIABLE: return "RELIABLE";
-  case BEST_EFFORT: return "BEST_EFFORT";
-  default: return "<Invalid TransportationType>";
-  }
-}
-
-// EnumDataType SubscriptionType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const SubscriptionType& value)
-{
-  switch (value) {
-  case Unsubscribed: os << "Unsubscribed"; break;
-  case SubscribedPassive: os << "SubscribedPassive"; break;
-  case SubscribedActive: os << "SubscribedActive"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const SubscriptionType& value)
-{
-  switch (value) {
-  case Unsubscribed: return "Unsubscribed";
-  case SubscribedPassive: return "SubscribedPassive";
-  case SubscribedActive: return "SubscribedActive";
-  default: return "<Invalid SubscriptionType>";
-  }
-}
-
-// EnumDataType PublicationType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const PublicationType& value)
-{
-  switch (value) {
-  case Unpublished: os << "Unpublished"; break;
-  case Published: os << "Published"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const PublicationType& value)
-{
-  switch (value) {
-  case Unpublished: return "Unpublished";
-  case Published: return "Published";
-  default: return "<Invalid PublicationType>";
-  }
-}
-
-// EnumDataType ResignAction
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignAction& value)
-{
-  switch (value) {
-  case UNCONDITIONALLY_DIVEST_ATTRIBUTES: os << "UNCONDITIONALLY_DIVEST_ATTRIBUTES"; break;
-  case DELETE_OBJECTS: os << "DELETE_OBJECTS"; break;
-  case CANCEL_PENDING_OWNERSHIP_ACQUISITIONS: os << "CANCEL_PENDING_OWNERSHIP_ACQUISITIONS"; break;
-  case DELETE_OBJECTS_THEN_DIVEST: os << "DELETE_OBJECTS_THEN_DIVEST"; break;
-  case CANCEL_THEN_DELETE_THEN_DIVEST: os << "CANCEL_THEN_DELETE_THEN_DIVEST"; break;
-  case NO_ACTION: os << "NO_ACTION"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const ResignAction& value)
-{
-  switch (value) {
-  case UNCONDITIONALLY_DIVEST_ATTRIBUTES: return "UNCONDITIONALLY_DIVEST_ATTRIBUTES";
-  case DELETE_OBJECTS: return "DELETE_OBJECTS";
-  case CANCEL_PENDING_OWNERSHIP_ACQUISITIONS: return "CANCEL_PENDING_OWNERSHIP_ACQUISITIONS";
-  case DELETE_OBJECTS_THEN_DIVEST: return "DELETE_OBJECTS_THEN_DIVEST";
-  case CANCEL_THEN_DELETE_THEN_DIVEST: return "CANCEL_THEN_DELETE_THEN_DIVEST";
-  case NO_ACTION: return "NO_ACTION";
-  default: return "<Invalid ResignAction>";
-  }
-}
-
-// EnumDataType RestoreFailureReason
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RestoreFailureReason& value)
-{
-  switch (value) {
-  case RTI_UNABLE_TO_RESTORE: os << "RTI_UNABLE_TO_RESTORE"; break;
-  case FEDERATE_REPORTED_FAILURE_DURING_RESTORE: os << "FEDERATE_REPORTED_FAILURE_DURING_RESTORE"; break;
-  case FEDERATE_RESIGNED_DURING_RESTORE: os << "FEDERATE_RESIGNED_DURING_RESTORE"; break;
-  case RTI_DETECTED_FAILURE_DURING_RESTORE: os << "RTI_DETECTED_FAILURE_DURING_RESTORE"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const RestoreFailureReason& value)
-{
-  switch (value) {
-  case RTI_UNABLE_TO_RESTORE: return "RTI_UNABLE_TO_RESTORE";
-  case FEDERATE_REPORTED_FAILURE_DURING_RESTORE: return "FEDERATE_REPORTED_FAILURE_DURING_RESTORE";
-  case FEDERATE_RESIGNED_DURING_RESTORE: return "FEDERATE_RESIGNED_DURING_RESTORE";
-  case RTI_DETECTED_FAILURE_DURING_RESTORE: return "RTI_DETECTED_FAILURE_DURING_RESTORE";
-  default: return "<Invalid RestoreFailureReason>";
-  }
-}
-
-// EnumDataType RestoreStatus
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RestoreStatus& value)
-{
-  switch (value) {
-  case NO_RESTORE_IN_PROGRESS: os << "NO_RESTORE_IN_PROGRESS"; break;
-  case FEDERATE_RESTORE_REQUEST_PENDING: os << "FEDERATE_RESTORE_REQUEST_PENDING"; break;
-  case FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN: os << "FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN"; break;
-  case FEDERATE_PREPARED_TO_RESTORE: os << "FEDERATE_PREPARED_TO_RESTORE"; break;
-  case FEDERATE_RESTORING: os << "FEDERATE_RESTORING"; break;
-  case FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE: os << "FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const RestoreStatus& value)
-{
-  switch (value) {
-  case NO_RESTORE_IN_PROGRESS: return "NO_RESTORE_IN_PROGRESS";
-  case FEDERATE_RESTORE_REQUEST_PENDING: return "FEDERATE_RESTORE_REQUEST_PENDING";
-  case FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN: return "FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN";
-  case FEDERATE_PREPARED_TO_RESTORE: return "FEDERATE_PREPARED_TO_RESTORE";
-  case FEDERATE_RESTORING: return "FEDERATE_RESTORING";
-  case FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE";
-  default: return "<Invalid RestoreStatus>";
-  }
-}
-
-// EnumDataType SaveFailureReason
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const SaveFailureReason& value)
-{
-  switch (value) {
-  case RTI_UNABLE_TO_SAVE: os << "RTI_UNABLE_TO_SAVE"; break;
-  case FEDERATE_REPORTED_FAILURE_DURING_SAVE: os << "FEDERATE_REPORTED_FAILURE_DURING_SAVE"; break;
-  case FEDERATE_RESIGNED_DURING_SAVE: os << "FEDERATE_RESIGNED_DURING_SAVE"; break;
-  case RTI_DETECTED_FAILURE_DURING_SAVE: os << "RTI_DETECTED_FAILURE_DURING_SAVE"; break;
-  case SAVE_TIME_CANNOT_BE_HONORED: os << "SAVE_TIME_CANNOT_BE_HONORED"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const SaveFailureReason& value)
-{
-  switch (value) {
-  case RTI_UNABLE_TO_SAVE: return "RTI_UNABLE_TO_SAVE";
-  case FEDERATE_REPORTED_FAILURE_DURING_SAVE: return "FEDERATE_REPORTED_FAILURE_DURING_SAVE";
-  case FEDERATE_RESIGNED_DURING_SAVE: return "FEDERATE_RESIGNED_DURING_SAVE";
-  case RTI_DETECTED_FAILURE_DURING_SAVE: return "RTI_DETECTED_FAILURE_DURING_SAVE";
-  case SAVE_TIME_CANNOT_BE_HONORED: return "SAVE_TIME_CANNOT_BE_HONORED";
-  default: return "<Invalid SaveFailureReason>";
-  }
-}
-
-// EnumDataType SaveStatus
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const SaveStatus& value)
-{
-  switch (value) {
-  case NO_SAVE_IN_PROGRESS: os << "NO_SAVE_IN_PROGRESS"; break;
-  case FEDERATE_INSTRUCTED_TO_SAVE: os << "FEDERATE_INSTRUCTED_TO_SAVE"; break;
-  case FEDERATE_SAVING: os << "FEDERATE_SAVING"; break;
-  case FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE: os << "FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const SaveStatus& value)
-{
-  switch (value) {
-  case NO_SAVE_IN_PROGRESS: return "NO_SAVE_IN_PROGRESS";
-  case FEDERATE_INSTRUCTED_TO_SAVE: return "FEDERATE_INSTRUCTED_TO_SAVE";
-  case FEDERATE_SAVING: return "FEDERATE_SAVING";
-  case FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE";
-  default: return "<Invalid SaveStatus>";
-  }
-}
-
-// EnumDataType ServiceGroupIndicator
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ServiceGroupIndicator& value)
-{
-  switch (value) {
-  case FEDERATION_MANAGEMENT: os << "FEDERATION_MANAGEMENT"; break;
-  case DECLARATION_MANAGEMENT: os << "DECLARATION_MANAGEMENT"; break;
-  case OBJECT_MANAGEMENT: os << "OBJECT_MANAGEMENT"; break;
-  case OWNERSHIP_MANAGEMENT: os << "OWNERSHIP_MANAGEMENT"; break;
-  case TIME_MANAGEMENT: os << "TIME_MANAGEMENT"; break;
-  case DATA_DISTRIBUTION_MANAGEMENT: os << "DATA_DISTRIBUTION_MANAGEMENT"; break;
-  case SUPPORT_SERVICES: os << "SUPPORT_SERVICES"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const ServiceGroupIndicator& value)
-{
-  switch (value) {
-  case FEDERATION_MANAGEMENT: return "FEDERATION_MANAGEMENT";
-  case DECLARATION_MANAGEMENT: return "DECLARATION_MANAGEMENT";
-  case OBJECT_MANAGEMENT: return "OBJECT_MANAGEMENT";
-  case OWNERSHIP_MANAGEMENT: return "OWNERSHIP_MANAGEMENT";
-  case TIME_MANAGEMENT: return "TIME_MANAGEMENT";
-  case DATA_DISTRIBUTION_MANAGEMENT: return "DATA_DISTRIBUTION_MANAGEMENT";
-  case SUPPORT_SERVICES: return "SUPPORT_SERVICES";
-  default: return "<Invalid ServiceGroupIndicator>";
-  }
-}
-
-// EnumDataType LowerBoundTimeStampCommitType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const LowerBoundTimeStampCommitType& value)
-{
-  switch (value) {
-  case TimeAdvanceCommit: os << "TimeAdvanceCommit"; break;
-  case NextMessageCommit: os << "NextMessageCommit"; break;
-  case TimeAdvanceAndNextMessageCommit: os << "TimeAdvanceAndNextMessageCommit"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const LowerBoundTimeStampCommitType& value)
-{
-  switch (value) {
-  case TimeAdvanceCommit: return "TimeAdvanceCommit";
-  case NextMessageCommit: return "NextMessageCommit";
-  case TimeAdvanceAndNextMessageCommit: return "TimeAdvanceAndNextMessageCommit";
-  default: return "<Invalid LowerBoundTimeStampCommitType>";
-  }
-}
-
-// EnumDataType SwitchesType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const SwitchesType& value)
-{
-  switch (value) {
-  case InteractionRelevanceAdvisorySwitchesType: os << "InteractionRelevanceAdvisorySwitchesType"; break;
-  case ObjectClassRelevanceAdvisorySwitchesType: os << "ObjectClassRelevanceAdvisorySwitchesType"; break;
-  case AttributeRelevanceAdvisorySwitchesType: os << "AttributeRelevanceAdvisorySwitchesType"; break;
-  case AttributeScopeAdvisorySwitchesType: os << "AttributeScopeAdvisorySwitchesType"; break;
-  case AutoProvideSwitchesType: os << "AutoProvideSwitchesType"; break;
-  case ConveyRegionDesignatorSetsSwitchesType: os << "ConveyRegionDesignatorSetsSwitchesType"; break;
-  case ServiceReportingSwitchesType: os << "ServiceReportingSwitchesType"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const SwitchesType& value)
-{
-  switch (value) {
-  case InteractionRelevanceAdvisorySwitchesType: return "InteractionRelevanceAdvisorySwitchesType";
-  case ObjectClassRelevanceAdvisorySwitchesType: return "ObjectClassRelevanceAdvisorySwitchesType";
-  case AttributeRelevanceAdvisorySwitchesType: return "AttributeRelevanceAdvisorySwitchesType";
-  case AttributeScopeAdvisorySwitchesType: return "AttributeScopeAdvisorySwitchesType";
-  case AutoProvideSwitchesType: return "AutoProvideSwitchesType";
-  case ConveyRegionDesignatorSetsSwitchesType: return "ConveyRegionDesignatorSetsSwitchesType";
-  case ServiceReportingSwitchesType: return "ServiceReportingSwitchesType";
-  default: return "<Invalid SwitchesType>";
-  }
-}
-
-// VectorDataType AttributeHandleVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeHandleVector& value)
-{
-  os << "{ ";
-  AttributeHandleVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// VectorDataType FederateHandleVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleVector& value)
-{
-  os << "{ ";
-  FederateHandleVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// VectorDataType ParameterHandleVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterHandleVector& value)
-{
-  os << "{ ";
-  ParameterHandleVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// VectorDataType DimensionHandleVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandleVector& value)
-{
-  os << "{ ";
-  DimensionHandleVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.SetDataType object at 0x0000000002B3C0B8>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandleSet& value)
-{
-  os << "{ ";
-  DimensionHandleSet::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// VectorDataType ObjectInstanceHandleVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandleVector& value)
-{
-  os << "{ ";
-  ObjectInstanceHandleVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// VectorDataType RegionHandleVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleVector& value)
-{
-  os << "{ ";
-  RegionHandleVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// VectorDataType ModuleHandleVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ModuleHandleVector& value)
-{
-  os << "{ ";
-  ModuleHandleVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// VectorDataType StringVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const StringVector& value)
-{
-  os << "{ ";
-  StringVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.SetDataType object at 0x0000000002B3C1D0>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const StringSet& value)
-{
-  os << "{ ";
-  StringSet::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C240>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleBoolPair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// VectorDataType FederateHandleBoolPairVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleBoolPairVector& value)
-{
-  os << "{ ";
-  FederateHandleBoolPairVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType RangeBoundsValue
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RangeBoundsValue& value)
-{
-  os << "{ ";
-  os << "lowerBound: " << value.getLowerBound();
-  os << ", ";
-  os << "upperBound: " << value.getUpperBound();
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C2E8>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const DimensionHandleRangeBoundsValuePair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// VectorDataType RegionValue
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionValue& value)
-{
-  os << "{ ";
-  RegionValue::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// VectorDataType RegionValueList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionValueList& value)
-{
-  os << "{ ";
-  RegionValueList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C400>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleDimensionHandleSetPair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// VectorDataType RegionHandleDimensionHandleSetPairVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleDimensionHandleSetPairVector& value)
-{
-  os << "{ ";
-  RegionHandleDimensionHandleSetPairVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C470>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleSpaceHandlePair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// VectorDataType RegionHandleSpaceHandlePairVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleSpaceHandlePairVector& value)
-{
-  os << "{ ";
-  RegionHandleSpaceHandlePairVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C4E0>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleRegionValuePair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// VectorDataType RegionHandleRegionValuePairVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegionHandleRegionValuePairVector& value)
-{
-  os << "{ ";
-  RegionHandleRegionValuePairVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C550>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const InteractionClassHandleRegionValueListPair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C588>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeHandleRegionValueListPair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// StructDataType AttributeState
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeState& value)
-{
-  os << "{ ";
-  os << "attributeHandle: " << value.getAttributeHandle();
-  os << " }";
-  return os;
-}
-
-// VectorDataType AttributeStateVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeStateVector& value)
-{
-  os << "{ ";
-  AttributeStateVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType ParameterValue
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterValue& value)
-{
-  os << "{ ";
-  os << "parameterHandle: " << value.getParameterHandle();
-  os << ", ";
-  os << "value: " << value.getValue();
-  os << " }";
-  return os;
-}
-
-// VectorDataType ParameterValueVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ParameterValueVector& value)
-{
-  os << "{ ";
-  ParameterValueVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType AttributeValue
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeValue& value)
-{
-  os << "{ ";
-  os << "attributeHandle: " << value.getAttributeHandle();
-  os << ", ";
-  os << "value: " << value.getValue();
-  os << " }";
-  return os;
-}
-
-// VectorDataType AttributeValueVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeValueVector& value)
-{
-  os << "{ ";
-  AttributeValueVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C828>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleSaveStatusPair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// VectorDataType FederateHandleSaveStatusPairVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleSaveStatusPairVector& value)
-{
-  os << "{ ";
-  FederateHandleSaveStatusPairVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C898>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleRestoreStatusPair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// VectorDataType FederateHandleRestoreStatusPairVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederateHandleRestoreStatusPairVector& value)
-{
-  os << "{ ";
-  FederateHandleRestoreStatusPairVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FederationExecutionInformation
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationExecutionInformation& value)
-{
-  os << "{ ";
-  os << "federationExecutionName: " << value.getFederationExecutionName();
-  os << ", ";
-  os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FederationExecutionInformationVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationExecutionInformationVector& value)
-{
-  os << "{ ";
-  FederationExecutionInformationVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// <__main__.PairDataType object at 0x0000000002B3C9E8>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandleNamePair& value)
-{
-  os << "{ ";
-  os << "first: " << value.first << ", ";
-  os << "second: " << value.second;
-  os << " }";
-  return os;
-}
-
-// VectorDataType ObjectInstanceHandleNamePairVector
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandleNamePairVector& value)
-{
-  os << "{ ";
-  ObjectInstanceHandleNamePairVector::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// EnumDataType CreateFederationExecutionResponseType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const CreateFederationExecutionResponseType& value)
-{
-  switch (value) {
-  case CreateFederationExecutionResponseSuccess: os << "CreateFederationExecutionResponseSuccess"; break;
-  case CreateFederationExecutionResponseFederationExecutionAlreadyExists: os << "CreateFederationExecutionResponseFederationExecutionAlreadyExists"; break;
-  case CreateFederationExecutionResponseCouldNotOpenFDD: os << "CreateFederationExecutionResponseCouldNotOpenFDD"; break;
-  case CreateFederationExecutionResponseErrorReadingFDD: os << "CreateFederationExecutionResponseErrorReadingFDD"; break;
-  case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: os << "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory"; break;
-  case CreateFederationExecutionResponseInconsistentFDD: os << "CreateFederationExecutionResponseInconsistentFDD"; break;
-  case CreateFederationExecutionResponseRTIinternalError: os << "CreateFederationExecutionResponseRTIinternalError"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const CreateFederationExecutionResponseType& value)
-{
-  switch (value) {
-  case CreateFederationExecutionResponseSuccess: return "CreateFederationExecutionResponseSuccess";
-  case CreateFederationExecutionResponseFederationExecutionAlreadyExists: return "CreateFederationExecutionResponseFederationExecutionAlreadyExists";
-  case CreateFederationExecutionResponseCouldNotOpenFDD: return "CreateFederationExecutionResponseCouldNotOpenFDD";
-  case CreateFederationExecutionResponseErrorReadingFDD: return "CreateFederationExecutionResponseErrorReadingFDD";
-  case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: return "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory";
-  case CreateFederationExecutionResponseInconsistentFDD: return "CreateFederationExecutionResponseInconsistentFDD";
-  case CreateFederationExecutionResponseRTIinternalError: return "CreateFederationExecutionResponseRTIinternalError";
-  default: return "<Invalid CreateFederationExecutionResponseType>";
-  }
-}
-
-// EnumDataType DestroyFederationExecutionResponseType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const DestroyFederationExecutionResponseType& value)
-{
-  switch (value) {
-  case DestroyFederationExecutionResponseSuccess: os << "DestroyFederationExecutionResponseSuccess"; break;
-  case DestroyFederationExecutionResponseFederatesCurrentlyJoined: os << "DestroyFederationExecutionResponseFederatesCurrentlyJoined"; break;
-  case DestroyFederationExecutionResponseFederationExecutionDoesNotExist: os << "DestroyFederationExecutionResponseFederationExecutionDoesNotExist"; break;
-  case DestroyFederationExecutionResponseRTIinternalError: os << "DestroyFederationExecutionResponseRTIinternalError"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const DestroyFederationExecutionResponseType& value)
-{
-  switch (value) {
-  case DestroyFederationExecutionResponseSuccess: return "DestroyFederationExecutionResponseSuccess";
-  case DestroyFederationExecutionResponseFederatesCurrentlyJoined: return "DestroyFederationExecutionResponseFederatesCurrentlyJoined";
-  case DestroyFederationExecutionResponseFederationExecutionDoesNotExist: return "DestroyFederationExecutionResponseFederationExecutionDoesNotExist";
-  case DestroyFederationExecutionResponseRTIinternalError: return "DestroyFederationExecutionResponseRTIinternalError";
-  default: return "<Invalid DestroyFederationExecutionResponseType>";
-  }
-}
-
-// EnumDataType JoinFederationExecutionResponseType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationExecutionResponseType& value)
-{
-  switch (value) {
-  case JoinFederationExecutionResponseSuccess: os << "JoinFederationExecutionResponseSuccess"; break;
-  case JoinFederationExecutionResponseFederateNameAlreadyInUse: os << "JoinFederationExecutionResponseFederateNameAlreadyInUse"; break;
-  case JoinFederationExecutionResponseFederationExecutionDoesNotExist: os << "JoinFederationExecutionResponseFederationExecutionDoesNotExist"; break;
-  case JoinFederationExecutionResponseSaveInProgress: os << "JoinFederationExecutionResponseSaveInProgress"; break;
-  case JoinFederationExecutionResponseRestoreInProgress: os << "JoinFederationExecutionResponseRestoreInProgress"; break;
-  case JoinFederationExecutionResponseInconsistentFDD: os << "JoinFederationExecutionResponseInconsistentFDD"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const JoinFederationExecutionResponseType& value)
-{
-  switch (value) {
-  case JoinFederationExecutionResponseSuccess: return "JoinFederationExecutionResponseSuccess";
-  case JoinFederationExecutionResponseFederateNameAlreadyInUse: return "JoinFederationExecutionResponseFederateNameAlreadyInUse";
-  case JoinFederationExecutionResponseFederationExecutionDoesNotExist: return "JoinFederationExecutionResponseFederationExecutionDoesNotExist";
-  case JoinFederationExecutionResponseSaveInProgress: return "JoinFederationExecutionResponseSaveInProgress";
-  case JoinFederationExecutionResponseRestoreInProgress: return "JoinFederationExecutionResponseRestoreInProgress";
-  case JoinFederationExecutionResponseInconsistentFDD: return "JoinFederationExecutionResponseInconsistentFDD";
-  default: return "<Invalid JoinFederationExecutionResponseType>";
-  }
-}
-
-// EnumDataType RegisterFederationSynchronizationPointResponseType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegisterFederationSynchronizationPointResponseType& value)
-{
-  switch (value) {
-  case RegisterFederationSynchronizationPointResponseSuccess: os << "RegisterFederationSynchronizationPointResponseSuccess"; break;
-  case RegisterFederationSynchronizationPointResponseLabelNotUnique: os << "RegisterFederationSynchronizationPointResponseLabelNotUnique"; break;
-  case RegisterFederationSynchronizationPointResponseMemberNotJoined: os << "RegisterFederationSynchronizationPointResponseMemberNotJoined"; break;
-  }
-  return os;
-}
-
-inline std::string to_string(const RegisterFederationSynchronizationPointResponseType& value)
-{
-  switch (value) {
-  case RegisterFederationSynchronizationPointResponseSuccess: return "RegisterFederationSynchronizationPointResponseSuccess";
-  case RegisterFederationSynchronizationPointResponseLabelNotUnique: return "RegisterFederationSynchronizationPointResponseLabelNotUnique";
-  case RegisterFederationSynchronizationPointResponseMemberNotJoined: return "RegisterFederationSynchronizationPointResponseMemberNotJoined";
-  default: return "<Invalid RegisterFederationSynchronizationPointResponseType>";
-  }
-}
-
-// <__main__.MapDataType object at 0x0000000002B3CEF0>
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ConfigurationParameterMap& value)
-{
-  os << "{ ";
-  ConfigurationParameterMap::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << i->first << ": " << i->second;
-    while (++i != value.end()) {
-      os << ", " << i->first << ": " << i->second;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringTransportationType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringTransportationType& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringTransportationTypeList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringTransportationTypeList& value)
-{
-  os << "{ ";
-  FOMStringTransportationTypeList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringDimension
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringDimension& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "upperBound: " << value.getUpperBound();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringDimensionList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringDimensionList& value)
-{
-  os << "{ ";
-  FOMStringDimensionList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringRoutingSpace
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringRoutingSpace& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "dimensionSet: " << value.getDimensionSet();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringRoutingSpaceList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringRoutingSpaceList& value)
-{
-  os << "{ ";
-  FOMStringRoutingSpaceList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringParameter
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringParameter& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringParameterList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringParameterList& value)
-{
-  os << "{ ";
-  FOMStringParameterList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringInteractionClass
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringInteractionClass& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "orderType: " << value.getOrderType();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << ", ";
-  os << "routingSpace: " << value.getRoutingSpace();
-  os << ", ";
-  os << "dimensionSet: " << value.getDimensionSet();
-  os << ", ";
-  os << "parameterList: " << value.getParameterList();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringInteractionClassList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringInteractionClassList& value)
-{
-  os << "{ ";
-  FOMStringInteractionClassList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringAttribute
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringAttribute& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "orderType: " << value.getOrderType();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << ", ";
-  os << "routingSpace: " << value.getRoutingSpace();
-  os << ", ";
-  os << "dimensionSet: " << value.getDimensionSet();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringAttributeList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringAttributeList& value)
-{
-  os << "{ ";
-  FOMStringAttributeList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringObjectClass
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringObjectClass& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "attributeList: " << value.getAttributeList();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringObjectClassList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringObjectClassList& value)
-{
-  os << "{ ";
-  FOMStringObjectClassList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringUpdateRate
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringUpdateRate& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "rate: " << value.getRate();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringUpdateRateList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringUpdateRateList& value)
-{
-  os << "{ ";
-  FOMStringUpdateRateList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringSwitch
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringSwitch& value)
-{
-  os << "{ ";
-  os << "switchesType: " << value.getSwitchesType();
-  os << ", ";
-  os << "enabled: " << value.getEnabled();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringSwitchList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringSwitchList& value)
-{
-  os << "{ ";
-  FOMStringSwitchList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMStringModule
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringModule& value)
-{
-  os << "{ ";
-  os << "content: " << value.getContent();
-  os << ", ";
-  os << "transportationTypeList: " << value.getTransportationTypeList();
-  os << ", ";
-  os << "dimensionList: " << value.getDimensionList();
-  os << ", ";
-  os << "routingSpaceList: " << value.getRoutingSpaceList();
-  os << ", ";
-  os << "interactionClassList: " << value.getInteractionClassList();
-  os << ", ";
-  os << "objectClassList: " << value.getObjectClassList();
-  os << ", ";
-  os << "updateRateList: " << value.getUpdateRateList();
-  os << ", ";
-  os << "switchList: " << value.getSwitchList();
-  os << ", ";
-  os << "artificialInteractionRoot: " << value.getArtificialInteractionRoot();
-  os << ", ";
-  os << "artificialObjectRoot: " << value.getArtificialObjectRoot();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMStringModuleList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMStringModuleList& value)
-{
-  os << "{ ";
-  FOMStringModuleList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMTransportationType
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMTransportationType& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMTransportationTypeList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMTransportationTypeList& value)
-{
-  os << "{ ";
-  FOMTransportationTypeList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMDimension
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMDimension& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "dimensionHandle: " << value.getDimensionHandle();
-  os << ", ";
-  os << "upperBound: " << value.getUpperBound();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMDimensionList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMDimensionList& value)
-{
-  os << "{ ";
-  FOMDimensionList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMRoutingSpace
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMRoutingSpace& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "spaceHandle: " << value.getSpaceHandle();
-  os << ", ";
-  os << "dimensionHandleSet: " << value.getDimensionHandleSet();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMRoutingSpaceList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMRoutingSpaceList& value)
-{
-  os << "{ ";
-  FOMRoutingSpaceList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMParameter
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMParameter& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "parameterHandle: " << value.getParameterHandle();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMParameterList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMParameterList& value)
-{
-  os << "{ ";
-  FOMParameterList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMInteractionClass
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMInteractionClass& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "interactionClassHandle: " << value.getInteractionClassHandle();
-  os << ", ";
-  os << "parentInteractionClassHandle: " << value.getParentInteractionClassHandle();
-  os << ", ";
-  os << "orderType: " << value.getOrderType();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << ", ";
-  os << "dimensionHandleSet: " << value.getDimensionHandleSet();
-  os << ", ";
-  os << "parameterList: " << value.getParameterList();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMInteractionClassList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMInteractionClassList& value)
-{
-  os << "{ ";
-  FOMInteractionClassList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMAttribute
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMAttribute& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "attributeHandle: " << value.getAttributeHandle();
-  os << ", ";
-  os << "orderType: " << value.getOrderType();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << ", ";
-  os << "dimensionHandleSet: " << value.getDimensionHandleSet();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMAttributeList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMAttributeList& value)
-{
-  os << "{ ";
-  FOMAttributeList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMObjectClass
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMObjectClass& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "objectClassHandle: " << value.getObjectClassHandle();
-  os << ", ";
-  os << "parentObjectClassHandle: " << value.getParentObjectClassHandle();
-  os << ", ";
-  os << "attributeList: " << value.getAttributeList();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMObjectClassList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMObjectClassList& value)
-{
-  os << "{ ";
-  FOMObjectClassList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMUpdateRate
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMUpdateRate& value)
-{
-  os << "{ ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "updateRateHandle: " << value.getUpdateRateHandle();
-  os << ", ";
-  os << "rate: " << value.getRate();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMUpdateRateList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMUpdateRateList& value)
-{
-  os << "{ ";
-  FOMUpdateRateList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMSwitch
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMSwitch& value)
-{
-  os << "{ ";
-  os << "switchesType: " << value.getSwitchesType();
-  os << ", ";
-  os << "enabled: " << value.getEnabled();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMSwitchList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMSwitchList& value)
-{
-  os << "{ ";
-  FOMSwitchList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// StructDataType FOMModule
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMModule& value)
-{
-  os << "{ ";
-  os << "moduleHandle: " << value.getModuleHandle();
-  os << ", ";
-  os << "transportationTypeList: " << value.getTransportationTypeList();
-  os << ", ";
-  os << "dimensionList: " << value.getDimensionList();
-  os << ", ";
-  os << "routingSpaceList: " << value.getRoutingSpaceList();
-  os << ", ";
-  os << "interactionClassList: " << value.getInteractionClassList();
-  os << ", ";
-  os << "objectClassList: " << value.getObjectClassList();
-  os << ", ";
-  os << "updateRateList: " << value.getUpdateRateList();
-  os << ", ";
-  os << "switchList: " << value.getSwitchList();
-  os << ", ";
-  os << "artificialInteractionRoot: " << value.getArtificialInteractionRoot();
-  os << ", ";
-  os << "artificialObjectRoot: " << value.getArtificialObjectRoot();
-  os << ", ";
-  os << "content: " << value.getContent();
-  os << " }";
-  return os;
-}
-
-// VectorDataType FOMModuleList
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FOMModuleList& value)
-{
-  os << "{ ";
-  FOMModuleList::const_iterator i = value.begin();
-  if (i != value.end()) {
-    os << *i;
-    while (++i != value.end()) {
-      os << ", " << *i;
-    }
-  }
-  os << " }";
-  return os;
-}
-
-// MessageDataType ConnectionLostMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ConnectionLostMessage& value)
-{
-  os << "{ ";
-  os << "faultDescription: " << value.getFaultDescription();
-  os << " }";
-  return os;
-}
-
-// MessageDataType CreateFederationExecutionRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const CreateFederationExecutionRequestMessage& value)
-{
-  os << "{ ";
-  os << "federationExecution: " << value.getFederationExecution();
-  os << ", ";
-  os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
-  os << ", ";
-  os << "fOMStringModuleList: " << value.getFOMStringModuleList();
-  os << " }";
-  return os;
-}
-
-// MessageDataType CreateFederationExecutionResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const CreateFederationExecutionResponseMessage& value)
-{
-  os << "{ ";
-  os << "createFederationExecutionResponseType: " << value.getCreateFederationExecutionResponseType();
-  os << ", ";
-  os << "exceptionString: " << value.getExceptionString();
-  os << " }";
-  return os;
-}
-
-// MessageDataType DestroyFederationExecutionRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const DestroyFederationExecutionRequestMessage& value)
-{
-  os << "{ ";
-  os << "federationExecution: " << value.getFederationExecution();
-  os << " }";
-  return os;
-}
-
-// MessageDataType DestroyFederationExecutionResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const DestroyFederationExecutionResponseMessage& value)
-{
-  os << "{ ";
-  os << "destroyFederationExecutionResponseType: " << value.getDestroyFederationExecutionResponseType();
-  os << " }";
-  return os;
-}
-
-// MessageDataType EnumerateFederationExecutionsRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const EnumerateFederationExecutionsRequestMessage& value)
-{
-  os << "{ ";
-  os << " }";
-  return os;
-}
-
-// MessageDataType EnumerateFederationExecutionsResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const EnumerateFederationExecutionsResponseMessage& value)
-{
-  os << "{ ";
-  os << "federationExecutionInformationVector: " << value.getFederationExecutionInformationVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType InsertFederationExecutionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertFederationExecutionMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "federationName: " << value.getFederationName();
-  os << ", ";
-  os << "logicalTimeFactoryName: " << value.getLogicalTimeFactoryName();
-  os << ", ";
-  os << "configurationParameterMap: " << value.getConfigurationParameterMap();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ShutdownFederationExecutionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ShutdownFederationExecutionMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << " }";
-  return os;
-}
-
-// MessageDataType EraseFederationExecutionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const EraseFederationExecutionMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ReleaseFederationHandleMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ReleaseFederationHandleMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << " }";
-  return os;
-}
-
-// MessageDataType InsertModulesMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertModulesMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  // StructField fOMModuleList (hidden)
-  //os << "fOMModuleList: " << value.getFOMModuleList();
-  os << " }";
-  return os;
-}
-
-// MessageDataType JoinFederationExecutionRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationExecutionRequestMessage& value)
-{
-  os << "{ ";
-  os << "federationExecution: " << value.getFederationExecution();
-  os << ", ";
-  os << "federateType: " << value.getFederateType();
-  os << ", ";
-  os << "federateName: " << value.getFederateName();
-  os << ", ";
-  os << "fOMStringModuleList: " << value.getFOMStringModuleList();
-  os << ", ";
-  os << "configurationParameterMap: " << value.getConfigurationParameterMap();
-  os << " }";
-  return os;
-}
-
-// MessageDataType JoinFederationExecutionResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederationExecutionResponseMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "joinFederationExecutionResponseType: " << value.getJoinFederationExecutionResponseType();
-  os << ", ";
-  os << "exceptionString: " << value.getExceptionString();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "federateType: " << value.getFederateType();
-  os << ", ";
-  os << "federateName: " << value.getFederateName();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ResignFederationExecutionLeafRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignFederationExecutionLeafRequestMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "resignAction: " << value.getResignAction();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ResignFederationExecutionRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignFederationExecutionRequestMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << " }";
-  return os;
-}
-
-// MessageDataType JoinFederateNotifyMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const JoinFederateNotifyMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  // StructField federateHandle (hidden)
-  //os << "federateHandle: " << value.getFederateHandle();
-  //os << ", ";
-  os << "federateType: " << value.getFederateType();
-  os << ", ";
-  os << "federateName: " << value.getFederateName();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ResignFederateNotifyMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ResignFederateNotifyMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ChangeAutomaticResignDirectiveMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeAutomaticResignDirectiveMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "resignAction: " << value.getResignAction();
-  os << " }";
-  return os;
-}
-
-// MessageDataType RegisterFederationSynchronizationPointMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegisterFederationSynchronizationPointMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "label: " << value.getLabel();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << ", ";
-  os << "federateHandleVector: " << value.getFederateHandleVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType RegisterFederationSynchronizationPointResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegisterFederationSynchronizationPointResponseMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "label: " << value.getLabel();
-  os << ", ";
-  os << "registerFederationSynchronizationPointResponseType: " << value.getRegisterFederationSynchronizationPointResponseType();
-  os << " }";
-  return os;
-}
-
-// MessageDataType AnnounceSynchronizationPointMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const AnnounceSynchronizationPointMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "label: " << value.getLabel();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << ", ";
-  os << "addJoiningFederates: " << value.getAddJoiningFederates();
-  os << ", ";
-  os << "federateHandleVector: " << value.getFederateHandleVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType SynchronizationPointAchievedMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const SynchronizationPointAchievedMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "label: " << value.getLabel();
-  os << ", ";
-  os << "federateHandleBoolPairVector: " << value.getFederateHandleBoolPairVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType FederationSynchronizedMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const FederationSynchronizedMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "label: " << value.getLabel();
-  os << ", ";
-  os << "federateHandleBoolPairVector: " << value.getFederateHandleBoolPairVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType EnableTimeRegulationRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const EnableTimeRegulationRequestMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "timeStamp: " << value.getTimeStamp();
-  os << ", ";
-  os << "commitId: " << value.getCommitId();
-  os << " }";
-  return os;
-}
-
-// MessageDataType EnableTimeRegulationResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const EnableTimeRegulationResponseMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "respondingFederateHandle: " << value.getRespondingFederateHandle();
-  os << ", ";
-  os << "timeStampValid: " << value.getTimeStampValid();
-  os << ", ";
-  os << "timeStamp: " << value.getTimeStamp();
-  os << " }";
-  return os;
-}
-
-// MessageDataType DisableTimeRegulationRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const DisableTimeRegulationRequestMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << " }";
-  return os;
-}
-
-// MessageDataType CommitLowerBoundTimeStampMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitLowerBoundTimeStampMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  // StructField federateHandle (hidden)
-  //os << "federateHandle: " << value.getFederateHandle();
-  //os << ", ";
-  os << "timeStamp: " << value.getTimeStamp();
-  os << ", ";
-  os << "commitType: " << value.getCommitType();
-  os << ", ";
-  os << "commitId: " << value.getCommitId();
-  os << " }";
-  return os;
-}
-
-// MessageDataType CommitLowerBoundTimeStampResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitLowerBoundTimeStampResponseMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "sendingFederateHandle: " << value.getSendingFederateHandle();
-  os << ", ";
-  os << "commitId: " << value.getCommitId();
-  os << " }";
-  return os;
-}
-
-// MessageDataType LockedByNextMessageRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const LockedByNextMessageRequestMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "sendingFederateHandle: " << value.getSendingFederateHandle();
-  os << ", ";
-  os << "lockedByNextMessage: " << value.getLockedByNextMessage();
-  os << " }";
-  return os;
-}
-
-// MessageDataType TimeConstrainedEnabledMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeConstrainedEnabledMessage& value)
-{
-  os << "{ ";
-  os << " }";
-  return os;
-}
-
-// MessageDataType TimeRegulationEnabledMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeRegulationEnabledMessage& value)
-{
-  os << "{ ";
-  os << " }";
-  return os;
-}
-
-// MessageDataType TimeAdvanceGrantedMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeAdvanceGrantedMessage& value)
-{
-  os << "{ ";
-  os << " }";
-  return os;
-}
-
-// MessageDataType InsertRegionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertRegionMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "regionHandleDimensionHandleSetPairVector: " << value.getRegionHandleDimensionHandleSetPairVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType CommitRegionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const CommitRegionMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "regionHandleRegionValuePairVector: " << value.getRegionHandleRegionValuePairVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType EraseRegionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const EraseRegionMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "regionHandleVector: " << value.getRegionHandleVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ChangeInteractionClassPublicationMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeInteractionClassPublicationMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "publicationType: " << value.getPublicationType();
-  os << ", ";
-  os << "interactionClassHandle: " << value.getInteractionClassHandle();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ChangeObjectClassPublicationMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeObjectClassPublicationMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "publicationType: " << value.getPublicationType();
-  os << ", ";
-  os << "objectClassHandle: " << value.getObjectClassHandle();
-  os << ", ";
-  os << "attributeHandles: " << value.getAttributeHandles();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ChangeInteractionClassSubscriptionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeInteractionClassSubscriptionMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "subscriptionType: " << value.getSubscriptionType();
-  os << ", ";
-  os << "interactionClassHandle: " << value.getInteractionClassHandle();
-  os << ", ";
-  os << "parameterFilterValues: " << value.getParameterFilterValues();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ChangeObjectClassSubscriptionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeObjectClassSubscriptionMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "subscriptionType: " << value.getSubscriptionType();
-  os << ", ";
-  os << "objectClassHandle: " << value.getObjectClassHandle();
-  os << ", ";
-  os << "attributeHandles: " << value.getAttributeHandles();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ChangeObjectInstanceSubscriptionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ChangeObjectInstanceSubscriptionMessage& value)
-{
-  os << "{ ";
-  // StructField federationHandle (hidden)
-  //os << "federationHandle: " << value.getFederationHandle();
-  //os << ", ";
-  os << "subscriptionType: " << value.getSubscriptionType();
-  os << ", ";
-  os << "objectClassHandle: " << value.getObjectClassHandle();
-  os << ", ";
-  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
-  os << " }";
-  return os;
-}
-
-// MessageDataType RegistrationForObjectClassMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RegistrationForObjectClassMessage& value)
-{
-  os << "{ ";
-  os << "objectClassHandle: " << value.getObjectClassHandle();
-  os << ", ";
-  os << "start: " << value.getStart();
-  os << " }";
-  return os;
-}
-
-// MessageDataType AttributesInScopeMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributesInScopeMessage& value)
-{
-  os << "{ ";
-  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
-  os << ", ";
-  os << "attributeHandles: " << value.getAttributeHandles();
-  os << ", ";
-  os << "inScope: " << value.getInScope();
-  os << " }";
-  return os;
-}
-
-// MessageDataType TurnUpdatesOnForInstanceMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const TurnUpdatesOnForInstanceMessage& value)
-{
-  os << "{ ";
-  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
-  os << ", ";
-  os << "attributeHandles: " << value.getAttributeHandles();
-  os << ", ";
-  os << "updateRate: " << value.getUpdateRate();
-  os << ", ";
-  os << "on: " << value.getOn();
-  os << " }";
-  return os;
-}
-
-// MessageDataType TurnInteractionsOnMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const TurnInteractionsOnMessage& value)
-{
-  os << "{ ";
-  os << "interactionClassHandle: " << value.getInteractionClassHandle();
-  os << ", ";
-  os << "on: " << value.getOn();
-  os << " }";
-  return os;
-}
-
-// MessageDataType InteractionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const InteractionMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "interactionClassHandle: " << value.getInteractionClassHandle();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << ", ";
-  os << "parameterValues: " << value.getParameterValues();
-  os << " }";
-  return os;
-}
-
-// MessageDataType TimeStampedInteractionMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeStampedInteractionMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "interactionClassHandle: " << value.getInteractionClassHandle();
-  os << ", ";
-  os << "orderType: " << value.getOrderType();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << ", ";
-  os << "timeStamp: " << value.getTimeStamp();
-  os << ", ";
-  os << "messageRetractionHandle: " << value.getMessageRetractionHandle();
-  os << ", ";
-  os << "parameterValues: " << value.getParameterValues();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ObjectInstanceHandlesRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandlesRequestMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "count: " << value.getCount();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ObjectInstanceHandlesResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ObjectInstanceHandlesResponseMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "objectInstanceHandleNamePairVector: " << value.getObjectInstanceHandleNamePairVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ReleaseMultipleObjectInstanceNameHandlePairsMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "objectInstanceHandleVector: " << value.getObjectInstanceHandleVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ReserveObjectInstanceNameRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveObjectInstanceNameRequestMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "name: " << value.getName();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ReserveObjectInstanceNameResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveObjectInstanceNameResponseMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "objectInstanceHandleNamePair: " << value.getObjectInstanceHandleNamePair();
-  os << ", ";
-  os << "success: " << value.getSuccess();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ReserveMultipleObjectInstanceNameRequestMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveMultipleObjectInstanceNameRequestMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "nameList: " << value.getNameList();
-  os << " }";
-  return os;
-}
-
-// MessageDataType ReserveMultipleObjectInstanceNameResponseMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const ReserveMultipleObjectInstanceNameResponseMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "objectInstanceHandleNamePairVector: " << value.getObjectInstanceHandleNamePairVector();
-  os << ", ";
-  os << "success: " << value.getSuccess();
-  os << " }";
-  return os;
-}
-
-// MessageDataType InsertObjectInstanceMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const InsertObjectInstanceMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "objectClassHandle: " << value.getObjectClassHandle();
-  os << ", ";
-  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
-  os << ", ";
-  os << "name: " << value.getName();
-  os << ", ";
-  os << "attributeStateVector: " << value.getAttributeStateVector();
-  os << " }";
-  return os;
-}
-
-// MessageDataType DeleteObjectInstanceMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const DeleteObjectInstanceMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << " }";
-  return os;
-}
-
-// MessageDataType TimeStampedDeleteObjectInstanceMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeStampedDeleteObjectInstanceMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
-  os << ", ";
-  os << "orderType: " << value.getOrderType();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << ", ";
-  os << "timeStamp: " << value.getTimeStamp();
-  os << ", ";
-  os << "messageRetractionHandle: " << value.getMessageRetractionHandle();
-  os << " }";
-  return os;
-}
-
-// MessageDataType AttributeUpdateMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const AttributeUpdateMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << ", ";
-  os << "attributeValues: " << value.getAttributeValues();
-  os << " }";
-  return os;
-}
-
-// MessageDataType TimeStampedAttributeUpdateMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const TimeStampedAttributeUpdateMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "federateHandle: " << value.getFederateHandle();
-  os << ", ";
-  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << ", ";
-  os << "timeStamp: " << value.getTimeStamp();
-  os << ", ";
-  os << "messageRetractionHandle: " << value.getMessageRetractionHandle();
-  os << ", ";
-  os << "orderType: " << value.getOrderType();
-  os << ", ";
-  os << "transportationType: " << value.getTransportationType();
-  os << ", ";
-  os << "attributeValues: " << value.getAttributeValues();
-  os << " }";
-  return os;
-}
-
-// MessageDataType RequestAttributeUpdateMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RequestAttributeUpdateMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "objectInstanceHandle: " << value.getObjectInstanceHandle();
-  os << ", ";
-  os << "attributeHandles: " << value.getAttributeHandles();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << " }";
-  return os;
-}
-
-// MessageDataType RequestClassAttributeUpdateMessage
-template<typename char_type, typename traits_type>
-std::basic_ostream<char_type, traits_type>&
-operator<<(std::basic_ostream<char_type, traits_type>& os, const RequestClassAttributeUpdateMessage& value)
-{
-  os << "{ ";
-  os << "federationHandle: " << value.getFederationHandle();
-  os << ", ";
-  os << "objectClassHandle: " << value.getObjectClassHandle();
-  os << ", ";
-  os << "attributeHandles: " << value.getAttributeHandles();
-  os << ", ";
-  os << "tag: " << value.getTag();
-  os << " }";
-  return os;
-}
-
+class OPENRTI_API QueryAttributeOwnershipRequestMessage final : public AbstractMessage {
+public:
+  QueryAttributeOwnershipRequestMessage() noexcept {};
+  QueryAttributeOwnershipRequestMessage(const QueryAttributeOwnershipRequestMessage&) = default;
+  QueryAttributeOwnershipRequestMessage(QueryAttributeOwnershipRequestMessage&&) noexcept = default;
+  virtual ~QueryAttributeOwnershipRequestMessage() noexcept = default;
+  QueryAttributeOwnershipRequestMessage& operator=(const QueryAttributeOwnershipRequestMessage&) = default;
+  QueryAttributeOwnershipRequestMessage& operator=(QueryAttributeOwnershipRequestMessage&&) = default;
+
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 102;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept;
+  bool operator<(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept;
+  bool operator!=(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const QueryAttributeOwnershipRequestMessage& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value) noexcept
+  { _federationHandle = value; }
+  void setFederationHandle(FederationHandle&& value) noexcept
+  { _federationHandle = std::move(value); }
+  FederationHandle& getFederationHandle() noexcept
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const noexcept
+  { return _federationHandle; }
+
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
+  { _objectInstanceHandle = value; }
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
+  { _objectInstanceHandle = std::move(value); }
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
+  { return _objectInstanceHandle; }
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
+  { return _objectInstanceHandle; }
+
+  void setAttributeHandle(const AttributeHandle& value) noexcept
+  { _attributeHandle = value; }
+  void setAttributeHandle(AttributeHandle&& value) noexcept
+  { _attributeHandle = std::move(value); }
+  AttributeHandle& getAttributeHandle() noexcept
+  { return _attributeHandle; }
+  const AttributeHandle& getAttributeHandle() const noexcept
+  { return _attributeHandle; }
+
+private:
+  FederationHandle _federationHandle;
+  ObjectInstanceHandle _objectInstanceHandle;
+  AttributeHandle _attributeHandle;
+};
+
+class OPENRTI_API QueryAttributeOwnershipResponseMessage final : public AbstractMessage {
+public:
+  QueryAttributeOwnershipResponseMessage() noexcept {};
+  QueryAttributeOwnershipResponseMessage(const QueryAttributeOwnershipResponseMessage&) = default;
+  QueryAttributeOwnershipResponseMessage(QueryAttributeOwnershipResponseMessage&&) noexcept = default;
+  virtual ~QueryAttributeOwnershipResponseMessage() noexcept = default;
+  QueryAttributeOwnershipResponseMessage& operator=(const QueryAttributeOwnershipResponseMessage&) = default;
+  QueryAttributeOwnershipResponseMessage& operator=(QueryAttributeOwnershipResponseMessage&&) = default;
+
+  virtual const char* getTypeName() const noexcept override;
+  static const int OpCode = 103;
+  virtual void out(std::ostream& os) const override;
+  virtual void out(std::ostream& os, ServerModel::Federation* federation) const override;
+  virtual void dispatch(const AbstractMessageDispatcher& dispatcher) const override;
+  virtual size_t messageSize() const noexcept override;
+
+  bool operator==(const AbstractMessage& rhs) const noexcept override;
+  bool operator==(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept;
+  bool operator<(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept;
+  bool operator!=(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
+  { return !operator==(rhs); }
+  bool operator>(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
+  { return rhs.operator<(*this); }
+  bool operator>=(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
+  { return !operator<(rhs); }
+  bool operator<=(const QueryAttributeOwnershipResponseMessage& rhs) const noexcept
+  { return !operator>(rhs); }
+
+  void setFederationHandle(const FederationHandle& value) noexcept
+  { _federationHandle = value; }
+  void setFederationHandle(FederationHandle&& value) noexcept
+  { _federationHandle = std::move(value); }
+  FederationHandle& getFederationHandle() noexcept
+  { return _federationHandle; }
+  const FederationHandle& getFederationHandle() const noexcept
+  { return _federationHandle; }
+
+  void setObjectInstanceHandle(const ObjectInstanceHandle& value) noexcept
+  { _objectInstanceHandle = value; }
+  void setObjectInstanceHandle(ObjectInstanceHandle&& value) noexcept
+  { _objectInstanceHandle = std::move(value); }
+  ObjectInstanceHandle& getObjectInstanceHandle() noexcept
+  { return _objectInstanceHandle; }
+  const ObjectInstanceHandle& getObjectInstanceHandle() const noexcept
+  { return _objectInstanceHandle; }
+
+  void setAttributeHandle(const AttributeHandle& value) noexcept
+  { _attributeHandle = value; }
+  void setAttributeHandle(AttributeHandle&& value) noexcept
+  { _attributeHandle = std::move(value); }
+  AttributeHandle& getAttributeHandle() noexcept
+  { return _attributeHandle; }
+  const AttributeHandle& getAttributeHandle() const noexcept
+  { return _attributeHandle; }
+
+  void setOwner(const FederateHandle& value) noexcept
+  { _owner = value; }
+  void setOwner(FederateHandle&& value) noexcept
+  { _owner = std::move(value); }
+  FederateHandle& getOwner() noexcept
+  { return _owner; }
+  const FederateHandle& getOwner() const noexcept
+  { return _owner; }
+
+private:
+  FederationHandle _federationHandle;
+  ObjectInstanceHandle _objectInstanceHandle;
+  AttributeHandle _attributeHandle;
+  FederateHandle _owner;
+};
+
+
+std::ostream& operator<<(std::ostream& os, const CallbackModel& value);
+std::ostream& operator<<(std::ostream& os, const OrderType& value);
+std::ostream& operator<<(std::ostream& os, const TransportationType& value);
+std::ostream& operator<<(std::ostream& os, const SubscriptionType& value);
+std::ostream& operator<<(std::ostream& os, const PublicationType& value);
+std::ostream& operator<<(std::ostream& os, const ResignAction& value);
+std::ostream& operator<<(std::ostream& os, const RestoreFailureReason& value);
+std::ostream& operator<<(std::ostream& os, const RestoreStatus& value);
+std::ostream& operator<<(std::ostream& os, const SaveFailureReason& value);
+std::ostream& operator<<(std::ostream& os, const SaveStatus& value);
+std::ostream& operator<<(std::ostream& os, const ServiceGroupIndicator& value);
+std::ostream& operator<<(std::ostream& os, const LowerBoundTimeStampCommitType& value);
+std::ostream& operator<<(std::ostream& os, const SwitchesType& value);
+std::ostream& operator<<(std::ostream& os, const ArrayDataTypeEncoding& value);
+std::ostream& operator<<(std::ostream& os, const Endianness& value);
+std::ostream& operator<<(std::ostream& os, const AttributeHandleVector& value);
+std::ostream& operator<<(std::ostream& os, const FederateHandleVector& value);
+std::ostream& operator<<(std::ostream& os, const ParameterHandleVector& value);
+std::ostream& operator<<(std::ostream& os, const DimensionHandleVector& value);
+std::ostream& operator<<(std::ostream& os, const DimensionHandleSet& value);
+std::ostream& operator<<(std::ostream& os, const ObjectInstanceHandleVector& value);
+std::ostream& operator<<(std::ostream& os, const RegionHandleVector& value);
+std::ostream& operator<<(std::ostream& os, const ModuleHandleVector& value);
+std::ostream& operator<<(std::ostream& os, const StringVector& value);
+std::ostream& operator<<(std::ostream& os, const StringSet& value);
+std::ostream& operator<<(std::ostream& os, const FederateHandleBoolPair& value);
+std::ostream& operator<<(std::ostream& os, const FederateHandleBoolPairVector& value);
+std::ostream& operator<<(std::ostream& os, const RangeBoundsValue& value);
+std::ostream& operator<<(std::ostream& os, const DimensionHandleRangeBoundsValuePair& value);
+std::ostream& operator<<(std::ostream& os, const RegionValue& value);
+std::ostream& operator<<(std::ostream& os, const RegionValueList& value);
+std::ostream& operator<<(std::ostream& os, const RegionHandleDimensionHandleSetPair& value);
+std::ostream& operator<<(std::ostream& os, const RegionHandleDimensionHandleSetPairVector& value);
+std::ostream& operator<<(std::ostream& os, const RegionHandleSpaceHandlePair& value);
+std::ostream& operator<<(std::ostream& os, const RegionHandleSpaceHandlePairVector& value);
+std::ostream& operator<<(std::ostream& os, const RegionHandleRegionValuePair& value);
+std::ostream& operator<<(std::ostream& os, const RegionHandleRegionValuePairVector& value);
+std::ostream& operator<<(std::ostream& os, const InteractionClassHandleRegionValueListPair& value);
+std::ostream& operator<<(std::ostream& os, const AttributeHandleRegionValueListPair& value);
+std::ostream& operator<<(std::ostream& os, const AttributeState& value);
+std::ostream& operator<<(std::ostream& os, const AttributeStateVector& value);
+std::ostream& operator<<(std::ostream& os, const ParameterValue& value);
+std::ostream& operator<<(std::ostream& os, const ParameterValueVector& value);
+std::ostream& operator<<(std::ostream& os, const AttributeValue& value);
+std::ostream& operator<<(std::ostream& os, const AttributeValueVector& value);
+std::ostream& operator<<(std::ostream& os, const FederateHandleSaveStatusPair& value);
+std::ostream& operator<<(std::ostream& os, const FederateHandleSaveStatusPairVector& value);
+std::ostream& operator<<(std::ostream& os, const FederateHandleRestoreStatusPair& value);
+std::ostream& operator<<(std::ostream& os, const FederateHandleRestoreStatusPairVector& value);
+std::ostream& operator<<(std::ostream& os, const FederationExecutionInformation& value);
+std::ostream& operator<<(std::ostream& os, const FederationExecutionInformationVector& value);
+std::ostream& operator<<(std::ostream& os, const ObjectInstanceHandleNamePair& value);
+std::ostream& operator<<(std::ostream& os, const ObjectInstanceHandleNamePairVector& value);
+std::ostream& operator<<(std::ostream& os, const CreateFederationExecutionResponseType& value);
+std::ostream& operator<<(std::ostream& os, const DestroyFederationExecutionResponseType& value);
+std::ostream& operator<<(std::ostream& os, const JoinFederationExecutionResponseType& value);
+std::ostream& operator<<(std::ostream& os, const RegisterFederationSynchronizationPointResponseType& value);
+std::ostream& operator<<(std::ostream& os, const ConfigurationParameterMap& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringBasicDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringBasicDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringSimpleDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringSimpleDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringEnumerator& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringEnumeratorList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringEnumeratedDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringEnumeratedDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringArrayDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringArrayDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringArrayDataType2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringArrayDataType2List& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordField& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordFieldList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordField2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordField2List& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordDataType2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringFixedRecordDataType2List& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordAlternative& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordAlternativeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordAlternative2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordAlternative2List& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordDataType2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringVariantRecordDataType2List& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringTransportationType& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringTransportationTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringDimension& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringDimensionList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringRoutingSpace& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringRoutingSpaceList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringParameter& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringParameterList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringInteractionClass& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringInteractionClassList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringAttribute& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringAttributeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringObjectClass& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringObjectClassList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringUpdateRate& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringUpdateRateList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringSwitch& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringSwitchList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringModule& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringModuleList& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringModule2& value);
+std::ostream& operator<<(std::ostream& os, const FOMStringModule2List& value);
+std::ostream& operator<<(std::ostream& os, const FOMTransportationType& value);
+std::ostream& operator<<(std::ostream& os, const FOMTransportationTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMDimension& value);
+std::ostream& operator<<(std::ostream& os, const FOMDimensionList& value);
+std::ostream& operator<<(std::ostream& os, const FOMRoutingSpace& value);
+std::ostream& operator<<(std::ostream& os, const FOMRoutingSpaceList& value);
+std::ostream& operator<<(std::ostream& os, const FOMParameter& value);
+std::ostream& operator<<(std::ostream& os, const FOMParameterList& value);
+std::ostream& operator<<(std::ostream& os, const FOMInteractionClass& value);
+std::ostream& operator<<(std::ostream& os, const FOMInteractionClassList& value);
+std::ostream& operator<<(std::ostream& os, const FOMAttribute& value);
+std::ostream& operator<<(std::ostream& os, const FOMAttributeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMObjectClass& value);
+std::ostream& operator<<(std::ostream& os, const FOMObjectClassList& value);
+std::ostream& operator<<(std::ostream& os, const FOMUpdateRate& value);
+std::ostream& operator<<(std::ostream& os, const FOMUpdateRateList& value);
+std::ostream& operator<<(std::ostream& os, const FOMSwitch& value);
+std::ostream& operator<<(std::ostream& os, const FOMSwitchList& value);
+std::ostream& operator<<(std::ostream& os, const FOMBasicDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMBasicDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMSimpleDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMSimpleDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMEnumerator& value);
+std::ostream& operator<<(std::ostream& os, const FOMEnumeratorList& value);
+std::ostream& operator<<(std::ostream& os, const FOMEnumeratedDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMEnumeratedDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMArrayDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMArrayDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMFixedRecordField& value);
+std::ostream& operator<<(std::ostream& os, const FOMFixedRecordFieldList& value);
+std::ostream& operator<<(std::ostream& os, const FOMFixedRecordDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMFixedRecordDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMVariantRecordAlternative& value);
+std::ostream& operator<<(std::ostream& os, const FOMVariantRecordAlternativeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMVariantRecordDataType& value);
+std::ostream& operator<<(std::ostream& os, const FOMVariantRecordDataTypeList& value);
+std::ostream& operator<<(std::ostream& os, const FOMModule& value);
+std::ostream& operator<<(std::ostream& os, const FOMModuleList& value);
+std::ostream& operator<<(std::ostream& os, const FOMModule2& value);
+std::ostream& operator<<(std::ostream& os, const FOMModule2List& value);
+std::ostream& operator<<(std::ostream& os, const ConnectionLostMessage& value);
+std::ostream& operator<<(std::ostream& os, const CreateFederationExecutionRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const CreateFederationExecutionRequest2Message& value);
+std::ostream& operator<<(std::ostream& os, const CreateFederationExecutionResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const DestroyFederationExecutionRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const DestroyFederationExecutionResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const EnumerateFederationExecutionsRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const EnumerateFederationExecutionsResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const InsertFederationExecutionMessage& value);
+std::ostream& operator<<(std::ostream& os, const ShutdownFederationExecutionMessage& value);
+std::ostream& operator<<(std::ostream& os, const EraseFederationExecutionMessage& value);
+std::ostream& operator<<(std::ostream& os, const ReleaseFederationHandleMessage& value);
+std::ostream& operator<<(std::ostream& os, const InsertModulesMessage& value);
+std::ostream& operator<<(std::ostream& os, const InsertModules2Message& value);
+std::ostream& operator<<(std::ostream& os, const JoinFederationExecutionRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const JoinFederationExecutionRequest2Message& value);
+std::ostream& operator<<(std::ostream& os, const JoinFederationExecutionResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const ResignFederationExecutionLeafRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const ResignFederationExecutionRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const JoinFederateNotifyMessage& value);
+std::ostream& operator<<(std::ostream& os, const ResignFederateNotifyMessage& value);
+std::ostream& operator<<(std::ostream& os, const ChangeAutomaticResignDirectiveMessage& value);
+std::ostream& operator<<(std::ostream& os, const RegisterFederationSynchronizationPointMessage& value);
+std::ostream& operator<<(std::ostream& os, const RegisterFederationSynchronizationPointResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const AnnounceSynchronizationPointMessage& value);
+std::ostream& operator<<(std::ostream& os, const SynchronizationPointAchievedMessage& value);
+std::ostream& operator<<(std::ostream& os, const FederationSynchronizedMessage& value);
+std::ostream& operator<<(std::ostream& os, const EnableTimeRegulationRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const EnableTimeRegulationResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const DisableTimeRegulationRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const EnableTimeConstrainedNotifyMessage& value);
+std::ostream& operator<<(std::ostream& os, const DisableTimeConstrainedNotifyMessage& value);
+std::ostream& operator<<(std::ostream& os, const CommitLowerBoundTimeStampMessage& value);
+std::ostream& operator<<(std::ostream& os, const CommitLowerBoundTimeStampResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const LockedByNextMessageRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const TimeConstrainedEnabledMessage& value);
+std::ostream& operator<<(std::ostream& os, const TimeRegulationEnabledMessage& value);
+std::ostream& operator<<(std::ostream& os, const TimeAdvanceGrantedMessage& value);
+std::ostream& operator<<(std::ostream& os, const InsertRegionMessage& value);
+std::ostream& operator<<(std::ostream& os, const CommitRegionMessage& value);
+std::ostream& operator<<(std::ostream& os, const EraseRegionMessage& value);
+std::ostream& operator<<(std::ostream& os, const ChangeInteractionClassPublicationMessage& value);
+std::ostream& operator<<(std::ostream& os, const ChangeObjectClassPublicationMessage& value);
+std::ostream& operator<<(std::ostream& os, const ChangeInteractionClassSubscriptionMessage& value);
+std::ostream& operator<<(std::ostream& os, const ChangeObjectClassSubscriptionMessage& value);
+std::ostream& operator<<(std::ostream& os, const ChangeObjectInstanceSubscriptionMessage& value);
+std::ostream& operator<<(std::ostream& os, const RegistrationForObjectClassMessage& value);
+std::ostream& operator<<(std::ostream& os, const AttributesInScopeMessage& value);
+std::ostream& operator<<(std::ostream& os, const TurnUpdatesOnForInstanceMessage& value);
+std::ostream& operator<<(std::ostream& os, const TurnInteractionsOnMessage& value);
+std::ostream& operator<<(std::ostream& os, const InteractionMessage& value);
+std::ostream& operator<<(std::ostream& os, const TimeStampedInteractionMessage& value);
+std::ostream& operator<<(std::ostream& os, const ObjectInstanceHandlesRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const ObjectInstanceHandlesResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value);
+std::ostream& operator<<(std::ostream& os, const ReserveObjectInstanceNameRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const ReserveObjectInstanceNameResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const ReserveMultipleObjectInstanceNameRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const ReserveMultipleObjectInstanceNameResponseMessage& value);
+std::ostream& operator<<(std::ostream& os, const InsertObjectInstanceMessage& value);
+std::ostream& operator<<(std::ostream& os, const DeleteObjectInstanceMessage& value);
+std::ostream& operator<<(std::ostream& os, const TimeStampedDeleteObjectInstanceMessage& value);
+std::ostream& operator<<(std::ostream& os, const AttributeUpdateMessage& value);
+std::ostream& operator<<(std::ostream& os, const TimeStampedAttributeUpdateMessage& value);
+std::ostream& operator<<(std::ostream& os, const RequestAttributeUpdateMessage& value);
+std::ostream& operator<<(std::ostream& os, const RequestClassAttributeUpdateMessage& value);
+std::ostream& operator<<(std::ostream& os, const QueryAttributeOwnershipRequestMessage& value);
+std::ostream& operator<<(std::ostream& os, const QueryAttributeOwnershipResponseMessage& value);
+
+template<typename T, typename ParentObjectClass>
+std::ostream&
+prettyprint(std::ostream& os, const T& value, ParentObjectClass*)
+{
+  os << value;
+  return os;
+}
+
+std::ostream& prettyprint(std::ostream& os, const CallbackModel& value);
+std::ostream& prettyprint(std::ostream& os, const OrderType& value);
+std::ostream& prettyprint(std::ostream& os, const TransportationType& value);
+std::ostream& prettyprint(std::ostream& os, const SubscriptionType& value);
+std::ostream& prettyprint(std::ostream& os, const PublicationType& value);
+std::ostream& prettyprint(std::ostream& os, const ResignAction& value);
+std::ostream& prettyprint(std::ostream& os, const RestoreFailureReason& value);
+std::ostream& prettyprint(std::ostream& os, const RestoreStatus& value);
+std::ostream& prettyprint(std::ostream& os, const SaveFailureReason& value);
+std::ostream& prettyprint(std::ostream& os, const SaveStatus& value);
+std::ostream& prettyprint(std::ostream& os, const ServiceGroupIndicator& value);
+std::ostream& prettyprint(std::ostream& os, const LowerBoundTimeStampCommitType& value);
+std::ostream& prettyprint(std::ostream& os, const SwitchesType& value);
+std::ostream& prettyprint(std::ostream& os, const ArrayDataTypeEncoding& value);
+std::ostream& prettyprint(std::ostream& os, const Endianness& value);
+std::ostream& prettyprint(std::ostream& os, const AttributeHandleVector& value);
+std::ostream& prettyprint(std::ostream& os, const FederateHandleVector& value);
+std::ostream& prettyprint(std::ostream& os, const ParameterHandleVector& value, ServerModel::InteractionClass* interactionClass);
+std::ostream& prettyprint(std::ostream& os, const DimensionHandleVector& value);
+std::ostream& prettyprint(std::ostream& os, const DimensionHandleSet& value);
+std::ostream& prettyprint(std::ostream& os, const ObjectInstanceHandleVector& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const RegionHandleVector& value);
+std::ostream& prettyprint(std::ostream& os, const ModuleHandleVector& value);
+std::ostream& prettyprint(std::ostream& os, const StringVector& value);
+std::ostream& prettyprint(std::ostream& os, const StringSet& value);
+std::ostream& prettyprint(std::ostream& os, const FederateHandleBoolPair& value);
+std::ostream& prettyprint(std::ostream& os, const FederateHandleBoolPairVector& value);
+std::ostream& prettyprint(std::ostream& os, const RangeBoundsValue& value);
+std::ostream& prettyprint(std::ostream& os, const DimensionHandleRangeBoundsValuePair& value);
+std::ostream& prettyprint(std::ostream& os, const RegionValue& value);
+std::ostream& prettyprint(std::ostream& os, const RegionValueList& value);
+std::ostream& prettyprint(std::ostream& os, const RegionHandleDimensionHandleSetPair& value);
+std::ostream& prettyprint(std::ostream& os, const RegionHandleDimensionHandleSetPairVector& value);
+std::ostream& prettyprint(std::ostream& os, const RegionHandleSpaceHandlePair& value);
+std::ostream& prettyprint(std::ostream& os, const RegionHandleSpaceHandlePairVector& value);
+std::ostream& prettyprint(std::ostream& os, const RegionHandleRegionValuePair& value);
+std::ostream& prettyprint(std::ostream& os, const RegionHandleRegionValuePairVector& value);
+std::ostream& prettyprint(std::ostream& os, const InteractionClassHandleRegionValueListPair& value);
+std::ostream& prettyprint(std::ostream& os, const AttributeHandleRegionValueListPair& value);
+std::ostream& prettyprint(std::ostream& os, const AttributeState& value);
+std::ostream& prettyprint(std::ostream& os, const AttributeStateVector& value);
+std::ostream& prettyprint(std::ostream& os, const ParameterValue& value, ServerModel::InteractionClass* interactionClass);
+std::ostream& prettyprint(std::ostream& os, const ParameterValueVector& value, ServerModel::InteractionClass* interactionClass);
+std::ostream& prettyprint(std::ostream& os, const AttributeValue& value);
+std::ostream& prettyprint(std::ostream& os, const AttributeValueVector& value);
+std::ostream& prettyprint(std::ostream& os, const FederateHandleSaveStatusPair& value);
+std::ostream& prettyprint(std::ostream& os, const FederateHandleSaveStatusPairVector& value);
+std::ostream& prettyprint(std::ostream& os, const FederateHandleRestoreStatusPair& value);
+std::ostream& prettyprint(std::ostream& os, const FederateHandleRestoreStatusPairVector& value);
+std::ostream& prettyprint(std::ostream& os, const FederationExecutionInformation& value);
+std::ostream& prettyprint(std::ostream& os, const FederationExecutionInformationVector& value);
+std::ostream& prettyprint(std::ostream& os, const ObjectInstanceHandleNamePair& value);
+std::ostream& prettyprint(std::ostream& os, const ObjectInstanceHandleNamePairVector& value);
+std::ostream& prettyprint(std::ostream& os, const CreateFederationExecutionResponseType& value);
+std::ostream& prettyprint(std::ostream& os, const DestroyFederationExecutionResponseType& value);
+std::ostream& prettyprint(std::ostream& os, const JoinFederationExecutionResponseType& value);
+std::ostream& prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointResponseType& value);
+std::ostream& prettyprint(std::ostream& os, const ConfigurationParameterMap& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringBasicDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringBasicDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringSimpleDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringSimpleDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringEnumerator& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringEnumeratorList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringEnumeratedDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringEnumeratedDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringArrayDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringArrayDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringArrayDataType2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringArrayDataType2List& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordField& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordFieldList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordField2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordField2List& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordDataType2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringFixedRecordDataType2List& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordAlternativeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordAlternative2List& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordDataType2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringVariantRecordDataType2List& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringTransportationType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringTransportationTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringDimension& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringDimensionList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringRoutingSpace& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringRoutingSpaceList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringParameter& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringParameterList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringInteractionClass& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringInteractionClassList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringAttribute& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringAttributeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringObjectClass& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringObjectClassList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringUpdateRate& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringUpdateRateList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringSwitch& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringSwitchList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringModule& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringModuleList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringModule2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMStringModule2List& value);
+std::ostream& prettyprint(std::ostream& os, const FOMTransportationType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMTransportationTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMDimension& value);
+std::ostream& prettyprint(std::ostream& os, const FOMDimensionList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMRoutingSpace& value);
+std::ostream& prettyprint(std::ostream& os, const FOMRoutingSpaceList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMParameter& value);
+std::ostream& prettyprint(std::ostream& os, const FOMParameterList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMInteractionClass& value);
+std::ostream& prettyprint(std::ostream& os, const FOMInteractionClassList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMAttribute& value);
+std::ostream& prettyprint(std::ostream& os, const FOMAttributeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMObjectClass& value);
+std::ostream& prettyprint(std::ostream& os, const FOMObjectClassList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMUpdateRate& value);
+std::ostream& prettyprint(std::ostream& os, const FOMUpdateRateList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMSwitch& value);
+std::ostream& prettyprint(std::ostream& os, const FOMSwitchList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMBasicDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMBasicDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMSimpleDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMSimpleDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMEnumerator& value);
+std::ostream& prettyprint(std::ostream& os, const FOMEnumeratorList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMEnumeratedDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMEnumeratedDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMArrayDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMArrayDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMFixedRecordField& value);
+std::ostream& prettyprint(std::ostream& os, const FOMFixedRecordFieldList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMFixedRecordDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMFixedRecordDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordAlternative& value);
+std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordAlternativeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordDataType& value);
+std::ostream& prettyprint(std::ostream& os, const FOMVariantRecordDataTypeList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMModule& value);
+std::ostream& prettyprint(std::ostream& os, const FOMModuleList& value);
+std::ostream& prettyprint(std::ostream& os, const FOMModule2& value);
+std::ostream& prettyprint(std::ostream& os, const FOMModule2List& value);
+std::ostream& prettyprint(std::ostream& os, const ConnectionLostMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const CreateFederationExecutionRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const CreateFederationExecutionRequest2Message& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const CreateFederationExecutionResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const DestroyFederationExecutionRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const DestroyFederationExecutionResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const EnumerateFederationExecutionsRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const EnumerateFederationExecutionsResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const InsertFederationExecutionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ShutdownFederationExecutionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const EraseFederationExecutionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ReleaseFederationHandleMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const InsertModulesMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const InsertModules2Message& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const JoinFederationExecutionRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const JoinFederationExecutionRequest2Message& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const JoinFederationExecutionResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ResignFederationExecutionLeafRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ResignFederationExecutionRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const JoinFederateNotifyMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ResignFederateNotifyMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ChangeAutomaticResignDirectiveMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const AnnounceSynchronizationPointMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const SynchronizationPointAchievedMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const FederationSynchronizedMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const EnableTimeRegulationRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const EnableTimeRegulationResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const DisableTimeRegulationRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const EnableTimeConstrainedNotifyMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const DisableTimeConstrainedNotifyMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const CommitLowerBoundTimeStampMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const CommitLowerBoundTimeStampResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const LockedByNextMessageRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const TimeConstrainedEnabledMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const TimeRegulationEnabledMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const TimeAdvanceGrantedMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const InsertRegionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const CommitRegionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const EraseRegionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ChangeInteractionClassPublicationMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ChangeObjectClassPublicationMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ChangeInteractionClassSubscriptionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ChangeObjectClassSubscriptionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ChangeObjectInstanceSubscriptionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const RegistrationForObjectClassMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const AttributesInScopeMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const TurnUpdatesOnForInstanceMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const TurnInteractionsOnMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const InteractionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const TimeStampedInteractionMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ObjectInstanceHandlesRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ObjectInstanceHandlesResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ReserveObjectInstanceNameRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ReserveObjectInstanceNameResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ReserveMultipleObjectInstanceNameRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const ReserveMultipleObjectInstanceNameResponseMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const InsertObjectInstanceMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const DeleteObjectInstanceMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const TimeStampedDeleteObjectInstanceMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const AttributeUpdateMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const TimeStampedAttributeUpdateMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const RequestAttributeUpdateMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const RequestClassAttributeUpdateMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const QueryAttributeOwnershipRequestMessage& value, ServerModel::Federation* federation);
+std::ostream& prettyprint(std::ostream& os, const QueryAttributeOwnershipResponseMessage& value, ServerModel::Federation* federation);
 
 // StructDataType RangeBoundsValue
 inline std::string to_string(const RangeBoundsValue& value)
@@ -9553,6 +10846,118 @@ inline std::string to_string(const AttributeValue& value)
 
 // StructDataType FederationExecutionInformation
 inline std::string to_string(const FederationExecutionInformation& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringBasicDataType
+inline std::string to_string(const FOMStringBasicDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringSimpleDataType
+inline std::string to_string(const FOMStringSimpleDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringEnumerator
+inline std::string to_string(const FOMStringEnumerator& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringEnumeratedDataType
+inline std::string to_string(const FOMStringEnumeratedDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringArrayDataType
+inline std::string to_string(const FOMStringArrayDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringArrayDataType2
+inline std::string to_string(const FOMStringArrayDataType2& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringFixedRecordField
+inline std::string to_string(const FOMStringFixedRecordField& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringFixedRecordDataType
+inline std::string to_string(const FOMStringFixedRecordDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringFixedRecordField2
+inline std::string to_string(const FOMStringFixedRecordField2& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringFixedRecordDataType2
+inline std::string to_string(const FOMStringFixedRecordDataType2& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringVariantRecordAlternative
+inline std::string to_string(const FOMStringVariantRecordAlternative& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringVariantRecordDataType
+inline std::string to_string(const FOMStringVariantRecordDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringVariantRecordAlternative2
+inline std::string to_string(const FOMStringVariantRecordAlternative2& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMStringVariantRecordDataType2
+inline std::string to_string(const FOMStringVariantRecordDataType2& value)
 {
     std::ostringstream out;
     out << value;
@@ -9639,6 +11044,14 @@ inline std::string to_string(const FOMStringModule& value)
     return out.str();
 }
 
+// StructDataType FOMStringModule2
+inline std::string to_string(const FOMStringModule2& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
 // StructDataType FOMTransportationType
 inline std::string to_string(const FOMTransportationType& value)
 {
@@ -9711,6 +11124,78 @@ inline std::string to_string(const FOMSwitch& value)
     return out.str();
 }
 
+// StructDataType FOMBasicDataType
+inline std::string to_string(const FOMBasicDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMSimpleDataType
+inline std::string to_string(const FOMSimpleDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMEnumerator
+inline std::string to_string(const FOMEnumerator& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMEnumeratedDataType
+inline std::string to_string(const FOMEnumeratedDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMArrayDataType
+inline std::string to_string(const FOMArrayDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMFixedRecordField
+inline std::string to_string(const FOMFixedRecordField& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMFixedRecordDataType
+inline std::string to_string(const FOMFixedRecordDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMVariantRecordAlternative
+inline std::string to_string(const FOMVariantRecordAlternative& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+// StructDataType FOMVariantRecordDataType
+inline std::string to_string(const FOMVariantRecordDataType& value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
 // StructDataType FOMModule
 inline std::string to_string(const FOMModule& value)
 {
@@ -9719,492 +11204,1979 @@ inline std::string to_string(const FOMModule& value)
     return out.str();
 }
 
-// MessageDataType ConnectionLostMessage
-inline std::string to_string(const ConnectionLostMessage& value)
+// StructDataType FOMModule2
+inline std::string to_string(const FOMModule2& value)
 {
     std::ostringstream out;
     out << value;
     return out.str();
 }
 
-// MessageDataType CreateFederationExecutionRequestMessage
-inline std::string to_string(const CreateFederationExecutionRequestMessage& value)
+
+inline constexpr size_t byteSize(const CallbackModel& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType CreateFederationExecutionResponseMessage
-inline std::string to_string(const CreateFederationExecutionResponseMessage& value)
+inline constexpr size_t byteSize(const OrderType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType DestroyFederationExecutionRequestMessage
-inline std::string to_string(const DestroyFederationExecutionRequestMessage& value)
+inline constexpr size_t byteSize(const TransportationType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType DestroyFederationExecutionResponseMessage
-inline std::string to_string(const DestroyFederationExecutionResponseMessage& value)
+inline constexpr size_t byteSize(const SubscriptionType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType EnumerateFederationExecutionsRequestMessage
-inline std::string to_string(const EnumerateFederationExecutionsRequestMessage& value)
+inline constexpr size_t byteSize(const PublicationType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType EnumerateFederationExecutionsResponseMessage
-inline std::string to_string(const EnumerateFederationExecutionsResponseMessage& value)
+inline constexpr size_t byteSize(const ResignAction& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType InsertFederationExecutionMessage
-inline std::string to_string(const InsertFederationExecutionMessage& value)
+inline constexpr size_t byteSize(const RestoreFailureReason& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType ShutdownFederationExecutionMessage
-inline std::string to_string(const ShutdownFederationExecutionMessage& value)
+inline constexpr size_t byteSize(const RestoreStatus& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType EraseFederationExecutionMessage
-inline std::string to_string(const EraseFederationExecutionMessage& value)
+inline constexpr size_t byteSize(const SaveFailureReason& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType ReleaseFederationHandleMessage
-inline std::string to_string(const ReleaseFederationHandleMessage& value)
+inline constexpr size_t byteSize(const SaveStatus& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType InsertModulesMessage
-inline std::string to_string(const InsertModulesMessage& value)
+inline constexpr size_t byteSize(const ServiceGroupIndicator& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType JoinFederationExecutionRequestMessage
-inline std::string to_string(const JoinFederationExecutionRequestMessage& value)
+inline constexpr size_t byteSize(const LowerBoundTimeStampCommitType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType JoinFederationExecutionResponseMessage
-inline std::string to_string(const JoinFederationExecutionResponseMessage& value)
+inline constexpr size_t byteSize(const SwitchesType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType ResignFederationExecutionLeafRequestMessage
-inline std::string to_string(const ResignFederationExecutionLeafRequestMessage& value)
+inline constexpr size_t byteSize(const ArrayDataTypeEncoding& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType ResignFederationExecutionRequestMessage
-inline std::string to_string(const ResignFederationExecutionRequestMessage& value)
+inline constexpr size_t byteSize(const Endianness& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType JoinFederateNotifyMessage
-inline std::string to_string(const JoinFederateNotifyMessage& value)
+inline size_t byteSize(const AttributeHandleVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType ResignFederateNotifyMessage
-inline std::string to_string(const ResignFederateNotifyMessage& value)
+inline size_t byteSize(const FederateHandleVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType ChangeAutomaticResignDirectiveMessage
-inline std::string to_string(const ChangeAutomaticResignDirectiveMessage& value)
+inline size_t byteSize(const ParameterHandleVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType RegisterFederationSynchronizationPointMessage
-inline std::string to_string(const RegisterFederationSynchronizationPointMessage& value)
+inline size_t byteSize(const DimensionHandleVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType RegisterFederationSynchronizationPointResponseMessage
-inline std::string to_string(const RegisterFederationSynchronizationPointResponseMessage& value)
+inline size_t byteSize(const DimensionHandleSet& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType AnnounceSynchronizationPointMessage
-inline std::string to_string(const AnnounceSynchronizationPointMessage& value)
+inline size_t byteSize(const ObjectInstanceHandleVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType SynchronizationPointAchievedMessage
-inline std::string to_string(const SynchronizationPointAchievedMessage& value)
+inline size_t byteSize(const RegionHandleVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType FederationSynchronizedMessage
-inline std::string to_string(const FederationSynchronizedMessage& value)
+inline size_t byteSize(const ModuleHandleVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType EnableTimeRegulationRequestMessage
-inline std::string to_string(const EnableTimeRegulationRequestMessage& value)
+inline size_t byteSize(const StringVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType EnableTimeRegulationResponseMessage
-inline std::string to_string(const EnableTimeRegulationResponseMessage& value)
+inline size_t byteSize(const StringSet& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType DisableTimeRegulationRequestMessage
-inline std::string to_string(const DisableTimeRegulationRequestMessage& value)
+inline size_t byteSize(const FederateHandleBoolPair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType CommitLowerBoundTimeStampMessage
-inline std::string to_string(const CommitLowerBoundTimeStampMessage& value)
+inline size_t byteSize(const FederateHandleBoolPairVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType CommitLowerBoundTimeStampResponseMessage
-inline std::string to_string(const CommitLowerBoundTimeStampResponseMessage& value)
+inline size_t byteSize(const RangeBoundsValue& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  result += byteSize(value.getLowerBound());
+  result += byteSize(value.getUpperBound());
+  return result;
 }
 
-// MessageDataType LockedByNextMessageRequestMessage
-inline std::string to_string(const LockedByNextMessageRequestMessage& value)
+inline size_t byteSize(const DimensionHandleRangeBoundsValuePair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType TimeConstrainedEnabledMessage
-inline std::string to_string(const TimeConstrainedEnabledMessage& value)
+inline size_t byteSize(const RegionValue& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType TimeRegulationEnabledMessage
-inline std::string to_string(const TimeRegulationEnabledMessage& value)
+inline size_t byteSize(const RegionValueList& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType TimeAdvanceGrantedMessage
-inline std::string to_string(const TimeAdvanceGrantedMessage& value)
+inline size_t byteSize(const RegionHandleDimensionHandleSetPair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType InsertRegionMessage
-inline std::string to_string(const InsertRegionMessage& value)
+inline size_t byteSize(const RegionHandleDimensionHandleSetPairVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType CommitRegionMessage
-inline std::string to_string(const CommitRegionMessage& value)
+inline size_t byteSize(const RegionHandleSpaceHandlePair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType EraseRegionMessage
-inline std::string to_string(const EraseRegionMessage& value)
+inline size_t byteSize(const RegionHandleSpaceHandlePairVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType ChangeInteractionClassPublicationMessage
-inline std::string to_string(const ChangeInteractionClassPublicationMessage& value)
+inline size_t byteSize(const RegionHandleRegionValuePair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType ChangeObjectClassPublicationMessage
-inline std::string to_string(const ChangeObjectClassPublicationMessage& value)
+inline size_t byteSize(const RegionHandleRegionValuePairVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType ChangeInteractionClassSubscriptionMessage
-inline std::string to_string(const ChangeInteractionClassSubscriptionMessage& value)
+inline size_t byteSize(const InteractionClassHandleRegionValueListPair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType ChangeObjectClassSubscriptionMessage
-inline std::string to_string(const ChangeObjectClassSubscriptionMessage& value)
+inline size_t byteSize(const AttributeHandleRegionValueListPair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType ChangeObjectInstanceSubscriptionMessage
-inline std::string to_string(const ChangeObjectInstanceSubscriptionMessage& value)
+inline size_t byteSize(const AttributeState& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  result += byteSize(value.getAttributeHandle());
+  result += byteSize(value.getOwnerFederate());
+  return result;
 }
 
-// MessageDataType RegistrationForObjectClassMessage
-inline std::string to_string(const RegistrationForObjectClassMessage& value)
+inline size_t byteSize(const AttributeStateVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType AttributesInScopeMessage
-inline std::string to_string(const AttributesInScopeMessage& value)
+inline size_t byteSize(const ParameterValue& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  result += byteSize(value.getParameterHandle());
+  result += byteSize(value.getValue());
+  return result;
 }
 
-// MessageDataType TurnUpdatesOnForInstanceMessage
-inline std::string to_string(const TurnUpdatesOnForInstanceMessage& value)
+inline size_t byteSize(const ParameterValueVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType TurnInteractionsOnMessage
-inline std::string to_string(const TurnInteractionsOnMessage& value)
+inline size_t byteSize(const AttributeValue& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  result += byteSize(value.getAttributeHandle());
+  result += byteSize(value.getValue());
+  return result;
 }
 
-// MessageDataType InteractionMessage
-inline std::string to_string(const InteractionMessage& value)
+inline size_t byteSize(const AttributeValueVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType TimeStampedInteractionMessage
-inline std::string to_string(const TimeStampedInteractionMessage& value)
+inline size_t byteSize(const FederateHandleSaveStatusPair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType ObjectInstanceHandlesRequestMessage
-inline std::string to_string(const ObjectInstanceHandlesRequestMessage& value)
+inline size_t byteSize(const FederateHandleSaveStatusPairVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType ObjectInstanceHandlesResponseMessage
-inline std::string to_string(const ObjectInstanceHandlesResponseMessage& value)
+inline size_t byteSize(const FederateHandleRestoreStatusPair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType ReleaseMultipleObjectInstanceNameHandlePairsMessage
-inline std::string to_string(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value)
+inline size_t byteSize(const FederateHandleRestoreStatusPairVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType ReserveObjectInstanceNameRequestMessage
-inline std::string to_string(const ReserveObjectInstanceNameRequestMessage& value)
+inline size_t byteSize(const FederationExecutionInformation& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  result += byteSize(value.getFederationExecutionName());
+  result += byteSize(value.getLogicalTimeFactoryName());
+  return result;
 }
 
-// MessageDataType ReserveObjectInstanceNameResponseMessage
-inline std::string to_string(const ReserveObjectInstanceNameResponseMessage& value)
+inline size_t byteSize(const FederationExecutionInformationVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType ReserveMultipleObjectInstanceNameRequestMessage
-inline std::string to_string(const ReserveMultipleObjectInstanceNameRequestMessage& value)
+inline size_t byteSize(const ObjectInstanceHandleNamePair& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  return byteSize(value.first) + byteSize(value.second);
 }
 
-// MessageDataType ReserveMultipleObjectInstanceNameResponseMessage
-inline std::string to_string(const ReserveMultipleObjectInstanceNameResponseMessage& value)
+inline size_t byteSize(const ObjectInstanceHandleNamePairVector& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
 }
 
-// MessageDataType InsertObjectInstanceMessage
-inline std::string to_string(const InsertObjectInstanceMessage& value)
+inline constexpr size_t byteSize(const CreateFederationExecutionResponseType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType DeleteObjectInstanceMessage
-inline std::string to_string(const DeleteObjectInstanceMessage& value)
+inline constexpr size_t byteSize(const DestroyFederationExecutionResponseType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType TimeStampedDeleteObjectInstanceMessage
-inline std::string to_string(const TimeStampedDeleteObjectInstanceMessage& value)
+inline constexpr size_t byteSize(const JoinFederationExecutionResponseType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType AttributeUpdateMessage
-inline std::string to_string(const AttributeUpdateMessage& value)
+inline constexpr size_t byteSize(const RegisterFederationSynchronizationPointResponseType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+ return sizeof(value); // sizeof()
 }
 
-// MessageDataType TimeStampedAttributeUpdateMessage
-inline std::string to_string(const TimeStampedAttributeUpdateMessage& value)
+inline size_t byteSize(const ConfigurationParameterMap& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item.first);
+    result += byteSize(item.second);
+  }
+  return result;
 }
 
-// MessageDataType RequestAttributeUpdateMessage
-inline std::string to_string(const RequestAttributeUpdateMessage& value)
+inline size_t byteSize(const FOMStringBasicDataType& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getSize());
+  result += byteSize(value.getEndian());
+  return result;
 }
 
-// MessageDataType RequestClassAttributeUpdateMessage
-inline std::string to_string(const RequestClassAttributeUpdateMessage& value)
+inline size_t byteSize(const FOMStringBasicDataTypeList& value) noexcept
 {
-    std::ostringstream out;
-    out << value;
-    return out.str();
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringSimpleDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRepresentation());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringSimpleDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringEnumerator& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getValue());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringEnumeratorList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringEnumeratedDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRepresentation());
+  result += byteSize(value.getEnumerators());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringEnumeratedDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringArrayDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getCardinality());
+  result += byteSize(value.getEncoding());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringArrayDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringArrayDataType2& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getCardinality());
+  result += byteSize(value.getEncoding());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringArrayDataType2List& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordField& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordFieldList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getFields());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordField2& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getVersion());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordField2List& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordDataType2& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getInclude());
+  result += byteSize(value.getVersion());
+  result += byteSize(value.getFields());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringFixedRecordDataType2List& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordAlternative& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getEnumerator());
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordAlternativeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDiscriminant());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getAlternatives());
+  result += byteSize(value.getEncoding());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordAlternative2& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getEnumerator());
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordAlternative2List& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordDataType2& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDiscriminant());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getAlternatives());
+  result += byteSize(value.getEncoding());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringVariantRecordDataType2List& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringTransportationType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringTransportationTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringDimension& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getUpperBound());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringDimensionList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringRoutingSpace& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDimensionSet());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringRoutingSpaceList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringParameter& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringParameterList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringInteractionClass& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getRoutingSpace());
+  result += byteSize(value.getDimensionSet());
+  result += byteSize(value.getParameterList());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringInteractionClassList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringAttribute& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getRoutingSpace());
+  result += byteSize(value.getDimensionSet());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringAttributeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringObjectClass& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getAttributeList());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringObjectClassList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringUpdateRate& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRate());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringUpdateRateList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringSwitch& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getSwitchesType());
+  result += byteSize(value.getEnabled());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringSwitchList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringModule& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getDesignator());
+  result += byteSize(value.getTransportationTypeList());
+  result += byteSize(value.getDimensionList());
+  result += byteSize(value.getRoutingSpaceList());
+  result += byteSize(value.getInteractionClassList());
+  result += byteSize(value.getObjectClassList());
+  result += byteSize(value.getUpdateRateList());
+  result += byteSize(value.getSwitchList());
+  result += byteSize(value.getSimpleDataTypeList());
+  result += byteSize(value.getEnumeratedDataTypeList());
+  result += byteSize(value.getArrayDataTypeList());
+  result += byteSize(value.getFixedRecordDataTypeList());
+  result += byteSize(value.getVariantRecordDataTypeList());
+  result += byteSize(value.getArtificialInteractionRoot());
+  result += byteSize(value.getArtificialObjectRoot());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringModuleList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMStringModule2& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getDesignator());
+  result += byteSize(value.getTransportationTypeList());
+  result += byteSize(value.getDimensionList());
+  result += byteSize(value.getRoutingSpaceList());
+  result += byteSize(value.getInteractionClassList());
+  result += byteSize(value.getObjectClassList());
+  result += byteSize(value.getUpdateRateList());
+  result += byteSize(value.getSwitchList());
+  result += byteSize(value.getBasicDataTypeList());
+  result += byteSize(value.getSimpleDataTypeList());
+  result += byteSize(value.getEnumeratedDataTypeList());
+  result += byteSize(value.getArrayDataTypeList());
+  result += byteSize(value.getFixedRecordDataTypeList());
+  result += byteSize(value.getVariantRecordDataTypeList());
+  result += byteSize(value.getArtificialInteractionRoot());
+  result += byteSize(value.getArtificialObjectRoot());
+  return result;
+}
+
+inline size_t byteSize(const FOMStringModule2List& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMTransportationType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getTransportationType());
+  return result;
+}
+
+inline size_t byteSize(const FOMTransportationTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMDimension& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDimensionHandle());
+  result += byteSize(value.getUpperBound());
+  return result;
+}
+
+inline size_t byteSize(const FOMDimensionList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMRoutingSpace& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getSpaceHandle());
+  result += byteSize(value.getDimensionHandleSet());
+  return result;
+}
+
+inline size_t byteSize(const FOMRoutingSpaceList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMParameter& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getParameterHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMParameterList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMInteractionClass& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getParentInteractionClassHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getDimensionHandleSet());
+  result += byteSize(value.getParameterList());
+  return result;
+}
+
+inline size_t byteSize(const FOMInteractionClassList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMAttribute& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getAttributeHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getDimensionHandleSet());
+  return result;
+}
+
+inline size_t byteSize(const FOMAttributeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMObjectClass& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getParentObjectClassHandle());
+  result += byteSize(value.getAttributeList());
+  return result;
+}
+
+inline size_t byteSize(const FOMObjectClassList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMUpdateRate& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getUpdateRateHandle());
+  result += byteSize(value.getRate());
+  return result;
+}
+
+inline size_t byteSize(const FOMUpdateRateList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMSwitch& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getSwitchesType());
+  result += byteSize(value.getEnabled());
+  return result;
+}
+
+inline size_t byteSize(const FOMSwitchList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMBasicDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getSize());
+  result += byteSize(value.getEndian());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMBasicDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMSimpleDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRepresentation());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMSimpleDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMEnumerator& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getValue());
+  return result;
+}
+
+inline size_t byteSize(const FOMEnumeratorList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMEnumeratedDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getRepresentation());
+  result += byteSize(value.getEnumerators());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMEnumeratedDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMArrayDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getCardinality());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMArrayDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMFixedRecordField& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getVersion());
+  return result;
+}
+
+inline size_t byteSize(const FOMFixedRecordFieldList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMFixedRecordDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getInclude());
+  result += byteSize(value.getVersion());
+  result += byteSize(value.getFields());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMFixedRecordDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMVariantRecordAlternative& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getEnumerator());
+  result += byteSize(value.getName());
+  result += byteSize(value.getDataType());
+  return result;
+}
+
+inline size_t byteSize(const FOMVariantRecordAlternativeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMVariantRecordDataType& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getName());
+  result += byteSize(value.getDiscriminant());
+  result += byteSize(value.getDataType());
+  result += byteSize(value.getAlternatives());
+  result += byteSize(value.getEncoding());
+  result += byteSize(value.getHandle());
+  return result;
+}
+
+inline size_t byteSize(const FOMVariantRecordDataTypeList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMModule& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getModuleHandle());
+  result += byteSize(value.getTransportationTypeList());
+  result += byteSize(value.getDimensionList());
+  result += byteSize(value.getRoutingSpaceList());
+  result += byteSize(value.getInteractionClassList());
+  result += byteSize(value.getObjectClassList());
+  result += byteSize(value.getUpdateRateList());
+  result += byteSize(value.getSwitchList());
+  result += byteSize(value.getArtificialInteractionRoot());
+  result += byteSize(value.getArtificialObjectRoot());
+  result += byteSize(value.getDesignator());
+  return result;
+}
+
+inline size_t byteSize(const FOMModuleList& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const FOMModule2& value) noexcept
+{
+  size_t result = 0;
+  result += byteSize(value.getBasicDataTypeList());
+  result += byteSize(value.getSimpleDataTypeList());
+  result += byteSize(value.getEnumeratedDataTypeList());
+  result += byteSize(value.getArrayDataTypeList());
+  result += byteSize(value.getFixedRecordDataTypeList());
+  result += byteSize(value.getVariantRecordDataTypeList());
+  return result;
+}
+
+inline size_t byteSize(const FOMModule2List& value) noexcept
+{
+  size_t result = 0;
+  for (auto& item : value)
+  {
+    result += byteSize(item);
+  }
+  return result;
+}
+
+inline size_t byteSize(const ConnectionLostMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFaultDescription());
+  return result;
+}
+
+inline size_t byteSize(const CreateFederationExecutionRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationExecution());
+  result += byteSize(value.getLogicalTimeFactoryName());
+  result += byteSize(value.getFOMStringModuleList());
+  return result;
+}
+
+inline size_t byteSize(const CreateFederationExecutionRequest2Message& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationExecution());
+  result += byteSize(value.getLogicalTimeFactoryName());
+  result += byteSize(value.getFOMStringModuleList());
+  return result;
+}
+
+inline size_t byteSize(const CreateFederationExecutionResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getCreateFederationExecutionResponseType());
+  result += byteSize(value.getExceptionString());
+  return result;
+}
+
+inline size_t byteSize(const DestroyFederationExecutionRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationExecution());
+  return result;
+}
+
+inline size_t byteSize(const DestroyFederationExecutionResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getDestroyFederationExecutionResponseType());
+  return result;
+}
+
+inline size_t byteSize(const EnumerateFederationExecutionsRequestMessage&) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  return result;
+}
+
+inline size_t byteSize(const EnumerateFederationExecutionsResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationExecutionInformationVector());
+  return result;
+}
+
+inline size_t byteSize(const InsertFederationExecutionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederationName());
+  result += byteSize(value.getLogicalTimeFactoryName());
+  result += byteSize(value.getConfigurationParameterMap());
+  return result;
+}
+
+inline size_t byteSize(const ShutdownFederationExecutionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  return result;
+}
+
+inline size_t byteSize(const EraseFederationExecutionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  return result;
+}
+
+inline size_t byteSize(const ReleaseFederationHandleMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  return result;
+}
+
+inline size_t byteSize(const InsertModulesMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFOMModuleList());
+  return result;
+}
+
+inline size_t byteSize(const InsertModules2Message& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFOMModule2List());
+  return result;
+}
+
+inline size_t byteSize(const JoinFederationExecutionRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationExecution());
+  result += byteSize(value.getFederateType());
+  result += byteSize(value.getFederateName());
+  result += byteSize(value.getFOMStringModuleList());
+  result += byteSize(value.getConfigurationParameterMap());
+  result += byteSize(value.getIsInternal());
+  return result;
+}
+
+inline size_t byteSize(const JoinFederationExecutionRequest2Message& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationExecution());
+  result += byteSize(value.getFederateType());
+  result += byteSize(value.getFederateName());
+  result += byteSize(value.getFOMStringModuleList());
+  result += byteSize(value.getConfigurationParameterMap());
+  result += byteSize(value.getIsInternal());
+  return result;
+}
+
+inline size_t byteSize(const JoinFederationExecutionResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getJoinFederationExecutionResponseType());
+  result += byteSize(value.getExceptionString());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getFederateType());
+  result += byteSize(value.getFederateName());
+  return result;
+}
+
+inline size_t byteSize(const ResignFederationExecutionLeafRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getResignAction());
+  return result;
+}
+
+inline size_t byteSize(const ResignFederationExecutionRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const JoinFederateNotifyMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getFederateType());
+  result += byteSize(value.getFederateName());
+  result += byteSize(value.getIsInternal());
+  return result;
+}
+
+inline size_t byteSize(const ResignFederateNotifyMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const ChangeAutomaticResignDirectiveMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getResignAction());
+  return result;
+}
+
+inline size_t byteSize(const RegisterFederationSynchronizationPointMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getFederateHandleVector());
+  return result;
+}
+
+inline size_t byteSize(const RegisterFederationSynchronizationPointResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getRegisterFederationSynchronizationPointResponseType());
+  return result;
+}
+
+inline size_t byteSize(const AnnounceSynchronizationPointMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getAddJoiningFederates());
+  result += byteSize(value.getFederateHandleVector());
+  return result;
+}
+
+inline size_t byteSize(const SynchronizationPointAchievedMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getFederateHandleBoolPairVector());
+  return result;
+}
+
+inline size_t byteSize(const FederationSynchronizedMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getLabel());
+  result += byteSize(value.getFederateHandleBoolPairVector());
+  return result;
+}
+
+inline size_t byteSize(const EnableTimeRegulationRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getCommitId());
+  return result;
+}
+
+inline size_t byteSize(const EnableTimeRegulationResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getRespondingFederateHandle());
+  result += byteSize(value.getTimeStampValid());
+  result += byteSize(value.getTimeStamp());
+  return result;
+}
+
+inline size_t byteSize(const DisableTimeRegulationRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const EnableTimeConstrainedNotifyMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const DisableTimeConstrainedNotifyMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  return result;
+}
+
+inline size_t byteSize(const CommitLowerBoundTimeStampMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getCommitType());
+  result += byteSize(value.getCommitId());
+  return result;
+}
+
+inline size_t byteSize(const CommitLowerBoundTimeStampResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getSendingFederateHandle());
+  result += byteSize(value.getCommitId());
+  return result;
+}
+
+inline size_t byteSize(const LockedByNextMessageRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getSendingFederateHandle());
+  result += byteSize(value.getLockedByNextMessage());
+  return result;
+}
+
+inline size_t byteSize(const TimeConstrainedEnabledMessage&) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  return result;
+}
+
+inline size_t byteSize(const TimeRegulationEnabledMessage&) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  return result;
+}
+
+inline size_t byteSize(const TimeAdvanceGrantedMessage&) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  return result;
+}
+
+inline size_t byteSize(const InsertRegionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getRegionHandleDimensionHandleSetPairVector());
+  return result;
+}
+
+inline size_t byteSize(const CommitRegionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getRegionHandleRegionValuePairVector());
+  return result;
+}
+
+inline size_t byteSize(const EraseRegionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getRegionHandleVector());
+  return result;
+}
+
+inline size_t byteSize(const ChangeInteractionClassPublicationMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getPublicationType());
+  result += byteSize(value.getInteractionClassHandle());
+  return result;
+}
+
+inline size_t byteSize(const ChangeObjectClassPublicationMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getPublicationType());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getAttributeHandles());
+  return result;
+}
+
+inline size_t byteSize(const ChangeInteractionClassSubscriptionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getSubscriptionType());
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getParameterFilterValues());
+  return result;
+}
+
+inline size_t byteSize(const ChangeObjectClassSubscriptionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getSubscriptionType());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getAttributeHandles());
+  return result;
+}
+
+inline size_t byteSize(const ChangeObjectInstanceSubscriptionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getSubscriptionType());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  return result;
+}
+
+inline size_t byteSize(const RegistrationForObjectClassMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getStart());
+  return result;
+}
+
+inline size_t byteSize(const AttributesInScopeMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandles());
+  result += byteSize(value.getInScope());
+  return result;
+}
+
+inline size_t byteSize(const TurnUpdatesOnForInstanceMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandles());
+  result += byteSize(value.getUpdateRate());
+  result += byteSize(value.getOn());
+  return result;
+}
+
+inline size_t byteSize(const TurnInteractionsOnMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getOn());
+  return result;
+}
+
+inline size_t byteSize(const InteractionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getParameterValues());
+  return result;
+}
+
+inline size_t byteSize(const TimeStampedInteractionMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getInteractionClassHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getMessageRetractionHandle());
+  result += byteSize(value.getParameterValues());
+  return result;
+}
+
+inline size_t byteSize(const ObjectInstanceHandlesRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getCount());
+  return result;
+}
+
+inline size_t byteSize(const ObjectInstanceHandlesResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandleNamePairVector());
+  return result;
+}
+
+inline size_t byteSize(const ReleaseMultipleObjectInstanceNameHandlePairsMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectInstanceHandleVector());
+  return result;
+}
+
+inline size_t byteSize(const ReserveObjectInstanceNameRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getName());
+  result += byteSize(value.getIsInternal());
+  return result;
+}
+
+inline size_t byteSize(const ReserveObjectInstanceNameResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandleNamePair());
+  result += byteSize(value.getSuccess());
+  return result;
+}
+
+inline size_t byteSize(const ReserveMultipleObjectInstanceNameRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getNameList());
+  return result;
+}
+
+inline size_t byteSize(const ReserveMultipleObjectInstanceNameResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandleNamePairVector());
+  result += byteSize(value.getSuccess());
+  return result;
+}
+
+inline size_t byteSize(const InsertObjectInstanceMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getName());
+  result += byteSize(value.getAttributeStateVector());
+  return result;
+}
+
+inline size_t byteSize(const DeleteObjectInstanceMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getTag());
+  return result;
+}
+
+inline size_t byteSize(const TimeStampedDeleteObjectInstanceMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getMessageRetractionHandle());
+  return result;
+}
+
+inline size_t byteSize(const AttributeUpdateMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getAttributeValues());
+  return result;
+}
+
+inline size_t byteSize(const TimeStampedAttributeUpdateMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getFederateHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getTag());
+  result += byteSize(value.getTimeStamp());
+  result += byteSize(value.getMessageRetractionHandle());
+  result += byteSize(value.getOrderType());
+  result += byteSize(value.getTransportationType());
+  result += byteSize(value.getAttributeValues());
+  return result;
+}
+
+inline size_t byteSize(const RequestAttributeUpdateMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandles());
+  result += byteSize(value.getTag());
+  return result;
+}
+
+inline size_t byteSize(const RequestClassAttributeUpdateMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectClassHandle());
+  result += byteSize(value.getAttributeHandles());
+  result += byteSize(value.getTag());
+  return result;
+}
+
+inline size_t byteSize(const QueryAttributeOwnershipRequestMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandle());
+  return result;
+}
+
+inline size_t byteSize(const QueryAttributeOwnershipResponseMessage& value) noexcept
+{
+  size_t result = sizeof(AbstractMessage);
+  result += byteSize(value.getFederationHandle());
+  result += byteSize(value.getObjectInstanceHandle());
+  result += byteSize(value.getAttributeHandle());
+  result += byteSize(value.getOwner());
+  return result;
 }
 
 } // namespace OpenRTI

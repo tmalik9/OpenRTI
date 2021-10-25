@@ -17,15 +17,16 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractProtocolSocket.h"
 
 namespace OpenRTI {
 
-AbstractProtocolSocket::AbstractProtocolSocket()
+AbstractProtocolSocket::AbstractProtocolSocket() noexcept
 {
 }
 
-AbstractProtocolSocket::~AbstractProtocolSocket()
+AbstractProtocolSocket::~AbstractProtocolSocket() noexcept
 {
 }
 

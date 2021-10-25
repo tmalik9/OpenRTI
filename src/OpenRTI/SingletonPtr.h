@@ -26,6 +26,12 @@
 
 namespace OpenRTI {
 
+// !!! DO NOT USE !!!
+// This class is considered generally unsafe, because get() may be called before the constructor has been called.
+// This may happen if get() is called from a static initializer, before the corresponding static variable of type SingletonPtr<T> has been called.
+// The constructor will then wipe SingletonPtr<T>::_ptr, leaving a memory leak. Happened in AbstractThreadLocal::_Provider/Win32 version.
+// Better rely on C++11 Magic Statics (N2660, http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2660.htm).
+
 template<typename T>
 class SingletonPtr {
 public:
@@ -50,6 +56,13 @@ public:
     return _ptr;
   }
 
+  void reset()
+  {
+    _ptr.reset();
+    while (unsigned(_initialized) != 0) {
+      _initialized.decFetch();
+    }
+  }
 private:
   SingletonPtr(const SingletonPtr&);
   SingletonPtr& operator=(const SingletonPtr&);

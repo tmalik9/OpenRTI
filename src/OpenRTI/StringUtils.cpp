@@ -26,6 +26,7 @@
 #include <limits>
 #include <sstream>
 
+#include "DebugNew.h"
 #include "OpenRTIConfig.h"
 #include "StringUtils.h"
 #include "Types.h"
@@ -112,9 +113,25 @@ caseCompare(const std::string& l, const char* r)
 }
 
 OPENRTI_API bool
+startsWith(const std::string& s, const char* head)
+{
+  size_t l = strlen(head);
+  if (l <= s.size())
+  {
+    return s.substr(0, l) == head;
+  }
+  return false;
+}
+
+OPENRTI_API bool
 endsWith(const std::string& s, const char* tail)
 {
-  return s.size() - s.rfind(tail) == std::strlen(tail);
+  size_t l = strlen(tail);
+  if (l <= s.size())
+  {
+    return s.substr(s.size()-l, l) == tail;
+  }
+  return false;
 }
 
 OPENRTI_API bool
@@ -269,6 +286,24 @@ split(const std::string& s, const char* c)
   std::string::size_type p0 = 0;
   std::string::size_type p = s.find_first_of(c);
   while (p != std::string::npos) {
+    v.push_back(s.substr(p0, p - p0));
+    p0 = s.find_first_not_of(c, p);
+    if (p0 == std::string::npos)
+      return v;
+    p = s.find_first_of(c, p0);
+  }
+  v.push_back(s.substr(p0, p - p0));
+  return v;
+}
+
+
+OPENRTI_API std::vector<std::wstring>
+split(const std::wstring& s, const wchar_t* c)
+{
+  std::vector<std::wstring> v;
+  std::wstring::size_type p0 = 0;
+  std::wstring::size_type p = s.find_first_of(c);
+  while (p != std::wstring::npos) {
     v.push_back(s.substr(p0, p - p0));
     p0 = s.find_first_not_of(c, p);
     if (p0 == std::string::npos)

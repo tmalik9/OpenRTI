@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "LeafServerThread.h"
 
 #include "MessageQueue.h"
@@ -25,38 +26,42 @@
 #include "ScopeUnlock.h"
 #include "ServerNode.h"
 #include "ServerOptions.h"
-#include "SingletonPtr.h"
 #include "ThreadServer.h"
 
 namespace OpenRTI {
+  
+static const uint32_t kInfinite = static_cast<uint32_t>(-1);
 
-class OPENRTI_LOCAL LeafServerThread::_Registry : public Referenced {
+class OPENRTI_LOCAL LeafServerThread::_Registry final : public Referenced {
 public:
   _Registry();
-  ~_Registry();
+  _Registry(const _Registry&) = delete;
+  ~_Registry() noexcept;
+  void Finalize();
+  static _Registry& GetInstance();
 
-  SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions);
+  SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
 
   void erase(LeafServerThread& serverThread);
 
-  static SharedPtr<AbstractServer> createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode);
+  static SharedPtr<AbstractServer> createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode, uint32_t timeoutMilliSeconds);
   static SharedPtr<AbstractServerNode> createServerNode();
-
-  static SingletonPtr<_Registry> _instance;
 
 private:
   mutable Mutex _mutex;
   UrlServerMap _urlServerMap;
 };
 
-SingletonPtr<LeafServerThread::_Registry>
-LeafServerThread::_Registry::_instance;
-
 LeafServerThread::_Registry::_Registry()
 {
 }
 
-LeafServerThread::_Registry::~_Registry()
+LeafServerThread::_Registry::~_Registry() noexcept
+{
+  Finalize();
+}
+
+void LeafServerThread::_Registry::Finalize()
 {
   ScopeLock scopeLock(_mutex);
   for (UrlServerMap::iterator i = _urlServerMap.begin(); i != _urlServerMap.end();) {
@@ -68,17 +73,25 @@ LeafServerThread::_Registry::~_Registry()
     ScopeUnlock scopeUnlock(_mutex);
     leafServerThread->postShutdown();
   }
+  _urlServerMap.clear();
 }
 
 SharedPtr<AbstractConnect>
-LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& clientOptions)
+LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds)
 {
   ScopeLock scopeLock(_mutex);
+  StringStringListMap serverThreadOptions = clientOptions;
   UrlServerMap::iterator i = _urlServerMap.find(url);
   if (i != _urlServerMap.end()) {
-    SharedPtr<AbstractConnect> connect = i->second->connect(clientOptions);
+    SharedPtr<LeafServerThread> leafServerThread = i->second;
+    if (serverThreadOptions.find("version") == serverThreadOptions.end())
+    {
+      auto version = leafServerThread->_server->getProtocolVersion();
+      serverThreadOptions["version"] = std::list<std::string>{std::to_string(version)};
+    }
+    SharedPtr<AbstractConnect> connect = leafServerThread->connect(serverThreadOptions, timeoutMilliSeconds);
     /// Even if we have a server it might have already decided to stop working.
-    /// If it is working it is guarenteed to get at least a connect to this server thread.
+    /// If it is working it is guaranteed to get at least a connect to this server thread.
     if (connect.valid())
       return connect;
 
@@ -90,7 +103,7 @@ LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& 
     i = _urlServerMap.insert(UrlServerMap::value_type(url, SharedPtr<LeafServerThread>())).first;
   }
 
-  /// This is be default the rti server node.
+  /// This is by default the rti server node.
   /// For testing we can plug something different
   SharedPtr<AbstractServerNode> serverNode;
   try {
@@ -106,18 +119,19 @@ LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& 
   /// Depending on the url create a server
   SharedPtr<AbstractServer> server;
   try {
-    server = createServer(url, serverNode);
+    server = createServer(url, serverNode, timeoutMilliSeconds);
   } catch (...) {
   }
   if (!server.valid()) {
     _urlServerMap.erase(i);
     return SharedPtr<AbstractConnect>();
   }
-
-  i->second = new LeafServerThread(server);
+  server->getServerNode();
+  i->second = MakeShared<LeafServerThread>(server);
   i->second->_iterator = i;
   i->second->start();
-  return i->second->connect(clientOptions);
+  serverThreadOptions["version"] = std::list<std::string>{std::to_string(server->getProtocolVersion())};
+  return i->second->connect(serverThreadOptions, timeoutMilliSeconds);
 }
 
 void
@@ -131,20 +145,22 @@ LeafServerThread::_Registry::erase(LeafServerThread& serverThread)
 }
 
 SharedPtr<AbstractServer>
-LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode)
+LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<AbstractServerNode>& serverNode, uint32_t timeoutMilliSeconds)
 {
   // rti://localhost connect is the default.
   if (url.getProtocol().empty() || url.getProtocol() == "rti" || url.getProtocol() == "pipe") {
-    SharedPtr<NetworkServer> server = new NetworkServer(serverNode);
+    SharedPtr<NetworkServer> server = MakeShared<NetworkServer>(serverNode);
 
     server->setServerName("Leaf server");
-    server->connectParentServer(url, Clock::now() + Clock::fromSeconds(70));
+    AbsTimeout timeout((timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds));
+    server->connectParentServer(url, timeout);
+    //DebugPrintf("parent protocol version=%d\n", server->getProtocolVersion());
 
     return server;
   } else if (url.getProtocol() == "thread") {
-    return new ThreadServer(serverNode);
+    return MakeShared<ThreadServer>(serverNode);
   } else if (url.getProtocol() == "rtinode") {
-    SharedPtr<NetworkServer> server = new NetworkServer(serverNode);
+    SharedPtr<NetworkServer> server = MakeShared<NetworkServer>(serverNode);
 
     server->setServerName(url.str());
     for (std::size_t i = 0; i < url.getNumQueries(); ++i) {
@@ -154,7 +170,8 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
       } else if (stringPair.first == "listen") {
         server->listen(URL::fromUrl(stringPair.second), 20);
       } else if (stringPair.first == "parent") {
-        server->connectParentServer(URL::fromUrl(stringPair.second), Clock::now() + Clock::fromSeconds(70));
+        AbsTimeout timeout((timeoutMilliSeconds == kInfinite) ? Clock::max() : Clock::now() + Clock::fromMilliSeconds(timeoutMilliSeconds));
+        server->connectParentServer(URL::fromUrl(stringPair.second), timeout);
       }
     }
 
@@ -167,7 +184,13 @@ LeafServerThread::_Registry::createServer(const URL& url, const SharedPtr<Abstra
 SharedPtr<AbstractServerNode>
 LeafServerThread::_Registry::createServerNode()
 {
-  return new ServerNode;
+  return MakeShared<ServerNode>();
+}
+
+LeafServerThread::_Registry& LeafServerThread::_Registry::GetInstance()
+{
+  static LeafServerThread::_Registry _instance;
+  return _instance;
 }
 
 LeafServerThread::LeafServerThread(const SharedPtr<AbstractServer>& server) :
@@ -176,14 +199,20 @@ LeafServerThread::LeafServerThread(const SharedPtr<AbstractServer>& server) :
   OpenRTIAssert(_server.valid());
 }
 
-LeafServerThread::~LeafServerThread(void)
+LeafServerThread::~LeafServerThread() noexcept
 {
 }
 
 SharedPtr<AbstractConnect>
-LeafServerThread::connect(const StringStringListMap& clientOptions)
+LeafServerThread::connect(const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds)
 {
-  return _server->postConnect(clientOptions);
+  return _server->postConnect(clientOptions, timeoutMilliSeconds);
+}
+
+
+void LeafServerThread::shutdown()
+{
+  _Registry::GetInstance().Finalize();
 }
 
 void
@@ -194,13 +223,10 @@ LeafServerThread::postShutdown()
 }
 
 SharedPtr<AbstractConnect>
-LeafServerThread::connect(const URL& url, const StringStringListMap& clientOptions)
+LeafServerThread::connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds)
 {
-  SharedPtr<_Registry> registry = _Registry::_instance.get();
-  if (!registry.valid())
-    return SharedPtr<AbstractConnect>();
-
-  return registry->connect(url, clientOptions);
+  _Registry& registry = _Registry::GetInstance();
+  return registry.connect(url, clientOptions, timeoutMilliSeconds);
 }
 
 void
@@ -208,9 +234,8 @@ LeafServerThread::run()
 {
   _server->exec();
 
-  SharedPtr<_Registry> registry = _Registry::_instance.get();
-  if (registry.valid())
-    registry->erase(*this);
+  _Registry& registry = _Registry::GetInstance();
+  registry.erase(*this);
 }
 
 } // namespace OpenRTI

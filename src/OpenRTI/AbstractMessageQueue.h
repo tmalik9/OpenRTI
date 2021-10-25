@@ -36,13 +36,10 @@ namespace OpenRTI {
 /// So, no - no double derived stuff!
 class OPENRTI_LOCAL AbstractMessageQueue : public AbstractMessageReceiver {
 public:
-  virtual ~AbstractMessageQueue() {}
-  virtual SharedPtr<const AbstractMessage> receive() = 0;
-  virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout) = 0;
-  virtual bool isOpen() const = 0;
-
-  SharedPtr<AbstractMessageSender> getMessageSender()
-  { return new MessageSender(this); }
+  virtual ~AbstractMessageQueue() noexcept {}
+  SharedPtr<AbstractMessageSender> getMessageSender() { 
+    return MakeShared<MessageSender>(this);
+  }
 
 protected:
   // FIXME may be only have const messages in delivery???
@@ -54,24 +51,24 @@ private:
   public:
     MessageSender(AbstractMessageQueue* messageQueue) : _messageQueue(messageQueue)
     { }
-    virtual ~MessageSender()
+    virtual ~MessageSender() noexcept
     {
       close();
     }
-    virtual void send(const SharedPtr<const AbstractMessage>& message)
+    void send(const SharedPtr<const AbstractMessage>& message) override
     {
       if (!_messageQueue.valid())
         throw RTIinternalError("Trying to send message to a closed MessageSender");
-      CondDebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
       _messageQueue->append(message);
     }
-    virtual void close()
+    void close() noexcept override
     {
       if (!_messageQueue.valid())
         return;
       _messageQueue->close();
-      _messageQueue = 0;
+      _messageQueue.reset();
     }
+    AbstractServer* getServer() const override { return nullptr; }
   private:
     SharedPtr<AbstractMessageQueue> _messageQueue;
   };

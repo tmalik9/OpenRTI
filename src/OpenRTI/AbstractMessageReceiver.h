@@ -29,30 +29,35 @@ namespace OpenRTI {
 
 class AbstractMessage;
 class Clock;
+class AbsTimeout;
 
 template<typename T>
-struct NotificationHandleWrapper : public AbstractNotificationHandle
+struct NotificationHandleWrapper final : public AbstractNotificationHandle
 {
   NotificationHandleWrapper(T* handle) 
   {
     _notificationHandleImpl = handle;
   }
-  virtual void Signal() {
+  ~NotificationHandleWrapper() noexcept {}
+  void Signal() override
+  {
     if (_notificationHandleImpl != nullptr)
     {
       _notificationHandleImpl->Signal();
     }
   }
+  // pointer borrowed from application
   T* _notificationHandleImpl;
 };
 
 class OPENRTI_API AbstractMessageReceiver : public Referenced {
 public:
-  virtual ~AbstractMessageReceiver() {}
+  virtual ~AbstractMessageReceiver() noexcept {}
   virtual SharedPtr<const AbstractMessage> receive() = 0;
-  virtual SharedPtr<const AbstractMessage> receive(const Clock& timeout) = 0;
+  virtual SharedPtr<const AbstractMessage> receive(const AbsTimeout& timeout) = 0;
   virtual bool empty() const = 0;
   virtual bool isOpen() const = 0;
+  virtual size_t getBytesQueued() const = 0;
   virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) = 0;
 };
 

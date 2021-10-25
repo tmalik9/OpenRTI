@@ -41,19 +41,19 @@ class _IntrusiveListIterator;
 template<typename Tag>
 class OPENRTI_LOCAL _IntrusiveListHook {
 public:
-  _IntrusiveListHook()
+  _IntrusiveListHook() noexcept
   { _clear(); }
   // Don't copy list membership
-  _IntrusiveListHook(const _IntrusiveListHook& intrusiveListHook)
+  _IntrusiveListHook(const _IntrusiveListHook& intrusiveListHook) noexcept
   { _clear(); OpenRTIAssert(!intrusiveListHook.is_linked()); }
-  ~_IntrusiveListHook()
+  ~_IntrusiveListHook() noexcept
   { _unlink(); }
 
   // Don't copy list membership
   _IntrusiveListHook& operator=(const _IntrusiveListHook& intrusiveListHook)
   { OpenRTIAssert(!intrusiveListHook.is_linked()); return *this; }
 
-  bool is_linked(void) const
+  bool is_linked() const
   {
     OpenRTIAssert((_next == this) == (_prev == this));
     return _next != this;
@@ -80,15 +80,15 @@ private:
 
   // Only reinitialize our own state, do not care for other list entries
   // possible pointing to this. Use with care!
-  void _clear(void)
+  void _clear() noexcept
   { _next = this; _prev = this; }
   // Remove this entry from the list, dont care for our own state
   // possibly pointing to other nodes. Use with care!
-  void _unlink(void)
+  void _unlink() noexcept
   { _next->_prev = _prev; _prev->_next = _next; }
 
   /// Remove this entry from the list and reinitializes this list hook.
-  void _unlink_clear(void)
+  void _unlink_clear() noexcept
   {
     _unlink();
     _clear();
@@ -109,20 +109,18 @@ private:
     std::swap(_prev, intrusiveListHook._prev);
   }
 
-  _IntrusiveListHook* _prev;
-  _IntrusiveListHook* _next;
+  _IntrusiveListHook* _prev = nullptr;
+  _IntrusiveListHook* _next = nullptr;
 };
 
 template<typename T, typename Tag>
-class OPENRTI_LOCAL _IntrusiveListIterator :
-  public std::iterator<std::bidirectional_iterator_tag, T, std::ptrdiff_t> {
-  typedef std::iterator<std::bidirectional_iterator_tag, T, std::ptrdiff_t> _Base;
+class OPENRTI_LOCAL _IntrusiveListIterator {
 public:
-  typedef typename _Base::value_type value_type;
-  typedef typename _Base::difference_type difference_type;
-  typedef typename _Base::pointer pointer;
-  typedef typename _Base::reference reference;
-  typedef typename _Base::iterator_category iterator_category;
+  using iterator_category = std::bidirectional_iterator_tag;
+  using value_type = T;
+  using difference_type = std::ptrdiff_t;
+  using pointer = T*;
+  using reference = T&;
 
   _IntrusiveListIterator() :
     _intrusiveListHook(NULL)
@@ -152,7 +150,7 @@ protected:
     _intrusiveListHook(intrusiveListHook)
   { }
 
-  void _unlink(void)
+  void _unlink()
   { return _intrusiveListHook->_unlink_clear(); }
 
   void _increment()
@@ -174,11 +172,11 @@ template<typename T, typename Tag>
 class OPENRTI_LOCAL _ForwardIntrusiveListIterator : public _IntrusiveListIterator<T, Tag> {
   typedef _IntrusiveListIterator<T, Tag> _Base;
 public:
-  typedef typename _Base::value_type value_type;
-  typedef typename _Base::difference_type difference_type;
-  typedef typename _Base::pointer pointer;
-  typedef typename _Base::reference reference;
-  typedef typename _Base::iterator_category iterator_category;
+  using typename _Base::value_type;
+  using typename _Base::difference_type;
+  using typename _Base::pointer;
+  using typename _Base::reference;
+  using typename _Base::iterator_category;
 
   _ForwardIntrusiveListIterator()
   { }
@@ -211,7 +209,7 @@ public:
   { return _ForwardIntrusiveListIterator(*this) -= n; }
 
   // Remove this entry from the list, and reinitialize this list node
-  // _ForwardIntrusiveListIterator unlink(void)
+  // _ForwardIntrusiveListIterator unlink()
   // { return _ForwardIntrusiveListIterator(_intrusiveListHook->_unlink_get_next()); }
 
 private:
@@ -230,11 +228,11 @@ template<typename T, typename Tag>
 class OPENRTI_LOCAL _ReverseIntrusiveListIterator : public _IntrusiveListIterator<T, Tag> {
   typedef _IntrusiveListIterator<T, Tag> _Base;
 public:
-  typedef typename _Base::value_type value_type;
-  typedef typename _Base::difference_type difference_type;
-  typedef typename _Base::pointer pointer;
-  typedef typename _Base::reference reference;
-  typedef typename _Base::iterator_category iterator_category;
+  using typename _Base::value_type;
+  using typename _Base::difference_type;
+  using typename _Base::pointer;
+  using typename _Base::reference;
+  using typename _Base::iterator_category;
 
   _ReverseIntrusiveListIterator()
   { }
@@ -267,7 +265,7 @@ public:
   { return _ReverseIntrusiveListIterator(*this) -= n; }
 
   // Remove this entry from the list, and reinitialize this list node
-  // _ReverseIntrusiveListIterator unlink(void)
+  // _ReverseIntrusiveListIterator unlink()
   // { return _ReverseIntrusiveListIterator(_intrusiveListHook->_unlink_get_next()); }
 
 private:
@@ -413,8 +411,8 @@ public:
   { OpenRTIAssert(_select(t).is_linked()); return const_iterator(const_cast<Hook*>(&_select(t))); }
 
 private:
-  // _IntrusiveList(const _IntrusiveList&);
-  // _IntrusiveList& operator=(const _IntrusiveList&);
+  _IntrusiveList(const _IntrusiveList&) = delete;
+  _IntrusiveList& operator=(const _IntrusiveList&);
 
   static const Hook& _select(const_reference t)
   { return static_cast<const Hook&>(t); }
@@ -435,19 +433,15 @@ public:
   { }
   IntrusiveList(const IntrusiveList& intrusiveList)
   { OpenRTIAssert(intrusiveList.empty()); }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   IntrusiveList(IntrusiveList&& intrusiveList)
   { _Implementation::swap(intrusiveList); }
-#endif
   ~IntrusiveList()
   { OpenRTIAssert(_Implementation::empty()); }
 
   IntrusiveList& operator=(const IntrusiveList& intrusiveList)
   { OpenRTIAssert(_Implementation::empty()); OpenRTIAssert(intrusiveList.empty()); return *this; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   IntrusiveList& operator=(IntrusiveList&& intrusiveList)
   { _Implementation::swap(intrusiveList); return *this; }
-#endif
 };
 
 } // namespace OpenRTI

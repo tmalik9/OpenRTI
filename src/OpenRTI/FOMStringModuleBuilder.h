@@ -131,6 +131,10 @@ public:
   }
   void popInteractionClass()
   {
+    if (getCurrentInteractionClass().getName().size() != 1)
+      throw ErrorReadingFDD("No name given for interaction class!");
+    if (getCurrentInteractionClass().getName().front().empty())
+      throw ErrorReadingFDD("Empty name given for interaction class!");
     _interactionClassIndexStack.pop_back();
   }
   FOMStringInteractionClass& getCurrentInteractionClass()
@@ -161,6 +165,68 @@ public:
       throw RTIinternalError("No current parameter.");
     return getCurrentInteractionClass().getParameterList().back();
   }
+
+  void addBasicDataType()
+  {
+    _module.getBasicDataTypeList().push_back(FOMStringBasicDataType());
+  }
+  FOMStringBasicDataType& getCurrentBasicDataType()
+  {
+    if (_module.getBasicDataTypeList().empty())
+      throw RTIinternalError("No current BasicDataType.");
+    return _module.getBasicDataTypeList().back();
+  }
+  void addSimpleDataType()
+  {
+    _module.getSimpleDataTypeList().push_back(FOMStringSimpleDataType());
+  }
+  FOMStringSimpleDataType& getCurrentSimpleDataType()
+  {
+    if (_module.getSimpleDataTypeList().empty())
+      throw RTIinternalError("No current SimpleDataType.");
+    return _module.getSimpleDataTypeList().back();
+  }
+  void addEnumeratedDataType()
+  {
+    _module.getEnumeratedDataTypeList().push_back(FOMStringEnumeratedDataType());
+  }
+  FOMStringEnumeratedDataType& getCurrentEnumeratedDataType()
+  {
+    if (_module.getEnumeratedDataTypeList().empty())
+      throw RTIinternalError("No current EnumeratedDataType.");
+    return _module.getEnumeratedDataTypeList().back();
+  }
+  void addArrayDataType()
+  {
+    _module.getArrayDataTypeList().push_back(FOMStringArrayDataType2());
+  }
+  FOMStringArrayDataType2& getCurrentArrayDataType()
+  {
+    if (_module.getArrayDataTypeList().empty())
+      throw RTIinternalError("No current StringArrayDataType.");
+    return _module.getArrayDataTypeList().back();
+  }
+  void addFixedRecordDataType()
+  {
+    _module.getFixedRecordDataTypeList().push_back(FOMStringFixedRecordDataType2());
+  }
+  FOMStringFixedRecordDataType2& getCurrentFixedRecordDataType()
+  {
+    if (_module.getFixedRecordDataTypeList().empty())
+      throw RTIinternalError("No current FixedRecordDataType.");
+    return _module.getFixedRecordDataTypeList().back();
+  }
+  void addVariantRecordDataType()
+  {
+    _module.getVariantRecordDataTypeList().push_back(FOMStringVariantRecordDataType2());
+  }
+  FOMStringVariantRecordDataType2& getCurrentVariantRecordDataType()
+  {
+    if (_module.getVariantRecordDataTypeList().empty())
+      throw RTIinternalError("No current VariantRecordDataType.");
+    return _module.getVariantRecordDataTypeList().back();
+  }
+
 
   void validate()
   {
@@ -317,7 +383,7 @@ public:
     }
   }
 
-  const FOMStringModule& getFOMStringModule() const
+  const FOMStringModule2& getFOMStringModule() const
   { return _module; }
 
 private:
@@ -331,7 +397,7 @@ private:
   typedef std::vector<size_t> InteractionClassIndexVector;
   InteractionClassIndexVector _parentInteractionClassIndexVector;
 
-  FOMStringModule _module;
+  FOMStringModule2 _module;
 };
 
 }

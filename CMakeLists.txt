@@ -1,6 +1,13 @@
 project(OpenRTI CXX)
-cmake_minimum_required(VERSION 2.6.0)
+
+cmake_minimum_required(VERSION 3.10)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+include(GetOpenRTIVersion)
+message(STATUS "Build OpenRTI: ${OPENRTI_VERSION}")
+message(STATUS "CMake Version: ${CMAKE_VERSION}") 
+message(STATUS "Building with compiler: ${CMAKE_CXX_COMPILER_ID}")
 
 set(PACKAGE_NAME "OpenRTI")
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
@@ -12,8 +19,8 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Not fully supported for all operating systems, but currently
 # the only way to make the circular link reference work on android.
-set(OPENRTI_BUILD_SHARED TRUE CACHE BOOL "Build libraries as shared library.")
-mark_as_advanced(OPENRTI_BUILD_SHARED)
+option(OPENRTI_BUILD_SHARED "Build libraries as shared library." ON)
+option(OPENRTI_EXCLUDE_INSTALL "Exclude CMake install()" OFF)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(LINUX TRUE)
@@ -33,7 +40,7 @@ enable_language(C)
 
 # Starting with cmake 3.1 we can easily change the
 # c++ standard version using
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 
 # Some whole project sensible defines
 if(UNIX)
@@ -51,6 +58,7 @@ if(SUNOS)
   endif()
 endif()
 
+
 if(LINUX)
   # Use the DEBUG2 build type on linux to do stl debugging, note that this changes the abi,
   # In theory the debug build type is the one that is the right one, but since almost nobody else uses this
@@ -59,15 +67,19 @@ if(LINUX)
   set(CMAKE_C_FLAGS_DEBUG2 "${CMAKE_C_FLAGS_DEBUG}")
 endif()
 
+
 if(MSVC)
+  # bkd Preprocessor Definitions
+  add_definitions(-DNOMINMAX)
+  add_definitions(-DTIME64)
+  add_definitions(-DUNICODE)
+  add_definitions(-D_UNICODE)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+	
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4290")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4290")
-  if(CMAKE_CL_64)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /bigobj")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-  endif()
+  add_compile_options(/bigobj)
 endif()
-add_definitions(-DRTI_DISABLE_WARNINGS)
 
 if(MINGW OR CYGWIN)
   if(DEFINED ENV{DLLTOOL})
@@ -79,27 +91,21 @@ endif()
 
 # Change the default build type to something fast
 if(NOT CMAKE_BUILD_TYPE)
+  message("No CMAKE_BUILD_TYPE set, using RelWithDebInfo")
   set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
-endif()
-
-if(CMAKE_VERSION VERSION_GREATER 2.8.4)
-  include(GNUInstallDirs)
 else()
-  include(GNUInstallDirsCompat)
+  message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 endif()
 
-set(OPENRTI_ENABLE_RTI13 OFF CACHE BOOL "Build and install the RTI13 interface.")
-set(OPENRTI_ENABLE_RTI1516 OFF CACHE BOOL "Build and install the RTI1516 interface.")
-set(OPENRTI_ENABLE_RTI1516E ON CACHE BOOL "Build and install the RTI1516E interface (EXPERIMENTAL).")
+include(GNUInstallDirs)
 
-set(OPENRTI_ENABLE_PYTHON_BINDINGS ON CACHE BOOL "Build python binding extension modules.")
+OPTION(OPENRTI_ENABLE_TESTS "Build and install the test suite." OFF)
+set(OPENRTI_ENABLE_PYTHON_BINDINGS OFF CACHE BOOL "Build python binding extension modules.")
 
-set(OPENRTI_RTI13_INCLUDE_SUBDIR "RTI13" CACHE PATH "Install the RTI13 include files into \${CMAKE_INSTALL_INCLUDEDIR}/\${OPENRTI_RTI13_INCLUDE_SUBDIR}.")
-set(OPENRTI_RTI1516_INCLUDE_SUBDIR "rti1516" CACHE PATH "Install the RTI1516 include files into \${CMAKE_INSTALL_INCLUDEDIR}/\${OPENRTI_RTI1516_INCLUDE_SUBDIR}/RTI.")
-set(OPENRTI_RTI1516E_INCLUDE_SUBDIR "rti1516e" CACHE PATH "Install the RTI1516E include files into \${CMAKE_INSTALL_INCLUDEDIR}/\${OPENRTI_RTI1516E_INCLUDE_SUBDIR}/RTI.")
-mark_as_advanced(OPENRTI_RTI13_INCLUDE_SUBDIR OPENRTI_RTI1516_INCLUDE_SUBDIR OPENRTI_RTI1516E_INCLUDE_SUBDIR)
+set(OPENRTI_RTI1516E_INCLUDE_SUBDIR "rti1516ev" CACHE PATH "Install the RTI1516E include files into \${CMAKE_INSTALL_INCLUDEDIR}/\${OPENRTI_RTI1516E_INCLUDE_SUBDIR}/RTI.")
+mark_as_advanced(OPENRTI_RTI1516E_INCLUDE_SUBDIR)
 
 if(UNIX)
   # the RPATH to be used when installing, but only if it's not a system directory
@@ -116,7 +122,7 @@ set(OPENRTI_INSTALL_WITH_RPATH ${OPENRTI_INSTALL_WITH_RPATH_DEFAULT} CACHE BOOL 
 
 # The only known compiler with this binary incompatibility of debug libraries is cl
 if(MSVC)
-  set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Filename postfix for debug libraries.")
+ set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Filename postfix for debug libraries.")
 endif()
 
 # We really want to hide all the OpenRTI private symbols.
@@ -143,6 +149,21 @@ if(MACOS)
   endif()
 endif()
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wsuggest-override>)
+#  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wsuggest-final-types>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wuninitialized>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unknown-pragmas>)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wall>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-microsoft-include>)
+  add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-unknown-pragmas>)
+elseif(MSVC)
+  add_compile_options(/MP)
+endif()
+
+
 # Work around some linux linkers that seem to default to --as-needed
 # Actually this also works around cmake reordering the link dependencies
 # ... well and not to forget that the problem originates from that
@@ -159,45 +180,52 @@ if(hasNoAsNeeded)
   set(CMAKE_EXE_LINKER_FLAGS "-Wl,--no-as-needed")
 endif()
 
+set(OPENRTI_CMAKEROOTDIR "${CMAKE_CURRENT_SOURCE_DIR}") # Path used to locate files relative to this CMakeLists.txt at cmake time.
 set(OPENRTI_DATAROOTDIR "${CMAKE_INSTALL_FULL_DATAROOTDIR}/OpenRTI" CACHE PATH "Path where OpenRTI puts runtime required paths." FORCE)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
 
-macro(OPENRTI_TARGET_LINK_PRIVATE_LIBRARIES _target)
-  if(CMAKE_VERSION VERSION_LESS 2.8.12)
-    target_link_libraries(${_target} ${ARGN})
-    # Each library where we have used this up to now uses explicit linking
-    set_property(TARGET ${_target} PROPERTY LINK_INTERFACE_LIBRARIES "")
-  elseif(CMAKE_VERSION VERSION_LESS 3.0.0)
-    target_link_libraries(${_target} LINK_PRIVATE ${ARGN})
-  else()
-    target_link_libraries(${_target} PRIVATE ${ARGN})
-  endif()
+macro(openrti_target_link_private_libraries _target)
+  target_link_libraries(${_target} PRIVATE ${ARGN})
 endmacro()
 
 macro(openrti_target_position_independent _target)
-  if(CMAKE_VERSION VERSION_GREATER 2.8.8)
     set_property(TARGET ${_target} PROPERTY POSITION_INDEPENDENT_CODE TRUE)
-  else()
-    set_property(TARGET ${_target} APPEND PROPERTY COMPILE_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
-  endif()
 endmacro()
-
-function(OPENRTI_SET_MSVC_STUB_DLL_NAME _target _name)
-  # Ideally we could use
-  #  set_property(TARGET fedtime1516Stub APPEND PROPERTY STATIC_LIBRARY_FLAGS_DEBUG "/DEF /NAME:$<TARGET_FILE:fedtime1516>")
-  # to get the final target file name as it is produced, but STATIC_LIBRARY_FLAGS does not evaluate generator expressions
-  set_property(TARGET ${_target} APPEND PROPERTY STATIC_LIBRARY_FLAGS "/DEF /NAME:${_name}.dll")
-  foreach(_config ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${_config} _CONFIG)
-    set(_dllName "${_name}${CMAKE_${_CONFIG}_POSTFIX}.dll")
-    set_property(TARGET ${_target} APPEND PROPERTY STATIC_LIBRARY_FLAGS_${_CONFIG} "/DEF /NAME:${_dllName}")
-  endforeach()
-endfunction()
 
 add_subdirectory(python)
 add_subdirectory(src)
-# add_subdirectory(tests)
 
+if(OPENRTI_ENABLE_TESTS)
+  add_subdirectory(tests)
+else()
+  message("OpenRTI: Building without tests")
+endif()
+
+if (NOT OPENRTI_EXCLUDE_INSTALL)
+
+    include(CMakePackageConfigHelpers)
+
+    configure_package_config_file(
+        "OpenRTIConfig.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
+        INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
+        PATH_VARS CMAKE_INSTALL_INCLUDEDIR
+    )
+
+    write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
+        VERSION "${OPENRTI_VERSION}"
+        COMPATIBILITY SameMajorVersion
+    )
+
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.cmake"
+              "${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfigVersion.cmake"
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI"
+    )
+
+    install(EXPORT OpenRTITargets DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/OpenRTI")
+endif()

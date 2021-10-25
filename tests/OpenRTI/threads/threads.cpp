@@ -47,7 +47,7 @@ public:
 protected:
   ThreadTest() : _threadWasRun(false)
   { }
-  virtual void run()
+  virtual void run() override
   { _threadWasRun = true; }
   bool _threadWasRun;
 };
@@ -58,14 +58,14 @@ public:
 
   static bool exec()
   {
-    SharedPtr<DetachedTest> testThread = new DetachedTest;
+    SharedPtr<DetachedTest> testThread = MakeShared<DetachedTest>();
     if (!testThread->start())
       return false;
     return true;
   }
 
 protected:
-  virtual void run()
+  virtual void run() override
   {
     Clock::sleep_for(Clock::max());
   }
@@ -94,7 +94,7 @@ protected:
     _counter = counter;
     Thread::start();
   }
-  virtual void run()
+  virtual void run() override
   {
     for (unsigned i = 0; i < 1000000; ++i) {
       ++(*_counter);
@@ -141,7 +141,7 @@ protected:
     _lockedData = lockedData;
     Thread::start();
   }
-  virtual void run()
+  virtual void run() override
   {
     for (unsigned i = 0; i < 1000000; ++i)
       _lockedData->exec();
@@ -169,14 +169,14 @@ public:
     }
     Clock stop = Clock::now();
 
-    std::cout << "Average thread conditon latency is: " << (stop - start).getNSec()*1e-9/10000 << std::endl;
+    std::cout << "Average thread conditon latency is: " << (stop - start).getNanoSeconds()*1e-9/10000 << std::endl;
 
     testThread.wait();
     return true;
   }
 
 protected:
-  virtual void run()
+  virtual void run() override
   {
     _ping.wait();
     _pong.notify_one();

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketTCP.h"
 
 #include "ErrnoWin32.h"
@@ -25,7 +26,7 @@
 
 namespace OpenRTI {
 
-SocketTCP::SocketTCP() :
+SocketTCP::SocketTCP() noexcept :
   SocketStream(new PrivateData)
 {
   _privateData->wsaStartup();

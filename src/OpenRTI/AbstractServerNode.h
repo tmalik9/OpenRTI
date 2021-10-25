@@ -30,6 +30,7 @@ namespace OpenRTI {
 
 class AbstractMessageSender;
 class ServerOptions;
+class AbstractServer;
 
 /// Provides a rti ServerNode in the tree hierarchy.
 /// This class already operates on AbstractMessage typed data structures.
@@ -40,8 +41,8 @@ class ServerOptions;
 /// These suffer from the locking overhead but do not disturb implementation that do not need.
 class OPENRTI_API AbstractServerNode : public Referenced {
 public:
-  AbstractServerNode();
-  virtual ~AbstractServerNode();
+  AbstractServerNode() noexcept;
+  virtual ~AbstractServerNode() noexcept;
 
   /// Hmm, make that more callback based during connection setup, but for now ...
   virtual ServerOptions& getServerOptions() = 0;
@@ -56,10 +57,13 @@ public:
   virtual ConnectHandle _insertParentConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& parentOptions) = 0;
   virtual void _eraseConnect(const ConnectHandle& connectHandle) = 0;
   virtual void _dispatchMessage(const AbstractMessage* message, const ConnectHandle& connectHandle) = 0;
-
+  virtual void setServer(AbstractServer* server) =0;
+  virtual AbstractServer* getServer() const = 0;
 private:
   AbstractServerNode(const AbstractServerNode&) = delete;
+  AbstractServerNode(AbstractServerNode&&) = delete;
   AbstractServerNode& operator=(const AbstractServerNode&) = delete;
+  AbstractServerNode& operator=(AbstractServerNode&&) = delete;
 };
 
 } // namespace OpenRTI

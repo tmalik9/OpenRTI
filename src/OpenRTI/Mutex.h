@@ -27,9 +27,7 @@
 #error "must include OpenRTIConfig.h!"
 #endif
 
-#if 201103L <= __CPlusPlusStd
-# include <mutex>
-#endif
+#include <mutex>
 
 namespace OpenRTI {
 
@@ -38,47 +36,49 @@ class ScopeLock;
 
 class OPENRTI_API Mutex {
 public:
-#if 201103L <= __CPlusPlusStd
-  Mutex(void)
-  { }
-#else
-  Mutex(void);
-#endif
-#if 201103L <= __CPlusPlusStd
-  ~Mutex(void)
-  { }
-#else
-  ~Mutex(void);
-#endif
+  Mutex() noexcept { }
+  ~Mutex() noexcept { }
 
-#if 201103L <= __CPlusPlusStd
-  void lock(void)
-  { _mutex.lock(); }
-#else
-  void lock(void);
-#endif
-#if 201103L <= __CPlusPlusStd
-  void unlock(void)
-  { _mutex.unlock(); }
-#else
-  void unlock(void);
-#endif
+  void lock() { _mutex.lock(); }
+  void unlock() { _mutex.unlock(); }
 
 private:
   Mutex(const Mutex&) = delete;
+  Mutex(Mutex&&) = delete;
   Mutex& operator=(const Mutex&) = delete;
+  Mutex& operator=(Mutex&&) = delete;
 
-#if 201103L <= __CPlusPlusStd
   std::mutex _mutex;
-#else
-  struct PrivateData;
-  PrivateData* _privateData;
-#endif
 
   friend class Condition;
   friend class ScopeLock;
 };
 
+class OPENRTI_API RecursiveMutex {
+public:
+  RecursiveMutex() noexcept { }
+  ~RecursiveMutex() noexcept { }
+
+  void lock()
+  {
+    _mutex.lock();
+  }
+  void unlock()
+  {
+    _mutex.unlock();
+  }
+
+private:
+  RecursiveMutex(const RecursiveMutex&) = delete;
+  RecursiveMutex(RecursiveMutex&&) = delete;
+  RecursiveMutex& operator=(const RecursiveMutex&) = delete;
+  RecursiveMutex& operator=(RecursiveMutex&&) = delete;
+
+  std::recursive_mutex _mutex;
+
+  friend class Condition;
+  friend class RecursiveScopeLock;
+};
 } // namespace OpenRTI
 
 #endif

@@ -29,11 +29,11 @@ namespace OpenRTI {
 class OPENRTI_LOCAL DefaultErrorHandler : public XML::ErrorHandler {
 public:
   DefaultErrorHandler();
-  virtual ~DefaultErrorHandler();
+  virtual ~DefaultErrorHandler() noexcept;
 
-  virtual void error(const char* msg, unsigned line, unsigned col);
-  virtual void fatalError(const char* msg, unsigned line, unsigned col);
-  virtual void warning(const char* msg, unsigned line, unsigned col);
+  void error(const char* msg, unsigned line, unsigned col) override;
+  void fatalError(const char* msg, unsigned line, unsigned col) override;
+  void warning(const char* msg, unsigned line, unsigned col) override;
 
   std::string getMessages() const;
 

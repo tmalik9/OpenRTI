@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "FEDFileReader.h"
 
 #include <fstream>
@@ -27,9 +28,9 @@
 
 namespace OpenRTI {
 
-class OPENRTI_LOCAL FEDContentHandler : public ParenthesesReader::ContentHandler {
+class OPENRTI_LOCAL FEDContentHandler final : public ParenthesesReader::ContentHandler {
 public:
-  virtual void startDocument()
+  void startDocument() override
   {
     OpenRTIAssert(_modeStack.empty());
     _fomStringModuleBuilder.addTransportationType();
@@ -37,13 +38,13 @@ public:
     _fomStringModuleBuilder.addTransportationType();
     _fomStringModuleBuilder.getCurrentTransportationType().setName(normalizeTransportationType("best_effort"));
   }
-  virtual void endDocument()
+  void endDocument() override
   {
     OpenRTIAssert(_modeStack.empty());
     _fomStringModuleBuilder.validate();
   }
 
-  virtual void startElement(const ParenthesesReader&, const StringVector& tokens)
+  void startElement(const ParenthesesReader&, const StringVector& tokens) override
   {
     OpenRTIAssert(!tokens.empty());
     const std::string& t0 = tokens.front();
@@ -160,7 +161,7 @@ public:
       _modeStack.push_back(UnknownMode);
     }
   }
-  virtual void endElement()
+  void endElement() override
   {
     Mode currentMode = getCurrentMode();
     if (currentMode == ObjectClassMode) {
@@ -171,7 +172,7 @@ public:
     _modeStack.pop_back();
   }
 
-  const FOMStringModule& getFOMStringModule() const
+  const FOMStringModule2& getFOMStringModule() const
   { return _fomStringModuleBuilder.getFOMStringModule(); }
 
   std::string normalizeTransportationType(const std::string& name)
@@ -264,7 +265,7 @@ public:
 
 class OPENRTI_LOCAL FEDErrorHandler : public ParenthesesReader::ErrorHandler {
 public:
-  virtual void error(const ParenthesesReader& parenthesesReader, const char* msg)
+  void error(const ParenthesesReader& parenthesesReader, const char* msg) override
   {
     std::stringstream stream;
     stream << "Error parsing fed file in line " << parenthesesReader.getLine() << " at column "
@@ -273,7 +274,7 @@ public:
   }
 };
 
-FOMStringModule
+FOMStringModule2
 FEDFileReader::read(std::istream& stream)
 {
   FEDContentHandler contentHandler;

@@ -8,7 +8,4 @@
       <UniqueIdentifier>{D03C7E1B-A654-315D-BE2C-4B74A2BA4081}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="CTestTestfile.cmake" />
-  </ItemGroup>
 </Project>

@@ -29,15 +29,16 @@ class Attributes;
 
 class OPENRTI_API ContentHandler : public Referenced {
 public:
-  virtual ~ContentHandler(void);
+  ContentHandler() {}
+  virtual ~ContentHandler() noexcept;
 
   virtual void characters(const char* data, unsigned length);
 /*   virtual void ignorableWhitespace(const char* data, unsigned length); */
 
   virtual void comment(const char* commentData, unsigned length);
 
-  virtual void startDocument(void);
-  virtual void endDocument(void);
+  virtual void startDocument();
+  virtual void endDocument();
 
   virtual void startElement(const char* uri, const char* localName,
                             const char* qName, const Attributes* atts);

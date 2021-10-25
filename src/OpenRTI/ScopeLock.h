@@ -28,42 +28,33 @@
 
 namespace OpenRTI {
 
-#if 201103L <= __CPlusPlusStd
-
 class ScopeLock : public std::unique_lock<std::mutex> {
 public:
-  ScopeLock(Mutex& mutex) : std::unique_lock<std::mutex>(mutex._mutex)
-  { }
-  ~ScopeLock(void)
-  { }
+  ScopeLock(Mutex& mutex) : std::unique_lock<std::mutex>(mutex._mutex) { }
+  ~ScopeLock() noexcept { }
 
 private:
-  ScopeLock(void);
-  ScopeLock(const ScopeLock&);
-  ScopeLock& operator=(const ScopeLock&);
+  ScopeLock() = delete;
+  ScopeLock(const ScopeLock&) = delete;
+  ScopeLock(ScopeLock&&) = delete;
+  ScopeLock& operator=(const ScopeLock&) = delete;
+  ScopeLock& operator=(ScopeLock&&) = delete;
 };
 
-#else
-
-class ScopeLock {
+class RecursiveScopeLock : public std::unique_lock<std::recursive_mutex> {
 public:
-  ScopeLock(Mutex& mutex) : mMutex(mutex)
-  { mMutex.lock(); }
-  ~ScopeLock(void)
-  { mMutex.unlock(); }
-
-  Mutex* mutex() const
-  { return &mMutex; }
+  RecursiveScopeLock(RecursiveMutex& mutex) : std::unique_lock<std::recursive_mutex>(mutex._mutex)
+  { }
+  ~RecursiveScopeLock() noexcept
+  { }
 
 private:
-  ScopeLock(void);
-  ScopeLock(const ScopeLock&);
-  ScopeLock& operator=(const ScopeLock&);
-
-  Mutex& mMutex;
+  RecursiveScopeLock() = delete;
+  RecursiveScopeLock(const RecursiveScopeLock&) = delete;
+  RecursiveScopeLock(RecursiveScopeLock&&) = delete;
+  RecursiveScopeLock& operator=(const RecursiveScopeLock&) = delete;
+  RecursiveScopeLock& operator=(RecursiveScopeLock&&) = delete;
 };
-
-#endif
 
 } // namespace OpenRTI
 

@@ -27,10 +27,10 @@ namespace XML {
 
 class ExpatXMLReader : public XMLReader {
 public:
-  ExpatXMLReader(void);
-  virtual ~ExpatXMLReader(void);
+  ExpatXMLReader();
+  virtual ~ExpatXMLReader();
   // returns bool instead of void to signal errors
-  virtual void parse(std::istream& stream, const std::string& encoding);
+  void parse(std::istream& stream, const std::string& encoding) override;
 };
 
 } // namespace XML

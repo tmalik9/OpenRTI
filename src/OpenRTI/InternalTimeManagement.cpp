@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "InternalTimeManagement.h"
 
 namespace OpenRTI {
@@ -26,11 +27,8 @@ InternalTimeManagement::InternalTimeManagement() :
   _timeConstrainedMode(TimeConstrainedDisabled),
   _timeAdvanceMode(TimeAdvanceGranted),
   _asynchronousDeliveryEnabled(false),
+  _allowPendingTimeInNextMessageRequest(false),
   _messageRetractionSerial(0)
-{
-}
-
-InternalTimeManagement::~InternalTimeManagement()
 {
 }
 

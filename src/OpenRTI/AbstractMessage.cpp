@@ -17,14 +17,12 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractMessage.h"
+#include "Message.h"
+#include "ServerModel.h"
 
 namespace OpenRTI {
-
-AbstractMessage::~AbstractMessage()
-{
-}
-
 
 std::string AbstractMessage::toString() const
 {
@@ -33,16 +31,39 @@ std::string AbstractMessage::toString() const
   return s.str();
 }
 
+
+std::string AbstractMessage::toString(ServerModel::Federation* federation) const
+{
+  std::ostringstream s;
+  out(s, federation);
+  return s.str();
+}
+
 bool
-AbstractMessage::getReliable() const
+AbstractMessage::getReliable() const noexcept
 {
   return true;
 }
 
 ObjectInstanceHandle
-AbstractMessage::getObjectInstanceHandleForMessage() const
+AbstractMessage::getObjectInstanceHandleForMessage() const noexcept
 {
   return ObjectInstanceHandle();
+}
+
+std::ostream& prettyprint(std::ostream& os, const InteractionClassHandle& value, ServerModel::Federation* federation)
+{
+  const auto* interactionClass = federation->getInteractionClass(value);
+  os << interactionClass->getFQName();
+  return os;
+}
+
+
+std::ostream& prettyprint(std::ostream& os, const ParameterHandle& value, ServerModel::InteractionClass* interactionClass)
+{
+  const auto* parameter = interactionClass->findParameterDefinition(value);
+  os << parameter->getName();
+  return os;
 }
 
 } // namespace OpenRTI

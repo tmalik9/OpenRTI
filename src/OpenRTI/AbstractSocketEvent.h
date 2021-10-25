@@ -37,7 +37,7 @@ typedef std::list<SharedPtr<AbstractSocketEvent> > SocketEventList;
 class OPENRTI_API AbstractSocketEvent : public Referenced {
 public:
   AbstractSocketEvent();
-  virtual ~AbstractSocketEvent();
+  virtual ~AbstractSocketEvent() noexcept = default;
 
   // Is called from the parent protocol layer when there is data to read
   virtual void read(SocketEventDispatcher& dispatcher) = 0;
@@ -47,29 +47,18 @@ public:
   virtual void write(SocketEventDispatcher& dispatcher) = 0;
   virtual bool getEnableWrite() const = 0;
 
-  // Is called when the given timeout value expires.
-  virtual void timeout(SocketEventDispatcher& dispatcher);
+  virtual size_t getBytesQueued() const = 0;
 
   // Is called when an unrecoverable error happens.
-  virtual void error(const Exception& e);
+  virtual void error(const Exception& e) = 0;
 
   virtual Socket* getSocket() const = 0;
-
-  /// Here we could also store a timeout value that is used for the poll/select timeout
-  /// Since we need to traverse all active readwriteevents in any case this is not an extra effort.
-  const Clock& getTimeout() const
-  { return _timeout; }
-  void setTimeout(const Clock& timeout)
-  { _timeout = timeout; }
 
 private:
   /// The event dispatcher this event is attached to
   SocketEventDispatcher* _socketEventDispatcher;
-  /// If attahced, the iterator into the dispatchers SocketEventList
+  /// If attached, the iterator into the dispatchers SocketEventList
   SocketEventList::iterator _iterator;
-  /// The absolute time of the timeout
-  Clock _timeout;
-
   friend class SocketEventDispatcher;
 };
 

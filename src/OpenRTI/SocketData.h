@@ -33,7 +33,7 @@ public:
 
 protected:
   SocketData(PrivateData* privateData);
-  virtual ~SocketData();
+  virtual ~SocketData() noexcept;
 };
 
 } // namespace OpenRTI

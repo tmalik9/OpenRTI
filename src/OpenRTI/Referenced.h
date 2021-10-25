@@ -27,35 +27,44 @@
 namespace OpenRTI {
 
 class OPENRTI_API Referenced {
-public:
-  Referenced(void) : _refcount(0u)
-  {}
-  /// Do not copy reference counts. Each new object has it's own counter
-  Referenced(const Referenced&) : _refcount(0u)
-  {}
-  /// Do not copy reference counts. Each new object has it's own counter
-  Referenced& operator=(const Referenced&)
-  { return *this; }
+  public:
+    Referenced() noexcept : _refcount(0u) {}
+    /// Do not copy reference counts. Each new object has it's own counter
+    Referenced(const Referenced&) noexcept : _refcount(0u) {}
+    Referenced(Referenced&&) = default;
+    virtual ~Referenced() noexcept {}
+    /// Do not copy reference counts. Each new object has it's own counter
+    Referenced& operator=(const Referenced&) noexcept {
+      _refcount.exchange(0u);
+      return *this;
+    }
+    Referenced& operator=(Referenced&&) = default;
 
-  static void get(const Referenced* ref)
-  { if (!ref) return; ref->_refcount.incFetch(Atomic::MemoryOrderRelease); }
-  static void getFirst(const Referenced* ref)
-  { get(ref); }
-  static unsigned put(const Referenced* ref)
-  { if (ref) return ref->_refcount.decFetch(Atomic::MemoryOrderAcqRel); else return ~0u; }
-  static void release(const Referenced* ref)
-  { if (!ref) return; ref->_refcount.decFetch(Atomic::MemoryOrderRelease); }
-  static unsigned count(const Referenced* ref)
-  { if (ref) return ref->_refcount; else return 0u; }
-  static bool shared(const Referenced* ref)
-  { if (ref) return 1u < ref->_refcount; else return false; }
+    static void incRef(const Referenced* ref) noexcept {
+      if (ref != nullptr) ref->_refcount.incFetch(Atomic::MemoryOrderRelease);
+    }
+    static void getFirst(const Referenced* ref) noexcept { incRef(ref); }
+    static unsigned decRef(const Referenced* ref) noexcept {
+      if (ref != nullptr) return ref->_refcount.decFetch(Atomic::MemoryOrderAcqRel);
+      else return ~0u;
+    }
+    static void release(const Referenced* ref) noexcept {
+      if (ref != nullptr) ref->_refcount.decFetch(Atomic::MemoryOrderRelease);
+    }
+    static unsigned count(const Referenced* ref) noexcept {
+      if (ref != nullptr) return ref->_refcount;
+      else return 0u;
+    }
+    static bool shared(const Referenced* ref) noexcept {
+      if (ref != nullptr) return 1u < ref->_refcount;
+      else return false;
+    }
 
-  template<typename T>
-  static void destruct(T* ref)
-  { delete ref; }
+    template<typename T>
+    static void destruct(T* ref) { delete ref; }
 
-private:
-  mutable Atomic _refcount;
+  private:
+    mutable Atomic _refcount;
 };
 
 } // namespace OpenRTI

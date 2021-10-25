@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ThreadLocal.h"
 
 #include <vector>
@@ -24,18 +25,23 @@
 # define NOMINMAX
 #endif
 #include <windows.h>
+#include "Referenced.h"
+#include "SharedPtr.h"
 
-#include "SingletonPtr.h"
 
 namespace OpenRTI {
 
 struct OPENRTI_LOCAL AbstractThreadLocal::_Provider : public Referenced {
   typedef std::vector<AbstractThreadLocal::_AbstractData*> ThreadLocalVector;
 
-  static SingletonPtr<_Provider> _instance;
 
-  _Provider();
-  ~_Provider();
+  _Provider() noexcept;
+  _Provider(const _Provider&) = delete;
+  _Provider(_Provider&&) = default;
+  ~_Provider() noexcept;
+  _Provider& operator=(const _Provider&) = delete;
+  _Provider& operator=(_Provider&&) = default;
+  static AbstractThreadLocal::_Provider& GetInstance();
 
   unsigned getNextIndex();
 
@@ -43,25 +49,27 @@ struct OPENRTI_LOCAL AbstractThreadLocal::_Provider : public Referenced {
   void setData(unsigned index, _AbstractData* abstractThreadLocal);
 
   ThreadLocalVector* _tlsVector();
-
   DWORD _key;
   unsigned _index;
 };
 
-SingletonPtr<AbstractThreadLocal::_Provider>
-AbstractThreadLocal::_Provider::_instance;
-
-AbstractThreadLocal::_Provider::_Provider() :
-  _key(TlsAlloc()),
-  _index(0)
+AbstractThreadLocal::_Provider::_Provider() noexcept
+  : _key(TlsAlloc()), _index(0)
 {
 }
 
-AbstractThreadLocal::_Provider::~_Provider()
+AbstractThreadLocal::_Provider::~_Provider() noexcept
 {
   TlsFree(_key);
   _key = TLS_OUT_OF_INDEXES;
 }
+
+AbstractThreadLocal::_Provider& AbstractThreadLocal::_Provider::GetInstance()
+{
+  static AbstractThreadLocal::_Provider _instance;
+  return _instance;
+}
+
 
 unsigned
 AbstractThreadLocal::_Provider::getNextIndex()
@@ -112,9 +120,8 @@ AbstractThreadLocal::_AbstractData::~_AbstractData()
 AbstractThreadLocal::AbstractThreadLocal() :
   _index(~0u)
 {
-  SharedPtr<_Provider> instance = _Provider::_instance.get();
-  if (instance.valid())
-    _index = instance->getNextIndex();
+  _Provider& instance = _Provider::GetInstance();
+  _index = instance.getNextIndex();
 }
 
 AbstractThreadLocal::~AbstractThreadLocal()
@@ -124,21 +131,23 @@ AbstractThreadLocal::~AbstractThreadLocal()
 AbstractThreadLocal::_AbstractData*
 AbstractThreadLocal::_get()
 {
-  SharedPtr<_Provider> instance = _Provider::_instance.get();
-  if (!instance.valid())
-    return 0;
-  return instance->getData(_index);
+  _Provider& instance = _Provider::GetInstance();
+  return instance.getData(_index);
 }
 
 void
 AbstractThreadLocal::_set(AbstractThreadLocal::_AbstractData* abstractThreadLocal)
 {
-  SharedPtr<_Provider> instance = _Provider::_instance.get();
-  if (!instance.valid())
-    return;
+  _Provider& instance = _Provider::GetInstance();
   if (_index == ~0u)
     return;
-  instance->setData(_index, abstractThreadLocal);
+  instance.setData(_index, abstractThreadLocal);
+}
+
+
+void AbstractThreadLocal::shutdown()
+{
+  //_Provider::GetInstance().reset();
 }
 
 } // namespace OpenRTI

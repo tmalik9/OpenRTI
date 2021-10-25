@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketAddress.h"
 
 #include <algorithm>
@@ -33,7 +34,7 @@
 
 namespace OpenRTI {
 
-SocketAddress::SocketAddress()
+SocketAddress::SocketAddress() noexcept
 {
 }
 
@@ -42,7 +43,7 @@ SocketAddress::SocketAddress(const SocketAddress& socketAddress) :
 {
 }
 
-SocketAddress::~SocketAddress()
+SocketAddress::~SocketAddress() noexcept
 {
 }
 
@@ -60,7 +61,7 @@ SocketAddress::valid() const
 }
 
 bool
-SocketAddress::isPipe() const
+SocketAddress::isPipe() const noexcept
 {
   return false;
 }
@@ -164,7 +165,7 @@ SocketAddress::resolve(const std::string& address, const std::string& service, b
   SocketAddressList socketAddressList;
   struct addrinfo *res = ai;
   while (res) {
-    socketAddressList.push_back(SocketAddress(new PrivateData(res->ai_addr, socklen_t(res->ai_addrlen))));
+    socketAddressList.push_back(SocketAddress(MakeShared<PrivateData>(res->ai_addr, socklen_t(res->ai_addrlen))));
     res = res->ai_next;
   }
   ::freeaddrinfo(ai);
@@ -210,7 +211,7 @@ SocketAddress::getNetworkPortData() const
 }
 
 SocketAddress
-SocketAddress::fromInet4Network(const SocketAddress& socketAddress, const VariableLengthData& networkAddressData, const VariableLengthData& networkPortData)
+SocketAddress::fromInet4Network(const SocketAddress& /*socketAddress*/, const VariableLengthData& networkAddressData, const VariableLengthData& networkPortData)
 {
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));
@@ -224,7 +225,7 @@ SocketAddress::fromInet4Network(const SocketAddress& socketAddress, const Variab
     throw TransportError("Invalid INET4 network port!");
   std::memcpy(&addr.sin_port, networkPortData.data(), sizeof(addr.sin_port));
 
-  return SocketAddress(new PrivateData((const struct sockaddr*)&addr, sizeof(addr)));
+  return SocketAddress(MakeShared<PrivateData>((const struct sockaddr*)&addr, static_cast<socklen_t>(sizeof(addr))));
 }
 
 SocketAddress
@@ -246,10 +247,10 @@ SocketAddress::fromInet6Network(const SocketAddress& socketAddress, const Variab
     throw TransportError("Invalid INET6 network port!");
   std::memcpy(&addr.sin6_port, networkPortData.data(), sizeof(addr.sin6_port));
 
-  return SocketAddress(new PrivateData((const struct sockaddr*)&addr, sizeof(addr)));
+  return SocketAddress(MakeShared<PrivateData>((const struct sockaddr*)&addr, static_cast<socklen_t>(sizeof(addr))));
 }
 
-SocketAddress::SocketAddress(PrivateData* privateData) :
+SocketAddress::SocketAddress(SharedPtr<PrivateData> privateData) :
   _privateData(privateData)
 {
 }
@@ -285,12 +286,26 @@ SocketAddress::cmp(const SocketAddress& socketAddress) const
   }
 }
 
+
+std::wstring SocketAddress::getHostName()
+{
+  DWORD bufferSize = 0;
+  std::wstring result;
+  BOOL ret = GetComputerNameExW(ComputerNameDnsFullyQualified, nullptr, &bufferSize);
+  if (!ret && GetLastError() == ERROR_MORE_DATA)
+  {
+    result.resize(bufferSize+1);
+    ret = GetComputerNameExW(ComputerNameDnsFullyQualified, &result[0], &bufferSize);
+  }
+  return result;
+}
+
 SocketAddress::PrivateData*
 SocketAddress::data()
 {
   if (PrivateData::count(_privateData.get()) == 1)
     return _privateData.get();
-  _privateData = new PrivateData;
+  _privateData = MakeShared<PrivateData>();
   return _privateData.get();
 }
 

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketStream.h"
 
 #include "ErrnoWin32.h"
@@ -26,7 +27,7 @@
 namespace OpenRTI {
 
 ssize_t
-SocketStream::send(const ConstBufferRange& bufferRange, bool more)
+SocketStream::send(const ConstBufferRange& bufferRange, bool /*more*/)
 {
   size_t bytelen = 0;
   size_t sendBufferSize = this->sendBufferSize(); /* FIXME Use the real send buffer size instead */
@@ -69,7 +70,7 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
   DWORD flags = 0;
   DWORD numBytesSent = 0;
   int ret = WSASend(_privateData->_socket, buffers, bufferCount, &numBytesSent, flags, NULL, NULL);
-  //DebugPrintf("%s: socket=0x%08x bufferCount=%d bytelen=%d numBytesSent=%d ret=%d\n", __FUNCTION__, _privateData->_socket, bufferCount, bytelen, numBytesSent, ret);
+  //DebugPrintf("%s: socket=%d bufferCount=%d bytelen=%d numBytesSent=%d ret=%d\n", __FUNCTION__, _privateData->_socket, bufferCount, bytelen, numBytesSent, ret);
   // get the error of the send call before trying setsocketopt
   int errorNumber = WSAGetLastError();
 
@@ -103,17 +104,11 @@ SocketStream::send(const ConstBufferRange& bufferRange, bool more)
   throw TransportError(errnoToUtf8(errorNumber));
 }
 
-
-ssize_t SocketStream::sendBufferSize() const
-{
-  return 64*1024;
-}
-
 ssize_t
 SocketStream::recv(const BufferRange& bufferRange, bool peek)
 {
   size_t bytelen = 0;
-  size_t readBufferSize = 64*1024; /* FIXME Use the real read buffer size instead */
+  constexpr size_t readBufferSize = 64*1024; /* FIXME Use the real read buffer size instead */
   // Currently fixed to max of 100
   // For stream sockets it does not matter: If we could not receive all in one chunk, the next chunk will receive the rest.
   WSABUF buffers[100];
@@ -130,7 +125,7 @@ SocketStream::recv(const BufferRange& bufferRange, bool peek)
     size = 1;
 #endif
 
-    buffers[bufferCount].buf = (char*)i.data();
+    buffers[bufferCount].buf = static_cast<char*>(i.data());
     buffers[bufferCount].len = ULONG(size);
     bytelen += size;
     i += size;
@@ -169,12 +164,7 @@ SocketStream::recv(const BufferRange& bufferRange, bool peek)
 }
 
 void
-SocketStream::cork(bool enable)
-{
-}
-
-void
-SocketStream::shutdown()
+SocketStream::cork(bool /*enable*/)
 {
 }
 
@@ -187,7 +177,7 @@ SocketStream::getpeername() const
   if (ret == -1)
     throw TransportError(errnoToUtf8(WSAGetLastError()));
 
-  return SocketAddress(new SocketAddress::PrivateData((struct sockaddr*)&sockaddr, addrlen));
+  return SocketAddress(MakeShared<SocketAddress::PrivateData>((struct sockaddr*)&sockaddr, addrlen));
 }
 
 SocketStream::SocketStream(PrivateData* privateData) :

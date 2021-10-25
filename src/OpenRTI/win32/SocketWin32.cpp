@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "Socket.h"
 
 #include "SocketPrivateDataWin32.h"
@@ -24,17 +25,17 @@
 namespace OpenRTI {
 
 void
-Socket::destruct(Socket* socket)
+Socket::destruct(Socket* socket) noexcept
 {
   delete socket;
 }
 
 bool
-Socket::isOpen() const
+Socket::isOpen() const noexcept
 {
   if (!_privateData)
     return false;
-  return SOCKET_ERROR != _privateData->_socket;
+  return (SOCKET)SOCKET_ERROR != _privateData->_socket;
 }
 
 void
@@ -48,7 +49,7 @@ Socket::Socket(PrivateData* privateData) :
 {
 }
 
-Socket::~Socket()
+Socket::~Socket() noexcept
 {
   delete _privateData;
   _privateData = 0;

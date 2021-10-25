@@ -17,7 +17,7 @@
  *
  */
 
-#include "../OpenRTIConfig.h"
+#include "OpenRTIConfig.h"
 
 #include "DynamicModule.h"
 

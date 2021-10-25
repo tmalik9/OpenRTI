@@ -37,11 +37,11 @@ enum Type {
 
 class Attributes {
 public:
-  virtual ~Attributes(void);
+  virtual ~Attributes() noexcept;
 
   virtual int getIndex(const char* qName) const = 0;
 //   virtual int getIndex(const char* uri, const char* localName) = 0;
-  virtual int getLength(void) const = 0;
+  virtual int getLength() const = 0;
   virtual const char* getLocalName(int index) const = 0;
 //   virtual const char* getQName(int index) const = 0;
   virtual Type getType(int index) const = 0;

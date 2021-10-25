@@ -29,9 +29,11 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cctype>
 
 #include "Export.h"
 #include "VariableLengthData.h"
+#include <locale>
 
 namespace OpenRTI {
 
@@ -53,6 +55,9 @@ inline bool contains(const StringVector& stringVector, const std::string& string
 
 OPENRTI_API bool
 caseCompare(const std::string& s, const char* cmp);
+
+OPENRTI_API bool
+startsWith(const std::string& s, const char* tail);
 
 OPENRTI_API bool
 endsWith(const std::string& s, const char* tail);
@@ -112,6 +117,17 @@ split(const char* s, const char* c = ", \t\n")
   return split(std::string(s), c);
 }
 
+OPENRTI_API std::vector<std::wstring>
+split(const std::wstring& s, const wchar_t* c = L", \t\n");
+
+inline std::vector<std::wstring>
+split(const wchar_t* s, const wchar_t* c = L", \t\n")
+{
+  if (!s)
+    return std::vector<std::wstring>();
+  return split(std::wstring(s), c);
+}
+
 template<typename Iter>
 inline std::string join(Iter begin, Iter end, const std::string& sep, bool quote)
 {
@@ -126,6 +142,14 @@ inline std::string join(Iter begin, Iter end, const std::string& sep, bool quote
     if (current != end) to << sep;
   }
   return to.str();
+}
+
+inline bool caseInSensitiveStringEqual(const std::string & str1, const std::string &str2)
+{
+  return ((str1.size() == str2.size()) && std::equal(str1.begin(), str1.end(), str2.begin(), [](char c1, char c2)
+  {
+    return (std::tolower(c1) == std::tolower(c2));
+  }));
 }
 
 inline std::string join(const std::vector<std::string>& parts, const std::string& sep, bool quote=true)
@@ -191,9 +215,9 @@ inline std::string to_string(const StringList& stringList)
 inline std::string to_string(const StringStringListMap& stringListMap)
 {
   StringList resultList;
-  for (auto& [key, values] : stringListMap)
+  for (auto& it : stringListMap)
   {
-    resultList.push_back(key + " : " + to_string(values));
+    resultList.push_back(it.first + " : " + to_string(it.second));
   }
   return join(resultList, ", ", false);
 }

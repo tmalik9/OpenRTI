@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "NetworkServer.h"
 
 #include <fstream>
@@ -45,11 +46,13 @@
 #include "SocketTCP.h"
 #include "StringUtils.h"
 #include "LogStream.h"
+#include "ServerModel.h"
+#include "AbsTimeout.h"
 
 namespace OpenRTI {
 
 NetworkServer::NetworkServer() :
-  AbstractServer(new ServerNode)
+  AbstractServer(MakeShared<ServerNode>())
 {
 }
 
@@ -100,12 +103,12 @@ NetworkServer::setUpFromConfig(std::istream& stream)
 {
   // Set up the config file parser
   SharedPtr<XML::XMLReader> reader;
-  reader = new XML::ExpatXMLReader;
+  reader = MakeShared<XML::ExpatXMLReader>();
 
-  SharedPtr<ServerConfigContentHandler> contentHandler = new ServerConfigContentHandler;
-  reader->setContentHandler(contentHandler.get());
-  SharedPtr<DefaultErrorHandler> errorHandler = new DefaultErrorHandler;
-  reader->setErrorHandler(errorHandler.get());
+  SharedPtr<ServerConfigContentHandler> contentHandler = MakeShared<ServerConfigContentHandler>();
+  reader->setContentHandler(contentHandler);
+  SharedPtr<DefaultErrorHandler> errorHandler = MakeShared<DefaultErrorHandler>();
+  reader->setErrorHandler(errorHandler);
 
   reader->parse(stream, "UTF-8");
 
@@ -118,8 +121,8 @@ NetworkServer::setUpFromConfig(std::istream& stream)
   if (contentHandler->isLogFileSet()) LogStream::AddLogFile(contentHandler->getLogFile());
   if (contentHandler->isLogToConsoleSet()) LogStream::EnableLogToConsole(contentHandler->getLogToConsole());
 
+  _dispatcher.setQueueLimit(contentHandler->getQueueLimit());
   getServerNode().getServerOptions()._preferCompression = contentHandler->getEnableZLibCompression();
-  getServerNode().getServerOptions()._permitTimeRegulation = contentHandler->getPermitTimeRegulation();
 
   if (!contentHandler->getParentServerUrl().empty()) {
     URL url = URL::fromUrl(contentHandler->getParentServerUrl());
@@ -129,7 +132,8 @@ NetworkServer::setUpFromConfig(std::istream& stream)
       else
         url.setProtocol("rti");
     }
-    connectParentServer(url, Clock::now() + Clock::fromSeconds(90));
+    AbsTimeout timeout(Clock::now() + Clock::fromSeconds(90));
+    connectParentServer(url, timeout);
   }
 
   for (unsigned i = 0; i < contentHandler->getNumListenConfig(); ++i) {
@@ -181,25 +185,25 @@ NetworkServer::listenInet(const std::string& node, const std::string& service, i
 SocketAddress
 NetworkServer::listenInet(const SocketAddress& socketAddress, int backlog)
 {
-  SharedPtr<SocketServerTCP> socket = new SocketServerTCP;
+  SharedPtr<SocketServerTCP> socket = MakeShared<SocketServerTCP>();
   socket->bind(socketAddress);
   socket->listen(backlog);
   SocketAddress boundAddress = socket->getsockname();
-  _dispatcher.insert(new SocketServerAcceptEvent(socket, *this));
+  _dispatcher.insert(MakeShared<SocketServerAcceptEvent>(socket, *this));
   return boundAddress;
 }
 
 void
 NetworkServer::listenPipe(const std::string& address, int backlog)
 {
-  SharedPtr<SocketServerPipe> socket = new SocketServerPipe();
+  SharedPtr<SocketServerPipe> socket = MakeShared<SocketServerPipe>();
   socket->bind(address);
   socket->listen(backlog);
-  _dispatcher.insert(new SocketServerAcceptEvent(socket, *this));
+  _dispatcher.insert(MakeShared<SocketServerAcceptEvent>(socket, *this));
 }
 
 void
-NetworkServer::connectParentServer(const URL& url, const Clock& abstime)
+NetworkServer::connectParentServer(const URL& url, const AbsTimeout& timeout)
 {
   if (url.getProtocol().empty() || url.getProtocol() == "rti" || url.getProtocol() == "rtic") {
     std::string host = url.getHost();
@@ -211,25 +215,25 @@ NetworkServer::connectParentServer(const URL& url, const Clock& abstime)
     bool compress = false;
     if (url.getProtocol() == "rtic")
       compress = true;
-    connectParentInetServer(host, service, compress, abstime);
+    connectParentInetServer(host, service, compress, timeout);
   } else if (url.getProtocol() == "pipe" || url.getProtocol() == "file") {
     std::string path = url.getPath();
     if (path.empty())
       path = OpenRTI_DEFAULT_PIPE_PATH;
-    connectParentPipeServer(path, abstime);
+    connectParentPipeServer(path, timeout);
   } else {
     throw RTIinternalError(std::string("Trying to connect to \"") + url.str() + "\": Unknown protocol type!");
   }
 }
 
 void
-NetworkServer::connectParentInetServer(const std::string& host, const std::string& service, bool compress, const Clock& abstime)
+NetworkServer::connectParentInetServer(const std::string& host, const std::string& service, bool compress, const AbsTimeout& timeout)
 {
   // Note that here the may be lenghty name lookup for the connection address happens
   std::list<SocketAddress> addressList = SocketAddress::resolve(host, service, false);
   while (!addressList.empty()) {
     try {
-      connectParentInetServer(addressList.front(), compress, abstime);
+      connectParentInetServer(addressList.front(), compress, timeout);
       return;
     } catch (const OpenRTI::Exception&) {
       addressList.pop_front();
@@ -242,26 +246,26 @@ NetworkServer::connectParentInetServer(const std::string& host, const std::strin
 }
 
 void
-NetworkServer::connectParentInetServer(const SocketAddress& socketAddress, bool compress, const Clock& abstime)
+NetworkServer::connectParentInetServer(const SocketAddress& socketAddress, bool compress, const AbsTimeout& timeout)
 {
-  SharedPtr<SocketTCP> socketStream = new SocketTCP;
+  SharedPtr<SocketTCP> socketStream = MakeShared<SocketTCP>();
   socketStream->connect(socketAddress);
-  connectParentStreamServer(socketStream, abstime, compress);
+  connectParentStreamServer(socketStream, timeout, compress);
 }
 
 void
-NetworkServer::connectParentPipeServer(const std::string& name, const Clock& abstime)
+NetworkServer::connectParentPipeServer(const std::string& name, const AbsTimeout& timeout)
 {
   // Try to connect to a pipe socket
-  SharedPtr<SocketPipe> socketStream = new SocketPipe;
+  SharedPtr<SocketPipe> socketStream = MakeShared<SocketPipe>();
   socketStream->connect(name);
 
-  connectParentStreamServer(socketStream, abstime, false);
+  connectParentStreamServer(socketStream, timeout, false);
 }
 
 // Creates a new server thread that is connected to a parent server through the socket stream
 void
-NetworkServer::connectParentStreamServer(const SharedPtr<SocketStream>& socketStream, const Clock& abstime, bool compress)
+NetworkServer::connectParentStreamServer(const SharedPtr<SocketStream>& socketStream, const AbsTimeout& timeout, bool compress)
 {
   // Set up the server configured option map
   StringStringListMap connectOptions;
@@ -273,15 +277,15 @@ NetworkServer::connectParentStreamServer(const SharedPtr<SocketStream>& socketSt
   }
 
   // Set up the protocol and socket events for connection startup
-  SharedPtr<ProtocolSocketEvent> protocolSocketEvent = new ProtocolSocketEvent(socketStream);
-  SharedPtr<InitialClientStreamProtocol> clientStreamProtocol = new InitialClientStreamProtocol(*this, connectOptions);
+  SharedPtr<ProtocolSocketEvent> protocolSocketEvent = MakeShared<ProtocolSocketEvent>(socketStream);
+  SharedPtr<InitialClientStreamProtocol> clientStreamProtocol = MakeShared<InitialClientStreamProtocol>(*this, connectOptions);
   protocolSocketEvent->setProtocolLayer(clientStreamProtocol);
   _dispatcher.insert(protocolSocketEvent);
 
   // Process messages until we have either received the servers response or the timeout expires
   do {
-    _dispatcher.exec(abstime);
-  } while (Clock::now() <= abstime && !_dispatcher.getDone());
+    _dispatcher.exec(timeout);
+  } while (!timeout.isExpired() && !_dispatcher.getDone());
 
   setDone(false);
 
@@ -323,6 +327,17 @@ NetworkServer::exec()
   }
 
   return EXIT_SUCCESS;
+}
+
+
+uint32_t NetworkServer::getProtocolVersion() const
+{
+  const ServerNode* serverNode = dynamic_cast<const ServerNode*>(&getServerNode());
+  if (serverNode != nullptr)
+  {
+    return serverNode->getParentConnect()->getVersion();
+  }
+  return 0;
 }
 
 void

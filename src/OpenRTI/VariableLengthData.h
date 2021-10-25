@@ -20,6 +20,7 @@
 #ifndef OpenRTI_VariableLengthData_h
 #define OpenRTI_VariableLengthData_h
 
+#include "DebugNew.h"
 #include "Exception.h"
 #include "Export.h"
 #include "Referenced.h"
@@ -29,7 +30,11 @@
 #include <cstring>
 #include <list>
 #include <ostream>
+#include <sstream>
 #include <string>
+#include <vector>
+#include <iomanip>
+#include <algorithm>
 
 #ifndef __CPlusPlusStd
 #error "must include OpenRTIConfig.h!"
@@ -39,6 +44,7 @@ namespace OpenRTI {
 
 class VariableLengthData;
 typedef std::list<VariableLengthData> VariableLengthDataList;
+typedef std::vector<VariableLengthData> VariableLengthDataVector;
 
 /// Class for an opaque byte array.
 /// The class behaves similar to a std::vector as it does not reallocate when clearing or
@@ -62,13 +68,13 @@ typedef std::list<VariableLengthData> VariableLengthDataList;
 
 class OPENRTI_API VariableLengthData {
 public:
-  VariableLengthData() :
-    _data(0),
+  VariableLengthData() noexcept :
+    _data(nullptr),
     _size(0),
     _offset(0)
   { }
   VariableLengthData(size_t size) :
-    _data(0),
+    _data(nullptr),
     _size(size),
     _offset(0)
   { }
@@ -83,12 +89,12 @@ public:
   //   _offset(0)
   // { }
   VariableLengthData(const char* string) :
-    _data(0),
+    _data(nullptr),
     _size(0),
     _offset(0)
   { setData(string, std::strlen(string)); }
   VariableLengthData(const std::string& s) :
-    _data(0),
+    _data(nullptr),
     _size(0),
     _offset(0)
   { setData(s.c_str(), s.size()); }
@@ -97,13 +103,11 @@ public:
     _size(value._size),
     _offset(value._offset)
   { }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  VariableLengthData(VariableLengthData&& value) :
+  VariableLengthData(VariableLengthData&& value) noexcept :
     _data(std::move(value._data)),
     _size(value._size),
     _offset(value._offset)
   { }
-#endif
   // Constructs a subrange of the given variable length data.
   // It references the same data than 'value', but it starts at offset in value and has the given size
   VariableLengthData(const VariableLengthData& value, size_t offset, size_t size) :
@@ -112,7 +116,7 @@ public:
     _offset(value._offset + offset)
   { OpenRTIAssert(offset + size <= value.size()); }
   VariableLengthData(const VariableLengthDataList& variableLengthDataList) :
-    _data(0),
+    _data(nullptr),
     _size(0),
     _offset(0)
   {
@@ -136,16 +140,14 @@ public:
     _offset = value._offset;
     return *this;
   }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
   VariableLengthData&
-  operator=(VariableLengthData&& value)
+  operator=(VariableLengthData&& value) noexcept
   {
     _data.swap(value._data);
     _size = value._size;
     _offset = value._offset;
     return *this;
   }
-#endif
 
   const void* data(size_t offset = 0) const
   { return constData(offset); }
@@ -179,7 +181,7 @@ public:
   uint8_t* uint8Data(size_t offset)
   { return static_cast<uint8_t*>(data(offset)); }
 
-  size_t size() const
+  size_t size() const noexcept
   { return _size; }
 
   size_t capacity() const
@@ -189,7 +191,7 @@ public:
     return _data->capacity() - _offset;
   }
 
-  bool empty() const
+  bool empty() const noexcept
   { return 0 == _size; }
 
   void clear()
@@ -224,7 +226,7 @@ public:
   {
     OpenRTIAssert(_size <= cap);
     // Don't mess with too small allocations.
-    cap = std::max(size_t(512), cap);
+    cap = std::max(size_t{512}, cap);
     if (!_data.valid()) {
       _data = createOwnData(cap);
     } else if (capacity() < cap) {
@@ -259,7 +261,7 @@ public:
     } else {
       // If possible detach from the data element
       _offset = 0;
-      _data.clear();
+      _data.reset();
     }
   }
 
@@ -939,13 +941,13 @@ public:
   }
 
 private:
-  class OPENRTI_API Data : public Referenced {
+  class OPENRTI_API Data final : public Referenced {
   public:
-    Data(size_t size) :
+    Data(size_t size) noexcept :
       _capacity(size),
       _data(_dummy)
     { }
-    Data(void* data) :
+    Data(void* data) noexcept :
       _capacity(0),
       _data(data)
     { }
@@ -954,36 +956,35 @@ private:
       if (_data != _dummy)
         ::operator delete(_data);
     }
-    void* data(size_t offset = 0)
+    void* data(size_t offset = 0) const noexcept
     {
       return static_cast<char*>(_data) + offset;
     }
-    void clear()
+    void clear() noexcept
     {
       if (_data != _dummy) {
         ::operator delete(_data);
         _data = 0;
       }
     }
-    size_t capacity() const
-    { return _capacity; }
+    size_t capacity() const noexcept { return _capacity; }
 
   private:
     const size_t _capacity;
     void* _data;
     // Due to the struct layout, this should be aligned to 16 bytes on 64 bits
     // and 8 bytes on 32 bits. That is, the data field should be about aligned enough?!
-    char _dummy[1];
+    char _dummy[1] = {0};
   };
 
-  static Data* createOwnData(size_t capacity)
+  static SharedPtr<Data> createOwnData(size_t capacity)
   {
-    void* data = ::operator new(capacity + sizeof(Data));
-    return new (data) Data(capacity);
+    void* data = alloc_new(capacity + sizeof(Data));
+    return SharedPtr<Data>(placement_new<Data>(data, capacity));
   }
-  static Data* createExternalData(void *data)
+  static SharedPtr<Data> createExternalData(void *data)
   {
-    return new Data(data);
+    return MakeShared<Data>(data);
   }
 
   SharedPtr<Data> _data;
@@ -991,11 +992,35 @@ private:
   size_t _offset;
 };
 
+template<typename TInputIter>
+static inline std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercase = true, bool insert_spaces = false)
+{
+  std::ostringstream ss;
+  ss << std::hex << std::setfill('0');
+  if (use_uppercase)
+    ss << std::uppercase;
+  while (first != last)
+  {
+    unsigned char currentByte = (*first++) & 0xff;
+    ss << std::setw(2) << (static_cast<unsigned int>(currentByte) & 0x000000ff);
+    if (insert_spaces && first != last)
+      ss << " ";
+  }
+  return ss.str();
+}
+
 template<typename char_type, typename traits_type>
 std::basic_ostream<char_type, traits_type>&
 operator<<(std::basic_ostream<char_type, traits_type>& os, const VariableLengthData& value)
 {
-  os << "{ size: " << value.size() << ", data: [...] }";
+  if (value.size() == 0)
+  {
+    os << "<empty>";
+  }
+  else
+  {
+    os << "{sz=" << value.size() << " ["<< make_hex_string(value.charData(), value.charData() + value.size(), true, true) << "]}";
+  }
   return os;
 }
 

@@ -41,6 +41,23 @@ else(BIG_ENDIAN)
   set(OpenRTI_HOST_IS_LITTLE_ENDIAN 1)
 endif(BIG_ENDIAN)
 
+if(NOT WIN32)
+  set(CMAKE_REQUIRED_LIBRARIES pthread)
+check_cxx_source_compiles("
+#define _GNU_SOURCE 1
+#include <pthread.h>
+int main(int argc, char* argv[])
+{
+  pthread_setname_np(pthread_self(), \"example\");
+}
+" OpenRTI_HAVE_PTHREAD_SETNAME_NP)
+  set(CMAKE_REQUIRED_LIBRARIES)
+  if(OpenRTI_HAVE_DLADDR)
+    set(DL_LIBRARIES dl)
+  endif()
+endif()
+
+# vismth: this won't work at all if the build directory is outside of the OpenRTI source tree ...
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/OpenRTIConfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/OpenRTIConfig.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -56,41 +73,47 @@ elseif(WIN32)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   # We need XP/SP2 We are currently bound to the GetAddrInfo call introduced
   # in that version.
-  add_definitions(-DWINVER=0x0502 -D_WIN32_WINNT=0x0502)
+  add_definitions(-D_WIN32_WINNT=_WIN32_WINNT_WIN7)
 endif()
 
 
 # A bunch of sources that are operating system dependent.
 if(WIN32)
   set(OpenRTI_OS_SOURCES
-    win32/AtomicWin32.cpp
-    win32/ClockWin32.cpp
-    win32/ConditionWin32.cpp
+    win32/ErrnoWin32.h
+    win32/NetworkStatisticsWin32.h
+    win32/PerformanceCounterStopWatch.h
+    win32/SocketAddressPrivateDataWin32.h
+    win32/SocketPrivateDataWin32.h
     win32/DynamicModuleWin32.cpp
     win32/ErrnoWin32.cpp
-    win32/MutexWin32.cpp
+    win32/NetworkStatisticsWin32.cpp
+    win32/PerformanceCounterStopWatch.cpp
     win32/SocketAddressWin32.cpp
     win32/SocketDataWin32.cpp
     win32/SocketEventDispatcherWin32.cpp
     win32/SocketPacketWin32.cpp
     win32/SocketPipeWin32.cpp
-    win32/SocketServerWin32.cpp
     win32/SocketServerPipeWin32.cpp
     win32/SocketServerTCPWin32.cpp
+    win32/SocketServerWin32.cpp
     win32/SocketStreamWin32.cpp
     win32/SocketTCPWin32.cpp
     win32/SocketUDPWin32.cpp
     win32/SocketWin32.cpp
     win32/ThreadLocalWin32.cpp
     win32/ThreadWin32.cpp
+    OpenRTI.rc
   )
 else(WIN32)
   set(OpenRTI_OS_SOURCES
-    posix/AtomicPosix.cpp
-    posix/ClockPosix.cpp
-    posix/ConditionPosix.cpp
+    posix/ErrnoPosix.h
+    posix/NetworkStatisticsPosix.h
+    posix/PerformanceCounterStopWatchPosix.h
+    posix/SocketAddressPrivateDataPosix.h
+    posix/SocketPrivateDataPosix.h
+    posix/ThreadPrivateDataPosix.h
     posix/DynamicModulePosix.cpp
-    posix/MutexPosix.cpp
     posix/NetworkStatisticsPosix.cpp
     posix/PerformanceCounterStopWatchPosix.cpp
     posix/SocketAddressPosix.cpp
@@ -99,8 +122,8 @@ else(WIN32)
     posix/SocketPacketPosix.cpp
     posix/SocketPipePosix.cpp
     posix/SocketPosix.cpp
-    posix/SocketServerPosix.cpp
     posix/SocketServerPipePosix.cpp
+    posix/SocketServerPosix.cpp
     posix/SocketServerTCPPosix.cpp
     posix/SocketStreamPosix.cpp
     posix/SocketTCPPosix.cpp
@@ -129,69 +152,248 @@ else(EXPAT_FOUND)
   )
 endif(EXPAT_FOUND)
 
-include(FindZLIB)
-if(ZLIB_FOUND)
-  message(WARNING "ZLIB is found but ignored due to a bug in ZLibProtocolLayer implementation. cf. src/OpenRTI/CMakeLists.txt for details.")
-#  include_directories(${ZLIB_INCLUDE_DIRS})
-#  add_definitions(-DOPENRTI_HAVE_ZLIB)
-#  set(OpenRTI_ZLIB_SOURCES
-#    ZLibProtocolLayer.cpp
-#  )
-else()
-  set(OpenRTI_ZLIB_SOURCES "")
-endif()
+# bkd: disabled ZLIB support. In case of reintegration, note that SAB CLA has to ship the according zlib licence  
+#include(FindZLIB)
+#if(ZLIB_FOUND)
+## ems: disabled (unused) ZLIB support due to a bug in the implementation:
+## -------------------- 8< --------------------
+## /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp: In constructor OpenRTI::ZLibProtocolLayer::ZLibProtocolLayer():
+## /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:190:50: error: invalid new-expression of abstract class type OpenRTI::ZLibProtocolLayer::ProtocolSocket
+##    _protocolSocket(new ProtocolSocket(Z_BEST_SPEED))
+##                                                   ^
+## /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:27:40: note:   because the following virtual functions are pure within OpenRTI::ZLibProtocolLayer::ProtocolSocket:
+##  class OPENRTI_LOCAL ZLibProtocolLayer::ProtocolSocket : public AbstractProtocolSocket {
+##                                         ^~~~~~~~~~~~~~
+## In file included from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolLayer.h:23:0,
+##                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/NestedProtocolLayer.h:23,
+##                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.h:23,
+##                  from /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/ZLibProtocolLayer.cpp:20:
+## /mnt/d/vfs/CANoe/feature/13.0_DistSim_HLA/Projects_Source/OpenRTI/src/OpenRTI/AbstractProtocolSocket.h:40:19: note:     virtual OpenRTI::ssize_t OpenRTI::AbstractProtocolSocket::sendBufferSize() const
+##    virtual ssize_t sendBufferSize() const = 0;
+##                    ^~~~~~~~~~~~~~
+## -------------------- >8 --------------------
+#  message(WARNING "ZLIB is found but ignored due to a bug in ZLibProtocolLayer implementation. cf. src/OpenRTI/CMakeLists.txt for details.")
+##  include_directories(${ZLIB_INCLUDE_DIRS})
+##  add_definitions(-DOPENRTI_HAVE_ZLIB)
+##  set(OpenRTI_ZLIB_SOURCES
+##    ZLibProtocolLayer.cpp
+##  )
+#else()
+#  set(OpenRTI_ZLIB_SOURCES "")
+#endif()
 
 set(OpenRTI_SOURCES
-  AbstractMessage.cpp
-  AbstractMessageEncoding.cpp
-  AbstractMessageSender.cpp
-  AbstractProtocolLayer.cpp
-  AbstractProtocolSocket.cpp
-  AbstractServerNode.cpp
-  AbstractServer.cpp
-  AbstractSocketEvent.cpp
-  Attributes.cpp
-  InternalAmbassador.cpp
-  InternalTimeManagement.cpp
-  Federate.cpp
-  ContentHandler.cpp
-  DefaultErrorHandler.cpp
-  ErrorHandler.cpp
-  ExpatXMLReader.cpp
-  Exception.cpp
-  FDD1516EFileReader.cpp
-  FDD1516FileReader.cpp
-  FEDFileReader.cpp
-  InitialClientStreamProtocol.cpp
-  InitialServerStreamProtocol.cpp
-  InitialStreamProtocol.cpp
-  LogStream.cpp
-  Message.cpp
-  MessageEncodingRegistry.cpp
-  NestedProtocolLayer.cpp
-  NetworkServer.cpp
-  NetworkStatistics.cpp
-  Options.cpp
-  ParenthesesReader.cpp
-  ServerModel.cpp
-  ServerNode.cpp
-  ProtocolSocketEvent.cpp
-  RegionSet.cpp
-  ServerConfigContentHandler.cpp
-  LeafServerThread.cpp
-  SocketEventDispatcher.cpp
-  SocketServerAcceptEvent.cpp
-  StreamBufferProtocol.cpp
-  StringUtils.cpp
-  TightBE1MessageEncoding.cpp
-  ThreadServer.cpp
-  URL.cpp
-  WeakReferenced.cpp
-  XMLReader.cpp
-  dprintf.cpp
+    AbsTimeout.cpp
+    AbsTimeout.h
+    AbstractConnect.h
+    AbstractLogicalTime.h
+    AbstractMessage.cpp
+    AbstractMessage.h
+    AbstractMessageDispatcher.h
+    AbstractMessageEncoding.cpp
+    AbstractMessageEncoding.h
+    AbstractMessageQueue.h
+    AbstractMessageReceiver.h
+    AbstractMessageSender.cpp
+    AbstractMessageSender.h
+    AbstractNetworkStatistics.h
+    AbstractNotificationHandle.h
+    AbstractProtocolLayer.cpp
+    AbstractProtocolLayer.h
+    AbstractProtocolSocket.cpp
+    AbstractProtocolSocket.h
+    AbstractServer.cpp
+    AbstractServer.h
+    AbstractServerNode.cpp
+    AbstractServerNode.h
+    AbstractSocketEvent.cpp
+    AbstractSocketEvent.h
+    Ambassador.h
+    Atomic.h
+    Attributes.cpp
+    Attributes.h
+    Buffer.h
+    Clock.h
+    Condition.h
+    ContentHandler.cpp
+    ContentHandler.h
+    DebugNew.h
+    DecodeDataStream.h
+    DefaultErrorHandler.cpp
+    DefaultErrorHandler.h
+    DynamicModule.h
+    EncodeDataStream.h
+    ErrorHandler.cpp
+    ErrorHandler.h
+    Exception.cpp
+    Exception.h
+    ExpatXMLReader.cpp
+    ExpatXMLReader.h
+    Export.h
+    FDD1516EFileReader.cpp
+    FDD1516EFileReader.h
+    FEDFileReader.cpp
+    FEDFileReader.h
+    FOMStringModuleBuilder.h
+    Federate.cpp
+    Federate.h
+    FederateHandleLowerBoundTimeStampMap.h
+    Handle.h
+    HandleAllocator.h
+    ImmediateCallbackDispatcher.cpp
+    ImmediateCallbackDispatcher.h
+    InitialClientStreamProtocol.cpp
+    InitialClientStreamProtocol.h
+    InitialServerStreamProtocol.cpp
+    InitialServerStreamProtocol.h
+    InitialStreamProtocol.cpp
+    InitialStreamProtocol.h
+    InternalAmbassador.cpp
+    InternalAmbassador.h
+    InternalTimeManagement.cpp
+    InternalTimeManagement.h
+    IntrusiveList.h
+    IntrusiveUnorderedMap.h
+    LeafServerThread.cpp
+    LeafServerThread.h
+    LogStream.cpp
+    LogStream.h
+    Message.cpp
+    Message.h
+    MessageEncodingRegistry.cpp
+    MessageEncodingRegistry.h
+    MessageQueue.h
+    MomTypes.h
+    Mutex.h
+    NestedProtocolLayer.cpp
+    NestedProtocolLayer.h
+    NetworkServer.cpp
+    NetworkServer.h
+    NetworkStatistics.cpp
+    NetworkStatistics.h
+    OpenRTIVersion.h
+    Options.cpp
+    Options.h
+    ParenthesesReader.cpp
+    ParenthesesReader.h
+    PooledMessageList.h
+    ProtocolSocketEvent.cpp
+    ProtocolSocketEvent.h
+    Rand.h
+    RangeBounds.h
+    Referenced.h
+    Region.h
+    RegionSet.cpp
+    RegionSet.h
+    ScopeLock.h
+    ScopeUnlock.h
+    ServerConfigContentHandler.cpp
+    ServerConfigContentHandler.h
+    ServerModel.cpp
+    ServerModel.h
+    ServerNode.cpp
+    ServerNode.h
+    ServerOptions.h
+    SharedPtr.h
+    SingletonPtr.h
+    Socket.h
+    SocketAddress.h
+    SocketData.h
+    SocketEventDispatcher.cpp
+    SocketEventDispatcher.h
+    SocketPacket.h
+    SocketPipe.h
+    SocketServer.h
+    SocketServerAcceptEvent.cpp
+    SocketServerAcceptEvent.h
+    SocketServerPipe.h
+    SocketServerTCP.h
+    SocketStream.h
+    SocketTCP.h
+    SocketUDP.h
+    StreamBufferProtocol.cpp
+    StreamBufferProtocol.h
+    StringUtils.cpp
+    StringUtils.h
+    TemplateTimeManagement.h
+    TestLib.h
+    Thread.h
+    ThreadLocal.h
+    ThreadServer.cpp
+    ThreadServer.h
+    TightBE1MessageEncoding.cpp
+    TightBE1MessageEncoding.h
+    TimeManagement.h
+    TranslateTypes.cpp
+    TranslateTypes.h
+    TranslateTypes.h
+    Types.h
+    URL.cpp
+    URL.h
+    ValueImplementation.h
+    VariableLengthData.h
+    VariableLengthDataTuple.cpp
+    VariableLengthDataTuple.h
+    WeakPtr.h
+    WeakReferenced.cpp
+    WeakReferenced.h
+    XMLReader.cpp
+    XMLReader.h
+    #ZLibProtocolLayer.h
+    dprintf.cpp
+    dprintf.h
+    encoding/BasicDataElements.cpp
+    encoding/BasicDataElements.h
+    encoding/DataElement.cpp
+    encoding/DataElement.h
+    encoding/Encoding.h
+    encoding/EncodingConfig.h
+    encoding/EncodingExceptions.h
+    encoding/HLAfixedArray.cpp
+    encoding/HLAfixedArray.h
+    encoding/HLAfixedRecord.cpp
+    encoding/HLAfixedRecord.h
+    encoding/HLAhandle.cpp
+    encoding/HLAhandle.h
+    encoding/HLAopaqueData.cpp
+    encoding/HLAopaqueData.h
+    encoding/HLAvariableArray.cpp
+    encoding/HLAvariableArray.h
+    encoding/HLAvariantRecord.cpp
+    encoding/HLAvariantRecord.h
+    mom/AbstractFederateMetrics.h
+    mom/MomFederate.cpp
+    mom/MomFederate.h
+    mom/MomFederateMetrics.cpp
+    mom/MomFederateMetrics.h
+    mom/MomFederation.cpp
+    mom/MomFederation.h
+    mom/MomInteractions.cpp
+    mom/MomInteractions.h
+    mom/MomManager.cpp
+    mom/MomManager.h
+    mom/MomServer.cpp
+    mom/MomServer.h
+    mom/MomTypes.h
+    stdafx.h
+    xml/amigaconfig.h
+    xml/ascii.h
+    xml/asciitab.h
+    xml/expat.h
+    xml/expat_external.h
+    xml/iasciitab.h
+    xml/internal.h
+    xml/latin1tab.h
+    xml/macconfig.h
+    xml/nametab.h
+    xml/utf8tab.h
+    xml/winconfig.h
+    xml/xmlrole.h
+    xml/xmltok.h
+    xml/xmltok_impl.h
   ${OpenRTI_OS_SOURCES}
   ${OpenRTI_EXPAT_SOURCES}
-  ${OpenRTI_ZLIB_SOURCES}
+  #${OpenRTI_ZLIB_SOURCES}
 )
 
 if(OPENRTI_BUILD_SHARED)
@@ -209,9 +411,9 @@ set_property(TARGET OpenRTI PROPERTY OUTPUT_NAME OpenRTI)
 if(EXPAT_FOUND)
   openrti_target_link_private_libraries(OpenRTI ${EXPAT_LIBRARIES})
 endif(EXPAT_FOUND)
-if(ZLIB_FOUND)
-  openrti_target_link_private_libraries(OpenRTI ${ZLIB_LIBRARIES})
-endif()
+#if(ZLIB_FOUND)
+#  openrti_target_link_private_libraries(OpenRTI ${ZLIB_LIBRARIES})
+#endif()
 if(WIN32)
   openrti_target_link_private_libraries(OpenRTI ws2_32)
 else(WIN32)
@@ -231,7 +433,7 @@ if(DL_LIBRARIES)
   openrti_target_link_private_libraries(OpenRTI ${DL_LIBRARIES})
 endif(DL_LIBRARIES)
 
-install(TARGETS OpenRTI
+install(TARGETS OpenRTI EXPORT OpenRTITargets
   PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
   RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
   LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"

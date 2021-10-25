@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "WeakReferenced.h"
 
 #include "Referenced.h"
@@ -30,7 +31,7 @@ WeakReferenced::WeakData::WeakData(WeakReferenced* weakReferenced) :
 {
 }
 
-WeakReferenced::WeakData::~WeakData()
+WeakReferenced::WeakData::~WeakData() noexcept
 {
 }
 

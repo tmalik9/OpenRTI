@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "InitialServerStreamProtocol.h"
 
 #include "LogStream.h"
@@ -34,7 +35,7 @@ InitialServerStreamProtocol::InitialServerStreamProtocol(AbstractServer& abstrac
   addScratchReadBuffer(12);
 }
 
-InitialServerStreamProtocol::~InitialServerStreamProtocol()
+InitialServerStreamProtocol::~InitialServerStreamProtocol() noexcept
 {
 }
 
@@ -53,13 +54,14 @@ InitialServerStreamProtocol::readOptionMap(const StringStringListMap& clientOpti
     errorResponse("No version field in the connect header given.");
     return;
   }
-  // Currently only version OPENRTI_ENCODING_VERSION is supported on both sides, currently just something to be
-  // extensible so that we can change something in the future without crashing clients or servers
-  // by a wrong protocol or behavior.
-  if (!contains(i->second, OPENRTI_ENCODING_VERSION)) {
-    errorResponse("Client does not support version " OPENRTI_ENCODING_VERSION " of the protocol.");
+
+  //DebugPrintf("%s: version=%s\n", __FUNCTION__, join(i->second, ",").c_str());
+  std::string protocolVersion = std::to_string(OPENRTI_ENCODING_VERSION);
+  if (!getCompatibleVersion(protocolVersion, i->second)) {
+    errorResponse("Client does not support version " OPENRTI_ENCODING_VERSION_STRING " of the protocol.");
     return;
   }
+  //DebugPrintf("%s: compatible version=%s\n", __FUNCTION__, protocolVersion.c_str());
 
   // Check the encodings
   i = clientOptionMap.find("encoding");
@@ -84,8 +86,21 @@ InitialServerStreamProtocol::readOptionMap(const StringStringListMap& clientOpti
   messageProtocol = MessageEncodingRegistry::instance().getEncoding(encodingList.front());
 
   // Get a new client connect from the server implementation.
+  StringStringListMap resultingClientOptionMap;
+  for (auto option : clientOptionMap)
+  {
+    if (option.first == "version")
+    {
+      StringList compatibleVersionList{protocolVersion};
+      resultingClientOptionMap.insert(std::make_pair(option.first, compatibleVersionList));
+    }
+    else
+    {
+      resultingClientOptionMap.insert(std::make_pair(option.first, option.second));
+    }
+  }
   SharedPtr<AbstractConnect> connect;
-  connect = _abstractServer.sendConnect(clientOptionMap, false /*parent*/);
+  connect = _abstractServer.sendConnect(resultingClientOptionMap, false /*parent*/);
   if (!connect.valid()) {
     errorResponse("Could not get an internal connect structure from the server!");
     return;
@@ -97,7 +112,7 @@ InitialServerStreamProtocol::readOptionMap(const StringStringListMap& clientOpti
 
   // Survived, respond with a valid response packet
   responseValueMap["version"].clear();
-  responseValueMap["version"].push_back(OPENRTI_ENCODING_VERSION);
+  responseValueMap["version"].push_back(protocolVersion);
   responseValueMap["encoding"].clear();
   responseValueMap["encoding"].push_back(encodingList.front());
   responseValueMap["compression"].clear();

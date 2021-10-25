@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ProtocolSocketEvent.h"
 
 #include "AbstractProtocolLayer.h"
@@ -71,7 +72,7 @@ struct OPENRTI_LOCAL ProtocolSocketEvent::ProtocolSocket : public AbstractProtoc
     if (!_replacingProtocol.valid())
       return;
     _protocolLayer.swap(_replacingProtocol);
-    _replacingProtocol = 0;
+    _replacingProtocol.reset();
   }
 
   SharedPtr<SocketStream> _socketStream;
@@ -85,7 +86,7 @@ ProtocolSocketEvent::ProtocolSocketEvent(const SharedPtr<SocketStream>& socketSt
 {
 }
 
-ProtocolSocketEvent::~ProtocolSocketEvent()
+ProtocolSocketEvent::~ProtocolSocketEvent() noexcept
 {
   delete _protocolSocket;
   _protocolSocket = 0;
@@ -96,15 +97,10 @@ ProtocolSocketEvent::read(SocketEventDispatcher& dispatcher)
 {
   if (!_protocolSocket->_closed) {
     _protocolSocket->read();
-  } else {
-    Buffer buffer;
-    buffer.push_back(VariableLengthData(64*1024));
-    ssize_t ret;
-    do {
-      ret = _protocolSocket->_socketStream->recv(BufferRange(buffer.byte_begin(), buffer.byte_end()), false);
-    } while (0 < ret);
-    if (ret == 0) {
-      dispatcher.erase(this);
+    if (_protocolSocket->_closed)
+    {
+      error(TransportError("connection closed"));
+      dispatcher.erase(SharedPtr<ProtocolSocketEvent>(this));
     }
   }
 }
@@ -116,7 +112,7 @@ ProtocolSocketEvent::getEnableRead() const
 }
 
 void
-ProtocolSocketEvent::write(SocketEventDispatcher& dispatcher)
+ProtocolSocketEvent::write(SocketEventDispatcher& /*dispatcher*/)
 {
   //OpenRTIAssert(!_protocolSocket->_closed);
   _protocolSocket->write();
@@ -126,6 +122,14 @@ bool
 ProtocolSocketEvent::getEnableWrite() const
 {
   return !_protocolSocket->_closed && _protocolSocket->_protocolLayer->getEnableWrite();
+}
+
+size_t
+ProtocolSocketEvent::getBytesQueued() const
+{
+  if (!_protocolSocket->_closed)
+    return _protocolSocket->_protocolLayer->getBytesQueued();
+  return 0;
 }
 
 void
@@ -147,7 +151,7 @@ ProtocolSocketEvent::setProtocolLayer(const SharedPtr<AbstractProtocolLayer>& pr
 }
 
 const SharedPtr<AbstractProtocolLayer>&
-ProtocolSocketEvent::getProtocolLayer() const
+ProtocolSocketEvent::getProtocolLayer() const noexcept
 {
   return _protocolSocket->_protocolLayer;
 }

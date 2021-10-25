@@ -32,101 +32,114 @@ namespace OpenRTI {
 template<typename T>
 class WeakPtr;
 
+// NOTE: this class is more similar to boost::intrusive_ptr than std::shared_ptr.
+// T must derive from Referenced *or* WeakReferenced, which store the reference count.
+// Note that Referenced and WeakReferenced implement getFirst differently, so don't
+// replace them by incRef here (although these are the same for 'Referenced')
 template<typename T>
 class OPENRTI_LOCAL SharedPtr {
-public:
-  SharedPtr(void) : _ptr(0)
-  {}
-  SharedPtr(T* ptr) : _ptr(ptr) // explicit???
-  { T::getFirst(_ptr); }
-  SharedPtr(const SharedPtr& p) : _ptr(p.get())
-  { T::get(_ptr); }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  SharedPtr(SharedPtr&& p) : _ptr(0)
-  { swap(p); }
-#endif
-  template<typename U>
-  SharedPtr(const SharedPtr<U>& p) : _ptr(p.get())
-  { T::get(_ptr); }
-  ~SharedPtr(void)
-  { put(); }
+  public:
+    constexpr SharedPtr() noexcept : _ptr(0) {}
+    explicit SharedPtr(T* ptr) : _ptr(ptr) { T::getFirst(_ptr); }
+    SharedPtr(const SharedPtr& p) : _ptr(p.get()) { T::incRef(_ptr); }
+    SharedPtr(SharedPtr&& p) : _ptr(0) { swap(p); }
+    template<typename U>
+    SharedPtr(const SharedPtr<U>& p) : _ptr(p.get()) { T::incRef(_ptr); }
+    ~SharedPtr() { reset(); }
 
-  SharedPtr& operator=(const SharedPtr& p)
-  { assign(p.get()); return *this; }
-#if 201103L <= __CPlusPlusStd || 200610L <= __cpp_rvalue_reference
-  SharedPtr& operator=(SharedPtr&& p)
-  { swap(p); return *this; }
-#endif
-  template<typename U>
-  SharedPtr& operator=(const SharedPtr<U>& p)
-  { assign(p.get()); return *this; }
-  template<typename U>
-  SharedPtr& operator=(U* p)
-  { assignFirst(p); return *this; }
+    SharedPtr& operator=(const SharedPtr& p) { assign(p.get()); return *this; }
+    SharedPtr& operator=(SharedPtr&& p) { swap(p); return *this; }
+    template<typename U>
+    SharedPtr& operator=(const SharedPtr<U>& p) { assign(p.get()); return *this; }
 
-  T* operator->(void) const
-  { return _ptr; }
+    T* operator->() const noexcept { return _ptr; }
+    T& operator*() const noexcept { return *_ptr; }
 
-  T& operator*(void) const
-  { return *_ptr; }
+    T* get() const noexcept { return _ptr; }
+    T* release() noexcept {
+      T* tmp = _ptr;
+      _ptr = 0;
+      T::release(tmp);
+      return tmp;
+    }
 
-  T* get() const
-  { return _ptr; }
-  T* release()
-  { T* tmp = _ptr; _ptr = 0; T::release(tmp); return tmp; }
-  SharedPtr take()
-  { SharedPtr sharedPtr; sharedPtr.swap(*this); return sharedPtr; }
+    bool valid() const noexcept { return 0 != _ptr; }
 
-  bool isShared(void) const
-  { return T::shared(_ptr); }
-  unsigned getNumRefs(void) const
-  { return T::count(_ptr); }
+    void reset() {
+      T* tmp = _ptr;
+      _ptr = 0;
+      if (!T::decRef(tmp))
+        T::destruct(tmp);
+    }
+    SharedPtr& swap(SharedPtr& sharedPtr) {
+      T* tmp = _ptr;
+      _ptr = sharedPtr._ptr;
+      sharedPtr._ptr = tmp;
+      return *this;
+    }
 
-  bool valid(void) const
-  { return 0 != _ptr; }
+  private:
+    void assign(T* p) {
+      T::incRef(p);
+      reset();
+      _ptr = p; }
+    void assignFirst(T* p) {
+      T::getFirst(p);
+      reset();
+      _ptr = p; }
+    // helper for WeakPtr
+    void assignNonRef(T* p) { reset(); _ptr = p; }
 
-  void clear()
-  { put(); }
-  SharedPtr& swap(SharedPtr& sharedPtr)
-  { T* tmp = _ptr; _ptr = sharedPtr._ptr; sharedPtr._ptr = tmp; return *this; }
+    // The reference itself.
+    T* _ptr;
 
-private:
-  void assign(T* p)
-  { T::get(p); put(); _ptr = p; }
-  void assignFirst(T* p)
-  { T::getFirst(p); put(); _ptr = p; }
-  void assignNonRef(T* p)
-  { put(); _ptr = p; }
-
-  void put(void)
-  { T* tmp = _ptr; _ptr = 0; if (!T::put(tmp)) T::destruct(tmp); }
-
-  // The reference itself.
-  T* _ptr;
-
-  template<typename U>
-  friend class WeakPtr;
+    template<typename U>
+    friend class WeakPtr;
 };
 
-// Hmmm, what if we get an automatic cast to a shared pointer of a fresh
-// allocated object pointer?
-// This will be gone after destruction of the temporary object ...
-// The same applies to the < operator below ...
+#pragma warning(push)
+#pragma warning(disable : 26409) // Avoid calling new and delete explicitly, use std::make_unique<T> instead
+template<class T, class ...Args>
+SharedPtr<T> MakeShared(Args&&... args)
+{
+  return SharedPtr<T>(new T(std::forward<Args>(args)...));
+}
+#pragma warning(pop)
 
 template<typename T>
 inline bool
 operator==(const SharedPtr<T>& sharedPtr0, const SharedPtr<T>& sharedPtr1)
-{ return sharedPtr0.get() == sharedPtr1.get(); }
+{
+  return sharedPtr0.get() == sharedPtr1.get();
+}
+
+template<typename T>
+inline bool
+operator==(const SharedPtr<T>& sharedPtr0, std::nullptr_t)
+{
+  return sharedPtr0.get() == nullptr;
+}
 
 template<typename T>
 inline bool
 operator!=(const SharedPtr<T>& sharedPtr0, const SharedPtr<T>& sharedPtr1)
-{ return sharedPtr0.get() != sharedPtr1.get(); }
+{
+  return sharedPtr0.get() != sharedPtr1.get();
+}
+
+template<typename T>
+inline bool
+operator!=(const SharedPtr<T>& sharedPtr0, std::nullptr_t)
+{
+  return sharedPtr0.get() != nullptr;
+}
 
 template<typename T>
 inline bool
 operator<(const SharedPtr<T>& sharedPtr0, const SharedPtr<T>& sharedPtr1)
-{ return sharedPtr0.get() < sharedPtr1.get(); }
+{
+  return sharedPtr0.get() < sharedPtr1.get();
+}
 
 } // namespace OpenRTI
 

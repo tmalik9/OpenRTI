@@ -29,10 +29,9 @@ namespace OpenRTI {
 
 class OPENRTI_LOCAL Region {
 public:
-  Region()
-  { }
-  Region(const Region& region) :
-    _dimensionHandleRangeBoundsMap(region._dimensionHandleRangeBoundsMap)
+  Region() noexcept { }
+  Region(const Region& region)
+    : _dimensionHandleRangeBoundsMap(region._dimensionHandleRangeBoundsMap)
   { }
   // The datatype held in messages
   Region(const RegionValue& regionValue)

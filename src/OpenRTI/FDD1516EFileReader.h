@@ -23,6 +23,7 @@
 #include <iosfwd>
 #include <string>
 #include "Export.h"
+#include "Message.h"
 
 namespace OpenRTI {
 
@@ -30,7 +31,7 @@ class FOMStringModule;
 
 class OPENRTI_API FDD1516EFileReader {
 public:
-  static FOMStringModule read(std::istream& stream, const std::string& encoding);
+  static FOMStringModule2 read(std::istream& stream, const std::string& encoding);
 };
 
 } // namespace OpenRTI

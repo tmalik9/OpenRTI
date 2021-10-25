@@ -25,6 +25,8 @@
 namespace OpenRTI {
 
 class OPENRTI_API AbstractThreadLocal {
+public:
+  static void shutdown();
 protected:
   AbstractThreadLocal();
   ~AbstractThreadLocal();

@@ -50,7 +50,7 @@
 // OPENRTI_API is used for the public API symbols. It either DLL imports or DLL exports (or does nothing for static build)
 // OPENRTI_LOCAL is used for non-api symbols.
 
-#ifdef OPENRTI_DLL // defined if OPENRTI is compiled as a DLL
+#if defined(OPENRTI_DLL) && !defined(OPENRTI_STANDALONE_TESTS) // defined if OPENRTI is compiled as a DLL
 # ifdef OPENRTI_DLL_EXPORTS // defined if we are building the OPENRTI DLL (instead of using it)
 #  define OPENRTI_API OPENRTI_HELPER_DLL_EXPORT
 # else

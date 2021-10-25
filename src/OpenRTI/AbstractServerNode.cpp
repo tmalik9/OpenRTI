@@ -17,15 +17,16 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractServerNode.h"
 
 namespace OpenRTI {
 
-AbstractServerNode::AbstractServerNode()
+AbstractServerNode::AbstractServerNode() noexcept
 {
 }
 
-AbstractServerNode::~AbstractServerNode()
+AbstractServerNode::~AbstractServerNode() noexcept
 {
 }
 

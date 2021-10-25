@@ -22,7 +22,6 @@
     </ClCompile>
     <Link>
       <GenerateMapFile>false</GenerateMapFile>
-      <GenerateDebugInformation>DebugFastLink</GenerateDebugInformation>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>

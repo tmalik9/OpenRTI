@@ -169,53 +169,42 @@ public:
 
   class byte_iterator : public _byte_iterator<VariableLengthDataList::iterator> {
   public:
-    byte_iterator()
-    { }
-    byte_iterator(const byte_iterator& i) :
-      _byte_iterator<VariableLengthDataList::iterator>(i)
-    { }
-    byte_iterator(const VariableLengthDataList::iterator& i) :
-      _byte_iterator<VariableLengthDataList::iterator>(i)
-    { }
-    void* data() const
-    { return _listIterator->data(_offset); }
+    byte_iterator() { }
+    byte_iterator(const byte_iterator& i) : _byte_iterator<VariableLengthDataList::iterator>(i) { }
+    byte_iterator(const VariableLengthDataList::iterator& i) : _byte_iterator<VariableLengthDataList::iterator>(i) { }
+    byte_iterator(byte_iterator&&) = default;
+    byte_iterator& operator=(const byte_iterator& i) = default;
+    byte_iterator& operator=(byte_iterator&&) = default;
+
+    void* data() const { return _listIterator->data(_offset); }
   };
 
   class const_byte_iterator : public _byte_iterator<VariableLengthDataList::const_iterator> {
   public:
     const_byte_iterator()
     { }
-    const_byte_iterator(const const_byte_iterator& i) :
-      _byte_iterator<VariableLengthDataList::const_iterator>(i)
-    { }
-    const_byte_iterator(const byte_iterator& i) :
-      _byte_iterator<VariableLengthDataList::const_iterator>(i)
-    { }
-    const_byte_iterator(const VariableLengthDataList::const_iterator& i) :
-      _byte_iterator<VariableLengthDataList::const_iterator>(i)
-    { }
-    const_byte_iterator(const VariableLengthDataList::iterator& i) :
-      _byte_iterator<VariableLengthDataList::const_iterator>(i)
-    { }
-    const void* data() const
-    { return _listIterator->data(_offset); }
+    const_byte_iterator(const const_byte_iterator& i) : _byte_iterator<VariableLengthDataList::const_iterator>(i) { }
+    const_byte_iterator(const_byte_iterator&& i) = default;
+    const_byte_iterator(const byte_iterator& i) : _byte_iterator<VariableLengthDataList::const_iterator>(i) { }
+    const_byte_iterator(const VariableLengthDataList::const_iterator& i) : _byte_iterator<VariableLengthDataList::const_iterator>(i) { }
+    const_byte_iterator(const VariableLengthDataList::iterator& i) : _byte_iterator<VariableLengthDataList::const_iterator>(i) { }
+    const_byte_iterator& operator=(const const_byte_iterator& i) = default;
+    const_byte_iterator& operator=(const_byte_iterator&&) = default;
+
+    const void* data() const { return _listIterator->data(_offset); }
   };
 
-  byte_iterator byte_begin()
-  { return begin(); }
-  byte_iterator byte_end()
-  { return end(); }
+  byte_iterator byte_begin() noexcept { return begin(); }
+  byte_iterator byte_end() noexcept { return end(); }
 
-  const_byte_iterator byte_begin() const
-  { return begin(); }
-  const_byte_iterator byte_end() const
-  { return end(); }
+  const_byte_iterator byte_begin() const noexcept { return begin(); }
+  const_byte_iterator byte_end() const noexcept { return end(); }
 
   // SLOW
-  size_t byte_size() const
+  size_t byte_size(const_byte_iterator begin, const_byte_iterator end) const
   {
     size_t result = 0;
-    for (auto iter=begin(); iter != end(); iter++)
+    for (auto iter=begin.iterator(); iter != end.iterator(); iter++)
     {
       result += iter->size();
     }

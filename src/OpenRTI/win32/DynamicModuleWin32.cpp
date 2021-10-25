@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "DynamicModule.h"
 
 #include "StringUtils.h"

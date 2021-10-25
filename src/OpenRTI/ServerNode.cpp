@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ServerNode.h"
 
 #include <algorithm>
@@ -26,45 +27,55 @@
 #include "LogStream.h"
 #include "ServerModel.h"
 #include "ServerOptions.h"
+#include "mom/MomServer.h"
+#include "mom/AbstractFederateMetrics.h"
+#include "StringUtils.h"
+#include "TranslateTypes.h"
 
 namespace OpenRTI {
 
-class OPENRTI_LOCAL FederationServer : public ServerModel::Federation {
+inline std::string to_string(const ConnectHandleSet& connectHandleSet)
+{
+  StringList resultList;
+  for (auto& connectHandle : connectHandleSet)
+  {
+    resultList.push_back(connectHandle.toString());
+  }
+  return join(resultList, ", ", false);
+}
+
+class OPENRTI_LOCAL FederationServer final : public ServerModel::Federation {
 public:
   FederationServer(ServerModel::Node& serverNode) :
-    ServerModel::Federation(serverNode),
-    _parentPermitTimeRegulation(true)
+    ServerModel::Federation(serverNode)
   { }
   virtual ~FederationServer()
-  { }
-
-  void setParentConfigurationParameterMap(const ConfigurationParameterMap& configurationParameterMap)
   {
-    ConfigurationParameterMap::const_iterator i;
-    // time regulation is by default permittet, but may be denied due to parent server policy
-    i = configurationParameterMap.find("permitTimeRegulation");
-    if (i != configurationParameterMap.end() && !i->second.empty()) {
-      _parentPermitTimeRegulation = (i->second.front() == "true");
-    } else {
-      _parentPermitTimeRegulation = true;
-    }
   }
 
-  void accept(const ConnectHandle& connectHandle, const InsertModulesMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const InsertModulesMessage* message)
   {
-    broadcastToChildren(message);
+    broadcastToChildren(SharedPtr<const AbstractMessage>(message));
     insert(message->getFOMModuleList());
   }
 
   void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionRequestMessage* message)
   {
+    JoinFederationExecutionRequest2Message message2 = TranslateTypes::translate(*message);
+    accept(connectHandle, &message2);
+  }
+
+  void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionRequest2Message* message)
+  {
     OpenRTIAssert(isRootServer());
 
     if (!message->getFederateName().empty() && isFederateNameInUse(message->getFederateName())) {
       SharedPtr<JoinFederationExecutionResponseMessage> response;
-      response = new JoinFederationExecutionResponseMessage;
+      response = MakeShared<JoinFederationExecutionResponseMessage>();
       response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseFederateNameAlreadyInUse);
       response->setExceptionString(message->getFederateName());
+      response->setFederateName(message->getFederateName());
+      response->setFederateType(message->getFederateType());
       getServerNode().send(connectHandle, response);
       return;
     }
@@ -76,16 +87,19 @@ public:
         insert(moduleHandleVector, message->getFOMStringModuleList());
       } catch (OpenRTI::Exception& e) {
         SharedPtr<JoinFederationExecutionResponseMessage> response;
-        response = new JoinFederationExecutionResponseMessage;
+        response = MakeShared<JoinFederationExecutionResponseMessage>();
         response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseInconsistentFDD);
         response->setExceptionString(e.what());
+        response->setFederateName(message->getFederateName());
         getServerNode().send(connectHandle, response);
         return;
       }
-
+      
+      // TBD: Here we should check the protocol version for each recipient and send the appropriate message.
+      // This should be done in broadcastToChildren. For now we stay clear and stick with the oldest message type.
       if (!moduleHandleVector.empty()) {
         SharedPtr<InsertModulesMessage> insertModules;
-        insertModules = new InsertModulesMessage;
+        insertModules = MakeShared<InsertModulesMessage>();
         getModuleList(insertModules->getFOMModuleList(), moduleHandleVector);
         insertModules->setFederationHandle(getFederationHandle());
         broadcastToChildren(insertModules);
@@ -96,6 +110,7 @@ public:
     ServerModel::Federate* federate = new ServerModel::Federate(*this);
     federate->setName(message->getFederateName());
     federate->setFederateType(message->getFederateType());
+    federate->setIsInternal(message->getIsInternal());
     insert(*federate);
 
     // Survived so far, insert a new federation connect
@@ -108,7 +123,7 @@ public:
 
     // Respond with Success
     SharedPtr<JoinFederationExecutionResponseMessage> response;
-    response = new JoinFederationExecutionResponseMessage;
+    response = MakeShared<JoinFederationExecutionResponseMessage>();
     response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseSuccess);
     response->setFederationHandle(getFederationHandle());
     response->setFederateHandle(federate->getFederateHandle());
@@ -117,11 +132,12 @@ public:
     send(connectHandle, response);
 
     // send all children the notification about the new federate except the one that gets the join response
-    SharedPtr<JoinFederateNotifyMessage> notify = new JoinFederateNotifyMessage;
+    SharedPtr<JoinFederateNotifyMessage> notify = MakeShared<JoinFederateNotifyMessage>();
     notify->setFederationHandle(getFederationHandle());
     notify->setFederateHandle(federate->getFederateHandle());
     notify->setFederateName(federate->getName());
     notify->setFederateType(federate->getFederateType());
+    notify->setIsInternal(federate->getIsInternal());
     broadcastToChildren(connectHandle, notify);
 
     // For those sync request that are automatically extended to new federates, send the announcement
@@ -130,11 +146,11 @@ public:
       // only those with an auto expanding federate set
       if (!j->getAddJoiningFederates())
         continue;
-
+      if (federate->getIsInternal())
+        continue;
       j->insert(*federate);
 
-      SharedPtr<AnnounceSynchronizationPointMessage> announce;
-      announce = new AnnounceSynchronizationPointMessage;
+      SharedPtr<AnnounceSynchronizationPointMessage> announce = MakeShared<AnnounceSynchronizationPointMessage>();
       announce->setFederationHandle(getFederationHandle());
       announce->setLabel(j->getLabel());
       announce->setTag(j->getTag());
@@ -155,7 +171,7 @@ public:
     federate->setFederateType(message->getFederateType());
 
     // send all children the notification about the new federate except the one that gets the join response
-    SharedPtr<JoinFederateNotifyMessage> notify = new JoinFederateNotifyMessage;
+    SharedPtr<JoinFederateNotifyMessage> notify = MakeShared<JoinFederateNotifyMessage>();
     notify->setFederationHandle(message->getFederationHandle());
     notify->setFederateHandle(message->getFederateHandle());
     notify->setFederateType(message->getFederateType());
@@ -182,7 +198,15 @@ public:
     // remove from time management
     if (federate->getIsTimeRegulating()) {
       eraseTimeRegulating(*federate);
-      SharedPtr<DisableTimeRegulationRequestMessage> request = new DisableTimeRegulationRequestMessage;
+      SharedPtr<DisableTimeRegulationRequestMessage> request = MakeShared<DisableTimeRegulationRequestMessage>();
+      request->setFederationHandle(getFederationHandle());
+      request->setFederateHandle(federateHandle);
+      broadcast(connectHandle, request);
+    }
+
+    if (federate->getIsTimeConstrained()) {
+      eraseTimeConstrained(*federate);
+      SharedPtr<DisableTimeConstrainedNotifyMessage> request = MakeShared<DisableTimeConstrainedNotifyMessage>();
       request->setFederationHandle(getFederationHandle());
       request->setFederateHandle(federateHandle);
       broadcast(connectHandle, request);
@@ -194,7 +218,7 @@ public:
         ++k;
       else {
         SharedPtr<SynchronizationPointAchievedMessage> achieved;
-        achieved = new SynchronizationPointAchievedMessage;
+        achieved = MakeShared<SynchronizationPointAchievedMessage>();
         achieved->setFederationHandle(getFederationHandle());
         achieved->setLabel(k->getSynchronization().getLabel());
         achieved->getFederateHandleBoolPairVector().push_back(FederateHandleBoolPair(federate->getFederateHandle(), false));
@@ -207,9 +231,10 @@ public:
 
     // If we are a root server ...
     if (isRootServer()) {
+      // after the messaging the mom server will be emptied already ...
       // ... and respond with Success
       /// FIXME shall we get that message from the federation server???
-      SharedPtr<ResignFederateNotifyMessage> notify = new ResignFederateNotifyMessage;
+      SharedPtr<ResignFederateNotifyMessage> notify = MakeShared<ResignFederateNotifyMessage>();
       notify->setFederateHandle(federateHandle);
       notify->setFederationHandle(getFederationHandle());
       broadcastToChildren(notify);
@@ -225,7 +250,7 @@ public:
     // If we have an upstream connect, mark this request as pending and ask the parent server
     else {
       /// FIXME in case of a dying parent, we need to reevaluate this too
-      sendToParent(message);
+      sendToParent(SharedPtr<const AbstractMessage>(message));
     }
   }
 
@@ -248,6 +273,10 @@ public:
     OpenRTIAssert(federate);
     federate->setResignAction(message->getResignAction());
 
+    if (getMomServer() != nullptr && federateHandle == getMomServer()->getOwnerFederate())
+    {
+      resignMomServer();
+    }
     resignConnect(connectHandle);
   }
 
@@ -261,8 +290,7 @@ public:
       if (Unpublished == interactionClass->getPublicationType())
         continue;
 
-      SharedPtr<ChangeInteractionClassPublicationMessage> message;
-      message = new ChangeInteractionClassPublicationMessage;
+      SharedPtr<ChangeInteractionClassPublicationMessage> message = MakeShared<ChangeInteractionClassPublicationMessage>();
       message->setFederationHandle(getFederationHandle());
       message->setPublicationType(Published);
       message->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
@@ -284,8 +312,7 @@ public:
       if (attributeHandleVector.empty())
         continue;
 
-      SharedPtr<ChangeObjectClassPublicationMessage> message;
-      message = new ChangeObjectClassPublicationMessage;
+      SharedPtr<ChangeObjectClassPublicationMessage> message = MakeShared<ChangeObjectClassPublicationMessage>();
       message->setFederationHandle(getFederationHandle());
       message->setPublicationType(Published);
       message->setObjectClassHandle(i->getObjectClassHandle());
@@ -305,18 +332,18 @@ public:
 
     for (ServerModel::Federate::HandleMap::const_iterator i = getFederateHandleFederateMap().begin();
          i != getFederateHandleFederateMap().end(); ++i) {
-      SharedPtr<ResignFederateNotifyMessage> notify = new ResignFederateNotifyMessage;
+      SharedPtr<ResignFederateNotifyMessage> notify = MakeShared<ResignFederateNotifyMessage>();
       notify->setFederationHandle(getFederationHandle());
       notify->setFederateHandle(i->getFederateHandle());
       federationConnect->send(notify);
     }
 
     SharedPtr<EraseFederationExecutionMessage> response;
-    response = new EraseFederationExecutionMessage;
+    response = MakeShared<EraseFederationExecutionMessage>();
     response->setFederationHandle(getFederationHandle());
-    federationConnect->send(response);
+    federationConnect->sendAndDeactivate(response);
 
-    federationConnect->setActive(false);
+    //federationConnect->setActive(false);
   }
 
   void broadcastEraseFederationExecution()
@@ -337,7 +364,7 @@ public:
     ServerModel::Federate* federate = insertFederate(connectHandle, message->getFederateName(), federateHandle);
     OpenRTIAssert(federate);
     federate->setFederateType(message->getFederateType());
-    broadcastToChildren(message);
+    broadcastToChildren(SharedPtr<const AbstractMessage>(message));
   }
   void accept(const ConnectHandle& connectHandle, const ResignFederateNotifyMessage* message)
   {
@@ -345,7 +372,7 @@ public:
     ServerModel::Federate* federate = getFederate(message->getFederateHandle());
     if (!federate)
       throw MessageError("Received ResignFederateNotify for unknown federate!");
-    broadcastToChildren(message);
+    broadcastToChildren(SharedPtr<const AbstractMessage>(message));
 
     // FIXME can we simplify this and remove the federate on upstream resign?
     ServerModel::FederationConnect* federationConnect = federate->getFederationConnect();
@@ -372,7 +399,7 @@ public:
     if (!federate)
       throw MessageError("Got ChangeAutomaticResignDirectiveMessage for an unknown federate!");
     federate->setResignAction(message->getResignAction());
-    broadcast(connectHandle, message);
+    broadcast(connectHandle, SharedPtr<const AbstractMessage>(message));
   }
 
   // Synchronization labels
@@ -387,7 +414,7 @@ public:
       // label is already there
       if (_synchronizationNameSynchronizationMap.find(message->getLabel()) != _synchronizationNameSynchronizationMap.end()) {
         SharedPtr<RegisterFederationSynchronizationPointResponseMessage> response;
-        response = new RegisterFederationSynchronizationPointResponseMessage;
+        response = MakeShared<RegisterFederationSynchronizationPointResponseMessage>();
         response->setFederationHandle(getFederationHandle());
         response->setLabel(message->getLabel());
         response->setFederateHandle(message->getFederateHandle());
@@ -425,7 +452,7 @@ public:
 
       // Respond to the originator
       SharedPtr<RegisterFederationSynchronizationPointResponseMessage> response;
-      response = new RegisterFederationSynchronizationPointResponseMessage;
+      response = MakeShared<RegisterFederationSynchronizationPointResponseMessage>();
       response->setFederationHandle(getFederationHandle());
       response->setLabel(message->getLabel());
       response->setFederateHandle(message->getFederateHandle());
@@ -449,7 +476,7 @@ public:
           continue;
 
         SharedPtr<AnnounceSynchronizationPointMessage> announce;
-        announce = new AnnounceSynchronizationPointMessage;
+        announce = MakeShared<AnnounceSynchronizationPointMessage>();
         announce->setFederationHandle(getFederationHandle());
         announce->setLabel(message->getLabel());
         announce->setTag(i->getTag());
@@ -462,18 +489,18 @@ public:
     else {
       // ... ask your father
       /// FIXME in case of a dying parent, we need to reevaluate this too
-      sendToParent(message);
+      sendToParent(SharedPtr<const AbstractMessage>(message));
     }
   }
-  void accept(const ConnectHandle& connectHandle, const RegisterFederationSynchronizationPointResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const RegisterFederationSynchronizationPointResponseMessage* message)
   {
     if (message->getLabel().empty())
       throw MessageError("Received empty label in RegisterFederationSynchronizationPointResponseMessage!");
 
-    send(message->getFederateHandle(), message);
+    send(message->getFederateHandle(), SharedPtr<const AbstractMessage>(message));
   }
 
-  void accept(const ConnectHandle& connectHandle, const AnnounceSynchronizationPointMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const AnnounceSynchronizationPointMessage* message)
   {
     if (message->getLabel().empty())
       throw MessageError("Received empty label in AnnounceSynchronizationPointMessage!");
@@ -503,6 +530,8 @@ public:
         ServerModel::Federate* federate = getFederate(*j);
         if (!federate)
           continue;
+        if (federate->getIsInternal())
+          continue;
         ServerModel::FederationConnect* federationConnect = federate->getFederationConnect();
         if (!federationConnect)
           continue;
@@ -522,7 +551,7 @@ public:
     for (std::map<ConnectHandle, FederateHandleVector>::iterator j = connectHandleFederateHandleVectorMap.begin();
          j != connectHandleFederateHandleVectorMap.end(); ++j) {
       SharedPtr<AnnounceSynchronizationPointMessage> announce;
-      announce = new AnnounceSynchronizationPointMessage;
+      announce = MakeShared<AnnounceSynchronizationPointMessage>();
       announce->setFederationHandle(getFederationHandle());
       announce->setLabel(message->getLabel());
       announce->setTag(message->getTag());
@@ -531,7 +560,7 @@ public:
       send(j->first, announce);
     }
   }
-  void accept(const ConnectHandle& connectHandle, const SynchronizationPointAchievedMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const SynchronizationPointAchievedMessage* message)
   {
     ServerModel::Synchronization::NameMap::iterator i = _synchronizationNameSynchronizationMap.find(message->getLabel());
     if (i == _synchronizationNameSynchronizationMap.end())
@@ -544,7 +573,7 @@ public:
     if (i->_waitingFederateSyncronizationMap.empty()) {
       if (isRootServer()) {
         SharedPtr<FederationSynchronizedMessage> response;
-        response = new FederationSynchronizedMessage;
+        response = MakeShared<FederationSynchronizedMessage>();
         response->setFederationHandle(getFederationHandle());
         response->setLabel(message->getLabel());
         response->getFederateHandleBoolPairVector().reserve(i->_achievedFederateSyncronizationMap.size());
@@ -558,7 +587,7 @@ public:
         ServerModel::Synchronization::NameMap::erase(*i);
       } else {
         SharedPtr<SynchronizationPointAchievedMessage> achieved;
-        achieved = new SynchronizationPointAchievedMessage;
+        achieved = MakeShared<SynchronizationPointAchievedMessage>();
         achieved->setFederationHandle(getFederationHandle());
         achieved->setLabel(message->getLabel());
         achieved->getFederateHandleBoolPairVector().reserve(i->_achievedFederateSyncronizationMap.size());
@@ -570,7 +599,7 @@ public:
       }
     }
   }
-  void accept(const ConnectHandle& connectHandle, const FederationSynchronizedMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const FederationSynchronizedMessage* message)
   {
     ServerModel::Synchronization::NameMap::iterator i = _synchronizationNameSynchronizationMap.find(message->getLabel());
     if (i == _synchronizationNameSynchronizationMap.end())
@@ -598,11 +627,11 @@ public:
       federateHandleBoolPairVector.push_back(*j);
     }
 
-    // ... then send them out throught the connect.
+    // ... then send them out through the connect.
     for (std::map<ConnectHandle, FederateHandleBoolPairVector>::iterator j = connectHandleFederateHandleVectorMap.begin();
          j != connectHandleFederateHandleVectorMap.end(); ++j) {
       SharedPtr<FederationSynchronizedMessage> synchronized;
-      synchronized = new FederationSynchronizedMessage;
+      synchronized = MakeShared<FederationSynchronizedMessage>();
       synchronized->setFederationHandle(getFederationHandle());
       synchronized->setLabel(message->getLabel());
       synchronized->getFederateHandleBoolPairVector().swap(j->second);
@@ -623,35 +652,32 @@ public:
     OpenRTIAssert(federationConnect);
     // OpenRTIAssert(federationConnect->getConnectHandle() == connectHandle);
 
-    // A correctly programmed ambassador already denies the enable request.
-    // So this is an error terminating the connection if somebody asks for that if it should not do so.
-    if (!federationConnect->getPermitTimeRegulation())
-      throw MessageError("EnableTimeRegulationRequestMessage from unauthorized connect!");
-
     if (isRootServer() || federationConnect->getIsParentConnect()) {
-      // Note that this message really loops back to the requestor.
-      // The requestor needs to know which federates he needs to wait for.
+      // Note that this message really loops back to the requester.
+      // The requester needs to know which federates he needs to wait for.
       // see an explanation in the ambassador's time management code
 
       if (federate->getIsTimeRegulating())
-        throw MessageError("EnableTimeRegulationRequestMessage for already time regulaitng federate!");
+        throw MessageError("EnableTimeRegulationRequestMessage for already time regulating federate!");
       insertTimeRegulating(*federate);
       federate->setTimeAdvanceTimeStamp(message->getTimeStamp());
       federate->setNextMessageTimeStamp(message->getTimeStamp());
       federate->setCommitId(message->getCommitId());
-      broadcastToChildren(message);
+      broadcastToChildren(SharedPtr<const AbstractMessage>(message));
     } else {
-      sendToParent(message);
+      sendToParent(SharedPtr<const AbstractMessage>(message));
       // FIXME:
       // If we really want to work well with a parent vanishing in between, we need to
       // store the outstanding requests here and on loosing connection to a parent complete
       // the role as root server ...
     }
   }
+
   void accept(const ConnectHandle&, const EnableTimeRegulationResponseMessage* message)
   {
-    send(message->getFederateHandle(), message);
+    send(message->getFederateHandle(), SharedPtr<const AbstractMessage>(message));
   }
+
   void accept(const ConnectHandle& connectHandle, const DisableTimeRegulationRequestMessage* message)
   {
     ServerModel::Federate* federate = getFederate(message->getFederateHandle());
@@ -660,9 +686,47 @@ public:
     if (!federate->getIsTimeRegulating())
       throw MessageError("DisableTimeRegulationRequestMessage for non time regulating Federate!");
     // Don't bail out on anything. If the federate dies in between, we might need to clean up somehow
-    broadcast(connectHandle, message);
+    broadcast(connectHandle, SharedPtr<const AbstractMessage>(message));
     eraseTimeRegulating(*federate);
   }
+
+  // main purpose of this is to route it through to the appropriate MomFederate
+  void accept(const ConnectHandle& connectHandle, const EnableTimeConstrainedNotifyMessage* message)
+  {
+    ServerModel::Federate* federate = getFederate(message->getFederateHandle());
+    if (!federate)
+      throw MessageError("EnableTimeConstrainedNotifyMessage from unknown Federate!");
+
+    ServerModel::FederationConnect* federationConnect = getFederationConnect(connectHandle);
+    OpenRTIAssert(federationConnect);
+    if (isRootServer() || federationConnect->getIsParentConnect()) {
+
+      if (federate->getIsTimeConstrained())
+        throw MessageError("EnableTimeConstrainedRequestMessage for already time constrained federate!");
+
+      insertTimeConstrained(*federate);
+      broadcastToChildren(SharedPtr<const AbstractMessage>(message));
+    }
+    else {
+      sendToParent(SharedPtr<const AbstractMessage>(message));
+    }
+
+   // broadcast(connectHandle, message);
+  }
+
+  void accept(const ConnectHandle& connectHandle, const DisableTimeConstrainedNotifyMessage* message)
+  {
+    ServerModel::Federate* federate = getFederate(message->getFederateHandle());
+    if (!federate)
+      throw MessageError("DisableTimeConstrainedNotifyMessage from unknown Federate!");
+    if (!federate->getIsTimeConstrained())
+      throw MessageError("DisableTimeConstrainedNotifyMessage for non time constrained Federate!");
+    // Don't bail out on anything. If the federate dies in between, we might need to clean up somehow
+    broadcast(connectHandle, SharedPtr<const AbstractMessage>(message));
+
+    eraseTimeConstrained(*federate);
+  }
+  
   void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampMessage* message)
   {
     ServerModel::Federate* federate = getFederate(message->getFederateHandle());
@@ -690,28 +754,42 @@ public:
       break;
     }
 
-    // send to all time constrainted connects except to where it originates
+    // send to all time constrained connects except to where it originates
     // Hmm, send to all federates. The problem is that non time constrained federates
     // must be able to query the GALT for itself, which is only possible if they know the time advances
     // of each regulating federate, thus just broadcast
-    broadcast(connectHandle, message);
+
+    if (getTimeConstrainedFederationConnectList().empty())
+    {
+      broadcast(connectHandle, SharedPtr<const AbstractMessage>(message));
+    }
+    else
+    {
+      for (ServerModel::FederationConnect::TimeConstrainedList::iterator i = getTimeConstrainedFederationConnectList().begin();
+        i != getTimeConstrainedFederationConnectList().end(); ++i) {
+        if (connectHandle == i->getConnectHandle())
+          continue;
+        i->send(SharedPtr<const AbstractMessage>(message));
+      }
+    }
+
   }
-  void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const CommitLowerBoundTimeStampResponseMessage* message)
   {
-    send(message->getFederateHandle(), message);
+    send(message->getFederateHandle(), SharedPtr<const AbstractMessage>(message));
   }
   void accept(const ConnectHandle& connectHandle, const LockedByNextMessageRequestMessage* message)
   {
     // Only time regulating federates are interrested in this message.
     // May be we should at one point track and store this connect handle set.
-    for (ServerModel::FederationConnect::SecondList::iterator i = getTimeRegulatingFederationConnectList().begin();
+    for (ServerModel::FederationConnect::TimeRegulatingList::iterator i = getTimeRegulatingFederationConnectList().begin();
          i != getTimeRegulatingFederationConnectList().end(); ++i) {
       if (connectHandle == i->getConnectHandle())
         continue;
-      i->send(message);
+
+      i->send(SharedPtr<const AbstractMessage>(message));
     }
   }
-
 
   // Regions
   void accept(const ConnectHandle& connectHandle, const InsertRegionMessage* message)
@@ -724,7 +802,7 @@ public:
       region->_dimensionHandleSet = i->second;
     }
 
-    broadcast(connectHandle, message);
+    broadcast(connectHandle, SharedPtr<const AbstractMessage>(message));
   }
   void accept(const ConnectHandle& connectHandle, const CommitRegionMessage* message)
   {
@@ -736,7 +814,7 @@ public:
       region->_regionValue = i->second;
     }
 
-    broadcast(connectHandle, message);
+    broadcast(connectHandle, SharedPtr<const AbstractMessage>(message));
   }
   void accept(const ConnectHandle& connectHandle, const EraseRegionMessage* message)
   {
@@ -748,85 +826,23 @@ public:
       delete region;
     }
 
-    broadcast(connectHandle, message);
+    broadcast(connectHandle, SharedPtr<const AbstractMessage>(message));
   }
 
   // (un)publish messages for interactions
-  void accept(const ConnectHandle& connectHandle, const ChangeInteractionClassPublicationMessage* message)
-  {
-    ServerModel::InteractionClass* interactionClass = getInteractionClass(message->getInteractionClassHandle());
-    if (!interactionClass)
-      return;
-    // Change publication type for this connect ...
-    ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
-    propagationConnectPair = interactionClass->setPublicationType(connectHandle, message->getPublicationType());
-    //DebugPrintf("%s(ChangeInteractionClassPublicationMessage): iclass=%s connectHandle=%s propagation=%s publishers=%s\n", __FUNCTION__, 
-    //            interactionClass->getFQName().c_str(),
-    //            connectHandle.toString().c_str(),
-    //            to_string(propagationConnectPair.first).c_str(),
-    //            to_string(interactionClass->getPublishingConnectHandleSet()).c_str()
-    //            );
-    // ... and propagate further if required.
-    switch (propagationConnectPair.first) {
-    case ServerModel::PropagateBroadcast:
-      broadcast(connectHandle, message);
-      break;
-    case ServerModel::PropagateSend:
-      send(propagationConnectPair.second, message);
-      break;
-    case ServerModel::PropagateNone:
-      break;
-    }
-
-    // See if and how we should respond to that publication
-    SubscriptionType subscriptionType = interactionClass->getSubscriptionTypeToConnect(connectHandle);
-    if (subscriptionType != Unsubscribed) {
-      if (message->getPublicationType() == Published) {
-        if (interactionClass->hasFilterSubscriptions())
-        {
-          auto& subscribers = interactionClass->getSubscribedConnectHandleSet();
-          for (const ConnectHandle& subscriber : subscribers)
-          {
-            // send one message per subscriber
-            SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
-            subscription = new ChangeInteractionClassSubscriptionMessage;
-            subscription->setFederationHandle(getFederationHandle());
-            subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
-            subscription->setSubscriptionType(subscriptionType);
-            ParameterValueVector parameters = interactionClass->getParameterFilters(subscriber);
-            if (!parameters.empty())
-            {
-              subscription->setParameterFilterValues(parameters);
-            }
-            send(connectHandle, subscription);
-          }
-        }
-        else
-        {
-          // send one message, w/o filters
-          SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
-          subscription = new ChangeInteractionClassSubscriptionMessage;
-          subscription->setFederationHandle(getFederationHandle());
-          subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
-          subscription->setSubscriptionType(subscriptionType);
-          send(connectHandle, subscription);
-        }
-      } else { // != Published
-        SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
-        subscription = new ChangeInteractionClassSubscriptionMessage;
-        subscription->setFederationHandle(getFederationHandle());
-        subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
-        subscription->setSubscriptionType(Unsubscribed);
-        send(connectHandle, subscription);
-      }
-    }
-  }
-
   void accept(const ConnectHandle& connectHandle, const ChangeObjectClassPublicationMessage* message)
   {
     ServerModel::ObjectClass* objectClass = ServerModel::Federation::getObjectClass(message->getObjectClassHandle());
     if (!objectClass)
       return;
+    if (message->getPublicationType() == PublicationType::Unpublished)
+    {
+      objectClassUnpublished(connectHandle, objectClass, message->getAttributeHandles());
+    }
+    else
+    {
+      objectClassPublished(connectHandle, objectClass, message->getAttributeHandles());
+    }
 
     // Build up the lists where to propagate what
     AttributeHandleVector broadcastAttributeHandles;
@@ -865,27 +881,27 @@ public:
     }
     if (!broadcastAttributeHandles.empty()) {
       SharedPtr<ChangeObjectClassPublicationMessage> request;
-      request = new ChangeObjectClassPublicationMessage;
+      request = MakeShared<ChangeObjectClassPublicationMessage>();
       request->setFederationHandle(message->getFederationHandle());
       request->setObjectClassHandle(message->getObjectClassHandle());
       request->getAttributeHandles().swap(broadcastAttributeHandles);
       request->setPublicationType(message->getPublicationType());
       broadcast(connectHandle, request);
     }
-    for (auto& [targetConnectHandle, attributeHandle] : sendAttributeHandlesMap) {
+    for (auto& it_targetConnectHandle_attributeHandle : sendAttributeHandlesMap) {
       SharedPtr<ChangeObjectClassPublicationMessage> request;
-      request = new ChangeObjectClassPublicationMessage;
+      request = MakeShared<ChangeObjectClassPublicationMessage>();
       request->setFederationHandle(message->getFederationHandle());
       request->setObjectClassHandle(message->getObjectClassHandle());
-      request->getAttributeHandles().swap(attributeHandle);
+      request->getAttributeHandles().swap(it_targetConnectHandle_attributeHandle.second);
       request->setPublicationType(message->getPublicationType());
-      send(targetConnectHandle, request);
+      send(it_targetConnectHandle_attributeHandle.first, request);
     }
 
     // Already existing subscriptions need to be sent to the new publishing connect
     if (!passiveSubscribeAttributeHandles.empty()) {
       SharedPtr<ChangeObjectClassSubscriptionMessage> subscription;
-      subscription = new ChangeObjectClassSubscriptionMessage;
+      subscription = MakeShared<ChangeObjectClassSubscriptionMessage>();
       subscription->setFederationHandle(getFederationHandle());
       subscription->setObjectClassHandle(objectClass->getObjectClassHandle());
       if (message->getPublicationType() == Published) {
@@ -898,7 +914,7 @@ public:
     }
     if (!activeSubscribeAttributeHandles.empty()) {
       SharedPtr<ChangeObjectClassSubscriptionMessage> subscription;
-      subscription = new ChangeObjectClassSubscriptionMessage;
+      subscription = MakeShared<ChangeObjectClassSubscriptionMessage>();
       subscription->setFederationHandle(getFederationHandle());
       subscription->setObjectClassHandle(objectClass->getObjectClassHandle());
       if (message->getPublicationType() == Published) {
@@ -918,7 +934,7 @@ public:
          j != getInteractionClassHandleInteractionClassMap().end(); ++j) {
       if (j->getPublicationType(connectHandle) == Unpublished)
         continue;
-      SharedPtr<ChangeInteractionClassPublicationMessage> message = new ChangeInteractionClassPublicationMessage;
+      SharedPtr<ChangeInteractionClassPublicationMessage> message = MakeShared<ChangeInteractionClassPublicationMessage>();
       message->setFederationHandle(getFederationHandle());
       message->setPublicationType(Unpublished);
       message->setInteractionClassHandle(j->getInteractionClassHandle());
@@ -936,12 +952,105 @@ public:
       }
       if (attributeHandleVector.empty())
         continue;
-      SharedPtr<ChangeObjectClassPublicationMessage> message = new ChangeObjectClassPublicationMessage;
+      SharedPtr<ChangeObjectClassPublicationMessage> message = MakeShared<ChangeObjectClassPublicationMessage>();
       message->setFederationHandle(getFederationHandle());
       message->setPublicationType(Unpublished);
       message->setObjectClassHandle(j->getObjectClassHandle());
       message->getAttributeHandles().swap(attributeHandleVector);
       accept(connectHandle, message.get());
+    }
+  }
+
+  void accept(const ConnectHandle& connectHandle, const ChangeInteractionClassPublicationMessage* message)
+  {
+    ServerModel::InteractionClass* interactionClass = getInteractionClass(message->getInteractionClassHandle());
+    if (!interactionClass)
+      return;
+    // Change publication type for this connect ...
+    ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
+    propagationConnectPair = interactionClass->setPublicationType(connectHandle, message->getPublicationType());
+    if (message->getPublicationType() == PublicationType::Unpublished)
+    {
+      interactionClassUnpublished(connectHandle, interactionClass);
+    }
+    else
+    {
+      interactionClassPublished(connectHandle, interactionClass);
+    }
+
+    // ... and propagate further if required.
+    switch (propagationConnectPair.first)
+    {
+      case ServerModel::PropagateBroadcast:
+        broadcast(connectHandle, SharedPtr<const AbstractMessage>(message));
+        break;
+
+      case ServerModel::PropagateSend:
+        send(propagationConnectPair.second, SharedPtr<const AbstractMessage>(message));
+        break;
+
+      case ServerModel::PropagateNone:
+        break;
+    }
+
+    // See if and how we should respond to that publication
+    // We need to tell the publisher (originator of the ChangeInteractionClassPublicationMessage) about possibly
+    // existing subscribers and their filters.
+    // getSubscriptionTypeToConnect yields Subscribed, if there are other subscribers besides
+    // the originator (designated by connectHandle).
+    if (message->getPublicationType() == Published)
+    {
+      // only care if the originator tells us he publishes sth.
+      SubscriptionType subscriptionType = interactionClass->getSubscriptionTypeToConnect(connectHandle);
+      if (subscriptionType != Unsubscribed)
+      {
+        if (interactionClass->hasFilterSubscriptions())
+        {
+          // there is at least one subscriber with filters - get their respective filter sets
+          auto& subscribers = interactionClass->getSubscribedConnectHandleSet();
+          for (const ConnectHandle& subscriber : subscribers)
+          {
+            // get the whole filter tuple set of the connection's subscription
+            std::list<ParameterValueVector> parameterFilters = interactionClass->getParameterFilters(subscriber);
+            if (parameterFilters.empty())
+            {
+              // the filter tuple is empty - never mind, send a regular, unfiltered subscription
+              SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
+              subscription = MakeShared<ChangeInteractionClassSubscriptionMessage>();
+              subscription->setFederationHandle(getFederationHandle());
+              subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
+              subscription->setSubscriptionType(subscriptionType);
+              send(connectHandle, subscription);
+            }
+            else
+            {
+              // the filter is not empty, send one message per tuple.
+              // ATTENTION SharedPtr's must not be reused here ...
+              for (auto& parameters : parameterFilters)
+              {
+                SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
+                subscription = MakeShared<ChangeInteractionClassSubscriptionMessage>();
+                subscription->setFederationHandle(getFederationHandle());
+                subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
+                subscription->setSubscriptionType(subscriptionType);
+                subscription->setParameterFilterValues(parameters);
+                send(connectHandle, subscription);
+              }
+            }
+          }
+        }
+        else
+        {
+          // send a regular, unfiltered subscription message to the publisher/originator
+          SharedPtr<ChangeInteractionClassSubscriptionMessage> subscription;
+          subscription = MakeShared<ChangeInteractionClassSubscriptionMessage>();
+          subscription->setFederationHandle(getFederationHandle());
+          subscription->setInteractionClassHandle(interactionClass->getInteractionClassHandle());
+          subscription->setSubscriptionType(subscriptionType);
+
+          send(connectHandle, subscription);
+        }
+      }
     }
   }
 
@@ -954,30 +1063,71 @@ public:
     // Change publication type for this connect ...
     ServerModel::PropagationTypeConnectHandlePair propagationConnectPair;
     ParameterValueVector parameterFilterValues = message->getParameterFilterValues();
-    propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, message->getSubscriptionType());
-    bool filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues);
+    bool filterChanged = false;
+    auto subscriptionType = message->getSubscriptionType();
+    // update federate metrics and interaction filters
+    if (subscriptionType == SubscriptionType::Unsubscribed)
+    {
+      interactionClassUnsubscribed(connectHandle, interactionClass);
+      if (!parameterFilterValues.empty())
+      {
+        // unsubscribe with filter: remove the parameter filter tuple
+        filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues, true);
+        if (!interactionClass->hasFilterSubscriptions(connectHandle))
+        {
+          // no filters left: remove the subscription
+          propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, SubscriptionType::Unsubscribed);
+        }
+        else
+        {
+          propagationConnectPair.first = ServerModel::PropagateBroadcast;
+        }
+      }
+      else
+      {
+        // unsubscribe completely: clear this connect's parameter filters
+        filterChanged = interactionClass->clearParameterFilters(connectHandle);
+        propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, SubscriptionType::Unsubscribed);
+      }
+    }
+    else
+    {
+      interactionClassSubscribed(connectHandle, interactionClass, subscriptionType == SubscribedActive);
+      // This can be somewhat finicky: if  parameterFilterValues is empty, this actually means to remove all filters 
+      // and subscribe without filter instead. But probably we don't want to clear out filters we once established,
+      // so we just add a match-all wildcard filter.
+      // Otoh if the interaction class was subscribed before without filters, and this call adds the first filter, 
+      // the subscription type will change with respect to subsequent unsubscribe calls:
+      // subscribe => subscribeWithFilter => unsubsribeFilter: the interaction class is now unsubscribed.
+      // Think about this again.
+      
+      // bkd: The wildcard filter causes a problem for subscriptions without filter + leaving federates:
+      // Scenario: 3 Federates with unfiltered subscription on an IA. If one federate is removed, a changeSubscription(Unsubscribe) is propagated.
+      // The clearParameterFilters (line 1093) reports a filter change and although propagationConnectPair is PropagateNone,
+      // the unsubscription is propagated to the getPublishingConnectHandleSet, causing an unwanted unsubscription on all publishers.
+      // Fix-Idea: only change to a filtered subscription if the request actually contains filter values (first condition)
+      // or when filters are already established (second condition).
+      if (!parameterFilterValues.empty() || !interactionClass->getParameterFilters(connectHandle).empty())  
+        filterChanged = interactionClass->updateParameterFilterValues(connectHandle, parameterFilterValues, false);
+
+      propagationConnectPair = interactionClass->setSubscriptionType(connectHandle, subscriptionType);
+    }
+
     // Update the receiving connect handle set
     interactionClass->updateCumulativeSubscription(connectHandle);
     // ... and propagate further if required.
     switch (propagationConnectPair.first) {
     case ServerModel::PropagateBroadcast:
-      send(interactionClass->getPublishingConnectHandleSet(), connectHandle, message);
+      send(interactionClass->getPublishingConnectHandleSet(), connectHandle, SharedPtr<const AbstractMessage>(message));
       break;
     case ServerModel::PropagateSend:
-      send(propagationConnectPair.second, message);
+      send(propagationConnectPair.second, SharedPtr<const AbstractMessage>(message));
       break;
     case ServerModel::PropagateNone:
-      // MUST still be forwarded when filter has changed => TODO: integrate filter settings into setSubscriptionType
+      // MUST still be forwarded when filter has changed
       if (filterChanged)
       {
-        //DebugPrintf("%s(ChangeInteractionClassSubscriptionMessage): filter changed: iclass=%s connectHandle=%s #parameterFilterValues=%d filterChanged=%d propagation=%s publishers=%s\n", __FUNCTION__, 
-        //            interactionClass->getFQName().c_str(),
-        //            connectHandle.toString().c_str(),
-        //            parameterFilterValues.size(), filterChanged,
-        //            to_string(propagationConnectPair.first).c_str(),
-        //            to_string(interactionClass->getPublishingConnectHandleSet()).c_str()
-        //            );
-        send(interactionClass->getPublishingConnectHandleSet(), connectHandle, message);
+        send(interactionClass->getPublishingConnectHandleSet(), connectHandle, SharedPtr<const AbstractMessage>(message));
       }
       break;
     }
@@ -991,6 +1141,14 @@ public:
       return;
     ServerModel::FederationConnect* federationConnect = getFederationConnect(connectHandle);
     OpenRTIAssert(federationConnect);
+    if (message->getSubscriptionType() == SubscriptionType::Unsubscribed)
+    {
+      objectClassUnsubscribed(connectHandle, objectClass, message->getAttributeHandles());
+    }
+    else
+    {
+      objectClassSubscribed(connectHandle, objectClass, message->getAttributeHandles(), message->getSubscriptionType() == SubscriptionType::SubscribedActive);
+    }
 
     ServerModel::ObjectClass::ObjectInstanceList objectInstanceList;
     std::map<ConnectHandle, AttributeHandleVector> sendAttributeHandlesMap;
@@ -1020,20 +1178,24 @@ public:
     }
 
     // Now propagate the subscription change further
-    for (auto [connectHandle, attributeHandleVector] : sendAttributeHandlesMap) {
+    for (auto it_targetConnectHandle_attributeHandleVector : sendAttributeHandlesMap) {
       SharedPtr<ChangeObjectClassSubscriptionMessage> request;
-      request = new ChangeObjectClassSubscriptionMessage;
+      request = MakeShared<ChangeObjectClassSubscriptionMessage>();
       request->setFederationHandle(message->getFederationHandle());
       request->setObjectClassHandle(message->getObjectClassHandle());
-      request->getAttributeHandles().swap(attributeHandleVector);
+      request->getAttributeHandles().swap(it_targetConnectHandle_attributeHandleVector.second);
       request->setSubscriptionType(message->getSubscriptionType());
-      send(connectHandle, request);
+      send(it_targetConnectHandle_attributeHandleVector.first, request);
     }
 
     // Insert all object instances that are now new to this connect
     if (message->getSubscriptionType() != Unsubscribed) {
       for (ServerModel::ObjectInstance* objectInstance : objectInstanceList) {
-        SharedPtr<InsertObjectInstanceMessage> request = new InsertObjectInstanceMessage;
+
+        // The new objectInstance has to be subscribed for this connectHandle 
+        objectInstance->setSubscriptionType(connectHandle, SubscribedPassive);
+
+        SharedPtr<InsertObjectInstanceMessage> request = MakeShared<InsertObjectInstanceMessage>();
         request->setFederationHandle(getFederationHandle());
         request->setObjectInstanceHandle(objectInstance->getObjectInstanceHandle());
         request->setObjectClassHandle(objectInstance->getObjectClass()->getObjectClassHandle());
@@ -1043,6 +1205,7 @@ public:
              k != objectInstance->getAttributeHandleInstanceAttributeMap().end(); ++k) {
           AttributeState attributeState;
           attributeState.setAttributeHandle(k->getAttributeHandle());
+          attributeState.setOwnerFederate(k->getOwnerFederate());
           request->getAttributeStateVector().push_back(attributeState);
         }
         if (!isParentConnect(connectHandle)) {
@@ -1055,7 +1218,7 @@ public:
 
   void accept(const ConnectHandle& connectHandle, const ChangeObjectInstanceSubscriptionMessage* message)
   {
-    ServerModel::ObjectClass* objectClass = ServerModel::Federation::getObjectClass(message->getObjectClassHandle());
+    const ServerModel::ObjectClass* objectClass = ServerModel::Federation::getObjectClass(message->getObjectClassHandle());
     if (!objectClass)
       return;
 
@@ -1091,7 +1254,7 @@ public:
 
     for (auto targetConnectHandle : connects) {
       SharedPtr<ChangeObjectInstanceSubscriptionMessage> request;
-      request = new ChangeObjectInstanceSubscriptionMessage;
+      request = MakeShared<ChangeObjectInstanceSubscriptionMessage>();
       request->setFederationHandle(message->getFederationHandle());
       request->setObjectClassHandle(message->getObjectClassHandle());
       request->setObjectInstanceHandle(message->getObjectInstanceHandle());
@@ -1106,7 +1269,7 @@ public:
     for (ServerModel::InteractionClass& interactionClass : getInteractionClassHandleInteractionClassMap()) {
       if (interactionClass.getSubscriptionType(connectHandle) == Unsubscribed)
         continue;
-      SharedPtr<ChangeInteractionClassSubscriptionMessage> message = new ChangeInteractionClassSubscriptionMessage;
+      SharedPtr<ChangeInteractionClassSubscriptionMessage> message = MakeShared<ChangeInteractionClassSubscriptionMessage>();
       message->setFederationHandle(getFederationHandle());
       message->setSubscriptionType(Unsubscribed);
       message->setInteractionClassHandle(interactionClass.getInteractionClassHandle());
@@ -1122,7 +1285,7 @@ public:
       }
       if (attributeHandleVector.empty())
         continue;
-      SharedPtr<ChangeObjectClassSubscriptionMessage> message = new ChangeObjectClassSubscriptionMessage;
+      SharedPtr<ChangeObjectClassSubscriptionMessage> message = MakeShared<ChangeObjectClassSubscriptionMessage>();
       message->setFederationHandle(getFederationHandle());
       message->setSubscriptionType(Unsubscribed);
       message->setObjectClassHandle(objectClass.getObjectClassHandle());
@@ -1148,9 +1311,9 @@ public:
       ServerModel::FederationConnect* federationConnect = getFederationConnect(connectHandle);
 
       // Provide some object instance handles to a federate.
-      // This is to be completely asyncronous in the registerObjectInstance call.
+      // This is to be completely asynchronous in the registerObjectInstance call.
       SharedPtr<ObjectInstanceHandlesResponseMessage> response;
-      response = new ObjectInstanceHandlesResponseMessage;
+      response = MakeShared<ObjectInstanceHandlesResponseMessage>();
       response->setFederationHandle(message->getFederationHandle());
       FederateHandle federateHandle = message->getFederateHandle();
       response->setFederateHandle(federateHandle);
@@ -1164,10 +1327,10 @@ public:
       federationConnect->send(response);
     } else {
       /// FIXME in case of a dying parent, we need to reevaluate this too
-      sendToParent(message);
+      sendToParent(SharedPtr<const AbstractMessage>(message));
     }
   }
-  void accept(const ConnectHandle& connectHandle, const ObjectInstanceHandlesResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ObjectInstanceHandlesResponseMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
@@ -1185,7 +1348,7 @@ public:
         objectInstance->reference(*federationConnect);
       }
 
-      federationConnect->send(message);
+      federationConnect->send(SharedPtr<const AbstractMessage>(message));
     }
   }
   void accept(const ConnectHandle& connectHandle, const ReleaseMultipleObjectInstanceNameHandlePairsMessage* message)
@@ -1201,12 +1364,25 @@ public:
         j->removeConnect(connectHandle);
       }
       if (!objectInstance->unreference(connectHandle))
+      {
+        //DebugPrintf("%s(ReleaseMultipleObjectInstanceNameHandlePairsMessage): name=%s connectHandle=%s\n", __FUNCTION__, objectInstance->getName().c_str(), connectHandle.toString().c_str());
+        //const ServerModel::ObjectInstanceConnect::HandleMap& handleMap = objectInstance->getConnectHandleObjectInstanceConnectMap();
+        //ServerModel::FederationConnect* federationConnect = getFederationConnect(connectHandle);
+        //if (federationConnect != nullptr)
+        //{
+        //  DebugPrintf("%s: name=%s federationConnect=%s\n", getName().c_str(), __FUNCTION__, federationConnect->getConnectHandle().toString().c_str());
+        //}
+        //for (auto& handleMapEntry : handleMap)
+        //{
+        //  DebugPrintf("%s: handleMapEntry.connectHandle=%s\n", __FUNCTION__, handleMapEntry.getConnectHandle().toString().c_str());
+        //}
         continue;
+      }
       erase(*objectInstance);
       if (isRootServer())
         continue;
       if (!releaseMessage.valid()) {
-        releaseMessage = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
+        releaseMessage = MakeShared<ReleaseMultipleObjectInstanceNameHandlePairsMessage>();
         releaseMessage->setFederationHandle(getFederationHandle());
         releaseMessage->getObjectInstanceHandleVector().reserve(message->getObjectInstanceHandleVector().size());
       }
@@ -1225,14 +1401,14 @@ public:
   // current server node.
   // FIXME: should work for the instance handles too. As long as the root server is authoritive, it will know all,
   // Once the root is no longer reachable, it is sufficient to know what is here and below ...
-  void accept(const ConnectHandle& connectHandle, const ReserveObjectInstanceNameRequestMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ReserveObjectInstanceNameRequestMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
     if (!federate)
       throw MessageError("Got ReserveObjectInstanceNameRequestMessage for an unknown federate!");
     // names starting with HLA are reserved for the RTI, a correct programmed ambassador does not request these
-    if (message->getName().compare(0, 3, "HLA") == 0)
+    if (!message->getIsInternal() && message->getName().compare(0, 3, "HLA") == 0)
       throw MessageError("Got ReserveObjectInstanceNameRequestMessage with name starting with HLA.");
 
     if (isRootServer()) {
@@ -1240,7 +1416,7 @@ public:
       OpenRTIAssert(federationConnect);
 
       SharedPtr<ReserveObjectInstanceNameResponseMessage> response;
-      response = new ReserveObjectInstanceNameResponseMessage;
+      response = MakeShared<ReserveObjectInstanceNameResponseMessage>();
       response->setFederationHandle(getFederationHandle());
       response->setFederateHandle(federateHandle);
       if (!isObjectInstanceNameInUse(message->getName())) {
@@ -1256,10 +1432,10 @@ public:
       federationConnect->send(response);
     } else {
       /// FIXME in case of a dying parent, we need to reevaluate this too
-      sendToParent(message);
+      sendToParent(SharedPtr<const AbstractMessage>(message));
     }
   }
-  void accept(const ConnectHandle& connectHandle, const ReserveObjectInstanceNameResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ReserveObjectInstanceNameResponseMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
@@ -1276,10 +1452,10 @@ public:
                                                                            message->getObjectInstanceHandleNamePair().second);
         objectInstance->reference(*federateConnect);
       }
-      federateConnect->send(message);
+      federateConnect->send(SharedPtr<const AbstractMessage>(message));
     }
   }
-  void accept(const ConnectHandle& connectHandle, const ReserveMultipleObjectInstanceNameRequestMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ReserveMultipleObjectInstanceNameRequestMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
@@ -1296,7 +1472,7 @@ public:
       OpenRTIAssert(federationConnect);
 
       SharedPtr<ReserveMultipleObjectInstanceNameResponseMessage> response;
-      response = new ReserveMultipleObjectInstanceNameResponseMessage;
+      response = MakeShared<ReserveMultipleObjectInstanceNameResponseMessage>();
       response->setFederationHandle(message->getFederationHandle());
       response->setFederateHandle(message->getFederateHandle());
       response->getObjectInstanceHandleNamePairVector().reserve(message->getNameList().size());
@@ -1322,10 +1498,10 @@ public:
       federationConnect->send(response);
     } else {
       /// FIXME in case of a dying parent, we need to reevaluate this too
-      sendToParent(message);
+      sendToParent(SharedPtr<const AbstractMessage>(message));
     }
   }
-  void accept(const ConnectHandle& connectHandle, const ReserveMultipleObjectInstanceNameResponseMessage* message)
+  void accept(const ConnectHandle& /*connectHandle*/, const ReserveMultipleObjectInstanceNameResponseMessage* message)
   {
     FederateHandle federateHandle = message->getFederateHandle();
     ServerModel::Federate* federate = getFederate(federateHandle);
@@ -1338,13 +1514,13 @@ public:
       // If so, then release the reservations.
     } else {
       if (message->getSuccess()) {
-        for (auto& [objectInstanceHandle, name] : message->getObjectInstanceHandleNamePairVector()) {
-          ServerModel::ObjectInstance* objectInstance = insertObjectInstance(objectInstanceHandle, name);
+        for (auto& it_objectInstanceHandle_name : message->getObjectInstanceHandleNamePairVector()) {
+          ServerModel::ObjectInstance* objectInstance = insertObjectInstance(it_objectInstanceHandle_name.first, it_objectInstanceHandle_name.second);
           objectInstance->reference(*federateConnect);
         }
       }
 
-      federateConnect->send(message);
+      federateConnect->send(SharedPtr<const AbstractMessage>(message));
     }
   }
 
@@ -1368,9 +1544,6 @@ public:
           continue;
         if (subscribedConnect == connectHandle)
           continue;
-        //DebugPrintf("%s(InsertObjectInstanceMessage): subscribedConnect=%s name=%s\n", __FUNCTION__,
-        //            subscribedConnect.toString().c_str(),
-        //            message->getName().c_str());
         if (!objectInstance)
           objectInstance = insertObjectInstance(objectInstanceHandle, message->getName());
         ServerModel::FederationConnect* federationConnect = getFederationConnect(subscribedConnect);
@@ -1391,7 +1564,7 @@ public:
       OpenRTIAssert(isParentConnect(connectHandle));
 
       SharedPtr<ReleaseMultipleObjectInstanceNameHandlePairsMessage> propagatedMessage;
-      propagatedMessage = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
+      propagatedMessage = MakeShared<ReleaseMultipleObjectInstanceNameHandlePairsMessage>();
       propagatedMessage->setFederationHandle(getFederationHandle());
       propagatedMessage->getObjectInstanceHandleVector().push_back(objectInstanceHandle);
 
@@ -1401,12 +1574,13 @@ public:
       OpenRTIAssert(!objectInstance->getConnectHandleObjectInstanceConnectMap().empty());
 
       objectInstance->setObjectClass(objectClass);
-      for (size_t j = 0; j < message->getAttributeStateVector().size(); ++j) {
-        ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(message->getAttributeStateVector()[j].getAttributeHandle());
+      for (auto& attributeState : message->getAttributeStateVector()) {
+        ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeState.getAttributeHandle());
         instanceAttribute->setOwnerConnectHandle(connectHandle);
+        instanceAttribute->setOwnerFederate(attributeState.getOwnerFederate());
       }
 
-      send(objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects, message);
+      send(objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects, SharedPtr<const AbstractMessage>(message));
     }
   }
   void accept(const ConnectHandle& connectHandle, const DeleteObjectInstanceMessage* message)
@@ -1420,8 +1594,11 @@ public:
       return;
 
     // send that to all servers that have seen that object instance at some time
-    OpenRTIAssert(objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects.count(connectHandle) == 0);
-    send(objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects, message);
+    OpenRTIAssert(objectInstance->getPrivilegeToDeleteInstanceAttribute() != nullptr);
+    auto privilegeToDeleteInstanceAttribute = objectInstance->getPrivilegeToDeleteInstanceAttribute();
+    OpenRTIAssert(privilegeToDeleteInstanceAttribute->_receivingConnects.count(connectHandle) == 0);
+    ConnectHandleSet receivingConnects = privilegeToDeleteInstanceAttribute->_receivingConnects;
+    send(receivingConnects, SharedPtr<const AbstractMessage>(message));
   }
   void accept(const ConnectHandle& connectHandle, const TimeStampedDeleteObjectInstanceMessage* message)
   {
@@ -1435,7 +1612,7 @@ public:
 
     // send that to all servers that have seen that object instance at some time
     OpenRTIAssert(objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects.count(connectHandle) == 0);
-    send(objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects, message);
+    send(objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects, SharedPtr<const AbstractMessage>(message));
   }
 
   void accept(const ConnectHandle& connectHandle, const AttributeUpdateMessage* message)
@@ -1450,6 +1627,9 @@ public:
     // If this list is trivial we do not need to make any copy of the message, just broadcast to this set of connects.
     // May be each object instance can have a callback attached which either does complex copy stuff or just forwards as possible?
 
+    // if connectHandle belongs to our local federate, it's an update we've sent.
+    // otherwise it's probably the parent connect, and it's an update received from the parent server.
+    objectInstanceUpdateSent(connectHandle, objectInstance);
     typedef std::map<ConnectHandle, AttributeValueVector> ConnectHandleAttributeValueVectorMap;
     ConnectHandleAttributeValueVectorMap connectHandleAttributeValueVectorMap;
     for (auto& attributeValue : message->getAttributeValues())
@@ -1459,25 +1639,25 @@ public:
         continue;
       for (ConnectHandle receivingConnect : instanceAttribute->_receivingConnects)
       {
-        connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
-        connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
-        //DebugPrintf("%s(TimeStampedAttributeUpdateMessage): instance=%s subscription(receivingConnect=%s) = %s, connectHandle=%s\n", __FUNCTION__,
-        //            objectInstance->getName().c_str(), 
-        //            receivingConnect.toString().c_str(),
-        //            to_string(objectInstance->getSubscriptionType(receivingConnect)).c_str(),
-        //            connectHandle.toString().c_str());
+        if (objectInstance->getSubscriptionType(receivingConnect) != Unsubscribed)
+        {
+          connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
+          connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
+        }
       }
     }
 
-    for (auto& [connectHandle, attributeValueVector] : connectHandleAttributeValueVectorMap) {
-      SharedPtr<AttributeUpdateMessage> update = new AttributeUpdateMessage;
+    for (auto& it_targetConnectHandle_attributeValueVector : connectHandleAttributeValueVectorMap) {
+      SharedPtr<AttributeUpdateMessage> update = MakeShared<AttributeUpdateMessage>();
       update->setFederationHandle(getFederationHandle());
       update->setFederateHandle(message->getFederateHandle());
       update->setObjectInstanceHandle(message->getObjectInstanceHandle());
       update->setTag(message->getTag());
       update->setTransportationType(message->getTransportationType());
-      update->getAttributeValues().swap(attributeValueVector);
-      send(connectHandle, update);
+      update->getAttributeValues().swap(it_targetConnectHandle_attributeValueVector.second);
+      send(it_targetConnectHandle_attributeValueVector.first, update);
+      // if targetConnectHandle belongs to our local federate, it's an update we've received from the parent connect.
+      objectInstanceReflectionReceived(it_targetConnectHandle_attributeValueVector.first, objectInstance);
     }
   }
 
@@ -1488,9 +1668,16 @@ public:
       return;
 
     // See the above improvements for the AttributeUpdateMessage FIXME
+    // if connectHandle belongs to our local federate, it's an update we've sent.
+    // otherwise it's probably the parent connect, and it's an update received from the parent server.
+    objectInstanceUpdateSent(connectHandle, objectInstance);
 
     typedef std::map<ConnectHandle, AttributeValueVector> ConnectHandleAttributeValueVectorMap;
     ConnectHandleAttributeValueVectorMap connectHandleAttributeValueVectorMap;
+
+    //auto connectHandleSet = objectInstance->getSubscribedConnectHandleSet();
+    
+
     for (auto& attributeValue : message->getAttributeValues())
     {
       ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeValue.getAttributeHandle());
@@ -1498,18 +1685,16 @@ public:
         continue;
       for (ConnectHandle receivingConnect : instanceAttribute->_receivingConnects)
       {
-        connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
-        connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
-        //DebugPrintf("%s(TimeStampedAttributeUpdateMessage): instance=%s subscription(receivingConnect=%s) = %s, connectHandle=%s\n", __FUNCTION__,
-        //            objectInstance->getName().c_str(), 
-        //            receivingConnect.toString().c_str(),
-        //            to_string(objectInstance->getSubscriptionType(receivingConnect)).c_str(),
-        //            connectHandle.toString().c_str());
+        if (objectInstance->getSubscriptionType(receivingConnect) != Unsubscribed)
+        {
+          connectHandleAttributeValueVectorMap[receivingConnect].reserve(message->getAttributeValues().size());
+          connectHandleAttributeValueVectorMap[receivingConnect].push_back(attributeValue);
+        }
       }
     }
 
-    for (auto& [connectHandle, attributeValueVector] : connectHandleAttributeValueVectorMap) {
-      SharedPtr<TimeStampedAttributeUpdateMessage> update = new TimeStampedAttributeUpdateMessage;
+    for (auto& it_targetConnectHandle_attributeValueVector : connectHandleAttributeValueVectorMap) {
+      SharedPtr<TimeStampedAttributeUpdateMessage> update = MakeShared<TimeStampedAttributeUpdateMessage>();
       update->setFederationHandle(getFederationHandle());
       update->setFederateHandle(message->getFederateHandle());
       update->setObjectInstanceHandle(message->getObjectInstanceHandle());
@@ -1518,30 +1703,45 @@ public:
       update->setMessageRetractionHandle(message->getMessageRetractionHandle());
       update->setOrderType(message->getOrderType());
       update->setTransportationType(message->getTransportationType());
-      update->getAttributeValues().swap(attributeValueVector);
-      send(connectHandle, update);
+      update->getAttributeValues().swap(it_targetConnectHandle_attributeValueVector.second);
+      send(it_targetConnectHandle_attributeValueVector.first, update);
+
+      // if targetConnectHandle belongs to our local federate, it's an update we've received from the parent connect.
+      objectInstanceReflectionReceived(it_targetConnectHandle_attributeValueVector.first, objectInstance);
     }
   }
 
-
-  // Send interactions due to the noted rounting tables
+  // Send interactions due to the noted routing tables
   void accept(const ConnectHandle& connectHandle, const InteractionMessage* message)
   {
     ServerModel::InteractionClass* interactionClass = getInteractionClass(message->getInteractionClassHandle());
     if (!interactionClass)
       throw MessageError("Received InteractionMessage for unknown interaction class!");
+    // check if the message stems from a locally connected federate, if so, increment the sent count.
+    interactionSent(connectHandle, interactionClass);
     // Send to all subscribed connects except the originating one
     for (auto& subscriberConnectHandle : interactionClass->_cumulativeSubscribedConnectHandleSet) {
-      // TODO: plug in self-delivery of interactions here!
+      // NOTE: self-delivery is implemented directly in the ambassador.
+      // Here, we shall never send back anything to the connect it came from.
       if (subscriberConnectHandle == connectHandle)
         continue;
       ServerModel::InteractionClass* currentInteractionClass = interactionClass;
       while (currentInteractionClass) {
         if (currentInteractionClass->getSubscriptionType(subscriberConnectHandle) != Unsubscribed) {
           if (currentInteractionClass == interactionClass) {
-            send(subscriberConnectHandle, message);
+            // interaction class specified in message
+            if (interactionClass->isMatching(subscriberConnectHandle, message->getParameterValues())) {
+              //DebugPrintf("%s: send %s to %s\n", __FUNCTION__, message->toString(this).c_str(), subscriberConnectHandle.toString().c_str());
+              send(subscriberConnectHandle, SharedPtr<const AbstractMessage>(message));
+              // check if the message goes to a locally connected federate, if so, increment the receive count.
+              interactionReceived(subscriberConnectHandle, currentInteractionClass);
+            }
+            //else
+            //{
+            //  DebugPrintf("%s: subscriber %s ignores %s\n", __FUNCTION__, subscriberConnectHandle.toString().c_str(), message->toString(this).c_str());
+            //}
           } else {
-            SharedPtr<InteractionMessage> message2 = new InteractionMessage;
+            SharedPtr<InteractionMessage> message2 = MakeShared<InteractionMessage>();
             message2->setFederationHandle(message->getFederationHandle());
             message2->setFederateHandle(message->getFederateHandle());
             message2->setTransportationType(message->getTransportationType());
@@ -1554,6 +1754,7 @@ public:
             }
             message2->setInteractionClassHandle(currentInteractionClass->getInteractionClassHandle());
             send(subscriberConnectHandle, message2);
+            interactionReceived(subscriberConnectHandle, currentInteractionClass);
           }
           break;
         }
@@ -1578,12 +1779,19 @@ public:
         if (currentInteractionClass->getSubscriptionType(subscriberConnectHandle) != Unsubscribed) {
           if (currentInteractionClass == interactionClass) {
             // interaction class specified in message
-            if (interactionClass->isFiltered(subscriberConnectHandle, message->getParameterValues())) {
-              send(subscriberConnectHandle, message);
+            if (interactionClass->isMatching(subscriberConnectHandle, message->getParameterValues())) {
+              //DebugPrintf("%s: send %s to %s\n", __FUNCTION__, message->toString(this).c_str(), subscriberConnectHandle.toString().c_str());
+              send(subscriberConnectHandle, SharedPtr<const AbstractMessage>(message));
+              // check if the message goes to a locally connected federate, if so, increment the receive count.
+              interactionReceived(subscriberConnectHandle, currentInteractionClass);
             }
+            //else
+            //{
+            //  DebugPrintf("%s: subscriber %s ignores %s\n", __FUNCTION__, subscriberConnectHandle.toString().c_str(), message->toString(this).c_str());
+            //}
           } else {
             // parent interaction class
-            SharedPtr<TimeStampedInteractionMessage> message2 = new TimeStampedInteractionMessage;
+            SharedPtr<TimeStampedInteractionMessage> message2 = MakeShared<TimeStampedInteractionMessage>();
             message2->setFederationHandle(message->getFederationHandle());
             message2->setFederateHandle(message->getFederateHandle());
             message2->setOrderType(message->getOrderType());
@@ -1599,6 +1807,7 @@ public:
             }
             message2->setInteractionClassHandle(currentInteractionClass->getInteractionClassHandle());
             send(subscriberConnectHandle, message2);
+            interactionReceived(subscriberConnectHandle, currentInteractionClass);
           }
           break;
         }
@@ -1615,6 +1824,10 @@ public:
     ServerModel::ObjectInstance* objectInstance = getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
       return;
+
+    // Sender resubscribes implicitly when sending the RequestAttributeUpdateMessage
+    // Provider resubscribes implicitly here
+    objectInstance->setSubscriptionType(connectHandle, SubscribedPassive);
 
     // Find the server connects that own the attributes and build up a message for those
     ConnectMessageMap connectMessageMap;
@@ -1650,7 +1863,25 @@ public:
 
     ConnectHandleSet connectHandleSet;
     objectClass->accumulateAllPublications(connectHandleSet);
-    send(connectHandleSet, connectHandle, message);
+    send(connectHandleSet, connectHandle, SharedPtr<const AbstractMessage>(message));
+  }
+
+  void accept(const ConnectHandle& connectHandle, const QueryAttributeOwnershipRequestMessage* message)
+  {
+    ObjectInstanceHandle objectInstanceHandle = message->getObjectInstanceHandle();
+    ServerModel::ObjectInstance* objectInstance = ServerModel::Federation::getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw MessageError("Received QueryAttributeOwnershipRequestMessage for unknown object instance!");
+    AttributeHandle attributeHandle = message->getAttributeHandle();
+    ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+    if (!instanceAttribute)
+      throw MessageError("Received QueryAttributeOwnershipRequestMessage for unknown object class!");
+    SharedPtr<QueryAttributeOwnershipResponseMessage> response = MakeShared<QueryAttributeOwnershipResponseMessage>();
+    response->setFederationHandle(message->getFederationHandle());
+    response->setObjectInstanceHandle(message->getObjectInstanceHandle());
+    response->setAttributeHandle(message->getAttributeHandle());
+    response->setOwner(instanceAttribute->getOwnerFederate());
+    send(connectHandle, response);
   }
 
   template<typename M>
@@ -1687,50 +1918,57 @@ public:
 
     OpenRTIAssert(!federationConnect->getIsParentConnect());
 
-    bool permitTimeRegulation = _parentPermitTimeRegulation && getServerNode().getServerOptions().getPermitTimeRegulation();
-    federationConnect->setPermitTimeRegulation(permitTimeRegulation);
-
-    SharedPtr<InsertFederationExecutionMessage> message = new InsertFederationExecutionMessage;
+    SharedPtr<InsertFederationExecutionMessage> message = MakeShared<InsertFederationExecutionMessage>();
     message->setFederationHandle(getFederationHandle());
     message->setFederationName(getName());
     message->setLogicalTimeFactoryName(getLogicalTimeFactoryName());
-    if (!federationConnect->getPermitTimeRegulation())
-      message->getConfigurationParameterMap()["permitTimeRegulation"].push_back("false");
     // FIXME add the server options
     federationConnect->send(message);
 
     SharedPtr<InsertModulesMessage> insertModules;
-    insertModules = new InsertModulesMessage;
+    insertModules = MakeShared<InsertModulesMessage>();
     insertModules->setFederationHandle(getFederationHandle());
     getModuleList(insertModules->getFOMModuleList());
     federationConnect->send(insertModules);
 
     /// FIXME currently these are all flushed when an EraseFederationExecutionMessage is received.
     /// FIXME Make that more explicit????
-    for (ServerModel::Federate::HandleMap::const_iterator i = getFederateHandleFederateMap().begin();
-         i != getFederateHandleFederateMap().end(); ++i) {
-      if (i->getConnectHandle() == connectHandle)
+    for (auto& federate : getFederateHandleFederateMap()) {
+      if (federate.getConnectHandle() == connectHandle)
         continue;
-      SharedPtr<JoinFederateNotifyMessage> notify = new JoinFederateNotifyMessage;
+      SharedPtr<JoinFederateNotifyMessage> notify = MakeShared<JoinFederateNotifyMessage>();
       notify->setFederationHandle(getFederationHandle());
-      notify->setFederateHandle(i->getFederateHandle());
-      notify->setFederateType(i->getFederateType());
-      notify->setFederateName(i->getName());
+      notify->setFederateHandle(federate.getFederateHandle());
+      notify->setFederateType(federate.getFederateType());
+      notify->setFederateName(federate.getName());
+      notify->setIsInternal(federate.getIsInternal());
       federationConnect->send(notify);
+
     }
 
-    for (ServerModel::FederationConnect::SecondList::iterator i = getTimeRegulatingFederationConnectList().begin();
+    for (ServerModel::FederationConnect::TimeConstrainedList::iterator i = getTimeConstrainedFederationConnectList().begin();
+      i != getTimeConstrainedFederationConnectList().end(); ++i) {
+      for (ServerModel::Federate::TimeConstrainedList::iterator j = i->getTimeConstrainedFederateList().begin();
+        j != i->getTimeConstrainedFederateList().end(); ++j) {
+        SharedPtr<EnableTimeConstrainedNotifyMessage> enable = MakeShared<EnableTimeConstrainedNotifyMessage>();
+        enable->setFederationHandle(getFederationHandle());
+        enable->setFederateHandle(j->getFederateHandle());
+        federationConnect->send(enable);
+      }
+    }
+
+    for (ServerModel::FederationConnect::TimeRegulatingList::iterator i = getTimeRegulatingFederationConnectList().begin();
          i != getTimeRegulatingFederationConnectList().end(); ++i) {
-      for (ServerModel::Federate::SecondList::iterator j = i->getTimeRegulatingFederateList().begin();
+      for (ServerModel::Federate::TimeRegulatingList::iterator j = i->getTimeRegulatingFederateList().begin();
            j != i->getTimeRegulatingFederateList().end(); ++j) {
-        SharedPtr<EnableTimeRegulationRequestMessage> enable = new EnableTimeRegulationRequestMessage;
+        SharedPtr<EnableTimeRegulationRequestMessage> enable = MakeShared<EnableTimeRegulationRequestMessage>();
         enable->setFederationHandle(getFederationHandle());
         enable->setFederateHandle(j->getFederateHandle());
         enable->setTimeStamp(j->getTimeAdvanceTimeStamp());
         enable->setCommitId(j->getCommitId());
         federationConnect->send(enable);
 
-        SharedPtr<CommitLowerBoundTimeStampMessage> commit = new CommitLowerBoundTimeStampMessage;
+        SharedPtr<CommitLowerBoundTimeStampMessage> commit = MakeShared<CommitLowerBoundTimeStampMessage>();
         commit->setFederationHandle(getFederationHandle());
         commit->setFederateHandle(j->getFederateHandle());
         commit->setTimeStamp(j->getNextMessageTimeStamp());
@@ -1750,11 +1988,11 @@ public:
         continue;
       std::size_t count = i->getRegionHandleRegionMap().size();
       SharedPtr<InsertRegionMessage> insertRegionMessage;
-      insertRegionMessage = new InsertRegionMessage;
+      insertRegionMessage = MakeShared<InsertRegionMessage>();
       insertRegionMessage->setFederationHandle(getFederationHandle());
       insertRegionMessage->getRegionHandleDimensionHandleSetPairVector().reserve(count);
       SharedPtr<CommitRegionMessage> commitRegionMessage;
-      commitRegionMessage = new CommitRegionMessage;
+      commitRegionMessage = MakeShared<CommitRegionMessage>();
       commitRegionMessage->setFederationHandle(getFederationHandle());
       commitRegionMessage->getRegionHandleRegionValuePairVector().reserve(count);
 
@@ -1813,7 +2051,7 @@ public:
     for (ObjectInstanceHandleSet::iterator j = objectInstanceHandleSet.begin();
          j != objectInstanceHandleSet.end(); ++j) {
       SharedPtr<DeleteObjectInstanceMessage> request;
-      request = new DeleteObjectInstanceMessage;
+      request = MakeShared<DeleteObjectInstanceMessage>();
       request->setFederationHandle(getFederationHandle());
       request->setObjectInstanceHandle(*j);
       accept(connectHandle, request.get());
@@ -1839,7 +2077,7 @@ public:
         if (isRootServer())
           continue;
         if (!releaseMessage.valid()) {
-          releaseMessage = new ReleaseMultipleObjectInstanceNameHandlePairsMessage;
+          releaseMessage = MakeShared<ReleaseMultipleObjectInstanceNameHandlePairsMessage>();
           releaseMessage->setFederationHandle(getFederationHandle());
           releaseMessage->getObjectInstanceHandleVector().reserve(getObjectInstanceHandleObjectInstanceMap().size());
         }
@@ -1862,7 +2100,7 @@ public:
 
         // Release region references
         if (!federate->getRegionHandleRegionMap().empty()) {
-          SharedPtr<EraseRegionMessage> eraseRegionMessage = new EraseRegionMessage;
+          SharedPtr<EraseRegionMessage> eraseRegionMessage = MakeShared<EraseRegionMessage>();
           eraseRegionMessage->setFederationHandle(getFederationHandle());
           eraseRegionMessage->getRegionHandleVector().reserve(federate->getRegionHandleRegionMap().size());
           for (ServerModel::Region::HandleMap::iterator k = federate->getRegionHandleRegionMap().begin();
@@ -1876,7 +2114,15 @@ public:
         // Remove from time management, needs to happen before the federation connect is removed
         if (federate->getIsTimeRegulating()) {
           eraseTimeRegulating(*federate);
-          SharedPtr<DisableTimeRegulationRequestMessage> request = new DisableTimeRegulationRequestMessage;
+          SharedPtr<DisableTimeRegulationRequestMessage> request = MakeShared<DisableTimeRegulationRequestMessage>();
+          request->setFederationHandle(getFederationHandle());
+          request->setFederateHandle(federate->getFederateHandle());
+          broadcast(connectHandle, request);
+        }
+        
+        if (federate->getIsTimeConstrained()) {
+          eraseTimeConstrained(*federate);
+          SharedPtr<DisableTimeConstrainedNotifyMessage> request = MakeShared<DisableTimeConstrainedNotifyMessage>();
           request->setFederationHandle(getFederationHandle());
           request->setFederateHandle(federate->getFederateHandle());
           broadcast(connectHandle, request);
@@ -1888,7 +2134,7 @@ public:
             ++k;
           else {
             SharedPtr<SynchronizationPointAchievedMessage> achieved;
-            achieved = new SynchronizationPointAchievedMessage;
+            achieved = MakeShared<SynchronizationPointAchievedMessage>();
             achieved->setFederationHandle(getFederationHandle());
             achieved->setLabel(k->getSynchronization().getLabel());
             achieved->getFederateHandleBoolPairVector().push_back(FederateHandleBoolPair(federate->getFederateHandle(), false));
@@ -1900,13 +2146,19 @@ public:
         // Remove from connects
         federationConnect->erase(*federate);
         Log(ServerFederate, Info) << getServerPath() << ": Resigning federate " << federate->getFederateHandle()
+                                  << " name=" << federate->getName() << " type=" << federate->getFederateType()
                                   << " because of closed connection!" << std::endl;
-        SharedPtr<ResignFederationExecutionRequestMessage> message = new ResignFederationExecutionRequestMessage;
+        SharedPtr<ResignFederationExecutionRequestMessage> message = MakeShared<ResignFederationExecutionRequestMessage>();
         message->setFederationHandle(getFederationHandle());
         message->setFederateHandle(federate->getFederateHandle());
         accept(connectHandle, message.get());
       }
-      OpenRTIAssert(federationConnect->getFederateList().empty());
+      federationConnect = getFederationConnect(connectHandle);
+      if (federationConnect != nullptr)
+      {
+        //DebugPrintf("%s: federationConnect=%p %d federates\n", __FUNCTION__, federationConnect, federationConnect->getFederateList().size());
+        OpenRTIAssert(federationConnect->getFederateList().empty());
+      }
     }
 
     // FIXME if the removed connection is the parent and we have a resign pending, respond as if we were the root
@@ -1955,6 +2207,9 @@ public:
     if (federate.getIsTimeRegulating())
       eraseTimeRegulating(federate);
 
+    if (federate.getIsTimeConstrained())
+      eraseTimeConstrained(federate);
+
     // Remove from connects
     ServerModel::FederationConnect* federationConnect = federate.getFederationConnect();
     if (federationConnect)
@@ -1971,7 +2226,7 @@ public:
       ServerModel::Federate* federate = getFederate(*i);
       if (!federate)
         continue;
-      ServerModel::FederationConnect* federationConnect = federate->getFederationConnect();
+      const ServerModel::FederationConnect* federationConnect = federate->getFederationConnect();
       if (!federationConnect)
         continue;
       if (federationConnect->getIsParentConnect())
@@ -2002,13 +2257,18 @@ public:
     for (ConnectHandleSet::const_iterator i = connectHandleSet.begin(); i != connectHandleSet.end(); ++i)
       send(*i, message);
   }
-
-  /// The parents policy if we are allowed to get time regulating
-  bool _parentPermitTimeRegulation;
+  
 };
 
 class OPENRTI_LOCAL ServerMessageDispatcher : public ServerModel::Node {
 public:
+  ServerMessageDispatcher(AbstractServerNode* serverNode)
+    : _serverNode(serverNode)
+  {
+  }
+  ~ServerMessageDispatcher()
+  {
+  }
   /// We have some stateless upstream messages that get handled in the root server,
   /// We remember these and know where to send them back.
   template<typename M>
@@ -2022,7 +2282,7 @@ public:
       // Remember the pending message ...
       _pendingMessageList.push_back(ConnectHandleMessagePair(connectHandle, message));
       // ... and go ask your father
-      sendToParent(message);
+      sendToParent(SharedPtr<const AbstractMessage>(message));
     } else {
       // If we are the root server, process this message
       // Note that this is the callback that needs to be implemented for this method to be useful
@@ -2041,7 +2301,7 @@ public:
       throw MessageError(std::string("No pending ") + message->getTypeName() + "!");
     // report downstream to the originator
     if (_pendingMessageList.front().first.valid())
-      send(_pendingMessageList.front().first, message);
+      send(_pendingMessageList.front().first, SharedPtr<const AbstractMessage>(message));
     // remove the pending message that succeeded
     _pendingMessageList.pop_front();
   }
@@ -2054,11 +2314,19 @@ public:
     // But the socket connect does not know if it is a parent connect or not.
     if (!isParentConnect(connectHandle))
       return;
-    broadcastToChildren(message);
+    broadcastToChildren(SharedPtr<const AbstractMessage>(message));
   }
 
   // Create messages
   void acceptAsRoot(const ConnectHandle& connectHandle, const CreateFederationExecutionRequestMessage* message)
+  {
+    // We might do the conversion even earlier, but in the case we're not the root server, and we are sending 
+    // the message to the parent node, we'd need to compare protocol versions again.
+    // This could lead to a new protocol version based translation mechanism, probably supported by the message generator.
+    CreateFederationExecutionRequest2Message message2 = TranslateTypes::translate(*message);
+    acceptAsRoot(connectHandle, &message2);
+  }
+  void acceptAsRoot(const ConnectHandle& connectHandle, const CreateFederationExecutionRequest2Message* message)
   {
     OpenRTIAssert(connectHandle.valid());
     OpenRTIAssert(isRootServer());
@@ -2066,7 +2334,7 @@ public:
     if (getFederationExecutionAlreadyExists(message->getFederationExecution())) {
       // Ok, have an active federation, create needs to fail
       SharedPtr<CreateFederationExecutionResponseMessage> response;
-      response = new CreateFederationExecutionResponseMessage;
+      response = MakeShared<CreateFederationExecutionResponseMessage>();
       response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseFederationExecutionAlreadyExists);
       send(connectHandle, response);
     } else {
@@ -2086,9 +2354,11 @@ public:
 
         // ... and respond with Success
         SharedPtr<CreateFederationExecutionResponseMessage> response;
-        response = new CreateFederationExecutionResponseMessage;
+        response = MakeShared<CreateFederationExecutionResponseMessage>();
         response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseSuccess);
         send(connectHandle, response);
+        // initialize the Mom federation object
+        federationServer->initializeMom(_serverNode->getServer(), FederateHandle());
 
       } catch (const InconsistentFDD& e) {
         delete federationServer;
@@ -2096,7 +2366,7 @@ public:
         Log(ServerFederation, Info) << getServerPath() << ": Caught Exception creating federation execution \""
                                     << e.getReason() << "\"." << std::endl;
         SharedPtr<CreateFederationExecutionResponseMessage> response;
-        response = new CreateFederationExecutionResponseMessage;
+        response = MakeShared<CreateFederationExecutionResponseMessage>();
         response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseInconsistentFDD);
         response->setExceptionString(e.getReason());
         send(connectHandle, response);
@@ -2105,7 +2375,7 @@ public:
         Log(ServerFederation, Info) << getServerPath() << ": Caught Exception creating federation execution \""
                                     << e.getReason() << "\"." << std::endl;
         SharedPtr<CreateFederationExecutionResponseMessage> response;
-        response = new CreateFederationExecutionResponseMessage;
+        response = MakeShared<CreateFederationExecutionResponseMessage>();
         response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseRTIinternalError);
         response->setExceptionString(e.getReason());
         send(connectHandle, response);
@@ -2115,13 +2385,15 @@ public:
 
         Log(ServerFederation, Info) << getServerPath() << ": Caught unknown Exception creating federation execution." << std::endl;
         SharedPtr<CreateFederationExecutionResponseMessage> response;
-        response = new CreateFederationExecutionResponseMessage;
+        response = MakeShared<CreateFederationExecutionResponseMessage>();
         response->setCreateFederationExecutionResponseType(CreateFederationExecutionResponseRTIinternalError);
         send(connectHandle, response);
       }
     }
   }
   void accept(const ConnectHandle& connectHandle, const CreateFederationExecutionRequestMessage* message)
+  { forwardUpstreamMessage(connectHandle, message); }
+  void accept(const ConnectHandle& connectHandle, const CreateFederationExecutionRequest2Message* message)
   { forwardUpstreamMessage(connectHandle, message); }
   void accept(const ConnectHandle& connectHandle, const CreateFederationExecutionResponseMessage* message)
   { forwardDownstreamMessage(connectHandle, message); }
@@ -2136,22 +2408,26 @@ public:
     FederationServer* federationServer = getFederation(message->getFederationExecution());
     if (!federationServer) {
       Log(ServerFederation, Debug) << getServerPath()
-                                   << ": DestroyFederationExecutionRequestMessage faild for unknown federation named \""
+                                   << ": DestroyFederationExecutionRequestMessage failed for unknown federation named \""
                                    << message->getFederationExecution() << "\"!" << std::endl;
       // Ok, have an inactive federation, destroy needs to fail
       SharedPtr<DestroyFederationExecutionResponseMessage> response;
-      response = new DestroyFederationExecutionResponseMessage;
+      response = MakeShared<DestroyFederationExecutionResponseMessage>();
       response->setDestroyFederationExecutionResponseType(DestroyFederationExecutionResponseFederationExecutionDoesNotExist);
       send(connectHandle, response);
     } else {
 
       // Federates currently joined?
+      if (federationServer->getFederateHandleFederateMap().size() == 1 && federationServer->getMomServer() != nullptr)
+      {
+        federationServer->resignMomServer();
+      }
       if (federationServer->hasJoinedFederates()) {
-        Log(ServerFederation, Debug) << getServerPath() << ": DestroyFederationExecutionRequestMessage faild for \""
+        Log(ServerFederation, Debug) << getServerPath() << ": DestroyFederationExecutionRequestMessage failed for \""
                                      << message->getFederationExecution() << "\", federates joined!" << std::endl;
         // federates there, so, no
         SharedPtr<DestroyFederationExecutionResponseMessage> response;
-        response = new DestroyFederationExecutionResponseMessage;
+        response = MakeShared<DestroyFederationExecutionResponseMessage>();
         response->setDestroyFederationExecutionResponseType(DestroyFederationExecutionResponseFederatesCurrentlyJoined);
         send(connectHandle, response);
       } else {
@@ -2172,7 +2448,7 @@ public:
 
         // ... and just respond with Success
         SharedPtr<DestroyFederationExecutionResponseMessage> response;
-        response = new DestroyFederationExecutionResponseMessage;
+        response = MakeShared<DestroyFederationExecutionResponseMessage>();
         response->setDestroyFederationExecutionResponseType(DestroyFederationExecutionResponseSuccess);
         send(connectHandle, response);
       }
@@ -2185,13 +2461,13 @@ public:
 
 
   // Enumerate federations
-  void acceptAsRoot(const ConnectHandle& connectHandle, const EnumerateFederationExecutionsRequestMessage* message)
+  void acceptAsRoot(const ConnectHandle& connectHandle, const EnumerateFederationExecutionsRequestMessage* /*message*/)
   {
     OpenRTIAssert(connectHandle.valid());
     OpenRTIAssert(isRootServer());
 
     SharedPtr<EnumerateFederationExecutionsResponseMessage> response;
-    response = new EnumerateFederationExecutionsResponseMessage;
+    response = MakeShared<EnumerateFederationExecutionsResponseMessage>();
     response->getFederationExecutionInformationVector().reserve(getFederationHandleFederationMap().size());
     for (ServerModel::Federation::HandleMap::iterator i = getFederationHandleFederationMap().begin();
          i != getFederationHandleFederationMap().end(); ++i) {
@@ -2230,7 +2506,6 @@ public:
     }
 
     federationServer = insertFederation(message->getFederationName(), federationHandle);
-    federationServer->setParentConfigurationParameterMap(message->getConfigurationParameterMap());
     federationServer->setLogicalTimeFactoryName(message->getLogicalTimeFactoryName());
     // FIXME add the server options
   }
@@ -2248,18 +2523,22 @@ public:
     FederationServer* federationServer = getFederation(federationHandle);
     if (!federationServer)
       throw MessageError("Received ShutdownFederationExecutionMessage for a non existing federation!");
-    ServerModel::FederationConnect* federationConnect = federationServer->getFederationConnect(connectHandle);
-    if (!federationConnect)
-      throw MessageError("Received ShutdownFederationExecutionMessage for a federation not knowing this connect!");
-
-    // Check if the federation has again gained a new federate in between
-    if (federationConnect->getHasFederates())
-      return;
-    // Can happen that we ask for shutdown that is already underway
-    if (!federationConnect->getActive())
-      return;
-
-    federationServer->eraseFederationExecutionAtConnect(connectHandle);
+    const ServerModel::FederationConnect* federationConnect = federationServer->getFederationConnect(connectHandle);
+    if (federationConnect != nullptr)
+    {
+      // Check if the federation has again gained a new federate in between
+      if (federationConnect->getHasFederates())
+        return;
+      // Can happen that we ask for shutdown that is already underway
+      if (!federationConnect->getActive())
+        return;
+      federationServer->eraseFederationExecutionAtConnect(connectHandle);
+    }
+    else
+    {
+      DebugPrintf("Received ShutdownFederationExecutionMessage for a federation not knowing this connect!\n");
+      //throw MessageError("Received ShutdownFederationExecutionMessage for a federation not knowing this connect!");
+    }
   }
   // Erase a new federation from the server node
   void accept(const ConnectHandle& connectHandle, const EraseFederationExecutionMessage* message)
@@ -2294,7 +2573,7 @@ public:
       // ... we are the lower most server node that still knows about that federation,
       // so respond with releasing the federation handle.
       SharedPtr<ReleaseFederationHandleMessage> response;
-      response = new ReleaseFederationHandleMessage;
+      response = MakeShared<ReleaseFederationHandleMessage>();
       response->setFederationHandle(federationHandle);
       sendToParent(response);
       erase(*federationServer);
@@ -2321,28 +2600,47 @@ public:
     // If we are still not the last one, wait until this happens
     // FIXME, move that into the erase connect in some way - may be with a new function
     // FIXME See if this is a real problem
-    ServerModel::FederationConnect* federationConnect = federationServer->getFederationConnect(connectHandle);
+    const ServerModel::FederationConnect* federationConnect = federationServer->getFederationConnect(connectHandle);
     if (!federationConnect)
+    {
+      //DebugPrintf("%s: federationConnect already gone\n", __FUNCTION__);
       return;
+    }
     if (federationConnect->getActive())
+    {
+      //DebugPrintf("%s: federationConnect still active\n", __FUNCTION__);
       return;
+    }
 
     federationServer->eraseConnect(connectHandle);
     if (federationServer->hasChildConnects())
+    {
+      //DebugPrintf("%s: federation server has child connects\n", __FUNCTION__);
       return;
+    }
     // Only release those federations that we were asked to release
     // FIXME better test for that ...
     if (getFederation(federationServer->getName()))
+    {
+      //DebugPrintf("%s: federation %s not found\n", __FUNCTION__, federationServer->getName().c_str());
       return;
+    }
 
-    if (isRootServer())
-      return;
-    sendToParent(message);
+    if (!isRootServer())
+    {
+      sendToParent(SharedPtr<const AbstractMessage>(message));
+    }
     erase(*federationServer);
   }
 
   // The Join messages
   void acceptAsRoot(const ConnectHandle& connectHandle, const JoinFederationExecutionRequestMessage* message)
+  {
+    JoinFederationExecutionRequest2Message message2 = TranslateTypes::translate(*message);
+    acceptAsRoot(connectHandle, &message2);
+  }
+
+  void acceptAsRoot(const ConnectHandle& connectHandle, const JoinFederationExecutionRequest2Message* message)
   {
     OpenRTIAssert(connectHandle.valid());
     OpenRTIAssert(isRootServer());
@@ -2355,10 +2653,10 @@ public:
     if (!federationServer) {
       // FederationExecutionDoesNotExist ...
       Log(ServerFederate, Info) << getServerPath()
-                                << ": JoinFederationExecutionRequestMessage faild for unknown federation named \""
+                                << ": JoinFederationExecutionRequestMessage failed for unknown federation named \""
                                 << message->getFederationExecution() << "\"!" << std::endl;
       SharedPtr<JoinFederationExecutionResponseMessage> response;
-      response = new JoinFederationExecutionResponseMessage;
+      response = MakeShared<JoinFederationExecutionResponseMessage>();
       response->setJoinFederationExecutionResponseType(JoinFederationExecutionResponseFederationExecutionDoesNotExist);
       send(connectHandle, response);
 
@@ -2367,8 +2665,16 @@ public:
       federationServer->accept(connectHandle, message);
     }
   }
+
   void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionRequestMessage* message)
-  { forwardUpstreamMessage(connectHandle, message); }
+  {
+    forwardUpstreamMessage(connectHandle, message);
+  }
+  void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionRequest2Message* message)
+  {
+    forwardUpstreamMessage(connectHandle, message); 
+  }
+
   void accept(const ConnectHandle& connectHandle, const JoinFederationExecutionResponseMessage* message)
   {
     OpenRTIAssert(connectHandle.valid());
@@ -2401,14 +2707,22 @@ public:
 
     forwardDownstreamMessage(connectHandle, message);
 
-    if (message->getJoinFederationExecutionResponseType() == JoinFederationExecutionResponseSuccess
-        && !requestConnectHandle.valid()) {
-      // if the connect has died in between, resign now again
-      SharedPtr<ResignFederationExecutionLeafRequestMessage> resign = new ResignFederationExecutionLeafRequestMessage;
-      resign->setFederationHandle(message->getFederationHandle());
-      resign->setFederateHandle(message->getFederateHandle());
-      resign->setResignAction(CANCEL_THEN_DELETE_THEN_DIVEST);
-      accept(connectHandle, resign.get());
+    if (message->getJoinFederationExecutionResponseType() == JoinFederationExecutionResponseSuccess)
+    {
+      if (!requestConnectHandle.valid())
+      {
+        // if the connect has died in between, resign now again
+        SharedPtr<ResignFederationExecutionLeafRequestMessage> resign = MakeShared<ResignFederationExecutionLeafRequestMessage>();
+        resign->setFederationHandle(message->getFederationHandle());
+        resign->setFederateHandle(message->getFederateHandle());
+        resign->setResignAction(CANCEL_THEN_DELETE_THEN_DIVEST);
+        accept(connectHandle, resign.get());
+      }
+      else
+      {
+        FederationServer* federationServer = getFederation(message->getFederationHandle());
+        federationServer->initializeMom(_serverNode->getServer(), message->getFederateHandle());
+      }
     }
   }
 
@@ -2447,7 +2761,7 @@ public:
   {
     acceptUpstreamFederationMessage(connectHandle, message);
 
-    SharedPtr<ShutdownFederationExecutionMessage> request = new ShutdownFederationExecutionMessage;
+    SharedPtr<ShutdownFederationExecutionMessage> request = MakeShared<ShutdownFederationExecutionMessage>();
     request->setFederationHandle(message->getFederationHandle());
     accept(connectHandle, request.get());
   }
@@ -2484,6 +2798,10 @@ public:
   { acceptFederationMessage(connectHandle, message); }
   void accept(const ConnectHandle& connectHandle, const DisableTimeRegulationRequestMessage* message)
   { acceptFederationMessage(connectHandle, message); }
+  void accept(const ConnectHandle& connectHandle, const EnableTimeConstrainedNotifyMessage* message)
+  { acceptFederationMessage(connectHandle, message); }
+  void accept(const ConnectHandle& connectHandle, const DisableTimeConstrainedNotifyMessage* message)
+  { acceptFederationMessage(connectHandle, message);  }
   void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampMessage* message)
   { acceptFederationMessage(connectHandle, message); }
   void accept(const ConnectHandle& connectHandle, const CommitLowerBoundTimeStampResponseMessage* message)
@@ -2555,7 +2873,7 @@ public:
   void accept(const ConnectHandle& connectHandle, const RequestClassAttributeUpdateMessage* message)
   { acceptFederationMessage(connectHandle, message); }
 
-  void accept(const ConnectHandle&, const AbstractMessage* message)
+  void accept(const ConnectHandle&, const AbstractMessage* /*message*/)
   { throw MessageError("Received unexpected message???"); }
 
   class OPENRTI_LOCAL DispatchFunctor {
@@ -2582,15 +2900,15 @@ public:
     }
   }
 
-  ConnectHandle insertConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName)
+  ConnectHandle insertConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
   {
-    ServerModel::NodeConnect* nodeConnect = Node::insertNodeConnect(messageSender, options, connectName);
+    const ServerModel::NodeConnect* nodeConnect = Node::insertNodeConnect(messageSender, options);
     return nodeConnect->getConnectHandle();
   }
 
-  ConnectHandle insertParentConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName)
+  ConnectHandle insertParentConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
   {
-    ServerModel::NodeConnect* nodeConnect = Node::insertParentNodeConnect(messageSender, options);
+    const ServerModel::NodeConnect* nodeConnect = Node::insertParentNodeConnect(messageSender, options);
     getServerOptions().setParentOptionMap(options);
     return nodeConnect->getConnectHandle();
   }
@@ -2606,7 +2924,17 @@ public:
     // Remove that from the federations.
     for (ServerModel::Federation::HandleMap::iterator i = getFederationHandleFederationMap().begin();
          i != getFederationHandleFederationMap().end(); ++i)
-      static_cast<FederationServer*>(i.get())->removeConnect(connectHandle);
+    {
+      FederationServer* federationServer = static_cast<FederationServer*>(i.get());
+      if (federationServer != nullptr)
+      {
+        federationServer->removeConnect(connectHandle);
+      }
+      //else
+      //{
+      //  DebugPrintf("%s: federationServer already gone\n", __FUNCTION__);
+      //}
+    }
 
     // And remove it here
     Node::erase(connectHandle);
@@ -2636,17 +2964,21 @@ public:
 private:
   FederationServer* getFederation(const std::string& federationName)
   {
-    ServerModel::Federation* federation = ServerModel::Node::getFederation(federationName);
-    if (!federation)
-      return 0;
-    return static_cast<FederationServer*>(federation);
+    ServerModel::Federation::NameMap::iterator i = _federationNameFederationMap.find(federationName);
+    if (i == _federationNameFederationMap.end())
+      return nullptr;
+    if (i.get() == nullptr)
+      return nullptr;
+    return static_cast<FederationServer*>(i.get());
   }
   FederationServer* getFederation(const FederationHandle& federationHandle)
   {
-    ServerModel::Federation* federation = ServerModel::Node::getFederation(federationHandle);
-    if (!federation)
-      return 0;
-    return static_cast<FederationServer*>(federation);
+    ServerModel::Federation::HandleMap::iterator i = _federationHandleFederationMap.find(federationHandle);
+    if (i == _federationHandleFederationMap.end())
+      return nullptr;
+    if (i.get() == nullptr)
+      return nullptr;
+    return static_cast<FederationServer*>(i.get());
   }
 
 
@@ -2660,6 +2992,7 @@ private:
     ServerModel::NodeConnect* connect = getNodeConnect(getParentConnectHandle());
     OpenRTIAssert(connect);
 
+    //DebugPrintf("%s: connect version=%d\n", __FUNCTION__, connect->getVersion());
     FederationServer* federationServer = new FederationServer(*this);
     federationServer->setName(name);
     federationServer->setFederationHandle(federationHandle);
@@ -2675,16 +3008,17 @@ private:
   /// 1. know where to respond.
   /// 2. to be able to replay these messages if the parent dies
   /// Note that the connect handles are invalidated once a connect dies while a response
-  /// is pending. This way we can keep track of the responses even when some reqests get
+  /// is pending. This way we can keep track of the responses even when some requests get
   /// invalid before they completed.
-  /// FIXME have also a list per connect so that only those are invaliated ...
+  /// FIXME have also a list per connect so that only those are invalidated ...
   typedef std::pair<ConnectHandle, SharedPtr<const AbstractMessage> > ConnectHandleMessagePair;
   typedef std::list<ConnectHandleMessagePair> ConnectHandleMessagePairList;
   ConnectHandleMessagePairList _pendingMessageList;
+  AbstractServerNode* _serverNode;
 };
 
 ServerNode::ServerNode() :
-  _serverMessageDispatcher(new ServerMessageDispatcher)
+  _serverMessageDispatcher(new ServerMessageDispatcher(this)), _server(nullptr)
 {
 }
 
@@ -2727,14 +3061,13 @@ ServerNode::getServerOptions() const
 ConnectHandle
 ServerNode::_insertConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
 {
-  return _serverMessageDispatcher->insertConnect(messageSender, options, getServerName().c_str());
+  return _serverMessageDispatcher->insertConnect(messageSender, options);
 }
 
 ConnectHandle
 ServerNode::_insertParentConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
 {
-  std::string connectName = getServerName() + "(Parent)";
-  return _serverMessageDispatcher->insertParentConnect(messageSender, options, connectName.c_str());
+  return _serverMessageDispatcher->insertParentConnect(messageSender, options);
 }
 
 void
@@ -2747,6 +3080,12 @@ void
 ServerNode::_dispatchMessage(const AbstractMessage* message, const ConnectHandle& connectHandle)
 {
   _serverMessageDispatcher->dispatch(*message, connectHandle);
+}
+
+
+OpenRTI::ServerModel::NodeConnect* ServerNode::getParentConnect() const
+{
+  return _serverMessageDispatcher->getNodeConnect(_serverMessageDispatcher->getParentConnectHandle());
 }
 
 } // namespace OpenRTI

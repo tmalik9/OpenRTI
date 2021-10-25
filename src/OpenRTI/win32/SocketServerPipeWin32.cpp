@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "SocketServerPipe.h"
 
 #include "SocketPrivateDataWin32.h"
@@ -30,18 +31,18 @@ SocketServerPipe::SocketServerPipe() :
 }
 
 void
-SocketServerPipe::bind(const std::string& file)
+SocketServerPipe::bind(const std::string& /*file*/)
 {
   throw RTIinternalError("Pipes are not implemented on WIN32");
 }
 
 void
-SocketServerPipe::listen(int backlog)
+SocketServerPipe::listen(int /*backlog*/)
 {
   throw RTIinternalError("Pipes are not implemented on WIN32");
 }
 
-SocketPipe*
+SharedPtr<SocketStream>
 SocketServerPipe::accept()
 {
   throw RTIinternalError("Pipes are not implemented on WIN32");

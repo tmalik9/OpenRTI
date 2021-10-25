@@ -17,22 +17,15 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractMessageEncoding.h"
 
 #include "Message.h"
 
 namespace OpenRTI {
 
-AbstractMessageEncoding::AbstractMessageEncoding()
-{
-}
-
-AbstractMessageEncoding::~AbstractMessageEncoding()
-{
-}
-
 bool
-AbstractMessageEncoding::getEnableRead() const
+AbstractMessageEncoding::getEnableRead() const noexcept
 {
   return true;
 }
@@ -51,11 +44,19 @@ bool AbstractMessageEncoding::getMoreToSend() const
   return !_connect->empty();
 }
 
+size_t AbstractMessageEncoding::getBytesQueued() const
+{
+  size_t bytesQueued = _connect->getMessageReceiver()->getBytesQueued();
+  size_t bytesBuffered = getBytesBuffered();
+  //DebugPrintf("%s: bytesQueued=%d bytesBuffered=%d\n", __FUNCTION__, bytesQueued, bytesBuffered);
+  return bytesQueued + bytesBuffered;
+}
+
 void
 AbstractMessageEncoding::error(const Exception& e)
 {
   /// FIXME!!!, just have a ConnectionClosed message. Depending on the server nodes state, it can decide what to do
-  SharedPtr<ConnectionLostMessage> message = new ConnectionLostMessage;
+  SharedPtr<ConnectionLostMessage> message = MakeShared<ConnectionLostMessage>();
   message->setFaultDescription(e.getReason());
   _connect->send(message);
   _connect->close();

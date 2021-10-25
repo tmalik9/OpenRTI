@@ -27,11 +27,10 @@
 #error "must include OpenRTIConfig.h!"
 #endif
 
-#if 201103L <= __CPlusPlusStd
-# include <condition_variable>
-# include "Clock.h"
-# include "Mutex.h"
-#endif
+#include <condition_variable>
+#include "Clock.h"
+#include "AbsTimeout.h"
+#include "Mutex.h"
 
 namespace OpenRTI {
 
@@ -40,72 +39,43 @@ class ScopeLock;
 
 class OPENRTI_API Condition {
 public:
-#if 201103L <= __CPlusPlusStd
-  Condition(void)
-  { }
-#else
-  Condition(void);
-#endif
-#if 201103L <= __CPlusPlusStd
-  ~Condition(void)
-  { }
-#else
-  ~Condition(void);
-#endif
+  Condition() noexcept { }
+  ~Condition() noexcept { }
 
-#if 201103L <= __CPlusPlusStd
-  void notify_one(void)
-  { _condition.notify_one(); }
-#else
-  void notify_one(void);
-#endif
-#if 201103L <= __CPlusPlusStd
-  void notify_all(void)
-  { _condition.notify_all(); }
-#else
-  void notify_all(void);
-#endif
-
-#if 201103L <= __CPlusPlusStd
-  void wait(ScopeLock& scopeLock)
-  { _condition.wait(scopeLock); }
-#else
-  void wait(ScopeLock& scopeLock);
-#endif
-#if 201103L <= __CPlusPlusStd
-  bool wait_until(ScopeLock& scopeLock, const Clock& timeout)
+  void notify_one() noexcept { _condition.notify_one(); }
+  void notify_all() { _condition.notify_all(); }
+  void wait(ScopeLock& scopeLock) { _condition.wait(scopeLock); }
+  bool wait_until(ScopeLock& scopeLock, const AbsTimeout& timeout)
   {
-    // Try to prevent overflow
-    std::chrono::nanoseconds nsec;
-    if (timeout.getNSec() <= (uint64_t)std::chrono::nanoseconds::max().count())
-      nsec = std::chrono::nanoseconds(timeout.getNSec());
+    if (timeout.getTimeout() == Clock::max())
+    {
+      _condition.wait(scopeLock);
+      return true;
+    }
     else
-      nsec = std::chrono::nanoseconds::max();
-
-    typedef std::chrono::steady_clock::duration duration_type;
-    duration_type duration;
-    if (nsec <= std::chrono::duration_cast<std::chrono::nanoseconds>(duration_type::max()))
-      duration = std::chrono::duration_cast<duration_type>(nsec);
-    else
-      duration = duration_type::max();
-
-    std::chrono::steady_clock::time_point tp = std::chrono::steady_clock::time_point(duration);
-    return std::cv_status::timeout != _condition.wait_until(scopeLock, tp);
+    {
+      while (!timeout.isExpired())
+      {
+        std::chrono::steady_clock::time_point tp(timeout.getTimeout());
+        std::cv_status status = _condition.wait_until(scopeLock, tp);
+        if (status == std::cv_status::no_timeout) return true;
+      }
+      return false;
+    }
   }
-#else
-  bool wait_until(ScopeLock& scopeLock, const Clock& abstime);
-#endif
+  bool wait_until(ScopeLock& scopeLock, const Clock& abstime)
+  {
+    AbsTimeout timeout(abstime);
+    return wait_until(scopeLock, timeout);
+  }
 
 private:
   Condition(const Condition&) = delete;
+  Condition(Condition&&) = delete;
   Condition& operator=(const Condition&) = delete;
+  Condition& operator=(Condition&&) = delete;
 
-#if 201103L <= __CPlusPlusStd
   std::condition_variable _condition;
-#else
-  struct PrivateData;
-  PrivateData* _privateData;
-#endif
 };
 
 } // namespace OpenRTI

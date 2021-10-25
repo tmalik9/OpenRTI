@@ -22,6 +22,7 @@
 #include <processenv.h>
 #endif
 
+#include "DebugNew.h"
 #include "LogStream.h"
 
 #include <cstdlib>
@@ -32,15 +33,20 @@
 #include "Referenced.h"
 #include "ScopeLock.h"
 #include "SharedPtr.h"
-#include "SingletonPtr.h"
 #include "StringUtils.h"
 #include "ThreadLocal.h"
 
-#ifdef _MSC_VER
+#if defined(_WIN32)
+#if __CPlusPlusStd >= 201703L
 #include <filesystem>
-
+#if _MSC_VER >= 1920
+namespace fs = std::filesystem;
+#else
 namespace fs = std::experimental::filesystem;
 #endif
+#endif
+#endif
+
 namespace OpenRTI {
 
 class OPENRTI_LOCAL LogStream::StreamPair {
@@ -52,18 +58,18 @@ public:
   struct OPENRTI_LOCAL ReferencedMutex : public Referenced {
     Mutex _mutex;
   };
-  static SharedPtr<ReferencedMutex> getReferencedMutex()
+  static SharedPtr<ReferencedMutex>& getReferencedMutex()
   {
-    static SingletonPtr<ReferencedMutex> referencedMutex;
-    return referencedMutex.get();
+    static SharedPtr<ReferencedMutex> referencedMutex = MakeShared<ReferencedMutex>();
+    return referencedMutex;
   }
 
   struct OPENRTI_LOCAL StreamBuf : public std::stringbuf {
   public:
-    StreamBuf(std::ostream& stream) :
+    StreamBuf(std::ostream& /*stream*/) :
       _referencedMutex(getReferencedMutex())
     {
-      AddStream(stream);
+      //AddStream(stream);
     }
     void AddStream(std::ostream& stream)
     {
@@ -79,7 +85,7 @@ public:
     }
 
   protected:
-    virtual int sync()
+    int sync() override
     {
       // Not having the mutex here can only happen in weired circumstances.
       // But if so, do not hold back the message.
@@ -207,7 +213,8 @@ LogStream::setPriority(LogStream::Priority priority)
 void LogStream::AddLogFile(const std::string& path)
 {
   std::string expandedPath = path;
-#if defined(_WIN32)
+#if defined(_WIN32) 
+#if __CPlusPlusStd >= 201703L
   DWORD requiredSize = ExpandEnvironmentStringsA(path.c_str(), NULL, 0);
   char* buffer = new char[requiredSize];
   DWORD expandedSize = ExpandEnvironmentStringsA(path.c_str(), buffer, requiredSize);
@@ -220,6 +227,7 @@ void LogStream::AddLogFile(const std::string& path)
   {
     fs::create_directories(directory);
   }
+#endif
 #endif
   LogStream& logger = Instance();
   std::cout << "Logging to \"" << expandedPath << "\"" << std::endl;
@@ -245,7 +253,7 @@ void LogStream::EnableLogToConsole(bool enable)
 }
 
 LogStream&
-LogStream::Instance(void)
+LogStream::Instance()
 {
   static LogStream logStreamInstance;
   return logStreamInstance;

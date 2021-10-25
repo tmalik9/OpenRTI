@@ -17,14 +17,43 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ServerModel.h"
 
 #include "ServerOptions.h"
 #include <sstream>
 #include <iomanip>
+#include "MessageQueue.h"
+#include "ServerNode.h"
+#include "mom/MomServer.h"
+#include "mom/MomFederateMetrics.h"
+#include "mom/AbstractFederateMetrics.h"
+#include "MessageEncodingRegistry.h"
 
 namespace OpenRTI {
 namespace ServerModel {
+
+static const unsigned int kIndentSpaces = 2;
+
+static inline std::string normalizeTransportationType(const TransportationType& value)
+{
+  switch (value)
+  {
+    case RELIABLE: return "HLAreliable";
+    case BEST_EFFORT: return "HLAbestEffort";
+    default: return "";
+  }
+}
+
+static inline std::string normalizeOrderType(const OrderType& value)
+{
+  switch (value)
+  {
+    case RECEIVE: return "Receive";
+    case TIMESTAMP: return "TimeStamp";
+    default: return "";
+  }
+}
 
 ////////////////////////////////////////////////////////////
 
@@ -63,6 +92,15 @@ InstanceAttribute::setAttributeHandle(const AttributeHandle& attributeHandle)
   HandleEntity<InstanceAttribute, AttributeHandle>::_setHandle(attributeHandle);
 }
 
+
+void InstanceAttribute::setOwnerFederate(const FederateHandle& federateHandle)
+{
+  //DebugPrintf("%s: name=%s.%s FederateHandle(%d) => FederateHandle(%d)\n", __FUNCTION__, 
+  //            _classAttribute.getObjectClass().getFQName().c_str(),
+  //            _classAttribute.getAttributeDefinition().getName().c_str(), 
+  //            _ownerFederate.getHandle(), federateHandle.getHandle());
+  _ownerFederate = federateHandle;
+}
 
 void InstanceAttribute::removeConnect(const ConnectHandle& connectHandle)
 {
@@ -152,7 +190,7 @@ ObjectInstance::reference(FederationConnect& federationConnect)
     return;
   ObjectInstanceConnect* objectInstanceConnect;
   objectInstanceConnect = new ObjectInstanceConnect(*this, federationConnect);
-  insert(*objectInstanceConnect);
+  _connectHandleObjectInstanceConnectMap.insert(*objectInstanceConnect);
   federationConnect.insert(*objectInstanceConnect);
 }
 
@@ -195,16 +233,6 @@ ObjectInstance::setObjectClass(ObjectClass* objectClass)
       setSubscriptionType(subscriber, SubscribedActive);
     }
   }
-  /*
-  size_t numSubscribers2 = getSubscribedConnectHandleSet().size();
-  DebugPrintf("%s: name=%s class=%s %d subscribers before, %d now\n", __FUNCTION__,
-              getName().c_str(), objectClass->getFQName().c_str(),
-              numSubscribers, numSubscribers2);
-  for (auto& subscriber : getSubscribedConnectHandleSet())
-  {
-    DebugPrintf("%s: subscriber=%s\n", __FUNCTION__, subscriber.toString().c_str());
-  }
-  */
 }
 
 ////////////////////////////////////////////////////////////
@@ -275,6 +303,15 @@ Synchronization::insert(Federate& federate)
   OpenRTIAssert(_achievedFederateSyncronizationMap.find(federate.getFederateHandle()) == _achievedFederateSyncronizationMap.end());
   if (federate.getResignPending())
     return;
+  if (federate.getIsInternal())
+  {
+    //DebugPrintf("%s(label=%s): federate %s is internal\n", __FUNCTION__, getLabel().c_str(), federate.getName().c_str());
+    return;
+  }
+  //else
+  //{
+  //  DebugPrintf("%s(label=%s): inserted federate %s\n", __FUNCTION__, getLabel().c_str(), federate.getName().c_str());
+  //}
   SynchronizationFederate* synchronizationFederate = new SynchronizationFederate(*this, federate);
   synchronizationFederate->setFederateHandle(federate.getFederateHandle());
   federate.insert(*synchronizationFederate);
@@ -298,12 +335,13 @@ Synchronization::achieved(const FederateHandle& federateHandle, bool successful)
 
 ////////////////////////////////////////////////////////////
 
-Federate::Federate(Federation& federation) :
-  _federation(federation),
-  _resignAction(CANCEL_THEN_DELETE_THEN_DIVEST),
-  _resignPending(false),
-  _federationConnect(0),
-  _commitId()
+Federate::Federate(Federation& federation)
+  : _federation(federation)
+  , _resignAction(CANCEL_THEN_DELETE_THEN_DIVEST)
+  , _resignPending(false)
+  , _federationConnect(0)
+  , _commitId()
+  , _isInternal(false)
 {
 }
 
@@ -361,8 +399,13 @@ Federate::getRegion(const LocalRegionHandle& regionHandle)
 bool
 Federate::getIsTimeRegulating() const
 {
-  // OpenRTIAssert(!SecondList::Hook::is_linked() || _federationConnect->_permitTimeRegulation);
-  return SecondList::Hook::is_linked();
+  return TimeRegulatingList::Hook::is_linked();
+}
+
+bool
+Federate::getIsTimeConstrained() const
+{
+  return TimeConstrainedList::Hook::is_linked();
 }
 
 void
@@ -450,17 +493,6 @@ Dimension::getIsReferencedByAnyModule() const
 
 ////////////////////////////////////////////////////////////
 
-UpdateRateModule::UpdateRateModule(UpdateRate& updateRate, Module& module) :
-  _updateRate(updateRate), _module(module)
-{
-}
-
-UpdateRateModule::~UpdateRateModule()
-{
-}
-
-////////////////////////////////////////////////////////////
-
 UpdateRate::UpdateRate(Federation& federation) :
   _federation(federation),
   _rate(0)
@@ -473,27 +505,9 @@ UpdateRate::~UpdateRate()
 }
 
 void
-UpdateRate::setName(const std::string& name)
-{
-  ModuleEntity<UpdateRate, UpdateRateHandle>::_setString(name);
-}
-
-void
-UpdateRate::setUpdateRateHandle(const UpdateRateHandle& updateRateHandle)
-{
-  ModuleEntity<UpdateRate, UpdateRateHandle>::_setHandle(updateRateHandle);
-}
-
-void
 UpdateRate::setRate(const double& rate)
 {
   _rate = rate;
-}
-
-bool
-UpdateRate::getIsReferencedByAnyModule() const
-{
-  return !_updateRateModuleList.empty();
 }
 
 ////////////////////////////////////////////////////////////
@@ -558,6 +572,17 @@ void
 ParameterDefinition::setParameterHandle(const ParameterHandle& parameterHandle)
 {
   HandleStringEntity<ParameterDefinition, ParameterHandle>::_setHandle(parameterHandle);
+}
+
+
+void ParameterDefinition::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level+1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<parameter>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<dataType>)XML" << getDataType() << R"XML(</dataType>)XML" << std::endl;
+  out << indent << R"XML(</parameter>)XML" << std::endl;
 }
 
 ////////////////////////////////////////////////////////////
@@ -663,18 +688,18 @@ InteractionClass::eraseParameterDefinitions()
   OpenRTIAssert(_parameterNameParameterMap.empty());
 }
 
-std::size_t
+uint32_t
 InteractionClass::getNumParameterDefinitions() const
 {
   // FIXME O(N)
-  return _parameterHandleParameterMap.size();
+  return static_cast<uint32_t>(_parameterHandleParameterMap.size());
 }
 
 ParameterHandle
 InteractionClass::getFirstUnusedParameterHandle()
 {
   // FIXME this is O(N)
-  std::size_t numParameters = 0;
+  uint32_t numParameters = 0;
   if (_parentInteractionClass)
     numParameters += _parentInteractionClass->getFirstUnusedParameterHandle().getHandle();
   numParameters += getNumParameterDefinitions();
@@ -689,38 +714,83 @@ InteractionClass::insert(ParameterDefinition& parameterDefinition)
   insertClassParameterFor(parameterDefinition);
 }
 
-bool InteractionClass::AddParameterFilterValues(ParameterFilterMap& filterMap, const ParameterValueVector& parameterFilters)
+// Normalize the given parameterFilters to match the this->_parameterFilterKeyPrototype. For unspecified values wildcards (empty VLD) will be inserted.
+// The result is split up to filterKeyVector (the parameter handles) and filterValueTuple.
+void InteractionClass::NormalizeFilterValues(const ParameterValueVector& parameterFilters, ParameterHandleVector& filterKeyVector, VariableLengthDataTuple& filterValueTuple) const
 {
-  bool result = false;
-  for (auto& parameterFilterValue : parameterFilters) {
-    auto existingValueMapIter = filterMap.find(parameterFilterValue.getParameterHandle());
-    if (existingValueMapIter == filterMap.end()) {
-      // parameter not filtered yet: insert list with one element ...
-      VariableLengthDataSet values;
-      values.insert(parameterFilterValue.getValue());
-      // ... into existing map
-      filterMap.insert(ParameterFilterMap::value_type(parameterFilterValue.getParameterHandle(), values));
-      //DebugPrintf("%s(%s): parameter added\n", __FUNCTION__, getFQName().c_str());
-      result = true;
-    } else {
-      // parameter already has filter: insert value to existing list of values
-      // first scan the value list if value already associated with parameter
-      VariableLengthDataSet& values = existingValueMapIter->second;
-      if (values.find(parameterFilterValue.getValue()) != values.end())
-      {
-        // value already exists - continue with next parameterFilterValue
-        continue;
-      }
-      // new value: add to list
-      existingValueMapIter->second.insert(parameterFilterValue.getValue());
-      //DebugPrintf("%s(%s): value added\n", __FUNCTION__, getFQName().c_str());
-      result = true;
+  filterKeyVector = ParameterHandleVector(_parameterFilterKeyPrototype);
+  filterValueTuple = VariableLengthDataTuple(filterKeyVector.size());
+  int valueIndex = 0;
+  for (auto& filterKey : filterKeyVector)
+  {
+    auto where = std::find_if(parameterFilters.begin(), parameterFilters.end(),
+      [filterKey](ParameterValue parameterValue) { return parameterValue.getParameterHandle() == filterKey; });
+    if (where == parameterFilters.end())
+    {
+      filterKey = ParameterHandle();
+      filterValueTuple[valueIndex] = VariableLengthData();
     }
+    else
+    {
+      filterValueTuple[valueIndex] = where->getValue();
+    }
+    valueIndex++;
   }
-  return result;
 }
 
-bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilters)
+// Add the specified parameterFilters to the given VariableLengthDataTupleSet
+bool InteractionClass::AddParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters)
+{
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple; // (filterKeyVector.size());
+  // update the _parameterFilterKeyPrototype, if necessary (new parameter handle specified in filter for the first time)
+  for (auto& item : parameterFilters)
+  {
+    if (std::find(_parameterFilterKeyPrototype.begin(), _parameterFilterKeyPrototype.end(), item.getParameterHandle()) == _parameterFilterKeyPrototype.end())
+    {
+      _parameterFilterKeyPrototype.push_back(item.getParameterHandle());
+    }
+  }
+  // bring the parameterFilters into a form matching _parameterFilterKeyPrototype. 
+  NormalizeFilterValues(parameterFilters, filterKeyVector, filterValueTuple);
+  if (!filterValueTuples.Contains(filterValueTuple))
+  {
+    filterValueTuples.Insert(filterValueTuple);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+// Add the specified parameterFilters to the given VariableLengthDataTupleSet
+bool InteractionClass::RemoveParameterFilterValues(VariableLengthDataTupleSet& filterValueTuples, const ParameterValueVector& parameterFilters)
+{
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple; // (filterKeyVector.size());
+  // update the _parameterFilterKeyPrototype, if necessary (new parameter handle specified in filter for the first time)
+  for (auto& item : parameterFilters)
+  {
+    if (std::find(_parameterFilterKeyPrototype.begin(), _parameterFilterKeyPrototype.end(), item.getParameterHandle()) == _parameterFilterKeyPrototype.end())
+    {
+      _parameterFilterKeyPrototype.push_back(item.getParameterHandle());
+    }
+  }
+  // bring the parameterFilters into a form matching _parameterFilterKeyPrototype. 
+  NormalizeFilterValues(parameterFilters, filterKeyVector, filterValueTuple);
+  if (filterValueTuples.Contains(filterValueTuple))
+  {
+    filterValueTuples.Erase(filterValueTuple);
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectHandle, const ParameterValueVector& parameterFilters, bool remove)
 {
   bool result = false;
   if (!connectHandle.valid())
@@ -731,21 +801,14 @@ bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectH
     return false;
   }
   auto where = _parameterFiltersByConnect.find(connectHandle);
-  if (parameterFilters.empty() /* && where != _parameterFiltersByFederate.end() */)
+  if (where == _parameterFiltersByConnect.end() && !remove)
   {
-    // given list is empty and any filter value list exists: request to remove filter
-    //_parameterFiltersByFederate.erase(where);
-    //DebugPrintf("%s(%s): empty filter list, connect=%s\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
-    return false;
-  }
-  else if (where == _parameterFiltersByConnect.end())
-  {
-    // connect handle not yet in filter: add
-    ParameterFilterMap newFilterMap;
+    // connect handle not yet in filter (and we're about to add filter): add new filter tuple set
+    VariableLengthDataTupleSet newFilterValueTupleSet;
     // convert vector <ParameterHandle, Value> to map<ParameterHandle : list of Values>
-    AddParameterFilterValues(newFilterMap, parameterFilters);
+    AddParameterFilterValues(newFilterValueTupleSet, parameterFilters);
     // now associate connect handle with ParameterFilterMap constructed above
-    _parameterFiltersByConnect.insert(ParameterFilterMapByConnect::value_type(connectHandle, newFilterMap));
+    _parameterFiltersByConnect.insert(ParameterFilterMapByConnect::value_type(connectHandle, newFilterValueTupleSet));
     //DebugPrintf("%s(%s): added connect %s\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
     result = true;
   }
@@ -754,16 +817,67 @@ bool InteractionClass::updateParameterFilterValues(const ConnectHandle& connectH
     // filter already exists for given connect ...
     auto& existingFilterValues = where->second;
     // merge given filters into existing parameter filter map
-    result = AddParameterFilterValues(existingFilterValues, parameterFilters);
+    if (remove)
+    {
+      result = RemoveParameterFilterValues(existingFilterValues, parameterFilters);
+      if (parameterFilters.empty())
+      {
+        _parameterFiltersByConnect.erase(connectHandle);
+      }
+    }
+    else
+    {
+      result = AddParameterFilterValues(existingFilterValues, parameterFilters);
+      for (auto& entry : _parameterFiltersByConnect)
+      {
+        if (entry.first != where->first)
+        {
+          entry.second.SetTupleSize(_parameterFilterKeyPrototype.size());
+        }
+      }
+    }
   }
-  //Dump(__FUNCTION__, _parameterFiltersByConnect);
   return result;
 }
 
+bool InteractionClass::clearParameterFilters(const ConnectHandle& connectHandle)
+{
+  if (!connectHandle.valid())
+  {
+    // given list is empty and any filter value list exists: request to remove filter
+    //_parameterFiltersByFederate.erase(where);
+    DebugPrintf("%s(%s): invalid connect handle\n", __FUNCTION__, getFQName().c_str());
+    return false;
+  }
+  auto where = _parameterFiltersByConnect.find(connectHandle);
+  if (where != _parameterFiltersByConnect.end())
+  {
+    _parameterFiltersByConnect.erase(where);
+    return true;
+  }
+  return false;
+}
 
 bool InteractionClass::hasFilterSubscriptions() const
 {
   return !_parameterFiltersByConnect.empty();
+}
+
+bool InteractionClass::hasFilterSubscriptions(const ConnectHandle& connectHandle) const
+{
+  if (!connectHandle.valid())
+  {
+    // given list is empty and any filter value list exists: request to remove filter
+    //_parameterFiltersByFederate.erase(where);
+    DebugPrintf("%s(%s): invalid connect handle\n", __FUNCTION__, getFQName().c_str());
+    return false;
+  }
+  auto where = _parameterFiltersByConnect.find(connectHandle);
+  if (where != _parameterFiltersByConnect.end())
+  {
+    return true;
+  }
+  return false;
 }
 
 template<typename TInputIter>
@@ -785,7 +899,7 @@ std::string make_hex_string(TInputIter first, TInputIter last, bool use_uppercas
 // In the parameter filter set defined in _parameterFiltersByConnect, test if all parameters from parameterValues match a given value.
 // if no parameter filter is defined for connectHandle, return true (all parameters 'match').
 // If there is no parameter filter specified for any of the parameters in parameterValues, also return true.
-bool InteractionClass::isFiltered(const ConnectHandle& connectHandle, const ParameterValueVector& parameterValues) const
+bool InteractionClass::isMatching(const ConnectHandle& connectHandle, const ParameterValueVector& parameterValues) const
 {
   auto where = _parameterFiltersByConnect.find(connectHandle);
   if (where == _parameterFiltersByConnect.end())
@@ -794,81 +908,85 @@ bool InteractionClass::isFiltered(const ConnectHandle& connectHandle, const Para
     return true;
   }
   // filter exists for given connect ...
-  const ParameterFilterMap& parameterFilterValues = where->second;
-  // match vector <ParameterHandle, Value> with existing map<ParameterHandle : list of Values>
+  const VariableLengthDataTupleSet& parameterFilterMap = where->second;
+  
   // go through received parameter value vector ...
-  if (parameterFilterValues.empty())
+  if (parameterFilterMap.empty())
   {
     //DebugPrintf("%s(name=%s): connect %s has no filter parameters\n", __FUNCTION__, getFQName().c_str(), connectHandle.toString().c_str());
     //Dump(__FUNCTION__, _parameterFiltersByConnect);
     return true;
   }
-  // go through all parameters specified in interaction ...
-  for (auto& parameterValue : parameterValues)
-  {
-    // ... and match parameter handles against each handle specified by filter subscriptions
-    auto parameterFilterIter = parameterFilterValues.find(parameterValue.getParameterHandle());
-    if (parameterFilterIter != parameterFilterValues.end())
-    {
-      //DebugPrintf("%s(name=%s): %s in list\n", __FUNCTION__, getFQName().c_str(), parameterValue.getParameterHandle().toString().c_str());
-      const VariableLengthData& parameterData = parameterValue.getValue();
-      // now go through each specified valid filter value for given parameter
-      const VariableLengthDataSet& values = parameterFilterIter->second;
-      if (values.find(parameterData) == values.end())
-      {
-        // value not found in set of allowed values for the current filter parameter => mismatch
-        return false;
-      }
-    }
-    // else: there is no filter for specified parameter, skip
-  }
-  // no mismatch found => match
-  return true;
+
+  ParameterHandleVector filterKeyVector;
+  VariableLengthDataTuple filterValueTuple;
+
+  NormalizeFilterValues(parameterValues, filterKeyVector, filterValueTuple);
+  return parameterFilterMap.FindNormalized(filterValueTuple);
 }
 
-
-ParameterValueVector InteractionClass::getParameterFilters(const ConnectHandle& connectHandle)
+ParameterValueVector InteractionClass::getParameterFilterPrototype() const
 {
-  ParameterValueVector result;
+  ParameterValueVector result(_parameterFilterKeyPrototype.size());
+  for (size_t index=0;index<result.size();index++)
+  {
+    result[index].setParameterHandle(_parameterFilterKeyPrototype[index]);
+  }
+  return result;
+}
+
+std::list<ParameterValueVector> InteractionClass::getParameterFilters(const ConnectHandle& connectHandle)
+{
+  std::list<ParameterValueVector> result;
   auto where = _parameterFiltersByConnect.find(connectHandle);
   if (where != _parameterFiltersByConnect.end())
   {
     // filter exists for given connect ...
-    auto& parameterFilterValues = where->second;
-    for (auto& parameterFilter : parameterFilterValues)
+    const VariableLengthDataTupleSet& parameterFilterValues = where->second;
+    // iterate whole set of tuples ...
+    for (auto& parameterTuple : parameterFilterValues)
     {
-      for (auto& value : parameterFilter.second)
+      ParameterValueVector resultElement(getParameterFilterPrototype());
+      auto resultElementIter = resultElement.begin();
+      // fill ParameterValueVector with values from tuple ...
+      for (auto& parameterValue : parameterTuple)
       {
-        ParameterValue parameterValue;
-        parameterValue.setParameterHandle(parameterFilter.first);
-        parameterValue.setValue(value);
-        result.push_back(parameterValue);
+        resultElementIter->setValue(parameterValue);
+        resultElementIter++;
       }
+      result.push_back(resultElement);
     }
   }
   return result;
 }
 
-void InteractionClass::Dump(const char* prefix, const VariableLengthDataSet& filterValues) const
+std::string InteractionClass::DumpInteractionFilters()
 {
-  for (auto& parameterData : filterValues)
+  std::ostringstream out;
+  for (auto& parameterFiltersByConnectEntry : _parameterFiltersByConnect)
   {
-    std::string dataRepr = make_hex_string(parameterData.charData(), parameterData.charData() + parameterData.size(), true, true);
-    DebugPrintf("%s(%s):     %s\n", prefix, getFQName().c_str(), dataRepr.c_str());
+    out << parameterFiltersByConnectEntry.first << " : " << std::endl;
+    out << parameterFiltersByConnectEntry.second << std::endl;
   }
+  return out.str();
 }
 
-void InteractionClass::Dump(const char* prefix, const ParameterFilterMapByConnect& filterValuesByConnect) const
+void InteractionClass::writeCurrentFDD(std::ostream& out, unsigned int level) const
 {
-  for (auto& [filteredConnectHandle, parameterFilterValues] : filterValuesByConnect)
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level+1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<interactionClass>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName().back() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<order>)XML" << normalizeOrderType(getOrderType()) << R"XML(</order>)XML" << std::endl;
+  for (const ParameterDefinition& parameter : _parameterHandleParameterMap)
   {
-    DebugPrintf("%s(%s): connect %s has %d filter parameters\n", prefix, getFQName().c_str(), filteredConnectHandle.toString().c_str(), parameterFilterValues.size());
-    for (auto& parameterFilter : parameterFilterValues)
-    {
-      DebugPrintf("%s(%s):   %s\n", prefix, getFQName().c_str(), parameterFilter.first.toString().c_str());
-      Dump(prefix, parameterFilter.second);
-    }
+    parameter.writeCurrentFDD(out, level + 1);
   }
+  for (const InteractionClass& childClass : getChildInteractionClassList())
+  {
+    childClass.writeCurrentFDD(out, level + 1);
+  }
+  out << indent << R"XML(</interactionClass>)XML" << std::endl;
 }
 
 ParameterDefinition*
@@ -887,6 +1005,20 @@ InteractionClass::getParameterDefinition(const ParameterHandle& parameterHandle)
   if (i == _parameterHandleParameterMap.end())
     return 0;
   return i.get();
+}
+
+ParameterDefinition*
+InteractionClass::findParameterDefinition(const ParameterHandle& parameterHandle)
+{
+  ParameterDefinition* definition = nullptr;
+  InteractionClass* interactionClass = this;
+  definition = interactionClass->getParameterDefinition(parameterHandle);
+  while (definition == nullptr && interactionClass->getParentInteractionClass() != nullptr)
+  {
+    interactionClass = interactionClass->getParentInteractionClass();
+    definition = interactionClass->getParameterDefinition(parameterHandle);
+  }
+  return definition;
 }
 
 void
@@ -988,6 +1120,24 @@ AttributeDefinition::setTransportationType(TransportationType transportationType
   _transportationType = transportationType;
 }
 
+void AttributeDefinition::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level+1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<attribute>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<dataType>)XML" << getDataType() << R"XML(</dataType>)XML" << std::endl;
+  out << indent1 << R"XML(<order>)XML" << normalizeOrderType(getOrderType()) << R"XML(</order>)XML" << std::endl;
+  out << indent1 << R"XML(<transportation>)XML" << normalizeTransportationType(getTransportationType()) << R"XML(</transportation>)XML" << std::endl;
+            //<updateType>Static</updateType>
+            //<updateCondition>NA</updateCondition>
+            //<ownership>DivestAcquire</ownership>
+            //<sharing>PublishSubscribe</sharing>
+            //<transportation>HLAreliable</transportation>
+            //<order>TimeStamp</order>
+  out << indent << R"XML(</attribute>)XML" << std::endl;
+}
+
 ////////////////////////////////////////////////////////////
 
 ObjectClass::ObjectClass(Federation& federation, ObjectClass* parentObjectClass) :
@@ -1075,18 +1225,18 @@ ObjectClass::eraseAttributeDefinitions()
   OpenRTIAssert(_attributeNameAttributeDefinitionMap.empty());
 }
 
-std::size_t
+uint32_t
 ObjectClass::getNumAttributeDefinitions() const
 {
   // FIXME O(N)
-  return _attributeHandleAttributeDefinitionMap.size();
+  return static_cast<uint32_t>(_attributeHandleAttributeDefinitionMap.size());
 }
 
 AttributeHandle
 ObjectClass::getFirstUnusedAttributeHandle()
 {
   // FIXME this is O(N)
-  std::size_t numAttributes = 0;
+  uint32_t numAttributes = 0;
   if (_parentObjectClass)
     numAttributes += _parentObjectClass->getFirstUnusedAttributeHandle().getHandle();
   numAttributes += getNumAttributeDefinitions();
@@ -1219,6 +1369,7 @@ void ObjectClass::_updateCumulativeSubscription(const ConnectHandle& connectHand
       continue;
 
     if (subscribe) {
+
       // Insert the connect handle into the receiving connects
       if (!instanceAttribute->_receivingConnects.insert(connectHandle).second)
         continue;
@@ -1240,12 +1391,31 @@ void ObjectClass::_updateCumulativeSubscription(const ConnectHandle& connectHand
   }
 }
 
+
+void ObjectClass::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level+1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<objectClass>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName().back() << R"XML(</name>)XML" << std::endl;
+  for (const AttributeDefinition& attribute : _attributeHandleAttributeDefinitionMap)
+  {
+    attribute.writeCurrentFDD(out, level + 1);
+  }
+  for (const ObjectClass& childClass : getChildObjectClassList())
+  {
+    childClass.writeCurrentFDD(out, level + 1);
+  }
+  out << indent << R"XML(</objectClass>)XML" << std::endl;
+}
+
 ////////////////////////////////////////////////////////////
 
-Module::Module(Federation& federation) :
-  _federation(federation),
-  _artificialInteractionRoot(false),
-  _artificialObjectRoot(false)
+Module::Module(Federation& federation, const std::string& designator)
+  : _federation(federation)
+  , _designator(designator)
+  , _artificialInteractionRoot(false)
+  , _artificialObjectRoot(false)
 {
 }
 
@@ -1257,6 +1427,12 @@ Module::~Module()
   OpenRTIAssert(_parameterDefinitionModuleList.empty());
   OpenRTIAssert(_objectClassModuleList.empty());
   OpenRTIAssert(_attributeDefinitionModuleList.empty());
+  OpenRTIAssert(_basicDataTypeModuleList.empty());
+  OpenRTIAssert(_simpleDataTypeModuleList.empty());
+  OpenRTIAssert(_enumeratedDataTypeModuleList.empty());
+  OpenRTIAssert(_arrayDataTypeModuleList.empty());
+  OpenRTIAssert(_fixedRecordDataTypeModuleList.empty());
+  OpenRTIAssert(_variantRecordDataTypeModuleList.empty());
 }
 
 void
@@ -1290,7 +1466,7 @@ Module::getModule(FOMModule& module)
   // FOMSwitchList _switchList;
   module.setArtificialInteractionRoot(getArtificialInteractionRoot());
   module.setArtificialObjectRoot(getArtificialObjectRoot());
-  module.setContent(getContent());
+  module.setDesignator(getDesignator());
 
   module.getDimensionList().reserve(_dimensionModuleList.size());
   for (DimensionModule::FirstList::iterator i = _dimensionModuleList.begin();
@@ -1314,6 +1490,16 @@ Module::getModule(FOMModule& module)
     fomUpdateRate.setRate(updateRate.getRate());
   }
 
+  /*
+  module.getBasicDataTypeList().reserve(_basicDataTypeModuleList.size());
+  for (auto& basicDataTypeModule : _basicDataTypeModuleList) {
+    BasicDataType& basicDataType = basicDataTypeModule.getBasicDataType();
+    module.getBasicDataTypeList().push_back(FOMBasicDataType());
+    FOMBasicDataType& fomBasicDataType = module.getBasicDataTypeList().back();
+    fomBasicDataType.setName(basicDataType.getName());
+    fomBasicDataType.setHandle(basicDataType.getHandle());
+  }
+  */
   {
     module.getInteractionClassList().reserve(_interactionClassModuleList.size());
     ParameterDefinitionModule::FirstList::iterator j = _parameterDefinitionModuleList.begin();
@@ -1337,12 +1523,12 @@ Module::getModule(FOMModule& module)
       // If so, add them too
       ++j;
       fomInteractionClass.getParameterList().reserve(interactionClass.getNumParameterDefinitions());
-      for (ParameterDefinition::HandleMap::iterator k = interactionClass.getParameterHandleParameterMap().begin();
-           k != interactionClass.getParameterHandleParameterMap().end(); ++k) {
+      for (const ParameterDefinition& parameter : interactionClass.getParameterHandleParameterMap()) {
         fomInteractionClass.getParameterList().push_back(FOMParameter());
         FOMParameter& fomParameter = fomInteractionClass.getParameterList().back();
-        fomParameter.setName(k->getName());
-        fomParameter.setParameterHandle(k->getParameterHandle());
+        fomParameter.setName(parameter.getName());
+        fomParameter.setDataType(parameter.getDataType());
+        fomParameter.setParameterHandle(parameter.getParameterHandle());
       }
     }
   }
@@ -1372,6 +1558,7 @@ Module::getModule(FOMModule& module)
         fomObjectClass.getAttributeList().push_back(FOMAttribute());
         FOMAttribute& fomAttribute = fomObjectClass.getAttributeList().back();
         fomAttribute.setName(k->getName());
+        fomAttribute.setDataType(k->getDataType());
         fomAttribute.setAttributeHandle(k->getAttributeHandle());
         fomAttribute.setOrderType(k->getOrderType());
         fomAttribute.setTransportationType(k->getTransportationType());
@@ -1387,7 +1574,7 @@ Module::insert(Dimension& dimension)
   DimensionModule* dimensionModule;
   dimensionModule = new DimensionModule(dimension, *this);
   dimension.insert(*dimensionModule);
-  insert(*dimensionModule);
+  insertModule(*dimensionModule);
   return dimensionModule;
 }
 
@@ -1397,8 +1584,62 @@ Module::insert(UpdateRate& updateRate)
   UpdateRateModule* updateRateModule;
   updateRateModule = new UpdateRateModule(updateRate, *this);
   updateRate.insert(*updateRateModule);
-  insert(*updateRateModule);
+  insertModule(*updateRateModule);
   return updateRateModule;
+}
+
+BasicDataTypeModule*
+Module::insert(BasicDataType& dataType)
+{
+  BasicDataTypeModule* module = new BasicDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+SimpleDataTypeModule*
+Module::insert(SimpleDataType& dataType)
+{
+  SimpleDataTypeModule* module = new SimpleDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+EnumeratedDataTypeModule*
+Module::insert(EnumeratedDataType& dataType)
+{
+  EnumeratedDataTypeModule* module = new EnumeratedDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+ArrayDataTypeModule*
+Module::insert(ArrayDataType& dataType)
+{
+  ArrayDataTypeModule* module = new ArrayDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+FixedRecordDataTypeModule*
+Module::insert(FixedRecordDataType& dataType)
+{
+  FixedRecordDataTypeModule* module = new FixedRecordDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
+}
+
+VariantRecordDataTypeModule*
+Module::insert(VariantRecordDataType& dataType)
+{
+  VariantRecordDataTypeModule* module = new VariantRecordDataTypeModule(dataType, *this);
+  dataType.insert(*module);
+  insertModule(*module);
+  return module;
 }
 
 InteractionClassModule*
@@ -1407,7 +1648,7 @@ Module::insert(InteractionClass& interactionClass)
   InteractionClassModule* interactionClassModule;
   interactionClassModule = new InteractionClassModule(interactionClass, *this);
   interactionClass.insert(*interactionClassModule);
-  insert(*interactionClassModule);
+  insertModule(*interactionClassModule);
   return interactionClassModule;
 }
 
@@ -1417,7 +1658,7 @@ Module::insertParameters(InteractionClass& interactionClass)
   ParameterDefinitionModule* parameterDefinitionModule;
   parameterDefinitionModule = new ParameterDefinitionModule(interactionClass, *this);
   interactionClass.insert(*parameterDefinitionModule);
-  insert(*parameterDefinitionModule);
+  insertModule(*parameterDefinitionModule);
   return parameterDefinitionModule;
 }
 
@@ -1427,7 +1668,7 @@ Module::insert(ObjectClass& objectClass)
   ObjectClassModule* objectClassModule;
   objectClassModule = new ObjectClassModule(objectClass, *this);
   objectClass.insert(*objectClassModule);
-  insert(*objectClassModule);
+  insertModule(*objectClassModule);
   return objectClassModule;
 }
 
@@ -1437,7 +1678,7 @@ Module::insertAttributes(ObjectClass& objectClass)
   AttributeDefinitionModule* attributeDefinitionModule;
   attributeDefinitionModule = new AttributeDefinitionModule(objectClass, *this);
   objectClass.insert(*attributeDefinitionModule);
-  insert(*attributeDefinitionModule);
+  insertModule(*attributeDefinitionModule);
   return attributeDefinitionModule;
 }
 
@@ -1446,8 +1687,7 @@ Module::insertAttributes(ObjectClass& objectClass)
 FederationConnect::FederationConnect(Federation& federation, NodeConnect& nodeConnect) :
   _federation(federation),
   _nodeConnect(nodeConnect),
-  _active(false),
-  _permitTimeRegulation(true)
+  _active(false)
 {
   HandleMap::Hook::setKey(nodeConnect.getConnectHandle());
 }
@@ -1457,6 +1697,7 @@ FederationConnect::~FederationConnect()
   /// FIXME
   _objectInstanceConnectList.clear();
   _timeRegulatingFederateList.unlink();
+  _timeConstrainedFederateList.unlink();
 }
 
 const FederationHandle&
@@ -1497,25 +1738,10 @@ FederationConnect::setActive(bool active)
 }
 
 bool
-FederationConnect::getPermitTimeRegulation() const
-{
-  if (_permitTimeRegulation)
-    return true;
-  return getIsParentConnect();
-}
-
-void
-FederationConnect::setPermitTimeRegulation(bool permitTimeRegulation)
-{
-  _permitTimeRegulation = permitTimeRegulation;
-}
-
-bool
 FederationConnect::getIsTimeRegulating() const
 {
-  OpenRTIAssert(_timeRegulatingFederateList.empty() != SecondList::Hook::is_linked());
-  OpenRTIAssert(!SecondList::Hook::is_linked() || _permitTimeRegulation);
-  return SecondList::Hook::is_linked();
+  OpenRTIAssert(_timeRegulatingFederateList.empty() != TimeRegulatingList::Hook::is_linked());
+  return TimeRegulatingList::Hook::is_linked();
 }
 
 void
@@ -1530,6 +1756,25 @@ FederationConnect::eraseTimeRegulating(Federate& federate)
   _timeRegulatingFederateList.unlink(federate);
 }
 
+bool
+FederationConnect::getIsTimeConstrained() const
+{
+  OpenRTIAssert(_timeConstrainedFederateList.empty() != TimeConstrainedList::Hook::is_linked());
+  return TimeConstrainedList::Hook::is_linked();
+}
+
+void
+FederationConnect::insertTimeConstrained(Federate& federate)
+{
+  _timeConstrainedFederateList.push_back(federate);
+}
+
+void
+FederationConnect::eraseTimeConstrained(Federate& federate)
+{
+  _timeConstrainedFederateList.unlink(federate);
+}
+
 void
 FederationConnect::send(const SharedPtr<const AbstractMessage>& message)
 {
@@ -1538,16 +1783,27 @@ FederationConnect::send(const SharedPtr<const AbstractMessage>& message)
   _nodeConnect.send(message);
 }
 
+void
+FederationConnect::sendAndDeactivate(const SharedPtr<const AbstractMessage>& message)
+{
+  if (!_active)
+    return;
+  _active = false;
+  _nodeConnect.send(message);
+}
+
 ////////////////////////////////////////////////////////////
 
-Federation::Federation(Node& serverNode) :
-  _serverNode(serverNode),
-  _objectInstanceHandleObjectInstanceMap(16384/*hash size*/)
+Federation::Federation(Node& serverNode)
+  : _serverNode(serverNode)
+  , _momServer()
+  , _objectInstanceHandleObjectInstanceMap(16384/*hash size*/)
 {
 }
 
 Federation::~Federation()
 {
+  _momServer.reset();
   // In case of an exception tis can be non empty
   _objectInstanceHandleObjectInstanceMap.clear();
 
@@ -1559,6 +1815,7 @@ Federation::~Federation()
   OpenRTIAssert(_federateHandleFederateMap.empty());
 
   OpenRTIAssert(_timeRegulatingFederationConnectList.empty());
+  OpenRTIAssert(_timeConstrainedFederationConnectList.empty());
 
   // Throw away the base modules
   while (!_moduleHandleModuleMap.empty()) {
@@ -1776,6 +2033,48 @@ Federation::insert(UpdateRate& updateRate)
 }
 
 void
+Federation::insert(BasicDataType& dataType)
+{
+  _basicDataTypeNameBasicDataTypeMap.insert(dataType);
+  _basicDataTypeHandleBasicDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(SimpleDataType& dataType)
+{
+  _simpleDataTypeNameSimpleDataTypeMap.insert(dataType);
+  _simpleDataTypeHandleSimpleDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(EnumeratedDataType& dataType)
+{
+  _enumeratedDataTypeNameEnumeratedDataTypeMap.insert(dataType);
+  _enumeratedDataTypeHandleEnumeratedDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(ArrayDataType& dataType)
+{
+  _arrayDataTypeNameArrayDataTypeMap.insert(dataType);
+  _arrayDataTypeHandleArrayDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(FixedRecordDataType& dataType)
+{
+  _fixedRecordDataTypeNameFixedRecordDataTypeMap.insert(dataType);
+  _fixedRecordDataTypeHandleFixedRecordDataTypeMap.insert(dataType);
+}
+
+void
+Federation::insert(VariantRecordDataType& dataType)
+{
+  _variantRecordDataTypeNameVariantRecordDataTypeMap.insert(dataType);
+  _variantRecordDataTypeHandleVariantRecordDataTypeMap.insert(dataType);
+}
+
+void
 Federation::insert(InteractionClass& interactionClass)
 {
   _interactionClassNameInteractionClassMap.insert(interactionClass);
@@ -1794,6 +2093,12 @@ Federation::insert(Module& module)
 {
   OpenRTIAssert(_moduleHandleModuleMap.find(module.getModuleHandle()) == _moduleHandleModuleMap.end());
   _moduleHandleModuleMap.insert(module);
+}
+
+
+void Federation::insert(Module& /*module*/, const FOMTransportationType& /*fomObjectClass*/)
+{
+
 }
 
 bool
@@ -1849,12 +2154,144 @@ Federation::insertOrCheck(Module& module, const FOMStringUpdateRate& stringUpdat
 }
 
 bool
+Federation::insertOrCheck(Module& module, const FOMStringBasicDataType& stringDataType)
+{
+  BasicDataType::NameMap::iterator i;
+  i = _basicDataTypeNameBasicDataTypeMap.find(stringDataType.getName());
+  if (i != _basicDataTypeNameBasicDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    BasicDataType* basicDataType = new BasicDataType(*this);
+    basicDataType->setName(stringDataType.getName());
+    basicDataType->setSize(stringDataType.getSize());
+    basicDataType->setEndian(stringDataType.getEndian());
+    basicDataType->setHandle(_basicDataTypeHandleAllocator.get());
+    insert(*basicDataType);
+    module.insert(*basicDataType);
+    return true;
+  }
+}
+
+bool
+Federation::insertOrCheck(Module& module, const FOMStringSimpleDataType& stringDataType)
+{
+  SimpleDataType::NameMap::iterator i;
+  i = _simpleDataTypeNameSimpleDataTypeMap.find(stringDataType.getName());
+  if (i != _simpleDataTypeNameSimpleDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    SimpleDataType* simpleDataType = new SimpleDataType(*this);
+    simpleDataType->setName(stringDataType.getName());
+    simpleDataType->setRepresentation(stringDataType.getRepresentation());
+    simpleDataType->setHandle(_simpleDataTypeHandleAllocator.get());
+    insert(*simpleDataType);
+    module.insert(*simpleDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringEnumeratedDataType& stringDataType)
+{
+  EnumeratedDataType::NameMap::iterator i;
+  i = _enumeratedDataTypeNameEnumeratedDataTypeMap.find(stringDataType.getName());
+  if (i != _enumeratedDataTypeNameEnumeratedDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    EnumeratedDataType* enumeratedDataType = new EnumeratedDataType(*this);
+    enumeratedDataType->setName(stringDataType.getName());
+    enumeratedDataType->setRepresentation(stringDataType.getRepresentation());
+    for (auto& enumerator : stringDataType.getEnumerators())
+    {
+      enumeratedDataType->addEnumerator(enumerator.getName(), enumerator.getValue());
+    }
+    enumeratedDataType->setHandle(_enumeratedDataTypeHandleAllocator.get());
+    insert(*enumeratedDataType);
+    module.insert(*enumeratedDataType);
+    return true;
+  }
+}
+
+//static inline ArrayDataTypeEncoding convert(const std::string& s)
+//{
+//  if (s == "HLAvariableArray") 
+//    return VariableArrayDataTypeEncoding;
+//  else
+//    return FixedArrayDataTypeEncoding;
+//}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringArrayDataType2& stringDataType)
+{
+  ArrayDataType::NameMap::iterator i;
+  i = _arrayDataTypeNameArrayDataTypeMap.find(stringDataType.getName());
+  if (i != _arrayDataTypeNameArrayDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    ArrayDataType* arrayDataType = new ArrayDataType(*this);
+    arrayDataType->setName(stringDataType.getName());
+    arrayDataType->setEncoding(stringDataType.getEncoding());
+    arrayDataType->setDataType(stringDataType.getDataType());
+    arrayDataType->setCardinality(stringDataType.getCardinality());
+    arrayDataType->setHandle(_arrayDataTypeHandleAllocator.get());
+    insert(*arrayDataType);
+    module.insert(*arrayDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringFixedRecordDataType2& stringDataType)
+{
+  FixedRecordDataType::NameMap::iterator i;
+  i = _fixedRecordDataTypeNameFixedRecordDataTypeMap.find(stringDataType.getName());
+  if (i != _fixedRecordDataTypeNameFixedRecordDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    FixedRecordDataType* fixedRecordDataType = new FixedRecordDataType(*this);
+    fixedRecordDataType->setName(stringDataType.getName());
+    for (auto& field : stringDataType.getFields())
+    {
+      fixedRecordDataType->addField(field.getName(), field.getDataType(), field.getVersion());
+    }
+    fixedRecordDataType->setEncoding(stringDataType.getEncoding());
+    fixedRecordDataType->setInclude(stringDataType.getInclude());
+    fixedRecordDataType->setVersion(stringDataType.getVersion());
+    fixedRecordDataType->setHandle(_fixedRecordDataTypeHandleAllocator.get());
+    insert(*fixedRecordDataType);
+    module.insert(*fixedRecordDataType);
+    return true;
+  }
+}
+
+bool Federation::insertOrCheck(Module& module, const FOMStringVariantRecordDataType2& stringDataType)
+{
+  VariantRecordDataType::NameMap::iterator i;
+  i = _variantRecordDataTypeNameVariantRecordDataTypeMap.find(stringDataType.getName());
+  if (i != _variantRecordDataTypeNameVariantRecordDataTypeMap.end()) {
+    module.insert(*i);
+    return false;
+  } else {
+    VariantRecordDataType* variantRecordDataType = new VariantRecordDataType(*this);
+    variantRecordDataType->setName(stringDataType.getName());
+    variantRecordDataType->setHandle(_variantRecordDataTypeHandleAllocator.get());
+    insert(*variantRecordDataType);
+    module.insert(*variantRecordDataType);
+    return true;
+  }
+}
+
+bool
 Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& stringInteractionClass)
 {
+
   InteractionClass::NameMap::iterator i;
   i = _interactionClassNameInteractionClassMap.find(stringInteractionClass.getName());
   if (i != _interactionClassNameInteractionClassMap.end()) {
     OpenRTIAssert(!i->getName().empty());
+    bool created = false;
 
     if (i->getOrderType() != resolveOrderType(stringInteractionClass.getOrderType())) {
       std::stringstream ss;
@@ -1888,22 +2325,42 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
     }
 
     // In this case we need to check for the parameter list being the same on both ends.
+    // i: Established IA Class
+    // j: IA Class to check
     if (!stringInteractionClass.getParameterList().empty()) {
       std::vector<ParameterHandle> parameterHandles;
       parameterHandles.reserve(stringInteractionClass.getParameterList().size());
+
       for (FOMStringParameterList::const_iterator j = stringInteractionClass.getParameterList().begin();
-           j != stringInteractionClass.getParameterList().end(); ++j) {
+            j != stringInteractionClass.getParameterList().end(); ++j) {
+
         ParameterDefinition* parameterDefinition;
         parameterDefinition = i->getParameterDefinition(j->getName());
-        if (!parameterDefinition) {
-          std::stringstream ss;
-          ss << "Inconsistent InteractionClass \"" << stringInteractionClass.getName() << "\": Parameter \""
-             << j->getName() << "\" not present in already established interaction class!";
-          throw InconsistentFDD(ss.str());
+
+        if (!parameterDefinition) 
+        {
+          ParameterDefinition* addParameterDefinition;
+          InteractionClass* interactionClass = getInteractionClass(i->getInteractionClassHandle());
+          addParameterDefinition = new ParameterDefinition(*interactionClass);
+          addParameterDefinition->setName(j->getName());
+          addParameterDefinition->setDataType(j->getDataType());
+          addParameterDefinition->setParameterHandle(module.getFederation()._parameterHandleAllocator.get());
+          i->insert(*addParameterDefinition);
+          parameterHandles.push_back(addParameterDefinition->getParameterHandle());
+
+          // This path so far only made consistency checks. We extended the IA class, so we have to return created = true.
+          // Otherwise the changed module is discarded.
+          created = true;
+
+          DebugPrintf("%s:  Adding unknown parameter '%s' to established IA class '%s'\n", __FUNCTION__, j->getName().c_str(), interactionClass->getName().back().c_str());
         }
-        parameterHandles.push_back(parameterDefinition->getParameterHandle());
+        else
+          parameterHandles.push_back(parameterDefinition->getParameterHandle());
       }
+
+      // Sort by handles...
       std::sort(parameterHandles.begin(), parameterHandles.end());
+      // ... to check for duplicate handles
       if (std::unique(parameterHandles.begin(), parameterHandles.end()) != parameterHandles.end()) {
         std::stringstream ss;
         ss << "Inconsistent InteractionClass \"" << stringInteractionClass.getName()
@@ -1916,7 +2373,7 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
     if (!stringInteractionClass.getParameterList().empty())
       module.insertParameters(*i);
 
-    return false;
+    return created;
   } else {
     InteractionClass* parentInteractionClass;
     parentInteractionClass = resolveParentInteractionClass(stringInteractionClass.getName());
@@ -1943,23 +2400,20 @@ Federation::insertOrCheck(Module& module, const FOMStringInteractionClass& strin
     if (!stringInteractionClass.getParameterList().empty())
       module.insertParameters(*interactionClass);
 
-    ParameterHandle nextParameterHandle = interactionClass->getFirstUnusedParameterHandle();
-    for (FOMStringParameterList::const_iterator dimSetIter = stringInteractionClass.getParameterList().begin();
-         dimSetIter != stringInteractionClass.getParameterList().end(); ++dimSetIter) {
-      if (interactionClass->getParameterDefinition(dimSetIter->getName())) {
+    for (const FOMStringParameter& stringParameter : stringInteractionClass.getParameterList()) {
+      if (interactionClass->getParameterDefinition(stringParameter.getName())) {
         std::stringstream ss;
-        ss << "Duplicate parameter name \"" << dimSetIter->getName() << "\" in InteractionClass \""
+        ss << "Duplicate parameter name \"" << stringParameter.getName() << "\" in InteractionClass \""
            << interactionClass->getName() << "\"!";
         throw InconsistentFDD(ss.str());
       }
 
       ParameterDefinition* parameterDefinition;
       parameterDefinition = new ParameterDefinition(*interactionClass);
-      parameterDefinition->setName(dimSetIter->getName());
-      parameterDefinition->setParameterHandle(nextParameterHandle);
+      parameterDefinition->setName(stringParameter.getName());
+      parameterDefinition->setDataType(stringParameter.getDataType());
+      parameterDefinition->setParameterHandle(module.getFederation()._parameterHandleAllocator.get());
       interactionClass->insert(*parameterDefinition);
-
-      nextParameterHandle = ParameterHandle(nextParameterHandle.getHandle() + 1);
     }
 
     return true;
@@ -1973,55 +2427,83 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
   i = _objectClassNameObjectClassMap.find(stringObjectClass.getName());
   if (i != _objectClassNameObjectClassMap.end()) {
     OpenRTIAssert(!i->getName().empty());
+    bool created = false;
 
     // In this case we need to check for the attribute list being the same on both ends.
     if (!stringObjectClass.getAttributeList().empty()) {
       std::vector<AttributeHandle> attributeHandles;
       attributeHandles.reserve(stringObjectClass.getAttributeList().size());
-      for (FOMStringAttributeList::const_iterator j = stringObjectClass.getAttributeList().begin();
-           j != stringObjectClass.getAttributeList().end(); ++j) {
+      for (const FOMStringAttribute& stringAttribute : stringObjectClass.getAttributeList()) {
         AttributeDefinition* attributeDefinition;
-        attributeDefinition = i->getAttributeDefinition(j->getName());
-        if (!attributeDefinition) {
-          std::stringstream ss;
-          ss << "Inconsistent ObjectClass \"" << stringObjectClass.getName() << "\": Attribute \""
-             << j->getName() << "\" not present in already established object class!";
-          throw InconsistentFDD(ss.str());
-        }
-        if (attributeDefinition->getOrderType() != resolveOrderType(j->getOrderType())) {
-          std::stringstream ss;
-          ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
-             << j->getName() << "\": OrderType " << j->getOrderType()
-             << " does not match the already established value of "
-             << attributeDefinition->getOrderType() << "!";
-          throw InconsistentFDD(ss.str());
-        }
-        if (attributeDefinition->getTransportationType() != resolveTransportationType(j->getTransportationType())) {
-          std::stringstream ss;
-          ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
-             << j->getName() << "\": TransportationType " << j->getTransportationType()
-             << " does not match the already established value of "
-             << attributeDefinition->getTransportationType() << "!";
-          throw InconsistentFDD(ss.str());
-        }
+        attributeDefinition = i->getAttributeDefinition(stringAttribute.getName());
 
-        DimensionHandleSet dimensionHandleSet;
-        for (StringSet::const_iterator k = j->getDimensionSet().begin();
-             k != j->getDimensionSet().end(); ++k) {
-          Dimension* dimension = resolveDimension(*k);
-          if (!dimension)
-            throw InconsistentFDD("Cannot resolve dimension \"" + *k + "\"!");
-          /// FIXME avoid using the handle sets ...
-          dimensionHandleSet.insert(dimension->getDimensionHandle());
-        }
-        if (attributeDefinition->_dimensionHandleSet != dimensionHandleSet) {
-          std::stringstream ss;
-          ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
-             << j->getName() << "\": Dimensions do not match the already established value!";
-          throw InconsistentFDD(ss.str());
-        }
+        if (!attributeDefinition) 
+        {
+          AttributeDefinition* addAttributeDefinition;
+          ObjectClass* objectClass = getObjectClass(i->getObjectClassHandle());
+          addAttributeDefinition = new AttributeDefinition(*objectClass);
+          addAttributeDefinition->setName(stringAttribute.getName());
+          addAttributeDefinition->setDataType(stringAttribute.getDataType());
+          addAttributeDefinition->setAttributeHandle(objectClass->getFirstUnusedAttributeHandle());
+          i->insert(*addAttributeDefinition);
 
-        attributeHandles.push_back(attributeDefinition->getAttributeHandle());
+          addAttributeDefinition->setOrderType(resolveOrderType(stringAttribute.getOrderType()));
+          addAttributeDefinition->setTransportationType(resolveTransportationType(stringAttribute.getTransportationType()));
+          for (StringSet::const_iterator j = stringAttribute.getDimensionSet().begin();
+            j != stringAttribute.getDimensionSet().end(); ++j) {
+            Dimension* dimension = resolveDimension(*j);
+            if (!dimension)
+              throw InconsistentFDD("Cannot resolve dimension \"" + *j + "\"!");
+            /// FIXME avoid using the handle sets ...
+            addAttributeDefinition->_dimensionHandleSet.insert(dimension->getDimensionHandle());
+          }
+
+          attributeHandles.push_back(addAttributeDefinition->getAttributeHandle());
+
+          //objectClass->writeCurrentFDD(std::cout, 0);
+
+          // This path so far only made consistency checks. We extended the object class, so we have to return created = true.
+          // Otherwise the changed module is discarded.
+          created = true;
+
+          DebugPrintf("%s:  Adding unknown attribute '%s' to established object class '%s'\n", __FUNCTION__, stringAttribute.getName().c_str(), objectClass->getName().back().c_str());
+        }
+        else
+        {
+          if (attributeDefinition->getOrderType() != resolveOrderType(stringAttribute.getOrderType())) {
+            std::stringstream ss;
+            ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
+              << stringAttribute.getName() << "\": OrderType " << stringAttribute.getOrderType()
+              << " does not match the already established value of "
+              << attributeDefinition->getOrderType() << "!";
+            throw InconsistentFDD(ss.str());
+          }
+          if (attributeDefinition->getTransportationType() != resolveTransportationType(stringAttribute.getTransportationType())) {
+            std::stringstream ss;
+            ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
+              << stringAttribute.getName() << "\": TransportationType " << stringAttribute.getTransportationType()
+              << " does not match the already established value of "
+              << attributeDefinition->getTransportationType() << "!";
+            throw InconsistentFDD(ss.str());
+          }
+
+          DimensionHandleSet dimensionHandleSet;
+          for (StringSet::const_iterator k = stringAttribute.getDimensionSet().begin();
+            k != stringAttribute.getDimensionSet().end(); ++k) {
+            Dimension* dimension = resolveDimension(*k);
+            if (!dimension)
+              throw InconsistentFDD("Cannot resolve dimension \"" + *k + "\"!");
+            /// FIXME avoid using the handle sets ...
+            dimensionHandleSet.insert(dimension->getDimensionHandle());
+          }
+          if (attributeDefinition->_dimensionHandleSet != dimensionHandleSet) {
+            std::stringstream ss;
+            ss << "Inconsistent ObjectClass  \"" << stringObjectClass.getName() << "\": Attribute \""
+              << stringAttribute.getName() << "\": Dimensions do not match the already established value!";
+            throw InconsistentFDD(ss.str());
+          }
+          attributeHandles.push_back(attributeDefinition->getAttributeHandle());
+        }
       }
       std::sort(attributeHandles.begin(), attributeHandles.end());
       if (std::unique(attributeHandles.begin(), attributeHandles.end()) != attributeHandles.end()) {
@@ -2036,7 +2518,7 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
     if (!stringObjectClass.getAttributeList().empty())
       module.insertAttributes(*i);
 
-    return false;
+    return created;
   } else {
     ObjectClass* parentObjectClass;
     parentObjectClass = resolveParentObjectClass(stringObjectClass.getName());
@@ -2065,6 +2547,7 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
       AttributeDefinition* attributeDefinition;
       attributeDefinition = new AttributeDefinition(*objectClass);
       attributeDefinition->setName(attrListIter->getName());
+      attributeDefinition->setDataType(attrListIter->getDataType());
       attributeDefinition->setAttributeHandle(nextAttributeHandle);
       objectClass->insert(*attributeDefinition);
 
@@ -2086,12 +2569,30 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
   }
 }
 
-ModuleHandle
-Federation::insert(const FOMStringModule& stringModule)
+/*
+void
+Federation::insert(ModuleHandleVector& moduleHandleVector, const FOMStringModuleList& stringModuleList)
 {
-  Module* module = new Module(*this);
+  moduleHandleVector.reserve(stringModuleList.size());
+  try {
+    for (auto& module : stringModuleList) {
+      ModuleHandle moduleHandle = insert(module);
+      if (moduleHandle.valid())
+        moduleHandleVector.push_back(moduleHandle);
+    }
+  } catch (...) {
+    for (ModuleHandleVector::iterator i = moduleHandleVector.begin(); i != moduleHandleVector.end(); ++i)
+      erase(*i);
+    moduleHandleVector.clear();
+    throw;
+  }
+}
+*/
+ModuleHandle
+Federation::insert(const FOMStringModule2& stringModule)
+{
+  Module* module = new Module(*this, stringModule.getDesignator());
   module->setModuleHandle(_moduleHandleAllocator.get());
-  module->setContent(stringModule.getContent());
   module->setArtificialInteractionRoot(stringModule.getArtificialInteractionRoot());
   module->setArtificialObjectRoot(stringModule.getArtificialObjectRoot());
   insert(*module);
@@ -2099,27 +2600,53 @@ Federation::insert(const FOMStringModule& stringModule)
   bool created = false;
   try {
 
-    for (FOMStringDimensionList::const_iterator j = stringModule.getDimensionList().begin();
-         j != stringModule.getDimensionList().end(); ++j) {
-      if (insertOrCheck(*module, *j))
+    for (auto& stringDimension : stringModule.getDimensionList()) {
+      if (insertOrCheck(*module, stringDimension))
         created = true;
     }
 
-    for (FOMStringUpdateRateList::const_iterator j = stringModule.getUpdateRateList().begin();
-         j != stringModule.getUpdateRateList().end(); ++j) {
-      if (insertOrCheck(*module, *j))
+    for (auto& stringUpdateRate : stringModule.getUpdateRateList()) {
+      if (insertOrCheck(*module, stringUpdateRate))
         created = true;
     }
 
-    for (FOMStringInteractionClassList::const_iterator j = stringModule.getInteractionClassList().begin();
-         j != stringModule.getInteractionClassList().end(); ++j) {
-      if (insertOrCheck(*module, *j))
+    for (auto& stringInteractionClassList : stringModule.getInteractionClassList()) {
+      if (insertOrCheck(*module, stringInteractionClassList))
         created = true;
     }
 
-    for (FOMStringObjectClassList::const_iterator j = stringModule.getObjectClassList().begin();
-         j != stringModule.getObjectClassList().end(); ++j) {
-      if (insertOrCheck(*module, *j))
+    for (auto& stringObjectClass : stringModule.getObjectClassList()) {
+      if (insertOrCheck(*module, stringObjectClass))
+        created = true;
+    }
+
+    for (auto& basicDataType : stringModule.getBasicDataTypeList()) {
+      if (insertOrCheck(*module, basicDataType))
+        created = true;
+    }
+
+    for (auto& simpleDataType : stringModule.getSimpleDataTypeList()) {
+      if (insertOrCheck(*module, simpleDataType))
+        created = true;
+    }
+
+    for (auto& enumeratedDataType : stringModule.getEnumeratedDataTypeList()) {
+      if (insertOrCheck(*module, enumeratedDataType))
+        created = true;
+    }
+
+    for (auto& arrayDataType : stringModule.getArrayDataTypeList()) {
+      if (insertOrCheck(*module, arrayDataType))
+        created = true;
+    }
+
+    for (auto& fixedRecordDataType : stringModule.getFixedRecordDataTypeList()) {
+      if (insertOrCheck(*module, fixedRecordDataType))
+        created = true;
+    }
+
+    for (auto& variantRecordDataType : stringModule.getVariantRecordDataTypeList()) {
+      if (insertOrCheck(*module, variantRecordDataType))
         created = true;
     }
 
@@ -2138,19 +2665,19 @@ Federation::insert(const FOMStringModule& stringModule)
 }
 
 void
-Federation::insert(const FOMStringModuleList& stringModuleList)
+Federation::insert(const FOMStringModule2List& stringModuleList)
 {
   ModuleHandleVector moduleHandleVector;
   insert(moduleHandleVector, stringModuleList);
 }
 
 void
-Federation::insert(ModuleHandleVector& moduleHandleVector, const FOMStringModuleList& stringModuleList)
+Federation::insert(ModuleHandleVector& moduleHandleVector, const FOMStringModule2List& stringModuleList)
 {
   moduleHandleVector.reserve(stringModuleList.size());
   try {
-    for (FOMStringModuleList::const_iterator i = stringModuleList.begin(); i != stringModuleList.end(); ++i) {
-      ModuleHandle moduleHandle = insert(*i);
+    for (auto& module : stringModuleList) {
+      ModuleHandle moduleHandle = insert(module);
       if (moduleHandle.valid())
         moduleHandleVector.push_back(moduleHandle);
     }
@@ -2205,6 +2732,120 @@ Federation::insert(Module& module, const FOMUpdateRate& fomUpdateRate)
 }
 
 void
+Federation::insert(Module& module, const FOMBasicDataType& fomBasicDataType)
+{
+  BasicDataType::HandleMap::iterator i = _basicDataTypeHandleBasicDataTypeMap.find(fomBasicDataType.getHandle());
+  if (i != _basicDataTypeHandleBasicDataTypeMap.end()) {
+    if (fomBasicDataType.getName() != i->getName())
+      throw MessageError("BasicDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _basicDataTypeHandleAllocator.take(fomBasicDataType.getHandle());
+    BasicDataType* basicDataType = new BasicDataType(*this);
+    basicDataType->setName(fomBasicDataType.getName());
+    basicDataType->setHandle(fomBasicDataType.getHandle());
+    insert(*basicDataType);
+    module.insert(*basicDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMSimpleDataType& fomSimpleDataType)
+{
+  SimpleDataType::HandleMap::iterator i = _simpleDataTypeHandleSimpleDataTypeMap.find(fomSimpleDataType.getHandle());
+  if (i != _simpleDataTypeHandleSimpleDataTypeMap.end()) {
+    if (fomSimpleDataType.getName() != i->getName())
+      throw MessageError("SimpleDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _simpleDataTypeHandleAllocator.take(fomSimpleDataType.getHandle());
+    SimpleDataType* simpleDataType = new SimpleDataType(*this);
+    simpleDataType->setName(fomSimpleDataType.getName());
+    simpleDataType->setHandle(fomSimpleDataType.getHandle());
+    insert(*simpleDataType);
+    module.insert(*simpleDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMEnumeratedDataType& fomEnumeratedDataType)
+{
+  EnumeratedDataType::HandleMap::iterator i = _enumeratedDataTypeHandleEnumeratedDataTypeMap.find(fomEnumeratedDataType.getHandle());
+  if (i != _enumeratedDataTypeHandleEnumeratedDataTypeMap.end()) {
+    if (fomEnumeratedDataType.getName() != i->getName())
+      throw MessageError("EnumeratedDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _enumeratedDataTypeHandleAllocator.take(fomEnumeratedDataType.getHandle());
+    EnumeratedDataType* enumeratedDataType = new EnumeratedDataType(*this);
+    enumeratedDataType->setName(fomEnumeratedDataType.getName());
+    enumeratedDataType->setHandle(fomEnumeratedDataType.getHandle());
+    insert(*enumeratedDataType);
+    module.insert(*enumeratedDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMArrayDataType& fomArrayDataType)
+{
+  ArrayDataType::HandleMap::iterator i = _arrayDataTypeHandleArrayDataTypeMap.find(fomArrayDataType.getHandle());
+  if (i != _arrayDataTypeHandleArrayDataTypeMap.end()) {
+    if (fomArrayDataType.getName() != i->getName())
+      throw MessageError("ArrayDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _arrayDataTypeHandleAllocator.take(fomArrayDataType.getHandle());
+    ArrayDataType* arrayDataType = new ArrayDataType(*this);
+    arrayDataType->setName(fomArrayDataType.getName());
+    arrayDataType->setHandle(fomArrayDataType.getHandle());
+    insert(*arrayDataType);
+    module.insert(*arrayDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMFixedRecordDataType& fomFixedRecordDataType)
+{
+  FixedRecordDataType::HandleMap::iterator i = _fixedRecordDataTypeHandleFixedRecordDataTypeMap.find(fomFixedRecordDataType.getHandle());
+  if (i != _fixedRecordDataTypeHandleFixedRecordDataTypeMap.end()) {
+    if (fomFixedRecordDataType.getName() != i->getName())
+      throw MessageError("FixedRecordDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _fixedRecordDataTypeHandleAllocator.take(fomFixedRecordDataType.getHandle());
+    FixedRecordDataType* fixedRecordDataType = new FixedRecordDataType(*this);
+    fixedRecordDataType->setName(fomFixedRecordDataType.getName());
+    fixedRecordDataType->setHandle(fomFixedRecordDataType.getHandle());
+    insert(*fixedRecordDataType);
+    module.insert(*fixedRecordDataType);
+  }
+}
+
+void
+Federation::insert(Module& module, const FOMVariantRecordDataType& fomVariantRecordDataType)
+{
+  VariantRecordDataType::HandleMap::iterator i = _variantRecordDataTypeHandleVariantRecordDataTypeMap.find(fomVariantRecordDataType.getHandle());
+  if (i != _variantRecordDataTypeHandleVariantRecordDataTypeMap.end()) {
+    if (fomVariantRecordDataType.getName() != i->getName())
+      throw MessageError("VariantRecordDataType name does not match.");
+
+    module.insert(*i);
+  } else {
+    _variantRecordDataTypeHandleAllocator.take(fomVariantRecordDataType.getHandle());
+    VariantRecordDataType* variantRecordDataType = new VariantRecordDataType(*this);
+    variantRecordDataType->setName(fomVariantRecordDataType.getName());
+    variantRecordDataType->setHandle(fomVariantRecordDataType.getHandle());
+    insert(*variantRecordDataType);
+    module.insert(*variantRecordDataType);
+  }
+}
+
+void
 Federation::insert(Module& module, const FOMInteractionClass& fomInteractionClass)
 {
   InteractionClass::HandleMap::iterator i;
@@ -2234,6 +2875,7 @@ Federation::insert(Module& module, const FOMInteractionClass& fomInteractionClas
           ParameterDefinition* parameterDefinition;
           parameterDefinition = new ParameterDefinition(*i);
           parameterDefinition->setName(j->getName());
+          parameterDefinition->setDataType(j->getDataType());
           parameterDefinition->setParameterHandle(j->getParameterHandle());
           i->insert(*parameterDefinition);
         }
@@ -2244,10 +2886,23 @@ Federation::insert(Module& module, const FOMInteractionClass& fomInteractionClas
              j != fomInteractionClass.getParameterList().end(); ++j) {
           ParameterDefinition* parameterDefinition;
           parameterDefinition = i->getParameterDefinition(j->getParameterHandle());
+          
+          //if (!parameterDefinition)
+          //  throw MessageError("InteractionClass parameter lists do not match.");
           if (!parameterDefinition)
+          {
+            ParameterDefinition* addParameterDefinition;
+            InteractionClass* interactionClass = getInteractionClass(i->getInteractionClassHandle());
+            addParameterDefinition = new ParameterDefinition(*interactionClass);
+            addParameterDefinition->setName(j->getName());
+            addParameterDefinition->setDataType(j->getDataType());
+            addParameterDefinition->setParameterHandle(j->getParameterHandle());   
+            i->insert(*addParameterDefinition);
+            DebugPrintf("%s:  Adding unknown parameter '%s' to established IA class '%s'\n", __FUNCTION__, j->getName().c_str(), interactionClass->getName().back().c_str());
+          }
+          else if (parameterDefinition->getName() != j->getName())
             throw MessageError("InteractionClass parameter lists do not match.");
-          if (parameterDefinition->getName() != j->getName())
-            throw MessageError("InteractionClass parameter lists do not match.");
+
           parameterHandles.push_back(j->getParameterHandle());
         }
         std::sort(parameterHandles.begin(), parameterHandles.end());
@@ -2286,6 +2941,7 @@ Federation::insert(Module& module, const FOMInteractionClass& fomInteractionClas
       parameterDefinition = new ParameterDefinition(*interactionClass);
       parameterDefinition->setName(j->getName());
       parameterDefinition->setParameterHandle(j->getParameterHandle());
+      parameterDefinition->setDataType(j->getDataType());
       interactionClass->insert(*parameterDefinition);
     }
   }
@@ -2315,6 +2971,7 @@ Federation::insert(Module& module, const FOMObjectClass& fomObjectClass)
           AttributeDefinition* attributeDefinition;
           attributeDefinition = new AttributeDefinition(*i);
           attributeDefinition->setName(j->getName());
+          attributeDefinition->setDataType(j->getDataType());
           attributeDefinition->setAttributeHandle(j->getAttributeHandle());
           i->insert(*attributeDefinition);
           attributeDefinition->setOrderType(j->getOrderType());
@@ -2328,16 +2985,33 @@ Federation::insert(Module& module, const FOMObjectClass& fomObjectClass)
              j != fomObjectClass.getAttributeList().end(); ++j) {
           AttributeDefinition* attributeDefinition;
           attributeDefinition = i->getAttributeDefinition(j->getAttributeHandle());
+          //if (!attributeDefinition)
+          //  throw MessageError("ObjectClass attribute lists do not match.");
           if (!attributeDefinition)
-            throw MessageError("ObjectClass attribute lists do not match.");
-          if (attributeDefinition->getName() != j->getName())
-            throw MessageError("ObjectClass attribute lists do not match.");
-          if (attributeDefinition->getOrderType() != j->getOrderType())
-            throw MessageError("ObjectClass order type does not match.");
-          if (attributeDefinition->getTransportationType() != j->getTransportationType())
-            throw MessageError("ObjectClass transportation type does not match.");
-          if (attributeDefinition->_dimensionHandleSet != j->getDimensionHandleSet())
-            throw MessageError("ObjectClass dimension handle set does not match.");
+          {
+            AttributeDefinition* addAttributeDefinition;
+            ObjectClass* objectClass = getObjectClass(i->getObjectClassHandle());
+            addAttributeDefinition = new AttributeDefinition(*objectClass);
+            addAttributeDefinition->setName(j->getName());
+            addAttributeDefinition->setDataType(j->getDataType());
+            addAttributeDefinition->setAttributeHandle(objectClass->getFirstUnusedAttributeHandle());
+            i->insert(*addAttributeDefinition);
+            addAttributeDefinition->setOrderType(j->getOrderType());
+            addAttributeDefinition->setTransportationType(j->getTransportationType());
+            addAttributeDefinition->_dimensionHandleSet = j->getDimensionHandleSet();
+            DebugPrintf("%s:  Adding unknown attribute '%s' to established object class '%s'\n", __FUNCTION__, j->getName().c_str(), objectClass->getName().back().c_str());
+          }
+          else
+          {
+            if (attributeDefinition->getName() != j->getName())
+              throw MessageError("ObjectClass attribute lists do not match.");
+            if (attributeDefinition->getOrderType() != j->getOrderType())
+              throw MessageError("ObjectClass order type does not match.");
+            if (attributeDefinition->getTransportationType() != j->getTransportationType())
+              throw MessageError("ObjectClass transportation type does not match.");
+            if (attributeDefinition->_dimensionHandleSet != j->getDimensionHandleSet())
+              throw MessageError("ObjectClass dimension handle set does not match.");
+          }
           attributeHandles.push_back(j->getAttributeHandle());
         }
         std::sort(attributeHandles.begin(), attributeHandles.end());
@@ -2372,6 +3046,7 @@ Federation::insert(Module& module, const FOMObjectClass& fomObjectClass)
       AttributeDefinition* attributeDefinition;
       attributeDefinition = new AttributeDefinition(*objectClass);
       attributeDefinition->setName(j->getName());
+      attributeDefinition->setDataType(j->getDataType());
       attributeDefinition->setAttributeHandle(j->getAttributeHandle());
       objectClass->insert(*attributeDefinition);
       attributeDefinition->setOrderType(j->getOrderType());
@@ -2387,31 +3062,80 @@ Federation::insert(const FOMModule& fomModule)
   Module::HandleMap::iterator i = _moduleHandleModuleMap.find(fomModule.getModuleHandle());
   if (i == _moduleHandleModuleMap.end()) {
     _moduleHandleAllocator.take(fomModule.getModuleHandle());
-    Module* module = new Module(*this);
+    Module* module = new Module(*this, fomModule.getDesignator());
     module->setModuleHandle(fomModule.getModuleHandle());
-    module->setContent(fomModule.getContent());
     module->setArtificialInteractionRoot(fomModule.getArtificialInteractionRoot());
     module->setArtificialObjectRoot(fomModule.getArtificialObjectRoot());
     insert(*module);
 
-    for (FOMDimensionList::const_iterator j = fomModule.getDimensionList().begin();
-         j != fomModule.getDimensionList().end(); ++j) {
-      insert(*module, *j);
+    for (auto& dimension : fomModule.getDimensionList()) {
+      insert(*module, dimension);
     }
 
-    for (FOMUpdateRateList::const_iterator j = fomModule.getUpdateRateList().begin();
-         j != fomModule.getUpdateRateList().end(); ++j) {
-      insert(*module, *j);
+    for (auto& updateRate : fomModule.getUpdateRateList()) {
+      insert(*module, updateRate);
     }
 
-    for (FOMInteractionClassList::const_iterator j = fomModule.getInteractionClassList().begin();
-         j != fomModule.getInteractionClassList().end(); ++j) {
-      insert(*module, *j);
+    for (auto& interactionClass : fomModule.getInteractionClassList()) {
+      insert(*module, interactionClass);
     }
 
-    for (FOMObjectClassList::const_iterator j = fomModule.getObjectClassList().begin();
-         j != fomModule.getObjectClassList().end(); ++j) {
-      insert(*module, *j);
+    for (auto& objectClass : fomModule.getObjectClassList()) {
+      insert(*module, objectClass);
+    }
+    for (auto& transportationType : fomModule.getTransportationTypeList()) {
+      insert(*module, transportationType);
+    }
+  }
+}
+
+void
+Federation::insert(const FOMModule2& fomModule)
+{
+  Module::HandleMap::iterator i = _moduleHandleModuleMap.find(fomModule.getModuleHandle());
+  if (i == _moduleHandleModuleMap.end()) {
+    _moduleHandleAllocator.take(fomModule.getModuleHandle());
+    Module* module = new Module(*this, fomModule.getDesignator());
+    module->setModuleHandle(fomModule.getModuleHandle());
+    module->setArtificialInteractionRoot(fomModule.getArtificialInteractionRoot());
+    module->setArtificialObjectRoot(fomModule.getArtificialObjectRoot());
+    insert(*module);
+
+    for (auto& dimension : fomModule.getDimensionList()) {
+      insert(*module, dimension);
+    }
+
+    for (auto& updateRate : fomModule.getUpdateRateList()) {
+      insert(*module, updateRate);
+    }
+
+    for (auto& interactionClass : fomModule.getInteractionClassList()) {
+      insert(*module, interactionClass);
+    }
+
+    for (auto& objectClass : fomModule.getObjectClassList()) {
+      insert(*module, objectClass);
+    }
+    for (auto& transportationType : fomModule.getTransportationTypeList()) {
+      insert(*module, transportationType);
+    }
+    for (auto& basicDataType : fomModule.getBasicDataTypeList()) {
+      insert(*module, basicDataType);
+    }
+    for (auto& simpleDataType : fomModule.getSimpleDataTypeList()) {
+      insert(*module, simpleDataType);
+    }
+    for (auto& enumeratedDataType : fomModule.getEnumeratedDataTypeList()) {
+      insert(*module, enumeratedDataType);
+    }
+    for (auto& arrayDataType : fomModule.getArrayDataTypeList()) {
+      insert(*module, arrayDataType);
+    }
+    for (auto& fixedRecordDataType : fomModule.getFixedRecordDataTypeList()) {
+      insert(*module, fixedRecordDataType);
+    }
+    for (auto& variantRecordDataType : fomModule.getVariantRecordDataTypeList()) {
+      insert(*module, variantRecordDataType);
     }
   }
 }
@@ -2419,8 +3143,16 @@ Federation::insert(const FOMModule& fomModule)
 void
 Federation::insert(const FOMModuleList& fomModuleList)
 {
-  for (FOMModuleList::const_iterator i = fomModuleList.begin(); i != fomModuleList.end(); ++i) {
-    insert(*i);
+  for (auto& module : fomModuleList) {
+    insert(module);
+  }
+}
+
+void
+Federation::insert(const FOMModule2List& fomModuleList)
+{
+  for (auto& module : fomModuleList) {
+    insert(module);
   }
 }
 
@@ -2485,6 +3217,60 @@ Federation::erase(Module& module)
     Dimension::HandleMap::erase(dimension);
   }
 
+  while (!module.getBasicDataTypeModuleList().empty()) {
+    BasicDataType& dataType = module.getBasicDataTypeModuleList().back().getBasicDataType();
+    module.getBasicDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _basicDataTypeHandleAllocator.put(dataType.getHandle());
+    BasicDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getSimpleDataTypeModuleList().empty()) {
+    SimpleDataType& dataType = module.getSimpleDataTypeModuleList().back().getSimpleDataType();
+    module.getSimpleDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _simpleDataTypeHandleAllocator.put(dataType.getHandle());
+    SimpleDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getEnumeratedDataTypeModuleList().empty()) {
+    EnumeratedDataType& dataType = module.getEnumeratedDataTypeModuleList().back().getEnumeratedDataType();
+    module.getEnumeratedDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _enumeratedDataTypeHandleAllocator.put(dataType.getHandle());
+    EnumeratedDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getArrayDataTypeModuleList().empty()) {
+    ArrayDataType& dataType = module.getArrayDataTypeModuleList().back().getArrayDataType();
+    module.getArrayDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _arrayDataTypeHandleAllocator.put(dataType.getHandle());
+    ArrayDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getFixedRecordDataTypeModuleList().empty()) {
+    FixedRecordDataType& dataType = module.getFixedRecordDataTypeModuleList().back().getFixedRecordDataType();
+    module.getFixedRecordDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _fixedRecordDataTypeHandleAllocator.put(dataType.getHandle());
+    FixedRecordDataType::HandleMap::erase(dataType);
+  }
+
+  while (!module.getVariantRecordDataTypeModuleList().empty()) {
+    VariantRecordDataType& dataType = module.getVariantRecordDataTypeModuleList().back().getVariantRecordDataType();
+    module.getVariantRecordDataTypeModuleList().pop_back();
+    if (dataType.getIsReferencedByAnyModule())
+      continue;
+    _variantRecordDataTypeHandleAllocator.put(dataType.getHandle());
+    VariantRecordDataType::HandleMap::erase(dataType);
+  }
+
   _moduleHandleAllocator.put(module.getModuleHandle());
   Module::HandleMap::erase(module);
 }
@@ -2509,6 +3295,115 @@ Federation::getModuleList(FOMModuleList& moduleList, const ModuleHandleVector& m
     moduleList.push_back(FOMModule());
     j->getModule(moduleList.back());
   }
+}
+
+
+void Federation::writeCurrentFDD(std::ostream& out) const
+{
+  out << R"XML(<?xml version="1.0" encoding="UTF-8"?>)XML" << std::endl;
+  out << R"XML(<objectModel xmlns="http://standards.ieee.org/IEEE1516-2010" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://standards.ieee.org/IEEE1516-2010 http://standards.ieee.org/downloads/1516/1516.2-2010/IEEE1516-DIF-2010.xsd">)XML" << std::endl;
+  std::string indent(kIndentSpaces, ' ');
+
+  if (!_objectClassNameObjectClassMap.empty())
+  {
+    out << indent << R"XML(<objects>)XML" << std::endl;
+    for (const ServerModel::ObjectClass& objectClass : _objectClassNameObjectClassMap)
+    {
+      if (!objectClass.getParentObjectClassHandle().valid())
+      {
+        objectClass.writeCurrentFDD(out, 2);
+      }
+    }
+    out << indent << R"XML(</objects>)XML" << std::endl;
+  }
+  if (!_interactionClassNameInteractionClassMap.empty())
+  {
+    out << indent << R"XML(<interactions>)XML" << std::endl;
+    for (const ServerModel::InteractionClass& interactionClass : _interactionClassNameInteractionClassMap)
+    {
+      if (!interactionClass.getParentInteractionClassHandle().valid())
+      {
+        interactionClass.writeCurrentFDD(out, 2);
+      }
+    }
+    out << indent << R"XML(</interactions>)XML" << std::endl;
+  }
+  out << indent << R"XML(<dimensions>)XML" << std::endl;
+  out << indent << R"XML(</dimensions>)XML" << std::endl;
+  /*
+  if (!_transpo.empty())
+  {
+    out << indent << R"XML(<interactions>)XML" << std::endl;
+    for (const ServerModel::InteractionClass& interactionClass : _interactionClassNameInteractionClassMap)
+    {
+      if (!interactionClass.getParentInteractionClassHandle().valid())
+      {
+        interactionClass.writeCurrentFDD(out, 2);
+      }
+    }
+    out << indent << R"XML(</interactions>)XML" << std::endl;
+  }
+  */
+  out << indent << R"XML(<transportations>)XML" << std::endl;
+  out << indent << R"XML(</transportations>)XML" << std::endl;
+
+  out << indent << R"XML(<dataTypes>)XML" << std::endl;
+  if (!_basicDataTypeNameBasicDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<basicDataTypes>)XML" << std::endl;
+    for (const ServerModel::BasicDataType& dataType : _basicDataTypeNameBasicDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</basicDataTypes>)XML" << std::endl;
+  }
+  if (!_simpleDataTypeNameSimpleDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<simpleDataTypes>)XML" << std::endl;
+    for (const ServerModel::SimpleDataType& dataType : _simpleDataTypeNameSimpleDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</simpleDataTypes>)XML" << std::endl;
+  }
+  if (!_enumeratedDataTypeNameEnumeratedDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<enumeratedDataTypes>)XML" << std::endl;
+    for (const ServerModel::EnumeratedDataType& dataType : _enumeratedDataTypeNameEnumeratedDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</enumeratedDataTypes>)XML" << std::endl;
+  }
+  if (!_arrayDataTypeNameArrayDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<arrayDataTypes>)XML" << std::endl;
+    for (const ServerModel::ArrayDataType& dataType : _arrayDataTypeNameArrayDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</arrayDataTypes>)XML" << std::endl;
+  }
+  if (!_fixedRecordDataTypeNameFixedRecordDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<fixedRecordDataTypes>)XML" << std::endl;
+    for (const ServerModel::FixedRecordDataType& dataType : _fixedRecordDataTypeNameFixedRecordDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</fixedRecordDataTypes>)XML" << std::endl;
+  }
+  if (!_variantRecordDataTypeNameVariantRecordDataTypeMap.empty())
+  {
+    out << indent << indent << R"XML(<variantRecordDataTypes>)XML" << std::endl;
+    for (const ServerModel::VariantRecordDataType& dataType : _variantRecordDataTypeNameVariantRecordDataTypeMap)
+    {
+      dataType.writeCurrentFDD(out, 3);
+    }
+    out << indent << indent << R"XML(</variantRecordDataTypes>)XML" << std::endl;
+  }
+  out << indent << R"XML(</dataTypes>)XML" << std::endl;
+  out << R"XML(</objectModel>)XML" << std::endl;
 }
 
 Module*
@@ -2547,6 +3442,20 @@ Federation::getInteractionClass(const InteractionClassHandle& interactionClassHa
   return i.get();
 }
 
+
+InteractionClassHandle
+Federation::getInteractionClassHandle(const std::string& fqInteractionClassName)
+{
+  StringVector interactionClassName = split(fqInteractionClassName, ".");
+  InteractionClass::NameMap::iterator i;
+  i = _interactionClassNameInteractionClassMap.find(interactionClassName);
+  if (i != _interactionClassNameInteractionClassMap.end())
+  {
+    return i->getInteractionClassHandle();
+  }
+  return ObjectClassHandle::invalid();
+}
+
 ObjectClass*
 Federation::getObjectClass(const ObjectClassHandle& objectClassHandle)
 {
@@ -2555,6 +3464,20 @@ Federation::getObjectClass(const ObjectClassHandle& objectClassHandle)
     return 0;
   return i.get();
 }
+
+ObjectClassHandle
+Federation::getObjectClassHandle(const std::string& fqClassName)
+{
+  StringVector className = split(fqClassName, ".");
+  ObjectClass::NameMap::iterator i;
+  i = _objectClassNameObjectClassMap.find(className);
+  if (i != _objectClassNameObjectClassMap.end())
+  {
+    return i->getObjectClassHandle();
+  }
+  return ObjectClassHandle::invalid();
+}
+
 
 OrderType
 Federation::resolveOrderType(const std::string& orderType)
@@ -2688,6 +3611,34 @@ Federation::eraseTimeRegulating(Federate& federate)
   _timeRegulatingFederationConnectList.unlink(*federationConnect);
 }
 
+void
+Federation::insertTimeConstrained(Federate& federate)
+{
+  OpenRTIAssert(!federate.getIsTimeConstrained());
+  FederationConnect* federationConnect = federate.getFederationConnect();
+  if (federationConnect == nullptr || federate.getResignPending()) {
+    return;
+  }
+  OpenRTIAssert(federationConnect);
+  if (!federationConnect->getIsTimeConstrained())
+    _timeConstrainedFederationConnectList.push_back(*federationConnect);
+  federationConnect->insertTimeConstrained(federate);
+}
+
+void
+Federation::eraseTimeConstrained(Federate& federate)
+{
+  OpenRTIAssert(federate.getIsTimeConstrained());
+  FederationConnect* federationConnect = federate.getFederationConnect();
+  // We can only be time Constrained if this exists and provides us with a link
+  OpenRTIAssert(federationConnect);
+  OpenRTIAssert(federationConnect->getIsTimeConstrained());
+  federationConnect->eraseTimeConstrained(federate);
+  if (!federationConnect->getTimeConstrainedFederateList().empty())
+    return;
+  _timeConstrainedFederationConnectList.unlink(*federationConnect);
+}
+
 Region*
 Federation::getOrCreateRegion(const RegionHandle& regionHandle)
 {
@@ -2724,6 +3675,15 @@ Federation::insert(ObjectInstance& objectInstance)
   _objectInstanceNameObjectInstanceMap.insert(objectInstance);
 }
 
+const ObjectInstance*
+Federation::getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle) const
+{
+  ObjectInstance::HandleMap::const_iterator i = _objectInstanceHandleObjectInstanceMap.find(objectInstanceHandle);
+  if (i == _objectInstanceHandleObjectInstanceMap.end())
+    return 0;
+  return i.get();
+}
+
 ObjectInstance*
 Federation::getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle)
 {
@@ -2736,8 +3696,15 @@ Federation::getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle)
 void
 Federation::erase(ObjectInstance& objectInstance)
 {
+#if !defined(NDEBUG) && !defined(_NDEBUG)
+  auto handle = objectInstance.getObjectInstanceHandle();
+  auto name = objectInstance.getName();
+#endif
   _objectInstanceHandleAllocator.put(objectInstance.getObjectInstanceHandle());
   ObjectInstance::HandleMap::erase(objectInstance);
+
+  OpenRTIAssert(_objectInstanceHandleObjectInstanceMap.find(handle) == _objectInstanceHandleObjectInstanceMap.end());
+  OpenRTIAssert(!isObjectInstanceNameInUse(name));
 }
 
 bool
@@ -2756,12 +3723,147 @@ Federation::insertObjectInstance(const ObjectInstanceHandle& objectInstanceHandl
   return objectInstance;
 }
 
+void Federation::initializeMom(AbstractServer* server, FederateHandle federateHandle)
+{
+#ifndef OPENRTI_STANDALONE_TESTS
+  // be careful: we always get called twice: once for the RTI federate, a second time for the application federate
+  if (_momServer == nullptr)
+  {
+    bool isRoot = !federateHandle.valid();
+    _momServer = MakeShared<MomServer>(this, server, isRoot, federateHandle);
+  }
+#endif
+}
+
+
+void Federation::resignMomServer()
+{
+#ifndef OPENRTI_STANDALONE_TESTS
+  if (_momServer != nullptr)
+  {
+    _momServer->resignFederationExecution();
+  }
+#endif
+}
+
+SharedPtr<MomServer> Federation::getMomServer() const
+{
+  return _momServer;
+}
+
+std::shared_ptr<AbstractFederateMetrics> Federation::getFederateMetrics(const ConnectHandle& connectHandle)
+{
+#ifndef OPENRTI_STANDALONE_TESTS
+  if (_momServer != nullptr)
+  {
+    for (auto iter = _federateHandleFederateMap.begin(); iter != _federateHandleFederateMap.end(); iter++)
+    {
+      if (connectHandle == iter->getConnectHandle())
+      {
+        return _momServer->getFederateMetrics();
+      }
+    }
+  }
+#endif
+  return std::shared_ptr<AbstractFederateMetrics>();
+}
+
+// conditionally increment the counters, if the connectHandle belongs to a ambassador which connects to this federation
+// through the given connectHandle. In that case, there will be a local/client MomManager with a
+// federate metrics data collector connected to this server.
+void Federation::interactionSent(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionSent(interactionClass->getInteractionClassHandle());
+}
+
+void Federation::interactionReceived(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionReceived(interactionClass->getInteractionClassHandle());
+}
+
+void Federation::interactionClassSubscribed(const ConnectHandle& connectHandle, const InteractionClass* interactionClass, bool active)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionSubscribed(interactionClass->getInteractionClassHandle(), active);
+}
+void Federation::interactionClassUnsubscribed(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionUnsubscribed(interactionClass->getInteractionClassHandle());
+}
+void Federation::interactionClassPublished(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionPublished(interactionClass->getInteractionClassHandle());
+}
+void Federation::interactionClassUnpublished(const ConnectHandle& connectHandle, const InteractionClass* interactionClass)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->interactionUnpublished(interactionClass->getInteractionClassHandle());
+}
+
+void Federation::objectClassSubscribed(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes, bool active)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->objectClassSubscribed(objectClass->getObjectClassHandle(), attributes, active);
+}
+void Federation::objectClassUnsubscribed(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->objectClassUnsubscribed(objectClass->getObjectClassHandle(), attributes);
+}
+void Federation::objectClassPublished(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->objectClassPublished(objectClass->getObjectClassHandle(), attributes);
+}
+void Federation::objectClassUnpublished(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+    metrics->objectClassUnpublished(objectClass->getObjectClassHandle(), attributes);
+}
+
+void Federation::objectInstanceReflectionReceived(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+  {
+    ObjectInstanceHandle instanceHandle = objectInstance->getObjectInstanceHandle();
+    ObjectClassHandle classHandle = objectInstance->getObjectClass()->getObjectClassHandle();
+    metrics->reflectionReceived(classHandle, instanceHandle);
+  }
+}
+
+
+void Federation::objectInstanceUpdateSent(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance)
+{
+  auto metrics = getFederateMetrics(connectHandle);
+  if (metrics != nullptr)
+  {
+    ObjectInstanceHandle instanceHandle = objectInstance->getObjectInstanceHandle();
+    ObjectClassHandle classHandle = objectInstance->getObjectClass()->getObjectClassHandle();
+    metrics->sentUpdate(classHandle, instanceHandle);
+  }
+}
+
 ////////////////////////////////////////////////////////////
 
-NodeConnect::NodeConnect() :
-  _isParentConnect(false)
+NodeConnect::NodeConnect()
+  : _isParentConnect(false)
+  , _version(0)
 {
-  //DebugPrintf("%s\n", __FUNCTION__);
 }
 
 NodeConnect::~NodeConnect()
@@ -2818,17 +3920,12 @@ NodeConnect::setOptions(const StringStringListMap& options)
     _name = i->second.front();
   else
     _name.clear();
-  i = options.find("isLeaf");
+  i = options.find("version");
+  assert(i != options.end() && !i->second.empty());
   if (i != options.end() && !i->second.empty())
   {
-    if (i->second.front() == "true") 
-    {
-      HandleMap::Hook::getModifiableKey().setLeafConnect(true);
-    }
-  }
-  else
-  {
-    _name.clear();
+    const char* s = i->second.front().c_str();
+    _version = strtoul(s, nullptr, 10);
   }
 }
 
@@ -2837,6 +3934,7 @@ NodeConnect::send(const SharedPtr<const AbstractMessage>& message)
 {
   if (!_messageSender.valid())
     return;
+  //std::cout << __FUNCTION__ << ": connect=" << getConnectHandle() << " version=" << getVersion() << std::endl;
   _messageSender->send(message);
 }
 
@@ -2884,17 +3982,25 @@ Node::isIdle() const
 NodeConnect*
 Node::getNodeConnect(const ConnectHandle& connectHandle)
 {
-  NodeConnect::HandleMap::iterator i = _connectHandleNodeConnectMap.find(connectHandle);
+  auto i = _connectHandleNodeConnectMap.find(connectHandle);
+  if (i == _connectHandleNodeConnectMap.end())
+    return 0;
+  return i.get();
+}
+
+const NodeConnect*
+Node::getNodeConnect(const ConnectHandle& connectHandle) const
+{
+  auto i = _connectHandleNodeConnectMap.find(connectHandle);
   if (i == _connectHandleNodeConnectMap.end())
     return 0;
   return i.get();
 }
 
 NodeConnect*
-Node::insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options, const char* connectName)
+Node::insertNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
 {
   NodeConnect* nodeConnect = new NodeConnect;
-  nodeConnect->setName(connectName);
   // >>> ### THIS ALLOCATES THE CONNECT HANDLE ###
   insert(*nodeConnect);
   // <<< ### THIS ALLOCATES THE CONNECT HANDLE ###
@@ -2907,20 +4013,18 @@ NodeConnect*
 Node::insertParentNodeConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& options)
 {
   OpenRTIAssert(!_parentConnectHandle.valid());
-  NodeConnect* nodeConnect = insertNodeConnect(messageSender, options, "ParentNodeConnect");
+  NodeConnect* nodeConnect = insertNodeConnect(messageSender, options);
   nodeConnect->setIsParentConnect(true);
   _parentConnectHandle = nodeConnect->getConnectHandle();
-  //DebugPrintf("%s: _parentConnectHandle=%s\n", __FUNCTION__, _parentConnectHandle.toString().c_str());
   return nodeConnect;
 }
 
 void
 Node::insert(NodeConnect& nodeConnect)
 {
-  ConnectHandle newConnectHandle = _connectHandleAllocator.getOrTake(nodeConnect.getConnectHandle());
-  newConnectHandle.setName(nodeConnect.getName());
-  //DebugPrintf("%s: newConnectHandle=%s\n", __FUNCTION__, newConnectHandle.toString().c_str());
-  nodeConnect.setConnectHandle(newConnectHandle);
+  // >>> ### THIS ALLOCATES THE CONNECT HANDLE ###
+  nodeConnect.setConnectHandle(_connectHandleAllocator.getOrTake(nodeConnect.getConnectHandle()));
+  // <<< ### THIS ALLOCATES THE CONNECT HANDLE ###
   _connectHandleNodeConnectMap.insert(nodeConnect);
 }
 
@@ -2945,24 +4049,6 @@ bool
 Node::getFederationExecutionAlreadyExists(const std::string& federationName) const
 {
   return _federationNameFederationMap.find(federationName) != _federationNameFederationMap.end();
-}
-
-Federation*
-Node::getFederation(const std::string& federationName)
-{
-  Federation::NameMap::iterator i = _federationNameFederationMap.find(federationName);
-  if (i == _federationNameFederationMap.end())
-    return 0;
-  return i.get();
-}
-
-Federation*
-Node::getFederation(const FederationHandle& federationHandle)
-{
-  Federation::HandleMap::iterator i = _federationHandleFederationMap.find(federationHandle);
-  if (i == _federationHandleFederationMap.end())
-    return 0;
-  return i.get();
 }
 
 void
@@ -3025,8 +4111,6 @@ Node::broadcast(const SharedPtr<const AbstractMessage>& message)
 void
 Node::broadcast(const ConnectHandle& connectHandle, const SharedPtr<const AbstractMessage>& message)
 {
-  //for (NodeConnect::HandleMap::iterator i = _connectHandleNodeConnectMap.begin();
-  //     i != _connectHandleNodeConnectMap.end(); ++i) {
   for (auto& connect : _connectHandleNodeConnectMap) {
     if (connect.getConnectHandle() == connectHandle)
       continue;
@@ -3038,6 +4122,95 @@ void
 Node::broadcastToChildren(const SharedPtr<const AbstractMessage>& message)
 {
   broadcast(_parentConnectHandle, message);
+}
+
+
+void BasicDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<basicData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<size>)XML" << getSize() << R"XML(</size>)XML" << std::endl;
+  out << indent1 << R"XML(<endian>)XML" << getEndian() << R"XML(</endian>)XML" << std::endl;
+  out << indent << R"XML(</basicData>)XML" << std::endl;
+}
+
+
+void SimpleDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<simpleData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<representation>)XML" << getRepresentation() << R"XML(</representation>)XML" << std::endl;
+  out << indent << R"XML(</simpleData>)XML" << std::endl;
+}
+
+
+void EnumeratedDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<enumeratedData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<representation>)XML" << getRepresentation() << R"XML(</representation>)XML" << std::endl;
+  std::string indent2((level + 2) * kIndentSpaces, ' ');
+  for (auto& enumerator : getEnumerators())
+  {
+    out << indent1 << R"XML(<enumerator>)XML" << std::endl;
+    out << indent2 << R"XML(<name>)XML" << enumerator.getName() << R"XML(</name>)XML" << std::endl;
+    out << indent2 << R"XML(<value>)XML" << enumerator.getValue() << R"XML(</value>)XML" << std::endl;
+    out << indent1 << R"XML(</enumerator>)XML" << std::endl;
+  }
+  out << indent << R"XML(</enumeratedData>)XML" << std::endl;
+}
+
+
+void ArrayDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<arrayData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<encoding>)XML" << getEncoding() << R"XML(</encoding>)XML" << std::endl;
+  out << indent1 << R"XML(<dataType>)XML" << getDataType() << R"XML(</dataType>)XML" << std::endl;
+  out << indent1 << R"XML(<cardinality>)XML" << getCardinality() << R"XML(</cardinality>)XML" << std::endl;
+  out << indent << R"XML(</arrayData>)XML" << std::endl;
+}
+
+
+void FixedRecordDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  std::string indent2((level + 2) * kIndentSpaces, ' ');
+  out << indent << R"XML(<fixedRecordData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent1 << R"XML(<encoding>)XML" << getEncoding() << R"XML(</encoding>)XML" << std::endl;
+  out << indent1 << R"XML(<version>)XML" << getVersion() << R"XML(</version>)XML" << std::endl;
+  if (!getInclude().empty())
+  {
+    out << indent1 << R"XML(<include>)XML" << getInclude() << R"XML(</include>)XML" << std::endl;
+  }
+  for (auto& field : getFields())
+  {
+    out << indent1 << R"XML(<field>)XML" << std::endl;
+    out << indent2 << R"XML(<name>)XML" << field.getName() << R"XML(</name>)XML" << std::endl;
+    out << indent2 << R"XML(<dataType>)XML" << field.getDataType() << R"XML(</dataType>)XML" << std::endl;
+    out << indent2 << R"XML(<version>)XML" << field.getVersion() << R"XML(</version>)XML" << std::endl;
+    out << indent1 << R"XML(</field>)XML" << std::endl;
+  }
+  out << indent << R"XML(</fixedRecordData>)XML" << std::endl;
+}
+
+void VariantRecordDataType::writeCurrentFDD(std::ostream& out, unsigned int level) const
+{
+  std::string indent(level * kIndentSpaces, ' ');
+  std::string indent1((level + 1) * kIndentSpaces, ' ');
+  out << indent << R"XML(<variantRecordData>)XML" << std::endl;
+  out << indent1 << R"XML(<name>)XML" << getName() << R"XML(</name>)XML" << std::endl;
+  out << indent << R"XML(</variantRecordData>)XML" << std::endl;
 }
 
 } // namespace ServerModel

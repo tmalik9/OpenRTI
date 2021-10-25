@@ -23,6 +23,9 @@
 #endif /* ndef COMPILED_FROM_DSP */
 
 #ifdef _MSC_VER
+#include <CodeAnalysis/Warnings.h>
+#pragma warning(disable: ALL_CODE_ANALYSIS_WARNINGS)
+#pragma warning(disable: 26408 26430 26438 26440 26481 26429 26461 26462 26482 26485 26493 26494 26496 26497)
 #pragma warning(disable : 4100 4127 4244 4456)
 #endif
 
@@ -436,7 +439,7 @@ static ELEMENT_TYPE *
 getElementType(XML_Parser parser, const ENCODING *enc,
                const char *ptr, const char *end);
 
-static unsigned long generate_hash_secret_salt(void);
+static unsigned long generate_hash_secret_salt();
 static XML_Bool startParsing(XML_Parser parser);
 
 static XML_Parser
@@ -695,7 +698,7 @@ static const XML_Char implicitContext[] = {
 };
 
 static unsigned long
-generate_hash_secret_salt(void)
+generate_hash_secret_salt()
 {
   unsigned int seed = time(NULL) % UINT_MAX;
   srand(seed);
@@ -1991,7 +1994,7 @@ XML_ErrorString(enum XML_Error code)
 }
 
 const XML_LChar * XMLCALL
-XML_ExpatVersion(void) {
+XML_ExpatVersion() {
 
   /* V1 is used to string-ize the version number. However, it would
      string-ize the actual version macro *names* unless we get them
@@ -2011,7 +2014,7 @@ XML_ExpatVersion(void) {
 }
 
 XML_Expat_Version XMLCALL
-XML_ExpatVersionInfo(void)
+XML_ExpatVersionInfo()
 {
   XML_Expat_Version version;
 
@@ -2023,7 +2026,7 @@ XML_ExpatVersionInfo(void)
 }
 
 const XML_Feature * XMLCALL
-XML_GetFeatureList(void)
+XML_GetFeatureList()
 {
   static const XML_Feature features[] = {
     {XML_FEATURE_SIZEOF_XML_CHAR,  XML_L("sizeof(XML_Char)"),

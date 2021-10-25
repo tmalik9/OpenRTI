@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "ServerConfigContentHandler.h"
 
 #include <iosfwd>
@@ -53,25 +54,24 @@ static bool enableFlagToBool(const char* enableValue)
   throw RTIinternalError("Invalid enable flag!");
 }
 
-ServerConfigContentHandler::ServerConfigContentHandler() :
-  _permitTimeRegulation(true),
+ServerConfigContentHandler::ServerConfigContentHandler() noexcept :
   _enableZLibCompression(true),
   _enableNetworkStatistics(false)
 {
 }
 
-ServerConfigContentHandler::~ServerConfigContentHandler()
+ServerConfigContentHandler::~ServerConfigContentHandler() noexcept
 {
 }
 
 void
-ServerConfigContentHandler::startDocument(void)
+ServerConfigContentHandler::startDocument()
 {
   OpenRTIAssert(_modeStack.empty());
 }
 
 void
-ServerConfigContentHandler::endDocument(void)
+ServerConfigContentHandler::endDocument()
 {
   OpenRTIAssert(_modeStack.empty());
 }
@@ -122,8 +122,8 @@ ServerConfigContentHandler::parseLogCategory(const std::string& s)
 }
 
 void
-ServerConfigContentHandler::startElement(const char* uri, const char* name,
-  const char* qName, const XML::Attributes* atts)
+ServerConfigContentHandler::startElement(const char* /*uri*/, const char* name,
+  const char* /*qName*/, const XML::Attributes* atts)
 {
   if (strcmp(name, "OpenRTIServerConfig") == 0)
   {
@@ -147,16 +147,6 @@ ServerConfigContentHandler::startElement(const char* uri, const char* name,
     _modeStack.push_back(ParentServerMode);
     _parentServerUrl = trim(atts->getValue("url"));
   }
-  else if (strcmp(name, "permitTimeRegulation") == 0)
-  {
-    if (getCurrentMode() != OpenRTIServerConfigMode && getCurrentMode() != ListenMode)
-    {
-      throw RTIinternalError("permitTimeRegulation tag not inside of OpenRTIServerConfig or listen tag!");
-    }
-    _modeStack.push_back(PermitTimeRegulationMode);
-    bool enable = enableFlagToBool(atts->getValue("enable"));
-    _permitTimeRegulation = enable;
-  }
   else if (strcmp(name, "enableZLibCompression") == 0)
   {
     if (getCurrentMode() != OpenRTIServerConfigMode)
@@ -176,6 +166,15 @@ ServerConfigContentHandler::startElement(const char* uri, const char* name,
     _modeStack.push_back(ListenMode);
     _listenConfig.push_back(ListenConfig());
     _listenConfig.back()._url = trim(atts->getValue("url"));
+  }
+  else if (strcmp(name, "QueueLimit") == 0)
+  {
+    if (getCurrentMode() != OpenRTIServerConfigMode)
+    {
+      throw RTIinternalError("QueueLimit tag not inside of OpenRTIServerConfig!");
+    }
+    _modeStack.push_back(QueueLimitMode);
+    _queueLimit = static_cast<size_t>(std::stoull(trim(atts->getValue("value"))) * 1024);
   }
   else if (strcmp(name, "LogPriority") == 0)
   {
@@ -234,7 +233,7 @@ ServerConfigContentHandler::startElement(const char* uri, const char* name,
   {
     if (getCurrentMode() != OpenRTIServerConfigMode && getCurrentMode() != ListenMode)
     {
-      throw RTIinternalError("permitTimeRegulation tag not inside of OpenRTIServerConfig or listen tag!");
+      throw RTIinternalError("NetworkStatistics tag not inside of OpenRTIServerConfig or listen tag!");
     }
     _modeStack.push_back(NetworkStatisticsMode);
     bool enable = enableFlagToBool(atts->getValue("enable"));
@@ -248,7 +247,7 @@ ServerConfigContentHandler::startElement(const char* uri, const char* name,
 }
 
 void
-ServerConfigContentHandler::endElement(const char* uri, const char* name, const char* qName)
+ServerConfigContentHandler::endElement(const char* /*uri*/, const char* /*name*/, const char* /*qName*/)
 {
   _modeStack.pop_back();
 }

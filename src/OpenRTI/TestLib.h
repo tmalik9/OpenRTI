@@ -25,24 +25,80 @@
 #include <string>
 #include <vector>
 
-#include <Condition.h>
-#include <Clock.h>
-#include <Options.h>
-#include <Referenced.h>
-#include <ScopeLock.h>
-#include <ScopeUnlock.h>
-#include <NetworkServer.h>
-#include <Rand.h>
-#include <SharedPtr.h>
-#include <StringUtils.h>
-#include <Thread.h>
+#include "Condition.h"
+#include "Clock.h"
+#include "Options.h"
+#include "Referenced.h"
+#include "ScopeLock.h"
+#include "ScopeUnlock.h"
+#include "NetworkServer.h"
+#include "Rand.h"
+#include "SharedPtr.h"
+#include "StringUtils.h"
+#include "Thread.h"
+#include "dprintf.h"
 
 #if !defined(_WIN32)
 #include <sys/time.h>
 #include <sys/resource.h>
 #endif
+#include "SocketAddress.h"
 
 namespace OpenRTI {
+
+class OPENRTI_LOCAL ServerThread : public Thread
+{
+  public:
+    void setupServer(const std::string& host, const SocketAddress& parentAddress, bool compress)
+    {
+      std::list<SocketAddress> addressList = SocketAddress::resolve(host, "0", true);
+      // Set up a stream socket for the server connect
+      bool success = false;
+      while (!addressList.empty())
+      {
+        SocketAddress address = addressList.front();
+        addressList.pop_front();
+        try
+        {
+          _address = _server.listenInet(address, 20);
+          success = true;
+          break;
+        }
+        catch (const OpenRTI::Exception&)
+        {
+          if (addressList.empty() && !success)
+            throw;
+        }
+      }
+      _server.setServerName(_address.getNumericName());
+      if (parentAddress.valid())
+      {
+        AbsTimeout timeout(Clock::now() + Clock::fromSeconds(1));
+        _server.connectParentInetServer(parentAddress, compress, timeout);
+      }
+      start();
+    }
+
+    void stopServer()
+    {
+      _server.postDone();
+      wait();
+    }
+
+    const SocketAddress& getAddress() const
+    {
+      return _address;
+    }
+
+  protected:
+    virtual void run() override
+    {
+      _server.exec();
+    }
+
+    NetworkServer _server;
+    SocketAddress _address;
+};
 
 class OPENRTI_LOCAL ServerPool {
 public:
@@ -101,55 +157,9 @@ public:
   }
 
 private:
-  class OPENRTI_LOCAL ServerThread : public Thread {
-  public:
-    void setupServer(const std::string& host, const SocketAddress& parentAddress, bool compress)
-    {
-      std::list<SocketAddress> addressList = SocketAddress::resolve(host, "0", true);
-      // Set up a stream socket for the server connect
-      bool success = false;
-      while (!addressList.empty()) {
-        SocketAddress address = addressList.front();
-        addressList.pop_front();
-        try {
-          _address = _server.listenInet(address, 20);
-          success = true;
-          break;
-        } catch (const OpenRTI::Exception&) {
-          if (addressList.empty() && !success)
-            throw;
-        }
-      }
-      _server.setServerName(_address.getNumericName());
-
-      if (parentAddress.valid()) {
-        Clock abstime = Clock::now() + Clock::fromSeconds(1);
-        _server.connectParentInetServer(parentAddress, compress, abstime);
-      }
-
-      start();
-    }
-
-    void stopServer()
-    {
-      _server.postDone();
-      wait();
-    }
-
-    const SocketAddress& getAddress() const
-    { return _address; }
-
-  protected:
-    virtual void run()
-    { _server.exec(); }
-
-    NetworkServer _server;
-    SocketAddress _address;
-  };
-
   SocketAddress startServer(const SocketAddress& parentAddress, bool compress)
   {
-    SharedPtr<ServerThread> serverThread = new ServerThread;
+    SharedPtr<ServerThread> serverThread = MakeShared<ServerThread>();
     serverThread->setupServer("localhost", parentAddress, compress);
     _serverThreadList.push_back(serverThread);
     return serverThread->getAddress();
@@ -406,7 +416,7 @@ public:
   };
 
   RTITest(int argc, const char* const argv[], bool disjointFederations) :
-    _optionString("A:C:F:JM:O:S:"),
+    _optionString("A:C:F:JM:O:S:v"),
     _options(argc, argv),
     _federationExecution(L"FederationExecution"),
     _numServers(1),
@@ -418,7 +428,7 @@ public:
   virtual ~RTITest()
   { }
 
-  virtual Ambassador* createAmbassador(const ConstructorArgs&) = 0;
+  virtual SharedPtr<Ambassador> createAmbassador(const ConstructorArgs&) = 0;
 
   void insertOptionString(const std::string& optionString)
   {
@@ -450,10 +460,14 @@ public:
       _fddFile = localeToUcs(argument);
       return true;
     case 'S':
-      _numServers = atoi(argument.c_str());
+      _numServers = atoi(argument.c_str()); // For S==0, protocol = thread + ThreadServer.cpp is used (otherwise, protocol = rti + NetworkServer.cpp) 
       return true;
     case 'J':
       _joinOnce = true;
+      return true;
+    case 'v':
+      sEnableDebugPrintf = true;
+      sDebugToConsole = true;
       return true;
     case '\0':
       _globalArgumentList.push_back(localeToUcs(argument));
@@ -483,8 +497,8 @@ public:
     ConstructorArgs constructorArgs;
     constructorArgs._fddFile = _fddFile;
     constructorArgs._mimFile = _mimFile;
-    constructorArgs._federationBarrier = new FederationBarrier(_numAmbassadorThreads);
-    constructorArgs._lbts = new LBTS(_numAmbassadorThreads);
+    constructorArgs._federationBarrier = MakeShared<FederationBarrier>(_numAmbassadorThreads);
+    constructorArgs._lbts = MakeShared<LBTS>(_numAmbassadorThreads);
     constructorArgs._argumentList = _globalArgumentList;
     constructorArgs._disjointFederations = _disjointFederations;
     constructorArgs._joinOnce = _joinOnce;
@@ -511,7 +525,7 @@ public:
       testAmbassador = createAmbassador(constructorArgs);
 
       SharedPtr<AmbassadorThread> ambassadorThread;
-      ambassadorThread = new AmbassadorThread(testAmbassador);
+      ambassadorThread = MakeShared<AmbassadorThread>(testAmbassador);
       _ambassadorThreadList.push_back(ambassadorThread);
       ambassadorThread->start();
     }
@@ -555,7 +569,7 @@ private:
     { return _success; }
 
   protected:
-    virtual void run()
+    virtual void run() override
     { _success = _testAmbassador->callExec(); }
 
   private:

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "URL.h"
 
 #include <sstream>
@@ -214,7 +215,7 @@ URL::fromProtocolPath(const std::string& protocol, const std::string& path)
 }
 
 const std::string&
-URL::getProtocol() const
+URL::getProtocol() const noexcept
 {
   return _protocol;
 }
@@ -226,7 +227,7 @@ URL::setProtocol(const std::string& protocol)
 }
 
 const std::string&
-URL::getHost() const
+URL::getHost() const noexcept
 {
   return _host;
 }
@@ -238,7 +239,7 @@ URL::setHost(const std::string& host)
 }
 
 const std::string&
-URL::getService() const
+URL::getService() const noexcept
 {
   return _service;
 }
@@ -250,7 +251,7 @@ URL::setService(const std::string& service)
 }
 
 const std::string&
-URL::getPath() const
+URL::getPath() const noexcept
 {
   return _path;
 }

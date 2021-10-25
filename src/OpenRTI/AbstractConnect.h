@@ -25,6 +25,7 @@
 #include "AbstractMessageReceiver.h"
 #include "Clock.h"
 #include "SharedPtr.h"
+#include "AbsTimeout.h"
 
 namespace OpenRTI {
 
@@ -32,20 +33,26 @@ class Clock;
 
 class OPENRTI_API AbstractConnect : public Referenced {
 public:
-  virtual ~AbstractConnect() {}
+  AbstractConnect() noexcept = default;
+  AbstractConnect(const AbstractConnect&) = default;
+  AbstractConnect(AbstractConnect&&) = delete;
+  virtual ~AbstractConnect() noexcept = default;
+  //AbstractConnect& operator=(const AbstractConnect&) = default;
+  //AbstractConnect& operator=(AbstractConnect&&) = default;
+
   virtual AbstractMessageSender* getMessageSender() = 0;
   virtual AbstractMessageReceiver* getMessageReceiver() = 0;
 
   /// Convenience methods for obvious tasks
   void send(const SharedPtr<const AbstractMessage>& message)
-  { 
+  {
     getMessageSender()->send(message);
   }
 
-  /// Returns the next message. Returns 0 if no new message arrives before abstime
-  SharedPtr<const AbstractMessage> receive(const Clock& abstime)
+  /// Returns the next message. Returns 0 if no new message arrives before timeout.
+  SharedPtr<const AbstractMessage> receive(const AbsTimeout& timeout)
   {
-    return getMessageReceiver()->receive(abstime);
+    return getMessageReceiver()->receive(timeout);
   }
   /// Returns the next message if there is one.
   SharedPtr<const AbstractMessage> receive()

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "DefaultErrorHandler.h"
 
 namespace OpenRTI {
@@ -25,7 +26,7 @@ DefaultErrorHandler::DefaultErrorHandler()
 {
 }
 
-DefaultErrorHandler::~DefaultErrorHandler()
+DefaultErrorHandler::~DefaultErrorHandler() noexcept
 {
 }
 
@@ -42,7 +43,7 @@ DefaultErrorHandler::fatalError(const char* msg, unsigned line, unsigned col)
 }
 
 void
-DefaultErrorHandler::warning(const char* msg, unsigned line, unsigned col)
+DefaultErrorHandler::warning(const char* /*msg*/, unsigned /*line*/, unsigned /*col*/)
 {
 }
 

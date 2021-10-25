@@ -149,4 +149,9 @@ AbstractThreadLocal::_set(AbstractThreadLocal::_AbstractData* abstractThreadLoca
   return _Provider::instance().setData(_index, abstractThreadLocal);
 }
 
+void
+AbstractThreadLocal::shutdown()
+{
+}
+
 } // namespace OpenRTI

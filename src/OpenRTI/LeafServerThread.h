@@ -32,19 +32,20 @@ namespace OpenRTI {
 class OPENRTI_API LeafServerThread : public Thread {
 public:
   LeafServerThread(const SharedPtr<AbstractServer>& server);
-  virtual ~LeafServerThread(void);
+  virtual ~LeafServerThread() noexcept;
 
   /// Shutdow this thread and wait for it to finish.
   void postShutdown();
 
-  /// Connect to thi particular thread.
-  SharedPtr<AbstractConnect> connect(const StringStringListMap& clientOptions);
+  /// Connect to this particular thread.
+  SharedPtr<AbstractConnect> connect(const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
 
   /// Call this to get a connect to a possibly new leaf server.
-  static SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions);
+  static SharedPtr<AbstractConnect> connect(const URL& url, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
 
+  static void shutdown();
 protected:
-  virtual void run();
+  void run() override;
 
 private:
   LeafServerThread(const LeafServerThread&) = delete;

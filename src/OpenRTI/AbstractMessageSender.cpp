@@ -17,15 +17,16 @@
  *
  */
 
+#include "DebugNew.h"
 #include "AbstractMessageSender.h"
 
 namespace OpenRTI {
 
-AbstractMessageSender::AbstractMessageSender()
+AbstractMessageSender::AbstractMessageSender() noexcept
 {
 }
 
-AbstractMessageSender::~AbstractMessageSender()
+AbstractMessageSender::~AbstractMessageSender() noexcept
 {
 }
 

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include <signal.h>
 #include <iostream>
 
@@ -31,11 +32,21 @@
 #include <sys/resource.h>
 #endif
 #include "AbstractNetworkStatistics.h"
+#include "AbsTimeout.h"
 
 static void usage(const char* argv0)
 {
   std::cerr << argv0 << ": [-b] [-c configfile] [-f file] [-h] [-i address] [-p parent]" << std::endl;
 }
+
+#if defined(_WIN32) && defined(_DEBUG)
+static void DumpHeap()
+{
+  _CrtDumpMemoryLeaks();
+}
+
+static int initHeapDump = atexit( DumpHeap);
+#endif
 
 class SignalNetworkServer : public OpenRTI::NetworkServer {
 public:
@@ -152,7 +163,8 @@ main(int argc, char* argv[])
           else
             url.setProtocol("rti");
         }
-        networkServer.connectParentServer(url, OpenRTI::Clock::now() + OpenRTI::Clock::fromSeconds(75));
+        OpenRTI::AbsTimeout timeout(OpenRTI::Clock::now() + OpenRTI::Clock::fromSeconds(75));
+        networkServer.connectParentServer(url, timeout);
       } catch (const OpenRTI::Exception& e) {
         std::cerr << "Could not connect parent server:" << std::endl;
         std::cerr << OpenRTI::utf8ToLocale(e.getReason()) << std::endl;
@@ -178,7 +190,12 @@ main(int argc, char* argv[])
     std::cerr << "Running in background is not yet supported!" << std::endl;
 #else
   if (background)
-    daemon(0, 0);
+  {
+    if (daemon(0, 0) != 0)
+    {
+      perror("daemon() failed");
+    }
+  }
 #endif
 
 #if !defined(_WIN32)

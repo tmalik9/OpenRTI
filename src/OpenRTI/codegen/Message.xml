@@ -3,7 +3,7 @@
 <messagelist>
   <!-- Everything that needs to be serialized into a whatever
        transportation chanel is defined here. From this xml file we
-       generate the message implementation in c++ and all the serialzation
+       generate the message implementation in c++ and all the serialization
        code into the sockets.
     -->
 
@@ -98,6 +98,16 @@
     <enumerant name="ServiceReportingSwitchesType"/>
   </type>
 
+  <type name="ArrayDataTypeEncoding" type="enum">
+    <enumerant name="FixedArrayDataTypeEncoding" repr="HLAfixedArray"/>
+    <enumerant name="VariableArrayDataTypeEncoding" repr="HLAvariableArray"/>
+  </type>
+
+  <type name="Endianness" type="enum">
+    <enumerant name="BigEndian" repr="BIG"/>
+    <enumerant name="LittleEndian" repr="LITTLE"/>
+  </type>
+
   <type name="Bool" ctype="bool" encoding="Bool"/>
   <type name="String" ctype="std::string" encoding="String"/>
   <type name="Unsigned" ctype="uint32_t" encoding="UInt32"/>
@@ -109,10 +119,16 @@
   <type name="AttributeHandle" ctype="AttributeHandle" encoding="UInt32"/>
   <type name="DimensionHandle" ctype="DimensionHandle" encoding="UInt32"/>
   <type name="UpdateRateHandle" ctype="UpdateRateHandle" encoding="UInt32"/>
-  <type name="ObjectClassHandle" ctype="ObjectClassHandle" encoding="UInt32"/>
-  <type name="ObjectInstanceHandle" ctype="ObjectInstanceHandle" encoding="UInt32"/>
-  <type name="InteractionClassHandle" ctype="InteractionClassHandle" encoding="UInt32"/>
-  <type name="ParameterHandle" ctype="ParameterHandle" encoding="UInt32"/>
+  <type name="BasicDataTypeHandle" ctype="BasicDataTypeHandle" encoding="UInt32"/>
+  <type name="SimpleDataTypeHandle" ctype="SimpleDataTypeHandle" encoding="UInt32"/>
+  <type name="EnumeratedDataTypeHandle" ctype="EnumeratedDataTypeHandle" encoding="UInt32"/>
+  <type name="ArrayDataTypeHandle" ctype="ArrayDataTypeHandle" encoding="UInt32"/>
+  <type name="FixedRecordDataTypeHandle" ctype="FixedRecordDataTypeHandle" encoding="UInt32"/>
+  <type name="VariantRecordDataTypeHandle" ctype="VariantRecordDataTypeHandle" encoding="UInt32"/>
+  <type name="ObjectClassHandle" ctype="ObjectClassHandle" encoding="UInt32" parent="Federation"/>
+  <type name="ObjectInstanceHandle" ctype="ObjectInstanceHandle" encoding="UInt32" parent="Federation"/>
+  <type name="InteractionClassHandle" ctype="InteractionClassHandle" encoding="UInt32" parent="Federation"/>
+  <type name="ParameterHandle" ctype="ParameterHandle" encoding="UInt32" parent="InteractionClass"/>
   <type name="FederateHandle" ctype="FederateHandle" encoding="UInt32"/>
   <type name="SpaceHandle" ctype="SpaceHandle" encoding="UInt32"/>
   <type name="TransportationHandle" ctype="TransportationHandle" encoding="UInt8"/>
@@ -160,15 +176,16 @@
 
   <type name="AttributeState" type="struct">
     <field name="AttributeHandle" type="AttributeHandle"/>
+    <field name="OwnerFederate" type="FederateHandle"/>
     <!-- <field name="AssociatedRegionSet" type="RegionValueList"/> -->
   </type>
-  <type name="AttributeStateVector" type="vector" scalar="AttributeState"/>
+  <type name="AttributeStateVector" type="vector" scalar="AttributeState" hide="True"/>
 
-  <type name="ParameterValue" type="struct">
+  <type name="ParameterValue" type="struct" parent="InteractionClass">
     <field name="ParameterHandle" type="ParameterHandle"/>
     <field name="Value" type="VariableLengthData"/>
   </type>
-  <type name="ParameterValueVector" type="vector" scalar="ParameterValue"/>
+  <type name="ParameterValueVector" type="vector" scalar="ParameterValue" parent="InteractionClass"/>
 
   <type name="AttributeValue" type="struct">
     <field name="AttributeHandle" type="AttributeHandle"/>
@@ -201,6 +218,9 @@
     <enumerant name="CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory"/>
     <enumerant name="CreateFederationExecutionResponseInconsistentFDD"/>
     <enumerant name="CreateFederationExecutionResponseRTIinternalError"/>
+    <enumerant name="CreateFederationExecutionResponseTimeout"/>
+  
+"/>
   </type>
 
   <type name="DestroyFederationExecutionResponseType" type="enum">
@@ -217,6 +237,7 @@
     <enumerant name="JoinFederationExecutionResponseSaveInProgress"/>
     <enumerant name="JoinFederationExecutionResponseRestoreInProgress"/>
     <enumerant name="JoinFederationExecutionResponseInconsistentFDD"/>
+    <enumerant name="JoinFederationExecutionResponseTimeout"/>
   </type>
 
   <type name="RegisterFederationSynchronizationPointResponseType" type="enum">
@@ -228,6 +249,106 @@
   <!-- Key/Value pair for configuration parameters, this is used when a federate joins -->
   <type name="ConfigurationParameterMap" type="map" key="String" value="StringVector"/>
 
+  <!-- Data Type Definitions. -->
+  <type name="FOMStringBasicDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Size" type="Unsigned"/>
+    <field name="Endian" type="Endianness"/>
+  </type>
+  <type name="FOMStringBasicDataTypeList" type="vector" scalar="FOMStringBasicDataType"/>
+  <type name="FOMStringSimpleDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Representation" type="String"/>
+  </type>
+  <type name="FOMStringSimpleDataTypeList" type="vector" scalar="FOMStringSimpleDataType"/>
+
+  <type name="FOMStringEnumerator" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Value" type="Unsigned"/>
+  </type>
+  <type name="FOMStringEnumeratorList" type="vector" scalar="FOMStringEnumerator"/>
+
+  <type name="FOMStringEnumeratedDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Representation" type="String"/>
+    <field name="Enumerators" type="FOMStringEnumeratorList"/>
+  </type>
+  <type name="FOMStringEnumeratedDataTypeList" type="vector" scalar="FOMStringEnumeratedDataType"/>
+
+  <type name="FOMStringArrayDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Cardinality" type="String"/>
+    <field name="Encoding" type="String"/>
+  </type>
+  <type name="FOMStringArrayDataTypeList" type="vector" scalar="FOMStringArrayDataType"/>
+  <type name="FOMStringArrayDataType2" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Cardinality" type="String"/>
+    <field name="Encoding" type="ArrayDataTypeEncoding"/>
+  </type>
+  <type name="FOMStringArrayDataType2List" type="vector" scalar="FOMStringArrayDataType2"/>
+
+  <type name="FOMStringFixedRecordField" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="DataType" type="Unsigned"/>
+  </type>
+  <type name="FOMStringFixedRecordFieldList" type="vector" scalar="FOMStringFixedRecordField"/>
+
+  <type name="FOMStringFixedRecordDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Encoding" type="String"/>
+    <field name="Fields" type="FOMStringFixedRecordFieldList"/>
+  </type>
+  <type name="FOMStringFixedRecordDataTypeList" type="vector" scalar="FOMStringFixedRecordDataType"/>
+
+  <type name="FOMStringFixedRecordField2" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Version" type="Unsigned"/>
+  </type>
+  <type name="FOMStringFixedRecordField2List" type="vector" scalar="FOMStringFixedRecordField2"/>
+
+  <type name="FOMStringFixedRecordDataType2" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Encoding" type="String"/>
+    <field name="Include" type="String"/>
+    <field name="Version" type="Unsigned"/>
+    <field name="Fields" type="FOMStringFixedRecordField2List"/>
+  </type>
+  <type name="FOMStringFixedRecordDataType2List" type="vector" scalar="FOMStringFixedRecordDataType2"/>
+
+  <type name="FOMStringVariantRecordAlternative" type="struct" copyOnWrite="true">
+    <field name="Enumerator" type="String"/>
+    <field name="Name" type="String"/>
+    <field name="DataType" type="Unsigned"/>
+  </type>
+  <type name="FOMStringVariantRecordAlternativeList" type="vector" scalar="FOMStringVariantRecordAlternative"/>
+
+  <type name="FOMStringVariantRecordDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Discriminant" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Alternatives" type="FOMStringVariantRecordAlternativeList"/>
+    <field name="Encoding" type="String"/>
+  </type>
+  <type name="FOMStringVariantRecordDataTypeList" type="vector" scalar="FOMStringVariantRecordDataType"/>
+
+  <type name="FOMStringVariantRecordAlternative2" type="struct" copyOnWrite="true">
+    <field name="Enumerator" type="String"/>
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+  </type>
+  <type name="FOMStringVariantRecordAlternative2List" type="vector" scalar="FOMStringVariantRecordAlternative2"/>
+  <type name="FOMStringVariantRecordDataType2" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Discriminant" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Alternatives" type="FOMStringVariantRecordAlternative2List"/>
+    <field name="Encoding" type="String"/>
+  </type>
+  <type name="FOMStringVariantRecordDataType2List" type="vector" scalar="FOMStringVariantRecordDataType2"/>
   <!-- Data Types to send an already parsed/read fom module to the root server for
        validation and handle allocation. -->
   <type name="FOMStringTransportationType" type="struct" copyOnWrite="true">
@@ -249,6 +370,7 @@
 
   <type name="FOMStringParameter" type="struct" copyOnWrite="true">
     <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
   </type>
   <type name="FOMStringParameterList" type="vector" scalar="FOMStringParameter"/>
 
@@ -264,6 +386,7 @@
 
   <type name="FOMStringAttribute" type="struct" copyOnWrite="true">
     <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
     <field name="OrderType" type="String"/>
     <field name="TransportationType" type="String"/>
     <field name="RoutingSpace" type="String"/>
@@ -290,7 +413,8 @@
   <type name="FOMStringSwitchList" type="vector" scalar="FOMStringSwitch"/>
 
   <type name="FOMStringModule" type="struct" copyOnWrite="true">
-    <field name="Content" type="String"/>
+    <field name="Designator" type="String"/>
+    <!--<field name="Content" type="String"/>-->
     <field name="TransportationTypeList" type="FOMStringTransportationTypeList"/>
     <field name="DimensionList" type="FOMStringDimensionList"/>
     <field name="RoutingSpaceList" type="FOMStringRoutingSpaceList"/>
@@ -298,11 +422,36 @@
     <field name="ObjectClassList" type="FOMStringObjectClassList"/>
     <field name="UpdateRateList" type="FOMStringUpdateRateList"/>
     <field name="SwitchList" type="FOMStringSwitchList"/>
+    <field name="SimpleDataTypeList" type="FOMStringSimpleDataTypeList"/>
+    <field name="EnumeratedDataTypeList" type="FOMStringEnumeratedDataTypeList"/>
+    <field name="ArrayDataTypeList" type="FOMStringArrayDataTypeList"/>
+    <field name="FixedRecordDataTypeList" type="FOMStringFixedRecordDataTypeList"/>
+    <field name="VariantRecordDataTypeList" type="FOMStringVariantRecordDataTypeList"/>
     <field name="ArtificialInteractionRoot" type="Bool"/>
     <field name="ArtificialObjectRoot" type="Bool"/>
   </type>
   <type name="FOMStringModuleList" type="vector" scalar="FOMStringModule"/>
 
+  <type name="FOMStringModule2" type="struct" copyOnWrite="true">
+    <field name="Designator" type="String"/>
+    <!--<field name="Content" type="String"/>-->
+    <field name="TransportationTypeList" type="FOMStringTransportationTypeList"/>
+    <field name="DimensionList" type="FOMStringDimensionList"/>
+    <field name="RoutingSpaceList" type="FOMStringRoutingSpaceList"/>
+    <field name="InteractionClassList" type="FOMStringInteractionClassList"/>
+    <field name="ObjectClassList" type="FOMStringObjectClassList"/>
+    <field name="UpdateRateList" type="FOMStringUpdateRateList"/>
+    <field name="SwitchList" type="FOMStringSwitchList"/>
+    <field name="BasicDataTypeList" type="FOMStringBasicDataTypeList"/>
+    <field name="SimpleDataTypeList" type="FOMStringSimpleDataTypeList"/>
+    <field name="EnumeratedDataTypeList" type="FOMStringEnumeratedDataTypeList"/>
+    <field name="ArrayDataTypeList" type="FOMStringArrayDataType2List"/>
+    <field name="FixedRecordDataTypeList" type="FOMStringFixedRecordDataType2List"/>
+    <field name="VariantRecordDataTypeList" type="FOMStringVariantRecordDataType2List"/>
+    <field name="ArtificialInteractionRoot" type="Bool"/>
+    <field name="ArtificialObjectRoot" type="Bool"/>
+  </type>
+  <type name="FOMStringModule2List" type="vector" scalar="FOMStringModule2"/>
 
   <!-- Data types to send ready to use FOM modules. -->
   <type name="FOMTransportationType" type="struct" copyOnWrite="true">
@@ -327,6 +476,7 @@
 
   <type name="FOMParameter" type="struct" copyOnWrite="true">
     <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
     <field name="ParameterHandle" type="ParameterHandle"/>
   </type>
   <type name="FOMParameterList" type="vector" scalar="FOMParameter"/>
@@ -344,6 +494,7 @@
 
   <type name="FOMAttribute" type="struct" copyOnWrite="true">
     <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
     <field name="AttributeHandle" type="AttributeHandle"/>
     <field name="OrderType" type="OrderType"/>
     <field name="TransportationType" type="TransportationType"/>
@@ -372,6 +523,78 @@
   </type>
   <type name="FOMSwitchList" type="vector" scalar="FOMSwitch"/>
 
+  <type name="FOMBasicDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Size" type="Unsigned"/>
+    <field name="Endian" type="Endianness"/>
+    <field name="Handle" type="BasicDataTypeHandle"/>
+  </type>
+  <type name="FOMBasicDataTypeList" type="vector" scalar="FOMBasicDataType"/>
+
+  <type name="FOMSimpleDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Representation" type="String"/>
+    <field name="Handle" type="SimpleDataTypeHandle"/>
+  </type>
+  <type name="FOMSimpleDataTypeList" type="vector" scalar="FOMSimpleDataType"/>
+
+  <type name="FOMEnumerator" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Value" type="Unsigned"/>
+  </type>
+  <type name="FOMEnumeratorList" type="vector" scalar="FOMEnumerator"/>
+
+  <type name="FOMEnumeratedDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Representation" type="String"/>
+    <field name="Enumerators" type="FOMEnumeratorList"/>
+    <field name="Handle" type="EnumeratedDataTypeHandle"/>
+  </type>
+  <type name="FOMEnumeratedDataTypeList" type="vector" scalar="FOMEnumeratedDataType"/>
+
+  <type name="FOMArrayDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Cardinality" type="String"/>
+    <field name="Encoding" type="ArrayDataTypeEncoding"/>
+    <field name="Handle" type="ArrayDataTypeHandle"/>
+  </type>
+  <type name="FOMArrayDataTypeList" type="vector" scalar="FOMArrayDataType"/>
+
+  <type name="FOMFixedRecordField" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Version" type="Unsigned"/>
+  </type>
+  <type name="FOMFixedRecordFieldList" type="vector" scalar="FOMFixedRecordField"/>
+
+  <type name="FOMFixedRecordDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Encoding" type="String"/>
+    <field name="Include" type="String"/>
+    <field name="Version" type="Unsigned"/>
+    <field name="Fields" type="FOMFixedRecordFieldList"/>
+    <field name="Handle" type="FixedRecordDataTypeHandle"/>
+  </type>
+  <type name="FOMFixedRecordDataTypeList" type="vector" scalar="FOMFixedRecordDataType"/>
+
+  <type name="FOMVariantRecordAlternative" type="struct" copyOnWrite="true">
+    <field name="Enumerator" type="String"/>
+    <field name="Name" type="String"/>
+    <field name="DataType" type="String"/>
+  </type>
+  <type name="FOMVariantRecordAlternativeList" type="vector" scalar="FOMVariantRecordAlternative"/>
+
+  <type name="FOMVariantRecordDataType" type="struct" copyOnWrite="true">
+    <field name="Name" type="String"/>
+    <field name="Discriminant" type="String"/>
+    <field name="DataType" type="String"/>
+    <field name="Alternatives" type="FOMVariantRecordAlternativeList"/>
+    <field name="Encoding" type="String"/>
+    <field name="Handle" type="VariantRecordDataTypeHandle"/>
+  </type>
+  <type name="FOMVariantRecordDataTypeList" type="vector" scalar="FOMVariantRecordDataType"/>
+
   <type name="FOMModule" type="struct" copyOnWrite="true">
     <field name="ModuleHandle" type="ModuleHandle"/>
     <field name="TransportationTypeList" type="FOMTransportationTypeList"/>
@@ -383,10 +606,20 @@
     <field name="SwitchList" type="FOMSwitchList"/>
     <field name="ArtificialInteractionRoot" type="Bool"/>
     <field name="ArtificialObjectRoot" type="Bool"/>
-    <field name="Content" type="String"/>
+    <!--<field name="Content" type="String"/>-->
+    <field name="Designator" type="String"/>
   </type>
   <type name="FOMModuleList" type="vector" scalar="FOMModule"/>
 
+  <type name="FOMModule2" type="struct" base="FOMModule" copyOnWrite="true">
+    <field name="BasicDataTypeList" type="FOMBasicDataTypeList"/>
+    <field name="SimpleDataTypeList" type="FOMSimpleDataTypeList"/>
+    <field name="EnumeratedDataTypeList" type="FOMEnumeratedDataTypeList"/>
+    <field name="ArrayDataTypeList" type="FOMArrayDataTypeList"/>
+    <field name="FixedRecordDataTypeList" type="FOMFixedRecordDataTypeList"/>
+    <field name="VariantRecordDataTypeList" type="FOMVariantRecordDataTypeList"/>
+  </type>
+  <type name="FOMModule2List" type="vector" scalar="FOMModule2"/>
 
   <!-- The messages -->
 
@@ -401,6 +634,12 @@
     <field name="LogicalTimeFactoryName" type="String"/>
     <!-- The already parsed list of FOM modules. -->
     <field name="FOMStringModuleList" type="FOMStringModuleList"/>
+  </message>
+  <message type="CreateFederationExecutionRequest2">
+    <field name="FederationExecution" type="String"/>
+    <field name="LogicalTimeFactoryName" type="String"/>
+    <!-- The already parsed list of FOM modules. -->
+    <field name="FOMStringModuleList" type="FOMStringModule2List"/>
   </message>
   <message type="CreateFederationExecutionResponse">
     <field name="CreateFederationExecutionResponseType" type="CreateFederationExecutionResponseType"/>
@@ -457,6 +696,11 @@
     <field name="FOMModuleList" type="FOMModuleList" hide="True"/>
   </message>
 
+  <message type="InsertModules2">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="FOMModule2List" type="FOMModule2List" hide="True"/>
+  </message>
+
   <!-- Join federation execution -->
   <message type="JoinFederationExecutionRequest">
     <field name="FederationExecution" type="String"/>
@@ -468,6 +712,20 @@
     <field name="FOMStringModuleList" type="FOMStringModuleList"/>
     <!-- Maximum backward compatible string based key value map describing the federate capabilites. -->
     <field name="ConfigurationParameterMap" type="ConfigurationParameterMap"/>
+    <field name="IsInternal" type="Bool"/>
+  </message>
+
+  <message type="JoinFederationExecutionRequest2">
+    <field name="FederationExecution" type="String"/>
+    <!-- The new federates type -->
+    <field name="FederateType" type="String"/>
+    <!-- The new federates unique name -->
+    <field name="FederateName" type="String"/>
+    <!-- The set of additional FOM modules -->
+    <field name="FOMStringModuleList" type="FOMStringModule2List"/>
+    <!-- Maximum backward compatible string based key value map describing the federate capabilites. -->
+    <field name="ConfigurationParameterMap" type="ConfigurationParameterMap"/>
+    <field name="IsInternal" type="Bool"/>
   </message>
   <message type="JoinFederationExecutionResponse">
     <!-- The federation handle to identify packets -->
@@ -503,13 +761,14 @@
   <!-- Notify messages for new and vanished Federates -->
   <message type="JoinFederateNotify">
     <!-- The federation handle to identify packets -->
-    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="FederationHandle" type="FederationHandle"/>
     <!-- The new federates handle -->
-    <field name="FederateHandle" type="FederateHandle" hide="True"/>
+    <field name="FederateHandle" type="FederateHandle"/>
     <!-- The new federates type -->
     <field name="FederateType" type="String"/>
     <!-- The new federates unique name -->
     <field name="FederateName" type="String"/>
+    <field name="IsInternal" type="Bool"/>
   </message>
   <message type="ResignFederateNotify">
     <!-- The federation handle to identify packets -->
@@ -589,6 +848,14 @@
   </message>
   <message type="DisableTimeRegulationRequest">
     <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederateHandle" type="FederateHandle"/>
+  </message>
+  <message type="EnableTimeConstrainedNotify">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="FederateHandle" type="FederateHandle"/>
+  </message>
+  <message type="DisableTimeConstrainedNotify">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
   </message>
   <!-- Is sent when a federate has requested a time advance.
@@ -704,23 +971,23 @@
 
   <!-- Interaction message -->
   <message type="Interaction">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
     <field name="InteractionClassHandle" type="InteractionClassHandle"/>
-    <field name="TransportationType" type="TransportationType"/>
-    <field name="Tag" type="VariableLengthData"/>
+    <field name="TransportationType" type="TransportationType" hide="True"/>
+    <field name="Tag" type="VariableLengthData" hide="True"/>
     <field name="ParameterValues" type="ParameterValueVector"/>
     <reliable expression="getTransportationType() == RELIABLE"/>
   </message>
   <message type="TimeStampedInteraction">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
     <field name="InteractionClassHandle" type="InteractionClassHandle"/>
     <field name="OrderType" type="OrderType"/>
-    <field name="TransportationType" type="TransportationType"/>
-    <field name="Tag" type="VariableLengthData"/>
+    <field name="TransportationType" type="TransportationType" hide="True"/>
+    <field name="Tag" type="VariableLengthData" hide="True"/>
     <field name="TimeStamp" type="VariableLengthData"/>
-    <field name="MessageRetractionHandle" type="MessageRetractionHandle"/>
+    <field name="MessageRetractionHandle" type="MessageRetractionHandle" hide="True"/>
     <field name="ParameterValues" type="ParameterValueVector"/>
     <reliable expression="getTransportationType() == RELIABLE"/>
   </message>
@@ -736,9 +1003,9 @@
     <field name="Count" type="Unsigned"/>
   </message>
   <message type="ObjectInstanceHandlesResponse">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
-    <field name="ObjectInstanceHandleNamePairVector" type="ObjectInstanceHandleNamePairVector"/>
+    <field name="ObjectInstanceHandleNamePairVector" type="ObjectInstanceHandleNamePairVector" hide="True"/>
   </message>
   <!-- Use this to unreference an object instance handle used by an ambassador. -->
   <message type="ReleaseMultipleObjectInstanceNameHandlePairs">
@@ -752,6 +1019,7 @@
     <field name="FederationHandle" type="FederationHandle"/>
     <field name="FederateHandle" type="FederateHandle"/>
     <field name="Name" type="String"/>
+    <field name="IsInternal" type="Bool"/>
   </message>
   <message type="ReserveObjectInstanceNameResponse">
     <field name="FederationHandle" type="FederationHandle"/>
@@ -767,7 +1035,7 @@
   <message type="ReserveMultipleObjectInstanceNameResponse">
     <field name="FederationHandle" type="FederationHandle"/>
     <field name="FederateHandle" type="FederateHandle"/>
-    <field name="ObjectInstanceHandleNamePairVector" type="ObjectInstanceHandleNamePairVector"/>
+    <field name="ObjectInstanceHandleNamePairVector" type="ObjectInstanceHandleNamePairVector" hide="True"/>
     <field name="Success" type="Bool"/>
   </message>
 
@@ -789,7 +1057,7 @@
     <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
     <field name="Name" type="String"/>
     <!-- Contains the owner federates for each attribute handle and may be some region associations? FIXME -->
-    <field name="AttributeStateVector" type="AttributeStateVector"/>
+    <field name="AttributeStateVector" type="AttributeStateVector" hide="True"/>
     <objectInstance expression="getObjectInstanceHandle()"/>
   </message>
 
@@ -829,12 +1097,12 @@
 
   <!-- Attribute updates -->
   <message type="AttributeUpdate">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="FederateHandle" type="FederateHandle"/>
     <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
-    <field name="Tag" type="VariableLengthData"/>
-    <field name="TransportationType" type="TransportationType"/>
-    <field name="AttributeValues" type="AttributeValueVector"/>
+    <field name="Tag" type="VariableLengthData" hide="True"/>
+    <field name="TransportationType" type="TransportationType" hide="True"/>
+    <field name="AttributeValues" type="AttributeValueVector" hide="True"/>
     <reliable expression="getTransportationType() == RELIABLE"/>
     <objectInstance expression="getObjectInstanceHandle()"/>
   </message>
@@ -854,9 +1122,9 @@
 
 
   <message type="RequestAttributeUpdate">
-    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
-    <field name="AttributeHandles" type="AttributeHandleVector"/>
+    <field name="AttributeHandles" type="AttributeHandleVector" hide="True"/>
     <field name="Tag" type="VariableLengthData"/>
     <objectInstance expression="getObjectInstanceHandle()"/>
   </message>
@@ -865,6 +1133,19 @@
     <field name="ObjectClassHandle" type="ObjectClassHandle"/>
     <field name="AttributeHandles" type="AttributeHandleVector"/>
     <field name="Tag" type="VariableLengthData"/>
+  </message>
+
+  <message type="QueryAttributeOwnershipRequest">
+    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandle" type="AttributeHandle"/>
+  </message>
+
+  <message type="QueryAttributeOwnershipResponse">
+    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandle" type="AttributeHandle"/>
+    <field name="Owner" type="FederateHandle"/>
   </message>
 
 </messagelist>

@@ -17,6 +17,7 @@
  *
  */
 
+#include "DebugNew.h"
 #include "MessageEncodingRegistry.h"
 
 #include "LogStream.h"
@@ -32,8 +33,8 @@ SharedPtr<AbstractMessageEncoding>
 MessageEncodingRegistry::getEncoding(const std::string& encodingName) const
 {
   if (encodingName == "TightBE1")
-    return new TightBE1MessageEncoding;
-  return 0;
+    return MakeShared<TightBE1MessageEncoding>();
+  return SharedPtr<AbstractMessageEncoding>();
 }
 
 StringList

@@ -26,7 +26,7 @@
 
 namespace OpenRTI {
 
-SocketTCP::SocketTCP() :
+SocketTCP::SocketTCP() noexcept :
   SocketStream(new PrivateData(-1))
 {
 }

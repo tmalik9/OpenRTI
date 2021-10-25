@@ -36,14 +36,15 @@ namespace OpenRTI {
 class OPENRTI_API AbstractServer : public Referenced {
 public:
   AbstractServer(const SharedPtr<AbstractServerNode>& serverNode);
-  virtual ~AbstractServer();
+  virtual ~AbstractServer() noexcept;
 
   /// The server node that processes the servers requests
-  /// For debugging purpose this one is exchangable
-  const AbstractServerNode& getServerNode() const;
+  /// For debugging purpose this one is exchangeable
+  const AbstractServerNode& getServerNode() const noexcept;
   AbstractServerNode& getServerNode();
 
   virtual int exec() = 0;
+  virtual uint32_t getProtocolVersion() const = 0;
 
   /// Supposed to be called from the current thread
   void setDone(bool done)
@@ -56,8 +57,9 @@ public:
   { _postDone(); }
 
   /// Connect to the server - independent of the actual implementation
-  SharedPtr<AbstractConnect> postConnect(const StringStringListMap& clientOptions);
+  SharedPtr<AbstractConnect> postConnect(const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
   SharedPtr<AbstractConnect> sendConnect(const StringStringListMap& clientOptions, bool parent);
+  SharedPtr<AbstractConnect> sendDirectConnect(SharedPtr<AbstractMessageSender> sender, const StringStringListMap& clientOptions);
 
 protected:
   typedef std::pair<SharedPtr<const AbstractMessage>, ConnectHandle> _MessageConnectHandlePair;
@@ -85,7 +87,7 @@ protected:
   virtual void _postOperation(const SharedPtr<_Operation>& operation) = 0;
 
   // From a different thread, connect/disconnect to the server
-  ConnectHandle _postConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& clientOptions);
+  ConnectHandle _postConnect(const SharedPtr<AbstractMessageSender>& messageSender, const StringStringListMap& clientOptions, uint32_t timeoutMilliSeconds);
   void _postDisconnect(const ConnectHandle& connectHandle);
   // From a different thread, shut down the server
   void _postDone();
@@ -111,6 +113,7 @@ private:
   AbstractServer& operator=(const AbstractServer&) = delete;
 
   class _Connect;
+  class _OneWayConnect;
   class _ConnectOperation;
   class _DisconnectOperation;
   class _DoneOperation;

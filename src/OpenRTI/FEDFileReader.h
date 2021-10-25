@@ -25,11 +25,11 @@
 
 namespace OpenRTI {
 
-class FOMStringModule;
+class FOMStringModule2;
 
 class OPENRTI_API FEDFileReader {
 public:
-  static FOMStringModule read(std::istream& stream);
+  static FOMStringModule2 read(std::istream& stream);
 };
 
 } // namespace OpenRTI
