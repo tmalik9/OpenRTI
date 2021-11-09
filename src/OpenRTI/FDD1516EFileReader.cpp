@@ -321,6 +321,7 @@ FDD1516EContentHandler::FDD1516EContentHandler() noexcept
           .node("enumerator", [this]() { _fomStringModuleBuilder.getCurrentEnumeratedDataType().getEnumerators().push_back(FOMStringEnumerator()); })
             .leaf("name", [this](const std::string& name) {_fomStringModuleBuilder.getCurrentEnumeratedDataType().getEnumerators().back().setName(name); })
             .leaf("value", [this](const std::string& s) {_fomStringModuleBuilder.getCurrentEnumeratedDataType().getEnumerators().back().setValue(from_string<uint32_t>(s)); })
+            .leaf("semantics")
           .end() // enumerator
         .end() // enumeratedData
       .end() // enumeratedDataTypes

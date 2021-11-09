@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{6D9646E9-9655-4032-AFF9-969BC6DD941B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>FOMCodeGen</RootNamespace>
+    <ProjectName>codegen</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(SolutionDir)SolutionSettings.props" />
+    <Import Project="$(SolutionDir)OpenRTI.props" />
+    <Import Project="$(SolutionDir)OpenRTI_Release.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(SolutionDir)SolutionSettings.props" />
+    <Import Project="$(SolutionDir)OpenRTI.props" />
+    <Import Project="$(SolutionDir)OpenRTI_Debug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(SolutionDir)SolutionSettings.props" />
+    <Import Project="$(SolutionDir)OpenRTI.props" />
+    <Import Project="$(SolutionDir)OpenRTI_Debug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(SolutionDir)SolutionSettings.props" />
+    <Import Project="$(SolutionDir)OpenRTI.props" />
+    <Import Project="$(SolutionDir)OpenRTI_Release.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CodeAnalysisRuleSet>CppCoreCheckConstRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev\;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev\;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev\;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev\;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="codegen.cpp" />
+    <ClCompile Include="implementation\RTFederateEncodings.cpp" />
+    <ClCompile Include="implementation\RTFederateInteractions.cpp" />
+    <ClCompile Include="implementation\RTFederateObjects.cpp" />
+    <ClCompile Include="momEncodings.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="mom.xml">
+      <Command>$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\mom.xml OpenRTI.Mom</Command>
+      <Message>generating code: mom.xml</Message>
+      <Outputs>momDataTypes.h;momEncodings.h</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">momDataTypes.h;momEncodings.h;momEncodings.cpp;momObjects.h;momObjects.cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">momDataTypes.h;momEncodings.h;momEncodings.cpp;momObjects.h;momObjects.cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">momDataTypes.h;momEncodings.h;momEncodings.cpp;momObjects.h;momObjects.cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">momDataTypes.h;momEncodings.h;momEncodings.cpp;momObjects.h;momObjects.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">generating code: %(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">generating code: %(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">generating code: %(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">generating code: %(Identity)</Message>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="implementation\RTFederateEncodings.h" />
+    <ClInclude Include="implementation\RTFederateInteractions.h" />
+    <ClInclude Include="implementation\RTFederateObjects.h" />
+    <ClInclude Include="interface\RTFederateDataTypes.h" />
+    <ClInclude Include="interface\RTFederateInteractionInterfaces.h" />
+    <ClInclude Include="interface\RTFederateObjectInterfaces.h" />
+    <ClInclude Include="momDataTypes.h" />
+    <ClInclude Include="momEncodings.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\OpenRTI\OpenRTI.vcxproj">
+      <Project>{1a1a66b8-408a-301f-aa77-dfd4708c8c6e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\rti1516ev\fedtime1516ev.vcxproj">
+      <Project>{ac5b586d-f120-3715-bc9c-fc80dd945c84}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\rti1516ev\rti1516ev.vcxproj">
+      <Project>{dee8a809-6531-30d3-9292-e70c38ed75fc}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="RTFederate.xml">
+      <Command>$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistributedSimulation.NRTFederateEncoding</Command>
+      <Outputs>%(Filename)DataTypes.h;%(Filename)Encodings.h;%(Filename)Encodings.cpp;%(Filename)ObjectInterfaces.h;%(Filename)Objects.h;%(Filename)Objects.cpp;%(Filename)InteractionInterfaces.h;%(Filename)Interactions.h;%(Filename)Interactions.cpp</Outputs>
+      <Message>generating %(Filename)DataTypes.h;%(Filename)Encodings.h;%(Filename)Encodings.cpp;%(Filename)ObjectInterfaces.h;%(Filename)Objects.h;%(Filename)Objects.cpp;%(Filename)InteractionInterfaces.h;%(Filename)Interactions.h;%(Filename)Interactions.cpp from %(Identity)</Message>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(TargetDir)\FOMCodeGen.exe</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistSimIB.NRTFederateEncoding  -o $(ProjectDir)\implementation -oi $(ProjectDir)\interface</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistSimIB.NRTFederateEncoding  -o $(ProjectDir)\implementation -oi $(ProjectDir)\interface</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistSimIB.NRTFederateEncoding  -o $(ProjectDir)\implementation -oi $(ProjectDir)\interface</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(TargetDir)\FOMCodeGen.exe $(ProjectDir)\RTFederate.xml NDistSimIB.NRTFederateEncoding  -o $(ProjectDir)\implementation -oi $(ProjectDir)\interface</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">generating interface\%(Filename)DataTypes.h;implementation\%(Filename)Encodings.h;implementation\%(Filename)Encodings.cpp;interface\%(Filename)ObjectInterfaces.h;implementation\%(Filename)Objects.h;implementation\%(Filename)Objects.cpp;interface\%(Filename)InteractionInterfaces.h;implementation\%(Filename)Interactions.h;implementation\%(Filename)Interactions.cpp from %(Identity)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">interface\%(Filename)DataTypes.h;implementation\%(Filename)Encodings.h;implementation\%(Filename)Encodings.cpp;interface\%(Filename)ObjectInterfaces.h;implementation\%(Filename)Objects.h;implementation\%(Filename)Objects.cpp;interface\%(Filename)InteractionInterfaces.h;implementation\%(Filename)Interactions.h;implementation\%(Filename)Interactions.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">generating interface\%(Filename)DataTypes.h;implementation\%(Filename)Encodings.h;implementation\%(Filename)Encodings.cpp;interface\%(Filename)ObjectInterfaces.h;implementation\%(Filename)Objects.h;implementation\%(Filename)Objects.cpp;interface\%(Filename)InteractionInterfaces.h;implementation\%(Filename)Interactions.h;implementation\%(Filename)Interactions.cpp from %(Identity)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">interface\%(Filename)DataTypes.h;implementation\%(Filename)Encodings.h;implementation\%(Filename)Encodings.cpp;interface\%(Filename)ObjectInterfaces.h;implementation\%(Filename)Objects.h;implementation\%(Filename)Objects.cpp;interface\%(Filename)InteractionInterfaces.h;implementation\%(Filename)Interactions.h;implementation\%(Filename)Interactions.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">generating interface\%(Filename)DataTypes.h;implementation\%(Filename)Encodings.h;implementation\%(Filename)Encodings.cpp;interface\%(Filename)ObjectInterfaces.h;implementation\%(Filename)Objects.h;implementation\%(Filename)Objects.cpp;interface\%(Filename)InteractionInterfaces.h;implementation\%(Filename)Interactions.h;implementation\%(Filename)Interactions.cpp from %(Identity)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">interface\%(Filename)DataTypes.h;implementation\%(Filename)Encodings.h;implementation\%(Filename)Encodings.cpp;interface\%(Filename)ObjectInterfaces.h;implementation\%(Filename)Objects.h;implementation\%(Filename)Objects.cpp;interface\%(Filename)InteractionInterfaces.h;implementation\%(Filename)Interactions.h;implementation\%(Filename)Interactions.cpp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">generating interface\%(Filename)DataTypes.h;implementation\%(Filename)Encodings.h;implementation\%(Filename)Encodings.cpp;interface\%(Filename)ObjectInterfaces.h;implementation\%(Filename)Objects.h;implementation\%(Filename)Objects.cpp;interface\%(Filename)InteractionInterfaces.h;implementation\%(Filename)Interactions.h;implementation\%(Filename)Interactions.cpp from %(Identity)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">interface\%(Filename)DataTypes.h;implementation\%(Filename)Encodings.h;implementation\%(Filename)Encodings.cpp;interface\%(Filename)ObjectInterfaces.h;implementation\%(Filename)Objects.h;implementation\%(Filename)Objects.cpp;interface\%(Filename)InteractionInterfaces.h;implementation\%(Filename)Interactions.h;implementation\%(Filename)Interactions.cpp</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
