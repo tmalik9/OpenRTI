@@ -150,9 +150,7 @@ SocketAddress::resolve(const std::string& address, const std::string& service, b
 
   std::string localeAddress = utf8ToLocale(address);
   // getaddrinfo returnd the wildcard address when NULL is given as the node argument
-  const char *localeAddressChar = NULL;
-  if (!localeAddress.empty())
-    localeAddressChar = localeAddress.c_str();
+  const char *localeAddressChar = localeAddress.empty() ? nullptr : localeAddress.c_str();
   std::string localeService = utf8ToLocale(service);
   struct addrinfo *ai = 0;
   while (int ret = ::getaddrinfo(localeAddressChar, localeService.c_str(), &hints, &ai)) {
@@ -161,7 +159,6 @@ SocketAddress::resolve(const std::string& address, const std::string& service, b
     WSACleanup();
     throw TransportError(localeToUtf8(gai_strerrorA(ret)));
   }
-
   SocketAddressList socketAddressList;
   struct addrinfo *res = ai;
   while (res) {

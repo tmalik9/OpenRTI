@@ -612,6 +612,8 @@ namespace FOMCodeGen
     }
     public class FixedRecordDataType : DataType
     {
+      private uint _version;
+
       public FixedRecordDataType(string name, uint version) : base(name)
       {
         Fields = new List<FixedRecordField>();
@@ -632,22 +634,49 @@ namespace FOMCodeGen
         get { return RefCppType; }
       }
 
-      public uint Version { get; set; }
+      public uint Version
+      {
+        get
+        {
+          if (BaseClass != null) {
+            var baseVersion = BaseClass.Version;
+            if (baseVersion > _version) return baseVersion;
+          }
+          return _version;
+        }
+        set {
+          if (BaseClass != null && BaseClass.Version > value) {
+            Console.WriteLine("Warning: fixed record {} has smaller version than it's base class! Setting to {}", Name, BaseClass.Name, BaseClass.Version);
+            _version = BaseClass.Version;
+          } else {
+            _version = value;
+          }
+        }
+      }
       public List<FixedRecordField> Fields { get; set; }
       public List<FixedRecordField> AllFields
       {
         get
         {
-          List<FixedRecordField> allFields = new List<FixedRecordField>();
           FixedRecordDataType baseClass = BaseClass;
-          if (baseClass != null)
-          {
+          // sort the fields ascending, according to field version.
+          int numElements = (int)Version + 1;
+          List<FixedRecordField>[] sortedFields = new List<FixedRecordField>[numElements];
+          for (int i = 0; i < numElements; i++) {
+            sortedFields[i] = new List<FixedRecordField>();
+          }
+          if (baseClass != null) {
             var baseClassFields = baseClass.AllFields;
             foreach (var field in baseClassFields)
-              allFields.Add(field);
+              sortedFields[field.Version].Add(field);
           }
           foreach (var field in Fields)
-            allFields.Add(field);
+            sortedFields[field.Version].Add(field);
+
+          List<FixedRecordField> allFields = new List<FixedRecordField>();
+          foreach (var fieldList in sortedFields) {
+            allFields.AddRange(fieldList);
+          }
           return allFields;
         }
       }
@@ -655,10 +684,8 @@ namespace FOMCodeGen
       public bool HasChilds { get; set; }
       public override bool Resolve(FOMParser fom)
       {
-        foreach (var field in Fields)
-        {
-          if (field.DataType is UnresolvedDataType)
-          {
+        foreach (var field in Fields) {
+          if (field.DataType is UnresolvedDataType) {
             field.DataType = fom.DataTypes.Find(dataType => dataType.Name == field.DataType.Name);
           }
         }
@@ -666,10 +693,8 @@ namespace FOMCodeGen
       }
       public override bool IsUsing(DataType dataType)
       {
-        foreach (var field in Fields)
-        {
-          if (field.DataType == dataType)
-          {
+        foreach (var field in Fields) {
+          if (field.DataType == dataType) {
             return true;
           }
         }

@@ -48,6 +48,11 @@
 #include "LogStream.h"
 #include "ServerModel.h"
 #include "AbsTimeout.h"
+#ifdef _WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
 
 namespace OpenRTI {
 
@@ -163,9 +168,12 @@ NetworkServer::listen(const URL& url, int backlog)
   }
 }
 
+#pragma warning(push)
+#pragma warning(disable : 4996)
 void
 NetworkServer::listenInet(const std::string& node, const std::string& service, int backlog)
 {
+  bool choosePort = (service == "0");
   std::list<SocketAddress> addressList = SocketAddress::resolve(node, service, true);
   // Set up a stream socket for the server connect
   bool success = false;
@@ -173,7 +181,9 @@ NetworkServer::listenInet(const std::string& node, const std::string& service, i
     SocketAddress address = addressList.front();
     addressList.pop_front();
     try {
-      listenInet(address, backlog);
+      auto socketAddress = listenInet(address, backlog);
+      if (choosePort)
+        std::cout << getpid() << ":" << socketAddress.getNumericName() << std::endl;
       success = true;
     } catch (const OpenRTI::Exception&) {
       if (addressList.empty() && !success)
@@ -181,6 +191,7 @@ NetworkServer::listenInet(const std::string& node, const std::string& service, i
     }
   }
 }
+#pragma warning(pop)
 
 SocketAddress
 NetworkServer::listenInet(const SocketAddress& socketAddress, int backlog)
