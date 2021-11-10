@@ -45,6 +45,7 @@
 #include "RTI1516Einteger64TimeFactory.h"
 #include "RTI1516Efloat64TimeFactory.h"
 #include "VariableLengthDataImplementation.h"
+#include "StringUtils.h"
 
 // Embed the HLAstandardMIM hard into the library as a last resort
 
@@ -601,7 +602,7 @@ public:
     // FIXME ask the time management about that
     OpenRTI::Federate* federate = getFederate();
     if (!federate)
-	std::unique_ptr<rti1516ev::LogicalTimeFactory>();
+  std::unique_ptr<rti1516ev::LogicalTimeFactory>();
     return rti1516ev::LogicalTimeFactoryFactory::makeLogicalTimeFactory(utf8ToUcs(federate->getLogicalTimeFactoryName()));
   }
 
@@ -1604,6 +1605,51 @@ public:
     }
   }
 
+  void federationResetInitiated(const NativeLogicalTime& logicalTime, const VariableLengthData& tag) override
+  {
+    if (!_federateAmbassador) {
+      Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
+      return;
+    }
+    try {
+        OpenRTI::_O1516EVariableLengthData rti1516Tag(tag);
+      _federateAmbassador->federationResetInitiated(logicalTime, rti1516Tag);
+    } catch (const rti1516ev::Exception& e) {
+      Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
+    }
+  }
+
+  // NOTE: this overrides virtual void federationResetDone(const NativeLogicalTime& logicalTime, const VariableLengthData& tag) = 0;
+  // where NativeLogicalTime is a typedef in RTI1516ETraits
+  void federationResetDone(const NativeLogicalTime& logicalTime, const VariableLengthData& tag) override
+  {
+    if (!_federateAmbassador) {
+      Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
+      return;
+    }
+    try {
+        OpenRTI::_O1516EVariableLengthData rti1516Tag(tag);
+      _federateAmbassador->federationResetDone(logicalTime, rti1516Tag);
+    } catch (const rti1516ev::Exception& e) {
+      Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
+    }
+  }
+
+  void federationResetAborted(const NativeLogicalTime& logicalTime, const VariableLengthData& tag) override
+  {
+    if (!_federateAmbassador) {
+      Log(FederateAmbassador, Warning) << "Calling callback with zero ambassador!" << std::endl;
+      return;
+    }
+    try {
+        OpenRTI::_O1516EVariableLengthData rti1516Tag(tag);
+      _federateAmbassador->federationResetAborted(logicalTime, rti1516Tag);
+    } catch (const rti1516ev::Exception& e) {
+      Log(FederateAmbassador, Warning) << "Caught an rti1516e exception in callback: " << e.what() << std::endl;
+    }
+  }
+
+
   rti1516ev::FederateAmbassador* _federateAmbassador;
   bool _inCallback;
 };
@@ -1628,6 +1674,12 @@ RTIambassadorImplementation::connect(rti1516ev::FederateAmbassador & federateAmb
       throw OpenRTI::CallNotAllowedFromWithinCallback();
     URL url = URL::fromUrl(ucsToUtf8(localSettingsDesignator));
     StringStringListMap clientoptions;
+    for (auto& query : url.getQuery())
+    {
+      auto key=query.first;
+      StringList value = splitl(query.second,",");
+      clientoptions[key] = value;
+    }
     _ambassadorInterface->connect(url, clientoptions, _ambassadorInterface->getConnectWaitTimeoutMilliSeconds());
     _ambassadorInterface->_federateAmbassador = &federateAmbassador;
     OpenRTI::CallbackModel callbackModel = translate(rti1516CallbackModel);
@@ -3672,6 +3724,8 @@ RTIambassadorImplementation::timeAdvanceRequest(const rti1516ev::LogicalTime& lo
     throw rti1516ev::LogicalTimeAlreadyPassed(OpenRTI::utf8ToUcs(e.what()));
   } catch (const OpenRTI::InTimeAdvancingState& e) {
     throw rti1516ev::InTimeAdvancingState(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::ResetInProgress& e) {
+    throw rti1516ev::ResetInProgress(OpenRTI::utf8ToUcs(e.what()));
   } catch (const OpenRTI::RequestForTimeRegulationPending& e) {
     throw rti1516ev::RequestForTimeRegulationPending(OpenRTI::utf8ToUcs(e.what()));
   } catch (const OpenRTI::RequestForTimeConstrainedPending& e) {
@@ -5734,6 +5788,62 @@ void RTIambassadorImplementation::setConnectWaitTimeout(uint32_t timeoutMilliSec
 void RTIambassadorImplementation::setOperationWaitTimeout(uint32_t timeoutMilliSeconds)
 {
   _ambassadorInterface->setOperationWaitTimeoutMilliSeconds(timeoutMilliSeconds);
+}
+
+void RTIambassadorImplementation::requestFederationReset(const rti1516ev::VariableLengthData& rti1516Tag)
+{
+  try {
+    OpenRTI::_I1516EVariableLengthData tag(rti1516Tag);
+    _ambassadorInterface->requestFederationReset(tag);
+  } catch (const OpenRTI::ResetNotSupportedByRti& e) {
+    throw rti1516ev::ResetNotSupportedByRti(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::ResetInProgress& e) {
+    throw rti1516ev::ResetInProgress(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::FederateNotExecutionMember& e) {
+    throw rti1516ev::FederateNotExecutionMember(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::NotConnected& e) {
+    throw rti1516ev::NotConnected(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const std::exception& e) {
+    throw rti1516ev::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
+  } catch (...) {
+    throw rti1516ev::RTIinternalError(L"Unknown internal error!");
+  }
+}
+void RTIambassadorImplementation::federationResetBegun(const rti1516ev::VariableLengthData& rti1516Tag)
+{
+  try {
+    OpenRTI::_I1516EVariableLengthData tag(rti1516Tag);
+    _ambassadorInterface->federationResetBegun(tag);
+  } catch (const OpenRTI::ResetNotInProgress& e) {
+    throw rti1516ev::ResetNotInProgress(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::FederateNotExecutionMember& e) {
+    throw rti1516ev::FederateNotExecutionMember(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::NotConnected& e) {
+    throw rti1516ev::NotConnected(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const std::exception& e) {
+    throw rti1516ev::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
+  } catch (...) {
+    throw rti1516ev::RTIinternalError(L"Unknown internal error!");
+  }
+}
+void RTIambassadorImplementation::federationResetComplete(bool success, const rti1516ev::VariableLengthData& rti1516Tag)
+{
+  try {
+    OpenRTI::_I1516EVariableLengthData tag(rti1516Tag);
+  _ambassadorInterface->federationResetComplete(success, tag);
+  } catch (const OpenRTI::ResetNotInProgress& e) {
+    throw rti1516ev::ResetNotInProgress(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::ResetNotBegun& e) {
+    throw rti1516ev::ResetNotBegun(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::FederateNotExecutionMember& e) {
+    throw rti1516ev::FederateNotExecutionMember(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const OpenRTI::NotConnected& e) {
+    throw rti1516ev::NotConnected(OpenRTI::utf8ToUcs(e.what()));
+  } catch (const std::exception& e) {
+    throw rti1516ev::RTIinternalError(OpenRTI::utf8ToUcs(e.what()));
+  } catch (...) {
+    throw rti1516ev::RTIinternalError(L"Unknown internal error!");
+  }
 }
 
 }

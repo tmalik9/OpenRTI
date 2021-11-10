@@ -45,10 +45,10 @@ public:
   void writeCallbackModel(const CallbackModel& value)
   {
     switch (value) {
-    case HLA_IMMEDIATE:
+    case CallbackModel::HLA_IMMEDIATE:
       writeUInt32Compressed(0);
       break;
-    case HLA_EVOKED:
+    case CallbackModel::HLA_EVOKED:
       writeUInt32Compressed(1);
       break;
     default:
@@ -60,10 +60,10 @@ public:
   void writeOrderType(const OrderType& value)
   {
     switch (value) {
-    case RECEIVE:
+    case OrderType::RECEIVE:
       writeUInt32Compressed(0);
       break;
-    case TIMESTAMP:
+    case OrderType::TIMESTAMP:
       writeUInt32Compressed(1);
       break;
     default:
@@ -75,10 +75,10 @@ public:
   void writeTransportationType(const TransportationType& value)
   {
     switch (value) {
-    case RELIABLE:
+    case TransportationType::RELIABLE:
       writeUInt32Compressed(0);
       break;
-    case BEST_EFFORT:
+    case TransportationType::BEST_EFFORT:
       writeUInt32Compressed(1);
       break;
     default:
@@ -90,13 +90,13 @@ public:
   void writeSubscriptionType(const SubscriptionType& value)
   {
     switch (value) {
-    case Unsubscribed:
+    case SubscriptionType::Unsubscribed:
       writeUInt32Compressed(0);
       break;
-    case SubscribedPassive:
+    case SubscriptionType::SubscribedPassive:
       writeUInt32Compressed(1);
       break;
-    case SubscribedActive:
+    case SubscriptionType::SubscribedActive:
       writeUInt32Compressed(2);
       break;
     default:
@@ -108,10 +108,10 @@ public:
   void writePublicationType(const PublicationType& value)
   {
     switch (value) {
-    case Unpublished:
+    case PublicationType::Unpublished:
       writeUInt32Compressed(0);
       break;
-    case Published:
+    case PublicationType::Published:
       writeUInt32Compressed(1);
       break;
     default:
@@ -123,22 +123,22 @@ public:
   void writeResignAction(const ResignAction& value)
   {
     switch (value) {
-    case UNCONDITIONALLY_DIVEST_ATTRIBUTES:
+    case ResignAction::UNCONDITIONALLY_DIVEST_ATTRIBUTES:
       writeUInt32Compressed(0);
       break;
-    case DELETE_OBJECTS:
+    case ResignAction::DELETE_OBJECTS:
       writeUInt32Compressed(1);
       break;
-    case CANCEL_PENDING_OWNERSHIP_ACQUISITIONS:
+    case ResignAction::CANCEL_PENDING_OWNERSHIP_ACQUISITIONS:
       writeUInt32Compressed(2);
       break;
-    case DELETE_OBJECTS_THEN_DIVEST:
+    case ResignAction::DELETE_OBJECTS_THEN_DIVEST:
       writeUInt32Compressed(3);
       break;
-    case CANCEL_THEN_DELETE_THEN_DIVEST:
+    case ResignAction::CANCEL_THEN_DELETE_THEN_DIVEST:
       writeUInt32Compressed(4);
       break;
-    case NO_ACTION:
+    case ResignAction::NO_ACTION:
       writeUInt32Compressed(5);
       break;
     default:
@@ -150,16 +150,16 @@ public:
   void writeRestoreFailureReason(const RestoreFailureReason& value)
   {
     switch (value) {
-    case RTI_UNABLE_TO_RESTORE:
+    case RestoreFailureReason::RTI_UNABLE_TO_RESTORE:
       writeUInt32Compressed(0);
       break;
-    case FEDERATE_REPORTED_FAILURE_DURING_RESTORE:
+    case RestoreFailureReason::FEDERATE_REPORTED_FAILURE_DURING_RESTORE:
       writeUInt32Compressed(1);
       break;
-    case FEDERATE_RESIGNED_DURING_RESTORE:
+    case RestoreFailureReason::FEDERATE_RESIGNED_DURING_RESTORE:
       writeUInt32Compressed(2);
       break;
-    case RTI_DETECTED_FAILURE_DURING_RESTORE:
+    case RestoreFailureReason::RTI_DETECTED_FAILURE_DURING_RESTORE:
       writeUInt32Compressed(3);
       break;
     default:
@@ -171,22 +171,22 @@ public:
   void writeRestoreStatus(const RestoreStatus& value)
   {
     switch (value) {
-    case NO_RESTORE_IN_PROGRESS:
+    case RestoreStatus::NO_RESTORE_IN_PROGRESS:
       writeUInt32Compressed(0);
       break;
-    case FEDERATE_RESTORE_REQUEST_PENDING:
+    case RestoreStatus::FEDERATE_RESTORE_REQUEST_PENDING:
       writeUInt32Compressed(1);
       break;
-    case FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN:
+    case RestoreStatus::FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN:
       writeUInt32Compressed(2);
       break;
-    case FEDERATE_PREPARED_TO_RESTORE:
+    case RestoreStatus::FEDERATE_PREPARED_TO_RESTORE:
       writeUInt32Compressed(3);
       break;
-    case FEDERATE_RESTORING:
+    case RestoreStatus::FEDERATE_RESTORING:
       writeUInt32Compressed(4);
       break;
-    case FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE:
+    case RestoreStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE:
       writeUInt32Compressed(5);
       break;
     default:
@@ -198,19 +198,19 @@ public:
   void writeSaveFailureReason(const SaveFailureReason& value)
   {
     switch (value) {
-    case RTI_UNABLE_TO_SAVE:
+    case SaveFailureReason::RTI_UNABLE_TO_SAVE:
       writeUInt32Compressed(0);
       break;
-    case FEDERATE_REPORTED_FAILURE_DURING_SAVE:
+    case SaveFailureReason::FEDERATE_REPORTED_FAILURE_DURING_SAVE:
       writeUInt32Compressed(1);
       break;
-    case FEDERATE_RESIGNED_DURING_SAVE:
+    case SaveFailureReason::FEDERATE_RESIGNED_DURING_SAVE:
       writeUInt32Compressed(2);
       break;
-    case RTI_DETECTED_FAILURE_DURING_SAVE:
+    case SaveFailureReason::RTI_DETECTED_FAILURE_DURING_SAVE:
       writeUInt32Compressed(3);
       break;
-    case SAVE_TIME_CANNOT_BE_HONORED:
+    case SaveFailureReason::SAVE_TIME_CANNOT_BE_HONORED:
       writeUInt32Compressed(4);
       break;
     default:
@@ -222,16 +222,16 @@ public:
   void writeSaveStatus(const SaveStatus& value)
   {
     switch (value) {
-    case NO_SAVE_IN_PROGRESS:
+    case SaveStatus::NO_SAVE_IN_PROGRESS:
       writeUInt32Compressed(0);
       break;
-    case FEDERATE_INSTRUCTED_TO_SAVE:
+    case SaveStatus::FEDERATE_INSTRUCTED_TO_SAVE:
       writeUInt32Compressed(1);
       break;
-    case FEDERATE_SAVING:
+    case SaveStatus::FEDERATE_SAVING:
       writeUInt32Compressed(2);
       break;
-    case FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE:
+    case SaveStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE:
       writeUInt32Compressed(3);
       break;
     default:
@@ -243,25 +243,25 @@ public:
   void writeServiceGroupIndicator(const ServiceGroupIndicator& value)
   {
     switch (value) {
-    case FEDERATION_MANAGEMENT:
+    case ServiceGroupIndicator::FEDERATION_MANAGEMENT:
       writeUInt32Compressed(0);
       break;
-    case DECLARATION_MANAGEMENT:
+    case ServiceGroupIndicator::DECLARATION_MANAGEMENT:
       writeUInt32Compressed(1);
       break;
-    case OBJECT_MANAGEMENT:
+    case ServiceGroupIndicator::OBJECT_MANAGEMENT:
       writeUInt32Compressed(2);
       break;
-    case OWNERSHIP_MANAGEMENT:
+    case ServiceGroupIndicator::OWNERSHIP_MANAGEMENT:
       writeUInt32Compressed(3);
       break;
-    case TIME_MANAGEMENT:
+    case ServiceGroupIndicator::TIME_MANAGEMENT:
       writeUInt32Compressed(4);
       break;
-    case DATA_DISTRIBUTION_MANAGEMENT:
+    case ServiceGroupIndicator::DATA_DISTRIBUTION_MANAGEMENT:
       writeUInt32Compressed(5);
       break;
-    case SUPPORT_SERVICES:
+    case ServiceGroupIndicator::SUPPORT_SERVICES:
       writeUInt32Compressed(6);
       break;
     default:
@@ -273,13 +273,13 @@ public:
   void writeLowerBoundTimeStampCommitType(const LowerBoundTimeStampCommitType& value)
   {
     switch (value) {
-    case TimeAdvanceCommit:
+    case LowerBoundTimeStampCommitType::TimeAdvanceCommit:
       writeUInt32Compressed(0);
       break;
-    case NextMessageCommit:
+    case LowerBoundTimeStampCommitType::NextMessageCommit:
       writeUInt32Compressed(1);
       break;
-    case TimeAdvanceAndNextMessageCommit:
+    case LowerBoundTimeStampCommitType::TimeAdvanceAndNextMessageCommit:
       writeUInt32Compressed(2);
       break;
     default:
@@ -291,25 +291,25 @@ public:
   void writeSwitchesType(const SwitchesType& value)
   {
     switch (value) {
-    case InteractionRelevanceAdvisorySwitchesType:
+    case SwitchesType::InteractionRelevanceAdvisorySwitchesType:
       writeUInt32Compressed(0);
       break;
-    case ObjectClassRelevanceAdvisorySwitchesType:
+    case SwitchesType::ObjectClassRelevanceAdvisorySwitchesType:
       writeUInt32Compressed(1);
       break;
-    case AttributeRelevanceAdvisorySwitchesType:
+    case SwitchesType::AttributeRelevanceAdvisorySwitchesType:
       writeUInt32Compressed(2);
       break;
-    case AttributeScopeAdvisorySwitchesType:
+    case SwitchesType::AttributeScopeAdvisorySwitchesType:
       writeUInt32Compressed(3);
       break;
-    case AutoProvideSwitchesType:
+    case SwitchesType::AutoProvideSwitchesType:
       writeUInt32Compressed(4);
       break;
-    case ConveyRegionDesignatorSetsSwitchesType:
+    case SwitchesType::ConveyRegionDesignatorSetsSwitchesType:
       writeUInt32Compressed(5);
       break;
-    case ServiceReportingSwitchesType:
+    case SwitchesType::ServiceReportingSwitchesType:
       writeUInt32Compressed(6);
       break;
     default:
@@ -321,10 +321,10 @@ public:
   void writeArrayDataTypeEncoding(const ArrayDataTypeEncoding& value)
   {
     switch (value) {
-    case FixedArrayDataTypeEncoding:
+    case ArrayDataTypeEncoding::FixedArrayDataTypeEncoding:
       writeUInt32Compressed(0);
       break;
-    case VariableArrayDataTypeEncoding:
+    case ArrayDataTypeEncoding::VariableArrayDataTypeEncoding:
       writeUInt32Compressed(1);
       break;
     default:
@@ -336,10 +336,10 @@ public:
   void writeEndianness(const Endianness& value)
   {
     switch (value) {
-    case BigEndian:
+    case Endianness::BigEndian:
       writeUInt32Compressed(0);
       break;
-    case LittleEndian:
+    case Endianness::LittleEndian:
       writeUInt32Compressed(1);
       break;
     default:
@@ -760,28 +760,28 @@ public:
   void writeCreateFederationExecutionResponseType(const CreateFederationExecutionResponseType& value)
   {
     switch (value) {
-    case CreateFederationExecutionResponseSuccess:
+    case CreateFederationExecutionResponseType::CreateFederationExecutionResponseSuccess:
       writeUInt32Compressed(0);
       break;
-    case CreateFederationExecutionResponseFederationExecutionAlreadyExists:
+    case CreateFederationExecutionResponseType::CreateFederationExecutionResponseFederationExecutionAlreadyExists:
       writeUInt32Compressed(1);
       break;
-    case CreateFederationExecutionResponseCouldNotOpenFDD:
+    case CreateFederationExecutionResponseType::CreateFederationExecutionResponseCouldNotOpenFDD:
       writeUInt32Compressed(2);
       break;
-    case CreateFederationExecutionResponseErrorReadingFDD:
+    case CreateFederationExecutionResponseType::CreateFederationExecutionResponseErrorReadingFDD:
       writeUInt32Compressed(3);
       break;
-    case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory:
+    case CreateFederationExecutionResponseType::CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory:
       writeUInt32Compressed(4);
       break;
-    case CreateFederationExecutionResponseInconsistentFDD:
+    case CreateFederationExecutionResponseType::CreateFederationExecutionResponseInconsistentFDD:
       writeUInt32Compressed(5);
       break;
-    case CreateFederationExecutionResponseRTIinternalError:
+    case CreateFederationExecutionResponseType::CreateFederationExecutionResponseRTIinternalError:
       writeUInt32Compressed(6);
       break;
-    case CreateFederationExecutionResponseTimeout:
+    case CreateFederationExecutionResponseType::CreateFederationExecutionResponseTimeout:
       writeUInt32Compressed(7);
       break;
     default:
@@ -793,16 +793,16 @@ public:
   void writeDestroyFederationExecutionResponseType(const DestroyFederationExecutionResponseType& value)
   {
     switch (value) {
-    case DestroyFederationExecutionResponseSuccess:
+    case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseSuccess:
       writeUInt32Compressed(0);
       break;
-    case DestroyFederationExecutionResponseFederatesCurrentlyJoined:
+    case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseFederatesCurrentlyJoined:
       writeUInt32Compressed(1);
       break;
-    case DestroyFederationExecutionResponseFederationExecutionDoesNotExist:
+    case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseFederationExecutionDoesNotExist:
       writeUInt32Compressed(2);
       break;
-    case DestroyFederationExecutionResponseRTIinternalError:
+    case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseRTIinternalError:
       writeUInt32Compressed(3);
       break;
     default:
@@ -814,25 +814,25 @@ public:
   void writeJoinFederationExecutionResponseType(const JoinFederationExecutionResponseType& value)
   {
     switch (value) {
-    case JoinFederationExecutionResponseSuccess:
+    case JoinFederationExecutionResponseType::JoinFederationExecutionResponseSuccess:
       writeUInt32Compressed(0);
       break;
-    case JoinFederationExecutionResponseFederateNameAlreadyInUse:
+    case JoinFederationExecutionResponseType::JoinFederationExecutionResponseFederateNameAlreadyInUse:
       writeUInt32Compressed(1);
       break;
-    case JoinFederationExecutionResponseFederationExecutionDoesNotExist:
+    case JoinFederationExecutionResponseType::JoinFederationExecutionResponseFederationExecutionDoesNotExist:
       writeUInt32Compressed(2);
       break;
-    case JoinFederationExecutionResponseSaveInProgress:
+    case JoinFederationExecutionResponseType::JoinFederationExecutionResponseSaveInProgress:
       writeUInt32Compressed(3);
       break;
-    case JoinFederationExecutionResponseRestoreInProgress:
+    case JoinFederationExecutionResponseType::JoinFederationExecutionResponseRestoreInProgress:
       writeUInt32Compressed(4);
       break;
-    case JoinFederationExecutionResponseInconsistentFDD:
+    case JoinFederationExecutionResponseType::JoinFederationExecutionResponseInconsistentFDD:
       writeUInt32Compressed(5);
       break;
-    case JoinFederationExecutionResponseTimeout:
+    case JoinFederationExecutionResponseType::JoinFederationExecutionResponseTimeout:
       writeUInt32Compressed(6);
       break;
     default:
@@ -844,13 +844,13 @@ public:
   void writeRegisterFederationSynchronizationPointResponseType(const RegisterFederationSynchronizationPointResponseType& value)
   {
     switch (value) {
-    case RegisterFederationSynchronizationPointResponseSuccess:
+    case RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseSuccess:
       writeUInt32Compressed(0);
       break;
-    case RegisterFederationSynchronizationPointResponseLabelNotUnique:
+    case RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseLabelNotUnique:
       writeUInt32Compressed(1);
       break;
-    case RegisterFederationSynchronizationPointResponseMemberNotJoined:
+    case RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseMemberNotJoined:
       writeUInt32Compressed(2);
       break;
     default:
@@ -1840,6 +1840,50 @@ public:
     writeBool( value.getLockedByNextMessage());
   }
 
+  void writeResetFederationRequestMessage(const ResetFederationRequestMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeVariableLengthData( value.getTimeStamp());
+    writeVariableLengthData( value.getTag());
+  }
+
+  void writeResetFederationInitiateMessage(const ResetFederationInitiateMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeFederateHandleVector( value.getFederateHandleVector());
+    writeVariableLengthData( value.getTimeStamp());
+    writeVariableLengthData( value.getTag());
+  }
+
+  void writeResetFederationDoneMessage(const ResetFederationDoneMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeVariableLengthData( value.getTimeStamp());
+    writeVariableLengthData( value.getTag());
+    writeBool( value.getSuccess());
+  }
+
+  void writeResetFederationBegunMessage(const ResetFederationBegunMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandleVector( value.getFederateHandleVector());
+    writeFederateHandle( value.getFederateHandle());
+    writeVariableLengthData( value.getTimeStamp());
+    writeVariableLengthData( value.getTag());
+  }
+
+  void writeResetFederationCompleteMessage(const ResetFederationCompleteMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandleBoolPairVector( value.getFederateHandleBoolPairVector());
+    writeFederateHandle( value.getFederateHandle());
+    writeVariableLengthData( value.getTimeStamp());
+    writeBool( value.getSuccess());
+    writeVariableLengthData( value.getTag());
+  }
+
   void writeTimeConstrainedEnabledMessage(const TimeConstrainedEnabledMessage&)
   {
   }
@@ -1907,6 +1951,119 @@ public:
     writeSubscriptionType( value.getSubscriptionType());
     writeObjectClassHandle( value.getObjectClassHandle());
     writeObjectInstanceHandle( value.getObjectInstanceHandle());
+  }
+
+  void writeOwnershipTransferState(const OwnershipTransferState& value)
+  {
+    switch (value) {
+    case OwnershipTransferState::None:
+      writeUInt32Compressed(0);
+      break;
+    case OwnershipTransferState::Acquiring:
+      writeUInt32Compressed(1);
+      break;
+    case OwnershipTransferState::Divesting:
+      writeUInt32Compressed(2);
+      break;
+    default:
+      writeUInt32Compressed(3);
+      break;
+    }
+  }
+
+  void writeAttributeOwnershipRequestDivestMessage(const AttributeOwnershipRequestDivestMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+    writeVariableLengthData( value.getTag());
+    writeBool( value.getUnconditional());
+  }
+
+  void writeAttributeOwnershipRequestAcquireMessage(const AttributeOwnershipRequestAcquireMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+    writeVariableLengthData( value.getTag());
+    writeBool( value.getIfAvailable());
+    writeFederateHandle( value.getFederateHandle());
+  }
+
+  void writeAttributeOwnershipResponseUnavailableMessage(const AttributeOwnershipResponseUnavailableMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void writeAttributeOwnershipConfirmDivestitureMessage(const AttributeOwnershipConfirmDivestitureMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void writeAttributeOwnershipRequestCancelAcquireMessage(const AttributeOwnershipRequestCancelAcquireMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+    writeBool( value.getImmediate());
+  }
+
+  void writeAttributeOwnershipResponseCancelConfirmationMessage(const AttributeOwnershipResponseCancelConfirmationMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void writeAttributeOwnershipRequestCancelDivestMessage(const AttributeOwnershipRequestCancelDivestMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void writeAttributeOwnershipDivestConfirmationMessage(const AttributeOwnershipDivestConfirmationMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void writeAttributeOwnershipResponseOwnershipAcquiredMessage(const AttributeOwnershipResponseOwnershipAcquiredMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeFederateHandle( value.getFederateHandle());
+    writeObjectClassHandle( value.getObjectClassHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandleVector( value.getAttributeHandles());
+    writeBool( value.getIfAvailable());
+  }
+
+  void writeQueryAttributeOwnershipRequestMessage(const QueryAttributeOwnershipRequestMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandle( value.getAttributeHandle());
+  }
+
+  void writeQueryAttributeOwnershipResponseMessage(const QueryAttributeOwnershipResponseMessage& value)
+  {
+    writeFederationHandle( value.getFederationHandle());
+    writeObjectInstanceHandle( value.getObjectInstanceHandle());
+    writeAttributeHandle( value.getAttributeHandle());
+    writeFederateHandle( value.getOwner());
   }
 
   void writeRegistrationForObjectClassMessage(const RegistrationForObjectClassMessage& value)
@@ -2075,21 +2232,6 @@ public:
     writeObjectClassHandle( value.getObjectClassHandle());
     writeAttributeHandleVector( value.getAttributeHandles());
     writeVariableLengthData( value.getTag());
-  }
-
-  void writeQueryAttributeOwnershipRequestMessage(const QueryAttributeOwnershipRequestMessage& value)
-  {
-    writeFederationHandle( value.getFederationHandle());
-    writeObjectInstanceHandle( value.getObjectInstanceHandle());
-    writeAttributeHandle( value.getAttributeHandle());
-  }
-
-  void writeQueryAttributeOwnershipResponseMessage(const QueryAttributeOwnershipResponseMessage& value)
-  {
-    writeFederationHandle( value.getFederationHandle());
-    writeObjectInstanceHandle( value.getObjectInstanceHandle());
-    writeAttributeHandle( value.getAttributeHandle());
-    writeFederateHandle( value.getOwner());
   }
 
   TightBE1MessageEncoding& _messageEncoding;
@@ -2452,6 +2594,56 @@ public:
   }
 
   void
+  encode(TightBE1MessageEncoding& messageEncoding, const ResetFederationRequestMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(ResetFederationRequestMessage::OpCode);
+    encodeStream.writeResetFederationRequestMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const ResetFederationInitiateMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(ResetFederationInitiateMessage::OpCode);
+    encodeStream.writeResetFederationInitiateMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const ResetFederationDoneMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(ResetFederationDoneMessage::OpCode);
+    encodeStream.writeResetFederationDoneMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const ResetFederationBegunMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(ResetFederationBegunMessage::OpCode);
+    encodeStream.writeResetFederationBegunMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const ResetFederationCompleteMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(ResetFederationCompleteMessage::OpCode);
+    encodeStream.writeResetFederationCompleteMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
   encode(TightBE1MessageEncoding& messageEncoding, const InsertRegionMessage& message) const
   {
     EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
@@ -2528,6 +2720,116 @@ public:
     EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
     encodeStream.writeUInt16Compressed(ChangeObjectInstanceSubscriptionMessage::OpCode);
     encodeStream.writeChangeObjectInstanceSubscriptionMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const AttributeOwnershipRequestDivestMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(AttributeOwnershipRequestDivestMessage::OpCode);
+    encodeStream.writeAttributeOwnershipRequestDivestMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const AttributeOwnershipRequestAcquireMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(AttributeOwnershipRequestAcquireMessage::OpCode);
+    encodeStream.writeAttributeOwnershipRequestAcquireMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const AttributeOwnershipResponseUnavailableMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(AttributeOwnershipResponseUnavailableMessage::OpCode);
+    encodeStream.writeAttributeOwnershipResponseUnavailableMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const AttributeOwnershipConfirmDivestitureMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(AttributeOwnershipConfirmDivestitureMessage::OpCode);
+    encodeStream.writeAttributeOwnershipConfirmDivestitureMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const AttributeOwnershipRequestCancelAcquireMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(AttributeOwnershipRequestCancelAcquireMessage::OpCode);
+    encodeStream.writeAttributeOwnershipRequestCancelAcquireMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const AttributeOwnershipResponseCancelConfirmationMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(AttributeOwnershipResponseCancelConfirmationMessage::OpCode);
+    encodeStream.writeAttributeOwnershipResponseCancelConfirmationMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const AttributeOwnershipRequestCancelDivestMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(AttributeOwnershipRequestCancelDivestMessage::OpCode);
+    encodeStream.writeAttributeOwnershipRequestCancelDivestMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const AttributeOwnershipDivestConfirmationMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(AttributeOwnershipDivestConfirmationMessage::OpCode);
+    encodeStream.writeAttributeOwnershipDivestConfirmationMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const AttributeOwnershipResponseOwnershipAcquiredMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(AttributeOwnershipResponseOwnershipAcquiredMessage::OpCode);
+    encodeStream.writeAttributeOwnershipResponseOwnershipAcquiredMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipRequestMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(QueryAttributeOwnershipRequestMessage::OpCode);
+    encodeStream.writeQueryAttributeOwnershipRequestMessage(message);
+    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
+  }
+
+  void
+  encode(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipResponseMessage& message) const
+  {
+    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
+    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
+    encodeStream.writeUInt16Compressed(QueryAttributeOwnershipResponseMessage::OpCode);
+    encodeStream.writeQueryAttributeOwnershipResponseMessage(message);
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
@@ -2691,26 +2993,6 @@ public:
     headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
   }
 
-  void
-  encode(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipRequestMessage& message) const
-  {
-    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
-    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(QueryAttributeOwnershipRequestMessage::OpCode);
-    encodeStream.writeQueryAttributeOwnershipRequestMessage(message);
-    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
-  void
-  encode(TightBE1MessageEncoding& messageEncoding, const QueryAttributeOwnershipResponseMessage& message) const
-  {
-    EncodeDataStream headerStream(messageEncoding.addScratchWriteBuffer());
-    EncodeStream encodeStream(messageEncoding.addScratchWriteBuffer(), messageEncoding);
-    encodeStream.writeUInt16Compressed(QueryAttributeOwnershipResponseMessage::OpCode);
-    encodeStream.writeQueryAttributeOwnershipResponseMessage(message);
-    headerStream.writeUInt32BE(uint32_t(encodeStream.size()));
-  }
-
 private:
   TightBE1MessageEncoding& _messageEncoding;
 };
@@ -2725,13 +3007,13 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = HLA_IMMEDIATE;
+      value = CallbackModel::HLA_IMMEDIATE;
       break;
     case 1:
-      value = HLA_EVOKED;
+      value = CallbackModel::HLA_EVOKED;
       break;
     default:
-      value = HLA_EVOKED;
+      value = CallbackModel::HLA_EVOKED;
       break;
     }
   }
@@ -2740,13 +3022,13 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = RECEIVE;
+      value = OrderType::RECEIVE;
       break;
     case 1:
-      value = TIMESTAMP;
+      value = OrderType::TIMESTAMP;
       break;
     default:
-      value = TIMESTAMP;
+      value = OrderType::TIMESTAMP;
       break;
     }
   }
@@ -2755,13 +3037,13 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = RELIABLE;
+      value = TransportationType::RELIABLE;
       break;
     case 1:
-      value = BEST_EFFORT;
+      value = TransportationType::BEST_EFFORT;
       break;
     default:
-      value = BEST_EFFORT;
+      value = TransportationType::BEST_EFFORT;
       break;
     }
   }
@@ -2770,16 +3052,16 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = Unsubscribed;
+      value = SubscriptionType::Unsubscribed;
       break;
     case 1:
-      value = SubscribedPassive;
+      value = SubscriptionType::SubscribedPassive;
       break;
     case 2:
-      value = SubscribedActive;
+      value = SubscriptionType::SubscribedActive;
       break;
     default:
-      value = SubscribedActive;
+      value = SubscriptionType::SubscribedActive;
       break;
     }
   }
@@ -2788,13 +3070,13 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = Unpublished;
+      value = PublicationType::Unpublished;
       break;
     case 1:
-      value = Published;
+      value = PublicationType::Published;
       break;
     default:
-      value = Published;
+      value = PublicationType::Published;
       break;
     }
   }
@@ -2803,25 +3085,25 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = UNCONDITIONALLY_DIVEST_ATTRIBUTES;
+      value = ResignAction::UNCONDITIONALLY_DIVEST_ATTRIBUTES;
       break;
     case 1:
-      value = DELETE_OBJECTS;
+      value = ResignAction::DELETE_OBJECTS;
       break;
     case 2:
-      value = CANCEL_PENDING_OWNERSHIP_ACQUISITIONS;
+      value = ResignAction::CANCEL_PENDING_OWNERSHIP_ACQUISITIONS;
       break;
     case 3:
-      value = DELETE_OBJECTS_THEN_DIVEST;
+      value = ResignAction::DELETE_OBJECTS_THEN_DIVEST;
       break;
     case 4:
-      value = CANCEL_THEN_DELETE_THEN_DIVEST;
+      value = ResignAction::CANCEL_THEN_DELETE_THEN_DIVEST;
       break;
     case 5:
-      value = NO_ACTION;
+      value = ResignAction::NO_ACTION;
       break;
     default:
-      value = NO_ACTION;
+      value = ResignAction::NO_ACTION;
       break;
     }
   }
@@ -2830,19 +3112,19 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = RTI_UNABLE_TO_RESTORE;
+      value = RestoreFailureReason::RTI_UNABLE_TO_RESTORE;
       break;
     case 1:
-      value = FEDERATE_REPORTED_FAILURE_DURING_RESTORE;
+      value = RestoreFailureReason::FEDERATE_REPORTED_FAILURE_DURING_RESTORE;
       break;
     case 2:
-      value = FEDERATE_RESIGNED_DURING_RESTORE;
+      value = RestoreFailureReason::FEDERATE_RESIGNED_DURING_RESTORE;
       break;
     case 3:
-      value = RTI_DETECTED_FAILURE_DURING_RESTORE;
+      value = RestoreFailureReason::RTI_DETECTED_FAILURE_DURING_RESTORE;
       break;
     default:
-      value = RTI_DETECTED_FAILURE_DURING_RESTORE;
+      value = RestoreFailureReason::RTI_DETECTED_FAILURE_DURING_RESTORE;
       break;
     }
   }
@@ -2851,25 +3133,25 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = NO_RESTORE_IN_PROGRESS;
+      value = RestoreStatus::NO_RESTORE_IN_PROGRESS;
       break;
     case 1:
-      value = FEDERATE_RESTORE_REQUEST_PENDING;
+      value = RestoreStatus::FEDERATE_RESTORE_REQUEST_PENDING;
       break;
     case 2:
-      value = FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN;
+      value = RestoreStatus::FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN;
       break;
     case 3:
-      value = FEDERATE_PREPARED_TO_RESTORE;
+      value = RestoreStatus::FEDERATE_PREPARED_TO_RESTORE;
       break;
     case 4:
-      value = FEDERATE_RESTORING;
+      value = RestoreStatus::FEDERATE_RESTORING;
       break;
     case 5:
-      value = FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE;
+      value = RestoreStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE;
       break;
     default:
-      value = FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE;
+      value = RestoreStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE;
       break;
     }
   }
@@ -2878,22 +3160,22 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = RTI_UNABLE_TO_SAVE;
+      value = SaveFailureReason::RTI_UNABLE_TO_SAVE;
       break;
     case 1:
-      value = FEDERATE_REPORTED_FAILURE_DURING_SAVE;
+      value = SaveFailureReason::FEDERATE_REPORTED_FAILURE_DURING_SAVE;
       break;
     case 2:
-      value = FEDERATE_RESIGNED_DURING_SAVE;
+      value = SaveFailureReason::FEDERATE_RESIGNED_DURING_SAVE;
       break;
     case 3:
-      value = RTI_DETECTED_FAILURE_DURING_SAVE;
+      value = SaveFailureReason::RTI_DETECTED_FAILURE_DURING_SAVE;
       break;
     case 4:
-      value = SAVE_TIME_CANNOT_BE_HONORED;
+      value = SaveFailureReason::SAVE_TIME_CANNOT_BE_HONORED;
       break;
     default:
-      value = SAVE_TIME_CANNOT_BE_HONORED;
+      value = SaveFailureReason::SAVE_TIME_CANNOT_BE_HONORED;
       break;
     }
   }
@@ -2902,19 +3184,19 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = NO_SAVE_IN_PROGRESS;
+      value = SaveStatus::NO_SAVE_IN_PROGRESS;
       break;
     case 1:
-      value = FEDERATE_INSTRUCTED_TO_SAVE;
+      value = SaveStatus::FEDERATE_INSTRUCTED_TO_SAVE;
       break;
     case 2:
-      value = FEDERATE_SAVING;
+      value = SaveStatus::FEDERATE_SAVING;
       break;
     case 3:
-      value = FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE;
+      value = SaveStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE;
       break;
     default:
-      value = FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE;
+      value = SaveStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE;
       break;
     }
   }
@@ -2923,28 +3205,28 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = FEDERATION_MANAGEMENT;
+      value = ServiceGroupIndicator::FEDERATION_MANAGEMENT;
       break;
     case 1:
-      value = DECLARATION_MANAGEMENT;
+      value = ServiceGroupIndicator::DECLARATION_MANAGEMENT;
       break;
     case 2:
-      value = OBJECT_MANAGEMENT;
+      value = ServiceGroupIndicator::OBJECT_MANAGEMENT;
       break;
     case 3:
-      value = OWNERSHIP_MANAGEMENT;
+      value = ServiceGroupIndicator::OWNERSHIP_MANAGEMENT;
       break;
     case 4:
-      value = TIME_MANAGEMENT;
+      value = ServiceGroupIndicator::TIME_MANAGEMENT;
       break;
     case 5:
-      value = DATA_DISTRIBUTION_MANAGEMENT;
+      value = ServiceGroupIndicator::DATA_DISTRIBUTION_MANAGEMENT;
       break;
     case 6:
-      value = SUPPORT_SERVICES;
+      value = ServiceGroupIndicator::SUPPORT_SERVICES;
       break;
     default:
-      value = SUPPORT_SERVICES;
+      value = ServiceGroupIndicator::SUPPORT_SERVICES;
       break;
     }
   }
@@ -2953,16 +3235,16 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = TimeAdvanceCommit;
+      value = LowerBoundTimeStampCommitType::TimeAdvanceCommit;
       break;
     case 1:
-      value = NextMessageCommit;
+      value = LowerBoundTimeStampCommitType::NextMessageCommit;
       break;
     case 2:
-      value = TimeAdvanceAndNextMessageCommit;
+      value = LowerBoundTimeStampCommitType::TimeAdvanceAndNextMessageCommit;
       break;
     default:
-      value = TimeAdvanceAndNextMessageCommit;
+      value = LowerBoundTimeStampCommitType::TimeAdvanceAndNextMessageCommit;
       break;
     }
   }
@@ -2971,28 +3253,28 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = InteractionRelevanceAdvisorySwitchesType;
+      value = SwitchesType::InteractionRelevanceAdvisorySwitchesType;
       break;
     case 1:
-      value = ObjectClassRelevanceAdvisorySwitchesType;
+      value = SwitchesType::ObjectClassRelevanceAdvisorySwitchesType;
       break;
     case 2:
-      value = AttributeRelevanceAdvisorySwitchesType;
+      value = SwitchesType::AttributeRelevanceAdvisorySwitchesType;
       break;
     case 3:
-      value = AttributeScopeAdvisorySwitchesType;
+      value = SwitchesType::AttributeScopeAdvisorySwitchesType;
       break;
     case 4:
-      value = AutoProvideSwitchesType;
+      value = SwitchesType::AutoProvideSwitchesType;
       break;
     case 5:
-      value = ConveyRegionDesignatorSetsSwitchesType;
+      value = SwitchesType::ConveyRegionDesignatorSetsSwitchesType;
       break;
     case 6:
-      value = ServiceReportingSwitchesType;
+      value = SwitchesType::ServiceReportingSwitchesType;
       break;
     default:
-      value = ServiceReportingSwitchesType;
+      value = SwitchesType::ServiceReportingSwitchesType;
       break;
     }
   }
@@ -3001,13 +3283,13 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = FixedArrayDataTypeEncoding;
+      value = ArrayDataTypeEncoding::FixedArrayDataTypeEncoding;
       break;
     case 1:
-      value = VariableArrayDataTypeEncoding;
+      value = ArrayDataTypeEncoding::VariableArrayDataTypeEncoding;
       break;
     default:
-      value = VariableArrayDataTypeEncoding;
+      value = ArrayDataTypeEncoding::VariableArrayDataTypeEncoding;
       break;
     }
   }
@@ -3016,13 +3298,13 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = BigEndian;
+      value = Endianness::BigEndian;
       break;
     case 1:
-      value = LittleEndian;
+      value = Endianness::LittleEndian;
       break;
     default:
-      value = LittleEndian;
+      value = Endianness::LittleEndian;
       break;
     }
   }
@@ -3052,107 +3334,107 @@ public:
 
   void readFederationHandle(FederationHandle& value)
   {
-    value = readUInt16Compressed();
+    value = FederationHandle(readUInt16Compressed());
   }
 
   void readModuleHandle(ModuleHandle& value)
   {
-    value = readUInt16Compressed();
+    value = ModuleHandle(readUInt16Compressed());
   }
 
   void readAttributeHandle(AttributeHandle& value)
   {
-    value = readUInt32Compressed();
+    value = AttributeHandle(readUInt32Compressed());
   }
 
   void readDimensionHandle(DimensionHandle& value)
   {
-    value = readUInt32Compressed();
+    value = DimensionHandle(readUInt32Compressed());
   }
 
   void readUpdateRateHandle(UpdateRateHandle& value)
   {
-    value = readUInt32Compressed();
+    value = UpdateRateHandle(readUInt32Compressed());
   }
 
   void readBasicDataTypeHandle(BasicDataTypeHandle& value)
   {
-    value = readUInt32Compressed();
+    value = BasicDataTypeHandle(readUInt32Compressed());
   }
 
   void readSimpleDataTypeHandle(SimpleDataTypeHandle& value)
   {
-    value = readUInt32Compressed();
+    value = SimpleDataTypeHandle(readUInt32Compressed());
   }
 
   void readEnumeratedDataTypeHandle(EnumeratedDataTypeHandle& value)
   {
-    value = readUInt32Compressed();
+    value = EnumeratedDataTypeHandle(readUInt32Compressed());
   }
 
   void readArrayDataTypeHandle(ArrayDataTypeHandle& value)
   {
-    value = readUInt32Compressed();
+    value = ArrayDataTypeHandle(readUInt32Compressed());
   }
 
   void readFixedRecordDataTypeHandle(FixedRecordDataTypeHandle& value)
   {
-    value = readUInt32Compressed();
+    value = FixedRecordDataTypeHandle(readUInt32Compressed());
   }
 
   void readVariantRecordDataTypeHandle(VariantRecordDataTypeHandle& value)
   {
-    value = readUInt32Compressed();
+    value = VariantRecordDataTypeHandle(readUInt32Compressed());
   }
 
   void readObjectClassHandle(ObjectClassHandle& value)
   {
-    value = readUInt32Compressed();
+    value = ObjectClassHandle(readUInt32Compressed());
   }
 
   void readObjectInstanceHandle(ObjectInstanceHandle& value)
   {
-    value = readUInt32Compressed();
+    value = ObjectInstanceHandle(readUInt32Compressed());
   }
 
   void readInteractionClassHandle(InteractionClassHandle& value)
   {
-    value = readUInt32Compressed();
+    value = InteractionClassHandle(readUInt32Compressed());
   }
 
   void readParameterHandle(ParameterHandle& value)
   {
-    value = readUInt32Compressed();
+    value = ParameterHandle(readUInt32Compressed());
   }
 
   void readFederateHandle(FederateHandle& value)
   {
-    value = readUInt32Compressed();
+    value = FederateHandle(readUInt32Compressed());
   }
 
   void readSpaceHandle(SpaceHandle& value)
   {
-    value = readUInt32Compressed();
+    value = SpaceHandle(readUInt32Compressed());
   }
 
   void readTransportationHandle(TransportationHandle& value)
   {
-    value = readUInt8Compressed();
+    value = TransportationHandle(readUInt8Compressed());
   }
 
   void readOrderingHandle(OrderingHandle& value)
   {
-    value = readUInt8Compressed();
+    value = OrderingHandle(readUInt8Compressed());
   }
 
   void readMessageRetractionHandle(MessageRetractionHandle& value)
   {
-    value = readUInt64Compressed();
+    value = MessageRetractionHandle(readUInt64Compressed());
   }
 
   void readRegionHandle(RegionHandle& value)
   {
-    value = readUInt64Compressed();
+    value = RegionHandle(readUInt64Compressed());
   }
 
   void readAttributeHandleVector(AttributeHandleVector& value)
@@ -3445,31 +3727,31 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = CreateFederationExecutionResponseSuccess;
+      value = CreateFederationExecutionResponseType::CreateFederationExecutionResponseSuccess;
       break;
     case 1:
-      value = CreateFederationExecutionResponseFederationExecutionAlreadyExists;
+      value = CreateFederationExecutionResponseType::CreateFederationExecutionResponseFederationExecutionAlreadyExists;
       break;
     case 2:
-      value = CreateFederationExecutionResponseCouldNotOpenFDD;
+      value = CreateFederationExecutionResponseType::CreateFederationExecutionResponseCouldNotOpenFDD;
       break;
     case 3:
-      value = CreateFederationExecutionResponseErrorReadingFDD;
+      value = CreateFederationExecutionResponseType::CreateFederationExecutionResponseErrorReadingFDD;
       break;
     case 4:
-      value = CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory;
+      value = CreateFederationExecutionResponseType::CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory;
       break;
     case 5:
-      value = CreateFederationExecutionResponseInconsistentFDD;
+      value = CreateFederationExecutionResponseType::CreateFederationExecutionResponseInconsistentFDD;
       break;
     case 6:
-      value = CreateFederationExecutionResponseRTIinternalError;
+      value = CreateFederationExecutionResponseType::CreateFederationExecutionResponseRTIinternalError;
       break;
     case 7:
-      value = CreateFederationExecutionResponseTimeout;
+      value = CreateFederationExecutionResponseType::CreateFederationExecutionResponseTimeout;
       break;
     default:
-      value = CreateFederationExecutionResponseTimeout;
+      value = CreateFederationExecutionResponseType::CreateFederationExecutionResponseTimeout;
       break;
     }
   }
@@ -3478,19 +3760,19 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = DestroyFederationExecutionResponseSuccess;
+      value = DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseSuccess;
       break;
     case 1:
-      value = DestroyFederationExecutionResponseFederatesCurrentlyJoined;
+      value = DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseFederatesCurrentlyJoined;
       break;
     case 2:
-      value = DestroyFederationExecutionResponseFederationExecutionDoesNotExist;
+      value = DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseFederationExecutionDoesNotExist;
       break;
     case 3:
-      value = DestroyFederationExecutionResponseRTIinternalError;
+      value = DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseRTIinternalError;
       break;
     default:
-      value = DestroyFederationExecutionResponseRTIinternalError;
+      value = DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseRTIinternalError;
       break;
     }
   }
@@ -3499,28 +3781,28 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = JoinFederationExecutionResponseSuccess;
+      value = JoinFederationExecutionResponseType::JoinFederationExecutionResponseSuccess;
       break;
     case 1:
-      value = JoinFederationExecutionResponseFederateNameAlreadyInUse;
+      value = JoinFederationExecutionResponseType::JoinFederationExecutionResponseFederateNameAlreadyInUse;
       break;
     case 2:
-      value = JoinFederationExecutionResponseFederationExecutionDoesNotExist;
+      value = JoinFederationExecutionResponseType::JoinFederationExecutionResponseFederationExecutionDoesNotExist;
       break;
     case 3:
-      value = JoinFederationExecutionResponseSaveInProgress;
+      value = JoinFederationExecutionResponseType::JoinFederationExecutionResponseSaveInProgress;
       break;
     case 4:
-      value = JoinFederationExecutionResponseRestoreInProgress;
+      value = JoinFederationExecutionResponseType::JoinFederationExecutionResponseRestoreInProgress;
       break;
     case 5:
-      value = JoinFederationExecutionResponseInconsistentFDD;
+      value = JoinFederationExecutionResponseType::JoinFederationExecutionResponseInconsistentFDD;
       break;
     case 6:
-      value = JoinFederationExecutionResponseTimeout;
+      value = JoinFederationExecutionResponseType::JoinFederationExecutionResponseTimeout;
       break;
     default:
-      value = JoinFederationExecutionResponseTimeout;
+      value = JoinFederationExecutionResponseType::JoinFederationExecutionResponseTimeout;
       break;
     }
   }
@@ -3529,16 +3811,16 @@ public:
   {
     switch (readUInt32Compressed()) {
     case 0:
-      value = RegisterFederationSynchronizationPointResponseSuccess;
+      value = RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseSuccess;
       break;
     case 1:
-      value = RegisterFederationSynchronizationPointResponseLabelNotUnique;
+      value = RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseLabelNotUnique;
       break;
     case 2:
-      value = RegisterFederationSynchronizationPointResponseMemberNotJoined;
+      value = RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseMemberNotJoined;
       break;
     default:
-      value = RegisterFederationSynchronizationPointResponseMemberNotJoined;
+      value = RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseMemberNotJoined;
       break;
     }
   }
@@ -4525,6 +4807,50 @@ public:
     readBool( value.getLockedByNextMessage());
   }
 
+  void readResetFederationRequestMessage(ResetFederationRequestMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readVariableLengthData( value.getTimeStamp());
+    readVariableLengthData( value.getTag());
+  }
+
+  void readResetFederationInitiateMessage(ResetFederationInitiateMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readFederateHandleVector( value.getFederateHandleVector());
+    readVariableLengthData( value.getTimeStamp());
+    readVariableLengthData( value.getTag());
+  }
+
+  void readResetFederationDoneMessage(ResetFederationDoneMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readVariableLengthData( value.getTimeStamp());
+    readVariableLengthData( value.getTag());
+    readBool( value.getSuccess());
+  }
+
+  void readResetFederationBegunMessage(ResetFederationBegunMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandleVector( value.getFederateHandleVector());
+    readFederateHandle( value.getFederateHandle());
+    readVariableLengthData( value.getTimeStamp());
+    readVariableLengthData( value.getTag());
+  }
+
+  void readResetFederationCompleteMessage(ResetFederationCompleteMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandleBoolPairVector( value.getFederateHandleBoolPairVector());
+    readFederateHandle( value.getFederateHandle());
+    readVariableLengthData( value.getTimeStamp());
+    readBool( value.getSuccess());
+    readVariableLengthData( value.getTag());
+  }
+
   void readTimeConstrainedEnabledMessage(TimeConstrainedEnabledMessage&)
   {
   }
@@ -4592,6 +4918,119 @@ public:
     readSubscriptionType( value.getSubscriptionType());
     readObjectClassHandle( value.getObjectClassHandle());
     readObjectInstanceHandle( value.getObjectInstanceHandle());
+  }
+
+  void readOwnershipTransferState(OwnershipTransferState& value)
+  {
+    switch (readUInt32Compressed()) {
+    case 0:
+      value = OwnershipTransferState::None;
+      break;
+    case 1:
+      value = OwnershipTransferState::Acquiring;
+      break;
+    case 2:
+      value = OwnershipTransferState::Divesting;
+      break;
+    default:
+      value = OwnershipTransferState::Divesting;
+      break;
+    }
+  }
+
+  void readAttributeOwnershipRequestDivestMessage(AttributeOwnershipRequestDivestMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+    readVariableLengthData( value.getTag());
+    readBool( value.getUnconditional());
+  }
+
+  void readAttributeOwnershipRequestAcquireMessage(AttributeOwnershipRequestAcquireMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+    readVariableLengthData( value.getTag());
+    readBool( value.getIfAvailable());
+    readFederateHandle( value.getFederateHandle());
+  }
+
+  void readAttributeOwnershipResponseUnavailableMessage(AttributeOwnershipResponseUnavailableMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void readAttributeOwnershipConfirmDivestitureMessage(AttributeOwnershipConfirmDivestitureMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void readAttributeOwnershipRequestCancelAcquireMessage(AttributeOwnershipRequestCancelAcquireMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+    readBool( value.getImmediate());
+  }
+
+  void readAttributeOwnershipResponseCancelConfirmationMessage(AttributeOwnershipResponseCancelConfirmationMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void readAttributeOwnershipRequestCancelDivestMessage(AttributeOwnershipRequestCancelDivestMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void readAttributeOwnershipDivestConfirmationMessage(AttributeOwnershipDivestConfirmationMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+  }
+
+  void readAttributeOwnershipResponseOwnershipAcquiredMessage(AttributeOwnershipResponseOwnershipAcquiredMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readFederateHandle( value.getFederateHandle());
+    readObjectClassHandle( value.getObjectClassHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandleVector( value.getAttributeHandles());
+    readBool( value.getIfAvailable());
+  }
+
+  void readQueryAttributeOwnershipRequestMessage(QueryAttributeOwnershipRequestMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandle( value.getAttributeHandle());
+  }
+
+  void readQueryAttributeOwnershipResponseMessage(QueryAttributeOwnershipResponseMessage& value)
+  {
+    readFederationHandle( value.getFederationHandle());
+    readObjectInstanceHandle( value.getObjectInstanceHandle());
+    readAttributeHandle( value.getAttributeHandle());
+    readFederateHandle( value.getOwner());
   }
 
   void readRegistrationForObjectClassMessage(RegistrationForObjectClassMessage& value)
@@ -4762,21 +5201,6 @@ public:
     readVariableLengthData( value.getTag());
   }
 
-  void readQueryAttributeOwnershipRequestMessage(QueryAttributeOwnershipRequestMessage& value)
-  {
-    readFederationHandle( value.getFederationHandle());
-    readObjectInstanceHandle( value.getObjectInstanceHandle());
-    readAttributeHandle( value.getAttributeHandle());
-  }
-
-  void readQueryAttributeOwnershipResponseMessage(QueryAttributeOwnershipResponseMessage& value)
-  {
-    readFederationHandle( value.getFederationHandle());
-    readObjectInstanceHandle( value.getObjectInstanceHandle());
-    readAttributeHandle( value.getAttributeHandle());
-    readFederateHandle( value.getOwner());
-  }
-
 private:
   TightBE1MessageEncoding& _messageEncoding;
 };
@@ -4843,9 +5267,49 @@ public:
     readPayloadVariableLengthData(value.getTimeStamp());
   }
 
+  void readPayloadResetFederationRequestMessage(ResetFederationRequestMessage& value)
+  {
+    readPayloadVariableLengthData(value.getTimeStamp());
+    readPayloadVariableLengthData(value.getTag());
+  }
+
+  void readPayloadResetFederationInitiateMessage(ResetFederationInitiateMessage& value)
+  {
+    readPayloadVariableLengthData(value.getTimeStamp());
+    readPayloadVariableLengthData(value.getTag());
+  }
+
+  void readPayloadResetFederationDoneMessage(ResetFederationDoneMessage& value)
+  {
+    readPayloadVariableLengthData(value.getTimeStamp());
+    readPayloadVariableLengthData(value.getTag());
+  }
+
+  void readPayloadResetFederationBegunMessage(ResetFederationBegunMessage& value)
+  {
+    readPayloadVariableLengthData(value.getTimeStamp());
+    readPayloadVariableLengthData(value.getTag());
+  }
+
+  void readPayloadResetFederationCompleteMessage(ResetFederationCompleteMessage& value)
+  {
+    readPayloadVariableLengthData(value.getTimeStamp());
+    readPayloadVariableLengthData(value.getTag());
+  }
+
   void readPayloadChangeInteractionClassSubscriptionMessage(ChangeInteractionClassSubscriptionMessage& value)
   {
     readPayloadParameterValueVector(value.getParameterFilterValues());
+  }
+
+  void readPayloadAttributeOwnershipRequestDivestMessage(AttributeOwnershipRequestDivestMessage& value)
+  {
+    readPayloadVariableLengthData(value.getTag());
+  }
+
+  void readPayloadAttributeOwnershipRequestAcquireMessage(AttributeOwnershipRequestAcquireMessage& value)
+  {
+    readPayloadVariableLengthData(value.getTag());
   }
 
   void readPayloadInteractionMessage(InteractionMessage& value)
@@ -5076,6 +5540,26 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
     _message = MakeShared<LockedByNextMessageRequestMessage>();
     decodeStream.readLockedByNextMessageRequestMessage(static_cast<LockedByNextMessageRequestMessage&>(*_message));
     break;
+  case ResetFederationRequestMessage::OpCode:
+    _message = MakeShared<ResetFederationRequestMessage>();
+    decodeStream.readResetFederationRequestMessage(static_cast<ResetFederationRequestMessage&>(*_message));
+    break;
+  case ResetFederationInitiateMessage::OpCode:
+    _message = MakeShared<ResetFederationInitiateMessage>();
+    decodeStream.readResetFederationInitiateMessage(static_cast<ResetFederationInitiateMessage&>(*_message));
+    break;
+  case ResetFederationDoneMessage::OpCode:
+    _message = MakeShared<ResetFederationDoneMessage>();
+    decodeStream.readResetFederationDoneMessage(static_cast<ResetFederationDoneMessage&>(*_message));
+    break;
+  case ResetFederationBegunMessage::OpCode:
+    _message = MakeShared<ResetFederationBegunMessage>();
+    decodeStream.readResetFederationBegunMessage(static_cast<ResetFederationBegunMessage&>(*_message));
+    break;
+  case ResetFederationCompleteMessage::OpCode:
+    _message = MakeShared<ResetFederationCompleteMessage>();
+    decodeStream.readResetFederationCompleteMessage(static_cast<ResetFederationCompleteMessage&>(*_message));
+    break;
   case InsertRegionMessage::OpCode:
     _message = MakeShared<InsertRegionMessage>();
     decodeStream.readInsertRegionMessage(static_cast<InsertRegionMessage&>(*_message));
@@ -5107,6 +5591,50 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
   case ChangeObjectInstanceSubscriptionMessage::OpCode:
     _message = MakeShared<ChangeObjectInstanceSubscriptionMessage>();
     decodeStream.readChangeObjectInstanceSubscriptionMessage(static_cast<ChangeObjectInstanceSubscriptionMessage&>(*_message));
+    break;
+  case AttributeOwnershipRequestDivestMessage::OpCode:
+    _message = MakeShared<AttributeOwnershipRequestDivestMessage>();
+    decodeStream.readAttributeOwnershipRequestDivestMessage(static_cast<AttributeOwnershipRequestDivestMessage&>(*_message));
+    break;
+  case AttributeOwnershipRequestAcquireMessage::OpCode:
+    _message = MakeShared<AttributeOwnershipRequestAcquireMessage>();
+    decodeStream.readAttributeOwnershipRequestAcquireMessage(static_cast<AttributeOwnershipRequestAcquireMessage&>(*_message));
+    break;
+  case AttributeOwnershipResponseUnavailableMessage::OpCode:
+    _message = MakeShared<AttributeOwnershipResponseUnavailableMessage>();
+    decodeStream.readAttributeOwnershipResponseUnavailableMessage(static_cast<AttributeOwnershipResponseUnavailableMessage&>(*_message));
+    break;
+  case AttributeOwnershipConfirmDivestitureMessage::OpCode:
+    _message = MakeShared<AttributeOwnershipConfirmDivestitureMessage>();
+    decodeStream.readAttributeOwnershipConfirmDivestitureMessage(static_cast<AttributeOwnershipConfirmDivestitureMessage&>(*_message));
+    break;
+  case AttributeOwnershipRequestCancelAcquireMessage::OpCode:
+    _message = MakeShared<AttributeOwnershipRequestCancelAcquireMessage>();
+    decodeStream.readAttributeOwnershipRequestCancelAcquireMessage(static_cast<AttributeOwnershipRequestCancelAcquireMessage&>(*_message));
+    break;
+  case AttributeOwnershipResponseCancelConfirmationMessage::OpCode:
+    _message = MakeShared<AttributeOwnershipResponseCancelConfirmationMessage>();
+    decodeStream.readAttributeOwnershipResponseCancelConfirmationMessage(static_cast<AttributeOwnershipResponseCancelConfirmationMessage&>(*_message));
+    break;
+  case AttributeOwnershipRequestCancelDivestMessage::OpCode:
+    _message = MakeShared<AttributeOwnershipRequestCancelDivestMessage>();
+    decodeStream.readAttributeOwnershipRequestCancelDivestMessage(static_cast<AttributeOwnershipRequestCancelDivestMessage&>(*_message));
+    break;
+  case AttributeOwnershipDivestConfirmationMessage::OpCode:
+    _message = MakeShared<AttributeOwnershipDivestConfirmationMessage>();
+    decodeStream.readAttributeOwnershipDivestConfirmationMessage(static_cast<AttributeOwnershipDivestConfirmationMessage&>(*_message));
+    break;
+  case AttributeOwnershipResponseOwnershipAcquiredMessage::OpCode:
+    _message = MakeShared<AttributeOwnershipResponseOwnershipAcquiredMessage>();
+    decodeStream.readAttributeOwnershipResponseOwnershipAcquiredMessage(static_cast<AttributeOwnershipResponseOwnershipAcquiredMessage&>(*_message));
+    break;
+  case QueryAttributeOwnershipRequestMessage::OpCode:
+    _message = MakeShared<QueryAttributeOwnershipRequestMessage>();
+    decodeStream.readQueryAttributeOwnershipRequestMessage(static_cast<QueryAttributeOwnershipRequestMessage&>(*_message));
+    break;
+  case QueryAttributeOwnershipResponseMessage::OpCode:
+    _message = MakeShared<QueryAttributeOwnershipResponseMessage>();
+    decodeStream.readQueryAttributeOwnershipResponseMessage(static_cast<QueryAttributeOwnershipResponseMessage&>(*_message));
     break;
   case InteractionMessage::OpCode:
     _message = MakeShared<InteractionMessage>();
@@ -5172,14 +5700,6 @@ TightBE1MessageEncoding::decodeBody(const VariableLengthData& variableLengthData
     _message = MakeShared<RequestClassAttributeUpdateMessage>();
     decodeStream.readRequestClassAttributeUpdateMessage(static_cast<RequestClassAttributeUpdateMessage&>(*_message));
     break;
-  case QueryAttributeOwnershipRequestMessage::OpCode:
-    _message = MakeShared<QueryAttributeOwnershipRequestMessage>();
-    decodeStream.readQueryAttributeOwnershipRequestMessage(static_cast<QueryAttributeOwnershipRequestMessage&>(*_message));
-    break;
-  case QueryAttributeOwnershipResponseMessage::OpCode:
-    _message = MakeShared<QueryAttributeOwnershipResponseMessage>();
-    decodeStream.readQueryAttributeOwnershipResponseMessage(static_cast<QueryAttributeOwnershipResponseMessage&>(*_message));
-    break;
   default:
     break;
   }
@@ -5208,8 +5728,29 @@ TightBE1MessageEncoding::decodePayload(const Buffer::const_iterator& i)
   case CommitLowerBoundTimeStampMessage::OpCode:
     payloadDecoder.readPayloadCommitLowerBoundTimeStampMessage(static_cast<CommitLowerBoundTimeStampMessage&>(*_message));
     break;
+  case ResetFederationRequestMessage::OpCode:
+    payloadDecoder.readPayloadResetFederationRequestMessage(static_cast<ResetFederationRequestMessage&>(*_message));
+    break;
+  case ResetFederationInitiateMessage::OpCode:
+    payloadDecoder.readPayloadResetFederationInitiateMessage(static_cast<ResetFederationInitiateMessage&>(*_message));
+    break;
+  case ResetFederationDoneMessage::OpCode:
+    payloadDecoder.readPayloadResetFederationDoneMessage(static_cast<ResetFederationDoneMessage&>(*_message));
+    break;
+  case ResetFederationBegunMessage::OpCode:
+    payloadDecoder.readPayloadResetFederationBegunMessage(static_cast<ResetFederationBegunMessage&>(*_message));
+    break;
+  case ResetFederationCompleteMessage::OpCode:
+    payloadDecoder.readPayloadResetFederationCompleteMessage(static_cast<ResetFederationCompleteMessage&>(*_message));
+    break;
   case ChangeInteractionClassSubscriptionMessage::OpCode:
     payloadDecoder.readPayloadChangeInteractionClassSubscriptionMessage(static_cast<ChangeInteractionClassSubscriptionMessage&>(*_message));
+    break;
+  case AttributeOwnershipRequestDivestMessage::OpCode:
+    payloadDecoder.readPayloadAttributeOwnershipRequestDivestMessage(static_cast<AttributeOwnershipRequestDivestMessage&>(*_message));
+    break;
+  case AttributeOwnershipRequestAcquireMessage::OpCode:
+    payloadDecoder.readPayloadAttributeOwnershipRequestAcquireMessage(static_cast<AttributeOwnershipRequestAcquireMessage&>(*_message));
     break;
   case InteractionMessage::OpCode:
     payloadDecoder.readPayloadInteractionMessage(static_cast<InteractionMessage&>(*_message));

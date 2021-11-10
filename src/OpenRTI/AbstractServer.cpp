@@ -215,7 +215,7 @@ AbstractServer::_ConnectOperation::wait(uint32_t timeoutMilliSeconds)
     _condition.wait_until(scopeLock, absTimeout);
     if (absTimeout.isExpired())
     {
-      _connectHandle = ConnectHandle::invalid();
+      _connectHandle = ConnectHandle();
       break;
     }
   }

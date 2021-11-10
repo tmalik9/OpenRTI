@@ -135,6 +135,14 @@ public:
   void acceptInternalMessage(const EnableTimeConstrainedNotifyMessage& message);
   void acceptInternalMessage(const DisableTimeConstrainedNotifyMessage& message);
 
+  void acceptInternalMessage(const ResetFederationInitiateMessage& message);
+  void acceptInternalMessage(const ResetFederationDoneMessage& message);
+
+  void acceptInternalMessage(const ResetFederationBegunMessage& message);
+  void acceptInternalMessage(const ResetFederationCompleteMessage& message);
+
+  void acceptInternalMessage(const AttributeOwnershipRequestAcquireMessage& message);
+  void acceptInternalMessage(const AttributeOwnershipRequestDivestMessage& message);
 
   std::pair<CreateFederationExecutionResponseType, std::string>
   dispatchWaitCreateFederationExecutionResponse(const AbsTimeout& timeout);
@@ -243,7 +251,7 @@ private:
   Mutex _callbackMessageListMutex;
 
   std::shared_ptr<AbstractNotificationHandle> _notificationHandle;
-  CallbackModel _callbackModel = HLA_EVOKED;
+  CallbackModel _callbackModel = CallbackModel::HLA_EVOKED;
   SharedPtr<ImmediateCallbackDispatcher> _immediateCallbackDispatcher;
   
 protected:

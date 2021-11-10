@@ -108,7 +108,7 @@ public:
     if (!isConnected())
       throw NotConnected(std::string("Could not get connect RTI of federation execution \"") +
                          federationExecutionName + std::string("\"."));
-    if (getProtocolVersion() == 8)
+    if (getProtocolVersion() <= 8)
     {
       // The create request message
       SharedPtr<CreateFederationExecutionRequestMessage> request = MakeShared<CreateFederationExecutionRequestMessage>();
@@ -119,7 +119,7 @@ public:
       // Send this message and wait for the response
       send(request);
     }
-    else if (getProtocolVersion() == 9)
+    else if (getProtocolVersion() == 9 || getProtocolVersion() == 10)
     {
       // The create request message
       SharedPtr<CreateFederationExecutionRequest2Message> request = MakeShared<CreateFederationExecutionRequest2Message>();
@@ -203,7 +203,7 @@ public:
    
     // The join request message
     // the protocol version might even be checked later
-    if (getProtocolVersion() == 8)
+    if (getProtocolVersion() <= 8)
     {
       SharedPtr<JoinFederationExecutionRequestMessage> request = MakeShared<JoinFederationExecutionRequestMessage>();
       request->setFederationExecution(federationExecutionName);
@@ -214,7 +214,7 @@ public:
       // Send this message and wait for the response
       send(request);
     }
-    else if (getProtocolVersion() == 9)
+    else if (getProtocolVersion() == 9 || getProtocolVersion() == 10)
     {
       SharedPtr<JoinFederationExecutionRequest2Message> request = MakeShared<JoinFederationExecutionRequest2Message>();
       request->setFederationExecution(federationExecutionName);
@@ -543,9 +543,12 @@ public:
     Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
     if (!objectClass)
       throw ObjectClassNotDefined(objectClassHandle.toString());
-    for (AttributeHandleVector::const_iterator i = attributeHandleVector.begin(); i != attributeHandleVector.end(); ++i)
-      if (!objectClass->getAttribute(*i))
-        throw AttributeNotDefined(i->toString());
+    for (auto attributeHandle : attributeHandleVector)
+    {
+      Federate::Attribute* attribute = objectClass->getAttribute(attributeHandle);
+      if (attribute == nullptr)
+        throw AttributeNotDefined(attributeHandle.toString());
+    }
 
     bool objectClassFreshPublished = false;
     // Mark the objectclass itself as published.
@@ -553,9 +556,10 @@ public:
     AttributeHandleVector::iterator j = attributeHandleVector.begin();
     if (objectClass->setPublicationType(Published)) {
       objectClassFreshPublished = true;
-      if (attributeHandleVector.empty() || attributeHandleVector.front() != AttributeHandle(0))
+      if (std::find(attributeHandleVector.begin(), attributeHandleVector.end(), AttributeHandle(0)) == attributeHandleVector.end())
+      {
         j = attributeHandleVector.insert(attributeHandleVector.begin(), AttributeHandle(0));
-      ++j;
+      }
     }
     for (AttributeHandleVector::const_iterator i = j; i != attributeHandleVector.end(); ++i) {
       // returns true if there is a change in the publication state
@@ -867,7 +871,7 @@ public:
          i != _federate->getObjectInstanceHandleMap().end();) {
       if (i->second->getObjectClassHandle() != objectClassHandle) {
         ++i;
-      } else if (i->second->isOwnedByFederate()) {
+      } else if (i->second->isOwnedByFederate(getFederateHandle())) {
         ++i;
       } else {
         _releaseObjectInstance(ObjectInstanceHandle((i++)->first));
@@ -924,7 +928,7 @@ public:
            i != _federate->getObjectInstanceHandleMap().end();) {
         if (i->second->getObjectClassHandle() != objectClassHandle) {
           ++i;
-        } else if (i->second->isOwnedByFederate()) {
+        } else if (i->second->isOwnedByFederate(getFederateHandle())) {
           ++i;
         } else {
           _releaseObjectInstance(ObjectInstanceHandle((i++)->first));
@@ -1239,7 +1243,7 @@ public:
 
     ObjectInstanceHandleNamePair handleNamePair = _getFreeObjectInstanceHandleNamePair();
 
-    _federate->insertObjectInstance(handleNamePair.first, handleNamePair.second, objectClassHandle, true);
+    _federate->insertObjectInstance(handleNamePair.first, handleNamePair.second, objectClassHandle);
 
     SharedPtr<InsertObjectInstanceMessage> request;
     request = MakeShared<InsertObjectInstanceMessage>();
@@ -1335,7 +1339,7 @@ public:
     // Once we have survived, we know that the objectInstanceName given in the argument is unique and ours.
     // Also the object instance handle in this local scope must be valid and ours.
 
-    _federate->insertObjectInstance(objectInstanceHandle, objectInstanceName, objectClassHandle, true);
+    _federate->insertObjectInstance(objectInstanceHandle, objectInstanceName, objectClassHandle);
 
     SharedPtr<InsertObjectInstanceMessage> request;
     request = MakeShared<InsertObjectInstanceMessage>();
@@ -1405,7 +1409,7 @@ public:
       const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(i->getAttributeHandle());
       if (!instanceAttribute)
         throw AttributeNotDefined(i->getAttributeHandle().toString());
-      if (!instanceAttribute->getIsOwnedByFederate())
+      if (!instanceAttribute->isOwnedByFederate(getFederateHandle()))
         throw AttributeNotOwned(i->getAttributeHandle().toString());
 #ifdef DEBUG_PRINTF
       Federate::ObjectClass* objectClass = _federate->getObjectClass(objectInstance->getObjectClassHandle());
@@ -1467,7 +1471,7 @@ public:
       const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(i->getAttributeHandle());
       if (!instanceAttribute)
         throw AttributeNotDefined(i->getAttributeHandle().toString());
-      if (!instanceAttribute->getIsOwnedByFederate())
+      if (!instanceAttribute->isOwnedByFederate(getFederateHandle()))
         throw AttributeNotOwned(i->getAttributeHandle().toString());
       unsigned index0 = instanceAttribute->getTransportationType();
       unsigned index1 = RECEIVE;
@@ -1592,6 +1596,12 @@ public:
     for (std::vector<ParameterValue>::const_iterator i = parameterValues.begin(); i != parameterValues.end(); ++i)
       if (!interactionClass->getParameter(i->getParameterHandle()))
         throw InteractionParameterNotDefined(i->getParameterHandle().toString());
+
+    if (getTimeManagement()->getIsResetInitiated() || getTimeManagement()->getIsResetPending())
+    {
+      throw ResetInProgress();
+    }
+
     bool timeRegulationEnabled = getTimeManagement()->getTimeRegulationEnabled();
 
     std::string reason;
@@ -1649,7 +1659,7 @@ public:
     Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
       throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
-    if (!objectInstance->isOwnedByFederate())
+    if (!objectInstance->isOwnedByFederate(getFederateHandle()))
       throw DeletePrivilegeNotHeld(objectInstanceHandle.toString());
 
     SharedPtr<DeleteObjectInstanceMessage> request;
@@ -1683,7 +1693,7 @@ public:
     if (!objectInstance)
       throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
     const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(AttributeHandle(0));
-    if (!instanceAttribute || !objectInstance->isOwnedByFederate())
+    if (!instanceAttribute || !instanceAttribute->isOwnedByFederate(getFederateHandle()))
       throw DeletePrivilegeNotHeld(objectInstanceHandle.toString());
     bool timeRegulationEnabled = getTimeManagement()->getTimeRegulationEnabled();
     if (timeRegulationEnabled && getTimeManagement()->logicalTimeAlreadyPassed(logicalTime))
@@ -1734,7 +1744,7 @@ public:
     Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
       throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
-    if (objectInstance->ownsAnyAttribute())
+    if (objectInstance->ownsAnyAttribute(getFederateHandle()))
       throw FederateOwnsAttributes(objectInstanceHandle.toString());
 
     throw RTIinternalError("Not implemented!");
@@ -1757,15 +1767,15 @@ public:
     Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
       throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
-    for (AttributeHandleVector::const_iterator j = attributeHandleVector.begin(); j != attributeHandleVector.end(); ++j) {
-      const Federate::InstanceAttribute* attribute = objectInstance->getInstanceAttribute(j->getHandle());
+    for (auto& attributeHandle : attributeHandleVector) {
+      const Federate::InstanceAttribute* attribute = objectInstance->getInstanceAttribute(attributeHandle);
       if (!attribute)
-        throw AttributeNotDefined(j->toString());
-      if (!attribute->getIsOwnedByFederate())
-        throw AttributeNotOwned(j->toString());
+        throw AttributeNotDefined(attributeHandle.toString());
+      if (!attribute->isOwnedByFederate(getFederateHandle()))
+        throw AttributeNotOwned(attributeHandle.toString());
     }
-    for (AttributeHandleVector::const_iterator j = attributeHandleVector.begin(); j != attributeHandleVector.end(); ++j) {
-      objectInstance->getInstanceAttribute(j->getHandle())->setTransportationType(transportationType);
+    for (auto& attributeHandle : attributeHandleVector) {
+      objectInstance->getInstanceAttribute(attributeHandle)->setTransportationType(transportationType);
     }
   }
 
@@ -1808,7 +1818,7 @@ public:
     if (!objectInstance)
       throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
     for (AttributeHandleVector::const_iterator j = attributeHandleVector.begin(); j != attributeHandleVector.end(); ++j) {
-      if (!objectInstance->getInstanceAttribute(j->getHandle()))
+      if (!objectInstance->getInstanceAttribute(*j))
         throw AttributeNotDefined(j->toString());
     }
 
@@ -1938,7 +1948,51 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
-    throw RTIinternalError("Not implemented");
+    Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
+    ObjectClassHandle objectClassHandle = objectInstance->getObjectClassHandle();
+    Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
+    if (!objectClass)
+      throw ObjectClassNotDefined(objectClassHandle.toString());
+    for (AttributeHandle attributeHandle : attributeHandleVector) {
+      Federate::Attribute* classAttribute = objectClass->getAttribute(attributeHandle);
+      if (classAttribute == nullptr)
+        throw AttributeNotDefined(attributeHandle.toString());
+      Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+      DebugPrintf("%s: object=(%s, %s) attribute=(%s) owner=(%s)\n", __FUNCTION__,
+                  objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                  classAttribute->getName().c_str(),
+                  instanceAttribute->getOwnerFederate().toString().c_str()
+                  );
+      if (instanceAttribute->getOwnerFederate() != getFederateHandle())
+      {
+        throw AttributeNotOwned(attributeHandle.toString());
+      }
+      if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Acquiring)
+      {
+        instanceAttribute->setOwnershipTransferState(OwnershipTransferState::None);
+        instanceAttribute->setOwnerFederate(instanceAttribute->getFederateWillingToAcquire());
+        DebugPrintf("%s: divesting+release requested: object=(%s, %s) attribute=(%s) owner=(%s)\n", __FUNCTION__,
+                    objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                    instanceAttribute->getClassAttribute().getName().c_str(),
+                    instanceAttribute->getOwnerFederate().toString().c_str()
+                    );
+      }
+      else
+      {
+        instanceAttribute->setOwnershipTransferState(OwnershipTransferState::Divesting);
+        instanceAttribute->setOwnerFederate(FederateHandle());
+      }
+    }
+
+    SharedPtr<AttributeOwnershipRequestDivestMessage> request = MakeShared<AttributeOwnershipRequestDivestMessage>();
+    request->setFederationHandle(getFederationHandle());
+    request->setObjectClassHandle(getKnownObjectClassHandle(objectInstanceHandle));
+    request->setObjectInstanceHandle(objectInstanceHandle);
+    request->setAttributeHandles(attributeHandleVector);
+    request->setUnconditional(true);
+    send(request);
   }
 
   void negotiatedAttributeOwnershipDivestiture(ObjectInstanceHandle objectInstanceHandle, AttributeHandleVector& attributeHandleVector, VariableLengthData& tag)
@@ -1956,7 +2010,37 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
-    throw RTIinternalError("Not implemented");
+    Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
+    ObjectClassHandle objectClassHandle = objectInstance->getObjectClassHandle();
+    Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
+    if (!objectClass)
+      throw ObjectClassNotDefined(objectClassHandle.toString());
+    for (AttributeHandle attributeHandle : attributeHandleVector) {
+      Federate::Attribute* classAttribute = objectClass->getAttribute(attributeHandle);
+      if (classAttribute == nullptr)
+        throw AttributeNotDefined(attributeHandle.toString());
+      Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+      DebugPrintf("%s: object=(%s, %s) attribute=(%s) owner=(%s)\n", __FUNCTION__,
+                  objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                  classAttribute->getName().c_str(),
+                  instanceAttribute->getOwnerFederate().toString().c_str()
+                  );
+      if (instanceAttribute->getOwnerFederate() != getFederateHandle())
+      {
+        throw AttributeNotOwned(attributeHandle.toString());
+      }
+    }
+
+    SharedPtr<AttributeOwnershipRequestDivestMessage> request = MakeShared<AttributeOwnershipRequestDivestMessage>();
+    request->setFederationHandle(getFederationHandle());
+    request->setObjectClassHandle(getKnownObjectClassHandle(objectInstanceHandle));
+    request->setObjectInstanceHandle(objectInstanceHandle);
+    request->setAttributeHandles(attributeHandleVector);
+    request->setTag(tag);
+    request->setUnconditional(false);
+    send(request);
   }
 
   void confirmDivestiture(ObjectInstanceHandle objectInstanceHandle, AttributeHandleVector& attributeHandleVector, VariableLengthData& tag)
@@ -1994,7 +2078,46 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
-    throw RTIinternalError("Not implemented");
+    Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
+    ObjectClassHandle objectClassHandle = objectInstance->getObjectClassHandle();
+    Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
+    if (!objectClass)
+      throw ObjectClassNotDefined(objectClassHandle.toString());
+    if (objectClass->getPublicationType() != PublicationType::Published)
+      throw ObjectClassNotPublished(objectClass->getFQName());
+    AttributeHandleVector requestAttributeHandleVector;
+    for (auto attributeHandle : attributeHandleVector) {
+      Federate::Attribute* classAttribute = objectClass->getAttribute(attributeHandle);
+      if (classAttribute == nullptr)
+        throw AttributeNotDefined(objectClass->getFQName() + "." + classAttribute->getName());
+      Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+      DebugPrintf("%s: object=(%s, %s) attribute=(%s) owner=(%s)\n", __FUNCTION__,
+                  objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                  classAttribute->getName().c_str(),
+                  instanceAttribute->getOwnerFederate().toString().c_str()
+                  );
+      if (objectClass->getAttributePublicationType(attributeHandle) != PublicationType::Published)
+        throw AttributeNotPublished(objectClass->getFQName() + "." + classAttribute->getName());
+      if (instanceAttribute->getOwnerFederate() == getFederateHandle())
+        throw FederateOwnsAttributes(objectClass->getFQName() + "." + classAttribute->getName());
+      if (instanceAttribute->getOwnershipTransferState() != OwnershipTransferState::Acquiring)
+      {
+        instanceAttribute->setOwnershipTransferState(OwnershipTransferState::Acquiring);
+        requestAttributeHandleVector.push_back(attributeHandle);
+      }
+    }
+
+    SharedPtr<AttributeOwnershipRequestAcquireMessage> request = MakeShared<AttributeOwnershipRequestAcquireMessage>();
+    request->setFederationHandle(getFederationHandle());
+    request->setObjectClassHandle(getKnownObjectClassHandle(objectInstanceHandle));
+    request->setObjectInstanceHandle(objectInstanceHandle);
+    request->setAttributeHandles(requestAttributeHandleVector);
+    request->setTag(tag);
+    request->setIfAvailable(false);
+    request->setFederateHandle(getFederateHandle());
+    send(request);
   }
 
   void attributeOwnershipAcquisitionIfAvailable(ObjectInstanceHandle objectInstanceHandle, AttributeHandleVector& attributeHandleVector)
@@ -2014,7 +2137,37 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
-    throw RTIinternalError("Not implemented");
+    Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
+    ObjectClassHandle objectClassHandle = objectInstance->getObjectClassHandle();
+    Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
+    if (!objectClass)
+      throw ObjectClassNotDefined(objectClassHandle.toString());
+    AttributeHandleVector requestAttributeHandleVector;
+    for (auto attributeHandle : attributeHandleVector) {
+      if (!objectClass->getAttribute(attributeHandle))
+        throw AttributeNotDefined(attributeHandle.toString());
+      Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+      Federate::Attribute* classAttribute = objectClass->getAttribute(attributeHandle);
+      DebugPrintf("%s: object=(%s, %s) attribute=(%s) owner=(%s)\n", __FUNCTION__,
+                  objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                  classAttribute->getName().c_str(),
+                  instanceAttribute->getOwnerFederate().toString().c_str()
+                  );
+      if (instanceAttribute->getOwnerFederate() == FederateHandle())
+      {
+        requestAttributeHandleVector.push_back(attributeHandle);
+      }
+    }
+
+    SharedPtr<AttributeOwnershipRequestAcquireMessage> request = MakeShared<AttributeOwnershipRequestAcquireMessage>();
+    request->setFederationHandle(getFederationHandle());
+    request->setObjectClassHandle(getKnownObjectClassHandle(objectInstanceHandle));
+    request->setObjectInstanceHandle(objectInstanceHandle);
+    request->setAttributeHandles(requestAttributeHandleVector);
+    request->setIfAvailable(false);
+    send(request);
   }
 
   void attributeOwnershipReleaseDenied(ObjectInstanceHandle, AttributeHandleVector&)
@@ -2049,7 +2202,25 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
-    throw RTIinternalError("Not implemented");
+    Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
+    ObjectClassHandle objectClassHandle = objectInstance->getObjectClassHandle();
+    Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
+    if (!objectClass)
+      throw ObjectClassNotDefined(objectClassHandle.toString());
+    for (AttributeHandleVector::const_iterator j = attributeHandleVector.begin(); j != attributeHandleVector.end(); ++j) {
+      if (!objectClass->getAttribute(*j))
+        throw AttributeNotDefined(j->toString());
+    }
+
+    SharedPtr<AttributeOwnershipRequestDivestMessage> request = MakeShared<AttributeOwnershipRequestDivestMessage>();
+    request->setFederationHandle(getFederationHandle());
+    request->setObjectClassHandle(getKnownObjectClassHandle(objectInstanceHandle));
+    request->setObjectInstanceHandle(objectInstanceHandle);
+    request->setAttributeHandles(attributeHandleVector);
+    request->setUnconditional(false);
+    send(request);
   }
 
   void cancelNegotiatedAttributeOwnershipDivestiture(ObjectInstanceHandle objectInstanceHandle, AttributeHandleVector& attributeHandleVector)
@@ -2067,7 +2238,24 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
-    throw RTIinternalError("Not implemented");
+    Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
+    ObjectClassHandle objectClassHandle = objectInstance->getObjectClassHandle();
+    Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
+    if (!objectClass)
+      throw ObjectClassNotDefined(objectClassHandle.toString());
+    for (AttributeHandleVector::const_iterator j = attributeHandleVector.begin(); j != attributeHandleVector.end(); ++j) {
+      if (!objectClass->getAttribute(*j))
+        throw AttributeNotDefined(j->toString());
+    }
+
+    SharedPtr<AttributeOwnershipRequestCancelDivestMessage> request = MakeShared<AttributeOwnershipRequestCancelDivestMessage>();
+    request->setFederationHandle(getFederationHandle());
+    request->setObjectClassHandle(getKnownObjectClassHandle(objectInstanceHandle));
+    request->setObjectInstanceHandle(objectInstanceHandle);
+    request->setAttributeHandles(attributeHandleVector);
+    send(request);
   }
 
   void cancelAttributeOwnershipAcquisition(ObjectInstanceHandle objectInstanceHandle, AttributeHandleVector& attributeHandleVector)
@@ -2085,7 +2273,24 @@ public:
       throw NotConnected();
     if (!_federate.valid())
       throw FederateNotExecutionMember();
-    throw RTIinternalError("Not implemented");
+    Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
+    ObjectClassHandle objectClassHandle = objectInstance->getObjectClassHandle();
+    Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
+    if (!objectClass)
+      throw ObjectClassNotDefined(objectClassHandle.toString());
+    for (AttributeHandleVector::const_iterator j = attributeHandleVector.begin(); j != attributeHandleVector.end(); ++j) {
+      if (!objectClass->getAttribute(*j))
+        throw AttributeNotDefined(j->toString());
+    }
+
+    SharedPtr<AttributeOwnershipRequestCancelAcquireMessage> request = MakeShared<AttributeOwnershipRequestCancelAcquireMessage>();
+    request->setFederationHandle(getFederationHandle());
+    request->setObjectClassHandle(getKnownObjectClassHandle(objectInstanceHandle));
+    request->setObjectInstanceHandle(objectInstanceHandle);
+    request->setAttributeHandles(attributeHandleVector);
+    send(request);
   }
 
   void queryAttributeOwnership(ObjectInstanceHandle objectInstanceHandle, AttributeHandle attributeHandle)
@@ -2131,10 +2336,10 @@ public:
     const Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
       throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
-    const Federate::InstanceAttribute* attribute = objectInstance->getInstanceAttribute(attributeHandle);
-    if (!attribute)
+    const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+    if (!instanceAttribute)
       throw AttributeNotDefined(attributeHandle.toString());
-    return attribute->getIsOwnedByFederate();
+    return instanceAttribute->getOwnerFederate() == getFederateHandle();
   }
 
   void enableTimeRegulation(const NativeLogicalTimeInterval& lookahead)
@@ -2276,6 +2481,10 @@ public:
       throw LogicalTimeAlreadyPassed(_timeManagement->logicalTimeToString(logicalTime));
     if (_timeManagement->getTimeAdvancePending())
       throw InTimeAdvancingState();
+    if (_timeManagement->getIsResetInitiated())
+      throw ResetInProgress();
+    if (_timeManagement->getIsResetPending())
+      throw ResetInProgress();
     if (_timeManagement->getTimeRegulationEnablePending())
       throw RequestForTimeRegulationPending();
     if (_timeManagement->getTimeConstrainedEnablePending())
@@ -2600,7 +2809,7 @@ public:
       const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(*j);
       if (!instanceAttribute)
         throw AttributeNotDefined(j->toString());
-      if (!instanceAttribute->getIsOwnedByFederate())
+      if (instanceAttribute->getOwnerFederate() != getFederateHandle())
         throw AttributeNotOwned(j->toString());
     }
     for (AttributeHandleVector::const_iterator j = attributeHandleVector.begin(); j != attributeHandleVector.end(); ++j) {
@@ -3553,7 +3762,7 @@ public:
       AttributeHandleVector attributeHandleVector;
       for (uint32_t j = 0; j < numAttributes; ++j) {
         const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(AttributeHandle(j));
-        if (!instanceAttribute->getIsOwnedByFederate())
+        if (instanceAttribute->getOwnerFederate() != getFederateHandle())
           continue;
         attributeHandleVector.reserve(numAttributes);
         attributeHandleVector.push_back(AttributeHandle(j));
@@ -3615,7 +3824,7 @@ public:
       AttributeHandleVector attributeHandleVector;
       for (uint32_t j = 0; j < numAttributes; ++j) {
         const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(AttributeHandle(j));
-        if (!instanceAttribute->getIsOwnedByFederate())
+        if (instanceAttribute->getOwnerFederate() != getFederateHandle())
           continue;
         attributeHandleVector.reserve(numAttributes);
         attributeHandleVector.push_back(AttributeHandle(j));
@@ -3854,6 +4063,38 @@ public:
     objectClass->setDeliverToSelf(enable);
   }
 
+  void requestFederationReset(const VariableLengthData& tag)
+  {
+    if (_timeManagement->getTimeAdvancePending())
+      throw InTimeAdvancingState();
+    if (_timeManagement->getTimeRegulationEnablePending())
+      throw RequestForTimeRegulationPending();
+    if (_timeManagement->getTimeConstrainedEnablePending())
+      throw RequestForTimeConstrainedPending();
+    if (getProtocolVersion() < 10)
+      throw ResetNotSupportedByRti();
+    if (getTimeManagement()->getIsResetInitiated() || getTimeManagement()->getIsResetPending())
+    {
+      throw ResetInProgress();
+    }
+    _timeManagement->requestFederationReset(*this, tag);
+  }
+
+  void federationResetBegun(const VariableLengthData& tag)
+  {
+    //DebugPrintf("%s: state=%s\n", __FUNCTION__, to_string(getTimeManagement()->getTimeAdvanceMode()).c_str());
+    if (!getTimeManagement()->getIsResetInitiated())
+      throw ResetNotInProgress("federation reset not in progress");
+    _timeManagement->federationResetBegun(*this, tag);
+  }
+
+  void federationResetComplete(bool success, const VariableLengthData& tag)
+  {
+    //DebugPrintf("%s: state=%s\n", __FUNCTION__, to_string(getTimeManagement()->getTimeAdvanceMode()).c_str());
+    if (!getTimeManagement()->getIsResetPending())
+      throw ResetNotBegun("federation was not begun by federate");
+    _timeManagement->federationResetComplete(*this, success, tag);
+  }
 
   void _requestObjectInstanceHandles(unsigned count)
   {
@@ -4065,7 +4306,7 @@ public:
     // Ok we get duplicate inserts. FIXME investigate this
     if (_federate->getObjectInstance(message.getObjectInstanceHandle()))
       return;
-    _federate->insertObjectInstance(message.getObjectInstanceHandle(), message.getName(), objectClassHandle, false);
+    _federate->insertObjectInstance(message.getObjectInstanceHandle(), message.getName(), objectClassHandle, message.getAttributeStateVector());
     discoverObjectInstance(message.getObjectInstanceHandle(), objectClassHandle, message.getName());
   }
   
@@ -4215,6 +4456,21 @@ public:
     OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
     _timeManagement->acceptCallbackMessage(*this, message);
   }
+
+  void acceptCallbackMessage(const ResetFederationInitiateMessage& message)
+  {
+    if (!_timeManagement.valid())
+      return;
+    _timeManagement->acceptCallbackMessage(*this, message);
+  }
+
+  void acceptCallbackMessage(const ResetFederationDoneMessage& message)
+  {
+    if (!_timeManagement.valid())
+      return;
+    _timeManagement->acceptCallbackMessage(*this, message);
+  }
+
   void acceptCallbackMessage(const RequestAttributeUpdateMessage& message)
   {
     if (!_federate.valid())
@@ -4226,10 +4482,10 @@ public:
       return;
     AttributeHandleVector attributeHandleVector;
     for (AttributeHandleVector::const_iterator j = message.getAttributeHandles().begin(); j != message.getAttributeHandles().end(); ++j) {
-      Federate::InstanceAttribute* attribute = objectInstance->getInstanceAttribute(j->getHandle());
+      Federate::InstanceAttribute* attribute = objectInstance->getInstanceAttribute(*j);
       if (!attribute)
         continue;
-      if (!attribute->getIsOwnedByFederate())
+      if (!attribute->isOwnedByFederate(getFederateHandle()))
         continue;
       attributeHandleVector.reserve(message.getAttributeHandles().size());
       attributeHandleVector.push_back(*j);
@@ -4239,7 +4495,75 @@ public:
     provideAttributeValueUpdate(objectInstanceHandle, attributeHandleVector, message.getTag());
   }
 
+  void acceptCallbackMessage(const AttributeOwnershipRequestAcquireMessage& message)
+  {
+    if (!_federate.valid())
+      return;
+    ObjectInstanceHandle objectInstanceHandle = message.getObjectInstanceHandle();
+    Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      return;
+    ObjectClassHandle objectClassHandle = objectInstance->getObjectClassHandle();
+    Federate::ObjectClass* objectClass = _federate->getObjectClass(objectClassHandle);
+    AttributeHandleVector attributeHandleVector;
+    for (auto attributeHandle : message.getAttributeHandles()) {
+      Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+      if (!instanceAttribute)
+        continue;
+      Federate::Attribute* classAttribute = objectClass->getAttribute(attributeHandle);
+      DebugPrintf("%s(AttributeOwnershipRequestAcquireMessage): object=(%s, %s) attribute=(%s) owner=(%s) state=%s\n", __FUNCTION__,
+                  objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                  classAttribute->getName().c_str(),
+                  instanceAttribute->getOwnerFederate().toString().c_str(),
+                  to_string(instanceAttribute->getOwnershipTransferState()).c_str()
+                  );
+      if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Divesting)
+      {
+        // we already divested of this attribute - immediately assign it to the requester
+        instanceAttribute->setOwnerFederate(message.getFederateHandle());
+      }
+      else if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Acquiring)
+      {
+        DebugPrintf("%s(AttributeOwnershipRequestAcquireMessage): already acquiring object=(%s, %s) attribute=(%s) owner=(%s) state=%s\n", __FUNCTION__,
+                    objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                    classAttribute->getName().c_str(),
+                    instanceAttribute->getOwnerFederate().toString().c_str(),
+                    to_string(instanceAttribute->getOwnershipTransferState()).c_str()
+                    );
+      }
+      else
+      {
+        attributeHandleVector.reserve(message.getAttributeHandles().size());
+        attributeHandleVector.push_back(attributeHandle);
+      }
+    }
+    if (attributeHandleVector.empty())
+      return;
+    requestAttributeOwnershipRelease(objectInstanceHandle, attributeHandleVector, message.getTag());
+  }
 
+  void acceptCallbackMessage(const AttributeOwnershipRequestDivestMessage& message)
+  {
+    if (!_federate.valid())
+      return;
+    ObjectInstanceHandle objectInstanceHandle = message.getObjectInstanceHandle();
+    Federate::ObjectInstance* objectInstance = _federate->getObjectInstance(objectInstanceHandle);
+    AttributeHandleVector acquiredAttributes;
+    if (!objectInstance)
+      return;
+    for (auto attributeHandle : message.getAttributeHandles()) {
+      Federate::InstanceAttribute* attribute = objectInstance->getInstanceAttribute(attributeHandle);
+      if (!attribute)
+        continue;
+      if (attribute->getOwnershipTransferState() == OwnershipTransferState::Acquiring)
+      {
+        acquiredAttributes.push_back(attributeHandle);
+        attribute->setOwnershipTransferState(OwnershipTransferState::None);
+        attribute->setOwnerFederate(getFederateHandle());
+      }
+    }
+    attributeOwnershipAcquisitionNotification(objectInstanceHandle, acquiredAttributes, message.getTag());
+  }
 
   // The callback into the binding concrete implementation.
   virtual void connectionLost(const std::string& faultDescription) = 0;
@@ -4321,6 +4645,10 @@ public:
   virtual void timeRegulationEnabled(const NativeLogicalTime& logicalTime) = 0;
   virtual void timeConstrainedEnabled(const NativeLogicalTime& logicalTime) = 0;
   virtual void timeAdvanceGrant(const NativeLogicalTime& logicalTime) = 0;
+  // vector extensions
+  virtual void federationResetInitiated(const NativeLogicalTime& logicalTime, const VariableLengthData& tag) = 0;
+  virtual void federationResetAborted(const NativeLogicalTime& logicalTime, const VariableLengthData& tag) = 0;
+  virtual void federationResetDone(const NativeLogicalTime& logicalTime, const VariableLengthData& tag) = 0;
 
   virtual void requestRetraction(MessageRetractionHandle messageRetractionHandle) = 0;
 

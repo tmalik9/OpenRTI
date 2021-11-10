@@ -23,7 +23,9 @@
 #include "Export.h"
 #include "Referenced.h"
 #include "Message.h"
+#include "Exception.h"
 #include <string>
+
 namespace OpenRTI {
 
 class InternalAmbassador;
@@ -46,8 +48,11 @@ public:
     TimeAdvanceRequestAvailable,
     NextMessageRequest,
     NextMessageRequestAvailable,
-    FlushQueueRequest
+    FlushQueueRequest,
+    ResetInitiated,
+    ResetPending,
   };
+  friend std::string OPENRTI_API to_string(TimeAdvanceMode);
 
   InternalTimeManagement();
   virtual ~InternalTimeManagement() noexcept = default;
@@ -79,7 +84,14 @@ public:
   { return !getTimeConstrainedDisabled(); }
 
   void setTimeAdvanceMode(TimeAdvanceMode timeAdvanceMode)
-  { _timeAdvanceMode = timeAdvanceMode; }
+  {
+    //DebugPrintf("%s: %s => %s\n", __FUNCTION__, to_string(_timeAdvanceMode).c_str(), to_string(timeAdvanceMode).c_str());
+    // if new state is ResetPending, previous state must be ResetInitiated
+    OpenRTIAssert(timeAdvanceMode!=ResetPending||_timeAdvanceMode == ResetInitiated);
+    // if new state is ResetInitiated, previous state must not be one of ResetInitiated or ResetPending
+    OpenRTIAssert(timeAdvanceMode!=ResetInitiated||(_timeAdvanceMode != ResetInitiated && timeAdvanceMode!=ResetPending));
+    _timeAdvanceMode = timeAdvanceMode;
+  }
   TimeAdvanceMode getTimeAdvanceMode() const
   { return _timeAdvanceMode; }
   bool getTimeAdvancePending() const
@@ -93,6 +105,8 @@ public:
   bool getIsAnyNextMessageMode() const {
     return _timeAdvanceMode == NextMessageRequest || _timeAdvanceMode == NextMessageRequestAvailable;
   }
+  bool getIsResetInitiated() const { return _timeAdvanceMode == ResetInitiated; }
+  bool getIsResetPending() const { return _timeAdvanceMode == ResetPending; }
 
   bool getAsynchronousDeliveryEnabled() const {
     return _asynchronousDeliveryEnabled;
@@ -111,7 +125,7 @@ public:
   OrderType getTimeStampOrderDelivery(OrderType orderType) const
   {
     if (!getTimeConstrainedEnabled())
-      return RECEIVE;
+      return OrderType::RECEIVE;
     return orderType;
   }
 
@@ -126,6 +140,10 @@ public:
   virtual void acceptInternalMessage(InternalAmbassador& ambassador, const CommitLowerBoundTimeStampMessage& message) = 0;
   virtual void acceptInternalMessage(InternalAmbassador& ambassador, const CommitLowerBoundTimeStampResponseMessage& message) = 0;
   virtual void acceptInternalMessage(InternalAmbassador& ambassador, const LockedByNextMessageRequestMessage& message) = 0;
+  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const ResetFederationInitiateMessage& message) = 0;
+  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const ResetFederationDoneMessage& message) = 0;
+  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const ResetFederationBegunMessage& message) = 0;
+  virtual void acceptInternalMessage(InternalAmbassador& ambassador, const ResetFederationCompleteMessage& message) = 0;
 
   virtual void queueTimeStampedMessage(InternalAmbassador& ambassador, const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback) = 0;
   virtual void queueReceiveOrderMessage(InternalAmbassador& ambassador, const AbstractMessage& message) = 0;

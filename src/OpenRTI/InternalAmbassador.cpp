@@ -363,6 +363,43 @@ InternalAmbassador::acceptInternalMessage(const LockedByNextMessageRequestMessag
 }
 
 void
+InternalAmbassador::acceptInternalMessage(const ResetFederationInitiateMessage& message)
+{
+  if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
+    timeManagement->acceptInternalMessage(*this, message);
+  }
+}
+
+void InternalAmbassador::acceptInternalMessage(const ResetFederationDoneMessage& message)
+{
+  if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
+    timeManagement->acceptInternalMessage(*this, message);
+  }
+}
+
+void InternalAmbassador::acceptInternalMessage(const ResetFederationBegunMessage& message)
+{
+  if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
+    timeManagement->acceptInternalMessage(*this, message);
+  }
+}
+
+void InternalAmbassador::acceptInternalMessage(const ResetFederationCompleteMessage& message)
+{
+  if (InternalTimeManagement* timeManagement = getTimeManagement())
+  {
+    OpenRTI::RecursiveScopeLock timeManagementLock(_timeManagementMutex);
+    timeManagement->acceptInternalMessage(*this, message);
+  }
+}
+
+void
 InternalAmbassador::acceptInternalMessage(const InsertRegionMessage& message)
 {
   Federate* federate = getFederate();
@@ -563,6 +600,50 @@ InternalAmbassador::acceptInternalMessage(const RequestClassAttributeUpdateMessa
 void InternalAmbassador::acceptInternalMessage(const QueryAttributeOwnershipRequestMessage& /*message*/)
 {
 
+}
+
+void
+InternalAmbassador::acceptInternalMessage(const AttributeOwnershipRequestAcquireMessage& message)
+{
+  Federate* federate = getFederate();
+  OpenRTIAssert(federate);
+  auto* objectInstance = federate->getObjectInstance(message.getObjectInstanceHandle());
+  auto* objectClass = federate->getObjectClass(objectInstance->getObjectClassHandle());
+  AttributeHandleVector ownedAttributes;
+  for (auto attributeHandle : message.getAttributeHandles())
+  {
+    auto* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+    auto* classAttribute = objectClass->getAttribute(attributeHandle);
+    if (instanceAttribute->getOwnerFederate() == federate->getFederateHandle())
+    {
+      DebugPrintf("%s(OWNED): object=(%s, %s) attribute=(%s) owner=(%s)\n", __FUNCTION__,
+                  objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                  classAttribute->getName().c_str(),
+                  instanceAttribute->getOwnerFederate().toString().c_str(),
+                  to_string(instanceAttribute->getOwnershipTransferState()).c_str()
+                  );
+      ownedAttributes.push_back(attributeHandle);
+    }
+    else
+    {
+      DebugPrintf("%s(NOT OWNED): object=(%s, %s) attribute=(%s) owner=(%s)\n", __FUNCTION__,
+                  objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                  classAttribute->getName().c_str(),
+                  instanceAttribute->getOwnerFederate().toString().c_str()
+                  );
+    }
+  }
+  if (!ownedAttributes.empty())
+  {
+    SharedPtr<AttributeOwnershipRequestAcquireMessage> callbackMessage = MakeShared<AttributeOwnershipRequestAcquireMessage>(message);
+    callbackMessage->setAttributeHandles(ownedAttributes);
+    queueCallback(callbackMessage);
+  }
+}
+
+void InternalAmbassador::acceptInternalMessage(const AttributeOwnershipRequestDivestMessage& message)
+{
+  queueCallback(message);
 }
 
 class OPENRTI_LOCAL InternalAmbassador::_CreateFederationExecutionFunctor {

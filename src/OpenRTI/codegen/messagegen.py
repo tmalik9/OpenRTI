@@ -1308,6 +1308,24 @@ class MessageDataType(StructDataType):
         'JoinFederationExecutionRequest2Message' : 105,
         'InsertModules2Message' : 106,
         'InsertObjectInstanceWithRegionsMessage' : 107,
+
+        'ResetFederationRequestMessage' : 108,
+        'ResetFederationInitiateMessage' : 109,
+        'ResetFederationDoneMessage' : 110,
+        'ResetFederationBegunMessage' : 111,
+        'ResetFederationCompleteMessage' : 112,
+
+
+        'AttributeOwnershipRequestDivest' : 113,
+        'AttributeOwnershipRequestAcquire' : 114,
+        'AttributeOwnershipResponseRelease' : 115,
+        'AttributeOwnershipResponseUnavailable' : 116,
+        'AttributeOwnershipConfirmDivestiture' : 117,
+        'AttributeOwnershipRequestCancelAcquire' : 118,
+        'AttributeOwnershipResponseCancelConfirmation' : 119,
+        'AttributeOwnershipRequestCancelDivest' : 120,
+        'AttributeOwnershipDivestConfirmation' : 121,
+        'AttributeOwnershipResponseOwnershipAcquired' : 122,
     }
     def getMessageOpcode(messageName):
         baseName =  messageName[:len(messageName)-7]

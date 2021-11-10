@@ -188,6 +188,7 @@ public:
     if (!federate)
       throw MessageError("Received ResignFederationExecutionRequestMessage for invalid federate handle!");
 
+    DebugPrintf("%s(%s%s): resign federate %s\n", __FUNCTION__, getServerPath().c_str(), (isRootServer() ? " (root)" : ""), federate->getName().c_str());
     // already done so ... just waiting for the response
     if (federate->getResignPending())
       return;
@@ -212,6 +213,7 @@ public:
       broadcast(connectHandle, request);
     }
 
+    // automatically achieve all sync points belonging to this federate 
     for (ServerModel::SynchronizationFederate::FirstList::iterator k = federate->getSynchronizationFederateList().begin();
          k != federate->getSynchronizationFederateList().end();) {
       if (!k->getSynchronization().getIsWaitingFor(federate->getFederateHandle()))
@@ -223,6 +225,18 @@ public:
         achieved->setLabel(k->getSynchronization().getLabel());
         achieved->getFederateHandleBoolPairVector().push_back(FederateHandleBoolPair(federate->getFederateHandle(), false));
         ++k;
+        accept(connectHandle, achieved.get());
+      }
+    }
+
+    for (ServerModel::ResettingFederate::FirstList::iterator k = federate->getResettingFederateList().begin();
+         k != federate->getResettingFederateList().end();k++) {
+    //for (auto& resettingFederate : federate->getResettingFederateList()) {
+      if (k->getState().getIsInitiated(federate->getFederateHandle())) {
+        SharedPtr<ResetFederationCompleteMessage> achieved = MakeShared<ResetFederationCompleteMessage>();
+        achieved->setFederationHandle(getFederationHandle());
+        achieved->setSuccess(true);
+        achieved->getFederateHandleBoolPairVector().push_back(FederateHandleBoolPair(federate->getFederateHandle(), true));
         accept(connectHandle, achieved.get());
       }
     }
@@ -240,6 +254,7 @@ public:
       broadcastToChildren(notify);
 
       // Remove the federate locally
+      DebugPrintf("%s(%s): erase federate %s\n", __FUNCTION__, getServerPath().c_str(), federate->getName().c_str());
       eraseFederate(*federate);
 
       // Remove a connect that runs idle
@@ -338,8 +353,7 @@ public:
       federationConnect->send(notify);
     }
 
-    SharedPtr<EraseFederationExecutionMessage> response;
-    response = MakeShared<EraseFederationExecutionMessage>();
+    SharedPtr<EraseFederationExecutionMessage> response = MakeShared<EraseFederationExecutionMessage>();
     response->setFederationHandle(getFederationHandle());
     federationConnect->sendAndDeactivate(response);
 
@@ -791,6 +805,137 @@ public:
     }
   }
 
+  // federation reset: currently, the request is only handled by the root node.
+  // This could probably changed by implementing a hierarchical reset
+  void accept(const ConnectHandle& connectHandle, const ResetFederationRequestMessage* message)
+  {
+    if (isRootServer()) {
+      //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+      bool supported = true;
+      // if any of the federates does not support reset, abort it early
+      for (auto& federationConnect : getConnectHandleFederationConnectMap())
+        if (federationConnect.getNodeConnect().getVersion() < 10)
+          supported = false;
+      if (!supported)
+      {
+        SharedPtr<ResetFederationDoneMessage> abortMessage = MakeShared<ResetFederationDoneMessage>();
+        abortMessage->setFederationHandle(getFederationHandle());
+        abortMessage->setTag(_resetState.getTag());
+        abortMessage->setSuccess(false);
+        //announce->setAddJoiningFederates(i->getAddJoiningFederates());
+        send(connectHandle, abortMessage);
+        return;
+      }
+      // all federates support reset, send initiate messages to the children
+      for (auto& federate : getFederateHandleFederateMap()) {
+        _resetState.insert(federate);
+      }
+      _resetState.setTag(message->getTag());
+
+      for (auto& federationConnect : getConnectHandleFederationConnectMap()) {
+        // build a list of all federates which take part in the reset.
+        FederateHandleVector federateHandleVector;
+        federateHandleVector.reserve(federationConnect.getFederateList().size());
+        for (ServerModel::Federate& federate : federationConnect.getFederateList()) {
+          if (!_resetState.getIsInitiated(federate.getFederateHandle()))
+            continue;
+          federateHandleVector.push_back(federate.getFederateHandle());
+        }
+        if (federateHandleVector.empty())
+          continue;
+
+        SharedPtr<ResetFederationInitiateMessage> announce = MakeShared<ResetFederationInitiateMessage>();
+        announce->setFederationHandle(getFederationHandle());
+        announce->setTag(_resetState.getTag());
+        announce->getFederateHandleVector().swap(federateHandleVector);
+        send(federationConnect.getConnectHandle(), announce);
+      }
+    } else {
+      // ... ask your father
+      /// FIXME in case of a dying parent, we need to reevaluate this too
+     sendToParent(SharedPtr<const AbstractMessage>(message));
+    }
+  }
+
+  void accept(const ConnectHandle& connectHandle, const ResetFederationInitiateMessage* message)
+  {
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+    for (auto& federatehandle : message->getFederateHandleVector()) {
+      OpenRTIAssert(federatehandle.valid());
+      _resetState.insert(*getFederate(federatehandle));
+    }
+    if (message->getFederateHandle().valid()) {
+      _resetState.insert(*getFederate(message->getFederateHandle()));
+    }
+    broadcastToChildren(SharedPtr<const AbstractMessage>(message));
+  }
+
+  void accept(const ConnectHandle& connectHandle, const ResetFederationBegunMessage* message)
+  {
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+    for (auto& federatehandle : message->getFederateHandleVector()) {
+      OpenRTIAssert(federatehandle.valid());
+      _resetState.begun(federatehandle);
+    }
+    if (message->getFederateHandle().valid()) {
+      _resetState.begun(message->getFederateHandle());
+    }
+    if (!isRootServer()) {
+      sendToParent(SharedPtr<const AbstractMessage>(message));
+    }
+  }
+
+  void accept(const ConnectHandle& connectHandle, const ResetFederationCompleteMessage* message)
+  {
+    for (auto& federatehandleBoolPair : message->getFederateHandleBoolPairVector()) {
+      OpenRTIAssert(federatehandleBoolPair.first.valid());
+      _resetState.complete(federatehandleBoolPair.first, federatehandleBoolPair.second);
+    }
+    if (message->getFederateHandle().valid())
+    {
+      _resetState.complete(message->getFederateHandle(), message->getSuccess());
+    }
+
+    if (isRootServer()) {
+      // we're the root ...
+      if (_resetState.getBegunFederateMap().empty() && _resetState.getInitiatedFederateMap().empty()) {
+        // there is no federate left in 'initiated' or 'begun' state - signal completion
+        //DebugPrintf("%s: success=%d message=%s\n", __FUNCTION__, _resetState.getSuccess(), message->toString().c_str());
+        SharedPtr<ResetFederationDoneMessage> response = MakeShared<ResetFederationDoneMessage>();
+        response->setFederationHandle(getFederationHandle());
+        // note: response.success decides whether or not this is an abort
+        response->setSuccess(_resetState.getSuccess());
+        response->setTag(message->getTag());
+        FederateHandleVector federateHandleVector;
+        for (auto& resettingFederate : _resetState.getCompleteFederateMap()) {
+          federateHandleVector.push_back(resettingFederate.getFederateHandle());
+        }
+        broadcastToChildren(federateHandleVector, response);
+        _resetState.clear();
+      }
+    } else {
+      // we're not the root: forward message
+      sendToParent(SharedPtr<const AbstractMessage>(message));
+    }
+  }
+
+  void accept(const ConnectHandle& connectHandle, const ResetFederationDoneMessage* message)
+  {
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message->toString().c_str());
+    if (message->getSuccess())
+    {
+      if (_resetState.getCompleteFederateMap().empty())
+        throw MessageError("ResetFederationCompleteMessage when federation reset not in progress!");
+      if (!_resetState.getInitiatedFederateMap().empty())
+        throw MessageError("ResetFederationCompleteMessage when some clients still in 'initiated' phase!");
+      if (!_resetState.getBegunFederateMap().empty())
+        throw MessageError("ResetFederationCompleteMessage when some clients still in 'begun' phase!");
+    }
+    broadcast(connectHandle, SharedPtr<const AbstractMessage>(message));
+    _resetState.clear();
+  }
+
+
   // Regions
   void accept(const ConnectHandle& connectHandle, const InsertRegionMessage* message)
   {
@@ -798,7 +943,7 @@ public:
          i != message->getRegionHandleDimensionHandleSetPairVector().end(); ++i) {
       ServerModel::Region* region = getOrCreateRegion(i->first);
       if (!region)
-        throw MessageError("InsertegionMessage for unknown Federate!");
+        throw MessageError("InsertRegionMessage for unknown Federate!");
       region->_dimensionHandleSet = i->second;
     }
 
@@ -1359,9 +1504,8 @@ public:
       ServerModel::ObjectInstance* objectInstance = getObjectInstance(*i);
       if (!objectInstance)
         throw MessageError("Got ReleaseMultipleObjectInstanceNameHandlePairsMessage for an unknown object instance!");
-      for (ServerModel::InstanceAttribute::HandleMap::iterator j = objectInstance->getAttributeHandleInstanceAttributeMap().begin();
-           j != objectInstance->getAttributeHandleInstanceAttributeMap().end(); ++j) {
-        j->removeConnect(connectHandle);
+      for (auto& instanceAttribute : objectInstance->getAttributeHandleInstanceAttributeMap()) {
+        instanceAttribute.removeConnect(connectHandle);
       }
       if (!objectInstance->unreference(connectHandle))
       {
@@ -1596,7 +1740,7 @@ public:
     // send that to all servers that have seen that object instance at some time
     OpenRTIAssert(objectInstance->getPrivilegeToDeleteInstanceAttribute() != nullptr);
     auto privilegeToDeleteInstanceAttribute = objectInstance->getPrivilegeToDeleteInstanceAttribute();
-    OpenRTIAssert(privilegeToDeleteInstanceAttribute->_receivingConnects.count(connectHandle) == 0);
+    //OpenRTIAssert(privilegeToDeleteInstanceAttribute->_receivingConnects.count(connectHandle) == 0);
     ConnectHandleSet receivingConnects = privilegeToDeleteInstanceAttribute->_receivingConnects;
     send(receivingConnects, SharedPtr<const AbstractMessage>(message));
   }
@@ -1882,6 +2026,174 @@ public:
     response->setAttributeHandle(message->getAttributeHandle());
     response->setOwner(instanceAttribute->getOwnerFederate());
     send(connectHandle, response);
+  }
+
+  void accept(const ConnectHandle& connectHandle, const AttributeOwnershipRequestAcquireMessage* message)
+  {
+    ObjectInstanceHandle objectInstanceHandle = message->getObjectInstanceHandle();
+    ServerModel::ObjectInstance* objectInstance = ServerModel::Federation::getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw MessageError("Received AttributeOwnershipAcquireMessage for unknown object instance!");
+    std::map<ConnectHandle, AttributeHandleVector> attributesByConnect;
+    for (auto attributeHandle : message->getAttributeHandles())
+    {
+      ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+      //DebugPrintf("%s(AttributeOwnershipRequestAcquireMessage): object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+      //            objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
+      //            instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
+      //            instanceAttribute->getOwnerFederate().toString().c_str(),
+      //            instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+      //            connectHandle.toString().c_str()
+      //            );
+      if (instanceAttribute->getOwnerFederate() == message->getFederateHandle())
+      {
+        DebugPrintf("%s: federate is already owner: object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+                    objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
+                    instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
+                    instanceAttribute->getOwnerFederate().toString().c_str(),
+                    instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+                    connectHandle.toString().c_str()
+                    );
+      }
+      if (instanceAttribute->getOwnerConnectHandle() == connectHandle)
+      {
+        DebugPrintf("%s: connect is already owner: object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+                    objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
+                    instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
+                    instanceAttribute->getOwnerFederate().toString().c_str(),
+                    instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+                    connectHandle.toString().c_str()
+                    );
+      }
+      if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Acquiring)
+      {
+        DebugPrintf("%s: already in acquire state: object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+                    objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
+                    instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
+                    instanceAttribute->getOwnerFederate().toString().c_str(),
+                    instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+                    connectHandle.toString().c_str()
+                    );
+      }
+      // we want to distribute the acquire messages to the owners of each respective attribute.
+      // The 
+      instanceAttribute->setOwnershipTransferState(OwnershipTransferState::Acquiring);
+      instanceAttribute->setFederateWillingToAcquire(message->getFederateHandle());
+      instanceAttribute->setConnectHandleWillingToAcquire(connectHandle);
+      attributesByConnect[instanceAttribute->getOwnerConnectHandle()].push_back(attributeHandle);
+    }
+    for (auto& connectAttributesPair : attributesByConnect)
+    {
+      SharedPtr<AttributeOwnershipRequestAcquireMessage> request = MakeShared<AttributeOwnershipRequestAcquireMessage>();
+      request->setFederationHandle(message->getFederationHandle());
+      request->setFederateHandle(message->getFederateHandle());
+      request->setObjectClassHandle(message->getObjectClassHandle());
+      request->setObjectInstanceHandle(message->getObjectInstanceHandle());
+      request->setIfAvailable(message->getIfAvailable());
+      request->setAttributeHandles(connectAttributesPair.second);
+      send(connectAttributesPair.first, request);
+    }
+  }
+
+  void accept(const ConnectHandle& connectHandle, const AttributeOwnershipRequestDivestMessage* message)
+  {
+    ObjectInstanceHandle objectInstanceHandle = message->getObjectInstanceHandle();
+    ServerModel::ObjectInstance* objectInstance = ServerModel::Federation::getObjectInstance(objectInstanceHandle);
+    if (!objectInstance)
+      throw MessageError("Received AttributeOwnershipAcquireMessage for unknown object instance!");
+    auto* objectClass = objectInstance->getObjectClass();
+    for (auto attributeHandle : message->getAttributeHandles())
+    {
+      ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
+      ServerModel::ClassAttribute* classAttribute = objectClass->getClassAttribute(attributeHandle);
+
+      //DebugPrintf("%s(AttributeOwnershipRequestDivestMessage): object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+      //            objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
+      //            instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
+      //            instanceAttribute->getOwnerFederate().toString().c_str(),
+      //            instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+      //            connectHandle.toString().c_str()
+      //            );
+      if (instanceAttribute->getOwnerConnectHandle() != connectHandle)
+      {
+        DebugPrintf("%s: connect is not owner: object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+                    objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                    classAttribute->getAttributeDefinition().getName().c_str(),
+                    instanceAttribute->getOwnerFederate().toString().c_str(),
+                    instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+                    connectHandle.toString().c_str()
+                    );
+      }
+      if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Divesting)
+      {
+        DebugPrintf("%s: already in divest state: object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+                    objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+                    classAttribute->getAttributeDefinition().getName().c_str(),
+                    instanceAttribute->getOwnerFederate().toString().c_str(),
+                    instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+                    connectHandle.toString().c_str()
+                    );
+      }
+      if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Acquiring)
+      {
+        // We're about to swap ownership. Need to update the receiving connects also!
+        instanceAttribute->setOwnerFederate(instanceAttribute->getFederateWillingToAcquire());
+        auto oldOwnerConnectHandle = instanceAttribute->getOwnerConnectHandle();
+        auto newOwnerConnectHandle = instanceAttribute->getConnectHandleWillingToAcquire();
+        instanceAttribute->setOwnerConnectHandle(newOwnerConnectHandle);
+        // In the LRC case, this should swap the owner connect from the local (federate) node connect to the parent node connect.
+        // In the root node case, this should swap the owner connect from the old owner federate connect to the new owner federate connect.
+        auto iter = instanceAttribute->_receivingConnects.find(newOwnerConnectHandle);
+        if (iter == instanceAttribute->_receivingConnects.end())
+        {
+          DebugPrintf("%s: new owner connect is not receiving: object=(%s, %s) attribute=(%s) owner=(%s) newOwnerConnectHandle=(%s) _receivingConnects.size=%d connect=(%s)\n", __FUNCTION__,
+                      objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
+                      instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
+                      instanceAttribute->getOwnerFederate().toString().c_str(),
+                      instanceAttribute->getConnectHandleWillingToAcquire().toString().c_str(),
+                      instanceAttribute->_receivingConnects.size(),
+                      connectHandle.toString().c_str()
+                      );
+        }
+        else
+        {
+          DebugPrintf("%s: erase new connect from receiving connects: object=(%s, %s) attribute=(%s) owner=(%s) newOwnerConnectHandle=(%s) _receivingConnects.size=%d connect=(%s)\n", __FUNCTION__,
+                      objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
+                      instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
+                      instanceAttribute->getOwnerFederate().toString().c_str(),
+                      instanceAttribute->getConnectHandleWillingToAcquire().toString().c_str(),
+                      instanceAttribute->_receivingConnects.size(),
+                      connectHandle.toString().c_str()
+                      );
+          instanceAttribute->_receivingConnects.erase(iter);
+        }
+
+        if (objectInstance->getSubscriptionType(oldOwnerConnectHandle) == Unsubscribed)
+        {
+          DebugPrintf("%s: old owner connect is unsubscribed: object=(%s, %s) attribute=(%s) owner=(%s) oldOwnerConnectHandle=(%s) connect=(%s)\n", __FUNCTION__,
+                      objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
+                      instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
+                      instanceAttribute->getOwnerFederate().toString().c_str(),
+                      oldOwnerConnectHandle.toString().c_str(),
+                      connectHandle.toString().c_str()
+                      );
+        }
+        else
+        {
+          instanceAttribute->_receivingConnects.insert(oldOwnerConnectHandle);
+        }
+        instanceAttribute->setFederateWillingToAcquire(FederateHandle());
+        instanceAttribute->setConnectHandleWillingToAcquire(ConnectHandle());
+        instanceAttribute->setOwnershipTransferState(OwnershipTransferState::None);
+      }
+      else
+      {
+        instanceAttribute->setOwnerFederate(FederateHandle());
+        instanceAttribute->setOwnerConnectHandle(ConnectHandle());
+        instanceAttribute->setOwnershipTransferState(OwnershipTransferState::None);
+      }
+    }
+    broadcast(connectHandle, SharedPtr<const AttributeOwnershipRequestDivestMessage>(message));
   }
 
   template<typename M>
@@ -2425,6 +2737,14 @@ public:
       if (federationServer->hasJoinedFederates()) {
         Log(ServerFederation, Debug) << getServerPath() << ": DestroyFederationExecutionRequestMessage failed for \""
                                      << message->getFederationExecution() << "\", federates joined!" << std::endl;
+        std::ostringstream msg;
+        msg << getServerPath() << ": DestroyFederationExecutionRequestMessage failed for \""
+                               << message->getFederationExecution() << "\", federates joined!" << std::endl;
+        for (auto& federate : federationServer->getFederateHandleFederateMap())
+        {
+          msg << federate.getName() << " resign pending: " << federate.getResignPending() << std::endl;
+        }
+        DebugPrintf("%s: %s\n", __FUNCTION__, msg.str().c_str());
         // federates there, so, no
         SharedPtr<DestroyFederationExecutionResponseMessage> response;
         response = MakeShared<DestroyFederationExecutionResponseMessage>();
@@ -2872,6 +3192,45 @@ public:
   { acceptFederationMessage(connectHandle, message); }
   void accept(const ConnectHandle& connectHandle, const RequestClassAttributeUpdateMessage* message)
   { acceptFederationMessage(connectHandle, message); }
+
+  // client starts a federation reset
+  void accept(const ConnectHandle& connectHandle, const ResetFederationRequestMessage* message)
+  {
+    acceptUpstreamFederationMessage(connectHandle, message);
+  }
+
+  // server tells client to init federation reset
+  void accept(const ConnectHandle& connectHandle, const ResetFederationInitiateMessage* message)
+  {
+    acceptDownstreamFederationMessage(connectHandle, message);
+  }
+
+  // client tells server to init federation reset
+  void accept(const ConnectHandle& connectHandle, const ResetFederationBegunMessage* message)
+  {
+    acceptUpstreamFederationMessage(connectHandle, message);
+  }
+
+  // client tells server it has completed federation reset
+  void accept(const ConnectHandle& connectHandle, const ResetFederationCompleteMessage* message)
+  {
+    acceptUpstreamFederationMessage(connectHandle, message);
+  }
+
+  void accept(const ConnectHandle& connectHandle, const ResetFederationDoneMessage* message)
+  {
+    acceptDownstreamFederationMessage(connectHandle, message);
+  }
+
+  void accept(const ConnectHandle& connectHandle, const AttributeOwnershipRequestAcquireMessage* message)
+  {
+    acceptFederationMessage(connectHandle, message);
+  }
+
+  void accept(const ConnectHandle& connectHandle, const AttributeOwnershipRequestDivestMessage* message)
+  {
+    acceptFederationMessage(connectHandle, message);
+  }
 
   void accept(const ConnectHandle&, const AbstractMessage* /*message*/)
   { throw MessageError("Received unexpected message???"); }

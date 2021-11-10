@@ -171,6 +171,8 @@ public:
   struct OPENRTI_API PublishSubscribe : public Referenced {
     PublishSubscribe();
     ~PublishSubscribe();
+    PublishSubscribe(const PublishSubscribe&) = default;
+    PublishSubscribe& operator=(const PublishSubscribe&) = default;
 
     const std::string& getName() const
     { return _name; }
@@ -188,21 +190,18 @@ public:
     { return _subscriptionType; }
     bool setSubscriptionType(SubscriptionType subscriptionType);
     bool isSubscribed() const
-    { return Unsubscribed != _subscriptionType; }
+    { return SubscriptionType::Unsubscribed != _subscriptionType; }
 
-    PublicationType getPublicationType() const
-    { return _publicationType; }
-    bool setPublicationType(PublicationType publicationType);
+    virtual PublicationType getPublicationType() const { return _publicationType; }
+    virtual bool setPublicationType(PublicationType publicationType);
     bool isPublished() const
-    { return Unpublished != _publicationType; }
+    { return PublicationType::Unpublished != _publicationType; }
 
     const DimensionHandleSet& getDimensionHandleSet() const
     { return _dimensionHandleSet; }
     void setDimensionHandleSet(const DimensionHandleSet& dimensionHandleSet);
 
   private:
-    // PublishSubscribe(const PublishSubscribe&);
-    // PublishSubscribe& operator=(const PublishSubscribe&);
 
     std::string _name;
 
@@ -297,6 +296,12 @@ public:
   struct OPENRTI_API Attribute final : public PublishSubscribe {
     void setDataType(const std::string& dataTypeName) { _dataType = dataTypeName; }
     const std::string& getDataType() const { return _dataType; }
+    virtual PublicationType getPublicationType() const override {
+      return PublishSubscribe::getPublicationType();
+    }
+    bool setPublicationType(PublicationType publicationType) override {
+      return PublishSubscribe::setPublicationType(publicationType);
+    }
     std::string _dataType;
   };
   typedef std::vector<SharedPtr<Attribute> > AttributeVector;
@@ -393,42 +398,51 @@ public:
   uint32_t getNumObjectClasses() const
   { return static_cast<uint32_t>(_objectClassVector.size()); }
 
-
+  struct ObjectInstance;
   /// Object Instances
   struct OPENRTI_API InstanceAttribute final : public Referenced {
-    InstanceAttribute(const Federate::Attribute& attribute, bool isOwnedByFederate);
+    InstanceAttribute(const Federate::Attribute& attribute, FederateHandle ownerFederate);
     ~InstanceAttribute();
 
-    OrderType getOrderType() const
-    { return _orderType; }
+    OrderType getOrderType() const { return _orderType; }
     void setOrderType(OrderType orderType);
 
-    TransportationType getTransportationType() const
-    { return _transportationType; }
+    TransportationType getTransportationType() const { return _transportationType; }
     void setTransportationType(TransportationType transportationType);
 
-    bool getIsOwnedByFederate() const
-    { return _isOwnedByFederate; }
-    void setIsOwnedByFederate(bool isOwnedByFederate);
+    FederateHandle getOwnerFederate() const { return _ownerFederate; }
+    void setOwnerFederate(FederateHandle ownerFederate) { _ownerFederate = ownerFederate; }
 
-    double getUpdateRate() const
-    { return _updateRate; }
+    bool isOwnedByFederate(FederateHandle federateHandle) const { return _ownerFederate == federateHandle; }
+    double getUpdateRate() const { return _updateRate; }
     void setUpdateRate(double updateRate);
+
+    const Attribute& getClassAttribute() const { return _classAttribute; }
+
+    void setOwnershipTransferState(OwnershipTransferState newState) { _ownershipTransferState = newState; }
+    OwnershipTransferState getOwnershipTransferState() const { return _ownershipTransferState; }
+
+    FederateHandle getFederateWillingToAcquire() const { return _ownerFederate; }
+    void setFederateWillingToAcquire(FederateHandle federateWillingToAcquire) { _federateWillingToAcquire = federateWillingToAcquire; }
 
   private:
     InstanceAttribute(const InstanceAttribute&);
     InstanceAttribute& operator=(const InstanceAttribute&);
 
+    const Federate::Attribute& _classAttribute;
     OrderType _orderType;
     TransportationType _transportationType;
-    bool _isOwnedByFederate;
     double _updateRate;
+    FederateHandle _ownerFederate;
+    OwnershipTransferState _ownershipTransferState;
+    FederateHandle _federateWillingToAcquire;
   };
   typedef std::vector<SharedPtr<InstanceAttribute> > InstanceAttributeVector;
 
   typedef std::map<std::string, ObjectInstanceHandle> NameObjectInstanceHandleMap;
   struct OPENRTI_API ObjectInstance final : public Referenced {
-    ObjectInstance(NameObjectInstanceHandleMap::iterator nameObjectInstanceHandleMapIterator, const ObjectClass& objectClass, bool owned);
+    ObjectInstance(NameObjectInstanceHandleMap::iterator nameObjectInstanceHandleMapIterator, const ObjectClass& objectClass, FederateHandle owner);
+    ObjectInstance(NameObjectInstanceHandleMap::iterator nameObjectInstanceHandleMapIterator, const ObjectClass& objectClass, const AttributeStateVector& attributeStates);
     ~ObjectInstance();
 
     const std::string& getName() const;
@@ -444,8 +458,8 @@ public:
     const InstanceAttribute* getInstanceAttribute(const AttributeHandle& attributeHandle) const;
     InstanceAttribute* getInstanceAttribute(const AttributeHandle& attributeHandle);
 
-    bool isOwnedByFederate() const;
-    bool ownsAnyAttribute() const;
+    bool isOwnedByFederate(FederateHandle federateHandle) const;
+    bool ownsAnyAttribute(FederateHandle federateHandle) const;
 
     SubscriptionType getSubscriptionType() const
     { return _subscriptionType; }
@@ -492,7 +506,8 @@ public:
   ObjectInstance* getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle);
   const ObjectInstance* getObjectInstance(const ObjectInstanceHandle& objectInstanceHandle) const;
   ObjectInstanceHandle getObjectInstanceHandle(const std::string& name) const;
-  void insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const std::string& name, ObjectClassHandle objectClassHandle, bool owned);
+  void insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const std::string& name, ObjectClassHandle objectClassHandle);
+  void insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const std::string& name, ObjectClassHandle objectClassHandle, const AttributeStateVector& attributeStates);
   void eraseObjectInstance(const ObjectInstanceHandle& objectInstanceHandle);
   const ObjectInstanceHandleMap& getObjectInstanceHandleMap() const
   { return _objectInstanceHandleMap; }

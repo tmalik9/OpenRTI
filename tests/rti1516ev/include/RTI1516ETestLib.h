@@ -805,6 +805,16 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
     void requestRetraction(rti1516ev::MessageRetractionHandle theHandle) override {
     }
 
+    void federationResetInitiated(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+    void federationResetDone(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+    void federationResetAborted(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+
   protected:
     std::unique_ptr<rti1516ev::RTIambassador> _ambassador;
     bool _enableConstrained = true;
@@ -1872,6 +1882,16 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
     }
 
     virtual void requestRetraction(rti1516ev::MessageRetractionHandle theHandle) override {
+    }
+
+    virtual void federationResetInitiated(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+    virtual void federationResetDone(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+    virtual void federationResetAborted(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
     }
 
     // void fail()
