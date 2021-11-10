@@ -885,6 +885,62 @@
     <field name="SendingFederateHandle" type="FederateHandle"/>
     <field name="LockedByNextMessage" type="Bool"/>
   </message>
+  <!--
+  Federation reset
+  Tell the RTI that the federate sending this request wants to start a federation reset
+  -->
+  <message type="ResetFederationRequest">
+    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederateHandle" type="FederateHandle"/>
+    <field name="TimeStamp" type="VariableLengthData"/>
+    <field name="Tag" type="VariableLengthData"/>
+  </message>
+  <!--
+  Tell the federate that the federate should prepare for federation reset.
+  After this message arrived at the federate, the federate must no longer issue timeAdvanceRequest/nextMessageRequest.
+  -->
+  <message type="ResetFederationInitiate">
+    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederateHandle" type="FederateHandle" hide="True"/>
+    <field name="FederateHandleVector" type="FederateHandleVector"/>
+    <field name="TimeStamp" type="VariableLengthData"/>
+    <field name="Tag" type="VariableLengthData"/>
+  </message>
+  <!--
+  Tell the federate that the federation reset has been completed.
+  The success indicator indicates failure in one of the following cases:
+  1. at least one federate has sent ResetFederationComplete with success indicator as false
+  2. at least one federate has resigned from the federation after reception of the ResetFederationInitiate message
+  3. at least one federate does not support federation reset
+  -->
+  <message type="ResetFederationDone">
+    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="TimeStamp" type="VariableLengthData"/>
+    <field name="Tag" type="VariableLengthData"/>
+    <field name="Success" type="Bool"/>
+  </message>
+  <!--
+  Tell the RTI that the joined federate sending this request is beginning to prepare for a federation reset.
+  -->
+  <message type="ResetFederationBegun">
+    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederateHandleVector" type="FederateHandleVector"/>
+    <field name="FederateHandle" type="FederateHandle" hide="True"/>
+    <field name="TimeStamp" type="VariableLengthData"/>
+    <field name="Tag" type="VariableLengthData"/>
+  </message>
+  <!--
+  Tell the RTI that the joined federate completed to prepare for a federation reset.
+  The success indicator tells the RTI whether or not the federate was able to handle the reset
+  -->
+  <message type="ResetFederationComplete">
+    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="FederateHandleBoolPairVector" type="FederateHandleBoolPairVector"/>
+    <field name="FederateHandle" type="FederateHandle" hide="True"/>
+    <field name="TimeStamp" type="VariableLengthData"/>
+    <field name="Success" type="Bool"/>
+    <field name="Tag" type="VariableLengthData"/>
+  </message>
 
   <!-- Just lookback messages that never leave the ambassador -->
   <message type="TimeConstrainedEnabled">
@@ -932,6 +988,7 @@
     <field name="ParameterFilterValues" type="ParameterValueVector"/>
     <!-- <field name="InteractionClassHandleRegionValueListPair" type="InteractionClassHandleRegionValueListPair"/> -->
   </message>
+
   <message type="ChangeObjectClassSubscription">
     <field name="FederationHandle" type="FederationHandle" hide="True"/>
     <field name="SubscriptionType" type="SubscriptionType"/>
@@ -944,6 +1001,141 @@
     <field name="SubscriptionType" type="SubscriptionType"/>
     <field name="ObjectClassHandle" type="ObjectClassHandle"/>
     <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+  </message>
+
+  <!-- Ownership Management Services. -->
+
+  <!-- Ownership transfer state of an attribute. -->
+  <type name="OwnershipTransferState" type="enum">
+    <enumerant name="None"/>
+    <enumerant name="Acquiring"/>        <!-- A non-owner is trying to acquire this attribute. -->
+    <enumerant name="Divesting"/>        <!-- The owner is trying to divest this attribute. -->
+  </type>
+
+  <!--
+  Message representing an attribute divestiture request. The request represents two particular
+  messages that come from the RTI interface, either an unconditional request, or a negotiated
+  request.
+  -->
+  <message type="AttributeOwnershipRequestDivest">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandles" type="AttributeHandleVector"/>
+    <field name="Tag" type="VariableLengthData"/>
+    <field name="Unconditional" type="Bool"/>
+  </message>
+
+  <!--
+   Message representing an attribute aquisition request. The request represents two particular
+   messages that come from the RTI interface, where the reqeust can be only if the attributes
+   are available (unowned) or where they are owned by another federate and the user wants to
+   kick off a pull/negotiated aquisition.
+  -->
+  <message type="AttributeOwnershipRequestAcquire">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandles" type="AttributeHandleVector"/>
+    <field name="Tag" type="VariableLengthData"/>
+    <field name="IfAvailable" type="Bool"/>
+    <field name="FederateHandle" type="FederateHandle" hide="True"/>
+  </message>
+
+  <!--
+   This message signals that the specified attributes of the specified object were not available
+   for acquisition as requested. These messages are queued up in response to "acquire if available"
+   requests for attributes that are either already owned or were acquired by another federate
+   before us.
+  -->
+  <message type="AttributeOwnershipResponseUnavailable">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandles" type="AttributeHandleVector"/>
+  </message>
+
+  <!--
+  Message representing the confirmation of divestiture for a bunch of attributes
+  -->
+  <message type="AttributeOwnershipConfirmDivestiture">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandles" type="AttributeHandleVector"/>
+  </message>
+
+  <!--
+  Message representing the request to cancel an attribute aquire.
+  -->
+  <message type="AttributeOwnershipRequestCancelAcquire">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandles" type="AttributeHandleVector"/>
+    <field name="Immediate" type="Bool"/>
+  </message>
+
+  <!--
+  Message representing an ownership acquisition or divestiture cancellation confirmation.
+  -->
+  <message type="AttributeOwnershipResponseCancelConfirmation">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandles" type="AttributeHandleVector"/>
+  </message>
+
+  <!--
+  Message representing the request to cancel an attribute divestiture.
+  -->
+  <message type="AttributeOwnershipRequestCancelDivest">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandles" type="AttributeHandleVector"/>
+  </message>
+
+  <!--
+  Message representing the confirmation of divestiture for a bunch of attributes
+  -->
+  <message type="AttributeOwnershipDivestConfirmation">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandles" type="AttributeHandleVector"/>
+  </message>
+
+  <!--
+  This message signals that the specified attributes of the specified object have been aquired.
+  The target federate of the message should point to the federate that has aquired them.
+  -->
+  <message type="AttributeOwnershipResponseOwnershipAcquired">
+    <field name="FederationHandle" type="FederationHandle" hide="True"/>
+    <field name="FederateHandle" type="FederateHandle" hide="True"/>
+    <field name="ObjectClassHandle" type="ObjectClassHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandles" type="AttributeHandleVector"/>
+    <field name="IfAvailable" type="Bool"/>
+  </message>
+
+  <!--
+  Message representing the request to query an attribute ownership.
+  -->
+  <message type="QueryAttributeOwnershipRequest">
+    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandle" type="AttributeHandle"/>
+  </message>
+
+  <!--
+  Message representing the response to querying an attribute ownership.
+  -->
+  <message type="QueryAttributeOwnershipResponse">
+    <field name="FederationHandle" type="FederationHandle"/>
+    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
+    <field name="AttributeHandle" type="AttributeHandle"/>
+    <field name="Owner" type="FederateHandle"/>
   </message>
 
   <!-- Ambassador internal messages. -->
@@ -1133,19 +1325,6 @@
     <field name="ObjectClassHandle" type="ObjectClassHandle"/>
     <field name="AttributeHandles" type="AttributeHandleVector"/>
     <field name="Tag" type="VariableLengthData"/>
-  </message>
-
-  <message type="QueryAttributeOwnershipRequest">
-    <field name="FederationHandle" type="FederationHandle"/>
-    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
-    <field name="AttributeHandle" type="AttributeHandle"/>
-  </message>
-
-  <message type="QueryAttributeOwnershipResponse">
-    <field name="FederationHandle" type="FederationHandle"/>
-    <field name="ObjectInstanceHandle" type="ObjectInstanceHandle"/>
-    <field name="AttributeHandle" type="AttributeHandle"/>
-    <field name="Owner" type="FederateHandle"/>
   </message>
 
 </messagelist>

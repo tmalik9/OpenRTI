@@ -362,6 +362,11 @@ namespace rti1516ev
       // 8.22
       virtual void requestRetraction (
          MessageRetractionHandle theHandle) override;
+
+      // vector extensions
+      virtual void federationResetInitiated(const LogicalTime& logicalTime, const VariableLengthData& tag) override;
+      virtual void federationResetDone(const LogicalTime& logicalTime, const VariableLengthData& tag) override;
+      virtual void federationResetAborted(const LogicalTime& logicalTime, const VariableLengthData& tag) override;
    };
 }
 

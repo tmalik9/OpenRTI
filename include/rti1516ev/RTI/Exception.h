@@ -183,7 +183,11 @@ namespace rti1516ev
    RTI_EXCEPTION(UnknownName)
    RTI_EXCEPTION(UnsupportedCallbackModel)
    RTI_EXCEPTION(InternalError)
-   #undef RTI_EXCEPTION
+   RTI_EXCEPTION(ResetInProgress)
+   RTI_EXCEPTION(ResetNotInProgress)
+   RTI_EXCEPTION(ResetNotBegun)
+   RTI_EXCEPTION(ResetNotSupportedByRti)
+#undef RTI_EXCEPTION
 }
 
 #endif // RTI_exception_h

@@ -48,6 +48,10 @@ std::string to_string(InternalTimeManagement::TimeAdvanceMode mode)
       return "NextMessageRequestAvailable";
     case InternalTimeManagement::TimeAdvanceMode::FlushQueueRequest:
       return "FlushQueueRequest";
+    case InternalTimeManagement::TimeAdvanceMode::ResetInitiated:
+      return "ResetInitiated";
+    case InternalTimeManagement::TimeAdvanceMode::ResetPending:
+      return "ResetPending";
     default:
       return "TimeAdvanceMode::Unknown";
   }

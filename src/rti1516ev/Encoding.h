@@ -19,6 +19,9 @@
 
 #pragma once
 
+#include <locale>
+#include <sstream>
+
 namespace rti1516ev {
 
 static inline size_t encodeIntoLE64(Octet* buffer, size_t bufferSize, size_t offset, uint64_t value)
@@ -197,13 +200,34 @@ static inline size_t decodeFromLE16(const Octet* buffer, size_t bufferSize, size
   return offset + 2;
 }
 
+static inline std::wstring to_wstring(const std::string& str)
+{
+  if (str.empty()) return std::wstring();
+  const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
+  std::vector<wchar_t> wideStringBuffer(str.length());
+  CType.widen(str.data(), str.data() + str.length(), &wideStringBuffer[0]);
+  return std::wstring(&wideStringBuffer[0], wideStringBuffer.size());
+}
+
+static inline std::string to_string(const std::wstring& str)
+{
+  if (str.empty()) return std::string();
+  const std::ctype<wchar_t>& CType = std::use_facet<std::ctype<wchar_t> >(std::locale());
+  std::vector<char> stringBuffer(str.length());
+  CType.narrow(str.data(), str.data() + str.length(), '_', &stringBuffer[0]);
+  return std::string(&stringBuffer[0], stringBuffer.size());
+}
+
+
 template<typename T>
 static inline size_t decodeCompressed(const Octet* buffer, size_t bufferSize, size_t offset, T& value)
 {
   unsigned shift = 7;
   if (bufferSize <= offset)
   {
-    throw EncoderException(L"provided buffer too small");
+    std::wostringstream msg;
+    msg << L"decodeCompressed<" << to_wstring(typeid(T).name()) << L">: provided buffer too small";
+    throw EncoderException(msg.str());
   }
   const Octet* p = buffer + offset;
   uint8_t byte = *p++; offset++;
@@ -212,7 +236,9 @@ static inline size_t decodeCompressed(const Octet* buffer, size_t bufferSize, si
   {
     if (bufferSize <= offset)
     {
-      throw EncoderException(L"provided buffer too small");
+      std::wostringstream msg;
+      msg << L"decodeCompressed<" << to_wstring(typeid(T).name()) << L">: provided buffer too small";
+      throw EncoderException(msg.str());
     }
     byte = *p++; offset++;
     value |= T(byte & 0x7f) << shift;

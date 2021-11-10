@@ -62,6 +62,11 @@ class DisableTimeConstrainedNotifyMessage;
 class CommitLowerBoundTimeStampMessage;
 class CommitLowerBoundTimeStampResponseMessage;
 class LockedByNextMessageRequestMessage;
+class ResetFederationRequestMessage;
+class ResetFederationInitiateMessage;
+class ResetFederationDoneMessage;
+class ResetFederationBegunMessage;
+class ResetFederationCompleteMessage;
 class TimeConstrainedEnabledMessage;
 class TimeRegulationEnabledMessage;
 class TimeAdvanceGrantedMessage;
@@ -73,6 +78,17 @@ class ChangeObjectClassPublicationMessage;
 class ChangeInteractionClassSubscriptionMessage;
 class ChangeObjectClassSubscriptionMessage;
 class ChangeObjectInstanceSubscriptionMessage;
+class AttributeOwnershipRequestDivestMessage;
+class AttributeOwnershipRequestAcquireMessage;
+class AttributeOwnershipResponseUnavailableMessage;
+class AttributeOwnershipConfirmDivestitureMessage;
+class AttributeOwnershipRequestCancelAcquireMessage;
+class AttributeOwnershipResponseCancelConfirmationMessage;
+class AttributeOwnershipRequestCancelDivestMessage;
+class AttributeOwnershipDivestConfirmationMessage;
+class AttributeOwnershipResponseOwnershipAcquiredMessage;
+class QueryAttributeOwnershipRequestMessage;
+class QueryAttributeOwnershipResponseMessage;
 class RegistrationForObjectClassMessage;
 class AttributesInScopeMessage;
 class TurnUpdatesOnForInstanceMessage;
@@ -93,8 +109,6 @@ class AttributeUpdateMessage;
 class TimeStampedAttributeUpdateMessage;
 class RequestAttributeUpdateMessage;
 class RequestClassAttributeUpdateMessage;
-class QueryAttributeOwnershipRequestMessage;
-class QueryAttributeOwnershipResponseMessage;
 
 class OPENRTI_LOCAL AbstractMessageDispatcher {
 public:
@@ -135,6 +149,11 @@ public:
   virtual void accept(const CommitLowerBoundTimeStampMessage&) const = 0;
   virtual void accept(const CommitLowerBoundTimeStampResponseMessage&) const = 0;
   virtual void accept(const LockedByNextMessageRequestMessage&) const = 0;
+  virtual void accept(const ResetFederationRequestMessage&) const = 0;
+  virtual void accept(const ResetFederationInitiateMessage&) const = 0;
+  virtual void accept(const ResetFederationDoneMessage&) const = 0;
+  virtual void accept(const ResetFederationBegunMessage&) const = 0;
+  virtual void accept(const ResetFederationCompleteMessage&) const = 0;
   virtual void accept(const TimeConstrainedEnabledMessage&) const = 0;
   virtual void accept(const TimeRegulationEnabledMessage&) const = 0;
   virtual void accept(const TimeAdvanceGrantedMessage&) const = 0;
@@ -146,6 +165,17 @@ public:
   virtual void accept(const ChangeInteractionClassSubscriptionMessage&) const = 0;
   virtual void accept(const ChangeObjectClassSubscriptionMessage&) const = 0;
   virtual void accept(const ChangeObjectInstanceSubscriptionMessage&) const = 0;
+  virtual void accept(const AttributeOwnershipRequestDivestMessage&) const = 0;
+  virtual void accept(const AttributeOwnershipRequestAcquireMessage&) const = 0;
+  virtual void accept(const AttributeOwnershipResponseUnavailableMessage&) const = 0;
+  virtual void accept(const AttributeOwnershipConfirmDivestitureMessage&) const = 0;
+  virtual void accept(const AttributeOwnershipRequestCancelAcquireMessage&) const = 0;
+  virtual void accept(const AttributeOwnershipResponseCancelConfirmationMessage&) const = 0;
+  virtual void accept(const AttributeOwnershipRequestCancelDivestMessage&) const = 0;
+  virtual void accept(const AttributeOwnershipDivestConfirmationMessage&) const = 0;
+  virtual void accept(const AttributeOwnershipResponseOwnershipAcquiredMessage&) const = 0;
+  virtual void accept(const QueryAttributeOwnershipRequestMessage&) const = 0;
+  virtual void accept(const QueryAttributeOwnershipResponseMessage&) const = 0;
   virtual void accept(const RegistrationForObjectClassMessage&) const = 0;
   virtual void accept(const AttributesInScopeMessage&) const = 0;
   virtual void accept(const TurnUpdatesOnForInstanceMessage&) const = 0;
@@ -166,8 +196,6 @@ public:
   virtual void accept(const TimeStampedAttributeUpdateMessage&) const = 0;
   virtual void accept(const RequestAttributeUpdateMessage&) const = 0;
   virtual void accept(const RequestClassAttributeUpdateMessage&) const = 0;
-  virtual void accept(const QueryAttributeOwnershipRequestMessage&) const = 0;
-  virtual void accept(const QueryAttributeOwnershipResponseMessage&) const = 0;
 };
 
 template<typename T>
@@ -211,6 +239,11 @@ public:
   virtual void accept(const CommitLowerBoundTimeStampMessage& message) const override { _t(message); }
   virtual void accept(const CommitLowerBoundTimeStampResponseMessage& message) const override { _t(message); }
   virtual void accept(const LockedByNextMessageRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationInitiateMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationDoneMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationBegunMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationCompleteMessage& message) const override { _t(message); }
   virtual void accept(const TimeConstrainedEnabledMessage& message) const override { _t(message); }
   virtual void accept(const TimeRegulationEnabledMessage& message) const override { _t(message); }
   virtual void accept(const TimeAdvanceGrantedMessage& message) const override { _t(message); }
@@ -222,6 +255,17 @@ public:
   virtual void accept(const ChangeInteractionClassSubscriptionMessage& message) const override { _t(message); }
   virtual void accept(const ChangeObjectClassSubscriptionMessage& message) const override { _t(message); }
   virtual void accept(const ChangeObjectInstanceSubscriptionMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipRequestDivestMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipRequestAcquireMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipResponseUnavailableMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipConfirmDivestitureMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipRequestCancelAcquireMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipResponseCancelConfirmationMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipRequestCancelDivestMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipDivestConfirmationMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipResponseOwnershipAcquiredMessage& message) const override { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const override { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const override { _t(message); }
   virtual void accept(const RegistrationForObjectClassMessage& message) const override { _t(message); }
   virtual void accept(const AttributesInScopeMessage& message) const override { _t(message); }
   virtual void accept(const TurnUpdatesOnForInstanceMessage& message) const override { _t(message); }
@@ -242,8 +286,6 @@ public:
   virtual void accept(const TimeStampedAttributeUpdateMessage& message) const override { _t(message); }
   virtual void accept(const RequestAttributeUpdateMessage& message) const override { _t(message); }
   virtual void accept(const RequestClassAttributeUpdateMessage& message) const override { _t(message); }
-  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const override { _t(message); }
-  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const override { _t(message); }
 private:
   T& _t;
 };
@@ -289,6 +331,11 @@ public:
   virtual void accept(const CommitLowerBoundTimeStampMessage& message) const override { _t(message); }
   virtual void accept(const CommitLowerBoundTimeStampResponseMessage& message) const override { _t(message); }
   virtual void accept(const LockedByNextMessageRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationRequestMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationInitiateMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationDoneMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationBegunMessage& message) const override { _t(message); }
+  virtual void accept(const ResetFederationCompleteMessage& message) const override { _t(message); }
   virtual void accept(const TimeConstrainedEnabledMessage& message) const override { _t(message); }
   virtual void accept(const TimeRegulationEnabledMessage& message) const override { _t(message); }
   virtual void accept(const TimeAdvanceGrantedMessage& message) const override { _t(message); }
@@ -300,6 +347,17 @@ public:
   virtual void accept(const ChangeInteractionClassSubscriptionMessage& message) const override { _t(message); }
   virtual void accept(const ChangeObjectClassSubscriptionMessage& message) const override { _t(message); }
   virtual void accept(const ChangeObjectInstanceSubscriptionMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipRequestDivestMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipRequestAcquireMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipResponseUnavailableMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipConfirmDivestitureMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipRequestCancelAcquireMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipResponseCancelConfirmationMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipRequestCancelDivestMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipDivestConfirmationMessage& message) const override { _t(message); }
+  virtual void accept(const AttributeOwnershipResponseOwnershipAcquiredMessage& message) const override { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const override { _t(message); }
+  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const override { _t(message); }
   virtual void accept(const RegistrationForObjectClassMessage& message) const override { _t(message); }
   virtual void accept(const AttributesInScopeMessage& message) const override { _t(message); }
   virtual void accept(const TurnUpdatesOnForInstanceMessage& message) const override { _t(message); }
@@ -320,8 +378,6 @@ public:
   virtual void accept(const TimeStampedAttributeUpdateMessage& message) const override { _t(message); }
   virtual void accept(const RequestAttributeUpdateMessage& message) const override { _t(message); }
   virtual void accept(const RequestClassAttributeUpdateMessage& message) const override { _t(message); }
-  virtual void accept(const QueryAttributeOwnershipRequestMessage& message) const override { _t(message); }
-  virtual void accept(const QueryAttributeOwnershipResponseMessage& message) const override { _t(message); }
 private:
   const T& _t;
 };

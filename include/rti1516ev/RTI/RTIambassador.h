@@ -758,6 +758,10 @@ namespace rti1516ev
 
       virtual void allowPendingTimeInNextMessageRequest() = 0;
       virtual void disallowPendingTimeInNextMessageRequest() = 0;
+
+      virtual void requestFederationReset(const rti1516ev::VariableLengthData& tag) = 0;
+      virtual void federationResetBegun(const rti1516ev::VariableLengthData& tag) = 0;
+      virtual void federationResetComplete(bool success, const rti1516ev::VariableLengthData& tag) = 0;
 };
 }
 

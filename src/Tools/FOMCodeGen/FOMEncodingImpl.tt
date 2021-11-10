@@ -303,14 +303,11 @@ void <#=dataType.Name#>Encoding::update()
 {
   size_t size = mData.size();
   mEncoding.resize(size);
+  HLAvariableArray::resize(size);
   for (size_t i=0; i < size; i++)
   {
     mEncoding[i].setDataPointer(&mData.data()[i]);
-    if (i >= HLAvariableArray::size()) {
-      addElementPointer(&mEncoding[i]);
-    } else {
-      setElementPointer(i, &mEncoding[i]);
-    }
+    HLAvariableArray::setElementPointer(i, &mEncoding[i]);
   }
 }
 

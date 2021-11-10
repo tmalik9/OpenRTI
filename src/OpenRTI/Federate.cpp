@@ -57,10 +57,10 @@ Federate::RegionData::setRegion(const Region& region)
 }
 
 Federate::PublishSubscribe::PublishSubscribe() :
-  _orderType(RECEIVE),
-  _transportationType(RELIABLE),
-  _subscriptionType(Unsubscribed),
-  _publicationType(Unpublished)
+  _orderType(OrderType::RECEIVE),
+  _transportationType(TransportationType::RELIABLE),
+  _subscriptionType(SubscriptionType::Unsubscribed),
+  _publicationType(PublicationType::Unpublished)
 {
 }
 
@@ -335,8 +335,8 @@ void Federate::InteractionClass::getFOMInteractionClass(FOMInteractionClass& fom
 }
 
 Federate::ObjectClass::ObjectClass() :
-  _subscriptionType(Unsubscribed),
-  _publicationType(Unpublished),
+  _subscriptionType(SubscriptionType::Unsubscribed),
+  _publicationType(PublicationType::Unpublished),
   _deliverToSelf(false)
 {
 }
@@ -456,7 +456,7 @@ Federate::ObjectClass::insertChildObjectClass(ObjectClass& objectClass)
 bool
 Federate::ObjectClass::isAttributeSubscribed(const AttributeHandle& attributeHandle) const
 {
-  return Unsubscribed != getEffectiveAttributeSubscriptionType(attributeHandle);
+  return SubscriptionType::Unsubscribed != getEffectiveAttributeSubscriptionType(attributeHandle);
 }
 
 SubscriptionType
@@ -499,7 +499,7 @@ Federate::ObjectClass::setSubscriptionType(SubscriptionType subscriptionType)
 bool
 Federate::ObjectClass::isAttributePublished(const AttributeHandle& attributeHandle) const
 {
-  return Unpublished != getEffectiveAttributePublicationType(attributeHandle);
+  return PublicationType::Unpublished != getEffectiveAttributePublicationType(attributeHandle);
 }
 
 PublicationType
@@ -528,7 +528,7 @@ Federate::ObjectClass::setAttributePublicationType(const AttributeHandle& attrib
 bool
 Federate::ObjectClass::isPublished() const
 {
-  return Unpublished != getEffectivePublicationType();
+  return PublicationType::Unpublished != getEffectivePublicationType();
 }
 
 PublicationType
@@ -545,11 +545,14 @@ Federate::ObjectClass::setPublicationType(PublicationType publicationType)
   return oldPublicationType != getEffectivePublicationType();
 }
 
-Federate::InstanceAttribute::InstanceAttribute(const Federate::Attribute& attribute, bool isOwnedByFederate) :
-  _orderType(attribute.getOrderType()),
-  _transportationType(attribute.getTransportationType()),
-  _isOwnedByFederate(isOwnedByFederate),
-  _updateRate(0)
+Federate::InstanceAttribute::InstanceAttribute(const Federate::Attribute& attribute, FederateHandle ownerFederate)
+  : _classAttribute(attribute)
+  , _orderType(attribute.getOrderType())
+  , _transportationType(attribute.getTransportationType())
+  , _updateRate(0)
+  , _ownerFederate(ownerFederate)
+  , _ownershipTransferState(OwnershipTransferState::None)
+  , _federateWillingToAcquire()
 {
 }
 
@@ -570,21 +573,15 @@ Federate::InstanceAttribute::setTransportationType(TransportationType transporta
 }
 
 void
-Federate::InstanceAttribute::setIsOwnedByFederate(bool isOwnedByFederate)
-{
-  _isOwnedByFederate = isOwnedByFederate;
-}
-
-void
 Federate::InstanceAttribute::setUpdateRate(double updateRate)
 {
   _updateRate = updateRate;
 }
 
 Federate::ObjectInstance::ObjectInstance(NameObjectInstanceHandleMap::iterator nameObjectInstanceHandleMapIterator,
-                                         const ObjectClass& objectClass, bool owned) :
+                                         const ObjectClass& objectClass, FederateHandle owner) :
   _nameObjectInstanceHandleMapIterator(nameObjectInstanceHandleMapIterator),
-  _subscriptionType(Unsubscribed)
+  _subscriptionType(SubscriptionType::Unsubscribed)
 {
   _objectClass = &objectClass;
   uint32_t numAttributes = objectClass.getNumAttributes();
@@ -593,9 +590,36 @@ Federate::ObjectInstance::ObjectInstance(NameObjectInstanceHandleMap::iterator n
     const Attribute* attribute = objectClass.getAttribute(AttributeHandle(k));
     if (attribute) {
       if (objectClass.isAttributePublished(AttributeHandle(k)))
-        _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>(new InstanceAttribute(*attribute, owned)));
+        _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>(new InstanceAttribute(*attribute, owner)));
       else
-        _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>(new InstanceAttribute(*attribute, false)));
+        _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>(new InstanceAttribute(*attribute, FederateHandle())));
+    } else {
+      _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>());
+    }
+  }
+}
+
+Federate::ObjectInstance::ObjectInstance(NameObjectInstanceHandleMap::iterator nameObjectInstanceHandleMapIterator,
+                                         const ObjectClass& objectClass, const AttributeStateVector& attributeStates) :
+  _nameObjectInstanceHandleMapIterator(nameObjectInstanceHandleMapIterator),
+  _subscriptionType(SubscriptionType::Unsubscribed)
+{
+  _objectClass = &objectClass;
+  uint32_t numAttributes = objectClass.getNumAttributes();
+  _instanceAttributeVector.reserve(numAttributes);
+  for (uint32_t k = 0; k < numAttributes; ++k) {
+    AttributeHandle attributeHandle = AttributeHandle(k);
+    const Attribute* attribute = objectClass.getAttribute(attributeHandle);
+    if (attribute) {
+      SharedPtr<InstanceAttribute> instanceAttribute = SharedPtr<InstanceAttribute>(new InstanceAttribute(*attribute, FederateHandle()));
+      for (const auto& attributeState : attributeStates)
+      {
+        if (attributeState.getAttributeHandle() == attributeHandle)
+        {
+          instanceAttribute->setOwnerFederate(attributeState.getOwnerFederate());
+        }
+      }
+      _instanceAttributeVector.push_back(instanceAttribute);
     } else {
       _instanceAttributeVector.push_back(SharedPtr<InstanceAttribute>());
     }
@@ -635,22 +659,22 @@ Federate::ObjectInstance::getInstanceAttribute(const AttributeHandle& attributeH
 }
 
 bool
-Federate::ObjectInstance::isOwnedByFederate() const
+Federate::ObjectInstance::isOwnedByFederate(FederateHandle federateHandle) const
 {
   const InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(0));
   if (!instanceAttribute)
     return false;
-  return instanceAttribute->getIsOwnedByFederate();
+  return instanceAttribute->getOwnerFederate() == federateHandle;
 }
 
 bool
-Federate::ObjectInstance::ownsAnyAttribute() const
+Federate::ObjectInstance::ownsAnyAttribute(FederateHandle federateHandle) const
 {
   for (uint32_t i = 0; i < static_cast<uint32_t>(_instanceAttributeVector.size()); ++i) {
     const InstanceAttribute* instanceAttribute = getInstanceAttribute(AttributeHandle(i));
     if (!instanceAttribute)
       continue;
-    if (instanceAttribute->getIsOwnedByFederate())
+    if (instanceAttribute->getOwnerFederate() == federateHandle)
       return true;
   }
   return false;
@@ -744,25 +768,25 @@ void
 Federate::applySwitch(const FOMSwitch& switchValue)
 {
   switch (switchValue.getSwitchesType()) {
-  case InteractionRelevanceAdvisorySwitchesType:
+    case SwitchesType::InteractionRelevanceAdvisorySwitchesType:
     _interactionRelevanceAdvisorySwitchEnabled = switchValue.getEnabled();
     break;
-  case ObjectClassRelevanceAdvisorySwitchesType:
+  case SwitchesType::ObjectClassRelevanceAdvisorySwitchesType:
     _objectClassRelevanceAdvisorySwitchEnabled = switchValue.getEnabled();
     break;
-  case AttributeRelevanceAdvisorySwitchesType:
+  case SwitchesType::AttributeRelevanceAdvisorySwitchesType:
     _attributeRelevanceAdvisorySwitchEnabled = switchValue.getEnabled();
     break;
-  case AttributeScopeAdvisorySwitchesType:
+  case SwitchesType::AttributeScopeAdvisorySwitchesType:
     _attributeScopeAdvisorySwitchEnabled = switchValue.getEnabled();
     break;
-  case AutoProvideSwitchesType:
+  case SwitchesType::AutoProvideSwitchesType:
     // _autoProvideSwitchEnabled = switchValue.getEnabled();
     break;
-  case ConveyRegionDesignatorSetsSwitchesType:
+  case SwitchesType::ConveyRegionDesignatorSetsSwitchesType:
     // _conveyRegionDesignatorSetsSwitchEnabled = switchValue.getEnabled();
     break;
-  case ServiceReportingSwitchesType:
+  case SwitchesType::ServiceReportingSwitchesType:
     // _serviceReportingSwitchesEnabled = switchValue.getEnabled();
     break;
   }
@@ -1136,8 +1160,9 @@ Federate::getObjectInstanceHandle(const std::string& name) const
   return i->second;
 }
 
+// this gets called from the path Ambassador<T>::registerObjectInstance()
 void
-Federate::insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const std::string& name, ObjectClassHandle objectClassHandle, bool owned)
+Federate::insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const std::string& name, ObjectClassHandle objectClassHandle)
 {
   OpenRTIAssert(_nameObjectInstanceHandleMap.find(name) == _nameObjectInstanceHandleMap.end());
   OpenRTIAssert(_objectInstanceHandleMap.find(objectInstanceHandle) == _objectInstanceHandleMap.end());
@@ -1145,7 +1170,25 @@ Federate::insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const 
   OpenRTIAssert(objectClass);
   NameObjectInstanceHandleMap::iterator i;
   i = _nameObjectInstanceHandleMap.insert(NameObjectInstanceHandleMap::value_type(name, objectInstanceHandle)).first;
-  SharedPtr<ObjectInstance> objectInstance = MakeShared<ObjectInstance>(i, *objectClass, owned);
+  SharedPtr<ObjectInstance> objectInstance;
+  objectInstance = MakeShared<ObjectInstance>(i, *objectClass, getFederateHandle());
+  objectInstance->setObjectClassHandle(objectClassHandle);
+  objectInstance->setSubscriptionType(SubscribedActive);
+  _objectInstanceHandleMap.insert(ObjectInstanceHandleMap::value_type(objectInstanceHandle, objectInstance));
+}
+
+// this gets called from the path Ambassador<T>::acceptCallbackMessage(const InsertObjectInstanceMessage& message)
+void
+Federate::insertObjectInstance(ObjectInstanceHandle objectInstanceHandle, const std::string& name, ObjectClassHandle objectClassHandle, const AttributeStateVector& attributeStates)
+{
+  OpenRTIAssert(_nameObjectInstanceHandleMap.find(name) == _nameObjectInstanceHandleMap.end());
+  OpenRTIAssert(_objectInstanceHandleMap.find(objectInstanceHandle) == _objectInstanceHandleMap.end());
+  const ObjectClass* objectClass = getObjectClass(objectClassHandle);
+  OpenRTIAssert(objectClass);
+  NameObjectInstanceHandleMap::iterator i;
+  i = _nameObjectInstanceHandleMap.insert(NameObjectInstanceHandleMap::value_type(name, objectInstanceHandle)).first;
+  SharedPtr<ObjectInstance> objectInstance;
+  objectInstance = MakeShared<ObjectInstance>(i, *objectClass, attributeStates);
   objectInstance->setObjectClassHandle(objectClassHandle);
   objectInstance->setSubscriptionType(SubscribedActive);
   _objectInstanceHandleMap.insert(ObjectInstanceHandleMap::value_type(objectInstanceHandle, objectInstance));

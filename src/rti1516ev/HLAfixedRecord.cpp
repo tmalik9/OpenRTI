@@ -25,9 +25,11 @@
 
 #include <cstring>
 #include <vector>
-
+#include <sstream>
 #include "Encoding.h"
 #include "Export.h"
+
+#define COMPRESS_HEADER
 
 namespace rti1516ev
 {
@@ -63,9 +65,13 @@ public:
       throw EncoderException(L"buffer to small: bufferSize=" + std::to_wstring(bufferSize) + L" offset=" + std::to_wstring(offset) + L" encodedLength=" + std::to_wstring(getEncodedLength()));
 #endif
     uint32_t byteLength = static_cast<uint32_t>(getEncodedLength());
+#ifdef COMPRESS_HEADER
     offset = encodeIntoBE32Compressed(buffer, bufferSize, offset, static_cast<uint32_t>(byteLength));
     offset = encodeIntoBE32Compressed(buffer, bufferSize, offset, static_cast<uint32_t>(_version));
-
+#else
+    offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<uint32_t>(byteLength));
+    offset = encodeIntoBE32(buffer, bufferSize, offset, static_cast<uint32_t>(_version));
+#endif
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
       offset = i->first->encodeInto(buffer, bufferSize, offset);
     }
@@ -76,11 +82,47 @@ public:
   {
     uint32_t byteLength;
     size_t index = startIndex;
-    index = decodeFromBE32Compressed(buffer, bufferSize, startIndex, byteLength);
-    index = decodeFromBE32Compressed(buffer, bufferSize, index, _version);
+    try {
+#ifdef COMPRESS_HEADER
+      index = decodeFromBE32Compressed(buffer, bufferSize, startIndex, byteLength);
+#else
+      index = decodeFromBE32(buffer, bufferSize, startIndex, byteLength);
+#endif
+    }
+    catch (const EncoderException& e)
+    {
+      std::wostringstream msg;
+      msg << e.what() + L" while decoding fixed record byte length";
+      throw EncoderException(msg.str());
+    }
+    try {
+#ifdef COMPRESS_HEADER
+      index = decodeFromBE32Compressed(buffer, bufferSize, index, _version);
+#else
+      index = decodeFromBE32(buffer, bufferSize, index, _version);
+#endif
+    }
+    catch (const EncoderException& e)
+    {
+      std::wostringstream msg;
+      msg << e.what() + L" while decoding fixed record version";
+      throw EncoderException(msg.str());
+    }
     size_t end = startIndex + byteLength;
-    for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end() && index < end; ++i) {
-      index = i->first->decodeFrom(buffer, bufferSize, index);
+    int count=0;
+    // NOTE: we decode only as far as the byteLength tells us to do, AND only for the data elements we know of.
+    // The first rule catches the case that the received record's version is smaller than that we know of, and contains fewer fields.
+    // The second rule lets us skip all fields we don't know of, because the record's version is higher than what we know.
+    for (DataElementVector::iterator i = _dataElementVector.begin(); i != _dataElementVector.end() && index < end; ++i, count++) {
+      try {
+        index = i->first->decodeFrom(buffer, bufferSize, index);
+      }
+      catch (const EncoderException& e)
+      {
+        std::wostringstream msg;
+        msg << e.what() + L" while decoding fixed record field #" << count;
+        throw EncoderException(msg.str());
+      }
     }
     return index;
   }
@@ -92,15 +134,21 @@ public:
 
   size_t getEncodedLength() const
   {
-    size_t length = 0; /*2 * sizeof(uint32_t)*/; // sizeof(version) + sizeof(byteLength)
+    // first get the bytes used by the record fields
+    size_t length = 0;
     for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
       length += i->first->getEncodedLength();
     }
-    uint8_t buffer[8];
+    // get the bytes used by the length and version fields
+#ifdef COMPRESS_HEADER
+    uint8_t buffer[10];
     size_t offset = 0;
-    offset = encodeIntoBE32Compressed(buffer, 8, offset, static_cast<uint32_t>(length));
-    offset = encodeIntoBE32Compressed(buffer, 8, offset, _version);
+    offset = encodeIntoBE32Compressed(buffer, sizeof(buffer), offset, static_cast<uint32_t>(length));
+    offset = encodeIntoBE32Compressed(buffer, sizeof(buffer), offset, _version);
     return offset + length;
+#else
+    return 2 * sizeof(uint32_t) + length;
+#endif
   }
 
   unsigned int getOctetBoundary()

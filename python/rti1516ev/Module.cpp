@@ -111,12 +111,9 @@ PyObject_GetString(std::wstring& string, PyObject* o)
   } else
 #endif
   if (PyUnicode_Check(o)) {
-    Py_ssize_t size = PyUnicode_GetSize(o);
-    string.resize(size);
-    if (size) {
-      const Py_UNICODE* ptr = PyUnicode_AsUnicode(o);
-      std::copy(ptr, ptr + size, string.begin());
-    }
+    Py_ssize_t size = 0;
+      wchar_t * ptr = PyUnicode_AsWideCharString(o, &size);
+      string = std::wstring(ptr);
     return true;
 
   } else {
@@ -2691,6 +2688,58 @@ struct PyRTI1516EFederateAmbassador : public rti1516ev::FederateAmbassador {
 
     PyObject* arg0 = PyObject_NewLogicalTime(theTime);
     PyObject* result = PyObject_CallMethod(ob_federateAmbassador, (char*)"timeAdvanceGrant", (char*)"N", arg0);
+    if (result) {
+      Py_DecRef(result);
+      return;
+    } else {
+      CATCH_PYTHON_EXCEPTION(exception);
+    }
+  }
+
+  virtual void federationResetInitiated(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+  {
+    if (!ob_federateAmbassador)
+      return;
+
+    GILStateScope gilStateScope;
+
+    PyObject* arg0 = PyObject_NewLogicalTime(logicalTime);
+    PyObject* arg1 = PyObject_NewVariableLengthData(tag);
+    PyObject* result = PyObject_CallMethod(ob_federateAmbassador, (char*)"federationResetInitiated", (char*)"NN", arg0, arg1);
+    if (result) {
+      Py_DecRef(result);
+      return;
+    } else {
+      CATCH_PYTHON_EXCEPTION(exception);
+    }
+  }
+  virtual void federationResetDone(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+  {
+    if (!ob_federateAmbassador)
+      return;
+
+    GILStateScope gilStateScope;
+
+    PyObject* arg0 = PyObject_NewLogicalTime(logicalTime);
+    PyObject* arg1 = PyObject_NewVariableLengthData(tag);
+    PyObject* result = PyObject_CallMethod(ob_federateAmbassador, (char*)"federationResetDone", (char*)"NN", arg0, arg1);
+    if (result) {
+      Py_DecRef(result);
+      return;
+    } else {
+      CATCH_PYTHON_EXCEPTION(exception);
+    }
+  }
+  virtual void federationResetAborted(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+  {
+    if (!ob_federateAmbassador)
+      return;
+
+    GILStateScope gilStateScope;
+
+    PyObject* arg0 = PyObject_NewLogicalTime(logicalTime);
+    PyObject* arg1 = PyObject_NewVariableLengthData(tag);
+    PyObject* result = PyObject_CallMethod(ob_federateAmbassador, (char*)"federationResetAborted", (char*)"NN", arg0, arg1);
     if (result) {
       Py_DecRef(result);
       return;

@@ -34,6 +34,8 @@
 #include "RTI/LogicalTime.h"
 #include "RTI/LogicalTimeInterval.h"
 #include "RTI/LogicalTimeFactory.h"
+#include "RTI/time/HLAinteger64Time.h"
+#include "RTI/time/HLAinteger64Interval.h"
 #include "RTI/RangeBounds.h"
 
 #include "TestLib.h"
@@ -171,8 +173,13 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
       return arg;
     }
 
+    rti1516ev::RTIambassador* getRtiAmbassador() const { return _ambassador.get(); }
     const rti1516ev::FederateHandle& getFederateHandle() const {
       return _federateHandle;
+    }
+
+    const std::wstring& getFederateName() const {
+      return _federateName;
     }
 
     const std::wstring& getLogicalTimeFactoryName() const {
@@ -182,40 +189,45 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
       _logicalTimeFactoryName = logicalTimeFactoryName;
     }
 
-    virtual bool execJoined(rti1516ev::RTIambassador& ambassador) = 0;
+    virtual bool execJoined(uint32_t threadIndex) = 0;
 
-    bool waitForAllFederates(rti1516ev::RTIambassador& ambassador) {
+    bool waitForAllFederates(rti1516ev::RTIambassador* ambassador) {
       _synchronized = 0;
-      DebugPrintf("%s\n", __FUNCTION__);
+      //DebugPrintf("%s\n", __FUNCTION__);
       // FIXME need a test for concurrent announces
       try {
-        ambassador.registerFederationSynchronizationPoint(getFederateType(), rti1516ev::VariableLengthData());
+        ambassador->registerFederationSynchronizationPoint(getFederateType(), rti1516ev::VariableLengthData());
       }
       catch (const rti1516ev::Exception& e) {
+        DebugPrintf("%s: rti1516ev::Exception: \"%ls\"\n", __FUNCTION__, e.what().c_str());
         std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
         return false;
       }
       catch (...) {
+        DebugPrintf("%s: Unknown Exception!\n", __FUNCTION__);
         std::wcout << L"Unknown Exception!" << std::endl;
         return false;
       }
 
       try {
-        Clock timeout = Clock::now() + Clock::fromSeconds(10);
+        AbsTimeout timeout(Clock::now() + Clock::fromSeconds(10));
         while (!_federateSet.empty()) {
-          if (ambassador.evokeCallback(10.0))
+          if (ambassador->evokeCallback(10.0))
             continue;
-          if (timeout < Clock::now()) {
+          if (timeout.isExpired()) {
+            DebugPrintf("%s: Timeout waiting for other federates to join!\n", __FUNCTION__);
             std::wcout << L"Timeout waiting for other federates to join!" << std::endl;
             return false;
           }
         }
       }
       catch (const rti1516ev::Exception& e) {
+        DebugPrintf("%s: rti1516ev::Exception: \"%ls\"\n", __FUNCTION__, e.what().c_str());
         std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
         return false;
       }
       catch (...) {
+        DebugPrintf("%s: Unknown Exception!\n", __FUNCTION__);
         std::wcout << L"Unknown Exception!" << std::endl;
         return false;
       }
@@ -225,10 +237,11 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
 
       try {
         for (std::vector<std::wstring>::const_iterator i = getFederateList().begin(); i != getFederateList().end(); ++i) {
-          ambassador.synchronizationPointAchieved(*i);
+          ambassador->synchronizationPointAchieved(*i);
         }
       }
       catch (const rti1516ev::Exception& e) {
+        DebugPrintf("%s: rti1516ev::Exception: \"%ls\"\n", __FUNCTION__, e.what().c_str());
         std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
         return false;
       }
@@ -238,17 +251,19 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
       }
 
       try {
-        Clock timeout = Clock::now() + Clock::fromSeconds(10);
+        AbsTimeout timeout(Clock::now() + Clock::fromSeconds(10));
         while (_synchronized < getFederateList().size()) {
-          if (ambassador.evokeCallback(10.0))
+          if (ambassador->evokeCallback(10.0))
             continue;
-          if (timeout < Clock::now()) {
+          if (timeout.isExpired()) {
+            DebugPrintf("%s: Timeout waiting for other federates to synchronize!", __FUNCTION__);
             std::wcout << L"Timeout waiting for other federates to synchronize!" << std::endl;
             return false;
           }
         }
       }
       catch (const rti1516ev::Exception& e) {
+        DebugPrintf("%s: rti1516ev::Exception: \"%ls\"\n", __FUNCTION__, e.what().c_str());
         std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
         return false;
       }
@@ -260,21 +275,22 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
       return true;
     }
 
-    virtual bool execJoinOnce() {
-      std::unique_ptr<rti1516ev::RTIambassador> ambassador;
+    // create the federation once, re-join several (_numIterations) times
+    virtual bool execJoinOnce(uint32_t threadIndex) {
       rti1516ev::RTIambassadorFactory factory;
-      ambassador = factory.createRTIambassador();
-      ambassador->setOperationWaitTimeout(10000);
+      assert(_ambassador == nullptr);
+      _ambassador = std::unique_ptr<rti1516ev::RTIambassador>(factory.createRTIambassador());
+      _ambassador->setOperationWaitTimeout(10000);
       _connectionLost = false;
-      ambassador->connect(*this, rti1516ev::HLA_EVOKED, getConnectUrl());
+      _ambassador->connect(*this, rti1516ev::HLA_EVOKED, getConnectUrl());
 
       // create, must work once
       try {
         if (getMimFile().empty())
-          ambassador->createFederationExecution(getFederationExecution(), getFddFileList(), std::wstring(L"HLAinteger64Time"));
+          _ambassador->createFederationExecution(getFederationExecution(), getFddFileList(), std::wstring(L"HLAinteger64Time"));
         else
-          ambassador->createFederationExecutionWithMIM(getFederationExecution(), getFddFileList(), getMimFile(), std::wstring(L"HLAinteger64Time"));
-        DebugPrintf("%s: createFederationExecution succeeded: name=%ls\n", __FUNCTION__, getFederationExecution().c_str());
+          _ambassador->createFederationExecutionWithMIM(getFederationExecution(), getFddFileList(), getMimFile(), std::wstring(L"HLAinteger64Time"));
+        //DebugPrintf("%s: createFederationExecution succeeded: name=%ls\n", __FUNCTION__, getFederationExecution().c_str());
 
         if (!getFederationBarrier()->success()) {
           DebugPrintf("%s: getFederationBarrier failed\n", __FUNCTION__);
@@ -301,8 +317,9 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
 
         // join must work
         try {
-          _federateHandle = ambassador->joinFederationExecution(getFederateType(), getFederationExecution());
-          DebugPrintf("%s: joinFederationExecution succeeded: name=%ls federateHandle=%ls\n", __FUNCTION__, getFederationExecution().c_str(), _federateHandle.toString().c_str());
+          _federateHandle = _ambassador->joinFederationExecution(getFederateType(), getFederationExecution());
+          _federateName = _ambassador->getFederateName(_federateHandle);
+          DebugPrintf("%s: joinFederationExecution succeeded: federateName=%ls federateHandle=%ls\n", __FUNCTION__, _federateName.c_str(), _federateHandle.toString().c_str());
         }
         catch (const rti1516ev::Exception& e) {
           std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
@@ -315,13 +332,14 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
 
         _federateSet.insert(getFederateList().begin(), getFederateList().end());
 
-        if (!execJoined(*ambassador))
+        if (!execJoined(threadIndex))
           return false;
 
         // and now resign must work
         try {
-          ambassador->resignFederationExecution(rti1516ev::CANCEL_THEN_DELETE_THEN_DIVEST);
-          DebugPrintf("%s: resignFederationExecution succeeded\n", __FUNCTION__);
+          std::wstring federateName = _ambassador->getFederateName(_federateHandle);
+          _ambassador->resignFederationExecution(rti1516ev::CANCEL_THEN_DELETE_THEN_DIVEST);
+          DebugPrintf("%s: resignFederationExecution(%ls) succeeded\n", __FUNCTION__, federateName.c_str());
         }
         catch (const rti1516ev::Exception& e) {
           std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
@@ -338,8 +356,9 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
 
       // destroy, must work once
       try {
-        ambassador->destroyFederationExecution(getFederationExecution());
-        DebugPrintf("%s: destroyFederationExecution succeeded\n", __FUNCTION__);
+        DebugPrintf("%s[%ls]: calling destroyFederationExecution ...\n", __FUNCTION__, getFederateName().c_str());
+        _ambassador->destroyFederationExecution(getFederationExecution());
+        DebugPrintf("%s[%ls]: destroyFederationExecution succeeded\n", __FUNCTION__, getFederateName().c_str());
 
         if (!getFederationBarrier()->success())
           return false;
@@ -347,6 +366,7 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
       catch (const rti1516ev::FederatesCurrentlyJoined&) {
         // Can happen in this test
         // Other threads just might have still joined.
+        DebugPrintf("%s[%ls]: destroyFederationExecution failed: FederatesCurrentlyJoined\n", __FUNCTION__, getFederateName().c_str());
 
         if (!getFederationBarrier()->fail())
           return false;
@@ -355,6 +375,7 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
         // Can happen in this test
         // Other threads might have been faster
 
+        DebugPrintf("%s[%ls]: destroyFederationExecution failed: FederationExecutionDoesNotExist\n", __FUNCTION__, getFederateName().c_str());
         if (!getFederationBarrier()->fail())
           return false;
       }
@@ -370,15 +391,16 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
       return true;
     }
 
-    virtual bool execJoinMultiple() {
+    // create and join the federation several (_numIterations) times
+    virtual bool execJoinMultiple(uint32_t threadIndex) {
       DebugPrintf("%s\n", __FUNCTION__);
-      std::unique_ptr<rti1516ev::RTIambassador> ambassador;
+      //std::unique_ptr<rti1516ev::RTIambassador> ambassador;
       rti1516ev::RTIambassadorFactory factory;
-      ambassador = factory.createRTIambassador();
-      ambassador->setOperationWaitTimeout(10000);
+      _ambassador = factory.createRTIambassador();
+      _ambassador->setOperationWaitTimeout(10000);
 
       _connectionLost = false;
-      ambassador->connect(*this, rti1516ev::HLA_EVOKED, getConnectUrl());
+      _ambassador->connect(*this, rti1516ev::HLA_EVOKED, getConnectUrl());
 
       // Try that several times. Ensure correct cleanup
       unsigned n = 99;
@@ -387,58 +409,74 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
         // create, must work once
         try {
           if (getMimFile().empty())
-            ambassador->createFederationExecution(getFederationExecution(), getFddFileList(), std::wstring(L"HLAinteger64Time"));
+            _ambassador->createFederationExecution(getFederationExecution(), getFddFileList(), std::wstring(L"HLAinteger64Time"));
           else
-            ambassador->createFederationExecutionWithMIM(getFederationExecution(), getFddFileList(), getMimFile(), std::wstring(L"HLAinteger64Time"));
+            _ambassador->createFederationExecutionWithMIM(getFederationExecution(), getFddFileList(), getMimFile(), std::wstring(L"HLAinteger64Time"));
 
           DebugPrintf("%s: createFederationExecution succeeded: name=%ls\n", __FUNCTION__, getFederationExecution().c_str());
           if (!getFederationBarrier()->success())
+          {
+            _ambassador.reset();
             return false;
+          }
         }
         catch (const rti1516ev::FederationExecutionAlreadyExists&) {
           // Can happen in this test
 
           if (!getFederationBarrier()->fail())
+          {
+            _ambassador.reset();
             return false;
+          }
         }
         catch (const rti1516ev::Exception& e) {
           std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
+          _ambassador.reset();
           return false;
         }
         catch (...) {
           std::wcout << L"Unknown Exception!" << std::endl;
+          _ambassador.reset();
           return false;
         }
 
         // join must work
         try {
-          _federateHandle = ambassador->joinFederationExecution(getFederateType(), getFederationExecution());
-          DebugPrintf("%s: joinFederationExecution succeeded: name=%ls federateHandle=%ls\n", __FUNCTION__, getFederationExecution().c_str(), _federateHandle.toString().c_str());
+          _federateHandle = _ambassador->joinFederationExecution(getFederateType(), getFederationExecution());
+          _federateName = _ambassador->getFederateName(_federateHandle);
+          DebugPrintf("%s: joinFederationExecution succeeded: federateName=%ls federateHandle=%ls\n", __FUNCTION__, _federateName.c_str(), _federateHandle.toString().c_str());
         }
         catch (const rti1516ev::Exception& e) {
           std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
+          _ambassador.reset();
           return false;
         }
         catch (...) {
           std::wcout << L"Unknown Exception!" << std::endl;
+          _ambassador.reset();
           return false;
         }
 
         _federateSet.insert(getFederateList().begin(), getFederateList().end());
 
-        if (!execJoined(*ambassador))
+        if (!execJoined(threadIndex))
+        {
+          _ambassador.reset();
           return false;
+        }
 
         // and now resign must work
         try {
-          ambassador->resignFederationExecution(rti1516ev::CANCEL_THEN_DELETE_THEN_DIVEST);
+          _ambassador->resignFederationExecution(rti1516ev::CANCEL_THEN_DELETE_THEN_DIVEST);
         }
         catch (const rti1516ev::Exception& e) {
           std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
+          _ambassador.reset();
           return false;
         }
         catch (...) {
           std::wcout << L"Unknown Exception!" << std::endl;
+          _ambassador.reset();
           return false;
         }
 
@@ -447,32 +485,43 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
 
         // destroy, must work once
         try {
-          ambassador->destroyFederationExecution(getFederationExecution());
+          _ambassador->destroyFederationExecution(getFederationExecution());
           DebugPrintf("%s: destroyFederationExecution succeeded\n", __FUNCTION__);
 
           if (!getFederationBarrier()->success())
+          {
+            _ambassador.reset();
             return false;
+          }
         }
         catch (const rti1516ev::FederatesCurrentlyJoined&) {
           // Can happen in this test
           // Other threads just might have still joined.
 
           if (!getFederationBarrier()->fail())
+          {
+            _ambassador.reset();
             return false;
+          }
         }
         catch (const rti1516ev::FederationExecutionDoesNotExist&) {
           // Can happen in this test
           // Other threads might have been faster
 
           if (!getFederationBarrier()->fail())
+          {
+            _ambassador.reset();
             return false;
+          }
         }
         catch (const rti1516ev::Exception& e) {
           std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
+          _ambassador.reset();
           return false;
         }
         catch (...) {
           std::wcout << L"Unknown Exception!" << std::endl;
+          _ambassador.reset();
           return false;
         }
       }
@@ -480,11 +529,11 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
       return true;
     }
 
-    bool exec() override {
+    bool exec(uint32_t threadIndex) override {
       if (_constructorArgs._joinOnce)
-        return execJoinOnce();
+        return execJoinOnce(threadIndex);
       else
-        return execJoinMultiple();
+        return execJoinMultiple(threadIndex);
     }
 
     void connectionLost(const std::wstring& faultDescription) override {
@@ -573,16 +622,16 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
     void multipleObjectInstanceNameReservationFailed(const std::set<std::wstring>& theObjectInstanceNames) override {
     }
 
-    virtual void discoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::ObjectClassHandle theObjectClass,
+    void discoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::ObjectClassHandle theObjectClass,
                                         std::wstring const & theObjectInstanceName) override {
     }
 
-    virtual void discoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::ObjectClassHandle theObjectClass,
+    void discoverObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::ObjectClassHandle theObjectClass,
                                         std::wstring const & theObjectInstanceName, rti1516ev::FederateHandle producingFederate) override {
       discoverObjectInstance(theObject, theObjectClass, theObjectInstanceName);
     }
 
-    virtual void reflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject,
+    void reflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject,
                                         rti1516ev::AttributeHandleValueMap const & theAttributeValues,
                                         rti1516ev::VariableLengthData const & theUserSuppliedTag,
                                         rti1516ev::OrderType sentOrder,
@@ -590,7 +639,7 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
                                         rti1516ev::SupplementalReflectInfo theReflectInfo) override {
     }
 
-    virtual void reflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject,
+    void reflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject,
                                         rti1516ev::AttributeHandleValueMap const & theAttributeValues,
                                         rti1516ev::VariableLengthData const & theUserSuppliedTag,
                                         rti1516ev::OrderType sentOrder,
@@ -601,161 +650,182 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
       reflectAttributeValues(theObject, theAttributeValues, theUserSuppliedTag, sentOrder, theType, theReflectInfo);
     }
 
-    virtual void reflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject,
-                                        rti1516ev::AttributeHandleValueMap const & theAttributeValues,
-                                        rti1516ev::VariableLengthData const & theUserSuppliedTag,
-                                        rti1516ev::OrderType sentOrder,
-                                        rti1516ev::TransportationType theType,
-                                        rti1516ev::LogicalTime const & theTime,
-                                        rti1516ev::OrderType receivedOrder,
-                                        rti1516ev::MessageRetractionHandle theHandle,
-                                        rti1516ev::SupplementalReflectInfo theReflectInfo) override {
+    void reflectAttributeValues(rti1516ev::ObjectInstanceHandle theObject,
+                                rti1516ev::AttributeHandleValueMap const & theAttributeValues,
+                                rti1516ev::VariableLengthData const & theUserSuppliedTag,
+                                rti1516ev::OrderType sentOrder,
+                                rti1516ev::TransportationType theType,
+                                rti1516ev::LogicalTime const & theTime,
+                                rti1516ev::OrderType receivedOrder,
+                                rti1516ev::MessageRetractionHandle theHandle,
+                                rti1516ev::SupplementalReflectInfo theReflectInfo) override {
       reflectAttributeValues(theObject, theAttributeValues, theUserSuppliedTag, sentOrder, theType, theTime, receivedOrder, theReflectInfo);
     }
 
-    virtual void receiveInteraction(rti1516ev::InteractionClassHandle theInteraction,
-                                    rti1516ev::ParameterHandleValueMap const & theParameterValues,
-                                    rti1516ev::VariableLengthData const & theUserSuppliedTag, rti1516ev::OrderType sentOrder, rti1516ev::TransportationType theType,
-                                    rti1516ev::SupplementalReceiveInfo theReceiveInfo) override {
+    void receiveInteraction(rti1516ev::InteractionClassHandle theInteraction,
+                            rti1516ev::ParameterHandleValueMap const & theParameterValues,
+                            rti1516ev::VariableLengthData const & theUserSuppliedTag,
+                            rti1516ev::OrderType sentOrder,
+                            rti1516ev::TransportationType theType,
+                            rti1516ev::SupplementalReceiveInfo theReceiveInfo) override {
     }
 
-    virtual void receiveInteraction(rti1516ev::InteractionClassHandle theInteraction,
-                                    rti1516ev::ParameterHandleValueMap const & theParameterValues,
-                                    rti1516ev::VariableLengthData const & theUserSuppliedTag,
-                                    rti1516ev::OrderType sentOrder,
-                                    rti1516ev::TransportationType theType,
-                                    rti1516ev::LogicalTime const & theTime,
-                                    rti1516ev::OrderType receivedOrder,
-                                    rti1516ev::SupplementalReceiveInfo theReceiveInfo) override {
+    void receiveInteraction(rti1516ev::InteractionClassHandle theInteraction,
+                            rti1516ev::ParameterHandleValueMap const & theParameterValues,
+                            rti1516ev::VariableLengthData const & theUserSuppliedTag,
+                            rti1516ev::OrderType sentOrder,
+                            rti1516ev::TransportationType theType,
+                            rti1516ev::LogicalTime const & theTime,
+                            rti1516ev::OrderType receivedOrder,
+                            rti1516ev::SupplementalReceiveInfo theReceiveInfo) override {
       receiveInteraction(theInteraction, theParameterValues, theUserSuppliedTag, sentOrder, theType, theReceiveInfo);
     }
 
-    virtual void receiveInteraction(rti1516ev::InteractionClassHandle theInteraction, rti1516ev::ParameterHandleValueMap const & theParameterValues,
-                                    rti1516ev::VariableLengthData const & theUserSuppliedTag, rti1516ev::OrderType sentOrder, rti1516ev::TransportationType theType,
-                                    rti1516ev::LogicalTime const & theTime, rti1516ev::OrderType receivedOrder, rti1516ev::MessageRetractionHandle theHandle,
-                                    rti1516ev::SupplementalReceiveInfo theReceiveInfo) override {
+    void receiveInteraction(rti1516ev::InteractionClassHandle theInteraction,
+                            rti1516ev::ParameterHandleValueMap const & theParameterValues,
+                            rti1516ev::VariableLengthData const & theUserSuppliedTag,
+                            rti1516ev::OrderType sentOrder,
+                            rti1516ev::TransportationType theType,
+                            rti1516ev::LogicalTime const & theTime,
+                            rti1516ev::OrderType receivedOrder,
+                            rti1516ev::MessageRetractionHandle theHandle,
+                            rti1516ev::SupplementalReceiveInfo theReceiveInfo) override {
       receiveInteraction(theInteraction, theParameterValues, theUserSuppliedTag, sentOrder, theType, theTime, receivedOrder, theReceiveInfo);
     }
 
-    virtual void removeObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::VariableLengthData const & theUserSuppliedTag,
+    void removeObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::VariableLengthData const & theUserSuppliedTag,
                                       rti1516ev::OrderType sentOrder, rti1516ev::SupplementalRemoveInfo theRemoveInfo) override {
     }
 
-    virtual void removeObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::VariableLengthData const & theUserSuppliedTag, rti1516ev::OrderType sentOrder,
+    void removeObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::VariableLengthData const & theUserSuppliedTag, rti1516ev::OrderType sentOrder,
                                       rti1516ev::LogicalTime const & theTime, rti1516ev::OrderType receivedOrder, rti1516ev::SupplementalRemoveInfo theRemoveInfo) override {
       removeObjectInstance(theObject, theUserSuppliedTag, sentOrder, theRemoveInfo);
     }
 
-    virtual void removeObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::VariableLengthData const & theUserSuppliedTag, rti1516ev::OrderType sentOrder,
+    void removeObjectInstance(rti1516ev::ObjectInstanceHandle theObject, rti1516ev::VariableLengthData const & theUserSuppliedTag, rti1516ev::OrderType sentOrder,
                                       rti1516ev::LogicalTime const & theTime, rti1516ev::OrderType receivedOrder, rti1516ev::MessageRetractionHandle theHandle,
                                       rti1516ev::SupplementalRemoveInfo theRemoveInfo) override {
       removeObjectInstance(theObject, theUserSuppliedTag, sentOrder, theTime, receivedOrder, theRemoveInfo);
     }
 
-    virtual void attributesInScope(rti1516ev::ObjectInstanceHandle theObject,
+    void attributesInScope(rti1516ev::ObjectInstanceHandle theObject,
                                    rti1516ev::AttributeHandleSet const & theAttributes) override {
     }
 
-    virtual void attributesOutOfScope(rti1516ev::ObjectInstanceHandle theObject,
+    void attributesOutOfScope(rti1516ev::ObjectInstanceHandle theObject,
                                       rti1516ev::AttributeHandleSet const & theAttributes) override {
     }
 
-    virtual void provideAttributeValueUpdate(rti1516ev::ObjectInstanceHandle theObject,
+    void provideAttributeValueUpdate(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & theAttributes,
         rti1516ev::VariableLengthData const & theUserSuppliedTag) override {
     }
 
-    virtual void turnUpdatesOnForObjectInstance(rti1516ev::ObjectInstanceHandle theObject,
+    void turnUpdatesOnForObjectInstance(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & theAttributes) override {
     }
 
-    virtual void turnUpdatesOnForObjectInstance(rti1516ev::ObjectInstanceHandle theObject,
+    void turnUpdatesOnForObjectInstance(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & theAttributes,
         std::wstring const & updateRateDesignator) override {
     }
 
-    virtual void turnUpdatesOffForObjectInstance(rti1516ev::ObjectInstanceHandle theObject,
+    void turnUpdatesOffForObjectInstance(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & theAttributes) override {
     }
 
-    virtual void confirmAttributeTransportationTypeChange(rti1516ev::ObjectInstanceHandle theObject,
+    void confirmAttributeTransportationTypeChange(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet theAttributes,
         rti1516ev::TransportationType theTransportation) override {
     }
 
-    virtual void reportAttributeTransportationType(rti1516ev::ObjectInstanceHandle theObject,
+    void reportAttributeTransportationType(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandle theAttribute,
         rti1516ev::TransportationType theTransportation) override {
     }
 
-    virtual void confirmInteractionTransportationTypeChange(rti1516ev::InteractionClassHandle theInteraction,
+    void confirmInteractionTransportationTypeChange(rti1516ev::InteractionClassHandle theInteraction,
         rti1516ev::TransportationType theTransportation) override {
     }
 
-    virtual void reportInteractionTransportationType(rti1516ev::FederateHandle federateHandle,
+    void reportInteractionTransportationType(rti1516ev::FederateHandle federateHandle,
         rti1516ev::InteractionClassHandle theInteraction,
         rti1516ev::TransportationType theTransportation) override {
     }
 
-    virtual void requestAttributeOwnershipAssumption(rti1516ev::ObjectInstanceHandle theObject,
+    void requestAttributeOwnershipAssumption(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & offeredAttributes,
         rti1516ev::VariableLengthData const & theUserSuppliedTag) override {
     }
 
-    virtual void requestDivestitureConfirmation(rti1516ev::ObjectInstanceHandle theObject,
+    void requestDivestitureConfirmation(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & releasedAttributes) override {
     }
 
-    virtual void attributeOwnershipAcquisitionNotification(rti1516ev::ObjectInstanceHandle theObject,
+    void attributeOwnershipAcquisitionNotification(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & securedAttributes,
         rti1516ev::VariableLengthData const & theUserSuppliedTag) override {
     }
 
-    virtual void attributeOwnershipUnavailable(rti1516ev::ObjectInstanceHandle theObject,
+    void attributeOwnershipUnavailable(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & theAttributes) override {
     }
 
-    virtual void requestAttributeOwnershipRelease(rti1516ev::ObjectInstanceHandle theObject,
+    void requestAttributeOwnershipRelease(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & candidateAttributes,
         rti1516ev::VariableLengthData const & theUserSuppliedTag) override {
     }
 
-    virtual void confirmAttributeOwnershipAcquisitionCancellation(rti1516ev::ObjectInstanceHandle theObject,
+    void confirmAttributeOwnershipAcquisitionCancellation(rti1516ev::ObjectInstanceHandle theObject,
         rti1516ev::AttributeHandleSet const & theAttributes) override {
     }
 
-    virtual void informAttributeOwnership(rti1516ev::ObjectInstanceHandle theObject,
+    void informAttributeOwnership(rti1516ev::ObjectInstanceHandle theObject,
                                           rti1516ev::AttributeHandle theAttribute,
                                           rti1516ev::FederateHandle theOwner) override {
     }
 
-    virtual void attributeIsNotOwned(rti1516ev::ObjectInstanceHandle theObject,
+    void attributeIsNotOwned(rti1516ev::ObjectInstanceHandle theObject,
                                      rti1516ev::AttributeHandle theAttribute) override {
     }
 
-    virtual void attributeIsOwnedByRTI(rti1516ev::ObjectInstanceHandle theObject,
+    void attributeIsOwnedByRTI(rti1516ev::ObjectInstanceHandle theObject,
                                        rti1516ev::AttributeHandle theAttribute) override {
     }
 
-    virtual void timeRegulationEnabled(rti1516ev::LogicalTime const & theFederateTime) override {
+    void timeRegulationEnabled(rti1516ev::LogicalTime const & theFederateTime) override {
     }
 
-    virtual void timeConstrainedEnabled(rti1516ev::LogicalTime const & theFederateTime) override {
+    void timeConstrainedEnabled(rti1516ev::LogicalTime const & theFederateTime) override {
     }
 
-    virtual void timeAdvanceGrant(rti1516ev::LogicalTime const & theTime) override {
+    void timeAdvanceGrant(rti1516ev::LogicalTime const & theTime) override {
     }
 
-    virtual void requestRetraction(rti1516ev::MessageRetractionHandle theHandle) override {
+    void requestRetraction(rti1516ev::MessageRetractionHandle theHandle) override {
     }
+
+    void federationResetInitiated(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+    void federationResetDone(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+    void federationResetAborted(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+
   protected:
+    std::unique_ptr<rti1516ev::RTIambassador> _ambassador;
     bool _enableConstrained = true;
     bool _enableRegulation = true;
     bool _enableConstrainedPastRegulation = true;
     bool _disableRegulationPastConstrained = true;
+
   private:
     std::wstring _logicalTimeFactoryName;
     rti1516ev::FederateHandle _federateHandle;
+    std::wstring _federateName;
     unsigned _synchronized;
     bool _connectionLost = false;
     std::set<std::wstring> _federateSet;
@@ -850,6 +920,7 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
         std::vector<std::wstring> additionalFomModules = std::vector<std::wstring>()) {
       _replaceFilesWithDataIfNeeded(additionalFomModules);
       _federateHandle = _ambassador->joinFederationExecution(federateType, federationExecutionName, additionalFomModules);
+      _federateName = _ambassador->getFederateName(_federateHandle);
       _grantedLogicalTime = _logicalTimeFactory->makeInitial();
       return _federateHandle;
     }
@@ -859,6 +930,7 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
         std::vector<std::wstring> additionalFomModules = std::vector<std::wstring>()) {
       _replaceFilesWithDataIfNeeded(additionalFomModules);
       _federateHandle = _ambassador->joinFederationExecution(federateName, federateType, federationExecutionName, additionalFomModules);
+          _federateName = _ambassador->getFederateName(_federateHandle);
       _grantedLogicalTime = _logicalTimeFactory->makeInitial();
       return _federateHandle;
     }
@@ -1606,7 +1678,7 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
     //    // _verifyReflectAttributeValues(objectInstanceHandle, attributeHandleValueMap);
     //}
 
-    virtual void receiveInteraction(rti1516ev::InteractionClassHandle,
+    void receiveInteraction(rti1516ev::InteractionClassHandle,
                                     const rti1516ev::ParameterHandleValueMap&,
                                     const rti1516ev::VariableLengthData&,
                                     rti1516ev::OrderType,
@@ -1621,7 +1693,7 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
     //{
     //}
 
-    virtual void receiveInteraction(rti1516ev::InteractionClassHandle interaction,
+    void receiveInteraction(rti1516ev::InteractionClassHandle interaction,
                                     rti1516ev::ParameterHandleValueMap const & parameterValues,
                                     rti1516ev::VariableLengthData const & tag,
                                     rti1516ev::OrderType sentOrder,
@@ -1653,6 +1725,7 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
                                     rti1516ev::OrderType receivedOrder,
                                     rti1516ev::MessageRetractionHandle theHandle,
                                     rti1516ev::SupplementalReceiveInfo theReceiveInfo) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     //virtual void receiveInteraction(rti1516ev::InteractionClassHandle interaction,
@@ -1673,6 +1746,7 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
                                       rti1516ev::OrderType sentOrder,
                                       rti1516ev::SupplementalRemoveInfo theRemoveInfo) override {
       // _verifyRemoveObjectInstance(objectInstanceHandle);
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void removeObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
@@ -1681,7 +1755,7 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
                                       rti1516ev::LogicalTime const & logicalTime,
                                       rti1516ev::OrderType receivedOrder,
                                       rti1516ev::SupplementalRemoveInfo theRemoveInfo) override {
-      // _verifyRemoveObjectInstance(objectInstanceHandle);
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void removeObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
@@ -1696,24 +1770,29 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
 
     virtual void attributesInScope(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
                                    rti1516ev::AttributeHandleSet const & attributes) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void attributesOutOfScope(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
                                       rti1516ev::AttributeHandleSet const & attributes) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void provideAttributeValueUpdate(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
         rti1516ev::AttributeHandleSet const & attributes,
         rti1516ev::VariableLengthData const & tag) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void turnUpdatesOnForObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
         rti1516ev::AttributeHandleSet const & attributes) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void turnUpdatesOnForObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
         rti1516ev::AttributeHandleSet const & attributes,
         const std::wstring& updateRateDesignator) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void turnUpdatesOffForObjectInstance(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
@@ -1742,10 +1821,12 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
     virtual void requestAttributeOwnershipAssumption(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
         rti1516ev::AttributeHandleSet const & offeredAttributes,
         rti1516ev::VariableLengthData const & tag) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void requestDivestitureConfirmation(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
         rti1516ev::AttributeHandleSet const & releasedAttributes) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void attributeOwnershipAcquisitionNotification(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
@@ -1755,20 +1836,24 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
 
     virtual void attributeOwnershipUnavailable(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
         rti1516ev::AttributeHandleSet const & attributes) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void requestAttributeOwnershipRelease(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
         rti1516ev::AttributeHandleSet const & candidateAttributes,
         rti1516ev::VariableLengthData const & tag) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void confirmAttributeOwnershipAcquisitionCancellation(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
         rti1516ev::AttributeHandleSet const & attributes) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void informAttributeOwnership(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
                                           rti1516ev::AttributeHandle attribute,
                                           rti1516ev::FederateHandle owner) override {
+      DebugPrintf("%s: UNHANDLED CALLBACK\n", __FUNCTION__);
     }
 
     virtual void attributeIsNotOwned(rti1516ev::ObjectInstanceHandle objectInstanceHandle,
@@ -1797,6 +1882,16 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
     }
 
     virtual void requestRetraction(rti1516ev::MessageRetractionHandle theHandle) override {
+    }
+
+    virtual void federationResetInitiated(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+    virtual void federationResetDone(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
+    }
+    virtual void federationResetAborted(const rti1516ev::LogicalTime& logicalTime, const rti1516ev::VariableLengthData& tag) override
+    {
     }
 
     // void fail()
@@ -1867,12 +1962,12 @@ class OPENRTI_LOCAL RTI1516ESimpleAmbassador : public rti1516ev::FederateAmbassa
     std::unique_ptr<rti1516ev::LogicalTimeFactory> _logicalTimeFactory;
 
     rti1516ev::FederateHandle _federateHandle;
-
+    std::wstring _federateName;
     std::unique_ptr<rti1516ev::LogicalTime> _grantedLogicalTime;
-    bool _timeRegulationEnabled = true;
-    bool _timeConstrainedEnabled = true;
+    bool _timeRegulationEnabled = false;
+    bool _timeConstrainedEnabled = false;
     //bool _enableConstrainedPastRegulation = true;
-    bool _timeAdvancePending;
+    bool _timeAdvancePending = false;
     // Hmm, FIXME: make an additional derived checking ambassador for the tests, keep a simple one without expensive tests
     // FIXME make this and for example the simple log below callbacks that we can attach or not as apropriate
 

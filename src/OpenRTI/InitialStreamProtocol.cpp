@@ -232,7 +232,7 @@ bool InitialStreamProtocol::getCompatibleVersion(std::string& resultingVersion, 
 
 OpenRTI::StringList InitialStreamProtocol::getCompatibleVersions()
 {
-  static StringList compatibleVersions{"9", "8"};
+  static StringList compatibleVersions{"10", "9", "8"};
   return compatibleVersions;
 }
 

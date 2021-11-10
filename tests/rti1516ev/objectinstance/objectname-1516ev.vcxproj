@@ -24,17 +24,18 @@
     <Platform>x64</Platform>
     <ProjectName>objectname-1516ev</ProjectName>
     <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -112,13 +113,11 @@
       <Project>{1A1A66B8-408A-301F-AA77-DFD4708C8C6E}</Project>
       <Name>OpenRTI</Name>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\rti1516ev\fedtime1516ev.vcxproj">
-      <Project>{8028FCD5-28A5-3B4E-90BA-1652FBC4C573}</Project>
-      <Name>fedtime1516ev</Name>
+    <ProjectReference Include="..\..\..\src\rti1516ev\fedtime1516ev.vcxproj">
+      <Project>{ac5b586d-f120-3715-bc9c-fc80dd945c84}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)src\rti1516ev\rti1516ev.vcxproj">
-      <Project>{8B44E524-3A8E-32AE-81DD-5115F5A4BAE2}</Project>
-      <Name>rti1516ev</Name>
+    <ProjectReference Include="..\..\..\src\rti1516ev\rti1516ev.vcxproj">
+      <Project>{dee8a809-6531-30d3-9292-e70c38ed75fc}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

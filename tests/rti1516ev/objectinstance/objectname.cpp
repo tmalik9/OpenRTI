@@ -38,15 +38,15 @@ public:
   virtual ~TestAmbassador()
   { }
 
-  virtual bool execJoined(rti1516ev::RTIambassador& ambassador) override
+  bool execJoined(uint32_t threadIndex) override
   {
-
+    rti1516ev::RTIambassador* ambassador = getRtiAmbassador();
     if (!waitForAllFederates(ambassador))
       return false;
 
     rti1516ev::ObjectClassHandle objectClassHandle1;
     try {
-      objectClassHandle1 = ambassador.getObjectClassHandle(L"ObjectClass1");
+      objectClassHandle1 = ambassador->getObjectClassHandle(L"ObjectClass1");
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
       return false;
@@ -58,7 +58,7 @@ public:
     std::set<rti1516ev::AttributeHandle> attributeHandles;
 
     try {
-      ambassador.subscribeObjectClassAttributes(objectClassHandle1, attributeHandles);
+      ambassador->subscribeObjectClassAttributes(objectClassHandle1, attributeHandles);
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
       return false;
@@ -68,7 +68,7 @@ public:
     }
 
     try {
-      ambassador.publishObjectClassAttributes(objectClassHandle1, attributeHandles);
+      ambassador->publishObjectClassAttributes(objectClassHandle1, attributeHandles);
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
       return false;
@@ -83,7 +83,7 @@ public:
       for (unsigned i = 0; i < count; ++i) {
         std::wstringstream stream;
         stream << "ObjectInstanceName" << i;
-        ambassador.reserveObjectInstanceName(stream.str());
+        ambassador->reserveObjectInstanceName(stream.str());
       }
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
@@ -96,7 +96,7 @@ public:
     try {
       Clock timeout = Clock::now() + Clock::fromSeconds(10);
       while (_nameReservationMap.size() < count) {
-        if (ambassador.evokeCallback(10.0))
+        if (ambassador->evokeCallback(10.0))
           continue;
         if (timeout < Clock::now()) {
           std::wcout << L"Timeout waiting for next message" << std::endl;
@@ -127,7 +127,7 @@ public:
     for (NameReservationMap::iterator i = _nameReservationMap.begin(); i != _nameReservationMap.end(); ++i) {
       try {
         if (!i->second) {
-          ambassador.registerObjectInstance(objectClassHandle1, i->first);
+          ambassador->registerObjectInstance(objectClassHandle1, i->first);
           // If we get the object but reservation fails, we should not get here
           return false;
         }
@@ -151,7 +151,7 @@ public:
       if (i != _nameReservationMap.end()) {
         for (++i; i != _nameReservationMap.end(); ++i) {
           if (i->second) {
-            objectInstanceHandles.insert(ambassador.registerObjectInstance(objectClassHandle1, i->first));
+            objectInstanceHandles.insert(ambassador->registerObjectInstance(objectClassHandle1, i->first));
           }
         }
       }
@@ -166,7 +166,7 @@ public:
     try {
       for (std::set<rti1516ev::ObjectInstanceHandle>::iterator i = objectInstanceHandles.begin();
            i != objectInstanceHandles.end(); ++i) {
-        ambassador.deleteObjectInstance(*i, toVariableLengthData("tag"));
+        ambassador->deleteObjectInstance(*i, toVariableLengthData("tag"));
       }
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
@@ -179,7 +179,7 @@ public:
     _nameReservationMap.clear();
 
     try {
-      ambassador.unpublishObjectClass(objectClassHandle1);
+      ambassador->unpublishObjectClass(objectClassHandle1);
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
       return false;
@@ -189,7 +189,7 @@ public:
     }
 
     try {
-      ambassador.unsubscribeObjectClass(objectClassHandle1);
+      ambassador->unsubscribeObjectClass(objectClassHandle1);
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
       return false;

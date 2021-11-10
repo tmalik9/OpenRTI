@@ -73,9 +73,13 @@ Region::setRegionHandle(const LocalRegionHandle& regionHandle)
 
 ////////////////////////////////////////////////////////////
 
-InstanceAttribute::InstanceAttribute(ObjectInstance& objectInstance, ClassAttribute& classAttribute) :
-  _objectInstance(objectInstance),
-  _classAttribute(classAttribute)
+InstanceAttribute::InstanceAttribute(ObjectInstance& objectInstance, ClassAttribute& classAttribute)
+  : _objectInstance(objectInstance)
+  , _classAttribute(classAttribute)
+  , _ownerFederate()
+  , _ownershipTransferState(OwnershipTransferState::None)
+  , _federateWillingToAcquire()
+
 {
   setAttributeHandle(_classAttribute.getAttributeHandle());
   /// FIXME
@@ -237,65 +241,6 @@ ObjectInstance::setObjectClass(ObjectClass* objectClass)
 
 ////////////////////////////////////////////////////////////
 
-SynchronizationFederate::SynchronizationFederate(Synchronization& synchronization, Federate& federate) :
-  _synchronization(synchronization),
-  _federate(federate),
-  _successful(false)
-{
-}
-
-SynchronizationFederate::~SynchronizationFederate()
-{
-}
-
-void
-SynchronizationFederate::setFederateHandle(const FederateHandle& federateHandle)
-{
-  HandleListEntity<SynchronizationFederate, FederateHandle>::_setHandle(federateHandle);
-}
-
-void
-SynchronizationFederate::setSuccessful(bool successful)
-{
-  _successful = successful;
-}
-
-////////////////////////////////////////////////////////////
-
-Synchronization::Synchronization()
-{
-}
-
-Synchronization::~Synchronization()
-{
-  _achievedFederateSyncronizationMap.clear();
-  _waitingFederateSyncronizationMap.clear();
-}
-
-void
-Synchronization::setLabel(const std::string& label)
-{
-  NameMap::Hook::setKey(label);
-}
-
-void
-Synchronization::setTag(const VariableLengthData& tag)
-{
-  _tag = tag;
-}
-
-void
-Synchronization::setAddJoiningFederates(bool addJoiningFederates)
-{
-  _addJoiningFederates = addJoiningFederates;
-}
-
-bool
-Synchronization::getIsWaitingFor(const FederateHandle& federateHandle)
-{
-  return _waitingFederateSyncronizationMap.find(federateHandle) != _waitingFederateSyncronizationMap.end();
-}
-
 void
 Synchronization::insert(Federate& federate)
 {
@@ -335,12 +280,79 @@ Synchronization::achieved(const FederateHandle& federateHandle, bool successful)
 
 ////////////////////////////////////////////////////////////
 
+void FederationReset::insert(Federate & federate)
+{
+  OpenRTIAssert(_initiatedFederateMap.find(federate.getFederateHandle()) == _initiatedFederateMap.end());
+  OpenRTIAssert(_resetBegunFederateMap.find(federate.getFederateHandle()) == _resetBegunFederateMap.end());
+  OpenRTIAssert(_resetCompleteFederateMap.find(federate.getFederateHandle()) == _resetCompleteFederateMap.end());
+  if (federate.getResignPending())
+    return;
+  if (federate.getIsInternal())
+  {
+    //DebugPrintf("%s(label=%s): federate %s is internal\n", __FUNCTION__, getLabel().c_str(), federate.getName().c_str());
+    return;
+  }
+  //else
+  //{
+  //  DebugPrintf("%s(label=%s): inserted federate %s\n", __FUNCTION__, getLabel().c_str(), federate.getName().c_str());
+  //}
+  ResettingFederate* resettingFederate = new ResettingFederate(*this, federate);
+  resettingFederate->setFederateHandle(federate.getFederateHandle());
+  federate.insert(*resettingFederate);
+  _initiatedFederateMap.insert(*resettingFederate);
+}
+
+void FederationReset::begun(const FederateHandle & federateHandle)
+{
+  //DebugPrintf("%s: federateHandle=%s\n", __FUNCTION__, federateHandle.toString().c_str());
+  //DebugPrintf("%s: _initiatedFederateMap.size=%d\n", __FUNCTION__, _initiatedFederateMap.size());
+  //DebugPrintf("%s: _resetBegunFederateMap.size=%d\n", __FUNCTION__, _resetBegunFederateMap.size());
+  //DebugPrintf("%s: _resetCompleteFederateMap.size=%d\n", __FUNCTION__, _resetCompleteFederateMap.size());
+  OpenRTIAssert(_initiatedFederateMap.find(federateHandle) != _initiatedFederateMap.end());
+  OpenRTIAssert(_resetCompleteFederateMap.find(federateHandle) == _resetCompleteFederateMap.end());
+  ServerModel::ResettingFederate::HandleMap::iterator i = _initiatedFederateMap.find(federateHandle);
+  if (i == _initiatedFederateMap.end())
+    return;
+  // Note that no matter where we are currently linked,
+  // this removes the entry from one of the maps
+  ResettingFederate::HandleMap::unlink(*i);
+  _resetBegunFederateMap.insert(*i);
+  //DebugPrintf("%s: _initiatedFederateMap.size=%d\n", __FUNCTION__, _initiatedFederateMap.size());
+  //DebugPrintf("%s: _resetBegunFederateMap.size=%d\n", __FUNCTION__, _resetBegunFederateMap.size());
+  //DebugPrintf("%s: _resetCompleteFederateMap.size=%d\n", __FUNCTION__, _resetCompleteFederateMap.size());
+}
+
+void FederationReset::complete(const FederateHandle & federateHandle, bool successful)
+{
+  //DebugPrintf("%s: federateHandle=%s successful=%d\n", __FUNCTION__, federateHandle.toString().c_str(), successful);
+  //DebugPrintf("%s: _initiatedFederateMap.size=%d\n", __FUNCTION__, _initiatedFederateMap.size());
+  //DebugPrintf("%s: _resetBegunFederateMap.size=%d\n", __FUNCTION__, _resetBegunFederateMap.size());
+  //DebugPrintf("%s: _resetCompleteFederateMap.size=%d\n", __FUNCTION__, _resetCompleteFederateMap.size());
+  // NOTE: some federates may still be in 'initiated' state while others have already completed.
+  // But the federate inserted must not be in the 'complete' state already.
+  OpenRTIAssert(_resetCompleteFederateMap.find(federateHandle) == _resetCompleteFederateMap.end());
+  ServerModel::ResettingFederate::HandleMap::iterator i = _resetBegunFederateMap.find(federateHandle);
+  OpenRTIAssert(i != _resetBegunFederateMap.end());
+  setSuccess(successful);
+  // Note that no matter where we are currently linked,
+  // this removes the entry from one of the maps
+  ResettingFederate::HandleMap::unlink(*i);
+  _resetCompleteFederateMap.insert(*i);
+  //DebugPrintf("%s: _initiatedFederateMap.size=%d\n", __FUNCTION__, _initiatedFederateMap.size());
+  //DebugPrintf("%s: _resetBegunFederateMap.size=%d\n", __FUNCTION__, _resetBegunFederateMap.size());
+  //DebugPrintf("%s: _resetCompleteFederateMap.size=%d\n", __FUNCTION__, _resetCompleteFederateMap.size());
+}
+
+////////////////////////////////////////////////////////////
+
 Federate::Federate(Federation& federation)
   : _federation(federation)
   , _resignAction(CANCEL_THEN_DELETE_THEN_DIVEST)
   , _resignPending(false)
   , _federationConnect(0)
   , _commitId()
+  , _synchronizationFederateList()
+  , _resettingFederateList()
   , _isInternal(false)
 {
 }
@@ -348,6 +360,7 @@ Federate::Federate(Federation& federation)
 Federate::~Federate()
 {
   _synchronizationFederateList.clear();
+  _resettingFederateList.clear();
   _federationConnect = 0;
 }
 
@@ -379,6 +392,12 @@ void
 Federate::insert(SynchronizationFederate& synchronizationFederate)
 {
   _synchronizationFederateList.push_back(synchronizationFederate);
+}
+
+void
+Federate::insert(ResettingFederate& resettingFederate)
+{
+  _resettingFederateList.push_back(resettingFederate);
 }
 
 void
@@ -1810,7 +1829,7 @@ Federation::~Federation()
   // There is no need that this gets cleaned up. We can have open synchronizations ...
   // OpenRTIAssert(_synchronizationNameSynchronizationMap.empty());
   _synchronizationNameSynchronizationMap.clear();
-
+  _resetState.clear();
   _federateHandleFederateMap.clear();
   OpenRTIAssert(_federateHandleFederateMap.empty());
 
@@ -3453,7 +3472,7 @@ Federation::getInteractionClassHandle(const std::string& fqInteractionClassName)
   {
     return i->getInteractionClassHandle();
   }
-  return ObjectClassHandle::invalid();
+  return InteractionClassHandle();
 }
 
 ObjectClass*
@@ -3475,7 +3494,7 @@ Federation::getObjectClassHandle(const std::string& fqClassName)
   {
     return i->getObjectClassHandle();
   }
-  return ObjectClassHandle::invalid();
+  return ObjectClassHandle();
 }
 
 

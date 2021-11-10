@@ -212,6 +212,10 @@ RTI_EXCEPTION(UnknownName)
 RTI_EXCEPTION(UnsupportedCallbackModel)
 RTI_EXCEPTION(EncoderException)
 RTI_EXCEPTION(InternalError)
+RTI_EXCEPTION(ResetInProgress)
+RTI_EXCEPTION(ResetNotInProgress)
+RTI_EXCEPTION(ResetNotBegun)
+RTI_EXCEPTION(ResetNotSupportedByRti)
 #undef RTI_EXCEPTION
 
 } // namespace OpenRTI

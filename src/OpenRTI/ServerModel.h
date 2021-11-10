@@ -36,6 +36,7 @@
 #include "StringUtils.h"
 #include "Types.h"
 #include "LogStream.h"
+//#include "OwnershipManager.h"
 
 #include <memory>
 
@@ -403,6 +404,15 @@ public:
   const FederateHandle& getOwnerFederate() const noexcept { return _ownerFederate; }
   void setOwnerFederate(const FederateHandle& federateHandle);
 
+  void setOwnershipTransferState(OwnershipTransferState newState) { _ownershipTransferState = newState; }
+  OwnershipTransferState getOwnershipTransferState() const { return _ownershipTransferState; }
+
+  FederateHandle getFederateWillingToAcquire() const { return _federateWillingToAcquire; }
+  void setFederateWillingToAcquire(FederateHandle federateWillingToAcquire) { _federateWillingToAcquire = federateWillingToAcquire; }
+
+  ConnectHandle getConnectHandleWillingToAcquire() const { return _connectHandleWillingToAcquire; }
+  void setConnectHandleWillingToAcquire(ConnectHandle connectHandleWillingToAcquire) { _connectHandleWillingToAcquire = connectHandleWillingToAcquire; }
+
   void removeConnect(const ConnectHandle& connectHandle);
 
   // Because of attribute ownership, it is clear for an object attribute where the update
@@ -412,15 +422,21 @@ public:
   /// The connect this attribute is owned by
   ConnectHandle _ownerConnectHandle;
 
-  /// The federate this attribute is owned by
-  FederateHandle _ownerFederate;
-
 private:
   InstanceAttribute(const InstanceAttribute&) = delete;
   InstanceAttribute& operator=(const InstanceAttribute&) = delete;
 
   ObjectInstance& _objectInstance;
   ClassAttribute& _classAttribute;
+
+  // The federate this attribute is owned by
+  FederateHandle _ownerFederate;
+  // indicates whether this attribute is in the process of being acquired or divested
+  OwnershipTransferState _ownershipTransferState;
+  // the federate willing to acquire this attribute
+  FederateHandle _federateWillingToAcquire;
+  // ... and it's connect
+  ConnectHandle _connectHandleWillingToAcquire;
 };
 
 ////////////////////////////////////////////////////////////
@@ -557,12 +573,18 @@ public:
   typedef HandleListEntity<SynchronizationFederate, FederateHandle>::HandleMap HandleMap;
   typedef HandleListEntity<SynchronizationFederate, FederateHandle>::FirstList FirstList;
 
-  SynchronizationFederate(Synchronization& synchronization, Federate& federate);
-  ~SynchronizationFederate();
+  SynchronizationFederate(Synchronization& synchronization, Federate& federate)
+    : _synchronization(synchronization), _federate(federate), _successful(false)
+  {
+  }
+  ~SynchronizationFederate() { }
 
-  const FederateHandle& getFederateHandle() const
-  { return HandleListEntity<SynchronizationFederate, FederateHandle>::_getHandle(); }
-  void setFederateHandle(const FederateHandle& federateHandle);
+  const FederateHandle& getFederateHandle() const {
+    return HandleListEntity<SynchronizationFederate, FederateHandle>::_getHandle();
+  }
+  void setFederateHandle(const FederateHandle& federateHandle) {
+    HandleListEntity<SynchronizationFederate, FederateHandle>::_setHandle(federateHandle);
+  }
 
   const Synchronization& getSynchronization() const noexcept { return _synchronization; }
   Synchronization& getSynchronization() noexcept { return _synchronization; }
@@ -570,7 +592,7 @@ public:
   Federate& getFederate() noexcept { return _federate; }
 
   bool getSuccessful() const noexcept { return _successful; }
-  void setSuccessful(bool successful);
+  void setSuccessful(bool successful) { _successful = successful; }
 
 private:
   SynchronizationFederate(const SynchronizationFederate&) = delete;
@@ -588,20 +610,24 @@ class OPENRTI_LOCAL Synchronization : public IntrusiveUnorderedMap<std::string, 
 public:
   typedef IntrusiveUnorderedMap<std::string, Synchronization> NameMap;
 
-  Synchronization();
-  ~Synchronization();
+  Synchronization() { }
+  ~Synchronization() {
+    _achievedFederateSyncronizationMap.clear();
+    _waitingFederateSyncronizationMap.clear();
+  }
 
-  const std::string& getLabel() const
-  { return NameMap::Hook::getKey(); }
-  void setLabel(const std::string& label);
+  const std::string& getLabel() const { return NameMap::Hook::getKey(); }
+  void setLabel(const std::string& label) { NameMap::Hook::setKey(label); }
 
   const VariableLengthData& getTag() const noexcept { return _tag; }
-  void setTag(const VariableLengthData& tag);
+  void setTag(const VariableLengthData& tag) { _tag = tag; }
 
   bool getAddJoiningFederates() const noexcept { return _addJoiningFederates; }
-  void setAddJoiningFederates(bool addJoiningFederates);
+  void setAddJoiningFederates(bool addJoiningFederates) { _addJoiningFederates = addJoiningFederates; }
 
-  bool getIsWaitingFor(const FederateHandle& federateHandle);
+  bool getIsWaitingFor(const FederateHandle& federateHandle) {
+    return _waitingFederateSyncronizationMap.find(federateHandle) != _waitingFederateSyncronizationMap.end();
+  }
 
   void insert(Federate& federate);
   void achieved(const FederateHandle& federateHandle, bool successful);
@@ -623,6 +649,81 @@ private:
 
   bool _addJoiningFederates;
 };
+
+class FederationReset;
+class OPENRTI_LOCAL ResettingFederate : public HandleListEntity<ResettingFederate, FederateHandle>  {
+public:
+  typedef HandleListEntity<ResettingFederate, FederateHandle>::HandleMap HandleMap;
+  typedef HandleListEntity<ResettingFederate, FederateHandle>::FirstList FirstList;
+
+  ResettingFederate(FederationReset& resetState, Federate& federate):  _resetState(resetState), _federate(federate) {}
+  ~ResettingFederate() { }
+
+  const FederateHandle& getFederateHandle() const {
+    return HandleListEntity<ResettingFederate, FederateHandle>::_getHandle(); }
+  void setFederateHandle(const FederateHandle& federateHandle) {
+    HandleListEntity<ResettingFederate, FederateHandle>::_setHandle(federateHandle);
+  }
+
+  const FederationReset& getState() const noexcept { return _resetState; }
+  FederationReset& getState() noexcept { return _resetState; }
+  const Federate& getFederate() const noexcept { return _federate; }
+  Federate& getFederate() noexcept { return _federate; }
+
+private:
+  ResettingFederate(const ResettingFederate&) = delete;
+  ResettingFederate& operator=(const ResettingFederate&) = delete;
+
+  FederationReset& _resetState;
+  Federate& _federate;
+};
+
+class OPENRTI_LOCAL FederationReset
+{
+  public:
+    FederationReset() : _resetCompleteFederateMap(), _initiatedFederateMap(), _success(true) {}
+    ~FederationReset()
+    {
+      _initiatedFederateMap.clear();
+      _resetCompleteFederateMap.clear();
+    }
+
+    bool getIsInitiated(const FederateHandle& federateHandle)
+    {
+      return _initiatedFederateMap.find(federateHandle) != _initiatedFederateMap.end();
+    }
+    const VariableLengthData& getTag() const noexcept { return _tag; }
+    void setTag(const VariableLengthData& tag) { _tag = tag; }
+
+    void insert(Federate& federate);
+    void begun(const FederateHandle& federateHandle);
+    void complete(const FederateHandle& federateHandle, bool successful);
+    void clear()
+    {
+      _initiatedFederateMap.clear();
+      _resetCompleteFederateMap.clear();
+      _resetBegunFederateMap.clear();
+      _success = true;
+    }
+    void setSuccess(bool newValue) { _success &= newValue; }
+    bool getSuccess() { return _success; }
+
+    ResettingFederate::HandleMap& getInitiatedFederateMap() { return _initiatedFederateMap; }
+    ResettingFederate::HandleMap& getBegunFederateMap() { return _resetBegunFederateMap; }
+    ResettingFederate::HandleMap& getCompleteFederateMap() { return _resetCompleteFederateMap; }
+  private:
+    FederationReset(const FederationReset&) = delete;
+    FederationReset& operator=(const FederationReset&) = delete;
+    // The FederateHandle to ResettingFederate map of federates that have begun the reset
+    ResettingFederate::HandleMap _resetBegunFederateMap;
+    // The FederateHandle to ResettingFederate map of federates that have completed the reset
+    ResettingFederate::HandleMap _resetCompleteFederateMap;
+    // The FederateHandle to ResettingFederate map of federates waiting for this reset
+    ResettingFederate::HandleMap _initiatedFederateMap;
+    VariableLengthData _tag;
+    bool _success = true;
+};
+
 
 ////////////////////////////////////////////////////////////
 
@@ -663,8 +764,9 @@ public:
   void setResignPending(bool resignPending);
 
   void insert(SynchronizationFederate& synchronizationFederate);
-  SynchronizationFederate::FirstList& getSynchronizationFederateList()
-  { return _synchronizationFederateList; }
+  void insert(ResettingFederate & resettingFederate);
+  SynchronizationFederate::FirstList& getSynchronizationFederateList() { return _synchronizationFederateList; }
+  ResettingFederate::FirstList& getResettingFederateList() { return _resettingFederateList; }
 
   Region* getRegion(const LocalRegionHandle& regionHandle);
   void insert(Region& region)
@@ -712,6 +814,8 @@ private:
   bool _resignPending;
   FederationConnect* _federationConnect;
   SynchronizationFederate::FirstList _synchronizationFederateList;
+  ResettingFederate::FirstList _resettingFederateList;
+
   Region::HandleMap _regionHandleRegionMap;
 
   // Time constrained federates current state
@@ -2458,9 +2562,11 @@ public:
   void objectClassUnpublished(const ConnectHandle& connectHandle, const ObjectClass* objectClass, const AttributeHandleVector& attributes);
   void objectInstanceReflectionReceived(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance);
   void objectInstanceUpdateSent(const ConnectHandle& connectHandle, const ObjectInstance* objectInstance);
+
   /// Synchronization state FIXME
   Synchronization::NameMap _synchronizationNameSynchronizationMap;
 
+  FederationReset _resetState;
 private:
   Federation(const Federation&) = delete;
   Federation& operator=(const Federation&) = delete;

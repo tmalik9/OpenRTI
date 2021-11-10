@@ -173,13 +173,17 @@ class CDataType(DataType):
 
 ###############################################################################
 class EnumLabel(object):
-    def __init__(self, name, value, repr):
+    def __init__(self, enumClass, name, value, repr):
+        self.__enumClass = enumClass
         self.__name = name
         self.__value = value
         self.__repr = repr
 
     def getName(self):
         return self.__name
+
+    def getScopedName(self):
+        return self.__enumClass + "::" + self.__name
 
     def getValue(self):
         return self.__value
@@ -194,9 +198,9 @@ class EnumDataType(DataType):
 
     def addEnum(self, name, value, repr=None):
         if repr is None:
-            self.__enumList.append(EnumLabel(name, value, name))
+            self.__enumList.append(EnumLabel(self.getName(), name, value, name))
         else:
-            self.__enumList.append(EnumLabel(name, value, repr))
+            self.__enumList.append(EnumLabel(self.getName(), name, value, repr))
 
     def getEnumList(self):
         return self.__enumList
@@ -234,9 +238,20 @@ class EnumDataType(DataType):
         sourceStream.writeline('{')
         sourceStream.writeline('  switch (value) {')
         for enum in self.__enumList:
-            sourceStream.writeline('  case {enum}: os << "{repr}"; break;'.format(enum = enum.getName(), repr=enum.getRepr()))
+            sourceStream.writeline('  case {enum}: os << "{repr}"; break;'.format(enum = enum.getScopedName(), repr=enum.getRepr()))
         sourceStream.writeline('  }')
         sourceStream.writeline('  return os;')
+        sourceStream.writeline('}')
+        sourceStream.writeline()
+
+    def writeToString(self, sourceStream):
+        sourceStream.writeline('inline std::string to_string(const {name}& value)'.format(name = self.getName()))
+        sourceStream.writeline('{')
+        sourceStream.writeline('  switch (value) {')
+        for enum in self.__enumList:
+            sourceStream.writeline('  case {enum}: return "{repr}";'.format(enum = enum.getScopedName(), repr=enum.getRepr()))
+        sourceStream.writeline('  default: return "<Invalid {name}>";'.format(name = self.getName()))
+        sourceStream.writeline('  }')
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -255,15 +270,6 @@ class EnumDataType(DataType):
         sourceStream.writeline('{')
         sourceStream.writeline('  os << value;')
         sourceStream.writeline('  return os;')
-        sourceStream.writeline('}')
-        sourceStream.writeline()
-        sourceStream.writeline('inline std::string to_string(const {name}& value)'.format(name = self.getName()))
-        sourceStream.writeline('{')
-        sourceStream.writeline('  switch (value) {')
-        for enum in self.__enumList:
-            sourceStream.writeline('  case {enum}: return "{repr}";'.format(enum = enum.getName(), repr=enum.getRepr()))
-        sourceStream.writeline('  default: return "<Invalid {name}>";'.format(name = self.getName()))
-        sourceStream.writeline('  }')
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -770,7 +776,7 @@ class StructField(object):
             else:
                 typeOfField = typeMap.getType(typeName)
                 if type(typeOfField) is EnumDataType:
-                    firstValue = typeOfField.getEnumList()[0].getName()
+                    firstValue = typeOfField.getEnumList()[0].getScopedName()
                     initializer = ' = ' + firstValue
             sourceStream.writeline('{typeName} {memberName}{initializer};'.format(typeName = typeName, memberName = memberName, initializer=initializer))
 
@@ -1302,10 +1308,31 @@ class MessageDataType(StructDataType):
         'JoinFederationExecutionRequest2Message' : 105,
         'InsertModules2Message' : 106,
         'InsertObjectInstanceWithRegionsMessage' : 107,
+
+        'ResetFederationRequestMessage' : 108,
+        'ResetFederationInitiateMessage' : 109,
+        'ResetFederationDoneMessage' : 110,
+        'ResetFederationBegunMessage' : 111,
+        'ResetFederationCompleteMessage' : 112,
+
+
+        'AttributeOwnershipRequestDivest' : 113,
+        'AttributeOwnershipRequestAcquire' : 114,
+        'AttributeOwnershipResponseRelease' : 115,
+        'AttributeOwnershipResponseUnavailable' : 116,
+        'AttributeOwnershipConfirmDivestiture' : 117,
+        'AttributeOwnershipRequestCancelAcquire' : 118,
+        'AttributeOwnershipResponseCancelConfirmation' : 119,
+        'AttributeOwnershipRequestCancelDivest' : 120,
+        'AttributeOwnershipDivestConfirmation' : 121,
+        'AttributeOwnershipResponseOwnershipAcquired' : 122,
     }
     def getMessageOpcode(messageName):
+        baseName =  messageName[:len(messageName)-7]
         if messageName in MessageDataType.__opcodeMap:
             return MessageDataType.__opcodeMap[messageName]
+        elif baseName in MessageDataType.__opcodeMap:
+            return MessageDataType.__opcodeMap[baseName]
         else:
             return None
 
@@ -1562,6 +1589,7 @@ class MessageEncoding(object):
         sourceStream.writeline()
 
     def writeCDecoder(self, dataType, sourceStream):
+        basicTypes=['double', 'uint8_t', 'uint32_t', 'uint16_t', 'bool']
         name = dataType.getName()
         typeName = dataType.getTypeName()
         encoding = dataType.getEncoding()
@@ -1577,8 +1605,10 @@ class MessageEncoding(object):
             sourceStream.writeline('  for (std::string::iterator i = value.begin(); i != value.end(); ++i) {')
             sourceStream.writeline('    *i = readChar();')
             sourceStream.writeline('  }')
-        else:
+        elif typeName in basicTypes:
             sourceStream.writeline('  value = read{encoding}Compressed();'.format(encoding = encoding))
+        else:
+            sourceStream.writeline('  value = {typeName}(read{encoding}Compressed());'.format(typeName=typeName, encoding = encoding))
         sourceStream.writeline('}')
         sourceStream.writeline()
 
@@ -1604,7 +1634,7 @@ class MessageEncoding(object):
         sourceStream.writeline('  switch (value) {')
         value = 0
         for enum in dataType.getEnumList():
-            sourceStream.writeline('  case {enum}:'.format(enum = enum.getName()))
+            sourceStream.writeline('  case {enum}:'.format(enum = enum.getScopedName()))
             sourceStream.writeline('    writeUInt32Compressed({value});'.format(value = value))
             sourceStream.writeline('    break;')
             value = value + 1
@@ -1623,11 +1653,11 @@ class MessageEncoding(object):
         value = 0
         for enum in dataType.getEnumList():
             sourceStream.writeline('  case {value}:'.format(value = value))
-            sourceStream.writeline('    value = {enum};'.format(enum = enum.getName()))
+            sourceStream.writeline('    value = {enum};'.format(enum = enum.getScopedName()))
             sourceStream.writeline('    break;')
             value = value + 1
         sourceStream.writeline('  default:')
-        sourceStream.writeline('    value = {enum};'.format(enum = enum.getName()))
+        sourceStream.writeline('    value = {enum};'.format(enum = enum.getScopedName()))
         sourceStream.writeline('    break;')
         sourceStream.writeline('  }')
         sourceStream.writeline('}')
@@ -2137,10 +2167,10 @@ class TypeMap(object):
     def __init__(self, root):
         self.__typeList = []
         self.__typeMap = {}
-        for node in root.getchildren():
+        for node in root:
             if node.tag == 'message':
                 message = MessageDataType(self, node.get('type') + 'Message', parentTypeName='AbstractMessage')
-                for field in node.getchildren():
+                for field in node:
                     if field.tag == 'field':
                         hide = field.get('hide')
                         if hide is not None:
@@ -2160,7 +2190,7 @@ class TypeMap(object):
                 typeName = node.get('type')
                 if typeName == 'enum':
                     enum = EnumDataType(self, node.get('name'))
-                    for enumerant in node.getchildren():
+                    for enumerant in node:
                         if enumerant.tag == 'enumerant':
                             enum.addEnum(enumerant.get('name'), enumerant.get('value'), enumerant.get('repr'))
                     self.addType(enum)
@@ -2182,7 +2212,7 @@ class TypeMap(object):
                 elif typeName == 'struct':
                     struct = StructDataType(self, node.get('name'), abstract=node.get('abstract'), parentObject=node.get('parent'), parentTypeName=node.get('base'))
                     struct.setCopyOnWrite(node.get('copyOnWrite') == 'true')
-                    for field in node.getchildren():
+                    for field in node:
                         if field.tag == 'field':
                             struct.addField(field.get('name'), field.get('type'), const=field.get('const'), value=field.get('value'))
                     self.addType(struct)

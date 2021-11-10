@@ -293,4 +293,19 @@ void NullFederateAmbassador::connectionLost(std::wstring const & faultDescriptio
     DebugPrintf("%s\n", __FUNCSIG__);
   }
 
+  void NullFederateAmbassador::federationResetInitiated(const LogicalTime& logicalTime, const VariableLengthData& tag)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+  void NullFederateAmbassador::federationResetDone(const LogicalTime& logicalTime, const VariableLengthData& tag)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
+  void NullFederateAmbassador::federationResetAborted(const LogicalTime& logicalTime, const VariableLengthData& tag)
+  {
+    DebugPrintf("%s\n", __FUNCSIG__);
+  }
+
 }

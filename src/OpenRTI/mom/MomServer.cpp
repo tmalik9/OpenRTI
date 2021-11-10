@@ -357,7 +357,13 @@ void MomServer::accept(const InsertObjectInstanceMessage& message)
   // Ok we get duplicate inserts.
   if (_rtiFederate->getObjectInstance(message.getObjectInstanceHandle()))
     return;
-  _rtiFederate->insertObjectInstance(message.getObjectInstanceHandle(), message.getName(), objectClassHandle, false);
+  _rtiFederate->insertObjectInstance(message.getObjectInstanceHandle(), message.getName(), objectClassHandle, message.getAttributeStateVector());
+  Federate::ObjectInstance* objectInstance = _rtiFederate->getObjectInstance(message.getObjectInstanceHandle());
+  for (auto& attributeState : message.getAttributeStateVector())
+  {
+    Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeState.getAttributeHandle());
+    instanceAttribute->setOwnerFederate(attributeState.getOwnerFederate());
+  }
   _momManager->discoverObjectInstance(message.getObjectInstanceHandle(), objectClassHandle, message.getName());
 }
 
@@ -654,7 +660,7 @@ ObjectInstanceHandle MomServer::registerObjectInstance(ObjectClassHandle objectC
   // Once we have survived, we know that the objectInstanceName given in the argument is unique and ours.
   // Also the object instance handle in this local scope must be valid and ours.
 
-  _rtiFederate->insertObjectInstance(objectInstanceHandle, objectInstanceName, objectClassHandle, true);
+  _rtiFederate->insertObjectInstance(objectInstanceHandle, objectInstanceName, objectClassHandle);
 
   SharedPtr<InsertObjectInstanceMessage> request;
   request = MakeShared<InsertObjectInstanceMessage>();
@@ -688,7 +694,7 @@ void MomServer::deleteObjectInstance(ObjectInstanceHandle objectInstanceHandle)
   Federate::ObjectInstance* objectInstance = _rtiFederate->getObjectInstance(objectInstanceHandle);
   if (!objectInstance)
     throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
-  if (!objectInstance->isOwnedByFederate())
+  if (!objectInstance->isOwnedByFederate(getFederateHandle()))
     throw DeletePrivilegeNotHeld(objectInstanceHandle.toString());
 
   SharedPtr<DeleteObjectInstanceMessage> request;
@@ -719,7 +725,7 @@ void MomServer::updateAttributeValues(ObjectInstanceHandle objectInstanceHandle,
     const Federate::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(i->getAttributeHandle());
     if (!instanceAttribute)
       throw AttributeNotDefined(i->getAttributeHandle().toString());
-    if (!instanceAttribute->getIsOwnedByFederate())
+    if (instanceAttribute->getOwnerFederate() != getFederateHandle())
       throw AttributeNotOwned(i->getAttributeHandle().toString());
 #ifdef DEBUG_PRINTF
     if (objectClass->getEffectiveAttributeSubscriptionType(i->getAttributeHandle()) == Unsubscribed)
@@ -762,7 +768,7 @@ void MomServer::requestAttributeValueUpdate(ObjectInstanceHandle objectInstanceH
     throw ObjectInstanceNotKnown(objectInstanceHandle.toString());
   for (AttributeHandleVector::const_iterator j = attributeHandleVector.begin(); j != attributeHandleVector.end(); ++j)
   {
-    if (!objectInstance->getInstanceAttribute(j->getHandle()))
+    if (!objectInstance->getInstanceAttribute(*j))
       throw AttributeNotDefined(j->toString());
   }
 

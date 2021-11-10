@@ -40,16 +40,17 @@ public:
   virtual ~TestAmbassador()
   { }
 
-  virtual bool execJoined(rti1516ev::RTIambassador& ambassador) override
+  bool execJoined(uint32_t threadIndex) override
   {
+    rti1516ev::RTIambassador* ambassador = getRtiAmbassador();
     try {
-      rti1516ev::ObjectClassHandle objectClassHandle = ambassador.getObjectClassHandle(L"ObjectClass0");
-      rti1516ev::ObjectClassHandle fqObjectClassHandle = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass0");
+      rti1516ev::ObjectClassHandle objectClassHandle = ambassador->getObjectClassHandle(L"ObjectClass0");
+      rti1516ev::ObjectClassHandle fqObjectClassHandle = ambassador->getObjectClassHandle(L"HLAobjectRoot.ObjectClass0");
       if (objectClassHandle != fqObjectClassHandle) {
         std::wcout << L"Full qualified object class lookup failed" << std::endl;
         return false;
       }
-      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador.getAttributeHandle(objectClassHandle, L"attribute0"));
+      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador->getAttributeHandle(objectClassHandle, L"attribute0"));
       _objectClassObjectClassHandleSet[objectClassHandle];
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
@@ -60,15 +61,15 @@ public:
     }
 
     try {
-      rti1516ev::ObjectClassHandle objectClassHandle = ambassador.getObjectClassHandle(L"ObjectClass1");
-      rti1516ev::ObjectClassHandle fqObjectClassHandle = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass0.ObjectClass1");
+      rti1516ev::ObjectClassHandle objectClassHandle = ambassador->getObjectClassHandle(L"ObjectClass1");
+      rti1516ev::ObjectClassHandle fqObjectClassHandle = ambassador->getObjectClassHandle(L"HLAobjectRoot.ObjectClass0.ObjectClass1");
       if (objectClassHandle != fqObjectClassHandle) {
         std::wcout << L"Full qualified object class lookup failed" << std::endl;
         return false;
       }
-      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador.getAttributeHandle(objectClassHandle, L"attribute0"));
-      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador.getAttributeHandle(objectClassHandle, L"attribute1"));
-      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador.getObjectClassHandle(L"ObjectClass0"));
+      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador->getAttributeHandle(objectClassHandle, L"attribute0"));
+      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador->getAttributeHandle(objectClassHandle, L"attribute1"));
+      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador->getObjectClassHandle(L"ObjectClass0"));
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
       return false;
@@ -78,17 +79,17 @@ public:
     }
 
     try {
-      rti1516ev::ObjectClassHandle objectClassHandle = ambassador.getObjectClassHandle(L"ObjectClass2");
-      rti1516ev::ObjectClassHandle fqObjectClassHandle = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass0.ObjectClass1.ObjectClass2");
+      rti1516ev::ObjectClassHandle objectClassHandle = ambassador->getObjectClassHandle(L"ObjectClass2");
+      rti1516ev::ObjectClassHandle fqObjectClassHandle = ambassador->getObjectClassHandle(L"HLAobjectRoot.ObjectClass0.ObjectClass1.ObjectClass2");
       if (objectClassHandle != fqObjectClassHandle) {
         std::wcout << L"Full qualified object class lookup failed" << std::endl;
         return false;
       }
-      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador.getAttributeHandle(objectClassHandle, L"attribute0"));
-      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador.getAttributeHandle(objectClassHandle, L"attribute1"));
-      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador.getAttributeHandle(objectClassHandle, L"attribute2"));
-      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador.getObjectClassHandle(L"ObjectClass0"));
-      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador.getObjectClassHandle(L"ObjectClass1"));
+      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador->getAttributeHandle(objectClassHandle, L"attribute0"));
+      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador->getAttributeHandle(objectClassHandle, L"attribute1"));
+      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador->getAttributeHandle(objectClassHandle, L"attribute2"));
+      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador->getObjectClassHandle(L"ObjectClass0"));
+      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador->getObjectClassHandle(L"ObjectClass1"));
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
       return false;
@@ -98,17 +99,17 @@ public:
     }
 
     try {
-      rti1516ev::ObjectClassHandle objectClassHandle = ambassador.getObjectClassHandle(L"ObjectClass3");
-      rti1516ev::ObjectClassHandle fqObjectClassHandle = ambassador.getObjectClassHandle(L"HLAobjectRoot.ObjectClass0.ObjectClass1.ObjectClass3");
+      rti1516ev::ObjectClassHandle objectClassHandle = ambassador->getObjectClassHandle(L"ObjectClass3");
+      rti1516ev::ObjectClassHandle fqObjectClassHandle = ambassador->getObjectClassHandle(L"HLAobjectRoot.ObjectClass0.ObjectClass1.ObjectClass3");
       if (objectClassHandle != fqObjectClassHandle) {
         std::wcout << L"Full qualified object class lookup failed" << std::endl;
         return false;
       }
-      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador.getAttributeHandle(objectClassHandle, L"attribute0"));
-      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador.getAttributeHandle(objectClassHandle, L"attribute1"));
-      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador.getAttributeHandle(objectClassHandle, L"attribute3"));
-      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador.getObjectClassHandle(L"ObjectClass0"));
-      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador.getObjectClassHandle(L"ObjectClass1"));
+      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador->getAttributeHandle(objectClassHandle, L"attribute0"));
+      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador->getAttributeHandle(objectClassHandle, L"attribute1"));
+      _objectClassAttributeHandleSet[objectClassHandle].insert(ambassador->getAttributeHandle(objectClassHandle, L"attribute3"));
+      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador->getObjectClassHandle(L"ObjectClass0"));
+      _objectClassObjectClassHandleSet[objectClassHandle].insert(ambassador->getObjectClassHandle(L"ObjectClass1"));
     } catch (const rti1516ev::Exception& e) {
       std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
       return false;
@@ -120,7 +121,7 @@ public:
     for (std::map<rti1516ev::ObjectClassHandle, rti1516ev::AttributeHandleSet>::const_iterator i = _objectClassAttributeHandleSet.begin();
          i != _objectClassAttributeHandleSet.end(); ++i) {
       try {
-        ambassador.publishObjectClassAttributes(i->first, i->second);
+        ambassador->publishObjectClassAttributes(i->first, i->second);
       } catch (const rti1516ev::Exception& e) {
         std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
         return false;
@@ -140,7 +141,7 @@ public:
       rti1516ev::AttributeHandleSet subscribedAttributeHandles = i->second;
 
       try {
-        ambassador.subscribeObjectClassAttributes(subscribedObjectClass, subscribedAttributeHandles);
+        ambassador->subscribeObjectClassAttributes(subscribedObjectClass, subscribedAttributeHandles);
       } catch (const rti1516ev::Exception& e) {
         std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
         return false;
@@ -171,7 +172,7 @@ public:
         }
 
         try {
-          objectInstanceHandle = ambassador.registerObjectInstance(registeredObjectClass);
+          objectInstanceHandle = ambassador->registerObjectInstance(registeredObjectClass);
         } catch (const rti1516ev::Exception& e) {
           std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
           return false;
@@ -184,7 +185,7 @@ public:
           try {
             Clock timeout = Clock::now() + Clock::fromSeconds(10);
             while (getFederateList().size() != _foreignObjectInstanceHandles.size() + 1 && !_fail) {
-              if (ambassador.evokeCallback(60.0))
+              if (ambassador->evokeCallback(60.0))
                 continue;
               if (timeout < Clock::now()) {
                 std::wcout << L"Timeout waiting for next message" << std::endl;
@@ -209,17 +210,17 @@ public:
             rti1516ev::ObjectInstanceHandle obj = *foreignObjIt;
             _unsubscribedObjectInstanceHandle = obj;
 
-            ambassador.unsubscribeObjectInstance(obj);
+            ambassador->unsubscribeObjectInstance(obj);
 
              // The second foreign objectInstance gets unsubscribed and resubscribed. Needs at least 3 federates (to get the 2 foreign objects)
             if (_foreignObjectInstanceHandles.size() > 1 && !_resubscribedObjectInstanceHandle.isValid()) {
 
               _resubscribedObjectInstanceHandle = *(++foreignObjIt);
-              ambassador.unsubscribeObjectInstance(_resubscribedObjectInstanceHandle);
+              ambassador->unsubscribeObjectInstance(_resubscribedObjectInstanceHandle);
 
               try {
                 // Implicit resubscribe on requestAttributeValueUpdate
-                ambassador.requestAttributeValueUpdate(_resubscribedObjectInstanceHandle, subscribedAttributeHandles, toVariableLengthData(Clock::now()));
+                ambassador->requestAttributeValueUpdate(_resubscribedObjectInstanceHandle, subscribedAttributeHandles, toVariableLengthData(Clock::now()));
               }
               catch (const rti1516ev::Exception & e) {
                 std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
@@ -245,9 +246,9 @@ public:
           rti1516ev::VariableLengthData tag = toVariableLengthData(Clock::now());
           for (rti1516ev::AttributeHandleSet::const_iterator k = j->second.begin();
                k != j->second.end(); ++k) {
-            attributeValues[*k] = toVariableLengthData(ambassador.getAttributeName(registeredObjectClass, *k));
+            attributeValues[*k] = toVariableLengthData(ambassador->getAttributeName(registeredObjectClass, *k));
           }
-          ambassador.updateAttributeValues(objectInstanceHandle, attributeValues, tag);
+          ambassador->updateAttributeValues(objectInstanceHandle, attributeValues, tag);
         } catch (const rti1516ev::Exception& e) {
           std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
           return false;
@@ -258,7 +259,7 @@ public:
 
         try {
           //{std::wstringstream msg; msg << getFederateType() << L" deleteObjectInstance " << objectInstanceHandle.toString() << std::endl; std::wcout << msg.str(); }
-          ambassador.deleteObjectInstance(objectInstanceHandle, toVariableLengthData("tag"));
+          ambassador->deleteObjectInstance(objectInstanceHandle, toVariableLengthData("tag"));
         } catch (const rti1516ev::Exception& e) {
           std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
           return false;
@@ -274,7 +275,7 @@ public:
             Clock timeout = Clock::now() + Clock::fromSeconds(10);
 
             while (!_foreignObjectInstanceHandles.empty() && !_fail) {
-              if (ambassador.evokeCallback(60.0))
+              if (ambassador->evokeCallback(60.0))
                 continue;
               if (timeout < Clock::now()) {
                 std::wcout << L"Timeout waiting for next message" << std::endl;
@@ -302,7 +303,7 @@ public:
       }
 
       try {
-        ambassador.unsubscribeObjectClass(subscribedObjectClass);
+        ambassador->unsubscribeObjectClass(subscribedObjectClass);
       } catch (const rti1516ev::Exception& e) {
         std::wcout << L"rti1516ev::Exception: \"" << e.what() << L"\"" << std::endl;
         return false;
@@ -438,13 +439,13 @@ public:
   void _checkReflectedAttributeValues(const rti1516ev::ObjectInstanceHandle& objectInstanceHandle, const rti1516ev::AttributeHandleValueMap& attributeValues)
   {
     if (objectInstanceHandle == _unsubscribedObjectInstanceHandle) {
-      Log(Assert, Error) << "Received attribute value for unsubscribed object instance " << objectInstanceHandle.toString() << std::endl;
+      std::cerr << "Received attribute value for unsubscribed object instance " << objectInstanceHandle.toString() << std::endl;
       _fail = true;
     }
 
     // Check if we got at most a single attribute update
     if (!_objectInstanceHandleSet.insert(objectInstanceHandle).second) {
-      Log(Assert, Error) << "Duplicate reflectAttributeValues." << std::endl;
+      std::cerr << "Duplicate reflectAttributeValues." << std::endl;
       _fail = true;
     }
     //else {
@@ -455,7 +456,7 @@ public:
          i != attributeValues.end(); ++i) {
       if (_expectedAttributeHandles.find(i->first) != _expectedAttributeHandles.end())
         continue;
-      Log(Assert, Error) << "Received attribute value for unsubscribed attribute " << i->first.toString() << std::endl;
+      std::cerr << "Received attribute value for unsubscribed attribute " << i->first.toString() << std::endl;
       _fail = true;
     }
   }

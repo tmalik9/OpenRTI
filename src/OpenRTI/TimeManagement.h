@@ -69,6 +69,8 @@ public:
   virtual void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeConstrainedEnabledMessage& message) = 0;
   virtual void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeRegulationEnabledMessage& message) = 0;
   virtual void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeAdvanceGrantedMessage& message) = 0;
+  virtual void acceptCallbackMessage(Ambassador<T>& ambassador, const ResetFederationInitiateMessage& message) = 0;
+  virtual void acceptCallbackMessage(Ambassador<T>& ambassador, const ResetFederationDoneMessage& message) = 0;
   virtual void reflectAttributeValues(Ambassador<T>& ambassador, const Federate::ObjectClass& objectClass,
                                       const TimeStampedAttributeUpdateMessage& message) = 0;
   virtual void removeObjectInstance(Ambassador<T>& ambassador, const TimeStampedDeleteObjectInstanceMessage& message) = 0;
@@ -76,6 +78,9 @@ public:
   virtual void receiveInteraction(Ambassador<T>& ambassador, const Federate::InteractionClass& interactionClass,
                                   const InteractionClassHandle& interactionClassHandle, const TimeStampedInteractionMessage& message) = 0;
   virtual void setNotificationHandle(std::shared_ptr<AbstractNotificationHandle> h) = 0;
+  virtual void requestFederationReset(InternalAmbassador& ambassador, const VariableLengthData& tag) = 0;
+  virtual void federationResetBegun(InternalAmbassador& ambassador, const VariableLengthData& tag) = 0;
+  virtual void federationResetComplete(InternalAmbassador& ambassador, bool success, const VariableLengthData& tag) = 0;
 };
 
 } // namespace OpenRTI

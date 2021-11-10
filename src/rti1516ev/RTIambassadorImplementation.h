@@ -637,6 +637,10 @@ public:
   std::wstring getAttributeDataType(rti1516ev::ObjectClassHandle rti1516ObjectClassHandle, rti1516ev::AttributeHandle rti1516AttributeHandle) override;
   void allowPendingTimeInNextMessageRequest() override;
   void disallowPendingTimeInNextMessageRequest() override;
+
+  void requestFederationReset(const rti1516ev::VariableLengthData& tag) override;
+  void federationResetBegun(const rti1516ev::VariableLengthData& tag) override;
+  void federationResetComplete(bool success, const rti1516ev::VariableLengthData& tag) override;
 private:
   class RTI1516EAmbassadorInterface;
   RTI1516EAmbassadorInterface* _ambassadorInterface;

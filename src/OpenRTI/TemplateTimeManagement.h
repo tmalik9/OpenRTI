@@ -94,6 +94,25 @@ public:
     _messageListPool.clear();
   }
 
+  void reset()
+  {
+    _logicalTime.first = _logicalTimeFactory.initialLogicalTime();
+    _logicalTime.second = 0;
+    _pendingLogicalTime = _logicalTime;
+    _outboundLowerBoundTimeStamp = _logicalTime;
+    _lastOutboundLowerBoundTimeStamp = _logicalTime;
+    _committedOutboundLowerBoundTimeStamp = _logicalTime.first;
+    _committedNextMessageLowerBoundTimeStamp = _logicalTime.first;
+    //_currentLookahead = _logicalTimeFactory.zeroLogicalTimeInterval();
+    _targetLookahead = _currentLookahead;
+    _timeAdvanceToBeScheduled = false;
+    while (!_logicalTimeMessageListMap.empty()) {
+      _logicalTimeMessageListMap.begin()->second.clear();
+      _logicalTimeMessageListMap.erase(_logicalTimeMessageListMap.begin());
+    }
+    _receiveOrderMessages.clear();
+    _messageListPool.clear();
+  }
   /// This is: don't do time advance to the past
   bool isLogicalTimeInThePast(const NativeLogicalTime& logicalTime) override
   {
@@ -298,6 +317,8 @@ public:
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnablePending());
     OpenRTIAssert(!InternalTimeManagement::getTimeConstrainedEnablePending());
     OpenRTIAssert(!InternalTimeManagement::getTimeAdvancePending());
+    OpenRTIAssert(!InternalTimeManagement::getIsResetInitiated());
+    OpenRTIAssert(!InternalTimeManagement::getIsResetPending());
     OpenRTIAssert(_logicalTime.first <= logicalTime);
 
     // This needs to be set first as this affects the behavior of some called methods below
@@ -383,6 +404,51 @@ public:
     } else {
       OpenRTIAssert(!"Undefined time advance mode!");
     }
+  }
+  void requestFederationReset(InternalAmbassador& ambassador, const VariableLengthData& tag) override
+  {
+    OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnablePending());
+    OpenRTIAssert(!InternalTimeManagement::getTimeConstrainedEnablePending());
+    OpenRTIAssert(!InternalTimeManagement::getTimeAdvancePending());
+    OpenRTIAssert(!InternalTimeManagement::getIsResetInitiated());
+    OpenRTIAssert(!InternalTimeManagement::getIsResetPending());
+
+    SharedPtr<ResetFederationRequestMessage> message = MakeShared<ResetFederationRequestMessage>();
+    message->setFederationHandle(ambassador.getFederate()->getFederationHandle());
+    message->setFederateHandle(ambassador.getFederate()->getFederateHandle());
+    message->setTag(tag);
+    VariableLengthData timeStamp = encodeLogicalTime(_logicalTimeFactory.getLogicalTime(_logicalTime.first));
+    message->setTimeStamp(timeStamp);
+
+    ambassador.send(message);
+  }
+
+  void federationResetBegun(InternalAmbassador& ambassador, const VariableLengthData& tag) override
+  {
+    OpenRTIAssert(InternalTimeManagement::getIsResetInitiated());
+    //DebugPrintf("%s: this=%p\n", __FUNCTION__, this);
+    SharedPtr<ResetFederationBegunMessage> message = MakeShared<ResetFederationBegunMessage>();
+    message->setFederationHandle(ambassador.getFederate()->getFederationHandle());
+    message->setFederateHandle(ambassador.getFederate()->getFederateHandle());
+    message->setTag(tag);
+    VariableLengthData timeStamp = encodeLogicalTime(_logicalTimeFactory.getLogicalTime(_logicalTime.first));
+    message->setTimeStamp(timeStamp);
+    ambassador.send(message);
+    InternalTimeManagement::setTimeAdvanceMode(InternalTimeManagement::ResetPending);
+}
+
+  virtual void federationResetComplete(InternalAmbassador& ambassador, bool success, const VariableLengthData& tag) override
+  {
+    //DebugPrintf("%s: this=%p\n", __FUNCTION__, this);
+    OpenRTIAssert(InternalTimeManagement::getIsResetPending());
+    SharedPtr<ResetFederationCompleteMessage> message = MakeShared<ResetFederationCompleteMessage>();
+    message->setFederationHandle(ambassador.getFederate()->getFederationHandle());
+    message->setFederateHandle(ambassador.getFederate()->getFederateHandle());
+    message->setSuccess(success);
+    message->setTag(tag);
+    VariableLengthData timeStamp = encodeLogicalTime(_logicalTimeFactory.getLogicalTime(_logicalTime.first));
+    message->setTimeStamp(timeStamp);
+    ambassador.send(message);
   }
 
   bool queryGALT(InternalAmbassador& ambassador, NativeLogicalTime& logicalTime) override
@@ -667,6 +733,29 @@ public:
 #endif
   }
 
+  void acceptInternalMessage(InternalAmbassador& ambassador, const ResetFederationInitiateMessage& message) override
+  {
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message.toString().c_str());
+    queueTimeStampedMessage(_logicalTime, message);
+  }
+  
+  void acceptInternalMessage(InternalAmbassador& ambassador, const ResetFederationBegunMessage& message) override
+  {
+    DebugPrintf("%s: message=%s\n", __FUNCTION__, message.toString().c_str());
+  }
+  
+  void acceptInternalMessage(InternalAmbassador& ambassador, const ResetFederationCompleteMessage& message) override
+  {
+    DebugPrintf("%s: message=%s\n", __FUNCTION__, message.toString().c_str());
+  }
+  
+  void acceptInternalMessage(InternalAmbassador& ambassador, const ResetFederationDoneMessage& message) override
+  {
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message.toString().c_str());
+    //InternalTimeManagement::setTimeAdvanceMode(InternalTimeManagement::TimeAdvanceGranted);
+    queueTimeStampedMessage(_logicalTime, message);
+  }
+  
   void queueTimeStampedMessage(InternalAmbassador& ambassador, const VariableLengthData& timeStamp, const AbstractMessage& message, bool loopback) override
   {
     queueTimeStampedMessage(ambassador, _logicalTimeFactory.decodeLogicalTime(timeStamp), message, loopback);
@@ -1090,7 +1179,9 @@ public:
   }
   void acceptCallbackMessage(Ambassador<T>& ambassador, const TimeAdvanceGrantedMessage& message) override
   {
-    OpenRTIAssert(InternalTimeManagement::getTimeAdvancePending());
+    //OpenRTIAssert(InternalTimeManagement::getTimeAdvancePending());
+    // this could happen after a federation reset, when there still was a grant message in the queue
+    if (!InternalTimeManagement::getTimeAdvancePending()) return;
     OpenRTIAssert(!InternalTimeManagement::getTimeConstrainedEnabled() || canAdvanceTo(_pendingLogicalTime));
     OpenRTIAssert(!InternalTimeManagement::getTimeConstrainedEnabled() || _logicalTimeMessageListMap.empty() || _pendingLogicalTime <= _logicalTimeMessageListMap.begin()->first);
     OpenRTIAssert(!InternalTimeManagement::getTimeRegulationEnabled() || _committedOutboundLowerBoundTimeStamp <= _toLogicalTime(_outboundLowerBoundTimeStamp));
@@ -1103,8 +1194,48 @@ public:
     }
 
     _logicalTime = _pendingLogicalTime;
-    InternalTimeManagement::setTimeAdvanceMode(InternalTimeManagement::TimeAdvanceGranted);
+    if (!InternalTimeManagement::getIsResetInitiated() && !InternalTimeManagement::getIsResetPending())
+    {
+      InternalTimeManagement::setTimeAdvanceMode(InternalTimeManagement::TimeAdvanceGranted);
+    }
     ambassador.timeAdvanceGrant(_logicalTimeFactory.getLogicalTime(_logicalTime.first));
+  }
+
+  void acceptCallbackMessage(Ambassador<T>& ambassador, const ResetFederationInitiateMessage& message) override
+  {
+    // NOTE: this *can* break a running time advance request
+    // OpenRTIAssert(!InternalTimeManagement::getTimeAdvancePending());
+    //OpenRTIAssert(!InternalTimeManagement::getIsResetPending());
+    OpenRTIAssert(!_timeAdvanceToBeScheduled);
+    //DebugPrintf("%s(ResetFederationInitiateMessage): state=%s message=%s\n", __FUNCTION__,
+    //  to_string(InternalTimeManagement::getTimeAdvanceMode()).c_str(),
+    //  message.toString().c_str());
+    if (InternalTimeManagement::getIsResetInitiated() || InternalTimeManagement::getIsResetPending())
+    {
+      DebugPrintf("%s: reset already in progress, state=%s message=%s\n", __FUNCTION__,
+        to_string(InternalTimeManagement::getTimeAdvanceMode()).c_str(),
+        message.toString().c_str());
+    }
+    else
+    {
+      InternalTimeManagement::setTimeAdvanceMode(InternalTimeManagement::ResetInitiated);
+      ambassador.federationResetInitiated(_logicalTimeFactory.getLogicalTime(_logicalTime.first), message.getTag());
+    }
+  }
+
+  void acceptCallbackMessage(Ambassador<T>& ambassador, const ResetFederationDoneMessage& message) override
+  {
+    //DebugPrintf("%s: message=%s\n", __FUNCTION__, message.toString().c_str());
+    reset();
+    InternalTimeManagement::setTimeAdvanceMode(InternalTimeManagement::TimeAdvanceGranted);
+    if (message.getSuccess())
+    {
+      ambassador.federationResetDone(_logicalTimeFactory.getLogicalTime(_logicalTime.first), message.getTag());
+    }
+    else
+    {
+      ambassador.federationResetAborted(_logicalTimeFactory.getLogicalTime(_logicalTime.first), message.getTag());
+    }
   }
 
   void reflectAttributeValues(Ambassador<T>& ambassador, const Federate::ObjectClass& objectClass,

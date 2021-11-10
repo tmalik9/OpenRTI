@@ -371,6 +371,11 @@ namespace rti1516ev
       // 8.22
       virtual void requestRetraction (
          MessageRetractionHandle theHandle) = 0;
+
+      // vector extensions
+      virtual void federationResetInitiated(const LogicalTime& logicalTime, const VariableLengthData& tag) = 0;
+      virtual void federationResetDone(const LogicalTime& logicalTime, const VariableLengthData& tag) = 0;
+      virtual void federationResetAborted(const LogicalTime& logicalTime, const VariableLengthData& tag) = 0;
    };
 }
 
