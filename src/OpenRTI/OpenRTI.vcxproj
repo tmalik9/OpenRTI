@@ -168,7 +168,6 @@
     <ClCompile Include="NetworkServer.cpp" />
     <ClCompile Include="NetworkStatistics.cpp" />
     <ClCompile Include="Options.cpp" />
-    <ClCompile Include="OwnershipManager.cpp" />
     <ClCompile Include="ParenthesesReader.cpp" />
     <ClCompile Include="ServerModel.cpp" />
     <ClCompile Include="ServerNode.cpp" />
@@ -246,7 +245,6 @@
     <ClInclude Include="mom\MomManager.h" />
     <ClInclude Include="mom\MomTypes.h" />
     <ClInclude Include="OpenRTIVersion.h" />
-    <ClInclude Include="OwnershipManager.h" />
     <ClInclude Include="TranslateTypes.h" />
     <ClInclude Include="VariableLengthDataTuple.h" />
     <ClInclude Include="win32\PerformanceCounterStopWatch.h" />

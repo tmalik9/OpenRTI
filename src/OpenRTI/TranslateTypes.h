@@ -36,14 +36,6 @@ inline ArrayDataTypeEncoding from_string<ArrayDataTypeEncoding>(const std::strin
     return ArrayDataTypeEncoding::VariableArrayDataTypeEncoding;
 }
 
-static inline std::string to_string(ArrayDataTypeEncoding value)
-{
-  if (value == ArrayDataTypeEncoding::FixedArrayDataTypeEncoding)
-    return "HLAfixedArray";
-  else
-    return "HLAVariableArray";
-}
-
 class OPENRTI_API TranslateTypes
 {
 public:

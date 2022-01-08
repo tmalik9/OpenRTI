@@ -927,7 +927,7 @@ private:
     { }
     String _name;
     Unsigned _size = 0;
-    Endianness _endian = BigEndian;
+    Endianness _endian = Endianness::BigEndian;
   };
 
   const Implementation& getConstImpl() const
@@ -1417,7 +1417,7 @@ private:
     String _name;
     String _dataType;
     String _cardinality;
-    ArrayDataTypeEncoding _encoding = FixedArrayDataTypeEncoding;
+    ArrayDataTypeEncoding _encoding = ArrayDataTypeEncoding::FixedArrayDataTypeEncoding;
   };
 
   const Implementation& getConstImpl() const
@@ -3124,7 +3124,7 @@ private:
       _switchesType(),
       _enabled()
     { }
-    SwitchesType _switchesType = InteractionRelevanceAdvisorySwitchesType;
+    SwitchesType _switchesType = SwitchesType::InteractionRelevanceAdvisorySwitchesType;
     Bool _enabled = false;
   };
 
@@ -3755,7 +3755,7 @@ private:
       _transportationType()
     { }
     String _name;
-    TransportationType _transportationType = RELIABLE;
+    TransportationType _transportationType = TransportationType::RELIABLE;
   };
 
   const Implementation& getConstImpl() const
@@ -4200,8 +4200,8 @@ private:
     String _name;
     InteractionClassHandle _interactionClassHandle;
     InteractionClassHandle _parentInteractionClassHandle;
-    OrderType _orderType = RECEIVE;
-    TransportationType _transportationType = RELIABLE;
+    OrderType _orderType = OrderType::RECEIVE;
+    TransportationType _transportationType = TransportationType::RELIABLE;
     DimensionHandleSet _dimensionHandleSet;
     FOMParameterList _parameterList;
   };
@@ -4341,8 +4341,8 @@ private:
     String _name;
     String _dataType;
     AttributeHandle _attributeHandle;
-    OrderType _orderType = RECEIVE;
-    TransportationType _transportationType = RELIABLE;
+    OrderType _orderType = OrderType::RECEIVE;
+    TransportationType _transportationType = TransportationType::RELIABLE;
     DimensionHandleSet _dimensionHandleSet;
   };
 
@@ -4636,7 +4636,7 @@ private:
       _switchesType(),
       _enabled()
     { }
-    SwitchesType _switchesType = InteractionRelevanceAdvisorySwitchesType;
+    SwitchesType _switchesType = SwitchesType::InteractionRelevanceAdvisorySwitchesType;
     Bool _enabled = false;
   };
 
@@ -4748,7 +4748,7 @@ private:
     { }
     String _name;
     Unsigned _size = 0;
-    Endianness _endian = BigEndian;
+    Endianness _endian = Endianness::BigEndian;
     BasicDataTypeHandle _handle;
   };
 
@@ -5168,7 +5168,7 @@ private:
     String _name;
     String _dataType;
     String _cardinality;
-    ArrayDataTypeEncoding _encoding = FixedArrayDataTypeEncoding;
+    ArrayDataTypeEncoding _encoding = ArrayDataTypeEncoding::FixedArrayDataTypeEncoding;
     ArrayDataTypeHandle _handle;
   };
 
@@ -6225,7 +6225,7 @@ public:
   { return _exceptionString; }
 
 private:
-  CreateFederationExecutionResponseType _createFederationExecutionResponseType = CreateFederationExecutionResponseSuccess;
+  CreateFederationExecutionResponseType _createFederationExecutionResponseType = CreateFederationExecutionResponseType::CreateFederationExecutionResponseSuccess;
   String _exceptionString;
 };
 
@@ -6308,7 +6308,7 @@ public:
   { return _destroyFederationExecutionResponseType; }
 
 private:
-  DestroyFederationExecutionResponseType _destroyFederationExecutionResponseType = DestroyFederationExecutionResponseSuccess;
+  DestroyFederationExecutionResponseType _destroyFederationExecutionResponseType = DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseSuccess;
 };
 
 class OPENRTI_API EnumerateFederationExecutionsRequestMessage final : public AbstractMessage {
@@ -6945,7 +6945,7 @@ public:
 
 private:
   FederationHandle _federationHandle;
-  JoinFederationExecutionResponseType _joinFederationExecutionResponseType = JoinFederationExecutionResponseSuccess;
+  JoinFederationExecutionResponseType _joinFederationExecutionResponseType = JoinFederationExecutionResponseType::JoinFederationExecutionResponseSuccess;
   String _exceptionString;
   FederateHandle _federateHandle;
   String _federateType;
@@ -7009,7 +7009,7 @@ public:
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
-  ResignAction _resignAction = UNCONDITIONALLY_DIVEST_ATTRIBUTES;
+  ResignAction _resignAction = ResignAction::UNCONDITIONALLY_DIVEST_ATTRIBUTES;
 };
 
 class OPENRTI_API ResignFederationExecutionRequestMessage final : public AbstractMessage {
@@ -7253,7 +7253,7 @@ public:
 private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
-  ResignAction _resignAction = UNCONDITIONALLY_DIVEST_ATTRIBUTES;
+  ResignAction _resignAction = ResignAction::UNCONDITIONALLY_DIVEST_ATTRIBUTES;
 };
 
 class OPENRTI_API RegisterFederationSynchronizationPointMessage final : public AbstractMessage {
@@ -7405,7 +7405,7 @@ private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   String _label;
-  RegisterFederationSynchronizationPointResponseType _registerFederationSynchronizationPointResponseType = RegisterFederationSynchronizationPointResponseSuccess;
+  RegisterFederationSynchronizationPointResponseType _registerFederationSynchronizationPointResponseType = RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseSuccess;
 };
 
 class OPENRTI_API AnnounceSynchronizationPointMessage final : public AbstractMessage {
@@ -7993,7 +7993,7 @@ private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   VariableLengthData _timeStamp;
-  LowerBoundTimeStampCommitType _commitType = TimeAdvanceCommit;
+  LowerBoundTimeStampCommitType _commitType = LowerBoundTimeStampCommitType::TimeAdvanceCommit;
   Unsigned _commitId = 0;
 };
 
@@ -8429,7 +8429,7 @@ public:
 
 private:
   FederationHandle _federationHandle;
-  PublicationType _publicationType = Unpublished;
+  PublicationType _publicationType = PublicationType::Unpublished;
   InteractionClassHandle _interactionClassHandle;
 };
 
@@ -8499,7 +8499,7 @@ public:
 
 private:
   FederationHandle _federationHandle;
-  PublicationType _publicationType = Unpublished;
+  PublicationType _publicationType = PublicationType::Unpublished;
   ObjectClassHandle _objectClassHandle;
   AttributeHandleVector _attributeHandles;
 };
@@ -8570,7 +8570,7 @@ public:
 
 private:
   FederationHandle _federationHandle;
-  SubscriptionType _subscriptionType = Unsubscribed;
+  SubscriptionType _subscriptionType = SubscriptionType::Unsubscribed;
   InteractionClassHandle _interactionClassHandle;
   ParameterValueVector _parameterFilterValues;
 };
@@ -8641,7 +8641,7 @@ public:
 
 private:
   FederationHandle _federationHandle;
-  SubscriptionType _subscriptionType = Unsubscribed;
+  SubscriptionType _subscriptionType = SubscriptionType::Unsubscribed;
   ObjectClassHandle _objectClassHandle;
   AttributeHandleVector _attributeHandles;
 };
@@ -8712,7 +8712,7 @@ public:
 
 private:
   FederationHandle _federationHandle;
-  SubscriptionType _subscriptionType = Unsubscribed;
+  SubscriptionType _subscriptionType = SubscriptionType::Unsubscribed;
   ObjectClassHandle _objectClassHandle;
   ObjectInstanceHandle _objectInstanceHandle;
 };
@@ -9039,7 +9039,7 @@ private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   InteractionClassHandle _interactionClassHandle;
-  TransportationType _transportationType = RELIABLE;
+  TransportationType _transportationType = TransportationType::RELIABLE;
   VariableLengthData _tag;
   ParameterValueVector _parameterValues;
 };
@@ -9159,8 +9159,8 @@ private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   InteractionClassHandle _interactionClassHandle;
-  OrderType _orderType = RECEIVE;
-  TransportationType _transportationType = RELIABLE;
+  OrderType _orderType = OrderType::RECEIVE;
+  TransportationType _transportationType = TransportationType::RELIABLE;
   VariableLengthData _tag;
   VariableLengthData _timeStamp;
   MessageRetractionHandle _messageRetractionHandle;
@@ -9867,7 +9867,7 @@ private:
   FederationHandle _federationHandle;
   FederateHandle _federateHandle;
   ObjectInstanceHandle _objectInstanceHandle;
-  OrderType _orderType = RECEIVE;
+  OrderType _orderType = OrderType::RECEIVE;
   VariableLengthData _tag;
   VariableLengthData _timeStamp;
   MessageRetractionHandle _messageRetractionHandle;
@@ -9964,7 +9964,7 @@ private:
   FederateHandle _federateHandle;
   ObjectInstanceHandle _objectInstanceHandle;
   VariableLengthData _tag;
-  TransportationType _transportationType = RELIABLE;
+  TransportationType _transportationType = TransportationType::RELIABLE;
   AttributeValueVector _attributeValues;
 };
 
@@ -10088,8 +10088,8 @@ private:
   VariableLengthData _tag;
   VariableLengthData _timeStamp;
   MessageRetractionHandle _messageRetractionHandle;
-  OrderType _orderType = RECEIVE;
-  TransportationType _transportationType = RELIABLE;
+  OrderType _orderType = OrderType::RECEIVE;
+  TransportationType _transportationType = TransportationType::RELIABLE;
   AttributeValueVector _attributeValues;
 };
 
@@ -10812,6 +10812,168 @@ std::ostream& prettyprint(std::ostream& os, const RequestClassAttributeUpdateMes
 std::ostream& prettyprint(std::ostream& os, const QueryAttributeOwnershipRequestMessage& value, ServerModel::Federation* federation);
 std::ostream& prettyprint(std::ostream& os, const QueryAttributeOwnershipResponseMessage& value, ServerModel::Federation* federation);
 
+inline std::string to_string(const CallbackModel& value)
+{
+  switch (value) {
+  case CallbackModel::HLA_IMMEDIATE: return "HLA_IMMEDIATE";
+  case CallbackModel::HLA_EVOKED: return "HLA_EVOKED";
+  default: return "<Invalid CallbackModel>";
+  }
+}
+
+inline std::string to_string(const OrderType& value)
+{
+  switch (value) {
+  case OrderType::RECEIVE: return "RECEIVE";
+  case OrderType::TIMESTAMP: return "TIMESTAMP";
+  default: return "<Invalid OrderType>";
+  }
+}
+
+inline std::string to_string(const TransportationType& value)
+{
+  switch (value) {
+  case TransportationType::RELIABLE: return "RELIABLE";
+  case TransportationType::BEST_EFFORT: return "BEST_EFFORT";
+  default: return "<Invalid TransportationType>";
+  }
+}
+
+inline std::string to_string(const SubscriptionType& value)
+{
+  switch (value) {
+  case SubscriptionType::Unsubscribed: return "Unsubscribed";
+  case SubscriptionType::SubscribedPassive: return "SubscribedPassive";
+  case SubscriptionType::SubscribedActive: return "SubscribedActive";
+  default: return "<Invalid SubscriptionType>";
+  }
+}
+
+inline std::string to_string(const PublicationType& value)
+{
+  switch (value) {
+  case PublicationType::Unpublished: return "Unpublished";
+  case PublicationType::Published: return "Published";
+  default: return "<Invalid PublicationType>";
+  }
+}
+
+inline std::string to_string(const ResignAction& value)
+{
+  switch (value) {
+  case ResignAction::UNCONDITIONALLY_DIVEST_ATTRIBUTES: return "UNCONDITIONALLY_DIVEST_ATTRIBUTES";
+  case ResignAction::DELETE_OBJECTS: return "DELETE_OBJECTS";
+  case ResignAction::CANCEL_PENDING_OWNERSHIP_ACQUISITIONS: return "CANCEL_PENDING_OWNERSHIP_ACQUISITIONS";
+  case ResignAction::DELETE_OBJECTS_THEN_DIVEST: return "DELETE_OBJECTS_THEN_DIVEST";
+  case ResignAction::CANCEL_THEN_DELETE_THEN_DIVEST: return "CANCEL_THEN_DELETE_THEN_DIVEST";
+  case ResignAction::NO_ACTION: return "NO_ACTION";
+  default: return "<Invalid ResignAction>";
+  }
+}
+
+inline std::string to_string(const RestoreFailureReason& value)
+{
+  switch (value) {
+  case RestoreFailureReason::RTI_UNABLE_TO_RESTORE: return "RTI_UNABLE_TO_RESTORE";
+  case RestoreFailureReason::FEDERATE_REPORTED_FAILURE_DURING_RESTORE: return "FEDERATE_REPORTED_FAILURE_DURING_RESTORE";
+  case RestoreFailureReason::FEDERATE_RESIGNED_DURING_RESTORE: return "FEDERATE_RESIGNED_DURING_RESTORE";
+  case RestoreFailureReason::RTI_DETECTED_FAILURE_DURING_RESTORE: return "RTI_DETECTED_FAILURE_DURING_RESTORE";
+  default: return "<Invalid RestoreFailureReason>";
+  }
+}
+
+inline std::string to_string(const RestoreStatus& value)
+{
+  switch (value) {
+  case RestoreStatus::NO_RESTORE_IN_PROGRESS: return "NO_RESTORE_IN_PROGRESS";
+  case RestoreStatus::FEDERATE_RESTORE_REQUEST_PENDING: return "FEDERATE_RESTORE_REQUEST_PENDING";
+  case RestoreStatus::FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN: return "FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN";
+  case RestoreStatus::FEDERATE_PREPARED_TO_RESTORE: return "FEDERATE_PREPARED_TO_RESTORE";
+  case RestoreStatus::FEDERATE_RESTORING: return "FEDERATE_RESTORING";
+  case RestoreStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE";
+  default: return "<Invalid RestoreStatus>";
+  }
+}
+
+inline std::string to_string(const SaveFailureReason& value)
+{
+  switch (value) {
+  case SaveFailureReason::RTI_UNABLE_TO_SAVE: return "RTI_UNABLE_TO_SAVE";
+  case SaveFailureReason::FEDERATE_REPORTED_FAILURE_DURING_SAVE: return "FEDERATE_REPORTED_FAILURE_DURING_SAVE";
+  case SaveFailureReason::FEDERATE_RESIGNED_DURING_SAVE: return "FEDERATE_RESIGNED_DURING_SAVE";
+  case SaveFailureReason::RTI_DETECTED_FAILURE_DURING_SAVE: return "RTI_DETECTED_FAILURE_DURING_SAVE";
+  case SaveFailureReason::SAVE_TIME_CANNOT_BE_HONORED: return "SAVE_TIME_CANNOT_BE_HONORED";
+  default: return "<Invalid SaveFailureReason>";
+  }
+}
+
+inline std::string to_string(const SaveStatus& value)
+{
+  switch (value) {
+  case SaveStatus::NO_SAVE_IN_PROGRESS: return "NO_SAVE_IN_PROGRESS";
+  case SaveStatus::FEDERATE_INSTRUCTED_TO_SAVE: return "FEDERATE_INSTRUCTED_TO_SAVE";
+  case SaveStatus::FEDERATE_SAVING: return "FEDERATE_SAVING";
+  case SaveStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE";
+  default: return "<Invalid SaveStatus>";
+  }
+}
+
+inline std::string to_string(const ServiceGroupIndicator& value)
+{
+  switch (value) {
+  case ServiceGroupIndicator::FEDERATION_MANAGEMENT: return "FEDERATION_MANAGEMENT";
+  case ServiceGroupIndicator::DECLARATION_MANAGEMENT: return "DECLARATION_MANAGEMENT";
+  case ServiceGroupIndicator::OBJECT_MANAGEMENT: return "OBJECT_MANAGEMENT";
+  case ServiceGroupIndicator::OWNERSHIP_MANAGEMENT: return "OWNERSHIP_MANAGEMENT";
+  case ServiceGroupIndicator::TIME_MANAGEMENT: return "TIME_MANAGEMENT";
+  case ServiceGroupIndicator::DATA_DISTRIBUTION_MANAGEMENT: return "DATA_DISTRIBUTION_MANAGEMENT";
+  case ServiceGroupIndicator::SUPPORT_SERVICES: return "SUPPORT_SERVICES";
+  default: return "<Invalid ServiceGroupIndicator>";
+  }
+}
+
+inline std::string to_string(const LowerBoundTimeStampCommitType& value)
+{
+  switch (value) {
+  case LowerBoundTimeStampCommitType::TimeAdvanceCommit: return "TimeAdvanceCommit";
+  case LowerBoundTimeStampCommitType::NextMessageCommit: return "NextMessageCommit";
+  case LowerBoundTimeStampCommitType::TimeAdvanceAndNextMessageCommit: return "TimeAdvanceAndNextMessageCommit";
+  default: return "<Invalid LowerBoundTimeStampCommitType>";
+  }
+}
+
+inline std::string to_string(const SwitchesType& value)
+{
+  switch (value) {
+  case SwitchesType::InteractionRelevanceAdvisorySwitchesType: return "InteractionRelevanceAdvisorySwitchesType";
+  case SwitchesType::ObjectClassRelevanceAdvisorySwitchesType: return "ObjectClassRelevanceAdvisorySwitchesType";
+  case SwitchesType::AttributeRelevanceAdvisorySwitchesType: return "AttributeRelevanceAdvisorySwitchesType";
+  case SwitchesType::AttributeScopeAdvisorySwitchesType: return "AttributeScopeAdvisorySwitchesType";
+  case SwitchesType::AutoProvideSwitchesType: return "AutoProvideSwitchesType";
+  case SwitchesType::ConveyRegionDesignatorSetsSwitchesType: return "ConveyRegionDesignatorSetsSwitchesType";
+  case SwitchesType::ServiceReportingSwitchesType: return "ServiceReportingSwitchesType";
+  default: return "<Invalid SwitchesType>";
+  }
+}
+
+inline std::string to_string(const ArrayDataTypeEncoding& value)
+{
+  switch (value) {
+  case ArrayDataTypeEncoding::FixedArrayDataTypeEncoding: return "HLAfixedArray";
+  case ArrayDataTypeEncoding::VariableArrayDataTypeEncoding: return "HLAvariableArray";
+  default: return "<Invalid ArrayDataTypeEncoding>";
+  }
+}
+
+inline std::string to_string(const Endianness& value)
+{
+  switch (value) {
+  case Endianness::BigEndian: return "BIG";
+  case Endianness::LittleEndian: return "LITTLE";
+  default: return "<Invalid Endianness>";
+  }
+}
+
 // StructDataType RangeBoundsValue
 inline std::string to_string(const RangeBoundsValue& value)
 {
@@ -10850,6 +11012,56 @@ inline std::string to_string(const FederationExecutionInformation& value)
     std::ostringstream out;
     out << value;
     return out.str();
+}
+
+inline std::string to_string(const CreateFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseSuccess: return "CreateFederationExecutionResponseSuccess";
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseFederationExecutionAlreadyExists: return "CreateFederationExecutionResponseFederationExecutionAlreadyExists";
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseCouldNotOpenFDD: return "CreateFederationExecutionResponseCouldNotOpenFDD";
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseErrorReadingFDD: return "CreateFederationExecutionResponseErrorReadingFDD";
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: return "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory";
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseInconsistentFDD: return "CreateFederationExecutionResponseInconsistentFDD";
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseRTIinternalError: return "CreateFederationExecutionResponseRTIinternalError";
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseTimeout: return "CreateFederationExecutionResponseTimeout";
+  default: return "<Invalid CreateFederationExecutionResponseType>";
+  }
+}
+
+inline std::string to_string(const DestroyFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseSuccess: return "DestroyFederationExecutionResponseSuccess";
+  case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseFederatesCurrentlyJoined: return "DestroyFederationExecutionResponseFederatesCurrentlyJoined";
+  case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseFederationExecutionDoesNotExist: return "DestroyFederationExecutionResponseFederationExecutionDoesNotExist";
+  case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseRTIinternalError: return "DestroyFederationExecutionResponseRTIinternalError";
+  default: return "<Invalid DestroyFederationExecutionResponseType>";
+  }
+}
+
+inline std::string to_string(const JoinFederationExecutionResponseType& value)
+{
+  switch (value) {
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseSuccess: return "JoinFederationExecutionResponseSuccess";
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseFederateNameAlreadyInUse: return "JoinFederationExecutionResponseFederateNameAlreadyInUse";
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseFederationExecutionDoesNotExist: return "JoinFederationExecutionResponseFederationExecutionDoesNotExist";
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseSaveInProgress: return "JoinFederationExecutionResponseSaveInProgress";
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseRestoreInProgress: return "JoinFederationExecutionResponseRestoreInProgress";
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseInconsistentFDD: return "JoinFederationExecutionResponseInconsistentFDD";
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseTimeout: return "JoinFederationExecutionResponseTimeout";
+  default: return "<Invalid JoinFederationExecutionResponseType>";
+  }
+}
+
+inline std::string to_string(const RegisterFederationSynchronizationPointResponseType& value)
+{
+  switch (value) {
+  case RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseSuccess: return "RegisterFederationSynchronizationPointResponseSuccess";
+  case RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseLabelNotUnique: return "RegisterFederationSynchronizationPointResponseLabelNotUnique";
+  case RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseMemberNotJoined: return "RegisterFederationSynchronizationPointResponseMemberNotJoined";
+  default: return "<Invalid RegisterFederationSynchronizationPointResponseType>";
+  }
 }
 
 // StructDataType FOMStringBasicDataType

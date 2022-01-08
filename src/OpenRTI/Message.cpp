@@ -5026,8 +5026,8 @@ std::ostream&
 operator<<(std::ostream& os, const CallbackModel& value)
 {
   switch (value) {
-  case HLA_IMMEDIATE: os << "HLA_IMMEDIATE"; break;
-  case HLA_EVOKED: os << "HLA_EVOKED"; break;
+  case CallbackModel::HLA_IMMEDIATE: os << "HLA_IMMEDIATE"; break;
+  case CallbackModel::HLA_EVOKED: os << "HLA_EVOKED"; break;
   }
   return os;
 }
@@ -5039,22 +5039,13 @@ prettyprint(std::ostream& os, const CallbackModel& value, ServerModel::Federatio
   return os;
 }
 
-inline std::string to_string(const CallbackModel& value)
-{
-  switch (value) {
-  case HLA_IMMEDIATE: return "HLA_IMMEDIATE";
-  case HLA_EVOKED: return "HLA_EVOKED";
-  default: return "<Invalid CallbackModel>";
-  }
-}
-
 // EnumDataType OrderType
 std::ostream&
 operator<<(std::ostream& os, const OrderType& value)
 {
   switch (value) {
-  case RECEIVE: os << "RECEIVE"; break;
-  case TIMESTAMP: os << "TIMESTAMP"; break;
+  case OrderType::RECEIVE: os << "RECEIVE"; break;
+  case OrderType::TIMESTAMP: os << "TIMESTAMP"; break;
   }
   return os;
 }
@@ -5066,22 +5057,13 @@ prettyprint(std::ostream& os, const OrderType& value, ServerModel::Federation* )
   return os;
 }
 
-inline std::string to_string(const OrderType& value)
-{
-  switch (value) {
-  case RECEIVE: return "RECEIVE";
-  case TIMESTAMP: return "TIMESTAMP";
-  default: return "<Invalid OrderType>";
-  }
-}
-
 // EnumDataType TransportationType
 std::ostream&
 operator<<(std::ostream& os, const TransportationType& value)
 {
   switch (value) {
-  case RELIABLE: os << "RELIABLE"; break;
-  case BEST_EFFORT: os << "BEST_EFFORT"; break;
+  case TransportationType::RELIABLE: os << "RELIABLE"; break;
+  case TransportationType::BEST_EFFORT: os << "BEST_EFFORT"; break;
   }
   return os;
 }
@@ -5093,23 +5075,14 @@ prettyprint(std::ostream& os, const TransportationType& value, ServerModel::Fede
   return os;
 }
 
-inline std::string to_string(const TransportationType& value)
-{
-  switch (value) {
-  case RELIABLE: return "RELIABLE";
-  case BEST_EFFORT: return "BEST_EFFORT";
-  default: return "<Invalid TransportationType>";
-  }
-}
-
 // EnumDataType SubscriptionType
 std::ostream&
 operator<<(std::ostream& os, const SubscriptionType& value)
 {
   switch (value) {
-  case Unsubscribed: os << "Unsubscribed"; break;
-  case SubscribedPassive: os << "SubscribedPassive"; break;
-  case SubscribedActive: os << "SubscribedActive"; break;
+  case SubscriptionType::Unsubscribed: os << "Unsubscribed"; break;
+  case SubscriptionType::SubscribedPassive: os << "SubscribedPassive"; break;
+  case SubscriptionType::SubscribedActive: os << "SubscribedActive"; break;
   }
   return os;
 }
@@ -5121,23 +5094,13 @@ prettyprint(std::ostream& os, const SubscriptionType& value, ServerModel::Federa
   return os;
 }
 
-inline std::string to_string(const SubscriptionType& value)
-{
-  switch (value) {
-  case Unsubscribed: return "Unsubscribed";
-  case SubscribedPassive: return "SubscribedPassive";
-  case SubscribedActive: return "SubscribedActive";
-  default: return "<Invalid SubscriptionType>";
-  }
-}
-
 // EnumDataType PublicationType
 std::ostream&
 operator<<(std::ostream& os, const PublicationType& value)
 {
   switch (value) {
-  case Unpublished: os << "Unpublished"; break;
-  case Published: os << "Published"; break;
+  case PublicationType::Unpublished: os << "Unpublished"; break;
+  case PublicationType::Published: os << "Published"; break;
   }
   return os;
 }
@@ -5149,26 +5112,17 @@ prettyprint(std::ostream& os, const PublicationType& value, ServerModel::Federat
   return os;
 }
 
-inline std::string to_string(const PublicationType& value)
-{
-  switch (value) {
-  case Unpublished: return "Unpublished";
-  case Published: return "Published";
-  default: return "<Invalid PublicationType>";
-  }
-}
-
 // EnumDataType ResignAction
 std::ostream&
 operator<<(std::ostream& os, const ResignAction& value)
 {
   switch (value) {
-  case UNCONDITIONALLY_DIVEST_ATTRIBUTES: os << "UNCONDITIONALLY_DIVEST_ATTRIBUTES"; break;
-  case DELETE_OBJECTS: os << "DELETE_OBJECTS"; break;
-  case CANCEL_PENDING_OWNERSHIP_ACQUISITIONS: os << "CANCEL_PENDING_OWNERSHIP_ACQUISITIONS"; break;
-  case DELETE_OBJECTS_THEN_DIVEST: os << "DELETE_OBJECTS_THEN_DIVEST"; break;
-  case CANCEL_THEN_DELETE_THEN_DIVEST: os << "CANCEL_THEN_DELETE_THEN_DIVEST"; break;
-  case NO_ACTION: os << "NO_ACTION"; break;
+  case ResignAction::UNCONDITIONALLY_DIVEST_ATTRIBUTES: os << "UNCONDITIONALLY_DIVEST_ATTRIBUTES"; break;
+  case ResignAction::DELETE_OBJECTS: os << "DELETE_OBJECTS"; break;
+  case ResignAction::CANCEL_PENDING_OWNERSHIP_ACQUISITIONS: os << "CANCEL_PENDING_OWNERSHIP_ACQUISITIONS"; break;
+  case ResignAction::DELETE_OBJECTS_THEN_DIVEST: os << "DELETE_OBJECTS_THEN_DIVEST"; break;
+  case ResignAction::CANCEL_THEN_DELETE_THEN_DIVEST: os << "CANCEL_THEN_DELETE_THEN_DIVEST"; break;
+  case ResignAction::NO_ACTION: os << "NO_ACTION"; break;
   }
   return os;
 }
@@ -5180,28 +5134,15 @@ prettyprint(std::ostream& os, const ResignAction& value, ServerModel::Federation
   return os;
 }
 
-inline std::string to_string(const ResignAction& value)
-{
-  switch (value) {
-  case UNCONDITIONALLY_DIVEST_ATTRIBUTES: return "UNCONDITIONALLY_DIVEST_ATTRIBUTES";
-  case DELETE_OBJECTS: return "DELETE_OBJECTS";
-  case CANCEL_PENDING_OWNERSHIP_ACQUISITIONS: return "CANCEL_PENDING_OWNERSHIP_ACQUISITIONS";
-  case DELETE_OBJECTS_THEN_DIVEST: return "DELETE_OBJECTS_THEN_DIVEST";
-  case CANCEL_THEN_DELETE_THEN_DIVEST: return "CANCEL_THEN_DELETE_THEN_DIVEST";
-  case NO_ACTION: return "NO_ACTION";
-  default: return "<Invalid ResignAction>";
-  }
-}
-
 // EnumDataType RestoreFailureReason
 std::ostream&
 operator<<(std::ostream& os, const RestoreFailureReason& value)
 {
   switch (value) {
-  case RTI_UNABLE_TO_RESTORE: os << "RTI_UNABLE_TO_RESTORE"; break;
-  case FEDERATE_REPORTED_FAILURE_DURING_RESTORE: os << "FEDERATE_REPORTED_FAILURE_DURING_RESTORE"; break;
-  case FEDERATE_RESIGNED_DURING_RESTORE: os << "FEDERATE_RESIGNED_DURING_RESTORE"; break;
-  case RTI_DETECTED_FAILURE_DURING_RESTORE: os << "RTI_DETECTED_FAILURE_DURING_RESTORE"; break;
+  case RestoreFailureReason::RTI_UNABLE_TO_RESTORE: os << "RTI_UNABLE_TO_RESTORE"; break;
+  case RestoreFailureReason::FEDERATE_REPORTED_FAILURE_DURING_RESTORE: os << "FEDERATE_REPORTED_FAILURE_DURING_RESTORE"; break;
+  case RestoreFailureReason::FEDERATE_RESIGNED_DURING_RESTORE: os << "FEDERATE_RESIGNED_DURING_RESTORE"; break;
+  case RestoreFailureReason::RTI_DETECTED_FAILURE_DURING_RESTORE: os << "RTI_DETECTED_FAILURE_DURING_RESTORE"; break;
   }
   return os;
 }
@@ -5213,28 +5154,17 @@ prettyprint(std::ostream& os, const RestoreFailureReason& value, ServerModel::Fe
   return os;
 }
 
-inline std::string to_string(const RestoreFailureReason& value)
-{
-  switch (value) {
-  case RTI_UNABLE_TO_RESTORE: return "RTI_UNABLE_TO_RESTORE";
-  case FEDERATE_REPORTED_FAILURE_DURING_RESTORE: return "FEDERATE_REPORTED_FAILURE_DURING_RESTORE";
-  case FEDERATE_RESIGNED_DURING_RESTORE: return "FEDERATE_RESIGNED_DURING_RESTORE";
-  case RTI_DETECTED_FAILURE_DURING_RESTORE: return "RTI_DETECTED_FAILURE_DURING_RESTORE";
-  default: return "<Invalid RestoreFailureReason>";
-  }
-}
-
 // EnumDataType RestoreStatus
 std::ostream&
 operator<<(std::ostream& os, const RestoreStatus& value)
 {
   switch (value) {
-  case NO_RESTORE_IN_PROGRESS: os << "NO_RESTORE_IN_PROGRESS"; break;
-  case FEDERATE_RESTORE_REQUEST_PENDING: os << "FEDERATE_RESTORE_REQUEST_PENDING"; break;
-  case FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN: os << "FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN"; break;
-  case FEDERATE_PREPARED_TO_RESTORE: os << "FEDERATE_PREPARED_TO_RESTORE"; break;
-  case FEDERATE_RESTORING: os << "FEDERATE_RESTORING"; break;
-  case FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE: os << "FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE"; break;
+  case RestoreStatus::NO_RESTORE_IN_PROGRESS: os << "NO_RESTORE_IN_PROGRESS"; break;
+  case RestoreStatus::FEDERATE_RESTORE_REQUEST_PENDING: os << "FEDERATE_RESTORE_REQUEST_PENDING"; break;
+  case RestoreStatus::FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN: os << "FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN"; break;
+  case RestoreStatus::FEDERATE_PREPARED_TO_RESTORE: os << "FEDERATE_PREPARED_TO_RESTORE"; break;
+  case RestoreStatus::FEDERATE_RESTORING: os << "FEDERATE_RESTORING"; break;
+  case RestoreStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE: os << "FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE"; break;
   }
   return os;
 }
@@ -5246,29 +5176,16 @@ prettyprint(std::ostream& os, const RestoreStatus& value, ServerModel::Federatio
   return os;
 }
 
-inline std::string to_string(const RestoreStatus& value)
-{
-  switch (value) {
-  case NO_RESTORE_IN_PROGRESS: return "NO_RESTORE_IN_PROGRESS";
-  case FEDERATE_RESTORE_REQUEST_PENDING: return "FEDERATE_RESTORE_REQUEST_PENDING";
-  case FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN: return "FEDERATE_WAITING_FOR_RESTORE_TO_BEGIN";
-  case FEDERATE_PREPARED_TO_RESTORE: return "FEDERATE_PREPARED_TO_RESTORE";
-  case FEDERATE_RESTORING: return "FEDERATE_RESTORING";
-  case FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_RESTORE";
-  default: return "<Invalid RestoreStatus>";
-  }
-}
-
 // EnumDataType SaveFailureReason
 std::ostream&
 operator<<(std::ostream& os, const SaveFailureReason& value)
 {
   switch (value) {
-  case RTI_UNABLE_TO_SAVE: os << "RTI_UNABLE_TO_SAVE"; break;
-  case FEDERATE_REPORTED_FAILURE_DURING_SAVE: os << "FEDERATE_REPORTED_FAILURE_DURING_SAVE"; break;
-  case FEDERATE_RESIGNED_DURING_SAVE: os << "FEDERATE_RESIGNED_DURING_SAVE"; break;
-  case RTI_DETECTED_FAILURE_DURING_SAVE: os << "RTI_DETECTED_FAILURE_DURING_SAVE"; break;
-  case SAVE_TIME_CANNOT_BE_HONORED: os << "SAVE_TIME_CANNOT_BE_HONORED"; break;
+  case SaveFailureReason::RTI_UNABLE_TO_SAVE: os << "RTI_UNABLE_TO_SAVE"; break;
+  case SaveFailureReason::FEDERATE_REPORTED_FAILURE_DURING_SAVE: os << "FEDERATE_REPORTED_FAILURE_DURING_SAVE"; break;
+  case SaveFailureReason::FEDERATE_RESIGNED_DURING_SAVE: os << "FEDERATE_RESIGNED_DURING_SAVE"; break;
+  case SaveFailureReason::RTI_DETECTED_FAILURE_DURING_SAVE: os << "RTI_DETECTED_FAILURE_DURING_SAVE"; break;
+  case SaveFailureReason::SAVE_TIME_CANNOT_BE_HONORED: os << "SAVE_TIME_CANNOT_BE_HONORED"; break;
   }
   return os;
 }
@@ -5280,27 +5197,15 @@ prettyprint(std::ostream& os, const SaveFailureReason& value, ServerModel::Feder
   return os;
 }
 
-inline std::string to_string(const SaveFailureReason& value)
-{
-  switch (value) {
-  case RTI_UNABLE_TO_SAVE: return "RTI_UNABLE_TO_SAVE";
-  case FEDERATE_REPORTED_FAILURE_DURING_SAVE: return "FEDERATE_REPORTED_FAILURE_DURING_SAVE";
-  case FEDERATE_RESIGNED_DURING_SAVE: return "FEDERATE_RESIGNED_DURING_SAVE";
-  case RTI_DETECTED_FAILURE_DURING_SAVE: return "RTI_DETECTED_FAILURE_DURING_SAVE";
-  case SAVE_TIME_CANNOT_BE_HONORED: return "SAVE_TIME_CANNOT_BE_HONORED";
-  default: return "<Invalid SaveFailureReason>";
-  }
-}
-
 // EnumDataType SaveStatus
 std::ostream&
 operator<<(std::ostream& os, const SaveStatus& value)
 {
   switch (value) {
-  case NO_SAVE_IN_PROGRESS: os << "NO_SAVE_IN_PROGRESS"; break;
-  case FEDERATE_INSTRUCTED_TO_SAVE: os << "FEDERATE_INSTRUCTED_TO_SAVE"; break;
-  case FEDERATE_SAVING: os << "FEDERATE_SAVING"; break;
-  case FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE: os << "FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE"; break;
+  case SaveStatus::NO_SAVE_IN_PROGRESS: os << "NO_SAVE_IN_PROGRESS"; break;
+  case SaveStatus::FEDERATE_INSTRUCTED_TO_SAVE: os << "FEDERATE_INSTRUCTED_TO_SAVE"; break;
+  case SaveStatus::FEDERATE_SAVING: os << "FEDERATE_SAVING"; break;
+  case SaveStatus::FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE: os << "FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE"; break;
   }
   return os;
 }
@@ -5312,29 +5217,18 @@ prettyprint(std::ostream& os, const SaveStatus& value, ServerModel::Federation* 
   return os;
 }
 
-inline std::string to_string(const SaveStatus& value)
-{
-  switch (value) {
-  case NO_SAVE_IN_PROGRESS: return "NO_SAVE_IN_PROGRESS";
-  case FEDERATE_INSTRUCTED_TO_SAVE: return "FEDERATE_INSTRUCTED_TO_SAVE";
-  case FEDERATE_SAVING: return "FEDERATE_SAVING";
-  case FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE: return "FEDERATE_WAITING_FOR_FEDERATION_TO_SAVE";
-  default: return "<Invalid SaveStatus>";
-  }
-}
-
 // EnumDataType ServiceGroupIndicator
 std::ostream&
 operator<<(std::ostream& os, const ServiceGroupIndicator& value)
 {
   switch (value) {
-  case FEDERATION_MANAGEMENT: os << "FEDERATION_MANAGEMENT"; break;
-  case DECLARATION_MANAGEMENT: os << "DECLARATION_MANAGEMENT"; break;
-  case OBJECT_MANAGEMENT: os << "OBJECT_MANAGEMENT"; break;
-  case OWNERSHIP_MANAGEMENT: os << "OWNERSHIP_MANAGEMENT"; break;
-  case TIME_MANAGEMENT: os << "TIME_MANAGEMENT"; break;
-  case DATA_DISTRIBUTION_MANAGEMENT: os << "DATA_DISTRIBUTION_MANAGEMENT"; break;
-  case SUPPORT_SERVICES: os << "SUPPORT_SERVICES"; break;
+  case ServiceGroupIndicator::FEDERATION_MANAGEMENT: os << "FEDERATION_MANAGEMENT"; break;
+  case ServiceGroupIndicator::DECLARATION_MANAGEMENT: os << "DECLARATION_MANAGEMENT"; break;
+  case ServiceGroupIndicator::OBJECT_MANAGEMENT: os << "OBJECT_MANAGEMENT"; break;
+  case ServiceGroupIndicator::OWNERSHIP_MANAGEMENT: os << "OWNERSHIP_MANAGEMENT"; break;
+  case ServiceGroupIndicator::TIME_MANAGEMENT: os << "TIME_MANAGEMENT"; break;
+  case ServiceGroupIndicator::DATA_DISTRIBUTION_MANAGEMENT: os << "DATA_DISTRIBUTION_MANAGEMENT"; break;
+  case ServiceGroupIndicator::SUPPORT_SERVICES: os << "SUPPORT_SERVICES"; break;
   }
   return os;
 }
@@ -5346,28 +5240,14 @@ prettyprint(std::ostream& os, const ServiceGroupIndicator& value, ServerModel::F
   return os;
 }
 
-inline std::string to_string(const ServiceGroupIndicator& value)
-{
-  switch (value) {
-  case FEDERATION_MANAGEMENT: return "FEDERATION_MANAGEMENT";
-  case DECLARATION_MANAGEMENT: return "DECLARATION_MANAGEMENT";
-  case OBJECT_MANAGEMENT: return "OBJECT_MANAGEMENT";
-  case OWNERSHIP_MANAGEMENT: return "OWNERSHIP_MANAGEMENT";
-  case TIME_MANAGEMENT: return "TIME_MANAGEMENT";
-  case DATA_DISTRIBUTION_MANAGEMENT: return "DATA_DISTRIBUTION_MANAGEMENT";
-  case SUPPORT_SERVICES: return "SUPPORT_SERVICES";
-  default: return "<Invalid ServiceGroupIndicator>";
-  }
-}
-
 // EnumDataType LowerBoundTimeStampCommitType
 std::ostream&
 operator<<(std::ostream& os, const LowerBoundTimeStampCommitType& value)
 {
   switch (value) {
-  case TimeAdvanceCommit: os << "TimeAdvanceCommit"; break;
-  case NextMessageCommit: os << "NextMessageCommit"; break;
-  case TimeAdvanceAndNextMessageCommit: os << "TimeAdvanceAndNextMessageCommit"; break;
+  case LowerBoundTimeStampCommitType::TimeAdvanceCommit: os << "TimeAdvanceCommit"; break;
+  case LowerBoundTimeStampCommitType::NextMessageCommit: os << "NextMessageCommit"; break;
+  case LowerBoundTimeStampCommitType::TimeAdvanceAndNextMessageCommit: os << "TimeAdvanceAndNextMessageCommit"; break;
   }
   return os;
 }
@@ -5379,28 +5259,18 @@ prettyprint(std::ostream& os, const LowerBoundTimeStampCommitType& value, Server
   return os;
 }
 
-inline std::string to_string(const LowerBoundTimeStampCommitType& value)
-{
-  switch (value) {
-  case TimeAdvanceCommit: return "TimeAdvanceCommit";
-  case NextMessageCommit: return "NextMessageCommit";
-  case TimeAdvanceAndNextMessageCommit: return "TimeAdvanceAndNextMessageCommit";
-  default: return "<Invalid LowerBoundTimeStampCommitType>";
-  }
-}
-
 // EnumDataType SwitchesType
 std::ostream&
 operator<<(std::ostream& os, const SwitchesType& value)
 {
   switch (value) {
-  case InteractionRelevanceAdvisorySwitchesType: os << "InteractionRelevanceAdvisorySwitchesType"; break;
-  case ObjectClassRelevanceAdvisorySwitchesType: os << "ObjectClassRelevanceAdvisorySwitchesType"; break;
-  case AttributeRelevanceAdvisorySwitchesType: os << "AttributeRelevanceAdvisorySwitchesType"; break;
-  case AttributeScopeAdvisorySwitchesType: os << "AttributeScopeAdvisorySwitchesType"; break;
-  case AutoProvideSwitchesType: os << "AutoProvideSwitchesType"; break;
-  case ConveyRegionDesignatorSetsSwitchesType: os << "ConveyRegionDesignatorSetsSwitchesType"; break;
-  case ServiceReportingSwitchesType: os << "ServiceReportingSwitchesType"; break;
+  case SwitchesType::InteractionRelevanceAdvisorySwitchesType: os << "InteractionRelevanceAdvisorySwitchesType"; break;
+  case SwitchesType::ObjectClassRelevanceAdvisorySwitchesType: os << "ObjectClassRelevanceAdvisorySwitchesType"; break;
+  case SwitchesType::AttributeRelevanceAdvisorySwitchesType: os << "AttributeRelevanceAdvisorySwitchesType"; break;
+  case SwitchesType::AttributeScopeAdvisorySwitchesType: os << "AttributeScopeAdvisorySwitchesType"; break;
+  case SwitchesType::AutoProvideSwitchesType: os << "AutoProvideSwitchesType"; break;
+  case SwitchesType::ConveyRegionDesignatorSetsSwitchesType: os << "ConveyRegionDesignatorSetsSwitchesType"; break;
+  case SwitchesType::ServiceReportingSwitchesType: os << "ServiceReportingSwitchesType"; break;
   }
   return os;
 }
@@ -5412,27 +5282,13 @@ prettyprint(std::ostream& os, const SwitchesType& value, ServerModel::Federation
   return os;
 }
 
-inline std::string to_string(const SwitchesType& value)
-{
-  switch (value) {
-  case InteractionRelevanceAdvisorySwitchesType: return "InteractionRelevanceAdvisorySwitchesType";
-  case ObjectClassRelevanceAdvisorySwitchesType: return "ObjectClassRelevanceAdvisorySwitchesType";
-  case AttributeRelevanceAdvisorySwitchesType: return "AttributeRelevanceAdvisorySwitchesType";
-  case AttributeScopeAdvisorySwitchesType: return "AttributeScopeAdvisorySwitchesType";
-  case AutoProvideSwitchesType: return "AutoProvideSwitchesType";
-  case ConveyRegionDesignatorSetsSwitchesType: return "ConveyRegionDesignatorSetsSwitchesType";
-  case ServiceReportingSwitchesType: return "ServiceReportingSwitchesType";
-  default: return "<Invalid SwitchesType>";
-  }
-}
-
 // EnumDataType ArrayDataTypeEncoding
 std::ostream&
 operator<<(std::ostream& os, const ArrayDataTypeEncoding& value)
 {
   switch (value) {
-  case FixedArrayDataTypeEncoding: os << "HLAfixedArray"; break;
-  case VariableArrayDataTypeEncoding: os << "HLAvariableArray"; break;
+  case ArrayDataTypeEncoding::FixedArrayDataTypeEncoding: os << "HLAfixedArray"; break;
+  case ArrayDataTypeEncoding::VariableArrayDataTypeEncoding: os << "HLAvariableArray"; break;
   }
   return os;
 }
@@ -5444,22 +5300,13 @@ prettyprint(std::ostream& os, const ArrayDataTypeEncoding& value, ServerModel::F
   return os;
 }
 
-inline std::string to_string(const ArrayDataTypeEncoding& value)
-{
-  switch (value) {
-  case FixedArrayDataTypeEncoding: return "HLAfixedArray";
-  case VariableArrayDataTypeEncoding: return "HLAvariableArray";
-  default: return "<Invalid ArrayDataTypeEncoding>";
-  }
-}
-
 // EnumDataType Endianness
 std::ostream&
 operator<<(std::ostream& os, const Endianness& value)
 {
   switch (value) {
-  case BigEndian: os << "BIG"; break;
-  case LittleEndian: os << "LITTLE"; break;
+  case Endianness::BigEndian: os << "BIG"; break;
+  case Endianness::LittleEndian: os << "LITTLE"; break;
   }
   return os;
 }
@@ -5469,15 +5316,6 @@ prettyprint(std::ostream& os, const Endianness& value, ServerModel::Federation* 
 {
   os << value;
   return os;
-}
-
-inline std::string to_string(const Endianness& value)
-{
-  switch (value) {
-  case BigEndian: return "BIG";
-  case LittleEndian: return "LITTLE";
-  default: return "<Invalid Endianness>";
-  }
 }
 
 // VectorDataType AttributeHandleVector
@@ -6523,14 +6361,14 @@ std::ostream&
 operator<<(std::ostream& os, const CreateFederationExecutionResponseType& value)
 {
   switch (value) {
-  case CreateFederationExecutionResponseSuccess: os << "CreateFederationExecutionResponseSuccess"; break;
-  case CreateFederationExecutionResponseFederationExecutionAlreadyExists: os << "CreateFederationExecutionResponseFederationExecutionAlreadyExists"; break;
-  case CreateFederationExecutionResponseCouldNotOpenFDD: os << "CreateFederationExecutionResponseCouldNotOpenFDD"; break;
-  case CreateFederationExecutionResponseErrorReadingFDD: os << "CreateFederationExecutionResponseErrorReadingFDD"; break;
-  case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: os << "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory"; break;
-  case CreateFederationExecutionResponseInconsistentFDD: os << "CreateFederationExecutionResponseInconsistentFDD"; break;
-  case CreateFederationExecutionResponseRTIinternalError: os << "CreateFederationExecutionResponseRTIinternalError"; break;
-  case CreateFederationExecutionResponseTimeout: os << "CreateFederationExecutionResponseTimeout"; break;
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseSuccess: os << "CreateFederationExecutionResponseSuccess"; break;
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseFederationExecutionAlreadyExists: os << "CreateFederationExecutionResponseFederationExecutionAlreadyExists"; break;
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseCouldNotOpenFDD: os << "CreateFederationExecutionResponseCouldNotOpenFDD"; break;
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseErrorReadingFDD: os << "CreateFederationExecutionResponseErrorReadingFDD"; break;
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: os << "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory"; break;
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseInconsistentFDD: os << "CreateFederationExecutionResponseInconsistentFDD"; break;
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseRTIinternalError: os << "CreateFederationExecutionResponseRTIinternalError"; break;
+  case CreateFederationExecutionResponseType::CreateFederationExecutionResponseTimeout: os << "CreateFederationExecutionResponseTimeout"; break;
   }
   return os;
 }
@@ -6542,30 +6380,15 @@ prettyprint(std::ostream& os, const CreateFederationExecutionResponseType& value
   return os;
 }
 
-inline std::string to_string(const CreateFederationExecutionResponseType& value)
-{
-  switch (value) {
-  case CreateFederationExecutionResponseSuccess: return "CreateFederationExecutionResponseSuccess";
-  case CreateFederationExecutionResponseFederationExecutionAlreadyExists: return "CreateFederationExecutionResponseFederationExecutionAlreadyExists";
-  case CreateFederationExecutionResponseCouldNotOpenFDD: return "CreateFederationExecutionResponseCouldNotOpenFDD";
-  case CreateFederationExecutionResponseErrorReadingFDD: return "CreateFederationExecutionResponseErrorReadingFDD";
-  case CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory: return "CreateFederationExecutionResponseCouldNotCreateLogicalTimeFactory";
-  case CreateFederationExecutionResponseInconsistentFDD: return "CreateFederationExecutionResponseInconsistentFDD";
-  case CreateFederationExecutionResponseRTIinternalError: return "CreateFederationExecutionResponseRTIinternalError";
-  case CreateFederationExecutionResponseTimeout: return "CreateFederationExecutionResponseTimeout";
-  default: return "<Invalid CreateFederationExecutionResponseType>";
-  }
-}
-
 // EnumDataType DestroyFederationExecutionResponseType
 std::ostream&
 operator<<(std::ostream& os, const DestroyFederationExecutionResponseType& value)
 {
   switch (value) {
-  case DestroyFederationExecutionResponseSuccess: os << "DestroyFederationExecutionResponseSuccess"; break;
-  case DestroyFederationExecutionResponseFederatesCurrentlyJoined: os << "DestroyFederationExecutionResponseFederatesCurrentlyJoined"; break;
-  case DestroyFederationExecutionResponseFederationExecutionDoesNotExist: os << "DestroyFederationExecutionResponseFederationExecutionDoesNotExist"; break;
-  case DestroyFederationExecutionResponseRTIinternalError: os << "DestroyFederationExecutionResponseRTIinternalError"; break;
+  case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseSuccess: os << "DestroyFederationExecutionResponseSuccess"; break;
+  case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseFederatesCurrentlyJoined: os << "DestroyFederationExecutionResponseFederatesCurrentlyJoined"; break;
+  case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseFederationExecutionDoesNotExist: os << "DestroyFederationExecutionResponseFederationExecutionDoesNotExist"; break;
+  case DestroyFederationExecutionResponseType::DestroyFederationExecutionResponseRTIinternalError: os << "DestroyFederationExecutionResponseRTIinternalError"; break;
   }
   return os;
 }
@@ -6577,29 +6400,18 @@ prettyprint(std::ostream& os, const DestroyFederationExecutionResponseType& valu
   return os;
 }
 
-inline std::string to_string(const DestroyFederationExecutionResponseType& value)
-{
-  switch (value) {
-  case DestroyFederationExecutionResponseSuccess: return "DestroyFederationExecutionResponseSuccess";
-  case DestroyFederationExecutionResponseFederatesCurrentlyJoined: return "DestroyFederationExecutionResponseFederatesCurrentlyJoined";
-  case DestroyFederationExecutionResponseFederationExecutionDoesNotExist: return "DestroyFederationExecutionResponseFederationExecutionDoesNotExist";
-  case DestroyFederationExecutionResponseRTIinternalError: return "DestroyFederationExecutionResponseRTIinternalError";
-  default: return "<Invalid DestroyFederationExecutionResponseType>";
-  }
-}
-
 // EnumDataType JoinFederationExecutionResponseType
 std::ostream&
 operator<<(std::ostream& os, const JoinFederationExecutionResponseType& value)
 {
   switch (value) {
-  case JoinFederationExecutionResponseSuccess: os << "JoinFederationExecutionResponseSuccess"; break;
-  case JoinFederationExecutionResponseFederateNameAlreadyInUse: os << "JoinFederationExecutionResponseFederateNameAlreadyInUse"; break;
-  case JoinFederationExecutionResponseFederationExecutionDoesNotExist: os << "JoinFederationExecutionResponseFederationExecutionDoesNotExist"; break;
-  case JoinFederationExecutionResponseSaveInProgress: os << "JoinFederationExecutionResponseSaveInProgress"; break;
-  case JoinFederationExecutionResponseRestoreInProgress: os << "JoinFederationExecutionResponseRestoreInProgress"; break;
-  case JoinFederationExecutionResponseInconsistentFDD: os << "JoinFederationExecutionResponseInconsistentFDD"; break;
-  case JoinFederationExecutionResponseTimeout: os << "JoinFederationExecutionResponseTimeout"; break;
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseSuccess: os << "JoinFederationExecutionResponseSuccess"; break;
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseFederateNameAlreadyInUse: os << "JoinFederationExecutionResponseFederateNameAlreadyInUse"; break;
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseFederationExecutionDoesNotExist: os << "JoinFederationExecutionResponseFederationExecutionDoesNotExist"; break;
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseSaveInProgress: os << "JoinFederationExecutionResponseSaveInProgress"; break;
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseRestoreInProgress: os << "JoinFederationExecutionResponseRestoreInProgress"; break;
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseInconsistentFDD: os << "JoinFederationExecutionResponseInconsistentFDD"; break;
+  case JoinFederationExecutionResponseType::JoinFederationExecutionResponseTimeout: os << "JoinFederationExecutionResponseTimeout"; break;
   }
   return os;
 }
@@ -6611,28 +6423,14 @@ prettyprint(std::ostream& os, const JoinFederationExecutionResponseType& value, 
   return os;
 }
 
-inline std::string to_string(const JoinFederationExecutionResponseType& value)
-{
-  switch (value) {
-  case JoinFederationExecutionResponseSuccess: return "JoinFederationExecutionResponseSuccess";
-  case JoinFederationExecutionResponseFederateNameAlreadyInUse: return "JoinFederationExecutionResponseFederateNameAlreadyInUse";
-  case JoinFederationExecutionResponseFederationExecutionDoesNotExist: return "JoinFederationExecutionResponseFederationExecutionDoesNotExist";
-  case JoinFederationExecutionResponseSaveInProgress: return "JoinFederationExecutionResponseSaveInProgress";
-  case JoinFederationExecutionResponseRestoreInProgress: return "JoinFederationExecutionResponseRestoreInProgress";
-  case JoinFederationExecutionResponseInconsistentFDD: return "JoinFederationExecutionResponseInconsistentFDD";
-  case JoinFederationExecutionResponseTimeout: return "JoinFederationExecutionResponseTimeout";
-  default: return "<Invalid JoinFederationExecutionResponseType>";
-  }
-}
-
 // EnumDataType RegisterFederationSynchronizationPointResponseType
 std::ostream&
 operator<<(std::ostream& os, const RegisterFederationSynchronizationPointResponseType& value)
 {
   switch (value) {
-  case RegisterFederationSynchronizationPointResponseSuccess: os << "RegisterFederationSynchronizationPointResponseSuccess"; break;
-  case RegisterFederationSynchronizationPointResponseLabelNotUnique: os << "RegisterFederationSynchronizationPointResponseLabelNotUnique"; break;
-  case RegisterFederationSynchronizationPointResponseMemberNotJoined: os << "RegisterFederationSynchronizationPointResponseMemberNotJoined"; break;
+  case RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseSuccess: os << "RegisterFederationSynchronizationPointResponseSuccess"; break;
+  case RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseLabelNotUnique: os << "RegisterFederationSynchronizationPointResponseLabelNotUnique"; break;
+  case RegisterFederationSynchronizationPointResponseType::RegisterFederationSynchronizationPointResponseMemberNotJoined: os << "RegisterFederationSynchronizationPointResponseMemberNotJoined"; break;
   }
   return os;
 }
@@ -6642,16 +6440,6 @@ prettyprint(std::ostream& os, const RegisterFederationSynchronizationPointRespon
 {
   os << value;
   return os;
-}
-
-inline std::string to_string(const RegisterFederationSynchronizationPointResponseType& value)
-{
-  switch (value) {
-  case RegisterFederationSynchronizationPointResponseSuccess: return "RegisterFederationSynchronizationPointResponseSuccess";
-  case RegisterFederationSynchronizationPointResponseLabelNotUnique: return "RegisterFederationSynchronizationPointResponseLabelNotUnique";
-  case RegisterFederationSynchronizationPointResponseMemberNotJoined: return "RegisterFederationSynchronizationPointResponseMemberNotJoined";
-  default: return "<Invalid RegisterFederationSynchronizationPointResponseType>";
-  }
 }
 
 // MapDataType ConfigurationParameterMap
