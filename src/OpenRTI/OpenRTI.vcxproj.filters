@@ -259,9 +259,6 @@
     <ClCompile Include="ImmediateCallbackDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OwnershipManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
@@ -729,9 +726,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="ImmediateCallbackDispatcher.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OwnershipManager.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
