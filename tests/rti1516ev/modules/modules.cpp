@@ -469,7 +469,7 @@ public:
     RTITest::Ambassador(constructorArgs)
   { }
 
-  virtual bool exec() override
+  virtual bool exec(uint32_t threadIndex) override
   {
     RTI1516ESimpleAmbassador ambassador;
     ambassador.connect(getConnectUrl());

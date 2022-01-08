@@ -111,12 +111,9 @@ PyObject_GetString(std::wstring& string, PyObject* o)
   } else
 #endif
   if (PyUnicode_Check(o)) {
-    Py_ssize_t size = PyUnicode_GetSize(o);
-    string.resize(size);
-    if (size) {
-      const Py_UNICODE* ptr = PyUnicode_AsUnicode(o);
-      std::copy(ptr, ptr + size, string.begin());
-    }
+    Py_ssize_t size = 0;
+      wchar_t * ptr = PyUnicode_AsWideCharString(o, &size);
+      string = std::wstring(ptr);
     return true;
 
   } else {

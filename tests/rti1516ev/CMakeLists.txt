@@ -18,11 +18,10 @@ endif()
 
 # Test directories should be listed here in sensible testing order
 add_subdirectory(link)
+add_subdirectory(connect)
 add_subdirectory(encode)
 add_subdirectory(fddget)
 add_subdirectory(time)
-#bkd disable failing test: add_subdirectory(modules)
 add_subdirectory(objectinstance)
 add_subdirectory(testfed)
-##bkd disable failing test:
-#add_subdirectory(mom/ManagerFederate)
+add_subdirectory(interaction)

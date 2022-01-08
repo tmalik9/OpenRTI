@@ -28,7 +28,7 @@
 #include <cstring>
 #include <vector>
 #include <cassert>
-
+#include <sstream>
 #include "Encoding.h"
 #include "Export.h"
 #include "HLAarrayImplementation.h"
@@ -56,7 +56,12 @@ class OPENRTI_LOCAL HLAvariableArrayOfBasicTypeImplementation : public HLAarrayO
 
     size_t decodedSize(const Octet* buffer, size_t bufferSize, size_t index) override {
       if (bufferSize < index + 4)
-        throw EncoderException(L"Insufficient buffer size for decoding!");
+      {
+        std::wostringstream msg;
+        msg << to_wstring(__FUNCTION__) << L": Insufficient buffer size while decoding variable array: ";
+        msg << L" bufferSize=" << bufferSize << L"index=" << index;
+        throw EncoderException(msg.str());
+      }
       uint32_t length;
       decodeFromBE32(buffer, bufferSize, index, length);
       return length;
@@ -116,7 +121,12 @@ class OPENRTI_LOCAL HLAvariableArrayImplementation : public HLAarrayImplementati
 
     size_t decodedSize(const Octet* buffer, size_t bufferSize, size_t index) override {
       if (bufferSize < index + 4)
-        throw EncoderException(L"Insufficient buffer size for decoding!");
+      {
+        std::wostringstream msg;
+        msg << L"HLAvariableArray::decodedSize: Insufficient buffer size for decoding!";
+        msg << " bufferSize=" << bufferSize << "index=" << index;
+        throw EncoderException(msg.str());
+      }
       uint32_t length;
       decodeFromBE32(buffer, bufferSize, index, length);
       return length;
@@ -141,9 +151,22 @@ class OPENRTI_LOCAL HLAvariableArrayImplementation : public HLAarrayImplementati
 
     size_t decodeFrom(const Octet* buffer, size_t bufferSize, size_t offset) override {
       if (bufferSize < offset + 4)
-        throw EncoderException(L"Insufficient buffer size for decoding!");
+      {
+        std::wostringstream msg;
+        msg << L"HLAvariableArray::decodeFrom: Insufficient buffer size for decoding!";
+        msg << " bufferSize=" << bufferSize << "offset=" << offset;
+        throw EncoderException(msg.str());
+      }
       uint32_t length;
+    try {
       offset = decodeFromBE32(buffer, bufferSize, offset, length);
+    }
+    catch (const EncoderException& e)
+    {
+      std::wostringstream msg;
+      msg << e.what() + L" while decoding variable array length";
+      throw EncoderException(msg.str());
+    }
 
       // Shrink _dataElementVector if necessary, deleting owned elements.
       // Note that _dataElementVector contains DataElements.
@@ -157,10 +180,19 @@ class OPENRTI_LOCAL HLAvariableArrayImplementation : public HLAarrayImplementati
       while (_dataElementVector.size() < length)
         _dataElementVector.push_back(std::make_pair(_protoType->clone().release(), true));
 
-      for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i) {
+      int count = 0;
+      for (DataElementVector::const_iterator i = _dataElementVector.begin(); i != _dataElementVector.end(); ++i, count++) {
         if (i->first == nullptr) // must not happen (should actually assert)
           throw EncoderException(L"HLAvariableArray::decodeFrom(): dataElement is zero!");
-        offset = i->first->decodeFrom(buffer, bufferSize, offset);
+        try {
+          offset = i->first->decodeFrom(buffer, bufferSize, offset);
+        }
+        catch (const EncoderException& e)
+        {
+          std::wostringstream msg;
+          msg << e.what() + L" while decoding variable array element #" << count;
+          throw EncoderException(msg.str());
+        }
       }
       return offset;
     }

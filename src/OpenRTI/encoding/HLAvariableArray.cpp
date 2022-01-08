@@ -187,7 +187,22 @@ public:
   }
   void resize(size_t length)
   {
-    _dataElementVector.resize(length);
+    size_t oldSize = _dataElementVector.size();
+    if (length < oldSize)
+    {
+      for (size_t i = length; i < oldSize; i++)
+      {
+        delete _dataElementVector[i].first; _dataElementVector[i].first = 0;
+      }
+    }
+    _dataElementVector.resize(length, std::make_pair(nullptr, true));
+    if (length > oldSize)
+    {
+      for (size_t i = oldSize; i < length; i++)
+      {
+        _dataElementVector[i].first = _protoType->clone().release();
+      }
+    }
   }
   void clear()
   {

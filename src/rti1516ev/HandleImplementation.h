@@ -76,7 +76,7 @@ namespace rti1516ev
     {                                                                   \
       if (!useImplementationClass())                                    \
         return;                                                         \
-      OpenRTI::Referenced::incRef(impl);                                   \
+      OpenRTI::Referenced::incRef(impl);                                \
     }                                                                   \
                                                                         \
     static OpenRTI::HandleKind                                          \
@@ -90,7 +90,7 @@ namespace rti1516ev
           OpenRTI::HandleKind::value_type value;                        \
         } u;                                                            \
         u.ptr = ptr;                                                    \
-        return u.value;                                                 \
+        return OpenRTI::HandleKind(u.value);                            \
       }                                                                 \
     }                                                                   \
     OpenRTI::HandleKind _handle;                                        \

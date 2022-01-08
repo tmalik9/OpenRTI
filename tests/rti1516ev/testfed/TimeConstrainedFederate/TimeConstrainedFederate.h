@@ -24,6 +24,7 @@ class TimeConstrainedFederate : public SimpleTestFederate
     void InitializeObjects();
 
     void cleanupSimulation() override;
+
   private:
     void sendInteraction();
     //ObjectInstanceHandle registerObject(const wchar_t* className);
@@ -52,5 +53,6 @@ class TimeConstrainedFederate : public SimpleTestFederate
     ObjectInstanceHandle   myPublishedObject;
     AttributeHandleSet     myPublishedAttributes;
 
+    bool isResetting = false;
 };
 

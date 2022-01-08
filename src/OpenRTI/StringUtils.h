@@ -109,6 +109,9 @@ utf8ToUtf16BE(const std::string& utf8, bool bom = false);
 OPENRTI_API std::vector<std::string>
 split(const std::string& s, const char* c = ", \t\n");
 
+OPENRTI_API std::list<std::string>
+splitl(const std::string& s, const char* c);
+
 inline std::vector<std::string>
 split(const char* s, const char* c = ", \t\n")
 {

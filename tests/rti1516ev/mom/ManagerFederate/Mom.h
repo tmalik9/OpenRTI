@@ -11,6 +11,7 @@
 #include <map>
 #include <functional>
 #include <cassert>
+#include <stdexcept>
 
 using namespace rti1516ev;
 
@@ -139,7 +140,7 @@ class Mom : public std::enable_shared_from_this<Mom>
         MomTreeNode* currentNode = mRoot;
         while (currentNode != nullptr && currentNode->type == MomType::Object)
         {
-          for (MomTreeNode* child : currentNode->children)
+          for (const MomTreeNode* child : currentNode->children)
           {
             if (child->type == MomType::Attribute)
             {

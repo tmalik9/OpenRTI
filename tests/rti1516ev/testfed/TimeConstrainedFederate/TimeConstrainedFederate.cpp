@@ -139,6 +139,8 @@ void TimeConstrainedFederate::cleanupSimulation()
 
 void TimeConstrainedFederate::sendInteraction()
 {
+  if (!isResetting)
+  {
   ////////////////////////////////////////////////
   /// create the necessary container and values
   ////////////////////////////////////////////////
@@ -164,6 +166,10 @@ void TimeConstrainedFederate::sendInteraction()
   /// we send another interaction, this time with a timestamp:
   HLAfloat64Time time = federateTime + federateLookahead;
   mRtiAmb->sendInteraction(x_InteractionClass, parameters, toVariableLengthData(L"hi!"), time);
+  }
+  else
+  {
+  }
 }
 
 void TimeConstrainedFederate::updateAttributeValues(ObjectInstanceHandle theObject)

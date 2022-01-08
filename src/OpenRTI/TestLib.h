@@ -316,6 +316,7 @@ public:
     std::vector<std::wstring> _federateList;
     bool _disjointFederations;
     bool _joinOnce;
+    int _protocolVersion;
     SharedPtr<FederationBarrier> _federationBarrier;
     SharedPtr<LBTS> _lbts;
     Rand _rand;
@@ -328,16 +329,16 @@ public:
     { }
     virtual ~Ambassador() {}
 
-    bool callExec()
+    bool callExec(uint32_t threadIndex)
     {
       _constructorArgs._federationBarrier->addThread();
-      bool result = exec();
+      bool result = exec(threadIndex);
       clearLBTS();
       _constructorArgs._federationBarrier->removeThread();
       return result;
     }
 
-    virtual bool exec() = 0;
+    virtual bool exec(uint32_t threadIndex) = 0;
 
     const std::wstring& getFederationExecution() const
     { return _constructorArgs._federationExecution; }
@@ -362,11 +363,20 @@ public:
     }
     std::wstring getConnectUrl() const
     {
-      if (_constructorArgs._address.empty()) {
-        return L"thread:///";
-      } else {
-        return std::wstring(L"rti://") + _constructorArgs._address + L"/";
+      std::wstring query=L"";
+      if (_constructorArgs._protocolVersion != 0)
+      {
+        query=L"?version=" + std::to_wstring(_constructorArgs._protocolVersion);
       }
+      if (_constructorArgs._address.empty()) {
+        return L"thread:///" + query;
+      } else {
+        return std::wstring(L"rti://") + _constructorArgs._address + L"/" + query;
+      }
+    }
+    int getProtocolversion() const
+    {
+      return _constructorArgs._protocolVersion;
     }
     const std::vector<std::wstring>& getFederateList() const
     { return _constructorArgs._federateList; }
@@ -416,14 +426,15 @@ public:
   };
 
   RTITest(int argc, const char* const argv[], bool disjointFederations) :
-    _optionString("A:C:F:JM:O:S:v"),
+    _optionString("A:C:F:JM:O:S:vp:"),
     _options(argc, argv),
     _federationExecution(L"FederationExecution"),
     _numServers(1),
     _numClientsPerServers(2),
     _numAmbassadorThreads(1),
     _disjointFederations(disjointFederations),
-    _joinOnce(false)
+    _joinOnce(false),
+    _protocolVersion(0)
   { }
   virtual ~RTITest()
   { }
@@ -469,6 +480,9 @@ public:
       sEnableDebugPrintf = true;
       sDebugToConsole = true;
       return true;
+    case 'p':
+      _protocolVersion = atoi(argument.c_str());
+      return true;
     case '\0':
       _globalArgumentList.push_back(localeToUcs(argument));
       return true;
@@ -502,6 +516,7 @@ public:
     constructorArgs._argumentList = _globalArgumentList;
     constructorArgs._disjointFederations = _disjointFederations;
     constructorArgs._joinOnce = _joinOnce;
+    constructorArgs._protocolVersion = _protocolVersion;
     for (unsigned i = 0; i < _numAmbassadorThreads; ++i) {
       std::wstringstream federateType;
       federateType << "Federate" << i;
@@ -525,7 +540,7 @@ public:
       testAmbassador = createAmbassador(constructorArgs);
 
       SharedPtr<AmbassadorThread> ambassadorThread;
-      ambassadorThread = MakeShared<AmbassadorThread>(testAmbassador);
+      ambassadorThread = MakeShared<AmbassadorThread>(testAmbassador, i);
       _ambassadorThreadList.push_back(ambassadorThread);
       ambassadorThread->start();
     }
@@ -540,7 +555,7 @@ public:
     SharedPtr<Ambassador> testAmbassador;
     testAmbassador = createAmbassador(constructorArgs);
 
-    bool success = testAmbassador->callExec();
+    bool success = testAmbassador->callExec(0);
 
     while (!_ambassadorThreadList.empty()) {
       _ambassadorThreadList.front()->wait();
@@ -560,9 +575,10 @@ private:
 
   class OPENRTI_LOCAL AmbassadorThread : public Thread {
   public:
-    AmbassadorThread(const SharedPtr<Ambassador>& testAmbassador) :
-      _testAmbassador(testAmbassador),
-      _success(true)
+    AmbassadorThread(const SharedPtr<Ambassador>& testAmbassador, uint32_t threadIndex)
+      : _testAmbassador(testAmbassador)
+      , _success(true)
+      , _threadIndex(threadIndex)
     { }
 
     bool getSuccess() const
@@ -570,11 +586,12 @@ private:
 
   protected:
     virtual void run() override
-    { _success = _testAmbassador->callExec(); }
+    { _success = _testAmbassador->callExec(_threadIndex); }
 
   private:
     SharedPtr<Ambassador> _testAmbassador;
     bool _success;
+    uint32_t _threadIndex;
   };
 
   ServerPool _serverPool;
@@ -592,6 +609,7 @@ private:
   unsigned _numAmbassadorThreads;
   bool _disjointFederations;
   bool _joinOnce;
+  int _protocolVersion;
 };
 
 }

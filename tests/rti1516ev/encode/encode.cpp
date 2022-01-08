@@ -1962,7 +1962,7 @@ bool testVariableArrayOfInteractionSubscriptionsEncoding()
     if (second != data[i].getActive())
       return false;
   }
-  std::cout << "variable array of interaction subscriptions OK" << std::endl;
+  if (gDebugPrint) std::cout << "variable array of interaction subscriptions OK" << std::endl;
   return true;
 }
 
@@ -2195,15 +2195,19 @@ bool testFixedRecordWithVersionsEncoding()
   return true;
 }
 
-bool testTightBEEncoding()
+bool testTightBE32Encoding()
 {
+  if (gDebugPrint) std::cout << "==============================================" << std::endl;
+  if (gDebugPrint) std::cout << "testing TightBE32 encoding" << std::endl;
+  if (gDebugPrint) std::cout << "==============================================" << std::endl;
   std::vector<uint32_t> values
   {
     0x0001, 0x0010, 0x0100, 0x1000,
     0x7fff, 0x07ff, 0x007f, 0x0007,
     0x8000, 0x0800, 0x0080, 0x0008,
     0xffff, 0x0fff, 0x00ff, 0x000f,
-    0x5555, 0x0505, 0x5050, 0x1234
+    0x5555, 0x0505, 0x5050, 0x1234,
+    0x7fffffff, 0x7f808080, 0x7f808080, 0x80000000
   };
   uint8_t buffer[128];
   size_t bufferSize = sizeof(buffer);
@@ -2211,20 +2215,51 @@ bool testTightBEEncoding()
   for (size_t i=0; i<values.size(); i++)
   {
     uint32_t value = values[i];
+    size_t prevOffset = offset;
     offset = rti1516ev::encodeIntoBE32Compressed(buffer, bufferSize, offset, values[i]);
-    std::cout << std::dec << i << " value=" << std::hex << value << " => buffer=" << make_hex_string(buffer, buffer + offset, true, true) << std::endl;
+    if (gDebugPrint) std::cout << std::dec << i << " offset=" << offset << " length=" << offset - prevOffset << " value=" << std::hex << value << " => buffer=" << make_hex_string(buffer, buffer + offset, true, true) << std::endl;
   }
   offset = 0;
   for (size_t i=0; i<values.size(); i++)
   {
     uint32_t value = 0;
     offset = rti1516ev::decodeFromBE32Compressed(buffer, bufferSize, offset, value);
-    std::cout << std::dec << i << " value=" << std::hex << value << std::endl;
+    if (gDebugPrint) std::cout << std::dec << i << " value=" << std::hex << value << std::endl;
     if (value != values[i])
     {
       return false;
     }
   }
+  // Need not be done with regular build tests, as it slows down test execution
+#if 0
+  for (uint32_t inValue = 0; inValue < 0xffffff; inValue++)
+  {
+    size_t offsetEncoding = 0;
+    offsetEncoding = rti1516ev::encodeIntoBE32Compressed(buffer, bufferSize, offsetEncoding, inValue);
+    offsetEncoding = rti1516ev::encodeIntoBE32Compressed(buffer, bufferSize, offsetEncoding, inValue);
+    uint32_t outValue1 = 0;
+    uint32_t outValue2 = 0;
+    size_t offsetDecoding = 0;
+    offsetDecoding = rti1516ev::decodeFromBE32Compressed(buffer, bufferSize, offsetDecoding, outValue1);
+    offsetDecoding = rti1516ev::decodeFromBE32Compressed(buffer, bufferSize, offsetDecoding, outValue2);
+    if (gDebugPrint)
+      std::cout << std::dec << "offsetEncoding=" << offsetEncoding << " inValue=" << std::hex << inValue 
+                << std::dec << " offsetDecoding=" << offsetDecoding << " outValue1=" << std::hex << outValue1 << " outValue2=" << std::hex << outValue2 
+                << " buffer=" << make_hex_string(buffer, buffer + offsetEncoding, true, true)
+                << std::endl;
+    if (inValue != outValue1)
+    {
+      std::cout << std::dec << "inValue=" << std::hex << inValue << " != outValue1=" << outValue1 << std::endl;
+      return false;
+    }
+    if (inValue != outValue2)
+    {
+      std::cout << std::dec << "inValue=" << std::hex << inValue << " != outValue2=" << outValue2 << std::endl;
+      return false;
+    }
+  }
+#endif
+  if (gDebugPrint) std::cout << "TightBE32 encoding OK" << std::endl;
   return true;
 }
 
@@ -2330,7 +2365,7 @@ main(int argc, char* argv[])
     return EXIT_FAILURE;
   }
 
-  if (!testTightBEEncoding())
+  if (!testTightBE32Encoding())
     return EXIT_FAILURE;
   if (!testDataElementEncoding(HLAASCIIcharDataType))
     return EXIT_FAILURE;

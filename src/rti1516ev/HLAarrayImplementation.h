@@ -161,8 +161,8 @@ class OPENRTI_LOCAL HLAarrayOfBasicTypeImplementation : public HLAarrayImplement
     }
 
     void resize(size_t length) override { 
-      _dataElementPointerVector.resize(length);
 
+      // remember which elements have been owned by this array (e.g. are actually are part of _dataVector)
       std::set<size_t> existingOwnedElements;
       if (_dataElementVector.size() > 0)
       {
@@ -170,14 +170,22 @@ class OPENRTI_LOCAL HLAarrayOfBasicTypeImplementation : public HLAarrayImplement
         BasicTypeEncoding* last = &_dataElementVector[_dataElementVector.size() - 1];
         for (size_t i = 0; i < _dataElementPointerVector.size();i++)
         {
+          // if _dataElementPointerVector[i] points into _dataElementVector, it is one of our own encoders in _dataElementVector.
           if (_dataElementPointerVector[i] > first && _dataElementPointerVector[i] < last)
             existingOwnedElements.insert(i);
         }
       }
+      // now resize 
       _dataVector.resize(length);
       _dataElementVector.resize(length);
+      _dataElementPointerVector.resize(length);
+      // set the data pointers of the encoders in the (resized) _dataElementVector to the elements in the
+      // (possibly reallocated) _dataVector
       for (size_t i = 0; i < length; i++) {
+        // all of our own encoders shall point into our owned data
         _dataElementVector[i].setDataPointer(&_dataVector[i]);
+        // if it is an already 'owned' data element, or a freshly allocated element,
+        // set the encoder reference to the corresponding encoder owned by this array.
         if (_dataElementPointerVector[i] == nullptr || existingOwnedElements.find(i) != existingOwnedElements.end())
           _dataElementPointerVector[i] = &_dataElementVector[i];
       }
@@ -303,7 +311,22 @@ class OPENRTI_LOCAL HLAarrayImplementation : public HLAarrayImplementationBase
     }
 
     void resize(size_t length) override {
-      _dataElementVector.resize(length);
+      size_t oldSize = _dataElementVector.size();
+      if (length < oldSize)
+      {
+        for (size_t i = length; i < oldSize; i++)
+        {
+          delete _dataElementVector[i].first; _dataElementVector[i].first = 0;
+        }
+      }
+      _dataElementVector.resize(length, std::make_pair(nullptr, true));
+      if (length > oldSize)
+      {
+        for (size_t i = oldSize; i < length; i++)
+        {
+          _dataElementVector[i].first = _protoType->clone().release();
+        }
+      }
     }
     void clear() override {
       _dataElementVector.clear();

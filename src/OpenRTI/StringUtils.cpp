@@ -296,6 +296,23 @@ split(const std::string& s, const char* c)
   return v;
 }
 
+OPENRTI_API std::list<std::string>
+splitl(const std::string& s, const char* c)
+{
+  std::list<std::string> l;
+  std::string::size_type p0 = 0;
+  std::string::size_type p = s.find_first_of(c);
+  while (p != std::string::npos) {
+    l.push_back(s.substr(p0, p - p0));
+    p0 = s.find_first_not_of(c, p);
+    if (p0 == std::string::npos)
+      return l;
+    p = s.find_first_of(c, p0);
+  }
+  l.push_back(s.substr(p0, p - p0));
+  return l;
+}
+
 
 OPENRTI_API std::vector<std::wstring>
 split(const std::wstring& s, const wchar_t* c)

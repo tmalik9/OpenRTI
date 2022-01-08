@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,11 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{24881B4F-74DB-409C-A213-DE8A35BB31ED}</ProjectGuid>
+    <ProjectGuid>{B213AA86-4E61-3299-BCA9-84F4505E9E9C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TR_TC_Responder1516e</RootNamespace>
-    <ProjectName>TR_TC_Responder-1516ev</ProjectName>
+    <Platform>x64</Platform>
+    <ProjectName>interaction-1516ev</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -75,65 +75,64 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_d</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">interaction-1516</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">interaction-1516</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">interaction-1516</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">interaction-1516</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CodeAnalysisRuleSet>CppCoreCheckConstRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev\;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev\;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev\;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev\;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)include\rti1516ev;$(SolutionDir)src\OpenRTI;$(SolutionDir)src\OpenRTI\vsbuild;$(SolutionDir)\tests\rti1516ev\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENRTI_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\OpenRTI\dprintf.cpp" />
-    <ClCompile Include="..\..\include\RTI1516ESimpleTestLib.cpp" />
-    <ClCompile Include="TR_TC_Responder.cpp" />
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Xml Include="..\fdd.xml">
-      <SubType>Designer</SubType>
-    </Xml>
-    <Xml Include="..\testfom.xml">
-      <SubType>Designer</SubType>
-    </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\runall.cmd" />
-    <None Include="..\testfom.fed" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\OpenRTI\dprintf.h" />
-    <ClInclude Include="..\..\include\RTI1516ESimpleTestLib.h" />
-    <ClInclude Include="TR_TC_Responder.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\rti1516ev\fedtime1516ev.vcxproj">
+    <ProjectReference Include="$(SolutionDir)src\OpenRTI\OpenRTI.vcxproj">
+      <Project>{1A1A66B8-408A-301F-AA77-DFD4708C8C6E}</Project>
+      <Name>OpenRTI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\rti1516ev\fedtime1516ev.vcxproj">
       <Project>{ac5b586d-f120-3715-bc9c-fc80dd945c84}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\src\rti1516ev\rti1516ev.vcxproj">
+    <ProjectReference Include="..\..\..\src\rti1516ev\rti1516ev.vcxproj">
       <Project>{dee8a809-6531-30d3-9292-e70c38ed75fc}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\RTI1516ETestLib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="interaction.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="fdd.xml">
+      <SubType>Designer</SubType>
+      <DeploymentContent>true</DeploymentContent>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
