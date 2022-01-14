@@ -10,13 +10,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TimeConstrainedFederate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\OpenRTI\dprintf.cpp">
+    <ClCompile Include="TimeRegulatingFederate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\include\RTI1516ESimpleTestLib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\OpenRTI\dprintf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -26,15 +26,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\testfom.fed" />
+    <None Include="..\runall.cmd" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TimeConstrainedFederate.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\OpenRTI\dprintf.h">
+    <ClInclude Include="TimeRegulatingFederate.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\RTI1516ESimpleTestLib.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\OpenRTI\dprintf.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

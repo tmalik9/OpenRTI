@@ -20,9 +20,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{D449BBED-638D-47F7-9363-6F856C0C7F0B}</ProjectGuid>
+    <ProjectGuid>{CEB9F98A-4D94-4FD5-A003-7A86E47E749E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>TimeRegulatingFederate1516e</RootNamespace>
+    <ProjectName>TimeRegulatingFederate-1516ev</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -104,56 +105,35 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\OpenRTI\dprintf.cpp" />
+    <ClCompile Include="..\..\..\src\OpenRTI\dprintf.cpp" />
     <ClCompile Include="..\..\include\RTI1516ESimpleTestLib.cpp" />
-    <ClCompile Include="ManagerFederate.cpp" />
+    <ClCompile Include="TimeRegulatingFederate.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Mom.cpp" />
-    <ClCompile Include="MomFederate.cpp" />
-    <ClCompile Include="MomFederation.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\OpenRTI\dprintf.h" />
+    <Xml Include="..\fdd.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="..\testfom.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\runall.cmd" />
+    <None Include="..\testfom.fed" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\OpenRTI\dprintf.h" />
     <ClInclude Include="..\..\include\RTI1516ESimpleTestLib.h" />
-    <ClInclude Include="ManagerFederate.h" />
-    <ClInclude Include="Mom.h" />
-    <ClInclude Include="MomFederate.h" />
-    <ClInclude Include="MomFederation.h" />
+    <ClInclude Include="TimeRegulatingFederate.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\rti1516ev\fedtime1516ev.vcxproj">
+    <ProjectReference Include="..\..\..\src\rti1516ev\fedtime1516ev.vcxproj">
       <Project>{ac5b586d-f120-3715-bc9c-fc80dd945c84}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\src\rti1516ev\rti1516ev.vcxproj">
+    <ProjectReference Include="..\..\..\src\rti1516ev\rti1516ev.vcxproj">
       <Project>{dee8a809-6531-30d3-9292-e70c38ed75fc}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="empty.xml" CopyToOutputDirectory="PreserveNewest">
-      <SubType>Designer</SubType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)\fom2cpp %(Identity) %(RelativeDir)%(Filename)FOM.inc %(Filename)FOM</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetDir)\fom2cpp %(Identity) %(RelativeDir)%(Filename)FOM.inc %(Filename)FOM</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(TargetDir)\fom2cpp %(Identity) %(RelativeDir)%(Filename)FOM.inc %(Filename)FOM</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(TargetDir)\fom2cpp %(Identity) %(RelativeDir)%(Filename)FOM.inc %(Filename)FOM</Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RelativeDir)%(Filename)FOM.inc</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RelativeDir)%(Filename)FOM.inc</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)%(Filename)FOM.inc</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)%(Filename)FOM.inc</Outputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">converting %(Identity) to %(RelativeDir)%(Filename)FOM.inc</Message>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(TargetDir)fom2cpp.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">converting %(Identity) to %(RelativeDir)%(Filename)FOM.inc</Message>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(TargetDir)fom2cpp.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">converting %(Identity) to %(RelativeDir)%(Filename)FOM.inc</Message>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(TargetDir)fom2cpp.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">converting %(Identity) to %(RelativeDir)%(Filename)FOM.inc</Message>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(TargetDir)fom2cpp.exe;%(AdditionalInputs)</AdditionalInputs>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="CMakeLists.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="emptyFOM.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

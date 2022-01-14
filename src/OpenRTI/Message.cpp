@@ -6262,6 +6262,26 @@ prettyprint(std::ostream& os, const PublicationType& value, ServerModel::Federat
   return os;
 }
 
+// EnumDataType OwnershipType
+std::ostream&
+operator<<(std::ostream& os, const OwnershipType& value)
+{
+  switch (value) {
+  case OwnershipType::NoTransfer: os << "NoTransfer"; break;
+  case OwnershipType::Divest: os << "Divest"; break;
+  case OwnershipType::Acquire: os << "Acquire"; break;
+  case OwnershipType::DivestAcquire: os << "DivestAcquire"; break;
+  }
+  return os;
+}
+
+std::ostream&
+prettyprint(std::ostream& os, const OwnershipType& value, ServerModel::Federation* )
+{
+  os << value;
+  return os;
+}
+
 // EnumDataType ResignAction
 std::ostream&
 operator<<(std::ostream& os, const ResignAction& value)
@@ -8753,6 +8773,8 @@ operator<<(std::ostream& os, const FOMStringAttribute&  value)
   os << "routingSpace: " << value.getRoutingSpace();
   os << ", ";
   os << "dimensionSet: " << value.getDimensionSet();
+  os << ", ";
+  os << "ownershipType: " << value.getOwnershipType();
   os << " }";
   return os;
 }
@@ -8772,6 +8794,8 @@ prettyprint(std::ostream& os, const FOMStringAttribute& value)
   os << "routingSpace: "<< value.getRoutingSpace();
   os << ", ";
   os << "dimensionSet: "<< value.getDimensionSet();
+  os << ", ";
+  os << "ownershipType: "<< value.getOwnershipType();
   os << " }";
   return os;
 }
@@ -9503,6 +9527,8 @@ operator<<(std::ostream& os, const FOMAttribute&  value)
   os << "transportationType: " << value.getTransportationType();
   os << ", ";
   os << "dimensionHandleSet: " << value.getDimensionHandleSet();
+  os << ", ";
+  os << "ownershipType: " << value.getOwnershipType();
   os << " }";
   return os;
 }
@@ -9522,6 +9548,8 @@ prettyprint(std::ostream& os, const FOMAttribute& value)
   os << "transportationType: "<< value.getTransportationType();
   os << ", ";
   os << "dimensionHandleSet: "<< value.getDimensionHandleSet();
+  os << ", ";
+  os << "ownershipType: "<< value.getOwnershipType();
   os << " }";
   return os;
 }

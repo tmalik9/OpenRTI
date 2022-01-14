@@ -32,6 +32,13 @@
     <enumerant name="Published"/>
   </type>
 
+  <type name="OwnershipType" type="enum">
+    <enumerant name="NoTransfer"/>
+    <enumerant name="Divest"/>
+    <enumerant name="Acquire"/>
+    <enumerant name="DivestAcquire"/>
+  </type>
+
   <type name="ResignAction" type="enum">
     <enumerant name="UNCONDITIONALLY_DIVEST_ATTRIBUTES"/>
     <enumerant name="DELETE_OBJECTS"/>
@@ -391,6 +398,7 @@
     <field name="TransportationType" type="String"/>
     <field name="RoutingSpace" type="String"/>
     <field name="DimensionSet" type="StringSet"/>
+    <field name="OwnershipType" type="String"/>
   </type>
   <type name="FOMStringAttributeList" type="vector" scalar="FOMStringAttribute"/>
 
@@ -499,6 +507,7 @@
     <field name="OrderType" type="OrderType"/>
     <field name="TransportationType" type="TransportationType"/>
     <field name="DimensionHandleSet" type="DimensionHandleSet"/>
+    <field name="OwnershipType" type="OwnershipType"/>
   </type>
   <type name="FOMAttributeList" type="vector" scalar="FOMAttribute"/>
 

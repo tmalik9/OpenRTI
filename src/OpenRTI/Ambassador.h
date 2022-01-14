@@ -1988,7 +1988,7 @@ public:
 
     SharedPtr<AttributeOwnershipRequestDivestMessage> request = MakeShared<AttributeOwnershipRequestDivestMessage>();
     request->setFederationHandle(getFederationHandle());
-    request->setObjectClassHandle(getKnownObjectClassHandle(objectInstanceHandle));
+    request->setObjectClassHandle(objectClassHandle);
     request->setObjectInstanceHandle(objectInstanceHandle);
     request->setAttributeHandles(attributeHandleVector);
     request->setUnconditional(true);

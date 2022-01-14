@@ -430,6 +430,7 @@ Federate::ObjectClass::insertAttribute(const FOMAttribute& fomAttribute)
   attribute->setTransportationType(fomAttribute.getTransportationType());
   attribute->setDimensionHandleSet(fomAttribute.getDimensionHandleSet());
   attribute->setDataType(fomAttribute.getDataType());
+  attribute->setOwnershipType(fomAttribute.getOwnershipType());
   for (IntrusiveList<ObjectClass>::iterator i = _childObjectClassList.begin();
        i != _childObjectClassList.end(); ++i) {
     i->insertAttribute(fomAttribute);

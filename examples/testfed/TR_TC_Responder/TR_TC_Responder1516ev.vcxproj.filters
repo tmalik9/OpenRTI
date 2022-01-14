@@ -10,13 +10,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\OpenRTI\dprintf.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\include\RTI1516ESimpleTestLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TR_TC_Responder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\OpenRTI\dprintf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,13 +29,13 @@
     <None Include="..\runall.cmd" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\OpenRTI\dprintf.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\RTI1516ESimpleTestLib.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="TR_TC_Responder.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\OpenRTI\dprintf.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

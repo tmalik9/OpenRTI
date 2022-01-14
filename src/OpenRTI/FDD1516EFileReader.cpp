@@ -240,7 +240,7 @@ FDD1516EContentHandler::FDD1516EContentHandler() noexcept
           .leaf("order", [this](const std::string& s) { _fomStringModuleBuilder.getCurrentObjectClassAttribute().setOrderType(s); })
           .leaf("transportation", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentObjectClassAttribute().setTransportationType(name); })
           .leaf("sharing")
-          .leaf("ownership")
+          .leaf("ownership", [this](const std::string& name) { _fomStringModuleBuilder.getCurrentObjectClassAttribute().setOwnershipType(name); })
           .leaf("dataType", [this](const std::string& s) { _fomStringModuleBuilder.getCurrentObjectClassAttribute().setDataType(s); })
           .leaf("updateType")
           .leaf("updateCondition")

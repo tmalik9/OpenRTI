@@ -257,6 +257,11 @@ public:
     }
   }
 
+  const ConnectHandleSet& getCumulativeSubscribedConnectHandleSet() const {
+    return _cumulativeSubscribedConnectHandleSet;
+  }
+
+protected:
   /// The cumulative set of connects that subscribe to this.
   /// Cumulative in the sense that also subscriptions to base classes are included here.
   ConnectHandleSet _cumulativeSubscribedConnectHandleSet;

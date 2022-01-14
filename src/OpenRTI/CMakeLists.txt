@@ -73,7 +73,7 @@ elseif(WIN32)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   # We need XP/SP2 We are currently bound to the GetAddrInfo call introduced
   # in that version.
-  add_definitions(-D_WIN32_WINNT=_WIN32_WINNT_WIN7)
+  add_definitions(-D_WIN32_WINNT=_WIN32_WINNT_WIN10)
 endif()
 
 

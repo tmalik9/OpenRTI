@@ -83,7 +83,7 @@ InstanceAttribute::InstanceAttribute(ObjectInstance& objectInstance, ClassAttrib
 {
   setAttributeHandle(_classAttribute.getAttributeHandle());
   /// FIXME
-  _receivingConnects = _classAttribute._cumulativeSubscribedConnectHandleSet;
+  _receivingConnects = _classAttribute.getCumulativeSubscribedConnectHandleSet();
 }
 
 InstanceAttribute::~InstanceAttribute()
@@ -225,14 +225,14 @@ ObjectInstance::setObjectClass(ObjectClass* objectClass)
   OpenRTIAssert(!_objectClass);
   _objectClass = objectClass;
   _objectClass->insert(*this);
-
+  DebugPrintf("%s: this=%s(%p) class=%s\n", __FUNCTION__, getName().c_str(), this, objectClass->getFQName().c_str());
   ClassAttribute::HandleMap& attributeHandleClassAttributeMap = objectClass->getAttributeHandleClassAttributeMap();
   //size_t numSubscribers = getSubscribedConnectHandleSet().size();
   for (ClassAttribute& classAttribute : attributeHandleClassAttributeMap) {
     ServerModel::InstanceAttribute* instanceAttribute = new ServerModel::InstanceAttribute(*this, classAttribute);
     //insert(*instanceAttribute);
     _attributeHandleInstanceAttributeMap.insert(*instanceAttribute);
-    for (auto subscriber : classAttribute._cumulativeSubscribedConnectHandleSet)
+    for (auto subscriber : classAttribute.getCumulativeSubscribedConnectHandleSet())
     {
       setSubscriptionType(subscriber, SubscribedActive);
     }
@@ -1357,7 +1357,7 @@ void ObjectClass::updateCumulativeSubscription(const ConnectHandle& connectHandl
   if (_parentObjectClass) {
     ClassAttribute* classAttribute = _parentObjectClass->getClassAttribute(attributeHandle);
     if (classAttribute)
-      if (0 != classAttribute->_cumulativeSubscribedConnectHandleSet.count(connectHandle))
+      if (0 != classAttribute->getCumulativeSubscribedConnectHandleSet().count(connectHandle))
         parentSubscribed = true;
   }
 
@@ -3746,11 +3746,13 @@ void Federation::initializeMom(AbstractServer* server, FederateHandle federateHa
 {
 #ifndef OPENRTI_STANDALONE_TESTS
   // be careful: we always get called twice: once for the RTI federate, a second time for the application federate
+#if 0
   if (_momServer == nullptr)
   {
     bool isRoot = !federateHandle.valid();
     _momServer = MakeShared<MomServer>(this, server, isRoot, federateHandle);
   }
+#endif
 #endif
 }
 

@@ -10,9 +10,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\OpenRTI\dprintf.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ManagerFederate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -25,14 +22,14 @@
     <ClCompile Include="MomFederation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\RTI1516ESimpleTestLib.cpp">
+    <ClCompile Include="..\..\src\OpenRTI\dprintf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\include\RTI1516ESimpleTestLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\OpenRTI\dprintf.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="ManagerFederate.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -45,7 +42,10 @@
     <ClInclude Include="MomFederation.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\RTI1516ESimpleTestLib.h">
+    <ClInclude Include="..\..\src\OpenRTI\dprintf.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\RTI1516ESimpleTestLib.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

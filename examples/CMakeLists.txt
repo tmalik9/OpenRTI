@@ -17,12 +17,4 @@ if(NOT OPENRTI_BUILD_SHARED)
 endif()
 
 # Test directories should be listed here in sensible testing order
-add_subdirectory(link)
-add_subdirectory(connect)
-add_subdirectory(encode)
-add_subdirectory(fddget)
-add_subdirectory(time)
-add_subdirectory(objectinstance)
-add_subdirectory(interaction)
-add_subdirectory(federation-reset)
-add_subdirectory(objectownership)
+add_subdirectory(testfed)

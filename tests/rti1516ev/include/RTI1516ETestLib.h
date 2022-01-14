@@ -282,6 +282,7 @@ class OPENRTI_LOCAL RTI1516ETestAmbassador : public RTITest::Ambassador, public 
       _ambassador = std::unique_ptr<rti1516ev::RTIambassador>(factory.createRTIambassador());
       _ambassador->setOperationWaitTimeout(10000);
       _connectionLost = false;
+      DebugPrintf("%s:connect to %ls\n", __FUNCTION__, getConnectUrl().c_str());
       _ambassador->connect(*this, rti1516ev::HLA_EVOKED, getConnectUrl());
 
       // create, must work once

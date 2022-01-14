@@ -129,6 +129,7 @@ LeafServerThread::_Registry::connect(const URL& url, const StringStringListMap& 
   server->getServerNode();
   i->second = MakeShared<LeafServerThread>(server);
   i->second->_iterator = i;
+  i->second->setName("LeafServerThread " + url.str()); 
   i->second->start();
   serverThreadOptions["version"] = std::list<std::string>{std::to_string(server->getProtocolVersion())};
   return i->second->connect(serverThreadOptions, timeoutMilliSeconds);

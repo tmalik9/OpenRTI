@@ -20,10 +20,10 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{CEB9F98A-4D94-4FD5-A003-7A86E47E749E}</ProjectGuid>
+    <ProjectGuid>{470EA8F4-2DA5-4D86-8FDB-BF03D4D07578}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TimeRegulatingFederate1516e</RootNamespace>
-    <ProjectName>TimeRegulatingFederate-1516ev</ProjectName>
+    <RootNamespace>ImmediateCallbackFederate1516e</RootNamespace>
+    <ProjectName>ImmediateCallbackFederate-1516ev</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -79,8 +79,6 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <CodeAnalysisRuleSet>CppCoreCheckConstRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -105,9 +103,9 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\OpenRTI\dprintf.cpp" />
-    <ClCompile Include="..\..\include\RTI1516ESimpleTestLib.cpp" />
-    <ClCompile Include="TimeRegulatingFederate.cpp" />
+    <ClCompile Include="..\..\..\src\OpenRTI\dprintf.cpp" />
+    <ClCompile Include="RTI1516EImmediateCallbackTestLib.cpp" />
+    <ClCompile Include="ImmediateCallbackFederate.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -119,19 +117,21 @@
     </Xml>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\runall.cmd" />
     <None Include="..\testfom.fed" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\OpenRTI\dprintf.h" />
-    <ClInclude Include="..\..\include\RTI1516ESimpleTestLib.h" />
-    <ClInclude Include="TimeRegulatingFederate.h" />
+    <ClInclude Include="..\..\..\src\OpenRTI\dprintf.h" />
+    <ClInclude Include="RTI1516EImmediateCallbackTestLib.h" />
+    <ClInclude Include="ImmediateCallbackFederate.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\rti1516ev\fedtime1516ev.vcxproj">
+    <Text Include="CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\rti1516ev\fedtime1516ev.vcxproj">
       <Project>{ac5b586d-f120-3715-bc9c-fc80dd945c84}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\src\rti1516ev\rti1516ev.vcxproj">
+    <ProjectReference Include="..\..\..\src\rti1516ev\rti1516ev.vcxproj">
       <Project>{dee8a809-6531-30d3-9292-e70c38ed75fc}</Project>
     </ProjectReference>
   </ItemGroup>

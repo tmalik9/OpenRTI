@@ -160,21 +160,24 @@ bool <#=dataType.Name#>Encoding::Is<#=field.Name#>Available() const
   }
 <#  } #>
 }
+<# if (cardinality > 0) {#>
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs)
   : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
-<# if (cardinality > 0) {#>
   , mData(<#=cardinality#>)
-<#  } #>
 {
-<# if (cardinality > 0) {#>
   set(rhs.mData.data(), rhs.mData.size());
   for (int i=0; i < <#=cardinality#>; i++)
   {
     mEncoding[i].setDataPointer(&mData[i]);
     setElementPointer(i, &mEncoding[i]);
   }
-<#  } #>
 }
+<#  } else { #>
+<#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs)
+  : HLAfixedArray(rhs)
+{
+}
+<#  } #>
 <# if (cardinality > 0) {#>
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=fixedArrayDataType.ParameterCppType#> data)
   : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
@@ -209,10 +212,10 @@ void <#=dataType.Name#>Encoding::set(const <#=fixedArrayDataType.DataType.CPPTyp
   : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
 {
 }
+
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs)
-  : HLAfixedArray(<#=fixedArrayDataType.DataType.Encoding#>(), <#=fixedArrayDataType.Cardinality#>)
+  : HLAfixedArray(rhs)
 {
-  set(rhs-mData);
 }
 <# if (cardinality > 0) {#>
 <#=fixedArrayDataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=fixedArrayDataType.ConstRefCppType#> data)
@@ -317,16 +320,18 @@ void <#=dataType.Name#>Encoding::update()
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
 {
 }
+
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(const <#=dataType.Name#>Encoding& rhs)
-  : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
+  : HLAvariableArray(rhs)
 {
-  set(rhs.mData);
 }
+
 <#=dataType.Name#>Encoding::<#=dataType.Name#>Encoding(<#=variableArrayDataType.ParameterCppType#> data)
   : HLAvariableArray(<#=variableArrayDataType.DataType.Encoding#>())
 {
   set(data);
 }
+
 void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.ParameterCppType#> data)
 {
   clear();
@@ -335,6 +340,7 @@ void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.ParameterCppType#>
     addElement(static_cast<const <#=variableArrayDataType.DataType.Encoding#>&>(data[i]));
   }
 }
+
 void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.RefCppType#> data)
 {
   clear();
@@ -343,6 +349,7 @@ void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.RefCppType#> data)
     addElementPointer(static_cast<<#=variableArrayDataType.DataType.Encoding#>*>(&data[i]));
   }
 }
+
 void <#=dataType.Name#>Encoding::set(const <#=variableArrayDataType.DataType.Encoding#>* data, size_t size)
 {
   clear();
@@ -351,6 +358,7 @@ void <#=dataType.Name#>Encoding::set(const <#=variableArrayDataType.DataType.Enc
     addElement(static_cast<const <#=variableArrayDataType.DataType.Encoding#>&>(data[i]));
   }
 }
+
 void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.DataType.Encoding#>* data, size_t size)
 {
   clear();
@@ -359,6 +367,7 @@ void <#=dataType.Name#>Encoding::set(<#=variableArrayDataType.DataType.Encoding#
     addElementPointer(static_cast<<#=variableArrayDataType.DataType.Encoding#>*>(&data[i]));
   }
 }
+
 // resize buffer and encoder array before actually decoding 
 size_t <#=dataType.Name#>Encoding::decodeFrom(const rti1516ev::Octet* buffer, size_t bufferSize, size_t index)
 {

@@ -10,13 +10,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\OpenRTI\dprintf.cpp">
+    <ClCompile Include="TimeConstrainedFederate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RTI1516EImmediateCallbackTestLib.cpp">
+    <ClCompile Include="..\..\include\RTI1516ESimpleTestLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ImmediateCallbackFederate.cpp">
+    <ClCompile Include="..\..\..\src\OpenRTI\dprintf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -28,17 +28,14 @@
     <None Include="..\testfom.fed" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\OpenRTI\dprintf.h">
+    <ClInclude Include="TimeConstrainedFederate.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImmediateCallbackFederate.h">
+    <ClInclude Include="..\..\include\RTI1516ESimpleTestLib.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="RTI1516EImmediateCallbackTestLib.h">
+    <ClInclude Include="..\..\..\src\OpenRTI\dprintf.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="CMakeLists.txt" />
   </ItemGroup>
 </Project>

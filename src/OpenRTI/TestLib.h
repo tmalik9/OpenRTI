@@ -52,6 +52,7 @@ class OPENRTI_LOCAL ServerThread : public Thread
     void setupServer(const std::string& host, const SocketAddress& parentAddress, bool compress)
     {
       std::list<SocketAddress> addressList = SocketAddress::resolve(host, "0", true);
+      DebugPrintf("%s: host=%s parent=%s\n", __FUNCTION__, host.c_str(), parentAddress.getNumericName().c_str());
       // Set up a stream socket for the server connect
       bool success = false;
       while (!addressList.empty())
@@ -70,11 +71,17 @@ class OPENRTI_LOCAL ServerThread : public Thread
             throw;
         }
       }
-      _server.setServerName(_address.getNumericName());
       if (parentAddress.valid())
       {
+        setName(_address.getNumericName() + "/" + parentAddress.getNumericName());
+        _server.setServerName(_address.getNumericName() + "/" + parentAddress.getNumericName());
         AbsTimeout timeout(Clock::now() + Clock::fromSeconds(1));
         _server.connectParentInetServer(parentAddress, compress, timeout);
+      }
+      else
+      {
+        setName(getAddress().getNumericName());
+        _server.setServerName(_address.getNumericName());
       }
       start();
     }
@@ -579,7 +586,9 @@ private:
       : _testAmbassador(testAmbassador)
       , _success(true)
       , _threadIndex(threadIndex)
-    { }
+    {
+      setName("AmbassadorThread #" + std::to_string(threadIndex));
+    }
 
     bool getSuccess() const
     { return _success; }

@@ -1543,7 +1543,7 @@ public:
   // Solved: A server just tracks what its children an itself has reserved.
   // So in case a branch is split away, reservations of now unreachable branches are not visible in the
   // current server node.
-  // FIXME: should work for the instance handles too. As long as the root server is authoritive, it will know all,
+  // FIXME: should work for the instance handles too. As long as the root server is authoritative, it will know all,
   // Once the root is no longer reachable, it is sufficient to know what is here and below ...
   void accept(const ConnectHandle& /*connectHandle*/, const ReserveObjectInstanceNameRequestMessage* message)
   {
@@ -1678,12 +1678,15 @@ public:
     if (!objectClass)
       throw MessageError("InsertObjectInstanceMessage for unknown ObjectClass.");
 
+    DebugPrintf("%s(InsertObjectInstanceMessage, %s): instance=%s name=%s class=%s\n", __FUNCTION__,
+      isRootServer() ? "root" : "leaf",
+      objectInstanceHandle.toString().c_str(), message->getName().c_str(), objectClass->getFQName().c_str());
     // FIXME Improve this with preevaluated sets:
     // std::map<ConnectHandle,ConnectHandleSet> ...
     ServerModel::ObjectInstance* objectInstance = getObjectInstance(objectInstanceHandle);
     ServerModel::ClassAttribute* privilegeToDeleteAttribute = objectClass->getPrivilegeToDeleteClassAttribute();
     if (privilegeToDeleteAttribute) {
-      for (const ConnectHandle& subscribedConnect : privilegeToDeleteAttribute->_cumulativeSubscribedConnectHandleSet) {
+      for (const ConnectHandle& subscribedConnect : privilegeToDeleteAttribute->getCumulativeSubscribedConnectHandleSet()) {
         if (isParentConnect(subscribedConnect))
           continue;
         if (subscribedConnect == connectHandle)
@@ -1723,8 +1726,22 @@ public:
         instanceAttribute->setOwnerConnectHandle(connectHandle);
         instanceAttribute->setOwnerFederate(attributeState.getOwnerFederate());
       }
-
+      std::string msg = string_printf("%s(InsertObjectInstanceMessage): connect=%s instance=%s name=%s class=%s #receivingConnects=%d #cumulativeSubscribedConnectHandleSet=%d #\n", __FUNCTION__,
+        connectHandle.toString().c_str(),
+        objectInstanceHandle.toString().c_str(), message->getName().c_str(), objectClass->getFQName().c_str(),
+        objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects.size(),
+        objectClass->getPrivilegeToDeleteClassAttribute()->getCumulativeSubscribedConnectHandleSet().size());
+      for (auto connect : objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects)
+        msg += string_printf(" receiving: %s\n", connect.toString().c_str());
+      for (auto connect : objectClass->getPrivilegeToDeleteClassAttribute()->getCumulativeSubscribedConnectHandleSet())
+        msg += string_printf(" subscribed: %s\n", connect.toString().c_str());
+      DebugPrintf("%s\n", msg.c_str());
       send(objectInstance->getPrivilegeToDeleteInstanceAttribute()->_receivingConnects, SharedPtr<const AbstractMessage>(message));
+    }
+    if (objectInstance && !objectInstance->getObjectClass())
+    {
+      DebugPrintf("%s(InsertObjectInstanceMessage): no object class for instance %s(%s)\n", __FUNCTION__,
+        objectInstance->getName().c_str(), objectInstanceHandle.toString().c_str());
     }
   }
   void accept(const ConnectHandle& connectHandle, const DeleteObjectInstanceMessage* message)
@@ -1864,7 +1881,7 @@ public:
     // check if the message stems from a locally connected federate, if so, increment the sent count.
     interactionSent(connectHandle, interactionClass);
     // Send to all subscribed connects except the originating one
-    for (auto& subscriberConnectHandle : interactionClass->_cumulativeSubscribedConnectHandleSet) {
+    for (auto& subscriberConnectHandle : interactionClass->getCumulativeSubscribedConnectHandleSet()) {
       // NOTE: self-delivery is implemented directly in the ambassador.
       // Here, we shall never send back anything to the connect it came from.
       if (subscriberConnectHandle == connectHandle)
@@ -1912,7 +1929,7 @@ public:
     if (!interactionClass)
       throw MessageError("Received TimeStampedInteractionMessage for unknown interaction class!");
     // Send to all subscribed connects except the originating one
-    for (auto& subscriberConnectHandle : interactionClass->_cumulativeSubscribedConnectHandleSet) {
+    for (auto& subscriberConnectHandle : interactionClass->getCumulativeSubscribedConnectHandleSet()) {
       if (subscriberConnectHandle == connectHandle)
         // don't send to self
         continue;
@@ -2013,7 +2030,7 @@ public:
   void accept(const ConnectHandle& connectHandle, const QueryAttributeOwnershipRequestMessage* message)
   {
     ObjectInstanceHandle objectInstanceHandle = message->getObjectInstanceHandle();
-    ServerModel::ObjectInstance* objectInstance = ServerModel::Federation::getObjectInstance(objectInstanceHandle);
+    ServerModel::ObjectInstance* objectInstance = getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
       throw MessageError("Received QueryAttributeOwnershipRequestMessage for unknown object instance!");
     AttributeHandle attributeHandle = message->getAttributeHandle();
@@ -2031,9 +2048,11 @@ public:
   void accept(const ConnectHandle& connectHandle, const AttributeOwnershipRequestAcquireMessage* message)
   {
     ObjectInstanceHandle objectInstanceHandle = message->getObjectInstanceHandle();
-    ServerModel::ObjectInstance* objectInstance = ServerModel::Federation::getObjectInstance(objectInstanceHandle);
-    if (!objectInstance)
+    ServerModel::ObjectInstance* objectInstance = getObjectInstance(objectInstanceHandle);
+    if (objectInstance == nullptr)
       throw MessageError("Received AttributeOwnershipAcquireMessage for unknown object instance!");
+    if (objectInstance->getObjectClass() == nullptr)
+      throw MessageError("No object class in object instance!");
     std::map<ConnectHandle, AttributeHandleVector> attributesByConnect;
     for (auto attributeHandle : message->getAttributeHandles())
     {
@@ -2098,99 +2117,96 @@ public:
   void accept(const ConnectHandle& connectHandle, const AttributeOwnershipRequestDivestMessage* message)
   {
     ObjectInstanceHandle objectInstanceHandle = message->getObjectInstanceHandle();
-    ServerModel::ObjectInstance* objectInstance = ServerModel::Federation::getObjectInstance(objectInstanceHandle);
+    ServerModel::ObjectInstance* objectInstance = getObjectInstance(objectInstanceHandle);
     if (!objectInstance)
-      throw MessageError("Received AttributeOwnershipAcquireMessage for unknown object instance!");
-    auto* objectClass = objectInstance->getObjectClass();
+      throw MessageError("Received AttributeOwnershipRequestDivestMessage for unknown object instance!");
+    auto* objectClass = getObjectClass(message->getObjectClassHandle());
+    if (!objectClass)
+      throw MessageError("no object class in object instance!");
+    DebugPrintf("%s(AttributeOwnershipRequestDivestMessage, %s, %s): instance=%s(%s) class=%s(%s)\n", __FUNCTION__,
+      isRootServer() ? "root" : "non-root",
+      hasChildConnects() ? "has children" : "no children",
+      objectInstance->getName().c_str(), objectInstanceHandle.toString().c_str(),
+      objectClass->getFQName().c_str(), message->getObjectClassHandle().toString().c_str());
+    // The root server usually does not know about the instance attributes
     for (auto attributeHandle : message->getAttributeHandles())
     {
       ServerModel::InstanceAttribute* instanceAttribute = objectInstance->getInstanceAttribute(attributeHandle);
-      ServerModel::ClassAttribute* classAttribute = objectClass->getClassAttribute(attributeHandle);
+      if (instanceAttribute == nullptr)
+      {
+        DebugPrintf("%s(AttributeOwnershipRequestDivestMessage, %s, %s): instance=%s(%s) class=%s(%s): instanceAttribute %s not found\n", __FUNCTION__,
+          isRootServer() ? "root" : "non-root",
+          hasChildConnects() ? "has children" : "no children",
+          objectInstance->getName().c_str(), objectInstanceHandle.toString().c_str(),
+          objectClass->getFQName().c_str(), message->getObjectClassHandle().toString().c_str(),
+          attributeHandle.toString().c_str()
+        );
+      }
+      if (!isRootServer())
+      {
+        auto* objectClassOfInstance = objectInstance->getObjectClass();
+        OpenRTIAssert(objectClassOfInstance != nullptr);
+        ServerModel::ClassAttribute* classAttribute = objectClass->getClassAttribute(attributeHandle);
 
-      //DebugPrintf("%s(AttributeOwnershipRequestDivestMessage): object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
-      //            objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
-      //            instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
-      //            instanceAttribute->getOwnerFederate().toString().c_str(),
-      //            instanceAttribute->getOwnerConnectHandle().toString().c_str(),
-      //            connectHandle.toString().c_str()
-      //            );
-      if (instanceAttribute->getOwnerConnectHandle() != connectHandle)
-      {
-        DebugPrintf("%s: connect is not owner: object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
-                    objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
-                    classAttribute->getAttributeDefinition().getName().c_str(),
-                    instanceAttribute->getOwnerFederate().toString().c_str(),
-                    instanceAttribute->getOwnerConnectHandle().toString().c_str(),
-                    connectHandle.toString().c_str()
-                    );
-      }
-      if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Divesting)
-      {
-        DebugPrintf("%s: already in divest state: object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
-                    objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
-                    classAttribute->getAttributeDefinition().getName().c_str(),
-                    instanceAttribute->getOwnerFederate().toString().c_str(),
-                    instanceAttribute->getOwnerConnectHandle().toString().c_str(),
-                    connectHandle.toString().c_str()
-                    );
-      }
-      if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Acquiring)
-      {
-        // We're about to swap ownership. Need to update the receiving connects also!
-        instanceAttribute->setOwnerFederate(instanceAttribute->getFederateWillingToAcquire());
-        auto oldOwnerConnectHandle = instanceAttribute->getOwnerConnectHandle();
-        auto newOwnerConnectHandle = instanceAttribute->getConnectHandleWillingToAcquire();
-        instanceAttribute->setOwnerConnectHandle(newOwnerConnectHandle);
-        // In the LRC case, this should swap the owner connect from the local (federate) node connect to the parent node connect.
-        // In the root node case, this should swap the owner connect from the old owner federate connect to the new owner federate connect.
-        auto iter = instanceAttribute->_receivingConnects.find(newOwnerConnectHandle);
-        if (iter == instanceAttribute->_receivingConnects.end())
+        //DebugPrintf("%s(AttributeOwnershipRequestDivestMessage): object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+        //            objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
+        //            instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
+        //            instanceAttribute->getOwnerFederate().toString().c_str(),
+        //            instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+        //            connectHandle.toString().c_str()
+        //            );
+        OpenRTIAssert(instanceAttribute != nullptr);
+        OpenRTIAssert(classAttribute != nullptr);
+        if (instanceAttribute->getOwnerConnectHandle() != connectHandle)
         {
-          DebugPrintf("%s: new owner connect is not receiving: object=(%s, %s) attribute=(%s) owner=(%s) newOwnerConnectHandle=(%s) _receivingConnects.size=%d connect=(%s)\n", __FUNCTION__,
-                      objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
-                      instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
-                      instanceAttribute->getOwnerFederate().toString().c_str(),
-                      instanceAttribute->getConnectHandleWillingToAcquire().toString().c_str(),
-                      instanceAttribute->_receivingConnects.size(),
-                      connectHandle.toString().c_str()
-                      );
+          DebugPrintf("%s: connect is not owner: object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+            objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+            classAttribute->getAttributeDefinition().getName().c_str(),
+            instanceAttribute->getOwnerFederate().toString().c_str(),
+            instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+            connectHandle.toString().c_str()
+          );
+        }
+        if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Divesting)
+        {
+          DebugPrintf("%s: already in divest state: object=(%s, %s) attribute=(%s) owner=(%s) ownerConnect=(%s) connect=(%s)\n", __FUNCTION__,
+            objectClass->getFQName().c_str(), objectInstance->getName().c_str(),
+            classAttribute->getAttributeDefinition().getName().c_str(),
+            instanceAttribute->getOwnerFederate().toString().c_str(),
+            instanceAttribute->getOwnerConnectHandle().toString().c_str(),
+            connectHandle.toString().c_str()
+          );
+          continue;
+        }
+        if (instanceAttribute->getOwnershipTransferState() == OwnershipTransferState::Acquiring)
+        {
+          // We're about to swap ownership. Need to update the receiving connects also!
+          instanceAttribute->setOwnerFederate(instanceAttribute->getFederateWillingToAcquire());
+          auto oldOwnerConnectHandle = instanceAttribute->getOwnerConnectHandle();
+          auto newOwnerConnectHandle = instanceAttribute->getConnectHandleWillingToAcquire();
+          instanceAttribute->setOwnerConnectHandle(newOwnerConnectHandle);
+          // In the LRC case, this should swap the owner connect from the local (federate) node connect to the parent node connect.
+          // In the root node case, this should swap the owner connect from the old owner federate connect to the new owner federate connect.
+          auto iter = instanceAttribute->_receivingConnects.find(newOwnerConnectHandle);
+          if (iter != instanceAttribute->_receivingConnects.end())
+          {
+            instanceAttribute->_receivingConnects.erase(iter);
+          }
+
+          if (objectInstance->getSubscriptionType(oldOwnerConnectHandle) != Unsubscribed)
+          {
+            instanceAttribute->_receivingConnects.insert(oldOwnerConnectHandle);
+          }
+          instanceAttribute->setFederateWillingToAcquire(FederateHandle());
+          instanceAttribute->setConnectHandleWillingToAcquire(ConnectHandle());
+          instanceAttribute->setOwnershipTransferState(OwnershipTransferState::None);
         }
         else
         {
-          DebugPrintf("%s: erase new connect from receiving connects: object=(%s, %s) attribute=(%s) owner=(%s) newOwnerConnectHandle=(%s) _receivingConnects.size=%d connect=(%s)\n", __FUNCTION__,
-                      objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
-                      instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
-                      instanceAttribute->getOwnerFederate().toString().c_str(),
-                      instanceAttribute->getConnectHandleWillingToAcquire().toString().c_str(),
-                      instanceAttribute->_receivingConnects.size(),
-                      connectHandle.toString().c_str()
-                      );
-          instanceAttribute->_receivingConnects.erase(iter);
+          instanceAttribute->setOwnerFederate(FederateHandle());
+          instanceAttribute->setOwnerConnectHandle(ConnectHandle());
+          instanceAttribute->setOwnershipTransferState(OwnershipTransferState::None);
         }
-
-        if (objectInstance->getSubscriptionType(oldOwnerConnectHandle) == Unsubscribed)
-        {
-          DebugPrintf("%s: old owner connect is unsubscribed: object=(%s, %s) attribute=(%s) owner=(%s) oldOwnerConnectHandle=(%s) connect=(%s)\n", __FUNCTION__,
-                      objectInstance->getObjectClass()->getFQName().c_str(), objectInstance->getName().c_str(),
-                      instanceAttribute->getClassAttribute().getAttributeDefinition().getName().c_str(),
-                      instanceAttribute->getOwnerFederate().toString().c_str(),
-                      oldOwnerConnectHandle.toString().c_str(),
-                      connectHandle.toString().c_str()
-                      );
-        }
-        else
-        {
-          instanceAttribute->_receivingConnects.insert(oldOwnerConnectHandle);
-        }
-        instanceAttribute->setFederateWillingToAcquire(FederateHandle());
-        instanceAttribute->setConnectHandleWillingToAcquire(ConnectHandle());
-        instanceAttribute->setOwnershipTransferState(OwnershipTransferState::None);
-      }
-      else
-      {
-        instanceAttribute->setOwnerFederate(FederateHandle());
-        instanceAttribute->setOwnerConnectHandle(ConnectHandle());
-        instanceAttribute->setOwnershipTransferState(OwnershipTransferState::None);
       }
     }
     broadcast(connectHandle, SharedPtr<const AttributeOwnershipRequestDivestMessage>(message));

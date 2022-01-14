@@ -120,6 +120,27 @@ public:
     }
   }
 
+  void writeOwnershipType(const OwnershipType& value)
+  {
+    switch (value) {
+    case OwnershipType::NoTransfer:
+      writeUInt32Compressed(0);
+      break;
+    case OwnershipType::Divest:
+      writeUInt32Compressed(1);
+      break;
+    case OwnershipType::Acquire:
+      writeUInt32Compressed(2);
+      break;
+    case OwnershipType::DivestAcquire:
+      writeUInt32Compressed(3);
+      break;
+    default:
+      writeUInt32Compressed(4);
+      break;
+    }
+  }
+
   void writeResignAction(const ResignAction& value)
   {
     switch (value) {
@@ -1164,6 +1185,7 @@ public:
     writeString( value.getTransportationType());
     writeString( value.getRoutingSpace());
     writeStringSet( value.getDimensionSet());
+    writeString( value.getOwnershipType());
   }
 
   void writeFOMStringAttributeList(const FOMStringAttributeList& value)
@@ -1357,6 +1379,7 @@ public:
     writeOrderType( value.getOrderType());
     writeTransportationType( value.getTransportationType());
     writeDimensionHandleSet( value.getDimensionHandleSet());
+    writeOwnershipType( value.getOwnershipType());
   }
 
   void writeFOMAttributeList(const FOMAttributeList& value)
@@ -3081,6 +3104,27 @@ public:
     }
   }
 
+  void readOwnershipType(OwnershipType& value)
+  {
+    switch (readUInt32Compressed()) {
+    case 0:
+      value = OwnershipType::NoTransfer;
+      break;
+    case 1:
+      value = OwnershipType::Divest;
+      break;
+    case 2:
+      value = OwnershipType::Acquire;
+      break;
+    case 3:
+      value = OwnershipType::DivestAcquire;
+      break;
+    default:
+      value = OwnershipType::DivestAcquire;
+      break;
+    }
+  }
+
   void readResignAction(ResignAction& value)
   {
     switch (readUInt32Compressed()) {
@@ -4131,6 +4175,7 @@ public:
     readString( value.getTransportationType());
     readString( value.getRoutingSpace());
     readStringSet( value.getDimensionSet());
+    readString( value.getOwnershipType());
   }
 
   void readFOMStringAttributeList(FOMStringAttributeList& value)
@@ -4324,6 +4369,7 @@ public:
     readOrderType( value.getOrderType());
     readTransportationType( value.getTransportationType());
     readDimensionHandleSet( value.getDimensionHandleSet());
+    readOwnershipType( value.getOwnershipType());
   }
 
   void readFOMAttributeList(FOMAttributeList& value)

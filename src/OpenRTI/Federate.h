@@ -302,7 +302,11 @@ public:
     bool setPublicationType(PublicationType publicationType) override {
       return PublishSubscribe::setPublicationType(publicationType);
     }
-    std::string _dataType;
+    OwnershipType getOwnershipType() const { return _ownershipType; }
+    void setOwnershipType(OwnershipType ownershipType) { _ownershipType = ownershipType; }
+
+    std::string   _dataType;
+    OwnershipType _ownershipType;
   };
   typedef std::vector<SharedPtr<Attribute> > AttributeVector;
 

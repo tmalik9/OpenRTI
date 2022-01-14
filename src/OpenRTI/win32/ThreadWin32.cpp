@@ -81,8 +81,12 @@ struct OPENRTI_LOCAL Thread::PrivateData {
 #if defined(_WIN32_WINNT_WIN10) && (_WIN32_WINNT >= _WIN32_WINNT_WIN10)
     if (!thread.getName().empty())
     {
-      HRESULT r;
-      r = SetThreadDescription(GetCurrentThread(), to_wstring(thread.getName()).c_str());
+      HRESULT hr;
+      hr = SetThreadDescription(_handle, to_wstring(thread.getName()).c_str());
+      if (FAILED(hr))
+      {
+        DebugPrintf("setting thread description for %s failed\n", thread.getName().c_str());
+      }
     }
 #endif
     return true;

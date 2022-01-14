@@ -128,7 +128,7 @@ public:
   
   bool execJoined(uint32_t threadIndex) override
   {
-    DebugPrintf("%s[%ls]\n", __FUNCTION__, getFederateName().c_str());
+    DebugPrintf("%s[%ls] url=%ls\n", __FUNCTION__, getFederateName().c_str(), getConnectUrl().c_str());
     rti1516ev::RTIambassador* ambassador = getRtiAmbassador();
     try {
       rti1516ev::ObjectClassHandle objectClassHandle = ambassador->getObjectClassHandle(L"ObjectClass1");
@@ -195,12 +195,12 @@ public:
       }
       else {
         try {
-          Clock timeout = Clock::now() + Clock::fromSeconds(10);
+          AbsTimeout timeout(Clock::now() + Clock::fromSeconds(10));
           _expectedObjectClassHandle = attributesByObjectClass.first;
           while (_foreignObjectInstanceHandles.size() != 1 && !_fail) {
             if (ambassador->evokeCallback(60.0))
               continue;
-            if (timeout < Clock::now()) {
+            if (timeout.isExpired()) {
               std::wcout << L"Timeout waiting for next message" << std::endl;
               return false;
             }
@@ -270,12 +270,12 @@ public:
 
     // Wait until all attribute updates are received and foreign objects were erased in removeObjectInstance
     try {
-      Clock timeout = Clock::now() + Clock::fromSeconds(10);
+      AbsTimeout timeout(Clock::now() + Clock::fromSeconds(10));
 
       while (!_foreignObjectInstanceHandles.empty() && !_fail) {
         if (ambassador->evokeCallback(60.0))
           continue;
-        if (timeout < Clock::now()) {
+        if (timeout.isExpired()) {
           std::wcout << L"Timeout waiting for next message" << std::endl;
           return false;
         }
@@ -351,12 +351,12 @@ public:
     if (!_foreignObjectInstanceHandles.empty())
     {
       try {
-        Clock timeout = Clock::now() + Clock::fromSeconds(10);
+        AbsTimeout timeout(Clock::now() + Clock::fromSeconds(10));
         //while (_reflectedObjectInstanceHandleSet.size() != 1 && !_fail) {
         while (_reflectedObjectInstanceHandleSet != _foreignObjectInstanceHandles && !_fail) {
           if (ambassador->evokeCallback(60.0))
             continue;
-          if (timeout < Clock::now()) {
+          if (timeout.isExpired()) {
             std::wcout << L"Timeout waiting for next message" << std::endl;
             return false;
           }

@@ -34,7 +34,7 @@ namespace FOMCodeGen
     }
     static string GetIncludeDirectory(string interfaceHeaderOutputDirectory, string[] includePaths)
     {
-      string interfacesIncludePath = "";
+      string interfacesIncludePath = interfaceHeaderOutputDirectory;
       string longestCommonPath = "";
       foreach (var includePath in includePaths)
       {
@@ -48,8 +48,7 @@ namespace FOMCodeGen
           longestCommonPath = commonPath;
         }
       }
-      if (longestCommonPath.Length > 0)
-      {
+      if (includePaths.Length > 1 && longestCommonPath.Length > 0) {
         interfacesIncludePath = interfaceHeaderOutputDirectory.
           Substring(longestCommonPath.Length + 1).Replace(System.IO.Path.DirectorySeparatorChar, '/');
         System.Console.WriteLine("includePath = {0}", interfacesIncludePath);

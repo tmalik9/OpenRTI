@@ -63,6 +63,13 @@ enum PublicationType {
   Published
 };
 
+enum OwnershipType {
+  NoTransfer,
+  Divest,
+  Acquire,
+  DivestAcquire
+};
+
 enum ResignAction {
   UNCONDITIONALLY_DIVEST_ATTRIBUTES,
   DELETE_OBJECTS,
@@ -2837,6 +2844,15 @@ public:
   const StringSet& getDimensionSet() const noexcept
   { return getConstImpl()._dimensionSet; }
 
+  void setOwnershipType(const String& value) noexcept
+  { getImpl()._ownershipType = value; }
+  void setOwnershipType(String&& value) noexcept
+  { getImpl()._ownershipType = std::move(value); }
+  String& getOwnershipType() noexcept
+  { return getImpl()._ownershipType; }
+  const String& getOwnershipType() const noexcept
+  { return getConstImpl()._ownershipType; }
+
   FOMStringAttribute& swap(FOMStringAttribute& rhs) noexcept
   {
     _impl.swap(rhs._impl);
@@ -2852,6 +2868,7 @@ public:
     if (getTransportationType() != rhs.getTransportationType()) return false;
     if (getRoutingSpace() != rhs.getRoutingSpace()) return false;
     if (getDimensionSet() != rhs.getDimensionSet()) return false;
+    if (getOwnershipType() != rhs.getOwnershipType()) return false;
     return true;
   }
   bool operator<(const FOMStringAttribute& rhs) const noexcept
@@ -2870,6 +2887,8 @@ public:
     if (rhs.getRoutingSpace() < getRoutingSpace()) return false;
     if (getDimensionSet() < rhs.getDimensionSet()) return true;
     if (rhs.getDimensionSet() < getDimensionSet()) return false;
+    if (getOwnershipType() < rhs.getOwnershipType()) return true;
+    if (rhs.getOwnershipType() < getOwnershipType()) return false;
     return false;
   }
   bool operator>(const FOMStringAttribute& rhs) const noexcept
@@ -2886,7 +2905,8 @@ private:
       _orderType(),
       _transportationType(),
       _routingSpace(),
-      _dimensionSet()
+      _dimensionSet(),
+      _ownershipType()
     { }
     String _name;
     String _dataType;
@@ -2894,6 +2914,7 @@ private:
     String _transportationType;
     String _routingSpace;
     StringSet _dimensionSet;
+    String _ownershipType;
   };
 
   const Implementation& getConstImpl() const
@@ -4307,6 +4328,15 @@ public:
   const DimensionHandleSet& getDimensionHandleSet() const noexcept
   { return getConstImpl()._dimensionHandleSet; }
 
+  void setOwnershipType(const OwnershipType& value) noexcept
+  { getImpl()._ownershipType = value; }
+  void setOwnershipType(OwnershipType&& value) noexcept
+  { getImpl()._ownershipType = std::move(value); }
+  OwnershipType& getOwnershipType() noexcept
+  { return getImpl()._ownershipType; }
+  const OwnershipType& getOwnershipType() const noexcept
+  { return getConstImpl()._ownershipType; }
+
   FOMAttribute& swap(FOMAttribute& rhs) noexcept
   {
     _impl.swap(rhs._impl);
@@ -4322,6 +4352,7 @@ public:
     if (getOrderType() != rhs.getOrderType()) return false;
     if (getTransportationType() != rhs.getTransportationType()) return false;
     if (getDimensionHandleSet() != rhs.getDimensionHandleSet()) return false;
+    if (getOwnershipType() != rhs.getOwnershipType()) return false;
     return true;
   }
   bool operator<(const FOMAttribute& rhs) const noexcept
@@ -4340,6 +4371,8 @@ public:
     if (rhs.getTransportationType() < getTransportationType()) return false;
     if (getDimensionHandleSet() < rhs.getDimensionHandleSet()) return true;
     if (rhs.getDimensionHandleSet() < getDimensionHandleSet()) return false;
+    if (getOwnershipType() < rhs.getOwnershipType()) return true;
+    if (rhs.getOwnershipType() < getOwnershipType()) return false;
     return false;
   }
   bool operator>(const FOMAttribute& rhs) const noexcept
@@ -4356,7 +4389,8 @@ private:
       _attributeHandle(),
       _orderType(),
       _transportationType(),
-      _dimensionHandleSet()
+      _dimensionHandleSet(),
+      _ownershipType()
     { }
     String _name;
     String _dataType;
@@ -4364,6 +4398,7 @@ private:
     OrderType _orderType = OrderType::RECEIVE;
     TransportationType _transportationType = TransportationType::RELIABLE;
     DimensionHandleSet _dimensionHandleSet;
+    OwnershipType _ownershipType = OwnershipType::NoTransfer;
   };
 
   const Implementation& getConstImpl() const
@@ -11509,6 +11544,7 @@ std::ostream& operator<<(std::ostream& os, const OrderType& value);
 std::ostream& operator<<(std::ostream& os, const TransportationType& value);
 std::ostream& operator<<(std::ostream& os, const SubscriptionType& value);
 std::ostream& operator<<(std::ostream& os, const PublicationType& value);
+std::ostream& operator<<(std::ostream& os, const OwnershipType& value);
 std::ostream& operator<<(std::ostream& os, const ResignAction& value);
 std::ostream& operator<<(std::ostream& os, const RestoreFailureReason& value);
 std::ostream& operator<<(std::ostream& os, const RestoreStatus& value);
@@ -11749,6 +11785,7 @@ std::ostream& prettyprint(std::ostream& os, const OrderType& value);
 std::ostream& prettyprint(std::ostream& os, const TransportationType& value);
 std::ostream& prettyprint(std::ostream& os, const SubscriptionType& value);
 std::ostream& prettyprint(std::ostream& os, const PublicationType& value);
+std::ostream& prettyprint(std::ostream& os, const OwnershipType& value);
 std::ostream& prettyprint(std::ostream& os, const ResignAction& value);
 std::ostream& prettyprint(std::ostream& os, const RestoreFailureReason& value);
 std::ostream& prettyprint(std::ostream& os, const RestoreStatus& value);
@@ -12019,6 +12056,17 @@ inline std::string to_string(const PublicationType& value)
   case PublicationType::Unpublished: return "Unpublished";
   case PublicationType::Published: return "Published";
   default: return "<Invalid PublicationType>";
+  }
+}
+
+inline std::string to_string(const OwnershipType& value)
+{
+  switch (value) {
+  case OwnershipType::NoTransfer: return "NoTransfer";
+  case OwnershipType::Divest: return "Divest";
+  case OwnershipType::Acquire: return "Acquire";
+  case OwnershipType::DivestAcquire: return "DivestAcquire";
+  default: return "<Invalid OwnershipType>";
   }
 }
 
@@ -12620,6 +12668,11 @@ inline constexpr size_t byteSize(const SubscriptionType& value) noexcept
 }
 
 inline constexpr size_t byteSize(const PublicationType& value) noexcept
+{
+ return sizeof(value); // sizeof()
+}
+
+inline constexpr size_t byteSize(const OwnershipType& value) noexcept
 {
  return sizeof(value); // sizeof()
 }
@@ -13398,6 +13451,7 @@ inline size_t byteSize(const FOMStringAttribute& value) noexcept
   result += byteSize(value.getTransportationType());
   result += byteSize(value.getRoutingSpace());
   result += byteSize(value.getDimensionSet());
+  result += byteSize(value.getOwnershipType());
   return result;
 }
 
@@ -13635,6 +13689,7 @@ inline size_t byteSize(const FOMAttribute& value) noexcept
   result += byteSize(value.getOrderType());
   result += byteSize(value.getTransportationType());
   result += byteSize(value.getDimensionHandleSet());
+  result += byteSize(value.getOwnershipType());
   return result;
 }
 

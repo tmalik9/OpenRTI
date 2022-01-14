@@ -1318,7 +1318,6 @@ class MessageDataType(StructDataType):
 
         'AttributeOwnershipRequestDivest' : 113,
         'AttributeOwnershipRequestAcquire' : 114,
-        'AttributeOwnershipResponseRelease' : 115,
         'AttributeOwnershipResponseUnavailable' : 116,
         'AttributeOwnershipConfirmDivestiture' : 117,
         'AttributeOwnershipRequestCancelAcquire' : 118,
