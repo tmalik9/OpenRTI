@@ -1127,18 +1127,6 @@ AttributeDefinition::setAttributeHandle(const AttributeHandle& attributeHandle)
   HandleStringEntity<AttributeDefinition, AttributeHandle>::_setHandle(attributeHandle);
 }
 
-void
-AttributeDefinition::setOrderType(OrderType orderType)
-{
-  _orderType = orderType;
-}
-
-void
-AttributeDefinition::setTransportationType(TransportationType transportationType)
-{
-  _transportationType = transportationType;
-}
-
 void AttributeDefinition::writeCurrentFDD(std::ostream& out, unsigned int level) const
 {
   std::string indent(level * kIndentSpaces, ' ');
@@ -1582,6 +1570,7 @@ Module::getModule(FOMModule& module)
         fomAttribute.setOrderType(k->getOrderType());
         fomAttribute.setTransportationType(k->getTransportationType());
         fomAttribute.setDimensionHandleSet(k->_dimensionHandleSet);
+        fomAttribute.setOwnershipType(k->getOwnershipType());
       }
     }
   }
@@ -2468,6 +2457,7 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
 
           addAttributeDefinition->setOrderType(resolveOrderType(stringAttribute.getOrderType()));
           addAttributeDefinition->setTransportationType(resolveTransportationType(stringAttribute.getTransportationType()));
+          addAttributeDefinition->setOwnershipType(resolveOwnershipType(stringAttribute.getOwnershipType()));
           for (StringSet::const_iterator j = stringAttribute.getDimensionSet().begin();
             j != stringAttribute.getDimensionSet().end(); ++j) {
             Dimension* dimension = resolveDimension(*j);
@@ -2572,6 +2562,7 @@ Federation::insertOrCheck(Module& module, const FOMStringObjectClass& stringObje
 
       attributeDefinition->setOrderType(resolveOrderType(attrListIter->getOrderType()));
       attributeDefinition->setTransportationType(resolveTransportationType(attrListIter->getTransportationType()));
+      attributeDefinition->setOwnershipType(resolveOwnershipType(attrListIter->getOwnershipType()));
       for (StringSet::const_iterator j = attrListIter->getDimensionSet().begin();
            j != attrListIter->getDimensionSet().end(); ++j) {
         Dimension* dimension = resolveDimension(*j);
@@ -2995,6 +2986,7 @@ Federation::insert(Module& module, const FOMObjectClass& fomObjectClass)
           i->insert(*attributeDefinition);
           attributeDefinition->setOrderType(j->getOrderType());
           attributeDefinition->setTransportationType(j->getTransportationType());
+          attributeDefinition->setOwnershipType(j->getOwnershipType());
           attributeDefinition->_dimensionHandleSet = j->getDimensionHandleSet();
         }
       } else {
@@ -3017,6 +3009,7 @@ Federation::insert(Module& module, const FOMObjectClass& fomObjectClass)
             i->insert(*addAttributeDefinition);
             addAttributeDefinition->setOrderType(j->getOrderType());
             addAttributeDefinition->setTransportationType(j->getTransportationType());
+            addAttributeDefinition->setOwnershipType(j->getOwnershipType());
             addAttributeDefinition->_dimensionHandleSet = j->getDimensionHandleSet();
             DebugPrintf("%s:  Adding unknown attribute '%s' to established object class '%s'\n", __FUNCTION__, j->getName().c_str(), objectClass->getName().back().c_str());
           }
@@ -3070,6 +3063,7 @@ Federation::insert(Module& module, const FOMObjectClass& fomObjectClass)
       objectClass->insert(*attributeDefinition);
       attributeDefinition->setOrderType(j->getOrderType());
       attributeDefinition->setTransportationType(j->getTransportationType());
+      attributeDefinition->setOwnershipType(j->getOwnershipType());
       attributeDefinition->_dimensionHandleSet = j->getDimensionHandleSet();
     }
   }
@@ -3523,6 +3517,24 @@ Federation::resolveTransportationType(const std::string& transportationType)
   else
     throw InconsistentFDD(std::string("Unknown transportation type \"") + transportationType + "\".");
 }
+
+OwnershipType
+Federation::resolveOwnershipType(const std::string& ownershipType)
+{
+  if (caseCompare(ownershipType, "NoTransfer"))
+    return OwnershipType::NoTransfer;
+  else if (caseCompare(ownershipType, "Divest"))
+    return OwnershipType::Divest;
+  else if (caseCompare(ownershipType, "Acquire"))
+    return OwnershipType::Divest;
+  else if (caseCompare(ownershipType, "DivestAcquire"))
+    return OwnershipType::Divest;
+  else if (ownershipType.empty())
+    return OwnershipType::NoTransfer;
+  else
+    throw InconsistentFDD(std::string("Unknown ownership type \"") + ownershipType + "\".");
+}
+
 
 Dimension*
 Federation::resolveDimension(const std::string& dimensionName)

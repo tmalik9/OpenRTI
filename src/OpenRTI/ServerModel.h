@@ -1953,13 +1953,14 @@ public:
   ObjectClass& getObjectClass()
   { return _objectClass; }
 
-  OrderType getOrderType() const
-  { return _orderType; }
-  void setOrderType(OrderType orderType);
+  OrderType getOrderType() const { return _orderType; }
+  void setOrderType(OrderType orderType) { _orderType = orderType; }
 
-  TransportationType getTransportationType() const
-  { return _transportationType; }
-  void setTransportationType(TransportationType transportationType);
+  TransportationType getTransportationType() const { return _transportationType; }
+  void setTransportationType(TransportationType transportationType) { _transportationType = transportationType; }
+
+  OwnershipType getOwnershipType() const { return _ownershipType; }
+  void setOwnershipType(OwnershipType ownershipType) { _ownershipType = ownershipType; }
 
   void insert(ClassAttribute& classAttribute)
   { _classAttributeList.push_back(classAttribute); }
@@ -1980,7 +1981,7 @@ private:
 
   OrderType _orderType;
   TransportationType _transportationType;
-
+  OwnershipType _ownershipType;
   ClassAttribute::FirstList _classAttributeList;
   std::string _dataType;
 };
@@ -2506,6 +2507,7 @@ public:
 
   OrderType resolveOrderType(const std::string& orderType);
   TransportationType resolveTransportationType(const std::string& transportationType);
+  OwnershipType resolveOwnershipType(const std::string& orderType);
 
   Dimension* resolveDimension(const std::string& dimensionName);
   UpdateRate* resolveUpdateRate(const std::string& updateRateName);
